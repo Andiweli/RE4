@@ -69,15 +69,6 @@ static inline void U16Set2(u16& a, u16& b, u16 v)
 }
 
 
-// 1 when the push target is gone or dead.
-static inline int pushTargetDead(cPlPush* p)
-{
-    if (p->m_Target == 0 || p->m_Target->hp <= 0) {
-        return 1;
-    }
-    return 0;
-}
-
 // Parts index mirror table (left <-> right parts of the player model).
 u16 pl00_mirror[80] = {
     0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F, 0x0010, 0x0005, 0x0006, 0x0007,
@@ -231,10 +222,7 @@ void cPlayer::init0()
 
     Wep = new cPlWep;
     Body = new cPlBody(this);
-    push = new cPlPush;
-    push->x8 = 0;
-    push->m_Target = 0;
-    push->pPl = this;
+    push = new cPlPush(this);
     Push = push;
     Waist = new cPlWaist;
     MotBase = new cMotBase;
@@ -1182,7 +1170,7 @@ void pl_R1_ObjPush(cPlayer* pEm)
         if (pEm->motionMove()) {
             pEm->r_no_2 = 0x14;
         }
-        if ((Joy[0].on & 0x100) && !pushTargetDead(pEm->Push)) {
+        if ((Joy[0].on & 0x100) && !pEm->Push->isBroken()) {
             if (pEm->Push->plAdjust()) {
                 break;
             }
@@ -1196,7 +1184,7 @@ void pl_R1_ObjPush(cPlayer* pEm)
         pEm->m_Work0 = 0;
         pEm->r_no_2 = 0x15;
     case 0x15:
-        if (!(Joy[0].on & 0x100) || pushTargetDead(pEm->Push)) {
+        if (!(Joy[0].on & 0x100) || pEm->Push->isBroken()) {
             pEm->Push->stopTarget();
             pEm->r_no_2 = 0x28;
         }
@@ -1210,7 +1198,7 @@ void pl_R1_ObjPush(cPlayer* pEm)
         break;
     case 0x16:
         pEm->motionMove();
-        if (!(Joy[0].on & 0x100) || pushTargetDead(pEm->Push)) {
+        if (!(Joy[0].on & 0x100) || pEm->Push->isBroken()) {
             pEm->r_no_2 = 0x28;
         }
         break;
