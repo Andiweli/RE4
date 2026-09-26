@@ -29,6 +29,7 @@
 #include "TexRender.h"
 #include "cSceObj.h"
 #include "db_log.h"
+#include "embarrel.h"
 
 // Room 3-01 (D:/Bio4/Prog/r301.cpp): the water render target, the enemy waves of the beach (with the
 // bowgun and rocket launcher Ganados), the rock wall, the shelf and the continue point (the rock that
@@ -598,7 +599,7 @@ static void r301_setEmBowgun()
 static void r301_checkRockWall()
 {
     Vec pos = {9293.0f, -6600.0f, 8202.0f};
-    cEm* dram;
+    cEmBarrel* dram;
 
     if (getRoomEtcDram(0x12, &dram, 1)) {
         pos = dram->pos;

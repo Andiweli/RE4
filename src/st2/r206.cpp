@@ -245,8 +245,8 @@ SceAtWork* GetKeyItemAtari()
 // (the sniper sequence's gate control).
 static void r206_auto_door_ck()
 {
-    cEm* gate0;
-    cEm* gate1;
+    cEmBarred* gate0;
+    cEmBarred* gate1;
 
     if (getRoomEtcBarred(0x10, &gate0, 1) != 1) {
         return;
@@ -254,25 +254,25 @@ static void r206_auto_door_ck()
     if (getRoomEtcBarred(0x11, &gate1, 1) != 1) {
         return;
     }
-    ((cEmBarred*) gate0)->setClosed();
-    ((cEmBarred*) gate1)->setClosed();
+    gate0->setClosed();
+    gate1->setClosed();
     for (;;) {
         if (pG->Room_flg[2] & 0x80000000) {
-            if (((cEmBarred*) gate0)->ckStatus() == 2) {
-                ((cEmBarred*) gate0)->setOpen(0);
+            if (gate0->ckStatus() == 2) {
+                gate0->setOpen(0);
             }
         } else {
-            if (((cEmBarred*) gate0)->ckStatus() == 1) {
-                ((cEmBarred*) gate0)->setClose(0);
+            if (gate0->ckStatus() == 1) {
+                gate0->setClose(0);
             }
         }
         if (pG->Room_flg[2] & 0x40000000) {
-            if (((cEmBarred*) gate1)->ckStatus() == 2) {
-                ((cEmBarred*) gate1)->setOpen(0);
+            if (gate1->ckStatus() == 2) {
+                gate1->setOpen(0);
             }
         } else {
-            if (((cEmBarred*) gate1)->ckStatus() == 1) {
-                ((cEmBarred*) gate1)->setClose(0);
+            if (gate1->ckStatus() == 1) {
+                gate1->setClose(0);
             }
         }
         SceSleep(1);
@@ -555,7 +555,7 @@ static void r206_snipe()
     cEmHit* hit2 = NULL;
     cEmHit* subHit0;
     cEmHit* subHit1;
-    cEm* gate;
+    cEmBarred* gate;
     SceAtWork* at;
     int done;
     int moved;
@@ -786,7 +786,7 @@ snipe_done:
     r206_work->em[7].setNoSuspend(1);
     if (getRoomEtcBarred(0x11, &gate, 1) == 1) {
         gate->setNoSuspend(1);
-        ((cEmBarred*) gate)->setOpen(0);
+        gate->setOpen(0);
     }
     SceEventStart(1);
     CamCtrl.CutCall(4);

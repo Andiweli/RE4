@@ -323,12 +323,12 @@ void R208Init()
         EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 5), 0, &r208_zeroVec, &r208_zeroVec, 4);
     }
     {
-        cEm* b0;
-        cEm* b1;
+        cEmBarred* b0;
+        cEmBarred* b1;
 
         if (getRoomEtcBarred(0xE, &b0, 1) == 1 && getRoomEtcBarred(0xF, &b1, 1) == 1) {
-            ((cEmBarred*) b0)->setClosed();
-            ((cEmBarred*) b1)->setClosed();
+            b0->setClosed();
+            b1->setClosed();
         }
     }
     if (RsfCheck(G_ROOM_ID, 12) && (SysFlagChk(pG, SYS_CONTINUE))) {
@@ -373,26 +373,26 @@ void R208Main()
         }
     }
     if ((pG->Room_flg[0] & 0x00800000) == 0) {
-        cEm* b0;
-        cEm* b1;
+        cEmBarred* b0;
+        cEmBarred* b1;
 
         if (getRoomEtcBarred(0xE, &b0, 1) == 1 && getRoomEtcBarred(0xF, &b1, 1) == 1) {
             if (pG->Room_flg[2] & 0x08000000) {
-                if (((cEmBarred*) b0)->ckStatus() == 2) {
-                    ((cEmBarred*) b0)->setOpen(0);
+                if (b0->ckStatus() == 2) {
+                    b0->setOpen(0);
                 }
             } else {
-                if (((cEmBarred*) b0)->ckStatus() == 1) {
-                    ((cEmBarred*) b0)->setClose(0);
+                if (b0->ckStatus() == 1) {
+                    b0->setClose(0);
                 }
             }
             if (pG->Room_flg[2] & 0x04000000) {
-                if (((cEmBarred*) b1)->ckStatus() == 2) {
-                    ((cEmBarred*) b1)->setOpen(0);
+                if (b1->ckStatus() == 2) {
+                    b1->setOpen(0);
                 }
             } else {
-                if (((cEmBarred*) b1)->ckStatus() == 1) {
-                    ((cEmBarred*) b1)->setClose(0);
+                if (b1->ckStatus() == 1) {
+                    b1->setClose(0);
                 }
             }
         }
@@ -1020,8 +1020,8 @@ extern "C" void emGroupeC_reset()
 // Group D: the four Ganado behind the gates, with the camera cut on the gates opening.
 extern "C" void emGroupeD_reset()
 {
-    cEm* b0;
-    cEm* b1;
+    cEmBarred* b0;
+    cEmBarred* b1;
     u32 i;
 
     if (RsfCheck(G_ROOM_ID, 4)) {
@@ -1045,29 +1045,29 @@ extern "C" void emGroupeD_reset()
     W->em[1].setGoto(&r208_goPos9, 0xC);
     W->em[3].setGoto(&r208_goPos8, 0xC);
     if (getRoomEtcBarred(0xE, &b0, 1) == 1 && getRoomEtcBarred(0xF, &b1, 1) == 1) {
-        ((cEmBarred*) b0)->setOpen(0);
-        ((cEmBarred*) b1)->setOpen(0);
+        b0->setOpen(0);
+        b1->setOpen(0);
     }
     for (i = 0; i < 0x41; i++) {
         if (getRoomEtcBarred(0xE, &b0, 1) == 1 && getRoomEtcBarred(0xF, &b1, 1) == 1) {
-            ((cEmBarred*) b0)->setOpen(0);
-            ((cEmBarred*) b1)->setOpen(0);
+            b0->setOpen(0);
+            b1->setOpen(0);
         }
         SceSleep(1);
     }
     CamCtrl.CutCall(0xB);
     for (i = 0; i < 0x2D; i++) {
         if (getRoomEtcBarred(0xE, &b0, 1) == 1 && getRoomEtcBarred(0xF, &b1, 1) == 1) {
-            ((cEmBarred*) b0)->setOpen(0);
-            ((cEmBarred*) b1)->setOpen(0);
+            b0->setOpen(0);
+            b1->setOpen(0);
         }
         SceSleep(1);
     }
     while (CamCtrl.IsMotionEnd() == 0) {
         SceSleep(1);
         if (getRoomEtcBarred(0xE, &b0, 1) == 1 && getRoomEtcBarred(0xF, &b1, 1) == 1) {
-            ((cEmBarred*) b0)->setOpen(0);
-            ((cEmBarred*) b1)->setOpen(0);
+            b0->setOpen(0);
+            b1->setOpen(0);
         }
     }
     CamCtrl.Comeback(0);

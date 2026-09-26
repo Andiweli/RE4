@@ -33,6 +33,7 @@
 #include "sscrn.h"
 #include "fade.h"
 #include "cSceObj.h"
+#include "embox.h"
 
 // Room 2-27 (D:/Bio4/Prog/r227.cpp): the entrance event, the cargo lift with its enemy waves and
 // falling crates, the gondola and the shelf items.
@@ -40,15 +41,15 @@
 struct R227Work {
     cDataUnit* evd[3];    // 0x000  r227s00 / s01 / s02 event data
     u8 pad_0C[0x40];
-    cEm* sw;              // 0x04C  lever (cEmSwitch)
+    cEmSwitch* sw;              // 0x04C  lever (cEmSwitch)
     cObj* elv;            // 0x050  the lift
     cObj* elv2;           // 0x054  its cage
     f32 elvY0;            // 0x058  start heights
     f32 elv2Y0;           // 0x05C
     cSat* sat;            // 0x060
     cSat* eat;            // 0x064
-    cEm* rack[2];         // 0x068  the two crate racks
-    cEm* box[3];          // 0x070  crates riding the lift
+    cEmRack* rack[2];         // 0x068  the two crate racks
+    cEmBox* box[3];          // 0x070  crates riding the lift
     f32 boxY0[3];         // 0x07C
     u32 emOnElvCnt;       // 0x088  enemies dropped onto the lift so far
     cEm* emFall[16];      // 0x08C  enemies that die when they fall off the lift
@@ -104,8 +105,8 @@ void R227Init()
     }
     getRoomEtcSwitch(4, &r227_work->sw, 1);
     if (r227_work->sw) {
-        ((cEmSwitch*) r227_work->sw)->setAutoOpen();
-        ((cEmSwitch*) r227_work->sw)->setBarrel();
+        r227_work->sw->setAutoOpen();
+        r227_work->sw->setBarrel();
     }
     if (DebugTrg(1)) {
         RsfClear(G_ROOM_ID, 0);
@@ -214,7 +215,7 @@ static void r227_checkBox0Fall()
         }
         SceSleep(1);
     }
-    ((cEmRack*) r227_work->rack[0])->setBreak(&r227_work->rack[0]->pos);
+    r227_work->rack[0]->setBreak(&r227_work->rack[0]->pos);
 }
 
 // Task: rack 1, the same the other way round.
@@ -248,7 +249,7 @@ static void r227_checkBox1Fall()
         }
         SceSleep(1);
     }
-    ((cEmRack*) r227_work->rack[1])->setBreak(&r227_work->rack[1]->pos);
+    r227_work->rack[1]->setBreak(&r227_work->rack[1]->pos);
 }
 
 // Clear the list of enemies watched for falling off the lift.
@@ -544,13 +545,13 @@ void r227_initCargoElv()
         SceAtDataSet_exec(3, SCE_LEVEL10, 0, (TaskFunc) r227_operateElv, 0, 1);
         if (getRoomEtcRack(5, &r227_work->rack[0], 1)) {
             if (RsfCheck(G_ROOM_ID, 1) == 0) {
-                ((cEmRack*) r227_work->rack[0])->setRange(0.0f, 0.0f, 3000.0f, 0.0f);
+                r227_work->rack[0]->setRange(0.0f, 0.0f, 3000.0f, 0.0f);
                 SceExec(0x12, (TaskFunc) r227_checkBox0Fall, 0, 0, SCE_PRIO_DEF_2, 0);
             }
         }
         if (getRoomEtcRack(9, &r227_work->rack[1], 1)) {
             if (RsfCheck(G_ROOM_ID, 2) == 0) {
-                ((cEmRack*) r227_work->rack[1])->setRange(0.0f, 0.0f, 0.0f, 3000.0f);
+                r227_work->rack[1]->setRange(0.0f, 0.0f, 0.0f, 3000.0f);
                 SceExec(0x12, (TaskFunc) r227_checkBox1Fall, 0, 0, SCE_PRIO_DEF_2, 0);
             }
         }

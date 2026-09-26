@@ -76,7 +76,7 @@ void R106Init()
     Vec pos;
     Vec rot;
     cEmDoor* door;
-    cEm* rack;
+    cEmRack* rack;
     cEmHit* hit;
 
 #line 66 "D:/Bio4/Prog/r106.cpp"
@@ -111,7 +111,7 @@ void R106Init()
     }
     r106_setEm();
     if (getRoomEtcRack(0, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(0.0f, 1800.0f, 0.0f, 2200.0f);
+        rack->setRange(0.0f, 1800.0f, 0.0f, 2200.0f);
     }
     pos.x = 33528.0f;
     pos.y = -7745.0f;

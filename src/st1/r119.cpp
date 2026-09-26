@@ -432,7 +432,7 @@ extern "C" void koyaA_destroy()
 {
     Vec pos = {113011.0f, 2270.0f, 16997.0f};
     Vec rot = {0.0f, 3.1415927f, 0.0f};
-    cEm* torch;
+    cEmTorch* torch;
 
     SndCall(8, 0x1B, &pos, 0x2B, 0, 0);
     if (RsfCheck(G_ROOM_ID, 4)) {
@@ -442,7 +442,7 @@ extern "C" void koyaA_destroy()
     }
     koyaA_delete();
     if (getRoomEtcTorch(0, &torch, 1)) {
-        ((cEmTorch*) torch)->setBreak();
+        torch->setBreak();
     }
 }
 
@@ -451,7 +451,7 @@ extern "C" void koyaB_destroy()
 {
     Vec pos = {117111.0f, 2270.0f, 17477.0f};
     Vec rot = {0.0f, 3.1415927f, 0.0f};
-    cEm* torch;
+    cEmTorch* torch;
 
     SndCall(8, 0x1B, &pos, 0x2B, 0, 0);
     if (RsfCheck(G_ROOM_ID, 5)) {
@@ -461,7 +461,7 @@ extern "C" void koyaB_destroy()
     }
     koyaB_delete();
     if (getRoomEtcTorch(1, &torch, 1)) {
-        ((cEmTorch*) torch)->setBreak();
+        torch->setBreak();
     }
 }
 
@@ -470,7 +470,7 @@ extern "C" void koyaC_destroy()
 {
     Vec pos = {121560.0f, 2270.0f, 15877.0f};
     Vec rot = {0.0f, 2.268928f, 0.0f};
-    cEm* torch;
+    cEmTorch* torch;
 
     SndCall(8, 0x1B, &pos, 0x2B, 0, 0);
     if (RsfCheck(G_ROOM_ID, 6)) {
@@ -480,7 +480,7 @@ extern "C" void koyaC_destroy()
     }
     koyaC_delete();
     if (getRoomEtcTorch(2, &torch, 1)) {
-        ((cEmTorch*) torch)->setBreak();
+        torch->setBreak();
     }
 }
 

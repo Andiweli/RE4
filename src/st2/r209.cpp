@@ -39,6 +39,7 @@
 #include "dvd.h"
 #include "datactrl.h"
 #include "db_log.h"
+#include "embox.h"
 
 // Room 2-09 (D:/Bio4/Prog/r209.cpp): the castle gallery / salon (Salazar's picture gallery): the
 // leader Ganado that lures the player through the doors, the gatling and bowgun battles, the four-
@@ -1320,7 +1321,7 @@ static void r209_SwitchAppearCheckEnd()
 // Task: waits for the pot (a hit box) to be broken, then arms area 0x1B with the bridge appearance.
 static void r209_PotBreakCheck()
 {
-    cEm* box;
+    cEmBox* box;
 
     if (getRoomEtcBox(0x20, &box, 1) == 1) {
         while (box->hp > 0) {

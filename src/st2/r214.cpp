@@ -78,7 +78,7 @@ struct R214Work {
     cCatapult214 cat[3];     // 0x004
     int hitWait;             // 0x0D0  frames before another catapult may fire at the player
     SCE_TASK* catTask;        // 0x0D4
-    cEm* barred[2];          // 0x0D8
+    cEmBarred* barred[2];          // 0x0D8
     cEmPatrol patrol[4];     // 0x0E0
     IdBinocular* bino;       // 0x550
     FocusAnimation* focus;   // 0x554
@@ -141,7 +141,7 @@ static const Vec r214_rockOfs = {0.0f, 800.0f, -2400.0f};
 // (Scenario_flg[1] 0x40000000) it sets up the patrols, the catapult crew event and the third wave.
 void R214Init()
 {
-    cEm* barred;
+    cEmBarred* barred;
 
 #line 98 "D:/Bio4/Prog/r214.cpp"
     R214Work*& wp = r214_work;   // reference: the following `lwz pG` stays below the store (r227 idiom)
@@ -153,10 +153,10 @@ void R214Init()
     }
     EvtMgr.SetFunc("evt_r214s00_func", (void*) Evt_R214S00_Func);
     if (getRoomEtcBarred(0x11, &r214_work->barred[0], 1)) {
-        ((cEmBarred*) r214_work->barred[0])->setClosed();
+        r214_work->barred[0]->setClosed();
     }
     if (getRoomEtcBarred(0x12, &r214_work->barred[1], 1)) {
-        ((cEmBarred*) r214_work->barred[1])->setClosed();
+        r214_work->barred[1]->setClosed();
     }
     if (pG->Part == 2) {
         r214_work->bridgeFlag = 1;
@@ -292,10 +292,10 @@ static void r214_checkEmReset()
     u32 i;
 
     if (r214_work->barred[0]) {
-        ((cEmBarred*) r214_work->barred[0])->setOpened();
+        r214_work->barred[0]->setOpened();
     }
     if (r214_work->barred[1]) {
-        ((cEmBarred*) r214_work->barred[1])->setOpened();
+        r214_work->barred[1]->setOpened();
     }
     int emNo[4] = {0xFB, 0xFC, 0xFD, 0xFE};
     int done[4];
@@ -447,11 +447,11 @@ static void r214_exec3rdEmSet()
     RsfSet(G_ROOM_ID, 1);
     if (r214_work->barred[0]) {
         r214_work->barred[0]->setNoSuspend(1);
-        ((cEmBarred*) r214_work->barred[0])->setOpen(0);
+        r214_work->barred[0]->setOpen(0);
     }
     if (r214_work->barred[1]) {
         r214_work->barred[1]->setNoSuspend(1);
-        ((cEmBarred*) r214_work->barred[1])->setOpen(0);
+        r214_work->barred[1]->setOpen(0);
     }
     r214_work->em5[0].setEm(0xF0, 4, 1, 1, 0);
     r214_work->em5[1].setEm(0xF1, 4, 1, 1, 0);

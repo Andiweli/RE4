@@ -32,6 +32,7 @@
 #include "snd.h"
 #include "rnd.h"
 #include "est.h"
+#include "embarrel.h"
 
 // Room 1-1f (D:/Bio4/Prog/r11f.cpp): the village chief's barn; the meeting event (s00/s01/s02),
 // the boss fight (0xF8 / 0xF9) with its s10 stream and the s11 escape event.
@@ -50,7 +51,7 @@ public:
 struct R11fWork {
     cEmWrap em0;      // 0x00  the boss (list 0xF8, then 0xF9)
     cEmWrap em1;      // 0x0C  list 0xFA
-    cEm* dram;        // 0x18  etc dram 9
+    cEmBarrel* dram;        // 0x18  etc dram 9
     cEmWindow* win;         // 0x1C  etc window 0xB
     u32 strId;        // 0x20  SndStrReq handle of the fight stream
 };

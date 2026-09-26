@@ -72,12 +72,12 @@ void R330Init()
 #line 48 "D:/Bio4/Prog/r330.cpp"
     r330_work = (R330Work*) MEM_CALLOC(sizeof(R330Work), 1, 0xd);
     {
-        cEm* a;
-        cEm* b;
+        cEmBarred* a;
+        cEmBarred* b;
 
         if (getRoomEtcBarred(0xA, &a, 1)) {
             if (getRoomEtcBarred(0xB, &b, 1)) {
-                ((cEmBarred*) a)->setDouble((cEmBarred*) b);
+                a->setDouble((cEmBarred*) b);
             }
         }
     }
@@ -86,17 +86,17 @@ void R330Init()
         SceAtDataSet_exec(3, 0x12, 0, (TaskFunc) R330EventS00Main, 0, 1);
         EvtMgr.EvtReadAram("event/evd/r330s00.evd", (u8) GetEmIdFromList(0xA0), 0, 0, 0);
         {
-            cEm* a;
+            cEmBarred* a;
 
             if (getRoomEtcBarred(0xA, &a, 1)) {
-                ((cEmBarred*) a)->setLockMode(1);
+                a->setLockMode(1);
             }
         }
         {
-            cEm* b;
+            cEmBarred* b;
 
             if (getRoomEtcBarred(0xB, &b, 1)) {
-                ((cEmBarred*) b)->setLockMode(1);
+                b->setLockMode(1);
             }
         }
     }
@@ -119,17 +119,17 @@ void R330EventS00Main()
         if (CheckDoorJumpWithAshley() == 0) {
             cMes.MesSet(0x67, 100, 0x150 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1, 1, 0, 0, 4);
         } else {
-            cEm* a;
-            cEm* b;
+            cEmBarred* a;
+            cEmBarred* b;
             int i;
 
             RsfSet(G_ROOM_ID, 0);
             SceAtSetEnable(3, 0);
             if (getRoomEtcBarred(0xA, &a, 1)) {
-                ((cEmBarred*) a)->setLockMode(0);
+                a->setLockMode(0);
             }
             if (getRoomEtcBarred(0xB, &b, 1)) {
-                ((cEmBarred*) b)->setLockMode(0);
+                b->setLockMode(0);
             }
             SceEventStart(0);
             SceSetEventCancel(1, (TaskFunc) R330EventS00End, 0, -1, 1);
@@ -170,21 +170,21 @@ void R330EventS00Main()
 void R330EventS00End()
 {
     {
-        cEm* a;
+        cEmBarred* a;
 
         if (getRoomEtcBarred(0xA, &a, 1)) {
             a->setNoSuspend(1);
-            ((cEmBarred*) a)->setLockMode(0);
-            ((cEmBarred*) a)->setClosed();
+            a->setLockMode(0);
+            a->setClosed();
         }
     }
     {
-        cEm* b;
+        cEmBarred* b;
 
         if (getRoomEtcBarred(0xB, &b, 1)) {
             b->setNoSuspend(1);
-            ((cEmBarred*) b)->setLockMode(0);
-            ((cEmBarred*) b)->setClosed();
+            b->setLockMode(0);
+            b->setClosed();
         }
     }
     pPL->endEvent(0);
@@ -230,17 +230,17 @@ extern "C" void Evt_R330S00_Func(Event* e)
         setRoomEtcDisp(0xA, 0, 1);
         setRoomEtcDisp(0xB, 0, 1);
         {
-            cEm* a;
+            cEmBarred* a;
 
             if (getRoomEtcBarred(0xA, &a, 1)) {
-                ((cEmBarred*) a)->setClose(0);
+                a->setClose(0);
             }
         }
         {
-            cEm* b;
+            cEmBarred* b;
 
             if (getRoomEtcBarred(0xB, &b, 1)) {
-                ((cEmBarred*) b)->setClose(0);
+                b->setClose(0);
             }
         }
         break;

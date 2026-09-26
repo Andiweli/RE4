@@ -110,7 +110,7 @@ static inline void r101_emDeadClear(int no)
 void R101Init()
 {
     cEmDoor* door;
-    cEm* rack;
+    cEmRack* rack;
     cEmWindow* win;
 
 #line 81 "D:/Bio4/Prog/r101.cpp"
@@ -137,16 +137,16 @@ void R101Init()
         door->setLock(ROOM_ARC_PTR(pG->pRoom, 0x1E), ROOM_ARC_PTR(pG->pRoom, 0x1F), 0, 0);
     }
     if (getRoomEtcRack(0xD, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(0.0f, 1000.0f, 0.0f, 2000.0f);
+        rack->setRange(0.0f, 1000.0f, 0.0f, 2000.0f);
     }
     if (getRoomEtcRack(0xF, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(2000.0f, 2000.0f, 0.0f, 2600.0f);
+        rack->setRange(2000.0f, 2000.0f, 0.0f, 2600.0f);
     }
     if (getRoomEtcRack(0x11, &rack, 1)) {
         rack->pos.x = 6656.0f;
         rack->pos.y = 902.0f;
         rack->pos.z = 8925.0f;
-        ((cEmRack*) rack)->setRange(2000.0f, 800.0f, 0.0f, 4400.0f);
+        rack->setRange(2000.0f, 800.0f, 0.0f, 4400.0f);
     }
     if (RsfCheck(G_ROOM_ID, 8) == 0) {
         if (getRoomEtcLadder(5, &r101_work->ladder[0], 1)) {
@@ -601,7 +601,7 @@ static void r101_Event20()
     int diff;
     int fail = 0;
     ReadModule* m;
-    cEm* rack;
+    cEmRack* rack;
     cEm* r;
     cEmWindow* win;
 

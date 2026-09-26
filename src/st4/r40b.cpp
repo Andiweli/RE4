@@ -97,7 +97,7 @@ static void r40b_getItem()
 // The Ganado behind the bars appear when the player reaches area 2.
 static void r40b_checkEmSet1()
 {
-    cEm* barred;
+    cEmBarred* barred;
 
     getRoomEtcBarred(0x32, &barred, 1);
     while (SceAtHitCheck(2) != 1) {

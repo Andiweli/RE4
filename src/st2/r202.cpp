@@ -410,7 +410,7 @@ void r202_initEmPatrol()
 static void r202_operateCannon()
 {
     Vec v;
-    cEm* torch;
+    cEmTorch* torch;
     void* zero;
 
     SceEventStart(0);
@@ -444,10 +444,10 @@ static void r202_operateCannon()
     SndCall(6, 0xA, 0, 0, 0, 0);
     SmdGetObjPtr(0x25)->be_flag &= ~2;
     if (getRoomEtcTorch(8, &torch, 1) != 0) {
-        ((cEmTorch*) torch)->setBreak();
+        torch->setBreak();
     }
     if (getRoomEtcTorch(9, &torch, 1) != 0) {
-        ((cEmTorch*) torch)->setBreak();
+        torch->setBreak();
     }
     SceSleep(10);
     if (!(pG->Room_flg[0] & 0x01000000)) {

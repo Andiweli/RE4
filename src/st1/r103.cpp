@@ -77,7 +77,7 @@ static void r103_BgmStartCheck();
 // glowing file at area 0x80 until Item_flg[0] 0x800.
 void R103Init()
 {
-    cEm* rack;
+    cEmRack* rack;
 
 #line 72 "D:/Bio4/Prog/r103.cpp"
     r103_work = (R103Work*) MEM_CALLOC(sizeof(R103Work), 1, 0xd);
@@ -97,7 +97,7 @@ void R103Init()
     r103_setSubMissionTarget(8);
     EatMgr.registEffInfo(EAT_ET_ROOM0, (AtEffInfo*) &r103_eff_info);
     if (getRoomEtcRack(6, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(0.0f, 3000.0f, 0.0f, 3000.0f);
+        rack->setRange(0.0f, 3000.0f, 0.0f, 3000.0f);
     }
     SceSetItemEvent(7, 0x92, 0, 0xA, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r103_shelf0, 0);
     SceSetItemEvent(8, 0x81, 1, 0xB, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r103_shelf1, 0);
@@ -238,7 +238,7 @@ extern "C" void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4,
 // The sub-mission target (etc item 0x13) hangs on scroll object `objNo` until it is taken.
 extern "C" void r103_setSubMissionTarget(u32 objNo)
 {
-    EtcItem* item;
+    cEmItem* item;
     u16* flg;
 
     flg = GetEtcFlgPtr(0x13, pG->room_id);
@@ -246,11 +246,11 @@ extern "C" void r103_setSubMissionTarget(u32 objNo)
         if (getRoomEtcItem(0x13, &item, 1)) {
             cObj* obj = SmdGetObjPtr(objNo);
 
-            PSVECSubtract(&((cEmItem*) item)->pos, &obj->pos, &((cEmItem*) item)->pos);
-            ((cEmItem*) item)->pos.x = -120.0f;
-            ((cEmItem*) item)->pos.z = 0.0f;
-            ((cEmItem*) item)->setParent(obj, 0, 0);
-            ((cEmItem*) item)->setRotType(2);
+            PSVECSubtract(&item->pos, &obj->pos, &item->pos);
+            item->pos.x = -120.0f;
+            item->pos.z = 0.0f;
+            item->setParent(obj, 0, 0);
+            item->setRotType(2);
         }
     }
 }

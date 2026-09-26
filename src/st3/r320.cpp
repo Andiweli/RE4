@@ -40,6 +40,7 @@
 #include "vec.h"
 #include "rnd.h"
 #include <string.h>
+#include "embarrel.h"
 
 // Rotate a model from three components written y, x, z (the store order the original has).
 static inline void setAngYXZ(cModel* m, f32 y, f32 x, f32 z)
@@ -578,7 +579,7 @@ void R320Init()
     {
         Vec smdPos = {0.0f, 0.0f, 0.0f};
         Vec smdRot = {0.0f, 0.0f, 0.0f};
-        cEm* dram;
+        cEmBarrel* dram;
 
         r320_work->smd = SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x29), ROOM_ARC_PTR(pG->pRoom, 0x2A), &smdPos, &smdRot, 0x10, 1);
         r320_work->smd->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x2B), 0xA, 0, 1, 0);

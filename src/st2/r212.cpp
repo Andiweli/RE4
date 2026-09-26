@@ -75,7 +75,7 @@ public:
 };
 
 struct R212Work {
-    cEm* rack[2];        // 0x000
+    cEmRack* rack[2];        // 0x000
     cSat* sat[4];        // 0x008  switch hit shapes
     f32 y0[4];           // 0x018  switch rest heights
     u16 hitNow;          // 0x028  switches pressed this frame (bits 0-3 by anything, 8-11 rack 0, 12-15 rack 1)
@@ -180,10 +180,10 @@ void r212_TrapInit()
         }
     }
     if (getRoomEtcRack(5, &r212_work->rack[0], 1)) {
-        ((cEmRack*) r212_work->rack[0])->setRange(5100.0f, 3000.0f, 7156.0f, 3000.0f);
+        r212_work->rack[0]->setRange(5100.0f, 3000.0f, 7156.0f, 3000.0f);
     }
     if (getRoomEtcRack(6, &r212_work->rack[1], 1)) {
-        ((cEmRack*) r212_work->rack[1])->setRange(5500.0f, 3000.0f, 6756.0f, 3000.0f);
+        r212_work->rack[1]->setRange(5500.0f, 3000.0f, 6756.0f, 3000.0f);
     }
     Vec zero = {0.0f, 0.0f, 0.0f};
 

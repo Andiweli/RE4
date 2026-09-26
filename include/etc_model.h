@@ -4,13 +4,6 @@
 #include "types.h"
 #include "vec.h"
 
-// Room item (game/EtcModel.cpp). Only the flag word is known.
-struct EtcItem {
-    u32 flags;   // 0x00  0x02: taken
-    u8 pad_4[0x70 - 0x04];
-    Vec pos;     // 0x70
-};
-
 // Etc model id (PS2 ETCMODEL_ID): EtcSetData::id, getRoomEtc `id`, the EtcModelSet switch. The GC data
 // goes up to 0x67 (ETC_AUTO_DOOR5); ETC_IRON_DOOR26/27 were added on the PS2.
 enum ETCMODEL_ID {
@@ -139,10 +132,12 @@ struct EtcSetData {
     Vec pos;         // 0x1C
 };
 
+class cEmItem;   // emitem.h
+
 // EtcModel.cpp is C++ but exports its functions with C linkage (unmangled names in the DOL).
-// C++ linkage (sym_map: GetEtcFlgPtr__Fii, getRoomEtcItem__FiPP7EtcItemi)
+// C++ linkage (sym_map: GetEtcFlgPtr__Fii, getRoomEtcItem__FiPP7cEmItemi)
 u16* GetEtcFlgPtr(u32 etc_no, u16 room_no);   // etc flag word of etc model `no` in `room` (stage << 8 | room), 0 when none
-int getRoomEtcItem(int room, EtcItem** ppEm, int bErrDisp);
+int getRoomEtcItem(int room, cEmItem** ppEm, int bErrDisp);
 
 extern "C" {
 void* GetEtcAddr(void* arc, const char* name);   // file `name` inside the room etc archive
@@ -155,18 +150,24 @@ class cEm;
 class cEmWindow;   // emwindow.h
 class cEmDoor;     // emdoor.h
 class cObjLadder;  // obj13.h
+class cEmRack;     // em.h
+class cEmBox;      // embox.h
+class cEmTorch;    // emtorch.h
+class cEmSwitch;   // emswitch.h
+class cEmBarred;   // emBarred.h
+class cEmBarrel;   // embarrel.h
 extern "C" {
 int getRoomEtcBreak(int no, cEm** ppEm, int bErrDisp);
 int setRoomEtcDisp(int no, int bDisp, int bErrDisp);
 int getRoomEtcWindow(int no, cEmWindow** ppEm, int bErrDisp);
-int getRoomEtcBox(int no, cEm** ppEm, int bErrDisp);
+int getRoomEtcBox(int no, cEmBox** ppEm, int bErrDisp);
 int getRoomEtcDoor(int no, cEmDoor** ppEm, int bErrDisp);
-int getRoomEtcRack(int no, cEm** ppEm, int bErrDisp);
+int getRoomEtcRack(int no, cEmRack** ppEm, int bErrDisp);
 int getRoomEtcLadder(int no, cObjLadder** ppEm, int bErrDisp);
-int getRoomEtcTorch(int no, cEm** ppEm, int bErrDisp);
-int getRoomEtcSwitch(int no, cEm** ppEm, int bErrDisp);
-int getRoomEtcBarred(int no, cEm** ppEm, int bErrDisp);
-int getRoomEtcDram(int no, cEm** ppEm, int bErrDisp);
+int getRoomEtcTorch(int no, cEmTorch** ppEm, int bErrDisp);
+int getRoomEtcSwitch(int no, cEmSwitch** ppEm, int bErrDisp);
+int getRoomEtcBarred(int no, cEmBarred** ppEm, int bErrDisp);
+int getRoomEtcDram(int no, cEmBarrel** ppEm, int bErrDisp);
 int EtcGetDasAddr(int id, void** pRet_addr);   // archive of etc model `id` (r400 setLadderMotion)
 // Generic lookup by etc type (getRoomEtc* call it; r20d counts the torches / lamps with it).
 int getRoomEtc(int no, ETCMODEL_ID id, cEm** pRet, int bDispErr);

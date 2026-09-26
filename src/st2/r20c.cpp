@@ -545,12 +545,12 @@ void R20cExecShootInit()
         SmdSetTrans(9, 0);
         EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_NONE, zero, zero);
     } else {
-        cEm* barred;
+        cEmBarred* barred;
         cObj* obj;
 
         getRoomEtcBarred(0, &barred, 1);
         if (barred) {
-            ((cEmBarred*) barred)->setClosed();
+            barred->setClosed();
         }
         SceAtDataSet_exec(9, SCE_LEVEL10, 0, (TaskFunc) R20cExecShootKaigaOpenMain, 0, 1);
         obj = SmdGetObjPtr(7);
@@ -595,7 +595,7 @@ found:
 // camera cut 0xE while the bar object 9 drops with SE / effect and the barred door opens; cancellable.
 static void R20cDoorOpenMain()
 {
-    cEm* barred;
+    cEmBarred* barred;
     int i;
 
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
@@ -624,7 +624,7 @@ static void R20cDoorOpenMain()
         CamCtrl.CutCall(0xC);
         getRoomEtcBarred(0, &barred, 1);
         if (barred) {
-            ((cEmBarred*) barred)->setOpen(0);
+            barred->setOpen(0);
         }
         SceSleep(40);
         SceSetEventCancel(0, 0, 0, -1, 1);
@@ -635,11 +635,11 @@ static void R20cDoorOpenMain()
 // Cancel / end path of the door opening: snap the barred door open, then the common end (mode 1 saves).
 static void R20cDoorOpenCancel(int mode)
 {
-    cEm* barred;
+    cEmBarred* barred;
 
     getRoomEtcBarred(0, &barred, 1);
     if (barred) {
-        ((cEmBarred*) barred)->setOpened();
+        barred->setOpened();
     }
     R20cDoorOpenEnd(mode);
 }

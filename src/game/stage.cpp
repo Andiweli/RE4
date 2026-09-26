@@ -18,6 +18,7 @@
 #include "dvd.h"
 #include "sce.h"
 #include "merchant.h"
+#include "emitem.h"
 
 extern "C" {
 int checkEmListNo(u16 room);
@@ -292,13 +293,13 @@ int checkSubMissionTarget(int stage_no, int target_no)
 // shooting-range mode the medallion in the current room is shown and pointed at.
 void subMissionSt1()
 {
-    static EtcItem* pCoin = NULL;
+    static cEmItem* pCoin = NULL;
     static s16 timer = 0;
     SubMissionTarget* tbl;
     SubMissionTarget* t;
     u16* p1;
     u16* p2;
-    EtcItem* item;
+    cEmItem* item;
     IdUnit* u;
     Vec scr;
     Vec pos;
@@ -329,13 +330,13 @@ void subMissionSt1()
         if (pG->shooting_mode != 0) {
             if (G_ROOM_ID == ((SubMissionTarget*) ((u32) t0 + ofs))->room1 && !(*p1 & 1)) {
                 if (getRoomEtcItem(t->no, &item, 1)) {
-                    item->flags &= ~2;
+                    item->be_flag &= ~2;
                     pCoin = item;
                 }
             }
             if (G_ROOM_ID == t->room2 && !(*p2 & 1)) {
                 if (getRoomEtcItem(t->no, &item, 1)) {
-                    item->flags &= ~2;
+                    item->be_flag &= ~2;
                     pCoin = item;
                 }
             }
@@ -364,7 +365,7 @@ void subMissionSt1()
         IdSys.set((void*) (pG->pCore->ofs_9C + (u32) pG->pCore), 0xFF, IDC_SUB_MISSION, 0x13, 5, 0);
         u = IdSys.unitPtr(0, IDC_SUB_MISSION);
         if (pCoin != NULL) {
-            pos = pCoin->pos;
+            pos = pCoin->world;
             GetScreenPos(&pos, &scr);
             scr.x = (scr.x - 256.0f) * 1.25f;
             scr.y = (scr.y - 224.0f) * -1.0714285f;

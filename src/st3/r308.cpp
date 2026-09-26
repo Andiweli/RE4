@@ -66,7 +66,7 @@ static void SceBgmCheck();
 void R308Init()
 {
     void* zero = 0;
-    cEm* barred;
+    cEmBarred* barred;
 
 #line 54 "D:/Bio4/Prog/r308.cpp"
     r308_work = (R308Work*) MEM_CALLOC(sizeof(R308Work), 1, 0xd);
@@ -97,7 +97,7 @@ void R308Init()
         SceAtSetEnable(0x83, 0);
     }
     if (getRoomEtcBarred(0, &barred, 1)) {
-        ((cEmBarred*) barred)->setNoClose();
+        barred->setNoClose();
     }
     SceExec(0x12, (TaskFunc) SceBgmCheck, 0, 0, 2, 0);
 }

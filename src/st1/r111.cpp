@@ -32,23 +32,23 @@ static void r111_ThunderMove();
 // sets Status_flg[1] 0x400 (raining), pre-breaks windows 0 and 0x13, and default floor attribute 3.
 void R111Init()
 {
-    cEm* rack;
+    cEmRack* rack;
     cEmWindow* win;
 
 #line 47 "D:/Bio4/Prog/r111.cpp"
     r111_work = (R111Work*) MEM_CALLOC(sizeof(R111Work), 1, 0xd);
 
     if (getRoomEtcRack(0xD, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(0.0f, 1000.0f, 0.0f, 2000.0f);
+        rack->setRange(0.0f, 1000.0f, 0.0f, 2000.0f);
     }
     if (getRoomEtcRack(0xF, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(2000.0f, 2000.0f, 0.0f, 2600.0f);
+        rack->setRange(2000.0f, 2000.0f, 0.0f, 2600.0f);
     }
     if (getRoomEtcRack(0x11, &rack, 1)) {
         rack->pos.x = 6656.0f;
         rack->pos.y = 902.0f;
         rack->pos.z = 8925.0f;
-        ((cEmRack*) rack)->setRange(2000.0f, 800.0f, 0.0f, 4400.0f);
+        rack->setRange(2000.0f, 800.0f, 0.0f, 4400.0f);
     }
     SceExec(0x12, (TaskFunc) r111_ThunderMove, 0, 0, SCE_PRIO_DEF_2, 0);
     {

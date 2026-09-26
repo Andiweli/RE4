@@ -126,7 +126,7 @@ extern "C" void Evt_R11CS20_Func(Event* e);
 // chosen route (r11c_initGate).
 void R11cInit()
 {
-    cEm* rack;
+    cEmRack* rack;
     cEm* em;
     void* arc;
 
@@ -175,13 +175,13 @@ void R11cInit()
         }
     }
     if (getRoomEtcRack(0, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(0.0f, 0.0f, 0.0f, 10000.0f);
+        rack->setRange(0.0f, 0.0f, 0.0f, 10000.0f);
     }
     if (getRoomEtcRack(1, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(0.0f, 10000.0f, 0.0f, 10000.0f);
+        rack->setRange(0.0f, 10000.0f, 0.0f, 10000.0f);
     }
     if (getRoomEtcRack(2, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(0.0f, 10000.0f, 0.0f, 10000.0f);
+        rack->setRange(0.0f, 10000.0f, 0.0f, 10000.0f);
     }
     if (!ScfFlagChk(pG, SCF_R11C_BESIEGED_EVENT)) {
         SceAtDataSet_exec(3, SCE_LEVEL10, 0, (TaskFunc) r11c_EventBesiegedStart, 0, 1);

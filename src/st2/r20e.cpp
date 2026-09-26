@@ -94,7 +94,7 @@ struct R20eWork {
     f32 crestDoorY;          // 0x21C
     u8 pad_220[0xC];
     cFence20e fence[3];      // 0x22C
-    cEm* rack;               // 0x298
+    cEmRack* rack;               // 0x298
     int effKind;             // 0x29C
     u32 snd;                 // 0x2A0
 };
@@ -208,7 +208,7 @@ void R20eInit()
         m->LightInfo.EnableMask |= 4;
     }
     if (getRoomEtcRack(8, &r20e_work->rack, 1)) {
-        ((cEmRack*) r20e_work->rack)->setRange(0.0f, 1180.0f, 0.0f, 5000.0f);
+        r20e_work->rack->setRange(0.0f, 1180.0f, 0.0f, 5000.0f);
     }
     if (pG->pl_type == 1) {
         EstSet(pPL, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_NONE, 0, 0);

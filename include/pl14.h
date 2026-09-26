@@ -185,7 +185,7 @@ private:
     u16 m_LeonHp;          // 0x7A4  player life the last worry line was spoken at
     u8 m_PlAtack;            // 0x7A6  hits left before he goes down
     u8 m_okTime;         // 0x7A7
-    cEm* pRackWk[3];         // 0x7A8  the room's racks (getRoomEtcRack)
+    cEmRack* pRackWk[3];         // 0x7A8  the room's racks (getRoomEtcRack)
 
 public:
     f32 neckY;          // 0x7B4

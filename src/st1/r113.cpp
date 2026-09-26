@@ -83,7 +83,7 @@ static void r113_ThunderMove();
 // cesspit, the shelf items and the closet hide spot.
 void R113Init()
 {
-    cEm* rack;
+    cEmRack* rack;
     void* zero = 0;
 
 #line 73 "D:/Bio4/Prog/r113.cpp"
@@ -102,7 +102,7 @@ void R113Init()
     SceExec(0x12, (TaskFunc) r103_initCesspit, (int) &r113_cesspit, 0, SCE_PRIO_DEF_2, 0);
     r103_setSubMissionTarget(8);
     if (getRoomEtcRack(6, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(0.0f, 3000.0f, 0.0f, 3000.0f);
+        rack->setRange(0.0f, 3000.0f, 0.0f, 3000.0f);
     }
     SceSetItemEvent(8, 0x8E, 0, 0xA, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r113_shelf0, 0);
     SceSetItemEvent(9, 0x8F, 1, 0xB, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r113_shelf1, 0);

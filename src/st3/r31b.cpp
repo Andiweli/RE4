@@ -139,9 +139,9 @@ extern "C" void Evt_R31BS00_Func(Event* e);
 // and a passed one is hidden as fallen (R31bSmdTransOff).
 void R31bInit()
 {
-    cEm* sw0;
-    cEm* sw1;
-    cEm* barred;
+    cEmSwitch* sw0;
+    cEmSwitch* sw1;
+    cEmBarred* barred;
     cEmDoor* door;
     cEmDoor* door2;
     cObj* obj;
@@ -176,25 +176,25 @@ void R31bInit()
     getRoomEtcSwitch(7, &sw1, 1);
     getRoomEtcBarred(9, &barred, 1);
     if (sw0 && sw1 && barred) {
-        ((cEmSwitch*) sw0)->setBarred((cEmBarred*) barred);
-        ((cEmSwitch*) sw0)->setConnectSwitch((cEmSwitch*) sw1);
-        ((cEmSwitch*) sw1)->setBarred((cEmBarred*) barred);
-        ((cEmSwitch*) sw1)->setConnectSwitch((cEmSwitch*) sw0);
-        ((cEmSwitch*) sw0)->setClosed();
-        ((cEmSwitch*) sw1)->setClosed();
-        ((cEmBarred*) barred)->setClosed();
+        sw0->setBarred((cEmBarred*) barred);
+        sw0->setConnectSwitch((cEmSwitch*) sw1);
+        sw1->setBarred((cEmBarred*) barred);
+        sw1->setConnectSwitch((cEmSwitch*) sw0);
+        sw0->setClosed();
+        sw1->setClosed();
+        barred->setClosed();
     }
     getRoomEtcSwitch(6, &sw0, 1);
     getRoomEtcSwitch(8, &sw1, 1);
     getRoomEtcBarred(0xA, &barred, 1);
     if (sw0 && sw1 && barred) {
-        ((cEmSwitch*) sw0)->setBarred((cEmBarred*) barred);
-        ((cEmSwitch*) sw0)->setConnectSwitch((cEmSwitch*) sw1);
-        ((cEmSwitch*) sw1)->setBarred((cEmBarred*) barred);
-        ((cEmSwitch*) sw1)->setConnectSwitch((cEmSwitch*) sw0);
-        ((cEmSwitch*) sw0)->setClosed();
-        ((cEmSwitch*) sw1)->setClosed();
-        ((cEmBarred*) barred)->setClosed();
+        sw0->setBarred((cEmBarred*) barred);
+        sw0->setConnectSwitch((cEmSwitch*) sw1);
+        sw1->setBarred((cEmBarred*) barred);
+        sw1->setConnectSwitch((cEmSwitch*) sw0);
+        sw0->setClosed();
+        sw1->setClosed();
+        barred->setClosed();
     }
     EvtMgr.SetFunc("evt_r31bs00_func", (void*) Evt_R31BS00_Func);
     R31bDoorSat(0);
