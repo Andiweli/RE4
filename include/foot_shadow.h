@@ -22,7 +22,7 @@ struct FootShadowTbl {
 
 extern "C" {
 // game/foot_shadow.cpp
-void DrawFootShadow(class cEm* pMod);
+void DrawFootShadow(class cModel* pMod);
 void drawShadowParts(GXTexObj* tex, Vec* pos, f32 size, f32 alpha);
 }
 

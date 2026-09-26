@@ -121,8 +121,8 @@ void R204Init()
     getRoomEtcBarred(0xB, &r204_work->barred[0], 1);
     getRoomEtcBarred(6, &r204_work->barred[1], 1);
     if (r204_work->sw != 0 && r204_work->barred[0] != 0) {
-        r204_work->sw->setBarred((cEmBarred*) r204_work->barred[0]);
-        r204_work->sw->setBarred2nd((cEmBarred*) r204_work->barred[1]);
+        r204_work->sw->setBarred(r204_work->barred[0]);
+        r204_work->sw->setBarred2nd(r204_work->barred[1]);
         r204_work->sw->setClosed();
         r204_work->barred[0]->setClosed();
         r204_work->barred[1]->setClosed();

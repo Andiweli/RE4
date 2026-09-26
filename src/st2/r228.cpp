@@ -128,9 +128,9 @@ static void r228_checkSalazarBattle()
     SceSleep(1);
     while ((alive = boss.isActive()) != 0) {
         if (RsfCheck(G_ROOM_ID, 2) == 0) {
-            cEm* e = em0.getPtr();
+            cEm38* e = (cEm38*)em0.getPtr();
 
-            if (e && ((cEm38*) e)->ckDown() == 1) {
+            if (e && e->ckDown() == 1) {
                 RsfSet(G_ROOM_ID, 2);
                 r228_work->se = 0;
                 r228_work->se = SceExec(0x12, (TaskFunc) r228_execSalazarNeckDown, 0, 0, SCE_PRIO_DEF_2, 0);

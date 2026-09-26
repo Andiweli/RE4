@@ -77,7 +77,7 @@ void R330Init()
 
         if (getRoomEtcBarred(0xA, &a, 1)) {
             if (getRoomEtcBarred(0xB, &b, 1)) {
-                a->setDouble((cEmBarred*) b);
+                a->setDouble(b);
             }
         }
     }

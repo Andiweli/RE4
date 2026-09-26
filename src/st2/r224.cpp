@@ -427,15 +427,15 @@ static void reva_common_move()
 // The lid opens: the Novistadors come out of the pit and the grate opens under them.
 static void futa_move()
 {
-    cEm* em0;
-    cEm* em1;
+    cEm2b* em0;
+    cEm2b* em1;
     void* zero;
 
     SceSleep(15);
     pG->Room_flg[0] |= 0x80000000;
-    em0 = r224_work->em0.getPtr();
-    em1 = r224_work->em1.getPtr();
-    if (em0 && ((cEm2b*) em0)->ckThrow2() == 1) {
+    em0 = (cEm2b*)r224_work->em0.getPtr();
+    em1 = (cEm2b*)r224_work->em1.getPtr();
+    if (em0 && em0->ckThrow2() == 1) {
         RsfSet(G_ROOM_ID, 0);
         em0->setNoSuspend(1);
     }
@@ -452,7 +452,7 @@ static void futa_move()
                 PSVECAdd(&em1->pos, &d, &em1->pos);
             }
         }
-    } else if (em1 && ((cEm2b*) em1)->ckThrow2() == 1) {
+    } else if (em1 && em1->ckThrow2() == 1) {
         RsfSet(G_ROOM_ID, 0);
         em1->setNoSuspend(1);
     }

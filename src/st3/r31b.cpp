@@ -441,8 +441,7 @@ static void R31bExecEventS00()
         r31b_work->em.setEm(0x14, -1, 0, 1, 1);
         em = r31b_work->em.getPtr();
         if (em) {
-            // The boss pointer the life meter shows: stored at Cckpt+0.
-            *(cEm**) &Cckpt = em;
+            Cckpt.lifeMeterBoss(em);
         }
         EstSet(0, -1, 0, 0, EFF_ROOM, 3, 0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
     }
@@ -1881,7 +1880,7 @@ static void R31bEmSetMain()
     em = (cEm32*) r31b_work->em.getPtr();
     if (em) {
         em->setNext(4);
-        *(cEm**) &Cckpt = em;
+        Cckpt.lifeMeterBoss(em);
     }
 }
 

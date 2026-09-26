@@ -1261,7 +1261,7 @@ void commonModelTrans(cModel* m, cModelInfo* info, Mtx viewMat, int flag)
     }
     if (!StaFlagChk(pG, STA_PROC_SHD_TEX)) {
         if (m->pFsdTbl != 0 && (m->be_flag & 0x10)) {
-            DrawFootShadow((cEm*) m);
+            DrawFootShadow(m);
         }
     }
     if (!StaFlagChk(pG, STA_PROC_SHD_TEX)) {

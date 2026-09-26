@@ -493,7 +493,7 @@ static void pl0f_R1_BossMove(cPl0f* em)
     pl0fBoatControl(em);
     em->partsMatCalc();
     em->partsWorldCalc();
-    if (w->pBoss && (s16) w->pBoss->hp <= 0) {
+    if (w->pBoss && w->pBoss->hp <= 0) {
         em->r_no_0 = 1;   // plain byte stores: the QImode 1 is the `bossMode = 1` pseudo (r30) kept across the calls
         em->r_no_1 = 1;
         em->r_no_2 = 0;
