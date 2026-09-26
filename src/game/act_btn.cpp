@@ -32,7 +32,7 @@ void cActionButton::init()
     if (!SpfFlagChk(pG, SPF_ACTBTN)) {
         stop = 0;
     }
-    this->m_stop_flag_old = stop;
+    setStopFlagOld(stop);
 }
 
 // Per-frame: walks the prompts from the highest slot, skips those the player state refuses,
@@ -45,7 +45,7 @@ void cActionButton::move()
     ActBtnWork* w;
 
     Cckpt.m_ActBttn.setDispFlag(0);
-    m_active_flag = 0;
+    setActive(0);
     if (SpfFlagChk(pG, SPF_ACTBTN) || (StaFlagChk(pG, STA_DIEDEMO)) || m_stop_flag_old) {
         init();
         return;
@@ -61,7 +61,7 @@ void cActionButton::move()
         if (checkPLStatus(w) == 0) {
             continue;
         }
-        m_active_flag = 1;
+        setActive(1);
         if (!DpfFlagChk(pG, DPF_ACTBTN) && !(w->flags & ACTCTR_NO_DISP)) {
             disp(w);
         }
@@ -327,7 +327,7 @@ ActBtnWork* cActionButton::pullWork()
     if (m_num > 7) {
         return 0;
     }
-    w = &work[m_num];
+    w = &m_task[m_num];
     m_num++;
     return w;
 }

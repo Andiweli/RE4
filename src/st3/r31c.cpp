@@ -925,7 +925,7 @@ static void r31c_TimerDoorCountDown()
         t--;
         SceSleep(1);
     }
-    while (ActBtn.m_active_flag == 1) {
+    while (ActBtn.isActive()) {
         SceSleep(1);
     }
     while (PlGetStatus() & 0xC0080) {
