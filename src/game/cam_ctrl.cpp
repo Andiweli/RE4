@@ -649,7 +649,7 @@ void CameraControl::switchCamera(CameraAreaRec* rec)
             delete m_pProc;
         }
         m_pProc = new (m_Free) CameraMotion(CameraMotionBuffer, 0, 0, 0.0f);
-        ((CameraMotion*) m_pProc)->m_p_base_mat = NULL;
+        ((CameraMotion*) m_pProc)->setBaseMatPtr(NULL);
         r0 = 5;
         break;
     case 7:
@@ -1183,7 +1183,7 @@ void CameraControl::Move()
         CamSmth.setRatio(0.0f);
         m_pProc->move();
         cur = m_pProc->param;
-        if (((CameraMotion*) m_pProc)->m_state == 1) {
+        if (((CameraMotion*) m_pProc)->getState() == 1) {
             if (m_pProc) {
                 delete m_pProc;
             }
@@ -2378,7 +2378,7 @@ void CameraControl::MotionSet(void* motion, int frame, f32 speed)
     m_system_flag |= 0x28;
     StaFlagOn(pG, STA_CUT_CHANGE);
     m_pProc = new (m_Free) CameraMotion(motion, 0, 0, speed);
-    ((CameraMotion*) m_pProc)->m_p_base_mat = NULL;
+    ((CameraMotion*) m_pProc)->setBaseMatPtr(NULL);
     r0 = 5;
     m_Inter.set(frame, &pG->Camera.param);
 }
