@@ -48,8 +48,10 @@ public:
     f32 bureSpeedX;       // 0x338  pitch step per frame (PS2 bureSpeedX)
     f32 bureSpeedY;       // 0x33C  yaw step per frame (PS2 bureSpeedY)
     u8 shotFrame[4];      // 0x340  fire motion shot frames, from each weapon's const table (ruger_tbl, xd9_tbl, ...) (PS2 shotFrame[4])
+private:
     u32 m_EraseTime;      // 0x344  (PS2 m_EraseTime; setEraseTime is not in the GC code)
     cModel* m_pParent;    // 0x348  model the weapon hangs on (parentSet) (PS2 m_pParent)
+public:
     u16 itemId;           // 0x34C  weapon item id (cObjLauncher::init: 0x35) (PS2 ITEM_ID itemId)
     u8 r_no_0;            // 0x34E  0 stay, 1 ready, 2 fire, 3 down, 4 reload, 5 drop (move dispatch)
     u8 r_no_1;            // 0x34F  step inside the mode
@@ -114,10 +116,11 @@ public:
 // Rocket (game/objRocket.cpp): hangs on the launcher, flies with its motion and explodes on the
 // scenario / water / player weapon target line (`rocket`, obj.h).
 class cObjRocket : public cObj {
-public:
+private:
     Vec oldPos;           // 0x328  position before this frame's motion (hit line start)
     int endTimer;         // 0x334  flight frames left (300)
 
+public:
     virtual ~cObjRocket() {}
     virtual void beginEvent(u32 flag);
     virtual void move();

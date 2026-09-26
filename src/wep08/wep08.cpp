@@ -68,7 +68,7 @@ void cObjStriker::init(cModel* parent)
 
         LightInfo.init2(1, 1, &p0, &p1, 1);
     }
-    m_pParent = parent;
+    setParent(parent);
     itemId = 0x2D;
     motReset[0] = WEP_ARC_PTR(0x31);
     resetMotion();

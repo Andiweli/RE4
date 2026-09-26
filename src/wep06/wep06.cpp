@@ -70,7 +70,7 @@ void cObjGovernment::init(cModel* parent)
 
         LightInfo.init2(1, 1, &p0, &p1, 1);
     }
-    m_pParent = parent;
+    setParent(parent);
     resetMotion();
     shotFrame[2] = shotFrame[1] = shotFrame[0] = 0x14;
     setAbility(5.73f, 2.86f, 0.2864f, 0.2864f);

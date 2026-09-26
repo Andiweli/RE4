@@ -1420,7 +1420,7 @@ void cSubLuis::equipWeapon()
         pWep->atari.m_flag &= 0xFCFF;
         pWep->pList->pParent = getPartsPtr(10);
         pWep->LightInfo.init2(1, 1, LuisLightZero(), &p1, 1);
-        ((cObjWep*) pWep)->m_pParent = this;
+        ((cObjWep*) pWep)->setParent(this);
     }
 }
 

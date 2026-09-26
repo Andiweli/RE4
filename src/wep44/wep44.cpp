@@ -58,7 +58,7 @@ void cObjGovernment::init(cModel* parent)
 
         LightInfo.init2(1, 1, &p0, &p1, 1);
     }
-    m_pParent = parent;
+    setParent(parent);
     resetMotion();
     shotFrame[0] = 0x14;
     shotFrame[1] = 0x14;
