@@ -689,7 +689,7 @@ void titleMain(TitleWork* w)
             w->Rno2++;
             break;
         case 2:
-            if (!Sofdec.isPlay()) {
+            if (!Sofdec.IsActive()) {
                 systemVISetBlack(1);
                 ScreenReSize(640, 448);
                 systemVISetBlack(0);
@@ -727,7 +727,7 @@ void titleMain(TitleWork* w)
             w->Rno2++;
             break;
         case 2:
-            if (!Sofdec.isPlay()) {
+            if (!Sofdec.IsActive()) {
                 systemVISetBlack(1);
                 ScreenReSize(640, 448);
                 systemVISetBlack(0);

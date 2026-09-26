@@ -75,7 +75,7 @@ extern "C" void R120Event()
     SceSleep(1);
     FadeSetW(2, 0, 0, 0);
     SceSleep(1);
-    if (Sofdec.m_be_flag & 0x20) {
+    if (Sofdec.isCancel()) {
         ScfFlagOn(pG, SCF_R120_EVENT_CANCEL);
     }
     SceEventStart(0);

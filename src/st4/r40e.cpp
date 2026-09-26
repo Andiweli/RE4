@@ -389,7 +389,7 @@ static void gameResult()
         Sofdec.Initialize("movie/adaend_c.sfd", 0);
     }
     SceSleep(1);
-    while (Sofdec.isPlay()) {
+    while (Sofdec.IsActive()) {
         SceSleep(1);
     }
     // Loop-note barrier: FadeSetW's `li r28,0xff` (a pseudo live across later calls) is issued after

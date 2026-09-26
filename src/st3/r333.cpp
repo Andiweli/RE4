@@ -602,7 +602,7 @@ static void gameResult()
     ScreenReSize(0x200, 0x1C0);
     Sofdec.Initialize("movie/ending.sfd", 0);
     SceSleep(1);
-    while (Sofdec.isPlay()) {
+    while (Sofdec.IsActive()) {
         SceSleep(1);
     }
     // Loop-note barrier (the r40e gameResult idiom): lifeMeterDisp's `li r4,0` and the counter's `li`
