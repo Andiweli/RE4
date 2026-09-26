@@ -53,7 +53,7 @@ struct SaveDataPtrs {
     u8 pad_0[8];
     u8* p8;    // 0x08
     u8* pC;    // 0x0C
-    u8* p10;   // 0x10  room save records (RoomData.num * 0xD8 + 0x10)
+    u8* p10;   // 0x10  room save records (RoomData.getSaveDataSize())
     u8* p14;   // 0x14  sub screen data
     u8* p18;   // 0x18  merchant data
 };
@@ -721,7 +721,7 @@ void cCard::loadMain()
         cardMesSet(MES_SAVE_DONE, 0, 0);
         memcpy(SD->p8, buf + SAVE_GAME, SAVE_GAME_SIZE);
         memcpy(SD->pC, buf + SAVE_DATA2, SAVE_DATA2_SIZE);
-        memcpy(SD->p10, buf + SAVE_ROOM, RoomData.num * 0xD8 + 0x10);
+        memcpy(SD->p10, buf + SAVE_ROOM, RoomData.getSaveDataSize());
         memcpy(SD->p14, buf + SAVE_SSCRN, SscrnDataSize());
         memcpy(SD->p18, buf + SAVE_MERCHANT, MerchantDataSize());
         GameSave.load(pSaveData);
@@ -784,7 +784,7 @@ void cCard::makeSaveData()
     GameSave.save(pSaveData, *(u32*) (buf + SAVE_HDR_MODE));
     memcpy(buf + SAVE_GAME, SD->p8, SAVE_GAME_SIZE);
     memcpy(buf + SAVE_DATA2, SD->pC, SAVE_DATA2_SIZE);
-    memcpy(buf + SAVE_ROOM, SD->p10, RoomData.num * 0xD8 + 0x10);
+    memcpy(buf + SAVE_ROOM, SD->p10, RoomData.getSaveDataSize());
     memcpy(buf + SAVE_SSCRN, SD->p14, SscrnDataSize());
     memcpy(buf + SAVE_MERCHANT, SD->p18, MerchantDataSize());
     *(u32*) (buf + SAVE_HDR_MAGIC) = 0x116;

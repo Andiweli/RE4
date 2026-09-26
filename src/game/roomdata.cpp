@@ -74,8 +74,8 @@ static StageTbl Room_data_tbl[10] = {
 
 cRoomData RoomData;
 
-// Boot: counts the rooms of the five stage tables (total) and those with a save record (stat 1,
-// num), allocates the save buffer (header + one 0xD8-byte RoomSave per room) and stamps each
+// Boot: counts the rooms of the five stage tables (m_RoomNum) and those with a save record (stat 1,
+// m_SaveNum), allocates the save buffer (header + one 0xD8-byte RoomSave per room) and stamps each
 // record with its stage / room id.
 void cRoomData::init()
 {
@@ -87,26 +87,26 @@ void cRoomData::init()
     m_pModule = 0;
     m_pModule_bss = 0;
     m_RelNo = 0;
-    total = 0;
+    m_RoomNum = 0;
     for (stage = 0; stage <= 9; stage++) {
         if (Room_data_tbl[stage].tbl != 0) {
-            total += Room_data_tbl[stage].num;
+            m_RoomNum += Room_data_tbl[stage].num;
         }
     }
-    num = 0;
+    m_SaveNum = 0;
     for (stage = 0; stage <= 9; stage++) {
         for (i = 0; checkRoomRange(stage, i) == 1; i++) {
             if (Room_data_tbl[stage].tbl[i].stat == 1) {
-                num++;
+                m_SaveNum++;
             }
         }
     }
 #line 306
-    m_pRoomSaveHead = (RoomSaveHdr*) MEM_CALLOC(num * sizeof(RoomSave) + sizeof(RoomSaveHdr), 1, 13);
-    m_pRoomSaveHead->size = num * sizeof(RoomSave) + sizeof(RoomSaveHdr);
-    // A local widens `num` (u16) to u32 before the store: written directly, the load of `num` and
+    m_pRoomSaveHead = (RoomSaveHdr*) MEM_CALLOC(m_SaveNum * sizeof(RoomSave) + sizeof(RoomSaveHdr), 1, 13);
+    m_pRoomSaveHead->size = m_SaveNum * sizeof(RoomSave) + sizeof(RoomSaveHdr);
+    // A local widens `m_SaveNum` (u16) to u32 before the store: written directly, the load of `m_SaveNum` and
     // the reload of `pSaveBuf` (after the `size` store above) swap order against the target.
-    u32 n = num;
+    u32 n = m_SaveNum;
     m_pRoomSaveHead->num = n;
     m_pRoomSaveData = (u8*) m_pRoomSaveHead + sizeof(RoomSaveHdr);
     stage = 0;
@@ -133,7 +133,7 @@ void cRoomData::save(void* p)
 {
     RoomSaveHdr* h = (RoomSaveHdr*) p;
 
-    memcpy(h, m_pRoomSaveHead, num * sizeof(RoomSave) + sizeof(RoomSaveHdr));
+    memcpy(h, m_pRoomSaveHead, m_SaveNum * sizeof(RoomSave) + sizeof(RoomSaveHdr));
 }
 
 // Restores the room records from a save game image, matched by id (records of rooms the build no
@@ -147,7 +147,7 @@ void cRoomData::load(void* p)
     int i;
 
     for (j = 0; j < h->num; j++, rec++) {
-        for (i = 0; i < num; i++) {
+        for (i = 0; i < m_SaveNum; i++) {
             dst = (RoomSave*) (i * sizeof(RoomSave) + (u32) m_pRoomSaveData);
             if (rec->id == dst->id) {
                 *dst = *rec;
@@ -171,7 +171,7 @@ void cRoomData::clear(void* p)
         // The loop with the call in its body is only rotated (entry test + bottom test) when written
         // as an explicitly guarded do/while; a `for` keeps the initial jump to the test.
         i = 0;
-        if (i < num) {
+        if (i < m_SaveNum) {
             do {
                 dst = (RoomSave*) (i * sizeof(RoomSave) + (u32) m_pRoomSaveData);
                 id = rec->id;
@@ -181,7 +181,7 @@ void cRoomData::clear(void* p)
                     break;
                 }
                 i++;
-            } while (i < num);
+            } while (i < m_SaveNum);
         }
     }
 }

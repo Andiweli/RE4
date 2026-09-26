@@ -949,7 +949,7 @@ SAVE_DATA_HEAD* cGameSave::alloc()
     u32 itemSize;
     SAVE_DATA_HEAD* d;
 
-    roomSize = ALIGN32(RoomData.num * 0xD8 + 0x10);
+    roomSize = ALIGN32(RoomData.getSaveDataSize());
     sscrnSize = ALIGN32(SscrnDataSize());
     sscrnOfs = roomOfs + roomSize;
     merchantSize = ALIGN32(MerchantDataSize());

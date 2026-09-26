@@ -297,13 +297,13 @@ void excepLoadSymbol()
             symbol_err = excepLoadSymbolSub("Bio4.Sscrn.sym", mod);
         }
     }
-    if (RoomData.m_pModule) {
-        OSModuleHeader* mod = RoomData.m_pModule;
+    if (RoomData.getModulePtr()) {
+        OSModuleHeader* mod = RoomData.getModulePtr();
         if ((s32) mod < 0 && (u32) mod <= 0x82FFFFFF && (s32) mod->info.sectionInfoOffset < 0) {
             strcpy(buf, FileTbl[RoomData.m_RelNo].name + 4);
             *strchr(buf, '.') = 0;
             sprintf(tmp_str, "Bio4.%s.sym", buf);
-            symbol_err = excepLoadSymbolSub(tmp_str, RoomData.m_pModule);
+            symbol_err = excepLoadSymbolSub(tmp_str, RoomData.getModulePtr());
         }
     }
 }
