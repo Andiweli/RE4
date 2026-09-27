@@ -3163,7 +3163,7 @@ void CardDbgCacheSet()
 void dispSaveInfo(int no, SaveInfo* p_info, int type, int flag)
 {
     IDSystem* id = &g_id->m_IdSave;
-    IdUnit* u;
+    ID_UNIT* u;
     int chapter;
     int special;
     int chap;
@@ -3361,8 +3361,8 @@ void CardID::updateSaveInfo(cCard* pCard)
 void CardID::init(int type, CardArc* data)
 {
     int i;
-    IdUnit* u;
-    IdUnit* v;
+    ID_UNIT* u;
+    ID_UNIT* v;
     f32 zero;
 
     this->m_mode = type;
@@ -3400,8 +3400,8 @@ void CardID::init(int type, CardArc* data)
     IdSys.unitPtr(1, IDC_SSCRN_NEAR_1)->rev_flag |= 0xF;
     zero = 0.0f;
     for (int j = 0; j < 7; j++) {
-        IdUnit* p = g_id->m_IdSave.unitPtr(0x15, 0x40 + j);
-        IdUnit* q = g_id->m_IdSave.unitPtr((u8) (j + 0x10), IDC_SSCRN_FAR_0);
+        ID_UNIT* p = g_id->m_IdSave.unitPtr(0x15, 0x40 + j);
+        ID_UNIT* q = g_id->m_IdSave.unitPtr((u8) (j + 0x10), IDC_SSCRN_FAR_0);
         q->type = 1;
         p->pos0.z = zero;
         p->pos0.y = zero;
@@ -3421,7 +3421,7 @@ void CardID::init(int type, CardArc* data)
     u->rev_flag |= 0xF;
     IdSys.unitPtr(5, IDC_SSCRN_NEAR_0)->rev_flag |= 0xF;
     {
-        IdUnit* w = IdSys.unitPtr(2, IDC_SSCRN_NEAR_0);
+        ID_UNIT* w = IdSys.unitPtr(2, IDC_SSCRN_NEAR_0);
         w->texNo = 0;
         w->tex_flag |= 2;
     }
@@ -3438,8 +3438,8 @@ void CardID::move(cCard* pCard)
     static void (CardID::*tbl[6])(cCard*) = {
         &CardID::wait, &CardID::start, &CardID::normal, &CardID::up_down, &CardID::up_down, &CardID::save,
     };
-    IdUnit* a;
-    IdUnit* b;
+    ID_UNIT* a;
+    ID_UNIT* b;
 
     (this->*tbl[rno0])(pCard);
     if (rno0 == 3) {
@@ -3471,8 +3471,8 @@ void CardID::move(cCard* pCard)
 // Id mode: idle list; applies a pending action (highlight / hide) to the cursor ids.
 void CardID::wait(cCard* pCard)
 {
-    IdUnit* a;
-    IdUnit* b;
+    ID_UNIT* a;
+    ID_UNIT* b;
 
     if (pCard->ckStatus(2)) {
         pCard->resetStatus(2);
@@ -3504,7 +3504,7 @@ void CardID::start(cCard* pCard)
 // Id mode: cursor on the selected file, Up / Down start the scroll animation (up_down).
 void CardID::normal(cCard* pCard)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     if (getAction() & 4) {
         u = IdSys.unitPtr(1, IDC_SSCRN_NEAR_0);
@@ -3529,9 +3529,9 @@ void CardID::normal(cCard* pCard)
 // Id mode: animates the list scroll by one entry and updates the cursor / entry ids.
 void CardID::up_down(cCard* pCard)
 {
-    IdUnit* a;
-    IdUnit* b;
-    IdUnit* w;
+    ID_UNIT* a;
+    ID_UNIT* b;
+    ID_UNIT* w;
 
     switch (rno1) {
     case 0:
@@ -3571,7 +3571,7 @@ void CardID::up_down(cCard* pCard)
         break;
     case 1:
         if (m_IdSave.unitPtr(0, IDC_SSCRN_FAR_0)->anima_state & 1) {
-            IdUnit* u = m_IdSave.unitPtr(0, IDC_SSCRN_FAR_0);
+            ID_UNIT* u = m_IdSave.unitPtr(0, IDC_SSCRN_FAR_0);
             u->path0 = g_p_path_org[0];
             u->curve[0] = (Hermite1*) g_p_hrmt_org[0];
             u->path1 = g_p_spln_org[0];
@@ -3604,7 +3604,7 @@ void CardID::up_down(cCard* pCard)
 // Id mode during a save / load: the selected entry blinks, then returns to normal.
 void CardID::save(cCard* pCard)
 {
-    IdUnit* u = IdSys.unitPtr(1, IDC_SSCRN_NEAR_0);
+    ID_UNIT* u = IdSys.unitPtr(1, IDC_SSCRN_NEAR_0);
     Hermite1* h = u->curve[0];
     int n = ((s8*) h)[3];
     int i;
@@ -3655,7 +3655,7 @@ void CardID::setAction(int a)
 // Shows / hides the message backdrop id `a`.
 void setMsgBG(int a, int flag)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     if (a == 0) {
         u = IdSys.unitPtr(0, IDC_SSCRN_NEAR_1);

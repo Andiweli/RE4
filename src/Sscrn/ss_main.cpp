@@ -54,7 +54,7 @@ void SubScreenTask();
 void clearZbuffer();
 void sscrnCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 int sscrnKey2Game(SUB_SCREEN* wk);
-void dispScrollBar(u32 top, u32 n, u32 num, IdUnit* bar, IdUnit* up, IdUnit* down);
+void dispScrollBar(u32 top, u32 n, u32 num, ID_UNIT* bar, ID_UNIT* up, ID_UNIT* down);
 void generalModelAlloc(SUB_SCREEN* wk);
 int sscrnMainMenu(SUB_SCREEN* wk);
 void idMainMenu(SUB_SCREEN* wk, int sw);
@@ -143,7 +143,7 @@ int sscrnKey2Game(SUB_SCREEN* wk)
 
 // Sizes and places a list scroll bar: `bar` spans the fraction n/num of the height between the `up`
 // and `down` arrow units, offset by top/num from the top; hidden (be_flag bit 3 off) when the list fits.
-void dispScrollBar(u32 top, u32 n, u32 num, IdUnit* bar, IdUnit* up, IdUnit* down)
+void dispScrollBar(u32 top, u32 n, u32 num, ID_UNIT* bar, ID_UNIT* up, ID_UNIT* down)
 {
     if (n < num) {
         f32 h = up->pos0.y - down->pos0.y;
@@ -361,7 +361,7 @@ void SubScreenTask()
                 v /= 10;
             }
             for (i = 0; i < 8; i++) {
-                IdUnit* u;
+                ID_UNIT* u;
                 u = IdSub.unitPtr(i + 1, IDC_SSCRN_PESETA);
                 u->be_flag |= 8;
                 u->tex_flag |= 2;
@@ -583,7 +583,7 @@ void SsItemExamine::move(SUB_SCREEN* wk)
         _rno++;
     }
     case 5: {
-        IdUnit* pos;
+        ID_UNIT* pos;
         _itemExam.move();
         _itemExam.trans();
         pos = IdSub.unitPtr(0xFE, IDC_DATA);
@@ -667,7 +667,7 @@ int sscrnMainMenu(SUB_SCREEN* wk)
 // with its animation restarted.
 void idMainMenu(SUB_SCREEN* wk, int sw)
 {
-    IdUnit* u;
+    ID_UNIT* u;
     int i;
 
     for (i = 0; i < 5; i++) {
@@ -685,7 +685,7 @@ void idMainMenu(SUB_SCREEN* wk, int sw)
 void idMainMenuFade(SUB_SCREEN* wk, int sw)
 {
     if (wk->open_flag != 0x10) {
-        IdUnit* u = IdSub.unitPtr(7, IDC_SSCRN_MAIN_MENU);
+        ID_UNIT* u = IdSub.unitPtr(7, IDC_SSCRN_MAIN_MENU);
         if (sw) {
             u->rev_flag &= ~0xF;
         } else {
@@ -838,9 +838,9 @@ void sscrnLightCreate(SUB_SCREEN* wk, cLit* lit)
 // shadows; flags bit 0 hides the leading zeros.
 void numDisp(int id, int num, Vec* pos, u32 flags)
 {
-    IdUnit* col0 = IdSub.unitPtr(0xFD, IDC_SSCRN_0);
-    IdUnit* col1 = IdSub.unitPtr(0xFE, IDC_SSCRN_0);
-    IdUnit* u;
+    ID_UNIT* col0 = IdSub.unitPtr(0xFD, IDC_SSCRN_0);
+    ID_UNIT* col1 = IdSub.unitPtr(0xFE, IDC_SSCRN_0);
+    ID_UNIT* u;
     int i;
 
     u = IdNum.unitPtr(0, id);

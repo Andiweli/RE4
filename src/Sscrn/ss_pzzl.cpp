@@ -122,7 +122,7 @@ void openMsgWindow(SUB_SCREEN* wk, int no);
 int remarkMsgCombine(int a, int b, int* no);
 int itemCommandType(cItem* item);
 }
-static void setCommandId(u8 type, IdUnit** tbl, s8* num, int lang);
+static void setCommandId(u8 type, ID_UNIT** tbl, s8* num, int lang);
 
 static int sscrn_pzzl_out(SUB_SCREEN* wk);
 
@@ -217,8 +217,8 @@ int back2PieceSelect(SUB_SCREEN* wk)
 void pzzlEquipDisp(SUB_SCREEN* wk, int sw)
 {
     pzlPlayer* pl = wk->puzzlePlayer;
-    IdUnit* id[3];
-    IdUnit* id2[3];
+    ID_UNIT* id[3];
+    ID_UNIT* id2[3];
     Vec scr;
     u8 unused0[0x20];  // two unused 0x20-byte locals keep the original frame (0x38 / 0x68)
     Vec pos;
@@ -301,9 +301,9 @@ void pzzlEquipDisp(SUB_SCREEN* wk, int sw)
 // restart the highlight animation after a move; sw 0 hides everything.
 void pzzlCursorDisp(SUB_SCREEN* wk, int sw)
 {
-    IdUnit* u0 = IdSub.unitPtr(0x20, IDC_SSCRN_ETC);
-    IdUnit* u1 = IdSub.unitPtr(0x21, IDC_SSCRN_ETC);
-    IdUnit* u2 = IdSub.unitPtr(0x22, IDC_SSCRN_ETC);
+    ID_UNIT* u0 = IdSub.unitPtr(0x20, IDC_SSCRN_ETC);
+    ID_UNIT* u1 = IdSub.unitPtr(0x21, IDC_SSCRN_ETC);
+    ID_UNIT* u2 = IdSub.unitPtr(0x22, IDC_SSCRN_ETC);
     pzlBoard* b = wk->puzzlePlayer->m_p_active_board;
     int x = b->m_cur_x;
     int y = b->m_cur_y;
@@ -1128,8 +1128,8 @@ void caseModelMove(int sw)
     Vec ofsA = {-1280.0f, 0.0f, 0.0f};
     Vec ofsB = {1280.0f, 0.0f, 0.0f};
     SUB_SCREEN* wk = &SubScreenWk;
-    IdUnit* u = IdSub.unitPtr(0xFE, IDC_SSCRN_BACK_GROUND);
-    IdUnit* u2 = IdSub.unitPtr(0xFD, IDC_SSCRN_BACK_GROUND);
+    ID_UNIT* u = IdSub.unitPtr(0xFE, IDC_SSCRN_BACK_GROUND);
+    ID_UNIT* u2 = IdSub.unitPtr(0xFD, IDC_SSCRN_BACK_GROUND);
     cModel* m = MapMgr.getWork(3);
     cParts* parts = m->getPartsPtr(1);
     Vec scr;
@@ -1289,7 +1289,7 @@ void SsPzzlInit::move(SUB_SCREEN* wk)
 // Shows (1) or fades out (0) the temporary space board frame (IdSub 0/0x10).
 void tempSpaceDisp(int sw)
 {
-    IdUnit* u = IdSub.unitPtr(0, IDC_SSCRN_NEAR_0);
+    ID_UNIT* u = IdSub.unitPtr(0, IDC_SSCRN_NEAR_0);
 
     switch (sw) {
     case 1:
@@ -1321,7 +1321,7 @@ int checkWeaponChange(int id, int bullets)
 // appended as the extra piece and put in hand; the debug editor; caseMove = first frame.
 void SsPzzlMain::init(SUB_SCREEN* wk)
 {
-    IdUnit* tbl[16];
+    ID_UNIT* tbl[16];
     s8 num;
     int lang;
     int i;
@@ -1481,7 +1481,7 @@ void SsPzzlMain::move(SUB_SCREEN* wk)
     pieceModelDisp(wk);
     pzzlCursorDisp(wk, 1);
     if (cur != exam) {
-        IdUnit* u = IdSub.unitPtr(1, IDC_SSCRN_CKPT_2);
+        ID_UNIT* u = IdSub.unitPtr(1, IDC_SSCRN_CKPT_2);
         int id = 0;
         int on = 0;
         int x;
@@ -1668,7 +1668,7 @@ void SsPzzlMain::quit(SUB_SCREEN* wk)
 // the map frames the life meter out and fades the character.
 void sscrn_pzzl_out_init(SUB_SCREEN* wk)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     u = IdSub.unitPtr(0xFE, IDC_SSCRN_BACK_GROUND);
     u->rev_flag |= 0xF;
@@ -1686,8 +1686,8 @@ void sscrn_pzzl_out_init(SUB_SCREEN* wk)
 // finished their animation.
 static int sscrn_pzzl_out(SUB_SCREEN* wk)
 {
-    IdUnit* u;
-    IdUnit* u2;
+    ID_UNIT* u;
+    ID_UNIT* u2;
 
     caseModelMove(0);
     pzzlClearZ(wk);
@@ -1704,7 +1704,7 @@ static int sscrn_pzzl_out(SUB_SCREEN* wk)
 // Plays the case units' open animation forward (CaseChange / shop re-entry).
 void sscrn_pzzl_in_init(SUB_SCREEN* wk)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     u = IdSub.unitPtr(0xFE, IDC_SSCRN_BACK_GROUND);
     u->rev_flag &= 0xF0;
@@ -2785,7 +2785,7 @@ int itemCommandType(cItem* item)
 }
 
 // The command menu id units of a command type (`lang`: 0 the case board set, 1 the space set).
-static void setCommandId(u8 type, IdUnit** tbl, s8* num, int lang)
+static void setCommandId(u8 type, ID_UNIT** tbl, s8* num, int lang)
 {
     u8 t = 0x1D;
 

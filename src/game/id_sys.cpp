@@ -34,13 +34,13 @@ struct IdBlend2 {
 
 // Bit tables indexed by table type (ck / disp).
 static inline int IdBitChk(u32* tbl, u8 n) { return FlagChkVar(tbl, (u32) n) ? 1 : 0; }
-#define ID_UNIT(i) ((IdUnit*) ((i) * sizeof(IdUnit) + (u32) m_IdUnit))
+#define ID_UNIT(i) ((ID_UNIT*) ((i) * sizeof(ID_UNIT) + (u32) m_IdUnit))
 
 // Allocates the pool of n IdUnits (memory group 13) and clears it.
 void IDSystem::gameInit(int n)
 {
 #line 66 "D:/Bio4/Prog/id_sys.cpp"
-    m_IdUnit = (IdUnit*) MEM_ALLOC(n * sizeof(IdUnit), 1, 0xD);
+    m_IdUnit = (ID_UNIT*) MEM_ALLOC(n * sizeof(ID_UNIT), 1, 0xD);
     m_maxId = n;
     if (m_IdUnit == 0) {
         m_maxId = 0;
@@ -58,7 +58,7 @@ void IDSystem::roomInit()
 
     m_nId = 0;
     for (i = 0; i < m_maxId; i++) {
-        memclr_asm(&m_IdUnit[i], sizeof(IdUnit));
+        memclr_asm(&m_IdUnit[i], sizeof(ID_UNIT));
         m_IdUnit[i].be_flag = 0xFF;
     }
     memclr_asm(m_disp_off, sizeof(m_disp_off));
@@ -94,7 +94,7 @@ void IDSystem::dispSw(int classNo, int sw)
 }
 
 // Frees a unit (and, for a group, all its children); warns when it is still queued in the OT.
-void IDSystem::unitPush(IdUnit* u)
+void IDSystem::unitPush(ID_UNIT* u)
 {
     int i;
 
@@ -103,7 +103,7 @@ void IDSystem::unitPush(IdUnit* u)
     }
     if (u->type == 1) {
         for (i = 0; i < m_maxId; i++) {
-            IdUnit* c = ID_UNIT(i);
+            ID_UNIT* c = ID_UNIT(i);
             if (c->be_flag != 0xFF && u == c->pParent) {
                 unitPush(c);
             }
@@ -117,14 +117,14 @@ void IDSystem::unitPush(IdUnit* u)
 }
 
 // Takes a free unit, cleared with default UVs and be_flag 0xD (alive, move, visible); 0 when full.
-IdUnit* IDSystem::unitPull()
+ID_UNIT* IDSystem::unitPull()
 {
     int i;
-    IdUnit* u = m_IdUnit;
+    ID_UNIT* u = m_IdUnit;
 
     for (i = 0; i < m_maxId; i++, u++) {
         if (u->be_flag == 0xFF) {
-            memclr_asm(u, sizeof(IdUnit));
+            memclr_asm(u, sizeof(ID_UNIT));
             u->be_flag = 0xD;
             u->u0 = 0.0f;
             u->u1 = 1.0f;
@@ -138,13 +138,13 @@ IdUnit* IDSystem::unitPull()
 }
 
 // Assigns tree depth `level` to a unit and level+1 to its children; tracks m_levelMax.
-void IDSystem::unitLevel(IdUnit* u, u8 level)
+void IDSystem::unitLevel(ID_UNIT* u, u8 level)
 {
     int i;
 
     if (u->type == 1) {
         for (i = 0; i < m_maxId; i++) {
-            IdUnit* c = ID_UNIT(i);
+            ID_UNIT* c = ID_UNIT(i);
             if (c->be_flag != 0xFF && u == c->pParent) {
                 unitLevel(c, level + 1);
             }
@@ -157,18 +157,18 @@ void IDSystem::unitLevel(IdUnit* u, u8 level)
 }
 
 // Links child under parent and renumbers its level.
-void IDSystem::unitParent(IdUnit* parent, IdUnit* child)
+void IDSystem::unitParent(ID_UNIT* parent, ID_UNIT* child)
 {
     child->pParent = parent;
     unitLevel(child, parent->levelNo + 1);
 }
 
 // Finds the live unit with mark id `id` of class `type`; logs and returns a static dummy when absent.
-IdUnit* IDSystem::unitPtr(u8 id, int type)
+ID_UNIT* IDSystem::unitPtr(u8 id, int type)
 {
-    static IdUnit tmpId;
+    static ID_UNIT tmpId;
     int i;
-    IdUnit* u = m_IdUnit;
+    ID_UNIT* u = m_IdUnit;
 
     for (i = 0; i < m_maxId; i++, u++) {
         if (u->be_flag != 0xFF && id == u->markNo && (u8) type == u->classNo) {
@@ -180,7 +180,7 @@ IdUnit* IDSystem::unitPtr(u8 id, int type)
 }
 
 // v2 record match: mode 0 compares the record id, mode 1 (child pass) its parent number.
-int cmp_id_no(IdData2* p_id_v2, u8 dst_no, int attr)
+int cmp_id_no(ID_DATA_V2* p_id_v2, u8 dst_no, int attr)
 {
     u8 no;
 
@@ -201,14 +201,14 @@ int cmp_id_no(IdData2* p_id_v2, u8 dst_no, int attr)
 void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
 {
     IdDataHeader* hdr = (IdDataHeader*) data;
-    IdData2* p2 = (IdData2*) ((u8*) data + 8);
-    IdData* p1 = (IdData*) ((u8*) data + 8);
+    ID_DATA_V2* p2 = (ID_DATA_V2*) ((u8*) data + 8);
+    ID_DATA_V1* p1 = (ID_DATA_V1*) ((u8*) data + 8);
     int ver;
     int sysVer;
     int i;
     int j;
-    IdUnit* u;
-    IdUnit* c;
+    ID_UNIT* u;
+    ID_UNIT* c;
     u32 a;
 
     setCk(type);
@@ -446,7 +446,7 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
 
     if (mode != 1) {
         for (i = 0; i < m_maxId; i++) {
-            IdUnit* c = &m_IdUnit[i];
+            ID_UNIT* c = &m_IdUnit[i];
             if (c->be_flag != 0xFF && (c->be_flag & 0x2)) {
                 c->be_flag &= ~0x2;
             }
@@ -459,7 +459,7 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
 void IDSystem::kill(u8 id, int type)
 {
     int i;
-    IdUnit* u = m_IdUnit;
+    ID_UNIT* u = m_IdUnit;
 
     for (i = 0; i < m_maxId; i++, u++) {
         if (u->be_flag == 0xFF) {
@@ -483,7 +483,7 @@ void IDSystem::kill(u8 id, int type)
 void IDSystem::stop()
 {
     int i;
-    IdUnit* u = m_IdUnit;
+    ID_UNIT* u = m_IdUnit;
 
     for (i = 0; i < m_maxId; i++, u++) {
         if (!(u->be_flag & 0x1)) {
@@ -534,7 +534,7 @@ void IDSystem::move()
     m_scrn_mat[2][3] = v.z;
 
     for (lv = 0; lv <= m_levelMax; lv++) {
-        IdUnit* u = m_IdUnit;
+        ID_UNIT* u = m_IdUnit;
         for (i = 0; i < m_maxId; i++, u++) {
             if (u->be_flag == 0xFF || !(u->be_flag & 0x1)) {
                 continue;
@@ -551,10 +551,10 @@ void IDSystem::move()
 }
 
 // Starts (1) or freezes (0) the animation of a unit and its children (be_flag 0x4).
-void IDSystem::beMove(IdUnit* u, int on_off)
+void IDSystem::beMove(ID_UNIT* u, int on_off)
 {
     int i;
-    IdUnit* c = m_IdUnit;
+    ID_UNIT* c = m_IdUnit;
 
     for (i = 0; i < m_maxId; i++, c++) {
         if (c->be_flag == 0xFF || !(c->be_flag & 0x1)) {
@@ -575,10 +575,10 @@ void IDSystem::beMove(IdUnit* u, int on_off)
 }
 
 // Sets all four curve timers of a unit and its children to `time` (frames).
-void IDSystem::setTime(IdUnit* u, s16 time)
+void IDSystem::setTime(ID_UNIT* u, s16 time)
 {
     int i;
-    IdUnit* c = m_IdUnit;
+    ID_UNIT* c = m_IdUnit;
 
     for (i = 0; i < m_maxId; i++, c++) {
         if (c->be_flag == 0xFF || !(c->be_flag & 0x1)) {
@@ -595,10 +595,10 @@ void IDSystem::setTime(IdUnit* u, s16 time)
 }
 
 // Recomputes the position of a unit and its children immediately (idSysMove00).
-void IDSystem::movePos(IdUnit* u)
+void IDSystem::movePos(ID_UNIT* u)
 {
     int i;
-    IdUnit* c;
+    ID_UNIT* c;
 
     idSysMove00(u);
     c = m_IdUnit;
@@ -638,7 +638,7 @@ void IDSystem::movePos(IdUnit* u)
 
 // Mover 0: position = scr + path point at the curve-0 parameter (timer[0] stepped forward/back
 // with loop/end flags), then rebuilds the quad vertices from sizeX/size_H and vtxType (anchor).
-void idSysMove00(IdUnit* u)
+void idSysMove00(ID_UNIT* u)
 {
     Vec tmp;
     f32 t;
@@ -692,7 +692,7 @@ void idSysMove00(IdUnit* u)
 
 // Builds the four quad vertices from sizeX/size_H with the anchor selected by vtxType & 0xF
 // (0 centre, 1..4 corners).
-void IdCalcVertex(IdUnit* u)
+void IdCalcVertex(ID_UNIT* u)
 {
     switch (u->vtxType & 0xF) {
     case 0:
@@ -761,7 +761,7 @@ void IdCalcVertex(IdUnit* u)
 }
 
 // Mover 1: scale from curve 1 applied to the vertices (size_flag 0x10 x only, 0x20 y only, else both).
-void idSysMove01(IdUnit* u)
+void idSysMove01(ID_UNIT* u)
 {
     f32 s;
     int i;
@@ -811,7 +811,7 @@ void idSysMove01(IdUnit* u)
 
 // Mover 2: colour from curve 2 (interpolates col0 -> col1 when col1 is set, else alpha only), then
 // multiplied by the parent's colour.
-void idSysMove02(IdUnit* u)
+void idSysMove02(ID_UNIT* u)
 {
     f32 r;
     int num;
@@ -883,7 +883,7 @@ void idSysMove02(IdUnit* u)
         u->col[3] = (f32) u->col0[3];
     }
     if (u->pParent != 0) {
-        IdUnit* p = u->pParent;
+        ID_UNIT* p = u->pParent;
         u->col[0] = (f32) (u8) (u->col[0] * p->col[0] / 255.0f);
         u->col[1] = (f32) (u8) (u->col[1] * p->col[1] / 255.0f);
         u->col[2] = (f32) (u8) (u->col[2] * p->col[2] / 255.0f);
@@ -893,7 +893,7 @@ void idSysMove02(IdUnit* u)
 
 // Mover 3: rotation = rot0 plus the curve-3 angle on the axis selected by rot_flag (degrees),
 // builds l_mat and, under a group parent, concatenates the parent matrix.
-void idSysMove03(IdUnit* u)
+void idSysMove03(ID_UNIT* u)
 {
     Vec rot;
     f32 a;
@@ -951,7 +951,7 @@ void idSysMove03(IdUnit* u)
 
 // Mover 4: texture animation: steps texNo (and the mask frame) through the TexAnm pattern list every
 // frame unless tex_flag holds them (0x2 / 0x4); hides the unit when the texture id is unknown.
-void idSysMove04(IdUnit* u)
+void idSysMove04(ID_UNIT* u)
 {
     TexAnm* anm;
 
@@ -993,7 +993,7 @@ void idSysMove04(IdUnit* u)
 void IDSystem::trans()
 {
     int i;
-    IdUnit* u;
+    ID_UNIT* u;
 
     if (DpfFlagChk(pG, DPF_ID_SYSTEM)) {
         return;
@@ -1019,9 +1019,9 @@ void IDSystem::trans()
 }
 
 // Queues a unit (and, for groups, its children first) into the OT with IdGeneralTrans.
-void IDSystem::unitTrans(IdUnit* u)
+void IDSystem::unitTrans(ID_UNIT* u)
 {
-    IdUnit* c = m_IdUnit; // declared before i: decides the r25/r26 split of the i+1 / c+1 loop temps
+    ID_UNIT* c = m_IdUnit; // declared before i: decides the r25/r26 split of the i+1 / c+1 loop temps
     int i;
     int j;
 
@@ -1037,7 +1037,7 @@ void IDSystem::unitTrans(IdUnit* u)
                 }
                 break;
             case 2: {
-                IdUnit* g = m_IdUnit;
+                ID_UNIT* g = m_IdUnit;
                 for (j = 0; j < m_maxId; j++, g++) {
                     if (g->be_flag != 0xFF && c == g->pParent) {
                         unitTrans(g);
@@ -1056,7 +1056,7 @@ void IDSystem::unitTrans(IdUnit* u)
 
 // OT callback: draws the unit by trans_type (0 common quad, 1 negative with pow <= 1, 2 negative
 // mode 2, 3.. shimmer), or a plain colour quad when it has no texture.
-void IdGeneralTrans(IdUnit* u)
+void IdGeneralTrans(ID_UNIT* u)
 {
     u->be_flag &= ~0x10;
     if (u->texId == 0xFF) {
@@ -1102,7 +1102,7 @@ static inline void IdVtxFmt()
 
 // Standard textured quad draw: blend table by blend_type, texture + colour channel, optional mask
 // texture stage (tex_flag 0x1, CI formats with TLUT), the unit's l_mat under the screen matrix.
-void IdCommonTrans(IdUnit* u)
+void IdCommonTrans(ID_UNIT* u)
 {
     int blend[5][4] = {
         { 1, 4, 5, 0 }, { 1, 4, 1, 0 }, { 1, 1, 1, 0 }, { 1, 2, 1, 0 }, { 1, 2, 0, 0 },
@@ -1176,7 +1176,7 @@ void IdCommonTrans(IdUnit* u)
 
 // Frame-buffer quad: copies the screen behind the unit into the id buffer and draws it back through
 // the unit's texture (mode selects the TEV combine: invert / multiply).
-void IdNegativeTrans(IdUnit* u, u32 pow)
+void IdNegativeTrans(ID_UNIT* u, u32 pow)
 {
     IdBlend blend[5] = {
         { 1, 4, 5, 0 }, { 1, 4, 1, 0 }, { 1, 1, 1, 0 }, { 1, 2, 1, 0 }, { 1, 2, 0, 0 },
@@ -1277,7 +1277,7 @@ void IdNegativeTrans(IdUnit* u, u32 pow)
 
 // Heat-shimmer quad: the screen copy is drawn through an indirect stage warped by the unit's
 // texture with strength alpha * (1 + sub/32) scaled by depth; type selects signed/replace warp.
-void IdShimmerTrans(IdUnit* u, int u_pow, int Refract_type)
+void IdShimmerTrans(ID_UNIT* u, int u_pow, int Refract_type)
 {
     IdBlend2 blend[5] = {
         { 1, 4, 5, 0 }, { 1, 4, 1, 0 }, { 1, 1, 1, 0 }, { 1, 2, 1, 0 }, { 1, 2, 0, 0 },

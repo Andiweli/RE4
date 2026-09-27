@@ -512,7 +512,7 @@ void idR330::init(u32 no)
 // the percentage digit pairs up with `cnt`.
 void idR330::move()
 {
-    IdUnit* u;
+    ID_UNIT* u;
     int i;
     int a;
     int b;

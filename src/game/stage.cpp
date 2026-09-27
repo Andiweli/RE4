@@ -300,7 +300,7 @@ void subMissionSt1()
     u16* p1;
     u16* p2;
     cEmItem* item;
-    IdUnit* u;
+    ID_UNIT* u;
     Vec scr;
     Vec pos;
     int digit[2];

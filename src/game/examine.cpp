@@ -493,7 +493,7 @@ void ItemExamine::idSet()
                 }
                 started = 0;
                 for (j = 2; j >= 0; j--) {
-                    IdUnit* u = m_pIdSys->unitPtr(base2 + j, IDC_DATA);
+                    ID_UNIT* u = m_pIdSys->unitPtr(base2 + j, IDC_DATA);
                     u->tex_flag |= 2;
                     u->texNo = d[j];
                     if (kind == 3) {
@@ -512,10 +512,10 @@ void ItemExamine::idSet()
                     }
                 }
                 for (n = 0; n <= 5; n++) {
-                    IdUnit* a;
-                    IdUnit* b;
-                    IdUnit* c;
-                    IdUnit* u;
+                    ID_UNIT* a;
+                    ID_UNIT* b;
+                    ID_UNIT* c;
+                    ID_UNIT* u;
                     int l;
 
                     u = m_pIdSys->unitPtr(base + n, IDC_DATA);
@@ -542,7 +542,7 @@ void ItemExamine::idSet()
                 }
             }
         } else {
-            IdUnit* u = m_pIdSys->unitPtr(0, IDC_DATA);
+            ID_UNIT* u = m_pIdSys->unitPtr(0, IDC_DATA);
             u->be_flag &= ~8;
             u->rev_flag |= 0xF;
         }

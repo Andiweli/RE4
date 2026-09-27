@@ -197,8 +197,8 @@ static int sscrn_cap_out(SUB_SCREEN* wk)
 void dispCapList(SUB_SCREEN* wk)
 {
     s8* sel = wk->pCapCursor;
-    IdUnit* u;
-    IdUnit* c;
+    ID_UNIT* u;
+    ID_UNIT* c;
     int i;
 
     for (i = 0; i < 24; i++) {

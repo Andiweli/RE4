@@ -114,7 +114,7 @@ void OptionScreen::init(int type)
     IdTexDataLoad(OPT_PTR(0x20), TEX_OWNER_ID_DEAD);
     IdSys.set(OPT_PTR(0x24), 0xFF, IDC_OPTION_BG, 0x13, 4, 0);
     if (_type != 0) {
-        IdUnit* u = IdSys.unitPtr(0, IDC_OPTION_BG);
+        ID_UNIT* u = IdSys.unitPtr(0, IDC_OPTION_BG);
         Hermite1* h = u->curve[2];
         IdSys.setTime(u, (s16) (int) h->key[h->num - 1].t);
     }
@@ -171,7 +171,7 @@ void OptionScreen::quit()
 }
 
 // Copies the highlight colour of the cursor unit into a menu item.
-static inline void setColor(IdUnit* u, IdUnit* base)
+static inline void setColor(ID_UNIT* u, ID_UNIT* base)
 {
     u->col0[0] = (u8) base->col[0];
     u->col0[1] = (u8) base->col[1];
@@ -188,8 +188,8 @@ int top_menu(OptionScreen* pOpt)
     static int x0 = 100;
     static int y0 = 245;
     s8 old = pOpt->_rno1;
-    IdUnit* base;
-    IdUnit* u;
+    ID_UNIT* base;
+    ID_UNIT* u;
     int i;
 
     if (Key.trg & KEY_START) {
@@ -325,8 +325,8 @@ int retry_load_menu(OptionScreen* pOpt)
     static u32 snd_id = 0;
     int old = pOpt->_rno2;
     int confirm = 0;
-    IdUnit* base;
-    IdUnit* u;
+    ID_UNIT* base;
+    ID_UNIT* u;
     int i;
 
     switch (pOpt->_rno3) {
@@ -469,7 +469,7 @@ int retry_load_menu(OptionScreen* pOpt)
             IdTexDataLoad(OPT_PTR(0x20), TEX_OWNER_ID_DEAD);
             IdSys.set(OPT_PTR(0x24), 0xFF, IDC_OPTION_BG, 0x13, 4, 0);
             {
-                IdUnit* bg = IdSys.unitPtr(0, IDC_OPTION_BG);
+                ID_UNIT* bg = IdSys.unitPtr(0, IDC_OPTION_BG);
                 Hermite1* h = bg->curve[2];
                 IdSys.setTime(bg, (s16) (int) h->key[h->num - 1].t);
             }
@@ -496,9 +496,9 @@ int controller_menu(OptionScreen* pOpt)
     static int x0 = 100;
     static int y0 = 245;
     int old = pOpt->_rno2;
-    IdUnit* base;
-    IdUnit* u;
-    IdUnit* off;
+    ID_UNIT* base;
+    ID_UNIT* u;
+    ID_UNIT* off;
     int i;
     int j;
 
@@ -602,8 +602,8 @@ int controller_menu(OptionScreen* pOpt)
         }
     }
     base = IdSys.unitPtr(8, IDC_OPTION);
-    IdUnit* sel = 0;
-    IdUnit* uns = 0;
+    ID_UNIT* sel = 0;
+    ID_UNIT* uns = 0;
     if (old != pOpt->_rno2) {
         IdSys.setTime(base, 0);
     }
@@ -718,8 +718,8 @@ int brightness_menu(OptionScreen* pOpt)
     static int x0 = 100;
     static int y0 = 245;
     s8 old = pOpt->_rno2;
-    IdUnit* base;
-    IdUnit* u;
+    ID_UNIT* base;
+    ID_UNIT* u;
     int level;
     int digits;
     int i;
@@ -867,9 +867,9 @@ int audio_menu(OptionScreen* pOpt)
     static int x0 = 100;
     static int y0 = 245;
     s8 old = pOpt->_rno2;
-    IdUnit* base;
-    IdUnit* cur;
-    IdUnit* u;
+    ID_UNIT* base;
+    ID_UNIT* cur;
+    ID_UNIT* u;
     int i;
 
     if (Key.trg & KEY_B) {
@@ -975,7 +975,7 @@ void num(int no, int digit_num, int flag, int mark_bottom, u8 id_class, int reve
         show = 0;
     }
     for (i = digit_num - 1; i >= 0; i--) {
-        IdUnit* u;
+        ID_UNIT* u;
 
         if (reverse == 0) {
             u = IdSys.unitPtr((u8) (mark_bottom + i), id_class);
@@ -1014,7 +1014,7 @@ int GameResult::move()
     u32 h;
     u32 m;
     u32 s;
-    IdUnit* u;
+    ID_UNIT* u;
     int hit;
 
     if (pG->g_shot_cnt != 0) {
@@ -1096,7 +1096,7 @@ int ChapterEnd::move()
     int sec;
     int chap2;
     int sec2;
-    IdUnit* u;
+    ID_UNIT* u;
     int hit;
 
     getChapterSection(_chapter, &chap, &sec);

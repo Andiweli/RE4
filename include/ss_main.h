@@ -429,7 +429,7 @@ void tel00ModelInit(cModel* m, SsArc* arc);
 void hunniganModelInit(cModel* m, void* data, u32 type);
 // ss_main.cpp helpers the screens share
 void clearZbuffer();
-void dispScrollBar(u32 top, u32 n, u32 num, IdUnit* bar, IdUnit* up, IdUnit* down);
+void dispScrollBar(u32 top, u32 n, u32 num, ID_UNIT* bar, ID_UNIT* up, ID_UNIT* down);
 void idMainMenuFade(SUB_SCREEN* wk, int sw);
 void weaponChangeRequest(u16 no, u16 type);
 }

@@ -102,7 +102,7 @@ void cActionButton::disp(ActBtnWork* work)
     int col = 0;
     u8 kind = work->kind;
     u8 btn = work->btn;
-    IdUnit* u;
+    ID_UNIT* u;
     s16 sx;
     s16 sy;
     int x;

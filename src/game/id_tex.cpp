@@ -117,7 +117,7 @@ int IdGetAnmAddr(u8 id, TexAnm** ppAnm)
 }
 
 // Sets the material colour channel from the unit's current col[] (0..255 floats).
-void IdChannelSet(IdUnit* pIdUnit)
+void IdChannelSet(ID_UNIT* pIdUnit)
 {
     GXColor c;
 

@@ -534,7 +534,7 @@ int SsTermMain::OpeMesMove()
         }
     }
     if (ope.str != 0 && (ope.flags & 0x08000000)) {
-        IdUnit* u;
+        ID_UNIT* u;
         if (SndStrStatusCk(ope.str, 2) == 0) {
             return 0;
         }
@@ -606,7 +606,7 @@ void SsTermMain::OpeMesSet(int no, int wait)
     if (no == -1) {
         cMes.WaitEnd(0);
     } else {
-        IdUnit* u = IdSub.unitPtr(0xFE, IDC_SSCRN_NEAR_0);
+        ID_UNIT* u = IdSub.unitPtr(0xFE, IDC_SSCRN_NEAR_0);
         int x = (int) ((u->pos0.x + 320.0f) * 0.8f);
         int y = (int) ((240.0f - u->pos0.y) * 0.8f);
         cMes.Clear();
@@ -828,7 +828,7 @@ static Vec term_zero1 = {0.0f, 0.0f, 0.0f};
 // The op starts after ope.wait (30 frames).
 void SsTermMain::init(SUB_SCREEN* wk)
 {
-    IdUnit* u;
+    ID_UNIT* u;
     cModel* m;
 
     IdTexDataLoad(SS_ARC_PTR(wk->pTermDat, 5), TEX_OWNER_ID_SSCRN);
@@ -898,7 +898,7 @@ void SsTermMain::move(SUB_SCREEN* wk)
 {
     if (modelOn != 0) {
         if (ended == 0 && (ope.flags & 0x10000000)) {
-            IdUnit* u;
+            ID_UNIT* u;
             termMotionCancel(wk->pTelDat, 10);
             ClrShape(MapMgr.getWork(0));
             ClrShape(MapMgr.getWork(2));

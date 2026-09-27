@@ -255,7 +255,7 @@ void titleNintendo(TITLE_WORK* w)
 // State 3: the health warning for 105 frames; START (after 45) fades it early.
 void titleWarning(TITLE_WORK* w)
 {
-    IdUnit* u = IdSys.unitPtr(0, IDC_TITLE);
+    ID_UNIT* u = IdSys.unitPtr(0, IDC_TITLE);
     FadeColor c0;
     FadeColor c1;
 
@@ -297,7 +297,7 @@ void titleWarning(TITLE_WORK* w)
 // skippable with START after its TTL_CANCEL_* frame; the title BGM starts at LOGO_CALL_FRAME.
 void titleLogo(TITLE_WORK* w)
 {
-    IdUnit* u = IdSys.unitPtr(0, IDC_TITLE);
+    ID_UNIT* u = IdSys.unitPtr(0, IDC_TITLE);
     static u32 LOGO_CALL_FRAME = TTL_CANCEL_DOLBY;
     FadeColor c0;
     FadeColor c1;
@@ -428,7 +428,7 @@ void titleMenuInit(TITLE_WORK* w)
         if ((w)->menu_num > 1 && (Key.trg & (KEY_UP | KEY_DOWN))) {                        \
             int i;                                                                         \
             for (i = 0; i < (w)->menu_num; i++) {                                           \
-                IdUnit* u = (w)->p_menu[i];                                                  \
+                ID_UNIT* u = (w)->p_menu[i];                                                  \
                 u->timer[3] = 0;                                                           \
                 u->timer[1] = 0;                                                           \
                 u->timer[2] = 0;                                                           \
@@ -756,7 +756,7 @@ void titleMain(TITLE_WORK* w)
     case 8:
         switch (w->Rno2) {
         case 0: {
-            IdUnit* u = IdSys.unitPtr(0, IDC_TITLE);
+            ID_UNIT* u = IdSys.unitPtr(0, IDC_TITLE);
             if (w->counter <= 584) {
                 w->counter = 645;
             }
@@ -798,7 +798,7 @@ void titleLoop(TITLE_WORK* w)
 {
     static f32 width = 900.0f;
     static f32 zoom_in_limit = 170.0f;
-    IdUnit* u;
+    ID_UNIT* u;
 
     IdSys.unitPtr(1, IDC_TITLE)->pos0.x = width * 0.0f;
     IdSys.unitPtr(2, IDC_TITLE)->pos0.x = width * 1.0f;
@@ -840,8 +840,8 @@ void titleLoop(TITLE_WORK* w)
 // Copies the colour of id unit `src` to unit `dst`.
 void id_color_copy(int src, int dst, u8 idc)
 {
-    IdUnit* s = IdSys.unitPtr(src, idc);
-    IdUnit* d = IdSys.unitPtr(dst, idc);
+    ID_UNIT* s = IdSys.unitPtr(src, idc);
+    ID_UNIT* d = IdSys.unitPtr(dst, idc);
 
     d->col0[0] = s->col0[0];
     d->col0[1] = s->col0[1];
@@ -1026,7 +1026,7 @@ void titleSub(TITLE_WORK* w)
         IdTexDataLoad(OMK_PTR(4), TEX_OWNER_ID_EVENT);
         IdSys.set(OMK_PTR(7), 0xFF, IDC_OPTION, 0x13, 4, 0);
         for (i = 0; i < 5; i++) {
-            IdUnit* u = IdSys.unitPtr(i, IDC_OPTION);
+            ID_UNIT* u = IdSys.unitPtr(i, IDC_OPTION);
             u->texNo = i;
             u->tex_flag |= 2;
         }
@@ -1112,9 +1112,9 @@ void titleSub(TITLE_WORK* w)
         }
         {
             s8 sel = w->omk_char_no;
-            IdUnit* a = IdSys.unitPtr(sel, IDC_OPTION);
-            IdUnit* b = IdSys.unitPtr(0xFE, IDC_OPTION);
-            IdUnit* u;
+            ID_UNIT* a = IdSys.unitPtr(sel, IDC_OPTION);
+            ID_UNIT* b = IdSys.unitPtr(0xFE, IDC_OPTION);
+            ID_UNIT* u;
             b->pos0 = a->pos0;
             u = IdSys.unitPtr(5, IDC_OPTION);
             u->texNo = sel;
@@ -1221,7 +1221,7 @@ int stageSelect(TITLE_WORK* w)
     {
         int i;
         for (i = 0; i < 4; i++) {
-            IdUnit* u = IdSys.unitPtr(i + 0x11, IDC_OPTION);
+            ID_UNIT* u = IdSys.unitPtr(i + 0x11, IDC_OPTION);
             u->texNo = i;
             u->tex_flag |= 2;
         }
@@ -1229,7 +1229,7 @@ int stageSelect(TITLE_WORK* w)
     {
         int i;
         for (i = 0; i < 4; i++) {
-            IdUnit* u = IdSys.unitPtr(i + 0x21, IDC_OPTION);
+            ID_UNIT* u = IdSys.unitPtr(i + 0x21, IDC_OPTION);
             if (w->omk_stage_no == i) {
                 u->be_flag &= ~8;
             } else {
@@ -1242,12 +1242,12 @@ int stageSelect(TITLE_WORK* w)
     IdSys.unitPtr(0x33, IDC_OPTION)->be_flag &= ~8;
     IdSys.unitPtr(0x34, IDC_OPTION)->be_flag &= ~8;
     if (ret == 1) {
-        IdUnit* u = IdSys.unitPtr(w->omk_stage_no + 0x31, IDC_OPTION);
+        ID_UNIT* u = IdSys.unitPtr(w->omk_stage_no + 0x31, IDC_OPTION);
         u->be_flag |= 8;
         IdSys.setTime(u, 0);
     }
     {
-        IdUnit* u;
+        ID_UNIT* u;
         u = IdSys.unitPtr(1, IDC_OPTION);
         if (ExtFlagChk(pSys, EXT_GET_ADA)) {
             u->be_flag &= ~8;
@@ -1326,7 +1326,7 @@ int stageSelect(TITLE_WORK* w)
                     IdSys.unitPtr(i * 16 + 0x80 + j, IDC_OPTION)->be_flag &= ~8;
                 }
             } else {
-                IdUnit* u = IdSys.unitPtr(i * 16 + 0x88, IDC_OPTION);
+                ID_UNIT* u = IdSys.unitPtr(i * 16 + 0x88, IDC_OPTION);
                 u->be_flag |= 8;
                 u->tex_flag |= 2;
                 IdSetNum(&IdSys, i * 16 + 0x81, IDC_OPTION, save.stage[i].score, 9999999, 7, 0);

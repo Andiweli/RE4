@@ -183,7 +183,7 @@ int getAreaNo(u32 room);
 void mapInitViewport(SUB_SCREEN* wk);
 void mapChangeViewport(SUB_SCREEN* wk);
 void stageNameDisp(SUB_SCREEN* wk);
-void markCharDisp(IdUnit* u, Mtx m);
+void markCharDisp(ID_UNIT* u, Mtx m);
 void markPlayerDisp(SUB_SCREEN* wk, int sw);
 void markGoalInit(SUB_SCREEN* wk);
 void markGoalQuit(SUB_SCREEN* wk);
@@ -461,7 +461,7 @@ int getAreaNo(u32 room)
 // its screen position (SsMapWork cx/cy/sw/sh and the GX viewport in 640x448 field coordinates).
 void mapInitViewport(SUB_SCREEN* wk)
 {
-    IdUnit* u = IdSub.unitPtr(0xFE, IDC_SSCRN_NEAR_0);
+    ID_UNIT* u = IdSub.unitPtr(0xFE, IDC_SSCRN_NEAR_0);
     f32 sx = fabsf(u->size_W);
     f32 sy = fabsf(u->size_H);
     Vec p;
@@ -534,7 +534,7 @@ void stageNameDisp(SUB_SCREEN* wk)
 
 // Places a character mark unit at the map screen position of matrix `m`'s translation, rotated to
 // its facing (z axis, degrees); skipped when the position projects behind the camera.
-void markCharDisp(IdUnit* u, Mtx m)
+void markCharDisp(ID_UNIT* u, Mtx m)
 {
     Vec pos;
     Vec scr;
@@ -558,7 +558,7 @@ void markCharDisp(IdUnit* u, Mtx m)
 // subMapMat, only while a partner exists).
 void markPlayerDisp(SUB_SCREEN* wk, int sw)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     if (!sw) {
         u = IdSub.unitPtr(0, IDC_SSCRN_0);
@@ -701,7 +701,7 @@ int markGoalPosition(SUB_SCREEN* wk, Vec* pos)
 // Shows (sw) the goal mark (IdSub 3/0x14) at the projected goal position, or hides it.
 void markGoalDisp(SUB_SCREEN* wk, int sw)
 {
-    IdUnit* u = IdSub.unitPtr(3, IDC_SSCRN_0);
+    ID_UNIT* u = IdSub.unitPtr(3, IDC_SSCRN_0);
     Vec pos;
     Vec scr;
 
@@ -849,7 +849,7 @@ int getMerchantMarkNo(int no)
 // Shows (sw) the up to seven merchant marks at their projected positions, or hides them all.
 void markMerchantDisp(SUB_SCREEN* wk, int sw)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     if (!sw) {
         int i;
@@ -960,8 +960,8 @@ int markTreasureExist(int no)
 void markTreasureDisp(SUB_SCREEN* wk, int sw)
 {
     SsMapWork* m = wk->map;
-    IdUnit* u;
-    IdUnit* u2;
+    ID_UNIT* u;
+    ID_UNIT* u2;
 
     if (!sw) {
         for (int i = 0; i < treasure_mark_num; i++) {
@@ -1053,7 +1053,7 @@ int markCoinExist(int stage, int no)
 void markCoinDisp(SUB_SCREEN* wk, int sw)
 {
     SsMapWork* m = wk->map;
-    IdUnit* u;
+    ID_UNIT* u;
 
     if (!sw) {
         for (int i = 0; i < coin_mark_num; i++) {
@@ -1170,7 +1170,7 @@ int markSavePosition(SUB_SCREEN* wk, int no, Vec* pos)
 void markSaveDisp(SUB_SCREEN* wk, int sw)
 {
     SsMapWork* m = wk->map;
-    IdUnit* u;
+    ID_UNIT* u;
     int i;
 
     if (!sw) {
@@ -1931,7 +1931,7 @@ static inline void mapModelLight(cModel* m)
 // floors get colour 5 + floor) from the colour units IdSub 0..10 of group 0x19.
 void mapModelInit(SUB_SCREEN* wk)
 {
-    IdUnit* id[11];
+    ID_UNIT* id[11];
     int i;
     int no;
     int j;  // one `j` for both room loops: expand_preferences hands the second loop's hoisted `j + 1`
@@ -2004,7 +2004,7 @@ void mapModelInit(SUB_SCREEN* wk)
 
         for (j = 0; j < n; j++) {
             cModelInfo* info;
-            IdUnit* u;
+            ID_UNIT* u;
             int col;
 
             mdl = MapMgr.getWork(no);
@@ -2107,7 +2107,7 @@ void doorModelDisp(SUB_SCREEN* wk)
     MapDoor* e = map_door_tbl[m->area].p;
     int base = (s8) wk->map_obj_num;
     int n = map_door_tbl[m->area].n;
-    IdUnit* id[3];
+    ID_UNIT* id[3];
     int i;
 
     id[0] = IdSub.unitPtr(0x10, IDC_SSCRN_FAR_1);
@@ -2116,7 +2116,7 @@ void doorModelDisp(SUB_SCREEN* wk)
     for (i = 0; i < n; i++, e++) {
         cModel* mdl;
         cModelInfo* info;
-        IdUnit* u;
+        ID_UNIT* u;
         int open;
 
         if (e->parts & 0x80) {
@@ -2725,7 +2725,7 @@ void SsMapMain::quit(SUB_SCREEN* wk)
 // Starts the map frame's close animation (IdSub 0/0x10) and fades the button hints.
 void sscrn_map_out_init(SUB_SCREEN* wk)
 {
-    IdUnit* u = IdSub.unitPtr(0, IDC_SSCRN_NEAR_0);
+    ID_UNIT* u = IdSub.unitPtr(0, IDC_SSCRN_NEAR_0);
 
     u->be_flag |= 8;
     u->rev_flag &= 0xF0;
@@ -2737,7 +2737,7 @@ void sscrn_map_out_init(SUB_SCREEN* wk)
 // the map id groups; 1 when the animation ended.
 static int sscrn_map_out(SUB_SCREEN* wk)
 {
-    IdUnit* u = IdSub.unitPtr(0, IDC_SSCRN_NEAR_0);
+    ID_UNIT* u = IdSub.unitPtr(0, IDC_SSCRN_NEAR_0);
 
     if ((s16) u->timer[0] == 0xF) {
         sscrnModelFree(wk);
@@ -2848,8 +2848,8 @@ void MapRead::move(SUB_SCREEN* wk)
 void MapModeSelect::init(SUB_SCREEN* wk)
 {
     SsMapWork* m = wk->map;
-    IdUnit* u;
-    IdUnit* u2;
+    ID_UNIT* u;
+    ID_UNIT* u2;
 
     IdSub.unitPtr(0x10, IDC_SSCRN_NEAR_0)->be_flag |= 8;
     IdSub.unitPtr(0x10, IDC_SSCRN_NEAR_0)->rev_flag &= 0xF0;
@@ -2910,7 +2910,7 @@ void mapModeChange(SUB_SCREEN* wk, s8 no)
 void MapModeSelect::move(SUB_SCREEN* wk)
 {
     SsMapWork* m = wk->map;
-    IdUnit* u;
+    ID_UNIT* u;
 
     if (Key.trg & 0x40020000) {
         switch (m->modeSel) {
@@ -2971,7 +2971,7 @@ void MapModeSelect::move(SUB_SCREEN* wk)
         }
         m->modeCursor = m->modeCursor < 0 ? 3 : (m->modeCursor > 3 ? 0 : m->modeCursor);
         if (old != m->modeCursor) {
-            IdUnit* u2;
+            ID_UNIT* u2;
 
             u = IdSub.unitPtr(0x20, IDC_SSCRN_NEAR_0);
             u2 = IdSub.unitPtr(0x60 + m->modeCursor, IDC_SSCRN_NEAR_0);
