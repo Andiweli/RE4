@@ -518,7 +518,7 @@ void tLightAreaInit()
     SpfFlagOn(pG, SPF_EARTHQUAKE);
     SpfFlagOn(pG, SPF_MIST);
     DbgFlagOn(pG, DBG_DBG_CAM);
-    CamDbg.m_target_type = 4;
+    CamDbg.setTargetType(4);
     Block.dispAllBlock(1);
 }
 

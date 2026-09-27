@@ -36,6 +36,10 @@ public:
     void camera_type_00(CAMERA* pCam, JOY* pJoy);
     void camera_type_01(CAMERA* pCam, JOY* pJoy);
     void menu(CAMERA* pCam, JOY* pJoy);
+    void setTargetType(int type) { m_target_type = type; }
+    void saveTargetType() { m_target_save = m_target_type; }
+    void loadTargetType() { m_target_type = m_target_save; }
+    void setKeyType(int type) { m_key_type = type; }
     int menuCamera(JOY* pJoy);
     int menuFlag(JOY* pJoy);
     int menuHitDisp(JOY* pJoy);

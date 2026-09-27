@@ -571,7 +571,7 @@ extern "C" void DB_WorkPush(int flags, int emArray)
     } else {
         DbgFlagOff(pG, DBG_ESPTOOL_ONEM);
     }
-    CamDbg.m_target_type = 0;
+    CamDbg.setTargetType(0);
 }
 
 // Restores the room's arrays and display (inverse of DB_WorkPush).
@@ -582,7 +582,7 @@ extern "C" void DB_WorkPop(int flags, int emArray)
     }
     db_emArray = emArray != 0;
     db_workPushed = 0;
-    CamDbg.m_target_type = 4;
+    CamDbg.setTargetType(4);
     EffectDeleteAll();
     DbgFlagOn(pG, DBG_ESPTOOL_ONSCR);
     ToolWorkPop(flags);

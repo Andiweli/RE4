@@ -351,7 +351,7 @@ void tEspAreaInit()
     DpfFlagOn(pG, DPF_SHADOW);
     DpfFlagOn(pG, DPF_FILTER);
     DbgFlagOn(pG, DBG_DBG_CAM);
-    CamDbg.m_target_type = 4;
+    CamDbg.setTargetType(4);
     Block.dispAllBlock(1);
 }
 

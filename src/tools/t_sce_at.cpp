@@ -353,8 +353,8 @@ void tSceAtInit()
     pW->mesNum = loadMesName(buf, (char*) pW->mesName);
     sprintf(buf, "d:\\bio4/prog/head/cmesmes.h");
     pW->cmesNum = loadMesName(buf, (char*) pW->cmesName);
-    CamDbg.m_target_save = CamDbg.m_target_type;
-    CamDbg.m_target_type = 4;
+    CamDbg.saveTargetType();
+    CamDbg.setTargetType(4);
 }
 
 // Server (d:) and local (x:) paths of the room's r<room>.aev.
@@ -398,7 +398,7 @@ static void tSceAtExit()
     case 9:
         file_unlock(pW->pathX);
         Debug_free(pW);
-        CamDbg.m_target_type = CamDbg.m_target_save;
+        CamDbg.loadTargetType();
         DbgFlagOff(pG, DBG_DBG_CAM);
         SetToolLight(-1);
         StaFlagOff(pG, STA_NO_LIGHTMASK);
