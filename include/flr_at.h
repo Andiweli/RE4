@@ -38,7 +38,7 @@ struct FLR_AT_DATA {
     u8 flag;         // 0x00  bit0: active (FlrAtOn / FlrAtOff)  (PS2 be_flg)
     u8 type;         // 0x01  attribute type asked for in FlrAtCheck  (PS2 id)
     u8 no;           // 0x02  record index; (type 2) the BGM control id snd.cpp remembers  (PS2 no)
-    u8 group;        // 0x03  group (FlrSys::group 0xFF = any)
+    u8 group;        // 0x03  group (FLR_AT_SYS::cur_group 0xFF = any)
     u8 priority;     // 0x04  save order in the tool (15 first)  (PS2 priority)
     u8 padd[15];     // 0x05  (PS2 padd)
     AREA_HIT_DATA area;  // 0x14
@@ -51,8 +51,8 @@ struct FLR_AT_DATA {
     };
 };
 
-// "FSE" room file header (pG->pRoomArc), followed by the FLR_AT_DATA records at 0x10 (PS2 FLR_AT_HEADER).
-struct FlrAtHead {
+// "FSE" room file header (pG->pRoomArc), followed by the FLR_AT_DATA records at 0x10.
+struct FLR_AT_HEADER {
     char magic[4];   // 0x00  "FSE"
     u16 version;     // 0x04  0x103
     u16 num;         // 0x06  record count
@@ -63,15 +63,15 @@ struct FlrAtHead {
 };
 
 // Floor system work (`pFlrSys` -> FlrAt_sys, 0x8C bytes).
-struct FlrSys {
-    void* pData;         // 0x00  room floor attribute data (NULL when the room has none)
-    FLR_AT_DATA* pList;        // 0x04  its records
-    u8 group;            // 0x08  current group (0xFF = any)
-    u8 foot_se[0x41];    // 0x09  foot SE variation per material (FlrAtSetDefVal a)
-    u8 foot_esp[0x42];   // 0x4A  foot effect per material (FlrAtSetDefVal b)
+struct FLR_AT_SYS {
+    FLR_AT_HEADER* pHead;    // 0x00  room floor attribute data (NULL when the room has none)
+    FLR_AT_DATA* pData;      // 0x04  its records
+    u8 cur_group;        // 0x08  current group (0xFF = any)
+    u8 def_se_set[0x41];    // 0x09  foot SE variation per material (FlrAtSetDefVal a)
+    u8 def_eff_set[0x42];   // 0x4A  foot effect per material (FlrAtSetDefVal b)
 };
 
-extern FlrSys* pFlrSys;
+extern FLR_AT_SYS* pFlrSys;
 
 FLR_AT_DATA* FlrAtCheck(int id, Vec* pos, int flag);
 

@@ -516,9 +516,9 @@ int footSeCheck(u16* call_no, Vec* pos)
                 *call_no += at->se.se_type * FOOT_SE_NUM;
             } else {
                 if (*call_no <= 3) {
-                    EspFootCall(*call_no >> 1, pFlrSys->foot_esp[pFlrSys->group], pos);
+                    EspFootCall(*call_no >> 1, pFlrSys->def_eff_set[pFlrSys->cur_group], pos);
                 }
-                *call_no += pFlrSys->foot_se[pFlrSys->group] * FOOT_SE_NUM;
+                *call_no += pFlrSys->def_se_set[pFlrSys->cur_group] * FOOT_SE_NUM;
             }
         }
     }
@@ -618,8 +618,8 @@ int wepSeCheck(u16* call_no, Vec* pos)
         FLR_AT_DATA* at = FlrAtCheck(0, pos, 4);
         if (at != NULL) {
             *call_no += at->se.cartridge_type;
-        } else if (pFlrSys->pData != NULL) {
-            *call_no += ((FlrAtHead*) pFlrSys->pData)->cartridge_type;
+        } else if (pFlrSys->pHead != NULL) {
+            *call_no += ((FLR_AT_HEADER*) pFlrSys->pHead)->cartridge_type;
         }
     }
     ret = sndExistCheck(2, *call_no);
