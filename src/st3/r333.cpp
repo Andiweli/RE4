@@ -61,7 +61,7 @@ struct R333Work {
 struct R333IdData {
     u8 pad_0[0x10];
     u32 ofsTex;   // 0x10  IdTexDataLoad(.., 7)
-    u32 ofsId;    // 0x14  IdSys.set(.., 0xFF, IDC_TITLE, ..)
+    u32 ofsId;    // 0x14  IdSys.set((ID_FILE_HEADER*) .., 0xFF, IDC_TITLE, ..)
 };
 
 static R333Work* r333_work;
@@ -778,7 +778,7 @@ void disp_id_data()
     R333IdData* d = (R333IdData*) r333_work->idData;
 
     IdTexDataLoad((void*) (d->ofsTex + (u32) d), 7);
-    IdSys.set((void*) (d->ofsId + (u32) d), 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) (d->ofsId + (u32) d), 0xFF, IDC_TITLE, 0x13, 6, 0);
 }
 
 // Drop the result id table (owner 7 textures, id table 0x28).

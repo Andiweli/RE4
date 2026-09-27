@@ -207,7 +207,7 @@ void ToolInterfaceDesign()
         if (pIdTool->pause == 0) {
             toolIdSys.roomInit();
             toolIdDataEncode(pIdBuf0, pIdTool);
-            toolIdSys.set(pIdBuf0, 0xFF, IDC_TOOL, 0xC, 6, 0);
+            toolIdSys.set((ID_FILE_HEADER*) pIdBuf0, 0xFF, IDC_TOOL, 0xC, 6, 0);
             toolIdSys.stop();
         } else {
             pIdTool->drawSafe = 0;

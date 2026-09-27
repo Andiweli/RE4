@@ -466,13 +466,13 @@ void idR330::init(u32 no)
     IdTexDataLoad(ROOM_ARC_PTR(pG->pRoom, 0x1F), 7);
     switch (mode) {
     case 0:
-        IdSys.set(ROOM_ARC_PTR(pG->pRoom, 0x22), 0xFF, IDC_EVENT, 0xC, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x22), 0xFF, IDC_EVENT, 0xC, 6, 0);
         break;
     case 1:
-        IdSys.set(ROOM_ARC_PTR(pG->pRoom, 0x20), 0xFF, IDC_EVENT, 0xC, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x20), 0xFF, IDC_EVENT, 0xC, 6, 0);
         break;
     case 2:
-        IdSys.set(ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, IDC_EVENT, 0xC, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, IDC_EVENT, 0xC, 6, 0);
         break;
     }
     cnt = 0;

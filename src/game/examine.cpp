@@ -458,7 +458,7 @@ void ItemExamine::idSet()
     }
     switch (m_scrn_flag) {
     case 1:
-        m_pIdSys->set(SS_ARC_PTR(wk->pCmmn, 15), 0xFF, IDC_DATA, 0x15, 2, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 15), 0xFF, IDC_DATA, 0x15, 2, 0);
         itemInfo(m_item_id, &inf);
         if (inf.type == 1) {
             val = 0;
@@ -548,17 +548,17 @@ void ItemExamine::idSet()
         }
         break;
     case 2:
-        m_pIdSys->set(SS_ARC_PTR(wk->pExam, 8), 0xFF, IDC_DATA, 0x15, 2, 0);
-        m_pIdSys->set(SS_ARC_PTR(wk->pExam, 9), 0xFF, IDC_DATA, 0x15, 2, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pExam, 8), 0xFF, IDC_DATA, 0x15, 2, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pExam, 9), 0xFF, IDC_DATA, 0x15, 2, 0);
         break;
     }
     switch (m_scrn_flag) {
     case 0:
     case 1:
-        m_pIdSys->set((void*) (pG->pCore->ofs_78 + (u32) pG->pCore), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) (pG->pCore->ofs_78 + (u32) pG->pCore), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
         break;
     case 2:
-        m_pIdSys->set(SS_ARC_PTR(wk->pExam, 7), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pExam, 7), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
         break;
     }
 }

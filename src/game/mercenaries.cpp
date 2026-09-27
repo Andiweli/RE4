@@ -995,7 +995,7 @@ void MercID::init(int num)
     pIdStart = DATA_PTR(pData, 0x18);
     pIdTimeUp = DATA_PTR(pData, 0x1C);
     set();
-    _idSys.set(pIdMain, 0xFF, IDC_GAUGE, 0x13, 5, 0);
+    _idSys.set((ID_FILE_HEADER*) pIdMain, 0xFF, IDC_GAUGE, 0x13, 5, 0);
     IdSetTrans(&_idSys, 0x20, IDC_GAUGE, 0);
     IdSetTrans(&_idSys, 0x60, IDC_GAUGE, 0);
     IdSetTrans(&_idSys, 0, IDC_GAUGE, 0);
@@ -1022,14 +1022,14 @@ void MercID::kill()
 // Shows the "mission start" id animation with its sound.
 void MercID::dispMissionStart()
 {
-    _idSys.set(pIdStart, 0xFF, IDC_EVENT, 0x13, 4, 0);
+    _idSys.set((ID_FILE_HEADER*) pIdStart, 0xFF, IDC_EVENT, 0x13, 4, 0);
     SndCall(6, 0x7C, 0, 0, 0, 0);
 }
 
 // Shows the "time up" id animation with its sound.
 void MercID::dispTimeUp()
 {
-    _idSys.set(pIdTimeUp, 0xFF, IDC_EVENT, 0x13, 4, 0);
+    _idSys.set((ID_FILE_HEADER*) pIdTimeUp, 0xFF, IDC_EVENT, 0x13, 4, 0);
     SndCall(6, 0x7E, 0, 0, 0, 0);
 }
 
@@ -1058,7 +1058,7 @@ int MercResult::init(MercSysWork* pWk)
     pIdExtra = DATA_PTR(omk_addr, 0x28);
     pIdEnd = DATA_PTR(omk_addr, 0x2C);
     IdTexDataLoad(pTex, TEX_OWNER_ID_TITLE);
-    IdSys.set(pIdRank[pWk->rslt.mode], 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) pIdRank[pWk->rslt.mode], 0xFF, IDC_TITLE, 0x13, 6, 0);
     _rno0 = 0;
     _rno1 = 0;
     _rno2 = 0;
@@ -1113,7 +1113,7 @@ int MercResult::move(MercSysWork* pWk)
         }
         FadeSetW(0x80000002, 10, 0, 0);
         IdSys.kill(0xFF, IDC_TITLE);
-        IdSys.set(pIdExtra, 0xFF, IDC_TITLE, 0x13, 4, 0);
+        IdSys.set((ID_FILE_HEADER*) pIdExtra, 0xFF, IDC_TITLE, 0x13, 4, 0);
         for (int i = 0; i < 4; i++) {
             int on = 0;
 
@@ -1155,7 +1155,7 @@ int MercResult::move(MercSysWork* pWk)
         }
         FadeSetW(0x80000002, 10, 0, 0);
         IdSys.kill(0xFF, IDC_TITLE);
-        IdSys.set(pIdEnd, 0xFF, IDC_TITLE, 0x13, 4, 0);
+        IdSys.set((ID_FILE_HEADER*) pIdEnd, 0xFF, IDC_TITLE, 0x13, 4, 0);
         _rno1 = 0;
         _rno0++;
         break;
@@ -1202,7 +1202,7 @@ void AdaResult::init()
     pTex = DATA_PTR(omk_addr, 0x10);
     pId = DATA_PTR(omk_addr, 0x14);
     IdTexDataLoad(pTex, TEX_OWNER_ID_TITLE);
-    IdSys.set(pId, 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) pId, 0xFF, IDC_TITLE, 0x13, 6, 0);
     _rno0 = 0;
     _rno1 = 0;
     _rno2 = 0;
@@ -1217,7 +1217,7 @@ int AdaResult::move(int messNo)
     switch (_rno0) {
     case 0:
         FadeSetW(0x80000002, 10, 0, 0);
-        IdSys.set(pId, 0xFF, IDC_TITLE, 0x13, 4, 0);
+        IdSys.set((ID_FILE_HEADER*) pId, 0xFF, IDC_TITLE, 0x13, 4, 0);
         _rno1 = 0;
         _rno0++;
         break;

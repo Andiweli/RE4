@@ -58,9 +58,9 @@ class cObjWep;
 struct R22cResultData {
     u8 pad_0[0x10];
     u32 ofsTexResult;   // 0x10  IdTexDataLoad(.., 7)
-    u32 ofsIdResult;    // 0x14  IdSys.set(.., 0xFF, IDC_TITLE, ..)
+    u32 ofsIdResult;    // 0x14  IdSys.set((ID_FILE_HEADER*) .., 0xFF, IDC_TITLE, ..)
     u32 ofsIdHigh;      // 0x18  the high-score variant of the result table
-    u32 ofsIdReload;    // 0x1C  IdSys.set(.., 0xFF, IDC_EVENT, ..)
+    u32 ofsIdReload;    // 0x1C  IdSys.set((ID_FILE_HEADER*) .., 0xFF, IDC_EVENT, ..)
     u32 ofsTexReload;   // 0x20  IdTexDataLoad(.., 6)
 };
 
@@ -1709,7 +1709,7 @@ void ResultScreen::reloadtime()
     IdTexRelease(TEX_OWNER_ID_EVENT);
     IdTexDataLoad(RES_PTR(data, ofsTexReload), TEX_OWNER_ID_EVENT);
     IdSys.kill(0xFF, IDC_EVENT);
-    IdSys.set(RES_PTR(data, ofsIdReload), 0xFF, IDC_EVENT, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) RES_PTR(data, ofsIdReload), 0xFF, IDC_EVENT, 0x13, 6, 0);
 }
 
 // Show the high-score variant of the result board with `score` split into seven digits.
@@ -1722,7 +1722,7 @@ void ResultScreen::highscore(int score)
     IdTexRelease(TEX_OWNER_ID_COCKPIT);
     IdSys.roomInit();
     IdTexDataLoad(RES_PTR(data, ofsTexResult), TEX_OWNER_ID_TITLE);
-    IdSys.set(RES_PTR(data, ofsIdHigh), 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) RES_PTR(data, ofsIdHigh), 0xFF, IDC_TITLE, 0x13, 6, 0);
     for (i = 0; i < 7; i++) {
         digit[i] = score % 10;
         score /= 10;
@@ -1754,7 +1754,7 @@ void ResultScreen::init()
     IdTexRelease(TEX_OWNER_ID_COCKPIT);
     IdSys.roomInit();
     IdTexDataLoad(RES_PTR(data, ofsTexResult), TEX_OWNER_ID_TITLE);
-    IdSys.set(RES_PTR(data, ofsIdResult), 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) RES_PTR(data, ofsIdResult), 0xFF, IDC_TITLE, 0x13, 6, 0);
     if (r22c_work->capId == 0xFFFF) {
         SndCall(6, 0xA, 0, 0, 0, 0);
     } else {
@@ -1926,7 +1926,7 @@ void ScoreSet(int pt, Vec* pos)
     }
     r22c_work->scoreTimer[slot] = 30;
     type = slot + 0x40;
-    r22c_work->score2.set(ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, type, 0x13, 6, 0);
+    r22c_work->score2.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, type, 0x13, 6, 0);
     u = r22c_work->score2.unitPtr(0, type);
     v = *pos;
     GetScreenPos(&v, &scr);

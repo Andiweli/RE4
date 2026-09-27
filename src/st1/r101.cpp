@@ -415,7 +415,7 @@ static void r101_Event30_TitleCall()
     } while (1);
     IdSys.dispSw(IDC_LIFE_METER, 0);
     IdTexDataLoad(tex->getAddr(), TEX_OWNER_ID_EVENT);
-    IdSys.set(id->getAddr(), 0xFF, IDC_EVENT, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) id->getAddr(), 0xFF, IDC_EVENT, 0x13, 6, 0);
     while (1) {
         if (pG->Room_flg[0] & 0x20000000) {
             goto end;

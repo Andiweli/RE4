@@ -491,29 +491,29 @@ void SsShopMain::init(SUB_SCREEN* wk)
     puzzleCameraInit(wk, &pG->Camera);
     IdTexDataLoad(SS_ARC_PTR(wk->pPzzlDat, 0x1AA), TEX_OWNER_ID_SSCRN);
     IdTexDataLoad(SS_ARC_PTR(wk->pShopDat, 4), TEX_OWNER_ID_SSCRN);
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
-    IdSub.set(SS_ARC_PTR(wk->pPzzlDat, 0x1AB), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 0, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pPzzlDat, 0x1AB), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 0, 0);
     tempSpaceDisp(0);
     {
         int i;
         for (i = 0; i < 0x3E; i++) {
             if (i == 0) {
-                IdNum.set(SS_ARC_PTR(wk->pCmmn, 8), 0xFF, IDC_NUM_00, 0x13, 8, 0);
+                IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, IDC_NUM_00, 0x13, 8, 0);
             } else {
-                IdNum.set(SS_ARC_PTR(wk->pCmmn, 8), 0xFF, 0x40 + i, 0x13, 9, 0);
+                IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, 0x40 + i, 0x13, 9, 0);
             }
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pShopDat, 6), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 7, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pShopDat, 6), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 7, 0);
     {
         int i;
         for (i = 0; i < 5; i++) {
-            IdSub.set(SS_ARC_PTR(wk->pShopDat, 8), 0xFF, 0x80 + i, 0x13, 5, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pShopDat, 8), 0xFF, 0x80 + i, 0x13, 5, 0);
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pShopDat, 7), 0xFF, IDC_SSCRN_CKPT_0, 0x13, 4, 0);
-    IdSub.set(SS_ARC_PTR(wk->pShopDat, 9), 0xFF, IDC_SSCRN_CKPT_3, 0x13, 3, 0);
-    IdSub.set(SS_ARC_PTR(wk->pShopDat, 5), 0xFF, IDC_SSCRN_CKPT_2, 0x15, 0, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pShopDat, 7), 0xFF, IDC_SSCRN_CKPT_0, 0x13, 4, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pShopDat, 9), 0xFF, IDC_SSCRN_CKPT_3, 0x13, 3, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pShopDat, 5), 0xFF, IDC_SSCRN_CKPT_2, 0x15, 0, 0);
     u = IdSub.unitPtr(0x52, IDC_SSCRN_CKPT_2);
     u->be_flag &= ~8;
     u = IdSub.unitPtr(0x56, IDC_SSCRN_CKPT_2);

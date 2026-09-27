@@ -1105,10 +1105,10 @@ void gameDiedemo(DIEDEMO_WORK* pDw)
             }
             switch (kind) {
             case 1:
-                IdSys.set((void*) (((OptionArc*) pG->pOption)->ofs_14 + (u32) pG->pOption), 0xFF, IDC_DEAD, 0x13, 6, 0);
+                IdSys.set((ID_FILE_HEADER*) (((OptionArc*) pG->pOption)->ofs_14 + (u32) pG->pOption), 0xFF, IDC_DEAD, 0x13, 6, 0);
                 break;
             case 2:
-                IdSys.set((void*) (((OptionArc*) pG->pOption)->ofs_1C + (u32) pG->pOption), 0xFF, IDC_DEAD, 0x13, 6, 0);
+                IdSys.set((ID_FILE_HEADER*) (((OptionArc*) pG->pOption)->ofs_1C + (u32) pG->pOption), 0xFF, IDC_DEAD, 0x13, 6, 0);
                 break;
             }
             if (StaFlagChk(pG, STA_EVENT_CANCEL)) {
@@ -1123,7 +1123,7 @@ void gameDiedemo(DIEDEMO_WORK* pDw)
             /* fallthrough */
         case 2:
             if (cnt >= pDw->exec_frame + 0x10E || (Key.trg & 0x80000000)) {
-                IdSys.set((void*) (((OptionArc*) pG->pOption)->ofs_18 + (u32) pG->pOption), 0xFF, IDC_CONTINUE, 0x13, 5, 0);
+                IdSys.set((ID_FILE_HEADER*) (((OptionArc*) pG->pOption)->ofs_18 + (u32) pG->pOption), 0xFF, IDC_CONTINUE, 0x13, 5, 0);
                 cnt2 = 0;
                 step++;
                 IdSys.beMove(IdSys.unitPtr(0x30, IDC_CONTINUE), 0);

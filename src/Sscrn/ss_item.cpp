@@ -168,7 +168,7 @@ void SsItemInit::move(SUB_SCREEN* wk)
         IdSubErase();
         IdNumErase();
         IdFreeBuffer();
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 2, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 2, 0);
         item_wait[0] = st;
         // `state++` written out here too (jump2 cross-jumps it into case 1's tail): at allocation
         // time this block has two pseudos, so the `lis item_wait@ha` gets r11.
@@ -244,12 +244,12 @@ void SsItemMain::init(SUB_SCREEN* wk)
     itemCameraInit(wk, &pG->Camera);
     IdTexDataLoad(SS_ARC_PTR(wk->pItemDat, 5), TEX_OWNER_ID_SSCRN);
     if (IdSub.setCk(IDC_SSCRN_0) == 0) {
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 2, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 2, 0);
     }
-    IdNum.set(SS_ARC_PTR(wk->pItemDat, 7), 0xFF, IDC_SSCRN_1, 0xC, 6, 0);
+    IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pItemDat, 7), 0xFF, IDC_SSCRN_1, 0xC, 6, 0);
     for (int i = 0; i < 32; i++) {
         int no = i + 0x40;
-        IdNum.set(SS_ARC_PTR(wk->pCmmn, 8), 0xFF, no, 0xC, 5, 0);
+        IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, no, 0xC, 5, 0);
         numDisp(no, 0, 0, 0);
     }
     for (int k = 0; k < 2; k++) {
@@ -260,7 +260,7 @@ void SsItemMain::init(SUB_SCREEN* wk)
             type++;
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pItemDat, 6), 0xFF, IDC_SSCRN_2, 0xC, 4, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pItemDat, 6), 0xFF, IDC_SSCRN_2, 0xC, 4, 0);
     for (int i = 0; i < 2; i++) {
         ID_UNIT* tbl[16];
         s8 num;
@@ -270,7 +270,7 @@ void SsItemMain::init(SUB_SCREEN* wk)
             tbl[j]->rev_flag |= 0xF;
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0x10), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 1, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0x10), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 1, 0);
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_2)->be_flag &= ~8;
     IdSub.unitPtr(0x60, IDC_SSCRN_2)->rev_flag |= 0xF;
     IdSub.unitPtr(0x61, IDC_SSCRN_2)->be_flag &= ~8;

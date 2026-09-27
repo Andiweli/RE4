@@ -124,12 +124,13 @@ struct ID_DATA_V2 {
     u32 ofs[6];      // 0x74
 };
 
-// Id data table header: version string, entry count, entries from 0x08.
-struct IdDataHeader {
-    char version[5];  // 0x00  "1.00" / "2.00"
-    u8 num;           // 0x05
-    u8 pad_6[2];
-};
+// Id data table header (IDSystem::set's argument), entries from 0x08.
+typedef struct _ID_FILE_HEADER {
+    char Version[4];  // 0x00  "1.00" / "2.00"
+    u8 GroupNo;       // 0x04
+    u8 UnitNum;       // 0x05
+    u8 dummy[2];      // 0x06
+} ID_FILE_HEADER;
 
 // Id class (PS2 ID_CLASS): the `type` / classNo of IDSystem::set/kill/setCk/dispSw/unitPtr and the IdSet*
 // helpers; IDC_NUM_00..IDC_NUM_61 are the 62 digit classes, IDC_ANY matches every class.
@@ -210,7 +211,7 @@ public:
     void unitLevel(ID_UNIT* u, u8 level);
     void unitParent(ID_UNIT* parent, ID_UNIT* child);
     ID_UNIT* unitPtr(u8 id, int type);
-    void set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode);
+    void set(ID_FILE_HEADER* data, u8 id, int type, u8 ot, u8 prio, u8 mode);
     void kill(u8 id, int type);
     void stop();
     void move();

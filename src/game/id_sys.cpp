@@ -198,9 +198,9 @@ int cmp_id_no(ID_DATA_V2* p_id_v2, u8 dst_no, int attr)
 
 // Instantiates the units of id table `data` whose id matches (`id` 0xFF for all) as class `type`.
 // It reads both 1.x and 2.x tables, and mode 1 is the recursive pass over a v2 id's children.
-void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
+void IDSystem::set(ID_FILE_HEADER* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
 {
-    IdDataHeader* hdr = (IdDataHeader*) data;
+    ID_FILE_HEADER* hdr = data;
     ID_DATA_V2* p2 = (ID_DATA_V2*) ((u8*) data + 8);
     ID_DATA_V1* p1 = (ID_DATA_V1*) ((u8*) data + 8);
     int ver;
@@ -220,13 +220,13 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
         OSReport("IDSystem::set(): Dat ver.%d < Sys ver.%d\n", ver, sysVer);
     }
 
-    for (i = 0; i < hdr->num; i++) {
+    for (i = 0; i < hdr->UnitNum; i++) {
         switch (ver) {
         case 1:
             if (id == 0xFF || p1->id == id) {
                 u = unitPull();
                 if (u == 0) {
-                    pLog->err(0, 0, "IDSystem::set() work full (0x%02x miss)", hdr->num - i);
+                    pLog->err(0, 0, "IDSystem::set() work full (0x%02x miss)", hdr->UnitNum - i);
                 } else {
                     u->be_flag = p1->flags;
                     u->markNo = p1->id;
@@ -334,7 +334,7 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
             if (id == 0xFF || cmp_id_no(p2, id, mode) != 0) {
                 u = unitPull();
                 if (u == 0) {
-                    pLog->err(0, 0, "IDSystem::set() work full (0x%02x miss)", hdr->num - i);
+                    pLog->err(0, 0, "IDSystem::set() work full (0x%02x miss)", hdr->UnitNum - i);
                 } else {
                     u->be_flag = p2->flags;
                     u->markNo = p2->id;

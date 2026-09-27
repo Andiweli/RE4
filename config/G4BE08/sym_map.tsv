@@ -4688,7 +4688,7 @@ address	size	section	unit	scope	name	demangled
 0x8014913C	0x38	.text	game/id_sys.cpp	global	unitParent__8IDSystemP7ID_UNITT1	IDSystem::unitParent
 0x80149174	0x98	.text	game/id_sys.cpp	global	unitPtr__8IDSystemUci	IDSystem::unitPtr
 0x8014920C	0x2C	.text	game/id_sys.cpp	global	cmp_id_no__FP7IdData2Uci	cmp_id_no
-0x80149238	0x898	.text	game/id_sys.cpp	global	set__8IDSystemPvUciUcUcUc	IDSystem::set
+0x80149238	0x898	.text	game/id_sys.cpp	global	set__8IDSystemP15_ID_FILE_HEADERUciUcUcUc	IDSystem::set
 0x80149AD0	0xE0	.text	game/id_sys.cpp	global	kill__8IDSystemUci	IDSystem::kill
 0x80149BB0	0xCC	.text	game/id_sys.cpp	global	stop__8IDSystem	IDSystem::stop
 0x80149C7C	0x170	.text	game/id_sys.cpp	global	move__8IDSystem	IDSystem::move

@@ -471,12 +471,12 @@ void SubScreenExec()
             } else {
                 IdNum.gameInit(0x1B2);
             }
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 7), 0xFF, IDC_SSCRN_PESETA, 0x13, 7, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 7), 0xFF, IDC_SSCRN_PESETA, 0x13, 7, 0);
             if (!(wk->open_flag & 0x10)) {
-                IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xB), 0xFF, IDC_SSCRN_MAIN_MENU, 0xF, 0, 0);
+                IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xB), 0xFF, IDC_SSCRN_MAIN_MENU, 0xF, 0, 0);
             }
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 0x11), 0xFF, IDC_SSCRN_ETC, 0x13, 9, 0);
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 9), 0xFF, IDC_SSCRN_BACK_GROUND, 9, 3, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0x11), 0xFF, IDC_SSCRN_ETC, 0x13, 9, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 9), 0xFF, IDC_SSCRN_BACK_GROUND, 9, 3, 0);
             switch (wk->open_flag) {
             case 2:
                 IdSys.dispSw(IDC_LIFE_METER, 0);

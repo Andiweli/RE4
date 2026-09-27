@@ -1235,7 +1235,7 @@ void SsPzzlInit::move(SUB_SCREEN* wk)
             IdSubErase();
             IdNumErase();
             IdFreeBuffer();
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
             pzzl_wait[0] = 0;
             state++;
         }
@@ -1349,20 +1349,20 @@ void SsPzzlMain::init(SUB_SCREEN* wk)
     puzzleCameraInit(wk, &pG->Camera);
     IdTexDataLoad(SS_ARC_PTR(wk->pPzzlDat, 0x1AA), TEX_OWNER_ID_SSCRN);
     if (!IdSub.setCk(IDC_SSCRN_0)) {
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
     }
-    IdSub.set(SS_ARC_PTR(wk->pPzzlDat, 0x1AB), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 0, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pPzzlDat, 0x1AB), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 0, 0);
     tempSpaceDisp(0);
     idMainMenuFade(wk, 1);
     for (i = 0; i < 0x3E; i++) {
         if (i == 0) {
-            IdNum.set(SS_ARC_PTR(wk->pCmmn, 8), 0xFF, IDC_NUM_00, 0x13, 8, 0);
+            IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, IDC_NUM_00, 0x13, 8, 0);
         } else {
-            IdNum.set(SS_ARC_PTR(wk->pCmmn, 8), 0xFF, 0x40 + i, 0x13, 9, 0);
+            IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, 0x40 + i, 0x13, 9, 0);
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xD), 0xFF, IDC_SSCRN_CKPT_0, 0x13, 2, 0);
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xE), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xD), 0xFF, IDC_SSCRN_CKPT_0, 0x13, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xE), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 2, 0);
     for (lang = 0; lang < 2; lang++) {
         u8 type;
 
@@ -1392,7 +1392,7 @@ void SsPzzlMain::init(SUB_SCREEN* wk)
             tbl[k]->rev_flag |= 0xF;
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0x10), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 1, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0x10), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 1, 0);
     sscrnLightCreate(wk, (cLit*) SS_ARC_PTR(wk->pCmmn, 0x12));
     if (wk->menu_old == 2 && wk->open_flag != 4) {
         wk->alpha_flag = 0;
@@ -1851,7 +1851,7 @@ void openMsgWindow(SUB_SCREEN* wk, int no)
     cMes.Delete(2);
     cMes.setLayout(1, LAYOUT_SUBSCRN);
     cMes.MesSet(no, msg_x, msg_y, 0x11, 1, 0, 3);
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xA), 0xFF, IDC_SSCRN_CONFIRM, 0x13, 0, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xA), 0xFF, IDC_SSCRN_CONFIRM, 0x13, 0, 0);
 }
 
 // Case cursor: A on a piece opens PieceCommand, X picks it up (PzzlThinking) and the d-pad moves

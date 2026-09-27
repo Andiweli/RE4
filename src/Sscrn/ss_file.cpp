@@ -276,7 +276,7 @@ void SsFileInit::move(SUB_SCREEN* wk)
         IdSubErase();
         IdNumErase();
         IdFreeBuffer();
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
         file_wait[0] = 0;
         state++;
         break;
@@ -389,11 +389,11 @@ void SsFileMain::init(SUB_SCREEN* wk)
     fileCameraInit(wk, &pG->Camera);
     IdTexDataLoad(SS_ARC_PTR(wk->pFileDat, 6), TEX_OWNER_ID_SSCRN);
     if (IdSub.setCk(IDC_SSCRN_0) == 0) {
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
     }
-    IdSub.set(SS_ARC_PTR(wk->pFileDat, 7), 0xFF, IDC_SSCRN_FAR_1, 9, 2, 0);
-    IdSub.set(SS_ARC_PTR(wk->pFileDat, 9), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 4, 0);
-    IdSub.set(SS_ARC_PTR(wk->pFileDat, 8), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pFileDat, 7), 0xFF, IDC_SSCRN_FAR_1, 9, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pFileDat, 9), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 4, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pFileDat, 8), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 2, 0);
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_1)->be_flag &= ~8;
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_2)->be_flag &= ~8;
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_2)->rev_flag |= 0xF;

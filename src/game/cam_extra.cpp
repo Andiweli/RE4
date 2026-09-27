@@ -440,13 +440,13 @@ void IdScope::init(void* type)
     IdTexDataLoad(WEP_ARC_PTR(4), TEX_OWNER_ID_SCOPE);
     switch (t) {
     case 0:
-        IdSys.set(WEP_ARC_PTR(5), 0xFF, IDC_SCOPE, 0x13, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) WEP_ARC_PTR(5), 0xFF, IDC_SCOPE, 0x13, 6, 0);
         break;
     case 1:
-        IdSys.set(WEP_ARC_PTR(6), 0xFF, IDC_SCOPE, 0x13, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) WEP_ARC_PTR(6), 0xFF, IDC_SCOPE, 0x13, 6, 0);
         break;
     case 2:
-        IdSys.set(WEP_ARC_PTR(7), 0xFF, IDC_SCOPE, 0x13, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) WEP_ARC_PTR(7), 0xFF, IDC_SCOPE, 0x13, 6, 0);
         break;
     }
 }
@@ -703,7 +703,7 @@ void IdBinocular::init(CAMERA* cam, void* a, void* b)
     SpfFlagOn(pG, SPF_ACTBTN);
     IdTexRelease(TEX_OWNER_ID_COCKPIT);
     IdTexDataLoad(a, TEX_OWNER_ID_COCKPIT);
-    IdSys.set(b, 0xFF, IDC_BINOCULAR, 0x13, 5, 0);
+    IdSys.set((ID_FILE_HEADER*) b, 0xFF, IDC_BINOCULAR, 0x13, 5, 0);
     m_pos0_L = IdSys.unitPtr(1, IDC_BINOCULAR)->pos0;
     m_pos0_C = IdSys.unitPtr(2, IDC_BINOCULAR)->pos0;
     m_pos0_R = IdSys.unitPtr(3, IDC_BINOCULAR)->pos0;

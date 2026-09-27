@@ -2381,7 +2381,7 @@ void SsMapInit::move(SUB_SCREEN* wk)
             IdSubErase();
             IdNumErase();
             IdFreeBuffer();
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
             map_wait[0] = 0;
             state++;
         }
@@ -2460,15 +2460,15 @@ void SsMapMain::init(SUB_SCREEN* wk)
     cur = focus;
     IdTexDataLoad(SS_ARC_PTR(wk->pMapDat, 4), TEX_OWNER_ID_SSCRN);
     if (!IdSub.setCk(IDC_SSCRN_NEAR_1)) {
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
     }
-    IdSub.set(SS_ARC_PTR(wk->pMapDat, 5), 0xFF, IDC_SSCRN_FAR_1, 9, 2, 0);
-    IdNum.set(SS_ARC_PTR(wk->pMapDat, 0xA), 0xFF, IDC_SSCRN_2, 0xC, 6, 0);
-    IdNum.set(SS_ARC_PTR(wk->pMapDat, 9), 0xFF, IDC_SSCRN_1, 0xC, 6, 0);
-    IdNum.set(SS_ARC_PTR(wk->pMapDat, 8), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
-    IdSub.set(SS_ARC_PTR(wk->pMapDat, 6), 0xFF, IDC_SSCRN_0, 0xC, 5, 0);
-    IdSub.set(SS_ARC_PTR(wk->pMapDat, 7), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
-    IdSub.set(SS_ARC_PTR(wk->pMapDat, 0xB), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 8, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 5), 0xFF, IDC_SSCRN_FAR_1, 9, 2, 0);
+    IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 0xA), 0xFF, IDC_SSCRN_2, 0xC, 6, 0);
+    IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 9), 0xFF, IDC_SSCRN_1, 0xC, 6, 0);
+    IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 8), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 6), 0xFF, IDC_SSCRN_0, 0xC, 5, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 7), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 0xB), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 8, 0);
     IdSub.unitPtr(0x10, IDC_SSCRN_NEAR_0)->rev_flag |= 0xF;
     IdSub.unitPtr(0x10, IDC_SSCRN_NEAR_0)->be_flag &= ~8;
     IdSub.unitPtr(0, IDC_SSCRN_NEAR_0)->be_flag &= ~8;

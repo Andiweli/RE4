@@ -832,8 +832,8 @@ void SsTermMain::init(SUB_SCREEN* wk)
     cModel* m;
 
     IdTexDataLoad(SS_ARC_PTR(wk->pTermDat, 5), TEX_OWNER_ID_SSCRN);
-    IdSub.set(SS_ARC_PTR(wk->pTermDat, 8), 0xFF, IDC_SSCRN_0, 0xC, 5, 0);
-    IdSub.set(SS_ARC_PTR(wk->pTermDat, 9), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pTermDat, 8), 0xFF, IDC_SSCRN_0, 0xC, 5, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pTermDat, 9), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
     u = IdSub.unitPtr(0x12, IDC_SSCRN_NEAR_0);
     u->be_flag &= ~8;
     u->rev_flag |= 0xF;

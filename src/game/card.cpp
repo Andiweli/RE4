@@ -3383,17 +3383,17 @@ void CardID::init(int type, CardArc* data)
     IdSys.kill(0xFF, IDC_CINESCO);
     IdSys.kill(0xFF, IDC_OPTION_BG);
     IdSys.kill(0xFF, IDC_OPTION);
-    m_IdSave.set(pFrame, 0xFF, IDC_SSCRN_FAR_0, 9, 3, 0);
+    m_IdSave.set((ID_FILE_HEADER*) pFrame, 0xFF, IDC_SSCRN_FAR_0, 9, 3, 0);
     for (i = 0; i < 7; i++) {
-        m_IdSave.set(pFile, 0xFF, 0x40 + i, 0xC, 6, 0);
+        m_IdSave.set((ID_FILE_HEADER*) pFile, 0xFF, 0x40 + i, 0xC, 6, 0);
     }
     if (this->m_mode == 1) {
-        IdSys.set(pSaveDat, 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
+        IdSys.set((ID_FILE_HEADER*) pSaveDat, 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
         IdSys.unitPtr(1, IDC_SSCRN_NEAR_0)->rev_flag |= 0xF;
     } else if (this->m_mode == 0) {
-        IdSys.set(pLoadDat, 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
+        IdSys.set((ID_FILE_HEADER*) pLoadDat, 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
     }
-    IdSys.set(pBg, 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
+    IdSys.set((ID_FILE_HEADER*) pBg, 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
     IdSys.unitPtr(0, IDC_SSCRN_NEAR_1)->be_flag &= ~8;
     IdSys.unitPtr(0, IDC_SSCRN_NEAR_1)->rev_flag |= 0xF;
     IdSys.unitPtr(1, IDC_SSCRN_NEAR_1)->be_flag &= ~8;

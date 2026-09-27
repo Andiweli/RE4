@@ -135,9 +135,9 @@ void titleSet(TITLE_WORK* w, int counter)
 {
     IdSys.kill(0xFF, IDC_TITLE);
     if (!ExtFlagChk(pSys, EXT_HARD_MODE)) {
-        IdSys.set(TITLE_ARC_PTR(w->pIdDat, 6), 0xFF, IDC_TITLE, 0x13, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) TITLE_ARC_PTR(w->pIdDat, 6), 0xFF, IDC_TITLE, 0x13, 6, 0);
     } else {
-        IdSys.set(TITLE_ARC_PTR(w->pIdDat, 7), 0xFF, IDC_TITLE, 0x13, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) TITLE_ARC_PTR(w->pIdDat, 7), 0xFF, IDC_TITLE, 0x13, 6, 0);
     }
     IdSys.setTime(IdSys.unitPtr(0, IDC_TITLE), (s16) counter);
 }
@@ -226,7 +226,7 @@ void titleNintendo(TITLE_WORK* w)
     }
     switch (w->Rno1) {
     case 0:
-        IdSys.set(TITLE_ARC_PTR(w->pIdDat, 0xB), 0xFF, IDC_TITLE, 0x13, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) TITLE_ARC_PTR(w->pIdDat, 0xB), 0xFF, IDC_TITLE, 0x13, 6, 0);
         c0.w = 0x000000FF;
         c1.w = 0x00000000;
         FadeSet(0x80000000, &c0.c, &c1.c, 15, 0, 0);
@@ -381,7 +381,7 @@ void titleMenuInit(TITLE_WORK* w)
 {
     IdSys.kill(0xFF, IDC_TITLE_MENU);
     if (ExtFlagChk(pSys, EXT_HARD_MODE)) {
-        IdSys.set(TITLE_ARC_PTR(w->pIdDat, 9), 0xFF, IDC_TITLE_MENU, 0x13, 5, 0);
+        IdSys.set((ID_FILE_HEADER*) TITLE_ARC_PTR(w->pIdDat, 9), 0xFF, IDC_TITLE_MENU, 0x13, 5, 0);
         w->menu_num = 5;
         w->p_menu[0] = IdSys.unitPtr(1, IDC_TITLE_MENU);
         w->p_menu[1] = IdSys.unitPtr(7, IDC_TITLE_MENU);
@@ -390,7 +390,7 @@ void titleMenuInit(TITLE_WORK* w)
         w->p_menu[4] = IdSys.unitPtr(5, IDC_TITLE_MENU);
         w->cursor = 3;
     } else {
-        IdSys.set(TITLE_ARC_PTR(w->pIdDat, 8), 0xFF, IDC_TITLE_MENU, 0x13, 5, 0);
+        IdSys.set((ID_FILE_HEADER*) TITLE_ARC_PTR(w->pIdDat, 8), 0xFF, IDC_TITLE_MENU, 0x13, 5, 0);
         w->menu_num = 3;
         w->p_menu[0] = IdSys.unitPtr(1, IDC_TITLE_MENU);
         w->p_menu[1] = IdSys.unitPtr(5, IDC_TITLE_MENU);
@@ -485,7 +485,7 @@ int titleMenuSelect(TITLE_WORK* w)
 void titleLevelInit(TITLE_WORK* w)
 {
     IdSys.kill(0xFF, IDC_TITLE_MENU);
-    IdSys.set(TITLE_ARC_PTR(w->pIdDat, 0xA), 0xFF, IDC_TITLE_MENU, 0x13, 5, 0);
+    IdSys.set((ID_FILE_HEADER*) TITLE_ARC_PTR(w->pIdDat, 0xA), 0xFF, IDC_TITLE_MENU, 0x13, 5, 0);
     w->p_menu[0] = IdSys.unitPtr(1, IDC_TITLE_MENU);
     w->p_menu[1] = IdSys.unitPtr(3, IDC_TITLE_MENU);
     w->p_menu[2] = IdSys.unitPtr(5, IDC_TITLE_MENU);
@@ -614,7 +614,7 @@ void titleMain(TITLE_WORK* w)
             OptScrn.init(1);
             IdTexDataLoad(G_ARC_PTR(ofs_74), TEX_OWNER_ID_COCKPIT);
             IdTexDataLoad(TITLE_ARC_PTR(w->pIdDat, 0xC), TEX_OWNER_ID_EVENT);
-            IdSys.set(TITLE_ARC_PTR(w->pIdDat, 0xD), 0xFF, IDC_EVENT, 0x13, 5, 0);
+            IdSys.set((ID_FILE_HEADER*) TITLE_ARC_PTR(w->pIdDat, 0xD), 0xFF, IDC_EVENT, 0x13, 5, 0);
             w->counter_bak = w->counter;
             w->Rno1 = 4;
             SndCall(0, 0x33, 0, 0, 0, 0);
@@ -901,8 +901,8 @@ void titleSub(TITLE_WORK* w)
         IdTexDataLoad(OMK_PTR(4), TEX_OWNER_ID_EVENT);
         IdSys.kill(0xFF, IDC_TITLE);
         IdSys.kill(0xFF, IDC_TITLE_MENU);
-        IdSys.set(OMK_PTR(5), 0xFF, IDC_OPTION_BG, 0x13, 5, 0);
-        IdSys.set(OMK_PTR(6), 0xFF, IDC_OPTION, 0x13, 4, 0);
+        IdSys.set((ID_FILE_HEADER*) OMK_PTR(5), 0xFF, IDC_OPTION_BG, 0x13, 5, 0);
+        IdSys.set((ID_FILE_HEADER*) OMK_PTR(6), 0xFF, IDC_OPTION, 0x13, 4, 0);
         if (SysFlagChk(pG, SYS_OMAKE_ETC_GAME)) {
             if (!ExtFlagChk(pSys, EXT_GET_ADA)) {
                 IdSys.unitPtr(4, IDC_OPTION_BG)->be_flag &= ~8;
@@ -1024,7 +1024,7 @@ void titleSub(TITLE_WORK* w)
         int i;
         FadeSetW(0x80000000, 5, 0, 0);
         IdTexDataLoad(OMK_PTR(4), TEX_OWNER_ID_EVENT);
-        IdSys.set(OMK_PTR(7), 0xFF, IDC_OPTION, 0x13, 4, 0);
+        IdSys.set((ID_FILE_HEADER*) OMK_PTR(7), 0xFF, IDC_OPTION, 0x13, 4, 0);
         for (i = 0; i < 5; i++) {
             ID_UNIT* u = IdSys.unitPtr(i, IDC_OPTION);
             u->texNo = i;
@@ -1180,7 +1180,7 @@ void stageSelectInit(TITLE_WORK* w)
     TitleArc* omk = w->pOmk;
 
     IdSys.kill(0xFF, IDC_OPTION);
-    IdSys.set(TITLE_ARC_PTR(omk, 8), 0xFF, IDC_OPTION, 0x13, 4, 0);
+    IdSys.set((ID_FILE_HEADER*) TITLE_ARC_PTR(omk, 8), 0xFF, IDC_OPTION, 0x13, 4, 0);
     w->omk_stage_no = 0;
 }
 
