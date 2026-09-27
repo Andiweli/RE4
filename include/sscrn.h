@@ -10,7 +10,7 @@
 // the Sscrn.rel DLL, linked into the ARAM-swapped area while it is open.
 class cObjWep;
 class cMap;
-struct ItemWork;
+struct cItem;
 struct SUB_SCREEN;
 struct SsFileWork;
 struct ItemScreenWork;
@@ -78,7 +78,7 @@ struct SUB_SCREEN {
     void* pExamDat;               // 0x23C  0x3E800-byte buffer
     void* pItemBin;               // 0x240  item examine model data (Sscrn SsItemExamine: x23C)
     void* pItemTpl;               // 0x244  item examine texture data
-    ItemWork* p_exam_item;           // 0x248  selected item slot (Sscrn CapSelect)
+    cItem* p_exam_item;           // 0x248  selected item slot (Sscrn CapSelect)
     cMap* p_exam_model;               // 0x24C  MapMgr work 2 (Sscrn CapSelect)
     u8 wep_rno;                  // 0x250  Sscrn weapon change task state (3 = done)
     s8 wep_idx;                  // 0x251  weapon change request slot
@@ -111,7 +111,7 @@ struct SUB_SCREEN {
     u16 get_item_id;                 // 0x2FA  item id handed to the opened sub screen (sce_at sceAtGetItem)
     u16 get_item_num;                 // 0x2FC  its count
     u8 pad_2FE[2];
-    ItemWork* p_get_item;           // 0x300  Sscrn ss_pzzl: the extra piece's slot (get() result)
+    cItem* p_get_item;           // 0x300  Sscrn ss_pzzl: the extra piece's slot (get() result)
     ItemScreenWork* item;  // 0x304  Sscrn ss_item cursor state (9 bytes)
     struct SsMapWork* map; // 0x308  Sscrn ss_map work (mark models, camera, viewport; 0x104C bytes)
     SsFileWork* file;      // 0x30C  Sscrn ss_file cursor/page state

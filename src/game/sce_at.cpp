@@ -1032,7 +1032,7 @@ void sceAtGetItem(SceAtWork* w)
     int sel;
     int i;
     ItemInfo info;
-    ItemWork tmp;
+    cItem tmp;
 
     SceUpCutStart();
     swep_flag = 0;
@@ -1288,7 +1288,7 @@ void sceAtGetItem_NoModel(SceAtWork* w)
     asm("" : "=r"(sel));
     int i;
     ItemInfo info;
-    ItemWork tmp;
+    cItem tmp;
 
     SceUpCutStart();
     pPL->setNoSuspend(1);

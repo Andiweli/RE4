@@ -63,8 +63,8 @@ extern "C" {
 void itemNameDisp(SUB_SCREEN* wk);
 void itemCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 void sscrn_item_out_init(SUB_SCREEN* wk);
-ItemWork* ITEM_PTR(int idx, int col);
-int ITEM_AT(ItemWork* p, int col);
+cItem* ITEM_PTR(int idx, int col);
+int ITEM_AT(cItem* p, int col);
 int itemTexNo(u16 id);
 u8 frameMarkNo(int n, int col);
 void itemFrameSet(SUB_SCREEN* wk, int col);
@@ -90,12 +90,12 @@ static int item_num_y = 0;
 static int item_cmd_mode = 0;
 
 static int item_read_req;
-static ItemWork item_dummy;
+static cItem item_dummy;
 // Non-static: the REL's ADDR16 fields for these hold A only (global symbols), see the em35 rule.
 u8 item_list[0x180];
 s8 item_num[2];
 s8 item_total;
-ItemWork* item_sel;
+cItem* item_sel;
 int item_frame_on;
 void* item_path0[2];
 Hermite1* item_curve[2];
@@ -113,7 +113,7 @@ void itemNameDisp(SUB_SCREEN* wk)
     int x;
     int y;
     int del = 0;
-    ItemWork* item = ITEM_PTR(iw->idx[iw->col], iw->col);
+    cItem* item = ITEM_PTR(iw->idx[iw->col], iw->col);
     x = (int) ((u->pos.x + 320.0f) * 0.8f);
     y = (int) ((240.0f - u->pos.y) * 0.8f);
     MessageControl* pm = &cMes;
@@ -490,7 +490,7 @@ static int sscrn_item_out(SUB_SCREEN* wk)
 
 // Item slot `idx` of list column `col` (0 key items, 1 treasures) from item_list, or the empty
 // item_dummy (flags 0) when out of range / 0xFF.
-ItemWork* ITEM_PTR(int idx, int col)
+cItem* ITEM_PTR(int idx, int col)
 {
     u8 no;
 
@@ -511,7 +511,7 @@ DUMMY:
 }
 
 // List index of item `p` in column `col`, -1 when it is not listed.
-int ITEM_AT(ItemWork* p, int col)
+int ITEM_AT(cItem* p, int col)
 {
     int i;
 
@@ -615,7 +615,7 @@ void itemFrameSet(SUB_SCREEN* wk, int col)
     no = col * 8 + 0x40;
     for (n = -3; n <= 4; n++) {
         IdUnit* m = IdNum.unitPtr(frameMarkNo(n, col), IDC_SSCRN_1);
-        ItemWork* item = ITEM_PTR(n + iw->idx[col], col);
+        cItem* item = ITEM_PTR(n + iw->idx[col], col);
         int off;
         if (iw->comb[col] != -1 && iw->sel[col] == n + iw->idx[col]) {
             goto HIDE;
@@ -1116,7 +1116,7 @@ void ItemCombine::init(SUB_SCREEN* wk)
     ItemScreenWork* iw = wk->item;
     s8 col = iw->col;
     u8 base = 0;
-    ItemWork* item;
+    cItem* item;
     IdUnit* u;
 
     switch (col) {
@@ -1183,8 +1183,8 @@ void ItemCombine::move(SUB_SCREEN* wk)
         }
         transit(1, wk);
     } else if (Key.trg & 0x80000000) {
-        ItemWork* a = ITEM_PTR(iw->sel[col], col);
-        ItemWork* b = ITEM_PTR(iw->comb[col], col);
+        cItem* a = ITEM_PTR(iw->sel[col], col);
+        cItem* b = ITEM_PTR(iw->comb[col], col);
         if (b != a && ItemMgr.combine(b, a, 0)) {
             ItemMgr.makeItemList(item_list, 0, &item_num[0], &item_num[1]);
             iw->idx[col] = ITEM_AT(b, col);
@@ -1293,8 +1293,8 @@ void itemMakeMove(SUB_SCREEN* wk)
     ItemScreenWork* iw = wk->item;
     JOY* joy = &Joy[0];
     SsItemMakeWork* mk = ITEM_MAKE_WORK(wk);
-    ItemWork* got = 0;
-    ItemWork* cur = ITEM_PTR(iw->idx[iw->col], iw->col);
+    cItem* got = 0;
+    cItem* cur = ITEM_PTR(iw->idx[iw->col], iw->col);
     ItemInfo info;
     int i;
 
@@ -1373,7 +1373,7 @@ void itemMakeDisp(SUB_SCREEN* wk, int x, int y)
 {
     ItemScreenWork* iw = wk->item;
     SsItemMakeWork* mk = ITEM_MAKE_WORK(wk);
-    ItemWork* cur = ITEM_PTR(iw->idx[iw->col], iw->col);
+    cItem* cur = ITEM_PTR(iw->idx[iw->col], iw->col);
     int i;
     u16 id;
 

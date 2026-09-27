@@ -12,7 +12,7 @@
 #define LEVEL_MAX 32
 #define LIST_MAX 0xFF
 
-// ItemWork::x6 tune levels (the exclusive nibble is read as a byte)
+// cItem::x6 tune levels (the exclusive nibble is read as a byte)
 
 MerchantInfo merchant_info_A = {0, -10, -10, -10, -10, 10000, 5, 10, 10, 10, 20, 30, 70, 30, 10};
 
@@ -1343,7 +1343,7 @@ int Merchant::stockSpecial(ITEM_ID id)
 }
 
 // 1 when the weapon is at every normal max level and the exclusive upgrade is offered.
-int Merchant::specialTunable(ItemWork* p_item)
+int Merchant::specialTunable(cItem* p_item)
 {
     if (stockSpecial(p_item->id) != 0 && p_item->getPowerLevel() + 1 == WeaponId2MaxLevel(p_item->id, 0) &&
         p_item->getSpeedLevel() + 1 == WeaponId2MaxLevel(p_item->id, 1) && p_item->getReloadLevel() + 1 == WeaponId2MaxLevel(p_item->id, 2) &&
@@ -1354,7 +1354,7 @@ int Merchant::specialTunable(ItemWork* p_item)
 }
 
 // 1 when the weapon already has its exclusive upgrade.
-int Merchant::specialTuned(ItemWork* p_item)
+int Merchant::specialTuned(cItem* p_item)
 {
     if (p_item->getPowerLevel() + 1 > WeaponId2MaxLevel(p_item->id, 0) || p_item->getSpeedLevel() + 1 > WeaponId2MaxLevel(p_item->id, 1) ||
         p_item->getReloadLevel() + 1 > WeaponId2MaxLevel(p_item->id, 2) || p_item->getBulletLevel() + 1 > WeaponId2MaxLevel(p_item->id, 3)) {
@@ -1364,7 +1364,7 @@ int Merchant::specialTuned(ItemWork* p_item)
 }
 
 // 1 when the weapon can still be tuned here (below an offered max, or the exclusive is available).
-int Merchant::tunable(ItemWork* p_item)
+int Merchant::tunable(cItem* p_item)
 {
     if (p_item == 0) {
         return 0;
@@ -1491,7 +1491,7 @@ int Merchant::makeExerciseList()
     }
     n = 0;
     for (int i = 0; i < g_item_price_tbl_num; i++, p++) {
-        ItemWork* item = ItemMgr.search(p->id);
+        cItem* item = ItemMgr.search(p->id);
 
         if (item == 0) {
             continue;
@@ -1522,7 +1522,7 @@ u8 Merchant::exerciseItemNum()
 }
 
 // Inventory slot of Sell list row `no`.
-ItemWork* Merchant::exerciseItemPtr(int no)
+cItem* Merchant::exerciseItemPtr(int no)
 {
     return ItemMgr.at(exerciseList[no]);
 }
@@ -1588,7 +1588,7 @@ int Merchant::buyupPrice(u16 id, int num)
 
 // Buying price of an inventory slot: the item plus, for a weapon, its loaded ammo and half of every
 // tune level bought.
-int Merchant::buyupPrice(ItemWork* item, int num)
+int Merchant::buyupPrice(cItem* item, int num)
 {
     int price = buyupPrice(item->id, num);
     const f32 rate = 0.5f; // pool entry before the 0x4330 magic; the literal is folded at every use
@@ -1635,7 +1635,7 @@ int Merchant::buyupPrice(ItemWork* item, int num)
 
 // Sells a slot to the merchant: adds the price to *money, returns the item (and a weapon's ammo)
 // to the stock and raises favor by shift_Buyup.
-int Merchant::buyup(ItemWork* p_item, int num, int* pocket)
+int Merchant::buyup(cItem* p_item, int num, int* pocket)
 {
     *pocket += buyupPrice(p_item, num);
     stockAdd(p_item->id, num);
@@ -1788,7 +1788,7 @@ LevelEntry* Merchant::levelupItemNo(int no)
 }
 
 // Inventory slot of Tune-up row `no` (0 when the weapon is offered but not owned).
-ItemWork* Merchant::levelupItemPtr(int no)
+cItem* Merchant::levelupItemPtr(int no)
 {
     LevelEntry* l = level.e;
     int cnt = 0;
@@ -1861,7 +1861,7 @@ int Merchant::levelupPrice(u16 id, int type, int lv)
 }
 
 // levelupPrice for an inventory slot.
-int Merchant::levelupPrice(ItemWork* item, int type, int lv)
+int Merchant::levelupPrice(cItem* item, int type, int lv)
 {
     return levelupPrice(item->id, type, lv);
 }

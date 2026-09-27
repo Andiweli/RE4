@@ -39,9 +39,9 @@ struct ShopWork {
     int cursor;      // 0x08
     int count;       // 0x0C  pieces to sell / buy
     u16 buyId;       // 0x10
-    ItemWork buy;    // 0x12  slot template of the item being bought (case placement)
+    cItem buy;    // 0x12  slot template of the item being bought (case placement)
     int placed;      // 0x20  the bought piece was put on the case
-    ItemWork* item;  // 0x24  item being sold / tuned
+    cItem* item;  // 0x24  item being sold / tuned
     int price;       // 0x28  tune-up price
     int lvType;      // 0x2C  tune type (0 fire, 1 magazine, 2 speed, 3 exclusive, 4 all)
     int lv[4];       // 0x30  tune levels after the purchase
@@ -192,7 +192,7 @@ void dispLvUpItemList(SUB_SCREEN* wk, int n, int cursor);
 void levelItemDisp(SUB_SCREEN* wk, int sw);
 int specialCaption(int id);
 void itemCaption(int id);
-void weaponLevelDisp(ItemWork* item, u16 id, int sw, int level);
+void weaponLevelDisp(cItem* item, u16 id, int sw, int level);
 void stockNumDisp(int num, int sw);
 void dispPrice(int type, int num, int price, Vec* pos, u32 flags);
 void setOrientation(int id, cModel* m);
@@ -873,7 +873,7 @@ void dispSellItemList(SUB_SCREEN* wk, int n, int cursor)
     int top = sw->top;
     int i;
     int end;
-    ItemWork* item;
+    cItem* item;
     PriceEntry* pe;
     int row;
 
@@ -1296,7 +1296,7 @@ void SellConfirm::move(SUB_SCREEN* wk)
         } else {
             u16 left = (u16) sw->count;
             u16 id = sw->item->id;
-            ItemWork* p;
+            cItem* p;
             int i;
 
             for (;;) {
@@ -1727,7 +1727,7 @@ int buyItem(SUB_SCREEN* wk)
     wk->merchant->sell(sw->buyId, sw->count, (int*) &pG->peseta);
     ItemMgr.get(sw->buyId, (u16) sw->count);
     if (sw->placed) {
-        ItemWork* p = ItemMgr.newbie();
+        cItem* p = ItemMgr.newbie();
         if (p) {
             p->x = sw->buy.x;
             p->y = sw->buy.y;
@@ -1736,7 +1736,7 @@ int buyItem(SUB_SCREEN* wk)
             wk->puzzlePlayer->pieceExtra()->item = p;
         }
     } else {
-        ItemWork* p = ItemMgr.newbie();
+        cItem* p = ItemMgr.newbie();
         if (p) {
             switch (p->id) {
             case 0x7C:
@@ -1922,7 +1922,7 @@ void dispLvUpItemList(SUB_SCREEN* wk, int n, int cursor)
     }
     stockNumDisp(0, 0);
     for (i = top; i < end; i++) {
-        ItemWork* item = m->levelupItemPtr(i);
+        cItem* item = m->levelupItemPtr(i);
         LevelEntry* le = m->levelupItemNo(i);
         int row = i - top;
         int col;
@@ -2029,7 +2029,7 @@ void levelItemDisp(SUB_SCREEN* wk, int sw)
         return;
     }
     {
-        ItemWork* item = m->levelupItemPtr(swk->cursor);
+        cItem* item = m->levelupItemPtr(swk->cursor);
         int type;
         int val[2];
         char tag[2];
@@ -2356,7 +2356,7 @@ void LvUpItemSelect::move(SUB_SCREEN* wk)
 {
     ShopWork* sw = wk->shop;
     Merchant* m = wk->merchant;
-    ItemWork* item = m->levelupItemPtr(sw->cursor);
+    cItem* item = m->levelupItemPtr(sw->cursor);
     IdUnit* u;
     int x;
     int y;
@@ -2503,7 +2503,7 @@ void LvUpConfirm::init(SUB_SCREEN* wk)
     shopStrPlay(wk, shop_msg[msg].str);
 }
 
-// ItemWork::x6 as its four tune-level nibbles.
+// cItem::x6 as its four tune-level nibbles.
 struct TuneLevel {
     u16 fire : 4;
     u16 mag : 4;
@@ -2557,7 +2557,7 @@ void LvUpConfirm::move(SUB_SCREEN* wk)
                 t->ex = v - 1;
             }
             if (sw->lvType == 3 || sw->lvType == 4) {
-                ItemWork* item = sw->item;
+                cItem* item = sw->item;
                 item->bullet = (item->bullet & 0xE000) | (WeaponId2ChargeNum(item->id, (item->lv8[1] & 0xF) + 1) & 0x1FFF);
             }
             if (ItemMgr.weapon() == sw->item) {
@@ -2599,7 +2599,7 @@ void itemCaption(int id)
 }
 
 // Tune level bars / values of weapon `id` (item = the owned slot, 0 for the shop's copy at `level`).
-void weaponLevelDisp(ItemWork* item, u16 id, int sw, int level)
+void weaponLevelDisp(cItem* item, u16 id, int sw, int level)
 {
     IdUnit* u = IdSub.unitPtr(5, IDC_SSCRN_CKPT_0);
     int lv = 0;

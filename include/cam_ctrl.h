@@ -138,16 +138,19 @@ public:
 };
 
 class CameraControl {
-public:
+private:
     u8 m_attached_cam_flag_old;                        // 0x00
     u8 m_attach_cam_flag;                        // 0x01
     u8 m_attach_num;                // 0x02
+public:
     u8 x3;                        // 0x03
+private:
     AttachCamera* m_p_attach[3];  // 0x04
     cModel* m_p_model[3];      // 0x10
     cModel* m_p_attach_model_old;           // 0x1C
     f32 m_scope_zoom;             // 0x20
     f32 m_scope_ang_x;             // 0x24
+public:
     u8 be_flag;                  // 0x28  bit 0 = data valid, bit 2 = disabled
     u8 pad_29[3];
     u32 m_system_flag;                 // 0x2C
@@ -198,21 +201,26 @@ public:
     int CurrentAreaNo();
     int CurrentCameraNo();
     CameraCut* DataSearch(int cameraNo);
+private:
     CameraLerp* LerpDataSearch(int srcNo, int srcSuf, int dstNo, int dstSuf);
     CameraDataHeader* calcAddr(CameraDataHeader* head);
+public:
     void RoomDataRead(CameraDataHeader* pBuff);
     void CoreDataRead(CameraDataHeader* data);
     void AreaOnOff(int No, int Suffix, int OnOff);
     void SetAreaAttr(int No, int Suffix, u8 attr);
     void UnsetAreaAttr(int No, int Suffix, u8 attr);
     void CutCall(int cutNo);
+private:
     void switchCamera(CameraAreaRec* rec);
     void areaHitCheck();
+public:
     void roomInit();
     void Check();
     void Move();
     void CalcAim(CameraCut* pCdat);
     f32 getCameraPitch();
+private:
     void r0_Wait();
     void r0_Debug();
     void r0_Fix();
@@ -222,9 +230,12 @@ public:
     void r0_UpCut();
     void r0_RailBehind();
     void r0_Free();
+public:
     void resetCameraAngle();
     f32 getCameraDirection();
+private:
     void debugDrawRail(CameraCut* pCdat);
+public:
     void UpCutCall(int cutNo, Vec* pos, Vec* ang, Vec* scale, int data_sel);
     void startPushObject();
     void endPushObject();

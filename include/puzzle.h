@@ -6,7 +6,7 @@
 #include "item.h"
 
 // Attache case packing puzzle (game/puzzle.cpp): pieces on a grid board.
-struct ItemWork;
+struct cItem;
 class cModel;
 
 // Piece shape data (piece_info entry + 4).
@@ -46,7 +46,7 @@ private:
     u8 m_place;         // 0x21  1 = on a board, 2 = in hand
     u8 pad_22[2];
 public:
-    ItemWork* item;   // 0x24
+    cItem* item;   // 0x24
     cModel* model;    // 0x28
 
     void orientation(int orientation_no);
@@ -139,11 +139,11 @@ public:
     int pieceMax() { return m_piece_max; }
     pzlPiece* pieceAt(int no) { return &m_piece[no]; }
     pzlPiece* piecePtr(int no);
-    pzlPiece* piecePtr(ItemWork* item);
+    pzlPiece* piecePtr(cItem* item);
     pzlPiece* pieceInHand() { return m_inhand; }
     pzlPiece* pieceExtra() { return m_extra; }
     void save();
-    int appendExtraPiece(ItemWork* pItem);
+    int appendExtraPiece(cItem* pItem);
     int removeExtraPiece();
     void inHandExtraPiece();
     void giveupExtraPiece();

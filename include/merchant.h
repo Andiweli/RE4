@@ -125,9 +125,9 @@ public:
     int levelNew();
     s8 levelMax(u16 id, int type);
     int stockSpecial(ITEM_ID id);
-    int specialTunable(ItemWork* p_item);
-    int specialTuned(ItemWork* p_item);
-    int tunable(ItemWork* p_item);
+    int specialTunable(cItem* p_item);
+    int specialTuned(cItem* p_item);
+    int tunable(cItem* p_item);
     void makeList();
     int makeSellingList();
     u8 sellingItemNum();
@@ -135,21 +135,21 @@ public:
     PriceEntry* sellingItemId(u16 id);
     int makeExerciseList();
     u8 exerciseItemNum();
-    ItemWork* exerciseItemPtr(int no);
+    cItem* exerciseItemPtr(int no);
     PriceEntry* exerciseItemNo(int no);
     PriceEntry* exerciseItemId(u16 id);
     int buyupPrice(u16 id, int num);
-    int buyupPrice(ItemWork* item, int num);
-    int buyup(ItemWork* p_item, int num, int* pocket);
+    int buyupPrice(cItem* item, int num);
+    int buyup(cItem* p_item, int num, int* pocket);
     int sellPrice(u16 id, int num);
     int sellUnit(u16 id);
     int sell(u16 id, int num, int* pocket);
     int levelupItemNum();
     LevelEntry* levelupItemNo(int no);
-    ItemWork* levelupItemPtr(int no);
+    cItem* levelupItemPtr(int no);
     LevelPrice* levelupItemPrice(u16 id);
     int levelupPrice(u16 id, int type, int lv);
-    int levelupPrice(ItemWork* item, int type, int lv);
+    int levelupPrice(cItem* item, int type, int lv);
 };                           // 0x514
 
 extern MerchantCharacter merchantChar;

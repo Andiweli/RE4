@@ -560,7 +560,7 @@ void SsItemExamine::move(SUB_SCREEN* wk)
         m->partsWorldCalc();
         ssItemInfo(exam_id, &info);
         if (info.type == 1) {
-            ItemWork* w = 0;
+            cItem* w = 0;
             ssItemInfo(wk->p_exam_item->id, &info);
             switch (info.type) {
             case 1:

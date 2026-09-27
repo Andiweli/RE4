@@ -120,7 +120,7 @@ int checkMsgWindow(SUB_SCREEN* wk);
 void closeMsgWindow(SUB_SCREEN* wk);
 void openMsgWindow(SUB_SCREEN* wk, int no);
 int remarkMsgCombine(int a, int b, int* no);
-int itemCommandType(ItemWork* item);
+int itemCommandType(cItem* item);
 }
 static void setCommandId(u8 type, IdUnit** tbl, s8* num, int lang);
 
@@ -267,7 +267,7 @@ void pzzlEquipDisp(SUB_SCREEN* wk, int sw)
         id[1]->be_flag &= ~8;
         id[2]->be_flag &= ~8;
         for (i = 0; i < 2; i++) {
-            ItemWork* w = ItemMgr.weaponParts(ItemMgr.weapon(), i);
+            cItem* w = ItemMgr.weaponParts(ItemMgr.weapon(), i);
             pzlPiece* p;
 
             if (w == 0) {
@@ -438,7 +438,7 @@ void drawCursor(SUB_SCREEN* wk, pzlBoard* b, int x, int y, PzzlCursor* c, int li
     Vec wa;
     Vec wd;
     Mtx mat;
-    ItemWork* item;
+    cItem* item;
     f32 g;
     pzlPiece* piece;
     Vec e;
@@ -990,7 +990,7 @@ void pieceModelDisp(SUB_SCREEN* wk)
         Vec pos;
         Vec scr;
         ItemInfo info;
-        ItemWork* item;
+        cItem* item;
         int id;
 
         if (wk->puzzlePlayer->spacePtr()->search(p)) {
@@ -1412,7 +1412,7 @@ void SsPzzlMain::init(SUB_SCREEN* wk)
         int y;
 
         ItemMgr.get(wk->get_item_id, wk->get_item_num);
-        ItemWork* last = ItemMgr.newbie();  // local: `mr r4,r0` for the argument instead of a re-read after the store
+        cItem* last = ItemMgr.newbie();  // local: `mr r4,r0` for the argument instead of a re-read after the store
 
         wk->p_get_item = last;
         wk->puzzlePlayer->appendExtraPiece(last);
@@ -1487,7 +1487,7 @@ void SsPzzlMain::move(SUB_SCREEN* wk)
         int x;
         int y;
         pzlPlayer* pl = wk->puzzlePlayer;
-        ItemWork* item;
+        cItem* item;
 
         if (pl->pieceInHand()) {
             item = pl->pieceInHand()->item;
@@ -2745,7 +2745,7 @@ void CaseChange::quit(SUB_SCREEN* wk)
 
 // Command menu type of an item: 0 weapon, 3 ammo / treasure, 4 usable, 5 combinable, 6 weapon
 // part, 7 key, 8 herb, 9 file.
-int itemCommandType(ItemWork* item)
+int itemCommandType(cItem* item)
 {
     switch (itemType(item->id)) {
     case 1:

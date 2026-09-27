@@ -6,7 +6,7 @@
 typedef u16 ITEM_ID;   // item id
 
 // One inventory slot (cItemMgr::pItems[], 0xE bytes).
-struct ItemWork {
+struct cItem {
     u16 id;        // 0x00  item id
     u16 num;       // 0x02  count / bullets
     u8 flags;      // 0x04  bit0 in use
@@ -45,7 +45,7 @@ struct ItemWork {
 
 // cItemMgr::ordering() output (cItemMgr::pOrder[], 8 bytes): the in-use slots holding one item id.
 struct ItemOrder {
-    ItemWork* p_item;  // 0x00
+    cItem* p_item;  // 0x00
     u16 num;         // 0x04  copy of item->num
     u8 pad_6[2];
 };
@@ -60,7 +60,7 @@ struct ItemInfo {
 
 // One saved slot (cItemMgr::save/load, 12 bytes; 0x180 of them after the 4-byte header).
 struct ItemSaveWork {
-    u16 id;        // 0x00  item id, bit 15 = ItemWork::type 1; 0xFFFF = empty
+    u16 id;        // 0x00  item id, bit 15 = cItem::type 1; 0xFFFF = empty
     u16 num;       // 0x02  num (weapons/parts: lv)
     u16 bullet;    // 0x04  weapons/parts: bullet; files: lv8[0]
     u8 pad_6[2];
@@ -83,23 +83,23 @@ private:
     s32 m_flag_num;                 // 0x04  words in pFlags (8)
     u16 used_id;                // 0x08  item id use() handed to check(), 0xFFFF = none
     u8 pad_A[2];
-    ItemWork* m_pWep;             // 0x0C  equipped weapon slot (NULL = bare hands)
+    cItem* m_pWep;             // 0x0C  equipped weapon slot (NULL = bare hands)
     u16 m_wep_id;                  // 0x10  equipped weapon item id
     s8 m_to_whom;                     // 0x12  0 player, 1 sub character heals (sce_at clears it before use())
     u8 m_char;                    // 0x13  inventory type (num(id) / search count only this type)
 public:
-    ItemWork* m_pItem;           // 0x14
-    ItemWork* m_pNew;            // 0x18  slot the last get() filled (puzzle PutInCase copies the piece position into it)
+    cItem* m_pItem;           // 0x14
+    cItem* m_pNew;            // 0x18  slot the last get() filled (puzzle PutInCase copies the piece position into it)
     s32 m_array_num;                 // 0x1C
     ItemOrder* m_p_order_tbl;          // 0x20  ordering() result (merchant: sorted slots of one item id)
     s32 m_order_tbl_num;                 // 0x24  entries in pOrder
     u32 m_bonus_time;                    // 0x28  (sce_at: number shown with item 0x73; get(0x73, n): mercenaries add time)
     u32 m_bonus_point;                    // 0x2C  (sce_at: number shown with item 0x75; get(0x75, n): mercenaries bonus time)
 
-    ItemWork* newbie() { return m_pNew; }
+    cItem* newbie() { return m_pNew; }
     void setToWhom(int who) { m_to_whom = who; }
     s8 getToWhom() { return m_to_whom; }
-    ItemWork* weapon() { return m_pWep; }
+    cItem* weapon() { return m_pWep; }
     u16 weaponId() { return m_wep_id; }
     void clear();
     int set_game(int trial_flag);
@@ -114,47 +114,47 @@ public:
     void gameInit();
     void roomInit();
     int init();
-    void construct(ItemWork* out, ITEM_ID room_no);  // fill a slot template for item `id` (puzzle PutInCase)
-    ItemWork* at(int i);       // 0x8001DB5C: slot `no` of pItems, NULL when no >= nItems
-    int searchAt(ItemWork* p);  // 0x8001DB80: slot index of `p`, -1 if not in pItems
+    void construct(cItem* out, ITEM_ID room_no);  // fill a slot template for item `id` (puzzle PutInCase)
+    cItem* at(int i);       // 0x8001DB5C: slot `no` of pItems, NULL when no >= nItems
+    int searchAt(cItem* p);  // 0x8001DB80: slot index of `p`, -1 if not in pItems
     int makeItemList(u8* p_list, int flag, s8* key_cnt, s8* gld_cnt);
-    ItemWork* search(u16 id);   // 0x8001DED0: the in-use slot of this->type holding `id`, NULL if none
-    ItemWork* minimumSearch(ITEM_ID id);
+    cItem* search(u16 id);   // 0x8001DED0: the in-use slot of this->type holding `id`, NULL if none
+    cItem* minimumSearch(ITEM_ID id);
     void ordering(ITEM_ID id);      // 0x8001DFD0: collect the in-use slots holding `id` into pOrder (qsort by order_cmp)
     int get(ITEM_ID id, int num);
-    int use(ItemWork* p);       // 0x8001E3BC
-    void erase(ItemWork* p);    // remove slot `p` (puzzle removeExtraPiece)
+    int use(cItem* p);       // 0x8001E3BC
+    void erase(cItem* p);    // remove slot `p` (puzzle removeExtraPiece)
     int dump(ITEM_ID id);           // 0x8001E970: drop item `id`
-    int dump(ItemWork* p);
-    int dumpAll(ItemWork* p);
+    int dump(cItem* p);
+    int dumpAll(cItem* p);
     int dumpType(int type);
     u16 num(int id, u8 type);   // 0x8001EAE4: count of item `id` of the given type (pl_sub: num(0xFE, 0))
     u16 num(int id);            // 0x8001EB54: count of item `id` of this->type
-    u16 num(ItemWork* p);
-    int combine(ItemWork* a, ItemWork* b, int flag);  // merge b into a (puzzle cmbPiece)
-    int partsCombine(ItemWork* pWeapon, ItemWork* pParts);
+    u16 num(cItem* p);
+    int combine(cItem* a, cItem* b, int flag);  // merge b into a (puzzle cmbPiece)
+    int partsCombine(cItem* pWeapon, cItem* pParts);
     int available(ITEM_ID id);      // 0x8001F2C4
     void flagclear();           // 0x8001F2E8
     int check(ITEM_ID id);
-    int arm(ItemWork* p);       // 0x8001F350: equip `p` (NULL: bare hands)
+    int arm(cItem* p);       // 0x8001F350: equip `p` (NULL: bare hands)
     // equipped weapon (this->xC), objWep: reloadable(x, 0) / reload(x, 0) / trigger(x)
     int reloadable();           // 0x8001F470
-    int reloadable(ItemWork* p, int flag);
+    int reloadable(cItem* p, int flag);
     int reload();               // 0x8001F5B4
-    int reload(ItemWork* p, int flag);
+    int reload(cItem* p, int flag);
     int trigger();              // 0x8001F7E8
-    int trigger(ItemWork* p);
-    u16 weaponId(ItemWork* p);
-    ItemWork* weaponParts(ItemWork* p, int no);
+    int trigger(cItem* p);
+    u16 weaponId(cItem* p);
+    cItem* weaponParts(cItem* p, int no);
     u16 bulletNumTotal(int bllt_id);
     u16 bulletNum();            // 0x8001FC20: bulletNumCurrent() of the equipped weapon
     u16 bulletNumCurrent();     // 0x8001FC40
     u16 bulletNum(ITEM_ID id);
-    u16 bulletNum(ItemWork* p);
+    u16 bulletNum(cItem* p);
     int saveDataSize();
     void save(void* pData);
     void load(void* pData);
-    int offboardDump(ItemWork* p_get_item);
+    int offboardDump(cItem* p_get_item);
     void takeOver();
     int countFiles();
     void debugNumDisp(int print_page);
@@ -173,7 +173,7 @@ extern "C" {
 u8 WeaponId2WeaponNo(ITEM_ID id);
 u8 WeaponId2WeaponType(ITEM_ID id);
 void itemInfo(ITEM_ID id, ItemInfo* info);
-// weapon item id -> its bullet item id (attr: ItemWork::x8 >> 13), charge count, max tune level per type
+// weapon item id -> its bullet item id (attr: cItem::x8 >> 13), charge count, max tune level per type
 u16 WeaponId2BulletId(ITEM_ID id, int bllt_type);
 u16 WeaponId2ChargeNum(ITEM_ID id, int level);
 int WeaponId2MaxLevel(ITEM_ID id, int type);
@@ -188,7 +188,7 @@ int addMoney(int n);
 u16 bareHand();
 int itemCombineCheck(ITEM_ID id);
 int itemCombine(ITEM_ID srcA, ITEM_ID srcB, u16* dst);
-int reload_main(ItemWork* pItem_A, ItemWork* pItem_B, int charge_num);
+int reload_main(cItem* pItem_A, cItem* pItem_B, int charge_num);
 u8 gld_order(u8 no);
 int gld_cmp(const void* a, const void* b);
 int order_cmp(const void* a, const void* b);
