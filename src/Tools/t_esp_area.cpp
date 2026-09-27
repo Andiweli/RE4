@@ -21,7 +21,7 @@ struct ESP_AREA {
     u8 be_flag;       // 0x01  bit 0: in use
     u8 area_no;      // 0x02
     u8 x3;
-    AreaData area;  // 0x04
+    AREA_HIT_DATA area;  // 0x04
     u32 flags34;    // 0x34  bit 0: in room
     u32 x38[0x18];
 };
@@ -73,7 +73,7 @@ void InitWork(ESP_AREA* w, int no)
 // panels); returns 0 on B (column done).
 int PosExec_callback(int no, ESP_AREA* w, cDbgButtonTemplate<ESP_AREA>* b)
 {
-    AreaData* a = &w->area;
+    AREA_HIT_DATA* a = &w->area;
 
     AreaDataEdit(a, 0xA0FF8080, 1, 0, 2.3f);
     AreaDataInfoDisp(a, 0x28, 0x18);
@@ -94,10 +94,10 @@ void PosUpdate_callback(int no, ESP_AREA* w, cDbgButtonTemplate<ESP_AREA>* b)
     if (IsWorkAlive(w)) {
         AreaGetCenterPos(&pos, &w->area);
         PSVECScale(&pos, &pos, 0.001f);
-        h = w->area.u.xz4.height / 1000.0f;
+        h = w->area.xz4.height / 1000.0f;
     }
     sprintf(buf, "%6.1f %6.1f %6.1f %6.1f", pos.x, pos.y, pos.z, h);
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // Data column pressed: rows AREA NO (left/right +-1, x10 with A) and IN ROOM (toggle, flags34
@@ -117,7 +117,7 @@ int AreaNoExec_callback(int no, ESP_AREA* w, cDbgButtonTemplate<ESP_AREA>* b)
         eprintf(0xAA, 0xB0, 0, 0, "          OFF");
     }
     if (pG->Frame_cnt & 7) {
-        eprintf(0x9A, (cursor + 10) * 16, 0, 0, cDbgStr::cursor());
+        eprintf(0x9A, (cursor + 10) * 16, 0, 0, ">");
     }
     rep = Joy[0].rep;
     if (rep & 0x80008) {
@@ -176,7 +176,7 @@ void AreaNoUpdate_callback(int no, ESP_AREA* w, cDbgButtonTemplate<ESP_AREA>* b)
     buf[3] = 0;
     buf[1] = digits[n / 10];
     buf[2] = digits[n % 10];
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // OPTION window: FOG on/off (Disp_flg 0x4000); B closes.
@@ -192,7 +192,7 @@ void OptionExec()
         eprintf(0xAA, 0xA0, 0, 0, "       OFF");
     }
     if (pG->Frame_cnt & 7) {
-        eprintf(0x9A, (cursor + 10) * 16, 0, 0, cDbgStr::cursor());
+        eprintf(0x9A, (cursor + 10) * 16, 0, 0, ">");
     }
     rep = Joy[0].rep;
     if (rep & 0x80008) {
@@ -276,7 +276,7 @@ void ToolEspArea()
         for (i = 0; i < ESP_AREA_MAX; i++, w++) {
             if (IsWorkAlive(w)) {
                 AreaGetCenterPos(&pos, &w->area);
-                pos.y = (pos.y + w->area.u.xz4.height) * 0.5f;
+                pos.y = (pos.y + w->area.xz4.height) * 0.5f;
                 Vec posCopy = pos;
                 if (GetScreenPos(&posCopy, &scr) == 1) {
                     u32 col1;
@@ -351,7 +351,7 @@ void tEspAreaInit()
     DpfFlagOn(pG, DPF_SHADOW);
     DpfFlagOn(pG, DPF_FILTER);
     DbgFlagOn(pG, DBG_DBG_CAM);
-    CamDbg.m_target_type = 4;
+    CamDbg.setTargetType(4);
     Block.dispAllBlock(1);
 }
 

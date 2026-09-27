@@ -14,19 +14,19 @@
 #include "trans.h"
 
 
-struct Esp18Work {
+typedef struct tagESP18_WK {
     Vec base_pos;    // 0x00 initial position
     f32 blur_rate;   // 0x0C -gen->Vec0.x
-};
+} ESP18_WK;
 
 // Heat shimmer: copies the frame buffer and redraws it through an indirect texture in
 // esp18_lp layers.
 class cEsp18 : public cEsp {
 public:
-    Esp18Work m_Free;  // 0xF8
+    ESP18_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -52,9 +52,9 @@ void cEsp18::move()
 }
 
 // Remembers the spawn position and takes the blur strength from -Vec0.x.
-int cEsp18::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp18::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp18Work* w = &m_Free;
+    ESP18_WK* w = &m_Free;
 
     w->base_pos = m_Pos;
     w->blur_rate = -pSeq->Vec0.x;
@@ -75,10 +75,10 @@ int cEsp18::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
 // the quad with 2 TEV stages. Tool_flg 0x20000 doubles the indirect alpha. Restores the GX state.
 void Esp18_Trans(cEsp18* esp)
 {
-    Esp18Work* w = &esp->m_Free;
+    ESP18_WK* w = &esp->m_Free;
     Mtx44 proj;
     Mtx inv;
-    EspAnmData* anm;
+    cAnm* anm;
     GXColor fog;
     GXColor col;
     f32 sx;
@@ -336,7 +336,7 @@ void Esp18_Trans(cEsp18* esp)
         stages++;
         {
             int no = esp->m_Tex_id;
-            EspTexWk* tw = EspGetTexWk(no, 1);
+            ESP_TEX_WK* tw = EspGetTexWk(no, 1);
             if (tw->Owner == EFF_NONE) {
                 pLog->err(0, 0, "ESP : TexId[%x] no data", no);
             } else {

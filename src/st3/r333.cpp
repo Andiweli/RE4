@@ -272,13 +272,13 @@ extern "C" void Evt_R333S00_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(3, 0);
         r333_work->timer = st3_getCountDownTimer();
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
         case 1:
             StaFlagOn(pG, STA_CAMERA_SET_ROOM);
@@ -291,8 +291,8 @@ extern "C" void Evt_R333S00_Func(Event* e)
             StaFlagOff(pG, STA_CAMERA_SET_ROOM);
             break;
         }
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     ((cModel*) mod)->be_flag |= 0x00100000;
                 }
@@ -304,7 +304,7 @@ extern "C" void Evt_R333S00_Func(Event* e)
         break;
     case 2:
         SmdSetTrans(3, 1);
-        st3_setCountDownTimer(r333_work->timer - e->MaxTotalFrame);
+        st3_setCountDownTimer(r333_work->timer - e->GetMaxTotalFrame());
         st3_startCountDown();
         break;
     }
@@ -319,7 +319,7 @@ extern "C" void Evt_R333S10_Func(Event* e)
     static int alphaTime = 50;
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0: {
         u32 i;
 
@@ -340,7 +340,7 @@ extern "C" void Evt_R333S10_Func(Event* e)
         break;
     }
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
         case 1:
             StaFlagOn(pG, STA_CAMERA_SET_ROOM);
@@ -358,8 +358,8 @@ extern "C" void Evt_R333S10_Func(Event* e)
             SmdSetTrans(0xCE, 1);
             break;
         }
-        if (e->NowCut == 0x10 || e->NowCut == 0x12) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0x10 || e->GetNowCut() == 0x12) {
+            if (e->GetNowFrame() == 0) {
                 void* m;
 
                 if (e->GetMod(&m, "pl0100", 0, 0) == 1) {
@@ -367,7 +367,7 @@ extern "C" void Evt_R333S10_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* m;
 
                 if (e->GetMod(&m, "pl0100", 0, 0) == 1) {
@@ -375,9 +375,9 @@ extern "C" void Evt_R333S10_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     ((cModel*) mod)->be_flag |= 0x00100000;
                 }
@@ -390,21 +390,21 @@ extern "C" void Evt_R333S10_Func(Event* e)
             }
             break;
         case 0xD:
-            if (e->NowFrame == e->MaxFrame - 1) {
+            if (e->GetNowFrame() == e->GetMaxFrame() - 1) {
                 Filter0bCapture();
             }
             break;
         case 0xE:
-            if (e->NowFrame <= alphaTime) {
-                Filter0bSetAlpha((u8) alpha - e->NowFrame * alpha / alphaTime);
+            if (e->GetNowFrame() <= alphaTime) {
+                Filter0bSetAlpha((u8) alpha - e->GetNowFrame() * alpha / alphaTime);
             }
             break;
         case 0x13:
-            if (e->NowFrame == 380) {
+            if (e->GetNowFrame() == 380) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
-                    FadeSetW(2, e->MaxFrame - 380, 0, 0);
+                    FadeSetW(2, e->GetMaxFrame() - 380, 0, 0);
                 }
             }
             break;
@@ -602,7 +602,7 @@ static void gameResult()
     ScreenReSize(0x200, 0x1C0);
     Sofdec.Initialize("movie/ending.sfd", 0);
     SceSleep(1);
-    while (Sofdec.isPlay()) {
+    while (Sofdec.IsActive()) {
         SceSleep(1);
     }
     // Loop-note barrier (the r40e gameResult idiom): lifeMeterDisp's `li r4,0` and the counter's `li`

@@ -359,7 +359,7 @@ static void r20d_setEm()
 // `z0 = 0.0f` before the loop would make PRE insert a second high.
 static void r20d_checkSwitch(int opened)
 {
-    cEm* sw;
+    cEmSwitch* sw;
     int open;
     f32 zero;
 
@@ -369,10 +369,10 @@ static void r20d_checkSwitch(int opened)
     }
     if (opened == 0) {
         open = 0;
-        ((cEmSwitch*) sw)->setClosed();
+        sw->setClosed();
     } else {
         open = 1;
-        ((cEmSwitch*) sw)->setOpened();
+        sw->setOpened();
     }
     for (;;) {
         f32 t = r20d_work->fence[0].t;
@@ -381,12 +381,12 @@ static void r20d_checkSwitch(int opened)
         if (open == 0) {
             if (t != z0) {
                 open = 1;
-                ((cEmSwitch*) sw)->setOpen();
+                sw->setOpen();
                 if (pG->Room_flg[0] & 0x40000000) {
                     continue;
                 }
             }
-            if (((cEmSwitch*) sw)->ckOpen() == 1) {
+            if (sw->ckOpen() == 1) {
                 SndCall(6, 0x24, 0, 0, 0, 0);
                 open = 1;
                 for (;;) {
@@ -398,14 +398,14 @@ static void r20d_checkSwitch(int opened)
                         r20d_work->fence[0].move(1.0f);
                         goto sleep;
                     }
-                    if (((cEmSwitch*) sw)->ckOpen() == 0) {
+                    if (sw->ckOpen() == 0) {
                         goto sleep;
                     }
                     SceSleep(1);
                 }
             }
         } else {
-            if (((cEmSwitch*) sw)->ckOpen() == 0) {
+            if (sw->ckOpen() == 0) {
                 f32 spd;
 
                 SndCall(6, 0x26, 0, 0, 0, 0);
@@ -418,7 +418,7 @@ static void r20d_checkSwitch(int opened)
                     t -= spd;
                     spd += 0.005f;
                     if (!(t < zero)) {
-                        if (((cEmSwitch*) sw)->ckOpen() == 1) {
+                        if (sw->ckOpen() == 1) {
                             goto sleep;
                         }
                         SceSleep(1);

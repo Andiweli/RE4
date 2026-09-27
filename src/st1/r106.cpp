@@ -76,7 +76,7 @@ void R106Init()
     Vec pos;
     Vec rot;
     cEmDoor* door;
-    cEm* rack;
+    cEmRack* rack;
     cEmHit* hit;
 
 #line 66 "D:/Bio4/Prog/r106.cpp"
@@ -111,7 +111,7 @@ void R106Init()
     }
     r106_setEm();
     if (getRoomEtcRack(0, &rack, 1)) {
-        ((cEmRack*) rack)->setRange(0.0f, 1800.0f, 0.0f, 2200.0f);
+        rack->setRange(0.0f, 1800.0f, 0.0f, 2200.0f);
     }
     pos.x = 33528.0f;
     pos.y = -7745.0f;
@@ -185,7 +185,7 @@ extern "C" void r106_setRollingStone()
         rock->setScale(4.2f);
     }
     {
-        EmListData d;
+        EM_LIST d;
 
         d.id = 0x12;
         d.type = 3;
@@ -361,8 +361,8 @@ static void r106_Event()
     if (r106_work->evd->waitLoadOk()) {
         EventMgr* evt;
 
-        if (EvtMgr.SetEvt(r106_work->evd->m_addr, (u32*) &ev)) {
-            ev->StatusFlag |= EvtStfBit(EvtStfFadeOut);
+        if (EvtMgr.SetEvt(r106_work->evd->getAddr(), (u32*) &ev)) {
+            ev->FlgOnStatus(EvtStfFadeOut);
         }
         evt = &EvtMgr;
         while (evt->IsAliveEvt(evt->GetNowExeEvtNamePtr(), 0, 0) != 0) {
@@ -486,14 +486,14 @@ extern "C" void Evt_R106S00_Func(Event* ev)
 {
     void* mod;
 
-    switch (ev->FuncType) {
+    switch (ev->GetFuncType()) {
     case 0:
         r106_work->closet->be_flag &= ~2;
         break;
     case 1:
-        switch (ev->NowCut) {
+        switch (ev->GetNowCut()) {
         case 0:
-            if (ev->NowFrame == 0) {
+            if (ev->GetNowFrame() == 0) {
                 if (ev->GetMod(&mod, "obm4000", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cObj*) mod)->be_flag |= 2;
@@ -503,7 +503,7 @@ extern "C" void Evt_R106S00_Func(Event* ev)
             }
             break;
         case 0x10:
-            if (ev->NowFrame == 0) {
+            if (ev->GetNowFrame() == 0) {
                 EffectEspDelete(0, ESP_CORE_KIND_ROOM_AREA09, 0, 0);
                 EffectEspgenDelete(0, ESP_CORE_KIND_ROOM_AREA09, 0);
                 EffectEfmDelete(0, ESP_CORE_KIND_ROOM_AREA09, 0);
@@ -512,7 +512,7 @@ extern "C" void Evt_R106S00_Func(Event* ev)
             }
             break;
         case 0x11:
-            if (ev->NowFrame == 0) {
+            if (ev->GetNowFrame() == 0) {
                 if (ev->GetMod(&mod, "obm4000", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cObj*) mod)->be_flag &= ~2;
@@ -522,7 +522,7 @@ extern "C" void Evt_R106S00_Func(Event* ev)
             }
             break;
         case 0x12:
-            if (ev->NowFrame == 0x41) {
+            if (ev->GetNowFrame() == 0x41) {
                 if (ev->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cObj*) mod)->be_flag |= 2;
@@ -534,9 +534,9 @@ extern "C" void Evt_R106S00_Func(Event* ev)
             }
             break;
         }
-        if (ev->NowFrame == 0) {
+        if (ev->GetNowFrame() == 0) {
             if (ev->GetMod(&mod, "wep0200", 0, 0) == 1) {
-                if (ev->NowCut > 3) {
+                if (ev->GetNowCut() > 3) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cObj*) mod)->be_flag &= ~2;
                 } else {
@@ -555,7 +555,7 @@ extern "C" void Evt_R106S00_Func(Event* ev)
 // The six Ganados of the hall.
 extern "C" void r106_setEm()
 {
-    EmListData d;
+    EM_LIST d;
 
     d.rot[0] = 0;
     d.rot[2] = 0;

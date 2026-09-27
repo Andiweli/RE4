@@ -29,9 +29,11 @@ class cSubLuis;
 class cVoice {
 public:
     u8 on;                // 0x00  a line is playing
+private:
     int time;            // 0x04  frames left
     u32 seId;            // 0x08  SndCall id, 0xF0F0F0F0 = none
 
+public:
     cVoice();
     void set(int mesNo, u16 seNo, int time);
     void move();
@@ -40,7 +42,7 @@ public:
 // Routine machine: owner->xFC is the routine number, xFD its step. Higher priority routines
 // (damage, die) interrupt lower ones.
 class cRoutine {
-public:
+private:
     cSubLuis* owner;      // 0x000
     cMot3 mot3;           // 0x004 .. 0x0EC  three-way blend (aim up / level / down)
     f32 rate;             // 0x0EC  mot3 rate (aim elevation)
@@ -52,6 +54,7 @@ public:
     cVoice voice;         // 0x100 .. 0x10C
     u8 shotCnt;           // 0x10C  shots of the current burst
     u8 pad10D[3];
+public:
     int work[4];          // 0x110  [0] damage: motion variant / turn: direction, [1] damage: voice type / turn: frames (PS2 work[4])
     f32 dist;             // 0x120  walk / run: arrival distance
     u8 pad124[0xC];
@@ -59,8 +62,7 @@ public:
     cEm* pTarget;         // 0x13C  enemy aimed at
     int m_ShootDown;              // 0x140  frames the dead target was kept
 
-    void init(cSubLuis* o);
-    int move();
+private:
     void moveFootwork();
     void moveDamage();
     void moveDie();
@@ -79,10 +81,18 @@ public:
     void moveAvoid();
     void moveTurn();
     void moveTurn180();
-    int set(int no);
     void end();
-    int eor();
     void shot();
+    // Handlers by routine number (owner->r_no_0); 4 (event) calls cSubLuis::m_pFunc instead. The name is ours.
+    static void (cRoutine::*move_tbl[18])();
+
+public:
+    void init(cSubLuis* o);
+    int move();
+    int set(int no);
+    int eor();
+    void endDamage() { end(); }
+    void voiceSet(int mesNo, u16 seNo, int time) { voice.set(mesNo, seNo, time); }
 };
 
 // Target analysis.
@@ -99,11 +109,13 @@ public:
         S_ESC_RACK = 7,
     };
 
+private:
     cSubLuis* owner;      // 0x00
     int iem;              // 0x04  EmMgr index the round-robin isTarget scan is at
     f32 plDist;           // 0x08  route distance to the player
     int time;              // 0x0C  frames
     s8 grenadeTimer;            // 0x10  frames the player has aimed a grenade at him (bit7 = handled)
+public:
     cEm* pEmNear;         // 0x14  nearest target
     f32 pEmNearDist;       // 0x18  its squared distance
     cFlag<u8, STAT> status;  // 0x1C
@@ -112,6 +124,7 @@ public:
     void init(cSubLuis* o);
     void move();
     int aimCheck();
+    f32 getPlDist() { return plDist; }
 };
 
 // Action machine: mode 0 wait, 1 attack, 2 chase the player, 3 go upstairs, 4 attack the player,
@@ -123,6 +136,7 @@ public:
         S_11C_BEGIN = 1,  // and done
     };
 
+private:
     cSubLuis* owner;      // 0x00
     int type;             // 0x04
     int rno0;              // 0x08  mode move() dispatches on
@@ -132,10 +146,10 @@ public:
     u8 padF;
     int timer;            // 0x10
     u8 pad14[0xC];
+public:
     cFlag<u8, STAT> status;  // 0x20
 
-    void init(cSubLuis* o);
-    void move(cAnalysis* an, cRoutine* rt);
+public:
     void moveAttack(cAnalysis* an, cRoutine* rt);
     void moveGo2F(cAnalysis* an, cRoutine* rt);
     void moveAttackPl(cAnalysis* an, cRoutine* rt);
@@ -146,7 +160,10 @@ public:
     void move11cBegin(cAnalysis* an, cRoutine* rt);
     void moveEscRack(cAnalysis* an, cRoutine* rt);
     void moveChasePl(cAnalysis* an, cRoutine* rt);
+    void init(cSubLuis* o);
+    void move(cAnalysis* an, cRoutine* rt);
     void set(int mode);
+    int check(int t) { return type == t; }
     int chasePlAreaCheck();
 };
 
@@ -185,33 +202,40 @@ private:
     u16 m_LeonHp;          // 0x7A4  player life the last worry line was spoken at
     u8 m_PlAtack;            // 0x7A6  hits left before he goes down
     u8 m_okTime;         // 0x7A7
-    cEm* pRackWk[3];         // 0x7A8  the room's racks (getRoomEtcRack)
+    cEmRack* pRackWk[3];         // 0x7A8  the room's racks (getRoomEtcRack)
 
 public:
     f32 neckY;          // 0x7B4
 
     cSubLuis();
     virtual ~cSubLuis();
+private:
     virtual void move();
+public:
     virtual void endDamage();
     void init();
     void modelSet();
+private:
     void think();
     int rackCheck();
     void seqSeCtrl();
     int damageCheck();
+public:
     void equipWeapon();
+private:
     void moveEye();
+public:
     void neckSet(f32 ang, f32 limit);
     void neckMove();
 };
 
 class cObjLuisItem : public cObj {
-public:
+private:
     int timer;            // 0x328
     Vec v;                // 0x32C  velocity
     Vec a;                // 0x338  acceleration
 
+public:
     virtual void move();
     void init(Vec* pos, f32 rotY);
 };

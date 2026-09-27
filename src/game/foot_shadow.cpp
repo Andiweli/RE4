@@ -41,7 +41,7 @@ static inline f32 shadowRate(Vec* pos, Vec* lpos, f32 range)
 // a shadow sprite (texture 0x13) per joint plus interpolated blobs between flagged joints; alpha
 // scales with the light's red component, Shd_color and the distance rate. Disp_flg 0x02000000 or
 // Shd_color 0xFF disables it.
-void DrawFootShadow(cEm* pMod)
+void DrawFootShadow(cModel* pMod)
 {
     Vec dir;
     Vec lpos;
@@ -169,7 +169,7 @@ void DrawFootShadow(cEm* pMod)
             prevOn = 0;
             prevCnt = 0;
             for (i = 0; i < tbl->nTbl; i++) {
-                FootShadowDat* dat = &tbl->dat[i];
+                FOOTSHADOW_DATA* dat = &tbl->dat[i];
                 cParts* p = pMod->getPartsPtr(dat->joint);
                 ShadowInfo mid;
                 Vec ofs;

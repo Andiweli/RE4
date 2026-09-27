@@ -100,7 +100,7 @@ private:
     s8 m_lines;            // 0x72
     u8 x73;
     u16 m_number_width;           // 0x74  width added by numbers/tables (code0a)
-public:
+private:
     // PS2 has m_line_gap private; public here because r20e, r224 and r307 read the low byte (lineSpace) through getWork().
     union {
         u16 m_line_gap;      // 0x76
@@ -148,7 +148,9 @@ public:
     int isAlive() { return be_flag & 1; }
     void setBorn() { be_flag |= 3; }
     void setDie() { be_flag &= ~1; }
+private:
     u32 attrCk(u32 attr) { return m_attr & attr; }
+public:
     s8 getSel() { return m_sel; }
     s8 getCursor() { return m_cur; }
     void setFontSize(s16 w, s16 h) {
@@ -166,16 +168,23 @@ public:
     void registQueue(MesQue* q) { m_queue = q; }
     void init(int no, int px, int py, u32 attr, int col, MessageFont* font);
     void move();
+private:
     void WidthCk();
     void QueSet(int code, MessageFont* font);
+public:
     void setNumber(u32 num, u16 digits);
+private:
     void putSelCursol();
     void putNextCursol(int flag);
+public:
     void setJump(u16 mes);
     void trans();
+private:
     int CommandExec();
     int CommandArg();
+public:
     void WaitEnd();
+private:
     int code00();
     int code01();
     int code02();
@@ -242,9 +251,11 @@ public:
     void stageInit();
     void loadStageFont();
     void loadEventFont();
+private:
     void setState(u32 b);
     void unsetState(u32 b);
     int checkState(u32 b);
+public:
     void Move();
     void Trans();
     void setFontSize(int no, s16 font_w, s16 font_h);
@@ -281,9 +292,10 @@ public:
 // ROM font glyph renderer (game/mes.cpp), used by the dvd error screen before the message
 // system is up.
 class RomFont {
-public:
+private:
     void* m_FontData;  // 0x00  OSFontHeader
 
+public:
     RomFont(void* font);
     void setup(void* image);
     void draw(int x, int y, int xChar, int yChar);

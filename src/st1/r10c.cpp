@@ -362,7 +362,7 @@ static void r10c_EmEvent_exit()
     SceEventEnd(0);
     StaFlagOff(pG, STA_ESP_COMPULSION_NOSUSPEND);
     {
-        EmListData* l = &pG->Em_list[3];
+        EM_LIST* l = &pG->Em_list[3];
 
         l->be_flag |= 1;
         l->set = 0;
@@ -386,7 +386,7 @@ static void r10c_EmEvent()
         RsfSet(G_ROOM_ID, 1);
         pG->Room_flg[0] &= ~0x04000000;
         {
-            EmListData* l = &pG->Em_list[2];
+            EM_LIST* l = &pG->Em_list[2];
 
             em = EmSetFromList2(2, 1);
             l->set = 0;

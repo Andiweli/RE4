@@ -254,7 +254,7 @@ static inline void r300_setEmAngR(cEmWrap* em, f32 ry)
 }
 
 // An ESL entry's position (1/10 units -> world) and yaw (rot[1] in 1/32768 turns -> degrees).
-static inline void r300_getListPos(EmListData* l, Vec* pos, f32& ry)
+static inline void r300_getListPos(EM_LIST* l, Vec* pos, f32& ry)
 {
     pos->x = (f32) l->pos[0] * 10.0f;
     pos->y = (f32) l->pos[1] * 10.0f;
@@ -326,7 +326,7 @@ void R300Init()
             r300_work->rock->setNoSuspend(1);
         }
         {
-            EmListData d;
+            EM_LIST d;
 
             d.id = 0x1D;
             d.type = 0xE;
@@ -440,7 +440,7 @@ void R300Init()
         em[0].setEm(3, -1, 1, 1, 1);
         em[1].setEm(4, -1, 1, 1, 1);
         if (pG->room_id_prev == 0x301) {
-            EmListData* l;
+            EM_LIST* l;
             f32 ry;
 
             Vec pos;
@@ -746,14 +746,14 @@ static void Evt_R300S00_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SysFlagOff(pG, SYS_SCISSOR_ON);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "evm4000", 0, 0) == 1) {
@@ -787,7 +787,7 @@ static void Evt_R300S00_Func(Event* e)
             break;
         case 8:
         case 11:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod, 1, 0);
                 }
@@ -797,14 +797,14 @@ static void Evt_R300S00_Func(Event* e)
         case 9:
         case 10:
         case 12:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod, 1, 1);
                 }
             }
             break;
         case 13:
-            if (e->NowFrame == 0x52) {
+            if (e->GetNowFrame() == 0x52) {
                 FadeSetW(2, 60, 0, 0);
             }
             break;
@@ -1508,7 +1508,7 @@ void modelSet()
     cModelInfo* info;
 
     r300_memset(pz, 0, sizeof(Vec));
-    r300_work->asl = SetObjSmd(r300_work->data[0]->m_addr, r300_work->data[1]->m_addr, pz, pz, 0x10, 1);
+    r300_work->asl = SetObjSmd(r300_work->data[0]->getAddr(), r300_work->data[1]->getAddr(), pz, pz, 0x10, 1);
     MotionSetCore(r300_work->asl, &r300_work->asl->Motion, ROOM_ARC_PTR(pG->pRoom, 0x30), 0, 0, 5, 0);
     info = ModInfoMgr.create(ROOM_ARC_PTR(pG->pRoom, 0x2D), ROOM_ARC_PTR(pG->pRoom, 0x2F));
     if (info) {
@@ -1518,19 +1518,19 @@ void modelSet()
     if (info) {
         r300_work->asl->addModel(info);
     }
-    info = ModInfoMgr.create(r300_work->data[2]->m_addr, r300_work->data[1]->m_addr);
+    info = ModInfoMgr.create(r300_work->data[2]->getAddr(), r300_work->data[1]->getAddr());
     if (info) {
         r300_work->asl->addModel(info);
     }
-    info = ModInfoMgr.create(r300_work->data[3]->m_addr, r300_work->data[1]->m_addr);
+    info = ModInfoMgr.create(r300_work->data[3]->getAddr(), r300_work->data[1]->getAddr());
     if (info) {
         r300_work->asl->addModel(info);
     }
-    info = ModInfoMgr.create(r300_work->data[4]->m_addr, r300_work->data[1]->m_addr);
+    info = ModInfoMgr.create(r300_work->data[4]->getAddr(), r300_work->data[1]->getAddr());
     if (info) {
         r300_work->asl->addModel(info);
     }
-    info = ModInfoMgr.create(r300_work->data[5]->m_addr, r300_work->data[1]->m_addr);
+    info = ModInfoMgr.create(r300_work->data[5]->getAddr(), r300_work->data[1]->getAddr());
     if (info) {
         r300_work->asl->addModel(info);
     }

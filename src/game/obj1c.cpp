@@ -24,7 +24,7 @@ void (*Obj1c_R1_move_tbl[3])(cObj1c*) = { obj1c_R1_Set, obj1c_R1_Crash, obj1c_R1
 cObj* SetFloatIsland(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cObj* obj;
-    IslandWork* w;
+    FREE_OBJ1C* w;
 
     obj = ObjMgr.create(cObjMgr::ID_FLOATISLAND);
     if (obj == 0) {
@@ -72,7 +72,7 @@ cObj* SetFloatIsland(void* bin, void* tpl, Vec* pos, Vec* rot)
 // Per-frame: timers, R1 routine, and hide/show with effect deletion by Status_flg[1] 0x80000.
 void cObj1c::move()
 {
-    IslandWork* w = ISLAND_WK(this);
+    FREE_OBJ1C* w = ISLAND_WK(this);
 
     be_flag &= ~0x4000;
     if (w->Crash_wait) {
@@ -97,7 +97,7 @@ void cObj1c::move()
 // Rno1 == 0: drift, a water effect (est 1/0) every 30 frames while visible, idle motion.
 void obj1c_R1_Set(cObj1c* pObj)
 {
-    IslandWork* w = ISLAND_WK(pObj);
+    FREE_OBJ1C* w = ISLAND_WK(pObj);
 
     obj1cSpdMove(pObj);
     if (w->Eff_wait) {
@@ -122,7 +122,7 @@ void obj1c_R1_Set(cObj1c* pObj)
 // Rno1 == 1: crash motion, then back to the idle motion (big variant when scale >= 1.5).
 void obj1c_R1_Crash(cObj1c* pObj)
 {
-    IslandWork* w = ISLAND_WK(pObj);
+    FREE_OBJ1C* w = ISLAND_WK(pObj);
 
     obj1cSpdMove(pObj);
     if (pObj->Motion.pMot) {
@@ -151,7 +151,7 @@ void obj1c_R1_Crash(cObj1c* pObj)
 // Rno1 == 2: same as Crash (the big crash entry).
 void obj1c_R1_CrashBig(cObj1c* pObj)
 {
-    IslandWork* w = ISLAND_WK(pObj);
+    FREE_OBJ1C* w = ISLAND_WK(pObj);
 
     obj1cSpdMove(pObj);
     if (pObj->Motion.pMot) {
@@ -180,7 +180,7 @@ void obj1c_R1_CrashBig(cObj1c* pObj)
 // Installs the idle/crash motions (normal and big-scale variants) and starts the idle.
 void cObj1c::setMotion(void* idle, void* crash, void* idleBig, void* crashBig)
 {
-    IslandWork* w = ISLAND_WK(this);
+    FREE_OBJ1C* w = ISLAND_WK(this);
 
     w->motIdle = idle;
     w->motCrash = crash;
@@ -196,7 +196,7 @@ void cObj1c::setMotion(void* idle, void* crash, void* idleBig, void* crashBig)
 // Plays the crash motion and the splash effect (15-frame effect cooldown).
 void cObj1c::setCrash()
 {
-    IslandWork* w = ISLAND_WK(this);
+    FREE_OBJ1C* w = ISLAND_WK(this);
 
     if (w->motCrash) {
         if (scale.x >= 1.5f) {
@@ -219,7 +219,7 @@ void cObj1c::setCrash()
 // the 15-frame crash window (ckCrash).
 void cObj1c::setCrashBig(Vec* pPos)
 {
-    IslandWork* w = ISLAND_WK(this);
+    FREE_OBJ1C* w = ISLAND_WK(this);
     Vec dir;
 
     PSVECSubtract(&pos, pPos, &dir);
@@ -262,7 +262,7 @@ int cObj1c::ckCrash()
 // island and decays by 10% per frame until below 50.
 void obj1cSpdMove(cObj1c* pObj)
 {
-    IslandWork* w = ISLAND_WK(pObj);
+    FREE_OBJ1C* w = ISLAND_WK(pObj);
     Vec d;
 
     if (w->Spd.x == 0.0f || w->Spd.z == 0.0f) {

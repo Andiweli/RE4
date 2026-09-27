@@ -190,7 +190,7 @@ struct SceAtFileHead {
 };
 
 // AreaViewCheck's cone scratch: the original frame reserves 0x40 bytes for it (frame 0xC8 with the
-// three other locals), not the 0x48 of `GeoCone[2]` (GeoCone was probably 0x20 without `radius` then).
+// three other locals), not the 0x48 of `GEOM_CONE_REV[2]` (GEOM_CONE_REV was probably 0x20 without `radius` then).
 struct SceAtViewCone {
     f32 w[16];
 };
@@ -473,7 +473,7 @@ int sceAtCheck_main(cEm* em, int target_type)
     Vec pos;
     Vec front;
     char name[21] = {'N', 'D', 'E', 'I', 'F', 'M', 'P', 'J', 'T', 'S', 'd', 's', ' ', 'f', 'C', 'K', 'L', 'U', 'H', ' ', ' '};
-    ItemInfo info;
+    ITEM_INFO info;
     SceAtWork* w;
     int col = 0;
     int cnt = 0;
@@ -603,7 +603,7 @@ int sceAtCheck_main(cEm* em, int target_type)
 // The area of `w` in world space: its parent's matrix applied (rotation ignored with flag bit3).
 // The area in world space: the record's area moved (and rotated unless flag bit3) by the parent
 // model / parts matrix when the area follows a parent.
-void sceAtGetArea(AreaData* ret_area, SceAtWork* w)
+void sceAtGetArea(AREA_HIT_DATA* ret_area, SceAtWork* w)
 {
     Mtx mat;
     Mtx pmat;
@@ -629,38 +629,38 @@ void sceAtGetArea(AreaData* ret_area, SceAtWork* w)
     Vec p[4];
     switch (ret_area->type) {
     case 1:
-        p[0].y = p[1].y = p[2].y = p[3].y = ret_area->u.xz4.floor;
-        p[0].x = ret_area->u.xz4.p[0].x;
-        p[0].z = ret_area->u.xz4.p[0].z;
-        p[1].x = ret_area->u.xz4.p[1].x;
-        p[1].z = ret_area->u.xz4.p[1].z;
-        p[2].x = ret_area->u.xz4.p[2].x;
-        p[2].z = ret_area->u.xz4.p[2].z;
-        p[3].x = ret_area->u.xz4.p[3].x;
-        p[3].z = ret_area->u.xz4.p[3].z;
+        p[0].y = p[1].y = p[2].y = p[3].y = ret_area->xz4.floor;
+        p[0].x = ret_area->xz4.p[0].x;
+        p[0].z = ret_area->xz4.p[0].z;
+        p[1].x = ret_area->xz4.p[1].x;
+        p[1].z = ret_area->xz4.p[1].z;
+        p[2].x = ret_area->xz4.p[2].x;
+        p[2].z = ret_area->xz4.p[2].z;
+        p[3].x = ret_area->xz4.p[3].x;
+        p[3].z = ret_area->xz4.p[3].z;
         PSMTXMultVec(mat, &p[0], &p[0]);
         PSMTXMultVec(mat, &p[1], &p[1]);
         PSMTXMultVec(mat, &p[2], &p[2]);
         PSMTXMultVec(mat, &p[3], &p[3]);
-        ret_area->u.xz4.floor = p[0].y;
-        ret_area->u.xz4.p[0].x = p[0].x;
-        ret_area->u.xz4.p[0].z = p[0].z;
-        ret_area->u.xz4.p[1].x = p[1].x;
-        ret_area->u.xz4.p[1].z = p[1].z;
-        ret_area->u.xz4.p[2].x = p[2].x;
-        ret_area->u.xz4.p[2].z = p[2].z;
-        ret_area->u.xz4.p[3].x = p[3].x;
-        ret_area->u.xz4.p[3].z = p[3].z;
+        ret_area->xz4.floor = p[0].y;
+        ret_area->xz4.p[0].x = p[0].x;
+        ret_area->xz4.p[0].z = p[0].z;
+        ret_area->xz4.p[1].x = p[1].x;
+        ret_area->xz4.p[1].z = p[1].z;
+        ret_area->xz4.p[2].x = p[2].x;
+        ret_area->xz4.p[2].z = p[2].z;
+        ret_area->xz4.p[3].x = p[3].x;
+        ret_area->xz4.p[3].z = p[3].z;
         break;
     case 2:
     case 3:
-        p[0].x = ret_area->u.cyl.x;
-        p[0].y = ret_area->u.cyl.floor;
-        p[0].z = ret_area->u.cyl.z;
+        p[0].x = ret_area->cylinder.x;
+        p[0].y = ret_area->cylinder.floor;
+        p[0].z = ret_area->cylinder.z;
         PSMTXMultVec(mat, &p[0], &p[0]);
-        ret_area->u.cyl.x = p[0].x;
-        ret_area->u.cyl.floor = p[0].y;
-        ret_area->u.cyl.z = p[0].z;
+        ret_area->cylinder.x = p[0].x;
+        ret_area->cylinder.floor = p[0].y;
+        ret_area->cylinder.z = p[0].z;
         break;
     }
 }
@@ -670,7 +670,7 @@ void sceAtGetArea(AreaData* ret_area, SceAtWork* w)
 // for item areas, the item's own hit box.
 int sceAtHitCheck(SceAtWork* w, cModel* pModel, Vec* pos_f, Vec* pos)
 {
-    AreaData area;
+    AREA_HIT_DATA area;
     f32 ang;
     int ret;
     f32 ry;
@@ -694,11 +694,11 @@ int sceAtHitCheck(SceAtWork* w, cModel* pModel, Vec* pos_f, Vec* pos)
         Vec c = {0.0f, 0.0f, 0.0f};
         SceAtViewCone cone;
 
-        c.x = area.u.eye.xz;
-        c.y = area.u.eye.floor;
-        c.z = area.u.eye.z;
+        c.x = area.eye_trigger.xz;
+        c.y = area.eye_trigger.floor;
+        c.z = area.eye_trigger.z;
         cc = c;
-        if (AreaViewCheck(&area, (GeoCone*) &cone) == 1) {
+        if (AreaViewCheck(&area, (GEOM_CONE_REV*) &cone) == 1) {
             ret = InScreenCheck(&cc) == 1;
         }
     } else {
@@ -1031,8 +1031,8 @@ void sceAtGetItem(SceAtWork* w)
     int put = 1;
     int sel;
     int i;
-    ItemInfo info;
-    ItemWork tmp;
+    ITEM_INFO info;
+    cItem tmp;
 
     SceUpCutStart();
     swep_flag = 0;
@@ -1287,8 +1287,8 @@ void sceAtGetItem_NoModel(SceAtWork* w)
     // head of the `sel = res` class (a block-local sel is replaced by the sign-extend temp: 4 refs, r31).
     asm("" : "=r"(sel));
     int i;
-    ItemInfo info;
-    ItemWork tmp;
+    ITEM_INFO info;
+    cItem tmp;
 
     SceUpCutStart();
     pPL->setNoSuspend(1);
@@ -1740,25 +1740,25 @@ int sceAtFunc_damage(SceAtWork* w, cModel* pModel)
     if (w->checkType & 2) {
         switch (w->area.type) {
         case 1:
-            pt[0].x = w->area.u.xz4.p[0].x;
-            pt[0].y = w->area.u.xz4.floor;
-            pt[0].z = w->area.u.xz4.p[0].z;
-            pt[1].x = w->area.u.xz4.p[3].x;
-            pt[1].y = w->area.u.xz4.floor;
-            pt[1].z = w->area.u.xz4.p[3].z;
-            pt[2].x = w->area.u.xz4.p[2].x;
-            pt[2].y = w->area.u.xz4.floor;
-            pt[2].z = w->area.u.xz4.p[2].z;
-            pt[3].x = w->area.u.xz4.p[1].x;
-            pt[3].y = w->area.u.xz4.floor;
-            pt[3].z = w->area.u.xz4.p[1].z;
-            DmgMgr.set(w->dmg.kind, time, pt, w->area.u.xz4.height);
+            pt[0].x = w->area.xz4.p[0].x;
+            pt[0].y = w->area.xz4.floor;
+            pt[0].z = w->area.xz4.p[0].z;
+            pt[1].x = w->area.xz4.p[3].x;
+            pt[1].y = w->area.xz4.floor;
+            pt[1].z = w->area.xz4.p[3].z;
+            pt[2].x = w->area.xz4.p[2].x;
+            pt[2].y = w->area.xz4.floor;
+            pt[2].z = w->area.xz4.p[2].z;
+            pt[3].x = w->area.xz4.p[1].x;
+            pt[3].y = w->area.xz4.floor;
+            pt[3].z = w->area.xz4.p[1].z;
+            DmgMgr.set(w->dmg.kind, time, pt, w->area.xz4.height);
             break;
         case 2:
-            c.x = w->area.u.cyl.x;
-            c.y = w->area.u.cyl.floor;
-            c.z = w->area.u.cyl.z;
-            DmgMgr.set(w->dmg.kind, time, &c, w->area.u.cyl.radius, w->area.u.cyl.height);
+            c.x = w->area.cylinder.x;
+            c.y = w->area.cylinder.floor;
+            c.z = w->area.cylinder.z;
+            DmgMgr.set(w->dmg.kind, time, &c, w->area.cylinder.radius, w->area.cylinder.height);
             break;
         }
     }
@@ -1870,7 +1870,7 @@ void sceAtGetLadderPos(SceAtLadder* ladder, Vec* pos, f32* ladder_ang)
 // 1 when another enemy (id <= 0x20) stands within 500 of the ladder's foot (someone is using it).
 int sceAtCheckLadderUp(SceAtLadder* ladder, cModel* pEm)
 {
-    AreaData area;
+    AREA_HIT_DATA area;
     Vec pos;
     f32 ang;
     u32 i;
@@ -2160,36 +2160,36 @@ void sceAtSetScrAt(SceAtWork* w)
         cModel* p = w->pParent;
 
         pos = p->pos;
-        poly[0].x = p->scale.x * w->area.u.xz4.p[0].x;
-        poly[0].y = p->scale.y * w->area.u.xz4.floor;
-        poly[0].z = p->scale.z * w->area.u.xz4.p[0].z;
-        poly[1].x = p->scale.x * w->area.u.xz4.p[1].x;
-        poly[1].y = p->scale.y * w->area.u.xz4.floor;
-        poly[1].z = p->scale.z * w->area.u.xz4.p[1].z;
-        poly[2].x = p->scale.x * w->area.u.xz4.p[2].x;
-        poly[2].y = p->scale.y * w->area.u.xz4.floor;
-        poly[2].z = p->scale.z * w->area.u.xz4.p[2].z;
-        poly[3].x = p->scale.x * w->area.u.xz4.p[3].x;
-        poly[3].y = p->scale.y * w->area.u.xz4.floor;
-        poly[3].z = p->scale.z * w->area.u.xz4.p[3].z;
+        poly[0].x = p->scale.x * w->area.xz4.p[0].x;
+        poly[0].y = p->scale.y * w->area.xz4.floor;
+        poly[0].z = p->scale.z * w->area.xz4.p[0].z;
+        poly[1].x = p->scale.x * w->area.xz4.p[1].x;
+        poly[1].y = p->scale.y * w->area.xz4.floor;
+        poly[1].z = p->scale.z * w->area.xz4.p[1].z;
+        poly[2].x = p->scale.x * w->area.xz4.p[2].x;
+        poly[2].y = p->scale.y * w->area.xz4.floor;
+        poly[2].z = p->scale.z * w->area.xz4.p[2].z;
+        poly[3].x = p->scale.x * w->area.xz4.p[3].x;
+        poly[3].y = p->scale.y * w->area.xz4.floor;
+        poly[3].z = p->scale.z * w->area.xz4.p[3].z;
     } else {
-        pos.x = w->area.u.xz4.p[0].x;
-        pos.y = w->area.u.xz4.floor;
-        pos.z = w->area.u.xz4.p[0].z;
+        pos.x = w->area.xz4.p[0].x;
+        pos.y = w->area.xz4.floor;
+        pos.z = w->area.xz4.p[0].z;
         poly[0].x = 0.0f;
         poly[0].y = 0.0f;
         poly[0].z = 0.0f;
-        poly[1].x = w->area.u.xz4.p[1].x - w->area.u.xz4.p[0].x;
+        poly[1].x = w->area.xz4.p[1].x - w->area.xz4.p[0].x;
         poly[1].y = 0.0f;
-        poly[1].z = w->area.u.xz4.p[1].z - w->area.u.xz4.p[0].z;
-        poly[2].x = w->area.u.xz4.p[2].x - w->area.u.xz4.p[0].x;
+        poly[1].z = w->area.xz4.p[1].z - w->area.xz4.p[0].z;
+        poly[2].x = w->area.xz4.p[2].x - w->area.xz4.p[0].x;
         poly[2].y = 0.0f;
-        poly[2].z = w->area.u.xz4.p[2].z - w->area.u.xz4.p[0].z;
-        poly[3].x = w->area.u.xz4.p[3].x - w->area.u.xz4.p[0].x;
+        poly[2].z = w->area.xz4.p[2].z - w->area.xz4.p[0].z;
+        poly[3].x = w->area.xz4.p[3].x - w->area.xz4.p[0].x;
         poly[3].y = 0.0f;
-        poly[3].z = w->area.u.xz4.p[3].z - w->area.u.xz4.p[0].z;
+        poly[3].z = w->area.xz4.p[3].z - w->area.xz4.p[0].z;
     }
-    h = w->area.u.xz4.height;
+    h = w->area.xz4.height;
     if (!(w->scr.flags & 2)) {
         if (!(w->scr.flags & 4)) {
             w->scr.attr |= 0x40;
@@ -2446,7 +2446,7 @@ void SceAtSetActColor(int at_no, int col)
 // World centre of area `no`.
 void SceAtGetCenterPos(Vec* ret_pos, int at_no)
 {
-    AreaData area;
+    AREA_HIT_DATA area;
     SceAtWork* w = SceAtPtr(at_no);
 
     if (w == 0) {
@@ -2484,33 +2484,33 @@ int SceAtSetParent(SceAtWork* w, cModel* parent, int flag)
     w->pParent = parent;
     switch (w->area.type) {
     case 1:
-        w->area.u.xz4.floor -= parent->pos.y;
-        w->area.u.xz4.p[0].x -= parent->pos.x;
-        w->area.u.xz4.p[0].z -= parent->pos.z;
-        w->area.u.xz4.p[1].x -= parent->pos.x;
-        w->area.u.xz4.p[1].z -= parent->pos.z;
-        w->area.u.xz4.p[2].x -= parent->pos.x;
-        w->area.u.xz4.p[2].z -= parent->pos.z;
-        w->area.u.xz4.p[3].x -= parent->pos.x;
-        w->area.u.xz4.p[3].z -= parent->pos.z;
-        w->area.u.xz4.floor *= inv.y;
-        w->area.u.xz4.p[0].x *= inv.x;
-        w->area.u.xz4.p[0].z *= inv.z;
-        w->area.u.xz4.p[1].x *= inv.x;
-        w->area.u.xz4.p[1].z *= inv.z;
-        w->area.u.xz4.p[2].x *= inv.x;
-        w->area.u.xz4.p[2].z *= inv.z;
-        w->area.u.xz4.p[3].x *= inv.x;
-        w->area.u.xz4.p[3].z *= inv.z;
+        w->area.xz4.floor -= parent->pos.y;
+        w->area.xz4.p[0].x -= parent->pos.x;
+        w->area.xz4.p[0].z -= parent->pos.z;
+        w->area.xz4.p[1].x -= parent->pos.x;
+        w->area.xz4.p[1].z -= parent->pos.z;
+        w->area.xz4.p[2].x -= parent->pos.x;
+        w->area.xz4.p[2].z -= parent->pos.z;
+        w->area.xz4.p[3].x -= parent->pos.x;
+        w->area.xz4.p[3].z -= parent->pos.z;
+        w->area.xz4.floor *= inv.y;
+        w->area.xz4.p[0].x *= inv.x;
+        w->area.xz4.p[0].z *= inv.z;
+        w->area.xz4.p[1].x *= inv.x;
+        w->area.xz4.p[1].z *= inv.z;
+        w->area.xz4.p[2].x *= inv.x;
+        w->area.xz4.p[2].z *= inv.z;
+        w->area.xz4.p[3].x *= inv.x;
+        w->area.xz4.p[3].z *= inv.z;
         break;
     case 2:
     case 3:
-        w->area.u.cyl.x -= parent->pos.x;
-        w->area.u.xz4.floor -= parent->pos.y;
-        w->area.u.cyl.z -= parent->pos.z;
-        w->area.u.cyl.x *= inv.x;
-        w->area.u.xz4.floor *= inv.y;
-        w->area.u.cyl.z *= inv.z;
+        w->area.cylinder.x -= parent->pos.x;
+        w->area.xz4.floor -= parent->pos.y;
+        w->area.cylinder.z -= parent->pos.z;
+        w->area.cylinder.x *= inv.x;
+        w->area.xz4.floor *= inv.y;
+        w->area.cylinder.z *= inv.z;
         break;
     default:
         return 0;
@@ -2809,7 +2809,7 @@ void sceAtCamCtrlCheck()
 // eye triggers) with its number, type letter and state.
 void sceAtDebugDisp()
 {
-    AreaData eye;
+    AREA_HIT_DATA eye;
     Mtx mat;
     Mtx pmat;
     SceAtWork* w;
@@ -2855,23 +2855,23 @@ void sceAtDebugDisp()
 
 // Builds the eye (view cone) area of an item: 100 radius at the item position, cone from its rot
 // (x / y angles, z = opening).
-void SceAtDataEyeTriggreCopy(AreaData* area, SceAtWork* w)
+void SceAtDataEyeTriggreCopy(AREA_HIT_DATA* area, SceAtWork* w)
 {
     SceAtItem* it;
 
-    area->Be_flag = 1;
+    area->be_flag = 1;
     area->type = 3;
     if (w->type != SCEAT_ID_ITEM) {
         return;
     }
     it = &w->item;
-    area->u.eye.floor = it->pos.y;
-    area->u.eye.radius = 100.0f;
-    area->u.eye.xz = w->item.pos.x;
-    area->u.eye.z = it->pos.z;
-    area->u.eye.ang_x = it->rot.x;
-    area->u.eye.ang_y = it->rot.y;
-    area->u.eye.open_ang = it->rot.z;
+    area->eye_trigger.floor = it->pos.y;
+    area->eye_trigger.radius = 100.0f;
+    area->eye_trigger.xz = w->item.pos.x;
+    area->eye_trigger.z = it->pos.z;
+    area->eye_trigger.ang_x = it->rot.x;
+    area->eye_trigger.ang_y = it->rot.y;
+    area->eye_trigger.open_ang = it->rot.z;
 }
 
 // Per frame: for each enabled item area — a shoot-down item (flag2 bit4) that was hit plays its
@@ -3151,15 +3151,15 @@ int SceAtCreateExecAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f3
     w->angle = (s8) (ang * 0.5f * 57.295776f);
     w->angleRange = (s8) (range * 0.5f * 57.295776f);
     AreaDataInit(&w->area, &m->pos, 1, 1500.0f, h);
-    w->area.u.xz4.floor = (pos[0].y + pos[1].y + pos[2].y + pos[3].y) * 0.25f;
-    w->area.u.xz4.p[0].x = pos[0].x;
-    w->area.u.xz4.p[0].z = pos[0].z;
-    w->area.u.xz4.p[1].x = pos[1].x;
-    w->area.u.xz4.p[1].z = pos[1].z;
-    w->area.u.xz4.p[2].x = pos[2].x;
-    w->area.u.xz4.p[2].z = pos[2].z;
-    w->area.u.xz4.p[3].x = pos[3].x;
-    w->area.u.xz4.p[3].z = pos[3].z;
+    w->area.xz4.floor = (pos[0].y + pos[1].y + pos[2].y + pos[3].y) * 0.25f;
+    w->area.xz4.p[0].x = pos[0].x;
+    w->area.xz4.p[0].z = pos[0].z;
+    w->area.xz4.p[1].x = pos[1].x;
+    w->area.xz4.p[1].z = pos[1].z;
+    w->area.xz4.p[2].x = pos[2].x;
+    w->area.xz4.p[2].z = pos[2].z;
+    w->area.xz4.p[3].x = pos[3].x;
+    w->area.xz4.p[3].z = pos[3].z;
     AddPrim(&pS->ot[w->otNo], (u32*) w);
     return w->no;
 }
@@ -3196,15 +3196,15 @@ int SceAtCreateFieldAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f
     w->angle = (s8) (ang * 0.5f * 57.295776f);
     w->angleRange = (s8) (range * 0.5f * 57.295776f);
     AreaDataInit(&w->area, &m->pos, 1, 1500.0f, h);
-    w->area.u.xz4.floor = (pos[0].y + pos[1].y + pos[2].y + pos[3].y) * 0.25f;
-    w->area.u.xz4.p[0].x = pos[0].x;
-    w->area.u.xz4.p[0].z = pos[0].z;
-    w->area.u.xz4.p[1].x = pos[1].x;
-    w->area.u.xz4.p[1].z = pos[1].z;
-    w->area.u.xz4.p[2].x = pos[2].x;
-    w->area.u.xz4.p[2].z = pos[2].z;
-    w->area.u.xz4.p[3].x = pos[3].x;
-    w->area.u.xz4.p[3].z = pos[3].z;
+    w->area.xz4.floor = (pos[0].y + pos[1].y + pos[2].y + pos[3].y) * 0.25f;
+    w->area.xz4.p[0].x = pos[0].x;
+    w->area.xz4.p[0].z = pos[0].z;
+    w->area.xz4.p[1].x = pos[1].x;
+    w->area.xz4.p[1].z = pos[1].z;
+    w->area.xz4.p[2].x = pos[2].x;
+    w->area.xz4.p[2].z = pos[2].z;
+    w->area.xz4.p[3].x = pos[3].x;
+    w->area.xz4.p[3].z = pos[3].z;
     w->field.value = val;
     w->field.pModel = m;
     AddPrim(&pS->ot[w->otNo], (u32*) w);
@@ -3368,7 +3368,7 @@ void SceAtCancelItemAt(cEm* pEm)
 // key / money (0, 5, 7), 3 the rest; 8 for item 0x8C.
 int sceAtCheckItemEffectCol(ITEM_ID item_id)
 {
-    ItemInfo info;
+    ITEM_INFO info;
 
     if (item_id == 0x8C) {
         return 8;
@@ -3398,7 +3398,7 @@ int sceAtCheckItemEffectCol(ITEM_ID item_id)
 // 1 when the item type (5 key, 7 money) must survive a room change (save_item record).
 int sceAtCheckSaveItem(u16 id)
 {
-    ItemInfo info;
+    ITEM_INFO info;
 
     itemInfo(id, &info);
     if (info.type == 5 || info.type == 7) {
@@ -3827,7 +3827,7 @@ int SceAtItemHitCheck(SceAtWork* w, Vec* pos)
 // Returns 1 with the item id / count, 0 when nothing is to be placed.
 int SceAtCheckSystemItemSet(u32 id, int* outId, int* outNum, Vec* pos, Vec* rot)
 {
-    EmListData d;
+    EM_LIST d;
     int num;
     int no;
 
@@ -3980,7 +3980,7 @@ fail:
 // breaks and then appears where it died. Taken items and those excluded by modeMask are skipped.
 void sceAtSetItem(SceAtWork* w)
 {
-    ItemInfo info;
+    ITEM_INFO info;
     Vec rot;
     cEm* em = 0;
     int id;
@@ -4158,7 +4158,7 @@ disable:
 
 // The pick-up area of an item: a cylinder of radius 2 * size (1500 default) and height 3000 from
 // 2000 below `pos`.
-void SceAtItemAutoArea(AreaData* area, Vec* pos, f32 radius)
+void SceAtItemAutoArea(AREA_HIT_DATA* area, Vec* pos, f32 radius)
 {
     Vec p = *pos;
 

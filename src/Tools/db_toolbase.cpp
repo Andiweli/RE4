@@ -107,7 +107,7 @@ int cDbgWindow::FindButton(int bcx, int bcy, cDbgButton** out)
 
     *out = 0;
     for (i = 0; i < m_nBut; i++) {
-        if (m_pButList[i]->m_cx == bcx && m_pButList[i]->m_cy == bcy) {
+        if (m_pButList[i]->GetCx() == bcx && m_pButList[i]->GetCy() == bcy) {
             *out = m_pButList[i];
             return 1;
         }
@@ -120,44 +120,8 @@ int cDbgWindow::FindButton(int bcx, int bcy, cDbgButton** out)
 int cDbgWindow::LocalUpdate()
 {
     int ret = 1;
-    int bcx;
-    int bcy;
-    u32 rep;
 
-    bcx = GetCx();
-    bcy = GetCy();
-    rep = Joy[0].rep;
-    if (rep & 0x10001) {
-        bcx--;
-    }
-    if (rep & 0x20002) {
-        bcx++;
-    }
-    if (rep & 0x80008) {
-        bcy--;
-    }
-    if (rep & 0x40004) {
-        bcy++;
-    }
-    if (bcx < 0) {
-        bcx = m_max_cx;
-    }
-    if (bcy < 0) {
-        bcy = m_max_cy;
-    }
-    if (bcx > m_max_cx) {
-        bcx = 0;
-    }
-    if (bcy > m_max_cy) {
-        bcy = 0;
-    }
-    if (bcx != GetCx() || bcy != GetCy()) {
-        cDbgButton* b;
-
-        if (FindButton(bcx, bcy, &b)) {
-            m_pCurrentBut = b;
-        }
-    }
+    CursorMove();
     ButtonAllUpdate();
     if (Joy[0].trg & 0x200) {
         ret = 0;
@@ -176,26 +140,14 @@ void cDbgWindow::LocalDisp()
         cDbgButton* b = m_pButList[i];
         int by = m_py + 1;
 
-        eprintf2(8, 12, (m_px + b->m_px) * 8, (by + b->m_py) * 14, 0x10, 0, b->m_pStr);
+        b->Disp(m_px, by);
     }
     cur = m_pCurrentBut;
     if (cur) {
         int bx = m_px;
         int by = m_py + 1;
 
-        if (pG->Frame_cnt & 4) {
-            eprintf2(8, 12, (bx + cur->m_px - 1) * 8, (by + cur->m_py) * 14, 0, 0, cDbgStr::cursor());
-        }
-        eprintf2(8, 12, (bx + cur->m_px) * 8, (by + cur->m_py) * 14, 0, 0, cur->m_pStr);
-        {
-            f32 fx = (f32) ((bx + cur->m_px) * 8);
-            f32 fh = 14.0f;
-            f32 mgn = 2.0f;
-            f32 zero = 0.0f;
-
-            DbgDrawBoxFill(fx - mgn, (f32) ((by + cur->m_py) * 14) - mgn, (f32) (cur->m_strlen * 8) + zero,
-                           fh + mgn, 0.7f, 0.7f, zero, 0.3f);
-        }
+        cur->DispCursor(bx, by);
     }
 }
 

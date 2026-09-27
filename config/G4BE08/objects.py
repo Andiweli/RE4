@@ -718,6 +718,7 @@ STRIP_UNUSED = {
     "game/shape.cpp",
     "game/geometry.cpp",
     "game/obj00.cpp",
+    "game/objRocket.cpp",
     "game/obj15.cpp",
     "game/objGondola.cpp",
     "game/obj12.cpp",

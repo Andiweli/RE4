@@ -2,7 +2,7 @@
 
 #include "foot_shadow.h"
 
-FootShadowDat pl_fsd_dat[6] = {
+FOOTSHADOW_DATA pl_fsd_dat[6] = {
     {0x15, 2, 1, 0xFF, 300.0f},
     {0x13, 1, 1, 0xC0, 450.0f},
     {0x12, 1, 0, 0x80, 700.0f},
@@ -11,7 +11,7 @@ FootShadowDat pl_fsd_dat[6] = {
     {0x16, 1, 0, 0x80, 700.0f},
 };
 
-FootShadowDat Em10_fsd_dat[6] = {
+FOOTSHADOW_DATA Em10_fsd_dat[6] = {
     {0x15, 1, 1, 0xFF, 300.0f},
     {0x13, 1, 1, 0xC8, 450.0f},
     {0x12, 1, 0, 0x80, 700.0f},
@@ -20,7 +20,7 @@ FootShadowDat Em10_fsd_dat[6] = {
     {0x16, 1, 0, 0x80, 700.0f},
 };
 
-FootShadowDat Em2b_fsd_dat[6] = {
+FOOTSHADOW_DATA Em2b_fsd_dat[6] = {
     {0x15, 5, 1, 0x40, 1200.0f},
     {0x13, 3, 1, 0x80, 1800.0f},
     {0x12, 2, 0, 0x80, 2500.0f},
@@ -29,7 +29,7 @@ FootShadowDat Em2b_fsd_dat[6] = {
     {0x16, 2, 0, 0x80, 2500.0f},
 };
 
-FootShadowDat Em2c_fsd_dat[6] = {
+FOOTSHADOW_DATA Em2c_fsd_dat[6] = {
     {0x0C, 1, 1, 0xFF, 1000.0f},
     {0x0B, 1, 1, 0x80, 800.0f},
     {0x0A, 1, 0, 0x80, 800.0f},
@@ -38,14 +38,14 @@ FootShadowDat Em2c_fsd_dat[6] = {
     {0x0E, 1, 0, 0x80, 800.0f},
 };
 
-FootShadowDat Obm72_fsd_dat[4] = {
+FOOTSHADOW_DATA Obm72_fsd_dat[4] = {
     {0x00, 1, 1, 0xFF, 1000.0f},
     {0x01, 1, 0, 0xFF, 1000.0f},
     {0x00, 1, 1, 0xFF, 1000.0f},
     {0x01, 1, 0, 0xFF, 1000.0f},
 };
 
-FootShadowDat Em32_fsd_dat[18] = {
+FOOTSHADOW_DATA Em32_fsd_dat[18] = {
     {0x1A, 1, 1, 0x80, 800.0f},
     {0x1B, 1, 1, 0xA0, 800.0f},
     {0x1C, 1, 1, 0xA0, 800.0f},

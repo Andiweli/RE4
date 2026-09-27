@@ -32,7 +32,7 @@ void cWepItem::move()
 // flash, 3 incendiary), pending motion, hold-on-parts / release, flight (obj10AddSpeed) and spin.
 void cWepItem::move00()
 {
-    WepItemWork* w = WEPITEM_WK(this);
+    FREE_WEP_ITEM* w = WEPITEM_WK(this);
     int life = w->timer;
     f32 wh;
 
@@ -206,7 +206,7 @@ void cWepItem::beginEvent(u32 flag)
 // player's landing sounds; returns 1 when the object should be destroyed.
 int obj10AddSpeed(cWepItem* pObj)
 {
-    WepItemWork* w = WEPITEM_WK(pObj);
+    FREE_WEP_ITEM* w = WEPITEM_WK(pObj);
     f32 wh;
     Vec ref;
     Vec nrm;
@@ -317,7 +317,7 @@ int effWaterCheck(cModel* pObj)
 cObj* SetObj10(void* bin, void* tpl, Vec* pos, Vec* rot, Vec* spd, f32 grav, f32 rad, int life, int flags)
 {
     cObj* obj;
-    WepItemWork* w;
+    FREE_WEP_ITEM* w;
 
     obj = ObjMgr.createBack(cObjMgr::ID_WEP_ITEM);
     if (obj == 0) {
@@ -376,7 +376,7 @@ cObj* SetObj10(void* bin, void* tpl, Vec* pos, Vec* rot, Vec* spd, f32 grav, f32
 // Sets the detonation type and its four est pairs (as Obj01SetEst).
 void Obj10SetEst(cObj* obj, int no0, int prm0, u32 type, int no1, int prm1, int no2, int prm2, int no3, int prm3)
 {
-    WepItemWork* w;
+    FREE_WEP_ITEM* w;
 
     if (obj == 0) {
         return;

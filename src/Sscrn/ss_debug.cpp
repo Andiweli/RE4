@@ -294,7 +294,7 @@ void ssDbgPzzl::move(SUB_SCREEN* wk)
             pG->peseta += step;
         }
         {
-            GlobalWork* g = pG;
+            GLOBAL_WK* g = pG;
             int p = g->peseta;
             if (p >= 0) {
                 if (p > 100000000) {

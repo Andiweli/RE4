@@ -33,6 +33,7 @@ struct EmObjWork {
 class cEmObj : public cEm {
 public:
     u8 free[0xDE0 - 0x3E0];   // 0x3E0  this class's own work (EMOBJ_WK)
+protected:
     void EmObjInit();
     void EmObjMove();
     void setSat(Vec* pos, int n, int flag, int cube, f32 sx, f32 sy, f32 sz);   // `cube` is unused (emwindow passes its setYarare cube flag; the mangled name needs the 4th int)
@@ -42,6 +43,7 @@ public:
     void setEatMain();
     void clrEat();
     void setYarare(s16 no, Vec* pos, u16 flag, int cube, f32 w, f32 h, f32 rad);
+public:
     void setEff(u8 eff_id);
     u8 getEff();
     void setEtc(u8 etc_no);

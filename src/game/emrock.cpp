@@ -1458,10 +1458,10 @@ int emRockRollStartCk(cEmRock* pEm)
     EmiData* emi;
     int dead;
     int i;
-    GlobalWork* g;
+    GLOBAL_WK* g;
 
     emi = pG->pEmi;
-    g = *(GlobalWork**) &pG;  // a second pG pseudo (`mr r11,r9`) that the pl_life test reads
+    g = *(GLOBAL_WK**) &pG;  // a second pG pseudo (`mr r11,r9`) that the pl_life test reads
     if (emi == 0) {
         return 0;
     }
@@ -1801,7 +1801,7 @@ void plemRockEscapeCamMove(cPlayer* pEm, f32 rate)
     Vec hit;
     Vec d;
     f32 len;
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     CAMERA* cam = &emRockCam;
 
     cam->param.fovy = 27.0f;

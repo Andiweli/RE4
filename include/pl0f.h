@@ -30,7 +30,7 @@ struct Pl0fNode {
 };
 
 // Work of the boat, overlaid on cEm from 0x3E0.
-struct Pl0fWork {
+struct FREE_PL0F {
     u32 Be_flg;        // 0x000 (0x3E0)  bit0: player on board, bit1: engine SE running, bit2/3: no crash / drop checks
     int Timer;        // 0x004
     int Timer2;       // 0x008
@@ -60,7 +60,7 @@ struct Pl0fWork {
     u32 Tiller;       // 0x0EC  setTiller bits: 1 forward, 2 back, 4 left, 8 right
     Vec Getoff_pos;    // 0x0F0  pl0fGetoffActEvtCk: landing position
     f32 Getoff_dir;    // 0x0FC
-    PenCloth Cloth;   // 0x100  long rope pendulum (pl0fLongRopeSet)
+    CLOTH_INFO Cloth;   // 0x100  long rope pendulum (pl0fLongRopeSet)
     cObjChain* pRope; // 0x160  long rope chain object
     cObj* pAnchor;    // 0x164  anchor object (pl0fSetAnchor)
     Pl0fNode node[2]; // 0x168  bow / stern
@@ -68,7 +68,7 @@ struct Pl0fWork {
     cPl0f* pSelf;     // 0x548  testSearchEm2f
 };
 
-#define PL0F_WK(em) ((Pl0fWork*) (((cPl0f*) (em))->free))
+#define PL0F_WK(em) ((FREE_PL0F*) (((cPl0f*) (em))->free))
 
 cObj* SetSpear(void* bin, void* tpl, Vec* pos, Vec* rot);   // game/obj1c.cpp
 

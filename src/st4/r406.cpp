@@ -21,6 +21,7 @@
 #include "TexRender.h"
 #include "cSceObj.h"
 #include "db_log.h"
+#include "embarrel.h"
 
 // Room 4-06 (D:/Bio4/Prog/r406.cpp): the mine of Assignment Ada (Leon's motion set on a normal game):
 // the Ganado waves keyed to the item, areas 2 / 3 / 8 and the alert areas 0xB / 0xC (counting the dead
@@ -159,7 +160,7 @@ static void r406_openedShelf(int no)
 static void r406_checkRockWall()
 {
     Vec pos = {9293.0f, -6600.0f, 8202.0f};
-    cEm* dram;
+    cEmBarrel* dram;
 
     if (getRoomEtcDram(0x12, &dram, 1)) {
         pos = dram->pos;

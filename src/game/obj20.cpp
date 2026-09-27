@@ -16,7 +16,7 @@
 extern "C" cObj* SetObaModel(cObj* parent, int partsNo, Vec* ofs, f32 rad, f32 h, u8 type)
 {
     cObj* obj;
-    ObaModelWork* w;
+    FREE_OBJ20* w;
 
     obj = ObjMgr.create(cObjMgr::ID_OBAMODEL);
     if (obj == 0) {
@@ -50,7 +50,7 @@ extern "C" cObj* SetObaModel(cObj* parent, int partsNo, Vec* ofs, f32 rad, f32 h
 // collision update.
 void cObjObaModel::move()
 {
-    ObaModelWork* w = OBAMODEL_WK(this);
+    FREE_OBJ20* w = OBAMODEL_WK(this);
 
     if (w->pEm) {
         if (!w->pEm->isAlive()) {

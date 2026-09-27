@@ -9,20 +9,20 @@
 #include "rnd.h"
 #include "db_log.h"
 
-struct Espgen02Work;
+typedef struct tagESPGEN02_WK ESPGEN02_WK;
 
 extern "C" {
-void espgen02_UpdateMatrix(EspgenWork* w);
-void espgen02_Update(EspgenWork* w);
-static void espgen02_Move00(EspgenWork* w);
-void espgen02_Move01(EspgenWork* w);
-static f32 Calc_D256(Espgen02Work* p, u8 d, f32 rate);
+void espgen02_UpdateMatrix(cEspgen* w);
+void espgen02_Update(cEspgen* w);
+static void espgen02_Move00(cEspgen* w);
+void espgen02_Move01(cEspgen* w);
+static f32 Calc_D256(ESPGEN02_WK* p, u8 d, f32 rate);
 }
 
 // Effect controller 02: like controller 00 but places every emitted esp on a path (path.cpp),
 // optionally oriented along it.
-struct Espgen02Work {
-    EspGenWork* rec;   // 0x14
+typedef struct tagESPGEN02_WK {
+    cEspSeqTbl* rec;   // 0x14
     cModel* pMod;     // 0x18
     u32 Guid_pMod;        // 0x1C model serial the controller was set up with
     u16 Time_cnt;           // 0x20 frame counter
@@ -43,8 +43,8 @@ struct Espgen02Work {
     u8 D_speed;           // 0x79
     u8 D_alpha;           // 0x7A
     u8 D_inter;          // 0x7B
-    EspSeqOpt opt;     // 0x7C
-    EspSeqOpt* pOpt;   // 0x98
+    ESPSEQ_CONTROL opt;     // 0x7C
+    ESPSEQ_CONTROL* pOpt;   // 0x98
     u8 PathOwner;         // 0x9C
     u8 PathId;         // 0x9D
     u8 Start_ratio;        // 0x9E position along the path in 1/100
@@ -54,13 +54,13 @@ struct Espgen02Work {
     u8 PathRot_y;           // 0xA3
     Vec PathScale;         // 0xA4
     u8 mode;           // 0xB0 bit0: orient along the path, bit1: orient along the path (type 2)
-};
+} ESPGEN02_WK;
 
 // Rebuilds the emitter matrix from parts Null_parts_no of pMod (same rules as espgen00): 0xFE = free
 // position, invalid parts numbers kill the controller.
-void espgen02_UpdateMatrix(EspgenWork* pEspgen)
+void espgen02_UpdateMatrix(cEspgen* pEspgen)
 {
-    Espgen02Work* p = (Espgen02Work*) pEspgen->work;
+    ESPGEN02_WK* p = (ESPGEN02_WK*) pEspgen->Free.buff;
     cModel* model = p->pMod;
 
     if ((p->Null_parts_no >= 0xF8 && p->Null_parts_no <= 0xFD) || p->Null_parts_no == 0xFF) {
@@ -101,7 +101,7 @@ void espgen02_UpdateMatrix(EspgenWork* pEspgen)
 }
 
 // Rate curve: d >= 0 fades 1 -> 1 - d/128 over the life, d < 0 grows 1 -> 1 + 10 * -d/128.
-static f32 Calc_D256(Espgen02Work* p, u8 d, f32 rate)
+static f32 Calc_D256(ESPGEN02_WK* p, u8 d, f32 rate)
 {
     s8 v = d;
     f32 t;
@@ -122,9 +122,9 @@ static f32 Calc_D256(Espgen02Work* p, u8 d, f32 rate)
 // One emitter frame: like espgen00, but each emission is placed at a point along the effect path.
 // colR is pinned (see the tag below) because scaleR, colR and spdR all have 6 weighted refs, and
 // without the pin colR loses to spdR in global-alloc (f23/f24 swapped).
-void espgen02_Update(EspgenWork* pEspgen)
+void espgen02_Update(cEspgen* pEspgen)
 {
-    Espgen02Work* p = (Espgen02Work*) pEspgen->work;
+    ESPGEN02_WK* p = (ESPGEN02_WK*) pEspgen->Free.buff;
     f32 scaleR;
     f32 spdR = 0.0f;
     // COMPILER-DIFF: #17. colR pinned to f24 (global-alloc order of the three 0.0f copies); no
@@ -168,7 +168,7 @@ void espgen02_Update(EspgenWork* pEspgen)
     }
     if (p->Next_cnt == 0) {
         Mtx mtx;
-        EspGenWork* rec;
+        cEspSeqTbl* rec;
         int n;
         int i;
 
@@ -355,10 +355,10 @@ void espgen02_Update(EspgenWork* pEspgen)
                     pp = &p->Offset;
                 }
                 if (p->Espgen_flg & 1) {
-                    ret = EspSeqSet(rec, &pEspgen->info, &p->Rand_seed, p->pMod, &mtx, 1, ang, &esp, p->pOpt, pp);
+                    ret = EspSeqSet(rec, &pEspgen->Eff_core, &p->Rand_seed, p->pMod, &mtx, 1, ang, &esp, p->pOpt, pp);
                     ang += step;
                 } else {
-                    ret = EspSeqSet(rec, &pEspgen->info, &p->Rand_seed, p->pMod, &mtx, 0, 0.0f, &esp, p->pOpt, pp);
+                    ret = EspSeqSet(rec, &pEspgen->Eff_core, &p->Rand_seed, p->pMod, &mtx, 0, 0.0f, &esp, p->pOpt, pp);
                 }
                 if (ret) {
                     esp->ApplyMatrix(m3);
@@ -386,33 +386,33 @@ void espgen02_Update(EspgenWork* pEspgen)
 }
 
 // Step 0 of Espgen02MoveTbl: first frame, then step 1.
-static void espgen02_Move00(EspgenWork* w)
+static void espgen02_Move00(cEspgen* w)
 {
     espgen02_Update(w);
-    w->step = 1;
+    w->Rno0 = 1;
 }
 
 // Step 1 of Espgen02MoveTbl: steady state.
-void espgen02_Move01(EspgenWork* w)
+void espgen02_Move01(cEspgen* w)
 {
     espgen02_Update(w);
 }
 
-// EspgenMoveTbl entry for controller type 2: dispatches on w->step.
-void Espgen02_Move(EspgenWork* pEspgen)
+// EspgenMoveTbl entry for controller type 2: dispatches on w->Rno0.
+void Espgen02_Move(cEspgen* pEspgen)
 {
-    static void (*Espgen02MoveTbl[])(EspgenWork*) = {espgen02_Move00, espgen02_Move01};
+    static void (*Espgen02MoveTbl[])(cEspgen*) = {espgen02_Move00, espgen02_Move01};
 
-    Espgen02MoveTbl[pEspgen->step](pEspgen);
+    Espgen02MoveTbl[pEspgen->Rno0](pEspgen);
 }
 
 // Fills the path emitter from the record: the espgen00 fields plus path group/id
 // (Espgen_work8_4[0..1]), Start_ratio/Rnd_ratio (percent), PathRot_x/y and mode (Espgen_work8_3[1..3]),
 // and PathScale = 1 + Espgen_vec0/10 when non-zero. Always returns 1.
-int Espgen02_SetFreeWork(EspgenWork* w, EspGenWork* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag)
+int Espgen02_SetFreeWork(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag)
 {
-    Espgen02Work* p = (Espgen02Work*) w->work;
+    ESPGEN02_WK* p = (ESPGEN02_WK*) w->Free.buff;
 
     p->rec = rec;
     p->pMod = model;

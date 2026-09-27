@@ -75,7 +75,7 @@ public:
 };
 
 struct R212Work {
-    cEm* rack[2];        // 0x000
+    cEmRack* rack[2];        // 0x000
     cSat* sat[4];        // 0x008  switch hit shapes
     f32 y0[4];           // 0x018  switch rest heights
     u16 hitNow;          // 0x028  switches pressed this frame (bits 0-3 by anything, 8-11 rack 0, 12-15 rack 1)
@@ -180,10 +180,10 @@ void r212_TrapInit()
         }
     }
     if (getRoomEtcRack(5, &r212_work->rack[0], 1)) {
-        ((cEmRack*) r212_work->rack[0])->setRange(5100.0f, 3000.0f, 7156.0f, 3000.0f);
+        r212_work->rack[0]->setRange(5100.0f, 3000.0f, 7156.0f, 3000.0f);
     }
     if (getRoomEtcRack(6, &r212_work->rack[1], 1)) {
-        ((cEmRack*) r212_work->rack[1])->setRange(5500.0f, 3000.0f, 6756.0f, 3000.0f);
+        r212_work->rack[1]->setRange(5500.0f, 3000.0f, 6756.0f, 3000.0f);
     }
     Vec zero = {0.0f, 0.0f, 0.0f};
 
@@ -352,12 +352,12 @@ static void r212_EventTrap()
     RsfSet(G_ROOM_ID, 0);
     SceEventStart(0);
     if (r212_work->evd->waitLoadOk() == 1 && m != 0) {
-        MemorySwap(m->pArc, (u32) r212_work->evd->m_addr, r212_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r212_work->evd->getAddr(), r212_work->evd->getSize());
         EvtMgr.SetEvt(m->pArc, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r212_work->evd->m_addr, r212_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r212_work->evd->getAddr(), r212_work->evd->getSize());
         r212_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     }
     Vec* pa = &ang;
@@ -395,13 +395,13 @@ static void r212_EventTrap()
 // 0x40 on pl0100, then hidden again.
 void Evt_R212S00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdGetObjPtr(0x1B)->be_flag &= ~2;
         SmdGetObjPtr(0xC)->be_flag &= ~2;
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {

@@ -146,7 +146,7 @@ enum HitNoEnum {
 
 // Giant robot statue work (game/objRobo.cpp `cObjRobo`): the Salazar statue that walks after the
 // player over the bridge; two scenario / effect collision pieces per side, 14 hit boxes.
-struct RoboWork {
+struct FREE_ROBO {
     s8 r_no_0;           // 0x00  R0Tbl index
     s8 r_no_1;              // 0x01
     u8 pad_2[6];
@@ -167,7 +167,7 @@ struct RoboWork {
 // the door, then chases the player over the bridge, breaking its pieces one by one.
 class cObjRobo : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  RoboWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_ROBO
 
     virtual void move();
     void SetBeginEvent(u32 a);
@@ -188,7 +188,7 @@ public:
     int SatMoveSub(cModel* pMod, Vec* pPosCenter, Vec* d);
 };
 
-#define ROBO_WK(o) ((RoboWork*) (o)->free)
+#define ROBO_WK(o) ((FREE_ROBO*) (o)->free)
 
 cObjRobo* SetObjRobo(void* bin, void* tpl, Vec* pos, Vec* rot);
 

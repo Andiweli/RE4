@@ -6,13 +6,13 @@
 #include "main_mem.h"
 #include "esp.h"
 
-struct Esp0cWork {
+typedef struct tagESP0C_WK {
     u8 EstNo;      // 0x00 est number (gen->Work8[0])
     u8 EstOwner_wt;     // 0x01 (gen->Work8[1])
     u8 EstNo_wt;     // 0x02 est number used when the sprite hit water (gen->prm byte 0xCF)
     u8 estPrm2;    // 0x03 (gen->prm byte 0xD3)
     u32 onWater;   // 0x04 1: the position was raised to the water surface
-};
+} ESP0C_WK;
 
 // Est work passed to EstSet (0x1C bytes).
 struct EstSetWork {
@@ -29,10 +29,10 @@ struct EstSetWork {
 // Est (effect set) trigger: on its first move it starts an est at its position and dies.
 class cEsp0c : public cEsp {
 public:
-    Esp0cWork m_Free;  // 0xF8
+    ESP0C_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 
@@ -47,7 +47,7 @@ cEsp* Esp0c_Create()
 // itself.
 void cEsp0c::move()
 {
-    Esp0cWork* w = &m_Free;
+    ESP0C_WK* w = &m_Free;
     EstSetWork est;
 
     memclr_asm(&est, sizeof(EstSetWork));
@@ -76,9 +76,9 @@ extern "C" void Esp0c_Trans(cEsp* esp)
 
 // Reads the est owner/id pairs, detaches from the parent into world space, applies the Work8[2]
 // floor / water snap (+65 units, + Vec0.y) and the Work8[3] in-room check; unknown modes fail.
-int cEsp0c::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp0c::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp0cWork* w = &m_Free;
+    ESP0C_WK* w = &m_Free;
     u32 attr;
     f32 h;
 

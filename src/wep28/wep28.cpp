@@ -129,7 +129,7 @@ void cObjBow::init(cModel* parent)
     AtariFlagsAnd(&atari, 0xFCFF);
     pList->pParent = parent->getPartsPtr(0x10);
     wepLightInit(this);
-    m_pParent = parent;
+    setParent(parent);
     motReset[0] = WEP_ARC_PTR(0x2D);
     motReset[1] = WEP_ARC_PTR(0x2D);
     resetMotion();

@@ -37,7 +37,7 @@ static Vec r109_rot2 = {0.0f, -4.00204f, 0.0f};
 void R109Init()
 {
     cObj* obj;
-    cEm* torch;
+    cEmTorch* torch;
 
 #line 53 "D:/Bio4/Prog/r109.cpp"
     r109_work = (R109Work*) MEM_CALLOC(sizeof(R109Work), 1, 0xd);
@@ -58,13 +58,13 @@ void R109Init()
     r109_work->eat[2] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 0x20), 0, &r109_pos2, &r109_rot2, 0);
 
     if (getRoomEtcTorch(0, &torch, 1)) {
-        ((cEmTorch*) torch)->setDelete();
+        torch->setDelete();
     }
     if (getRoomEtcTorch(1, &torch, 1)) {
-        ((cEmTorch*) torch)->setDelete();
+        torch->setDelete();
     }
     if (getRoomEtcTorch(2, &torch, 1)) {
-        ((cEmTorch*) torch)->setDelete();
+        torch->setDelete();
     }
     koya_init();
     SmdSetTrans(0x2C, 0);

@@ -659,10 +659,10 @@ static void R30bCrane()
 
                             r30b_work->em[idx[n]].getPos(&p);
                             if (GetDistanceXZ(&p, &c->pos) <= 250000.0f) {
-                                cEm* em = r30b_work->em[n].getPtr();
+                                cEmGanado* em = (cEmGanado*)r30b_work->em[n].getPtr();
 
                                 if (em) {
-                                    ((cEmGanado*) em)->setUFOCatch(ROOM_ARC_PTR(pG->pRoom, 0x26), ROOM_ARC_PTR(pG->pRoom, 0x27));
+                                    em->setUFOCatch(ROOM_ARC_PTR(pG->pRoom, 0x26), ROOM_ARC_PTR(pG->pRoom, 0x27));
                                     SetCatchEm(n);
                                     c->catchIdx[c->nCatch] = n;
                                     c->nCatch++;
@@ -914,12 +914,12 @@ static void R30bEventS00()
 // Event r30bs00: the fade at cut 5.
 void Evt_R30BS00_Func(Event* e)
 {
-    if (e->FuncType == 1) {
-        switch (e->NowCut) {
+    if (e->GetFuncType() == 1) {
+        switch (e->GetNowCut()) {
         case 0:
             break;
         case 5:
-            if (e->NowFrame == 25) {
+            if (e->GetNowFrame() == 25) {
                 FadeSetW(2, 40, 0, 0);
             }
             break;

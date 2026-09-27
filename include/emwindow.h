@@ -63,19 +63,29 @@ public:
     virtual void move();   // key function: the vtable stays in this unit (cEmMgr::construct stores it)
 
     int init(void* bin, void* tpl, Vec* pos, Vec* rot, int type, u8 etcNo, void* arc);
+private:
     void DmCk();
+public:
     static int ExeWindowEvent(cEmWindow* pEm);
+private:
     void CalFloor();
+public:
     u8 GetFloor();
     int ChkBreakDir(Vec* pos);
     int ChkStatus();        // etc flag word of this window (GetEtcFlgPtr), 0 when none; bit0 = broken
+private:
     void SetStatus(u16 flag);
+public:
     int SetShake();
     int SetBreakAll(Vec* pos, int break_size, int breakType);
     int SetBreakModel();
+private:
     int SetChangeModel(void* bin, void* tpl);
+public:
     int SetAtariOff();
+private:
     int SetBreakEsp(int dir_type, int break_size, int breakType);
+public:
     void SetEnableDamage(int flag);
     int ChkEnableDamage();
     void SetEtcFlag(u32 flag, int boolType);

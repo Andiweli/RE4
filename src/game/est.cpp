@@ -19,10 +19,10 @@ cEspEventModelList EspEvModList;
 
 // The common entry: starts est table (owner c, id d) with parts b (-1 = the table's default) on the
 // model a (0 = none), at pos/rot (NULL = the table's own), core flags e, kind f, Core_pEm g and an
-// optional EspSeqOpt h.
+// optional ESPSEQ_CONTROL h.
 void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void* g, void* h)
 {
-    EspSeqData* head = EspGetEstAddr(c, d, 0);
+    cEspSeqHead* head = EspGetEstAddr(c, d, 0);
 
     EstSet(a, b, pos, rot, head, e, f, g, c, h);
 }
@@ -31,10 +31,10 @@ void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void
 // 0x2000 during a movie / bit 0 in the no-suspend mode from Status_flg[2]), the call number, parts,
 // offset (pos != NULL sets Flg bit 1 = explicit position) and rotation (head->rot is in degrees),
 // and a random seed. Debug_flg[1] 0x01000000 disables all effects.
-void EstSet(cModel* model, int no, Vec* pos, Vec* rot, EspSeqData* head, u16 e, u8 f, void* g, u32 owner, void* h)
+void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, void* h)
 {
-    EspgenWork* w;
-    Espgen10Work* p;
+    cEspgen* w;
+    ESPGEN10_WK* p;
 
     if (DbgFlagChk(pG, DBG_NO_EST_CALL)) {
         return;
@@ -56,8 +56,8 @@ void EstSet(cModel* model, int no, Vec* pos, Vec* rot, EspSeqData* head, u16 e, 
         return;
     }
     EspgenIncCallNo();
-    w->id = 0x10;
-    p = (Espgen10Work*) w->work;
+    w->Id = 0x10;
+    p = (ESPGEN10_WK*) w->Free.buff;
     p->head = head;
     p->pMod = model;
     if (model != NULL) {
@@ -86,9 +86,9 @@ void EstSet(cModel* model, int no, Vec* pos, Vec* rot, EspSeqData* head, u16 e, 
     p->Rand_seed = Rnd() | (Rnd() << 8) | (Rnd() << 16);
     if (h != NULL) {
         p->p8 = &p->opt;
-        p->opt = *(EspSeqOpt*) h;
+        p->opt = *(ESPSEQ_CONTROL*) h;
     } else {
-        p->p8 = (EspSeqOpt*) h;
+        p->p8 = (ESPSEQ_CONTROL*) h;
     }
 }
 
@@ -112,7 +112,7 @@ void AreaSstSet(int id)
     flag = 0;
     ent = sys->Area_addr->ent;
     for (i = 0; i < sys->Area_addr->num; i++, ent++) {
-        if (AreaHitCheck(ent->area, &pos) == 1) {
+        if (AreaHitCheck(&ent->area, &pos) == 1) {
             flag |= 1 << ent->area_no;
         }
     }
@@ -199,7 +199,7 @@ void SstSet(u32 owner, int blk_no, ESP_CORE_KIND kind, int start_id, int end_id,
         }
         ofs = tbl->data->ofs;
         ofs += i;
-        EstSet(NULL, -1, NULL, NULL, (EspSeqData*) ((u8*) tbl->data + *ofs), 0x4001, (u8) kind, 0, EFF_SST, NULL);
+        EstSet(NULL, -1, NULL, NULL, (cEspSeqHead*) ((u8*) tbl->data + *ofs), 0x4001, (u8) kind, 0, EFF_SST, NULL);
     }
     if (bTimeLoop) {
         EspGenSetMoveLoop(200);
@@ -337,11 +337,11 @@ static inline void EspEatEffectMessage(int type)
     }
 }
 
-// 1 when the hit point lies on a near-horizontal floor whose FlrAt entry is marked as a puddle (se.eff_type 1).
+// 1 when the hit point lies on a near-horizontal floor whose FLR_AT_DATA entry is marked as a puddle (se.eff_type 1).
 int EspChkInPuddle(Vec* pos, Vec* nor)
 {
     if (nor->y > 0.9f) {
-        FlrAt* at = FlrAtCheck(0, pos, 1);
+        FLR_AT_DATA* at = FlrAtCheck(0, pos, 1);
 
         if (at != NULL && at->se.eff_type == 1) {
             return 1;
@@ -464,7 +464,7 @@ int ChkWaterEffectEnable(Vec* pos)
 // position pointer doubles as the owner key.
 void EstSetEm10WaterFall(Vec* pMod)
 {
-    EspSeqData* head = EspGetEstAddr(EFF_ROOM, 0x32, 1);
+    cEspSeqHead* head = EspGetEstAddr(EFF_ROOM, 0x32, 1);
 
     if (head != NULL) {
         EstSet((cModel*) pMod, -1, NULL, NULL, EFF_ROOM, 0x32, 0, ESP_CORE_KIND_NONE, pMod, NULL);

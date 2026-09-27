@@ -27,7 +27,7 @@ public:
     Esp4cWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
     virtual void Destruct();
 };
 
@@ -89,7 +89,7 @@ void Esp4c_Trans()
 // Fills Esp4cWork from the record: Type Work8[0] (2 = spread/damp from Work8[1..2]), specular
 // texture Tex_id, shimmer powers prm 0xCE/0xD2, reflection type Work8[3], angles (degrees ->
 // radians), mask texture when Tool_flg 0x4000; then applies the first frame at once.
-int cEsp4c::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp4c::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp4cWork* w = &m_Free;
 

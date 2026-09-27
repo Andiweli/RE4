@@ -59,7 +59,7 @@ void cObjMachinegun::init(cModel* parent)
         pList->pos.z = 4.0f;
         LightInfo.init2(1, 1, &p0, &p1, 1);
     }
-    m_pParent = parent;
+    setParent(parent);
     switch (pG->weapon_type) {
     case 0:
     default:

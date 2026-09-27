@@ -48,9 +48,9 @@
 
 struct R204Work {
     cObj* chand[2];        // 0x000  chandelier scroll objects
-    cEm* sw;               // 0x008
+    cEmSwitch* sw;               // 0x008
     u8 pad_C[4];
-    cEm* barred[2];        // 0x010
+    cEmBarred* barred[2];        // 0x010
     cEmWrap em[11];        // 0x018  the mob (enemy list 0x4A..0x54)
     u8 pad_9C[0x438 - 0x9C];
     TexRenderMng* tex;     // 0x438
@@ -121,11 +121,11 @@ void R204Init()
     getRoomEtcBarred(0xB, &r204_work->barred[0], 1);
     getRoomEtcBarred(6, &r204_work->barred[1], 1);
     if (r204_work->sw != 0 && r204_work->barred[0] != 0) {
-        ((cEmSwitch*) r204_work->sw)->setBarred((cEmBarred*) r204_work->barred[0]);
-        ((cEmSwitch*) r204_work->sw)->setBarred2nd((cEmBarred*) r204_work->barred[1]);
-        ((cEmSwitch*) r204_work->sw)->setClosed();
-        ((cEmBarred*) r204_work->barred[0])->setClosed();
-        ((cEmBarred*) r204_work->barred[1])->setClosed();
+        r204_work->sw->setBarred(r204_work->barred[0]);
+        r204_work->sw->setBarred2nd(r204_work->barred[1]);
+        r204_work->sw->setClosed();
+        r204_work->barred[0]->setClosed();
+        r204_work->barred[1]->setClosed();
     }
     {
         Mtx m;
@@ -308,7 +308,7 @@ void R204Main()
     u32 no;
 
     if (RsfCheck(G_ROOM_ID, 1)) {
-        if (!(pG->Room_flg[0] & 0x80000000) && ((cEmBarred*) r204_work->barred[1])->ckOpen() == 1) {
+        if (!(pG->Room_flg[0] & 0x80000000) && r204_work->barred[1]->ckOpen() == 1) {
             pG->Room_flg[0] |= 0x80000000;
             for (i = 0; i <= 10; i++) {
                 r204_work->em[i].setFindPL();
@@ -343,7 +343,7 @@ void R204Main()
         }
     }
     if (!RsfCheck(G_ROOM_ID, 6)) {
-        if (((cEmSwitch*) r204_work->sw)->ckSwitch() == 1 || DebugTrg(0)) {
+        if (r204_work->sw->ckSwitch() == 1 || DebugTrg(0)) {
             RsfSet(G_ROOM_ID, 6);
             SceExec(0x12, (TaskFunc) door_move, 0, 0, SCE_PRIO_DEF_2, 0);
         }
@@ -986,11 +986,11 @@ void Evt_R204S00_Func(Event* e)
     void* mod3;
     cObj* obj;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             SmdSetTrans(0xC, 0);
             obj = SmdGetObjPtr(0xC);
             if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {
@@ -1023,22 +1023,22 @@ void Evt_R204S00_Func(Event* e)
                 ((cModel*) mod)->LightInfo.SelectMask = obj->LightInfo.SelectMask;
             }
         }
-        if (e->NowCut <= 2) {
-            if (e->NowCut >= 0) {
-                if (e->NowFrame == 0) {
+        if (e->GetNowCut() <= 2) {
+            if (e->GetNowCut() >= 0) {
+                if (e->GetNowFrame() == 0) {
                     if (e->GetMod(&mod2, "pl0100", 0, 0) == 1) {
                         ModelInfoSetTrans((cModel*) mod2, 6, 0);
                     }
                 }
             } else {
-                if (e->NowFrame == 0) {
+                if (e->GetNowFrame() == 0) {
                     if (e->GetMod(&mod3, "pl0100", 0, 0) == 1) {
                         ModelInfoSetTrans((cModel*) mod3, 6, 1);
                     }
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod3, "pl0100", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod3, 6, 1);
                 }
@@ -1081,9 +1081,9 @@ static void door_move()
     DpfFlagOff(pG, DPF_PL);
     CamCtrl.CutCall(0xD);
     SceSleep(0x28);
-    ((cEmBarred*) r204_work->barred[1])->setClosed();
+    r204_work->barred[1]->setClosed();
     SceSleep(1);
-    ((cEmBarred*) r204_work->barred[1])->setOpen(0);
+    r204_work->barred[1]->setOpen(0);
     CamCtrl.CutCall(0xE);
     SceSleep(0x28);
     CamCtrl.Comeback(0);

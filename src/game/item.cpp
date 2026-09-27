@@ -27,7 +27,7 @@
 // exclusive tune level (1..7).
 struct WepInfo {
     u16 id;         // 0x00
-    u8 attr;        // 0x02  ItemWork::bullet >> 13 this row applies to
+    u8 attr;        // 0x02  cItem::bullet >> 13 this row applies to
     u8 no;          // 0x03  weapon number (pG->wep_no)
     u8 type;        // 0x04  weapon type (pG->wep_type)
     u8 x5;
@@ -54,11 +54,11 @@ struct ItemSet {
     u16 num;
 };
 
-// ItemWork::bullet: 3-bit attribute and 13-bit bullet count
+// cItem::bullet: 3-bit attribute and 13-bit bullet count
 #define BULLET(p) ((p)->bullet & 0x1FFF)
 
-// Sets the loaded bullet count (low 13 bits of ItemWork::bullet), keeping the attribute bits.
-static inline void setBullet(ItemWork* p, u16 n)
+// Sets the loaded bullet count (low 13 bits of cItem::bullet), keeping the attribute bits.
+static inline void setBullet(cItem* p, u16 n)
 {
     p->bullet = (p->bullet & 0xE000) | (n & 0x1FFF);
 }
@@ -246,7 +246,7 @@ f32 getBulletRatio(ITEM_ID id, int level)
 // Empties every slot and the availability flags (new game).
 void cItemMgr::clear()
 {
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     int i;
 
     for (i = 0; i < m_array_num; i++, p++) {
@@ -267,7 +267,7 @@ int cItemMgr::set_game(int trial_flag)
     get(0x7C, 0);
     get(0x23, 1);
     {
-        ItemWork* p = newbie();
+        cItem* p = newbie();
         p->x = 2;
         p->y = 1;
         p->orient = 0;
@@ -276,7 +276,7 @@ int cItemMgr::set_game(int trial_flag)
     }
     get(0x04, 20);
     {
-        ItemWork* p = newbie();
+        cItem* p = newbie();
         p->x = 7;
         p->y = 0;
         p->orient = 0;
@@ -284,7 +284,7 @@ int cItemMgr::set_game(int trial_flag)
     }
     get(0x05, 1);
     {
-        ItemWork* p = newbie();
+        cItem* p = newbie();
         p->x = 6;
         p->y = 3;
         p->orient = 0;
@@ -293,7 +293,7 @@ int cItemMgr::set_game(int trial_flag)
     if (trial_flag != 0) {
         get(0x30, 0);
         {
-            ItemWork* p = newbie();
+            cItem* p = newbie();
             p->x = 12;
             p->y = 1;
             p->orient = 0;
@@ -301,7 +301,7 @@ int cItemMgr::set_game(int trial_flag)
         }
         get(0x20, 0);
         {
-            ItemWork* p = newbie();
+            cItem* p = newbie();
             p->num = 100;
             p->x = 17;
             p->y = 0;
@@ -310,7 +310,7 @@ int cItemMgr::set_game(int trial_flag)
         }
         get(0x20, 0);
         {
-            ItemWork* p = newbie();
+            cItem* p = newbie();
             p->num = 100;
             p->x = 17;
             p->y = 2;
@@ -319,7 +319,7 @@ int cItemMgr::set_game(int trial_flag)
         }
         get(0x20, 0);
         {
-            ItemWork* p = newbie();
+            cItem* p = newbie();
             p->num = 100;
             p->x = 17;
             p->y = 4;
@@ -328,7 +328,7 @@ int cItemMgr::set_game(int trial_flag)
         }
         get(0x20, 0);
         {
-            ItemWork* p = newbie();
+            cItem* p = newbie();
             p->num = 100;
             p->x = 13;
             p->y = 4;
@@ -337,7 +337,7 @@ int cItemMgr::set_game(int trial_flag)
         }
         get(0x20, 0);
         {
-            ItemWork* p = newbie();
+            cItem* p = newbie();
             p->num = 100;
             p->x = 9;
             p->y = 4;
@@ -359,7 +359,7 @@ int cItemMgr::set_game(int trial_flag)
 int cItemMgr::set_ada(int no)
 {
     if (no == 2) {
-        ItemWork* p;
+        cItem* p;
         u16 on;
         int i;
 
@@ -400,7 +400,7 @@ int cItemMgr::set_ada(int no)
 // 3 Krauser (bow + grenades), 4 HUNK (TMP + rounds), 5 Wesker (handgun, Killer7, Rifle, grenades).
 int cItemMgr::set_char(int no)
 {
-    ItemWork* p;   // one function-scope pointer for every case (case 3 gets r31)
+    cItem* p;   // one function-scope pointer for every case (case 3 gets r31)
 
     switch (no) {
     case 0: {
@@ -560,7 +560,7 @@ int cItemMgr::set_stage1(int no)
         break;
     }
     case 1: {
-        ItemWork* p;
+        cItem* p;
         u16 on;
         int i;
 
@@ -600,7 +600,7 @@ int cItemMgr::set_stage1(int no)
 int cItemMgr::set_stage2(int no)
 {
     int ret = 0;
-    ItemWork* p;   // function-scope (case 3 takes r31)
+    cItem* p;   // function-scope (case 3 takes r31)
 
     switch (no) {
     case 0: {
@@ -749,7 +749,7 @@ int cItemMgr::set_stage3(int no)
 
     switch (no) {
     case 0: {
-        ItemWork* p;
+        cItem* p;
         u16 on;
         int i;
 
@@ -802,7 +802,7 @@ int cItemMgr::set_stage3(int no)
         break;
     }
     case 1: {
-        ItemWork* p;
+        cItem* p;
         u16 on;
         int i;
 
@@ -865,7 +865,7 @@ int cItemMgr::set_range(int no)
 
     switch (no) {
     case 0: {
-        ItemWork* p;
+        cItem* p;
         int i;
 
         ret = 1;
@@ -887,7 +887,7 @@ int cItemMgr::set_range(int no)
         break;
     }
     case 1: {
-        ItemWork* p;
+        cItem* p;
         int i;
 
         ret = 1;
@@ -997,7 +997,7 @@ int cItemMgr::set_debug(int no)
         break;
     }
     case 5: {
-        ItemWork* p;
+        cItem* p;
         u16 on;
         int i;
 
@@ -1267,14 +1267,14 @@ void cItemMgr::roomInit()
 // Boot: allocates the 0x180 slots, the ordering table and the 256-bit availability mask.
 int cItemMgr::init()
 {
-    ItemWork* p;
+    cItem* p;
     int i;
     u32 sz;
 
     m_array_num = 0x180;
 #line 2508 "D:/Bio4/Prog/item.cpp"
-    m_pItem = (ItemWork*) MEM_ALLOC(0x180 * sizeof(ItemWork), 1, 13);
-    m_p_order_tbl = (ItemOrder*) MEM_ALLOC(m_array_num * sizeof(ItemOrder), 1, 13);
+    m_pItem = (cItem*) MEM_ALLOC(0x180 * sizeof(cItem), 1, 13);
+    m_p_order_tbl = (ITEM_ORDER*) MEM_ALLOC(m_array_num * sizeof(ITEM_ORDER), 1, 13);
     if (m_pItem == 0) {
         return 0;
     }
@@ -1302,7 +1302,7 @@ int cItemMgr::init()
 
 // Static item table: type (1 weapon, 2 ammo, 3 knife-like, 5/12 treasure, 6 grenade, 7 map, 8 money,
 // 9 weapon part, 10 file, 11 key, 13 gem, 14 ...), default pick-up count and max per slot for every id.
-void itemInfo(ITEM_ID id, ItemInfo* info)
+void itemInfo(ITEM_ID id, ITEM_INFO* info)
 {
     switch (id) {
     case 0x03:
@@ -1630,7 +1630,7 @@ void itemInfo(ITEM_ID id, ItemInfo* info)
 // Initialises a slot for item `id`: weapons get their level nibbles (special fixed ones: 0x21
 // Punisher upgrade from Scenario_flg, 0x3E, ...) and a full first magazine, parts start detached,
 // files record the count of files owned.
-void cItemMgr::construct(ItemWork* p, ITEM_ID id)
+void cItemMgr::construct(cItem* p, ITEM_ID id)
 {
     p->flags = 1;
     p->id = id;
@@ -1680,7 +1680,7 @@ void cItemMgr::construct(ItemWork* p, ITEM_ID id)
 }
 
 // Slot by index (0 when out of range).
-ItemWork* cItemMgr::at(int i)
+cItem* cItemMgr::at(int i)
 {
     if (i < m_array_num) {
         return &m_pItem[i];
@@ -1689,7 +1689,7 @@ ItemWork* cItemMgr::at(int i)
 }
 
 // Index of a slot (-1 when not in the pool).
-int cItemMgr::searchAt(ItemWork* p)
+int cItemMgr::searchAt(cItem* p)
 {
     int i;
 
@@ -1728,7 +1728,7 @@ int gld_cmp(const void* a, const void* b)
 // sorted by gld_order; all != 0 -> every slot index (0xFF for the other set). Returns the count.
 int cItemMgr::makeItemList(u8* p_list, int flag, s8* key_cnt, s8* gld_cnt)
 {
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     int cnt = 0;
     int i;
 
@@ -1787,9 +1787,9 @@ int cItemMgr::makeItemList(u8* p_list, int flag, s8* key_cnt, s8* gld_cnt)
 }
 
 // First slot holding item `id` in the current set.
-ItemWork* cItemMgr::search(u16 id)
+cItem* cItemMgr::search(u16 id)
 {
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     int i;
 
     for (i = 0; i < m_array_num; i++, p++) {
@@ -1801,10 +1801,10 @@ ItemWork* cItemMgr::search(u16 id)
 }
 
 // Slot holding item `id` with the smallest count (the ammo box to use up first).
-ItemWork* cItemMgr::minimumSearch(ITEM_ID id)
+cItem* cItemMgr::minimumSearch(ITEM_ID id)
 {
-    ItemWork* p = m_pItem;
-    ItemWork* best = 0;
+    cItem* p = m_pItem;
+    cItem* best = 0;
     int min = 10000000;
     int i;
 
@@ -1820,13 +1820,13 @@ ItemWork* cItemMgr::minimumSearch(ITEM_ID id)
 // qsort comparator: descending count.
 int order_cmp(const void* a, const void* b)
 {
-    return ((ItemOrder*) b)->num - ((ItemOrder*) a)->num;
+    return ((ITEM_ORDER*) b)->num - ((ITEM_ORDER*) a)->num;
 }
 
 // Fills m_p_order_tbl with the slots of item `id` sorted by descending count (reload order).
 void cItemMgr::ordering(ITEM_ID id)
 {
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     int n = 0;
     int i;
 
@@ -1838,7 +1838,7 @@ void cItemMgr::ordering(ITEM_ID id)
         }
     }
     m_order_tbl_num = n;
-    qsort(m_p_order_tbl, n, sizeof(ItemOrder), order_cmp);
+    qsort(m_p_order_tbl, n, sizeof(ITEM_ORDER), order_cmp);
 }
 
 // Adds n pesetas (capped at 99,999,999).
@@ -1856,9 +1856,9 @@ int addMoney(int n)
 // maxNum (0 when full), otherwise a new slot is constructed (m_pNew). Returns 0 when nothing was taken.
 int cItemMgr::get(ITEM_ID id, int num)
 {
-    ItemInfo info;
-    ItemInfo* pInfo = &info;
-    ItemWork* p;
+    ITEM_INFO info;
+    ITEM_INFO* pInfo = &info;
+    cItem* p;
     int max;
     int i;
 
@@ -1961,7 +1961,7 @@ static inline int useSubChar(cItemMgr* m)
 // herb mixes raise the max life (20 steps for the player, 5 for Ashley), keys/documents mark
 // used_id for the scenario check, and consumables are removed when their count hits 0. Returns 0
 // when the item could not be used.
-int cItemMgr::use(ItemWork* p)
+int cItemMgr::use(cItem* p)
 {
     if (p == 0) {
         return 0;
@@ -2124,12 +2124,12 @@ chk:
 }
 
 // Frees a slot; a weapon also detaches its parts and, if it was armed, re-arms the bare hand.
-void cItemMgr::erase(ItemWork* p)
+void cItemMgr::erase(cItem* p)
 {
     p->flags = 0;
     if (itemType(p->id) == 1) {
         int idx = ItemMgr.searchAt(p);
-        ItemWork* q = m_pItem;
+        cItem* q = m_pItem;
         int i;
 
         for (i = 0; i < m_array_num; i++, q++) {
@@ -2157,7 +2157,7 @@ int cItemMgr::dump(ITEM_ID id)
 }
 
 // Discards a slot (erase); 0 when p is NULL.
-int cItemMgr::dump(ItemWork* p)
+int cItemMgr::dump(cItem* p)
 {
     if (p == 0) {
         return 0;
@@ -2172,7 +2172,7 @@ int cItemMgr::dump(ItemWork* p)
 }
 
 // Discards a slot regardless of count.
-int cItemMgr::dumpAll(ItemWork* p)
+int cItemMgr::dumpAll(cItem* p)
 {
     if (p == 0) {
         return 0;
@@ -2182,10 +2182,10 @@ int cItemMgr::dumpAll(ItemWork* p)
     return 1;
 }
 
-// Discards every item of ItemInfo type t (e.g. type 7 maps at a new round).
+// Discards every item of ITEM_INFO type t (e.g. type 7 maps at a new round).
 int cItemMgr::dumpType(int type)
 {
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     int i;
 
     for (i = 0; i < m_array_num; i++, p++) {
@@ -2201,7 +2201,7 @@ int cItemMgr::dumpType(int type)
 // Total count of item `id` in inventory set t.
 u16 cItemMgr::num(int id, u8 type)
 {
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     u16 n = 0;
     int i;
 
@@ -2216,7 +2216,7 @@ u16 cItemMgr::num(int id, u8 type)
 // Total count of item `id` in the current set.
 u16 cItemMgr::num(int id)
 {
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     u16 n = 0;
     int i;
 
@@ -2229,7 +2229,7 @@ u16 cItemMgr::num(int id)
 }
 
 // Count of a slot (0 for NULL).
-u16 cItemMgr::num(ItemWork* p)
+u16 cItemMgr::num(cItem* p)
 {
     if (p == 0) {
         return 0;
@@ -2274,7 +2274,7 @@ int itemCombine(ITEM_ID srcA, ITEM_ID srcB, u16* dst)
 // swaps the loaded ammo type (bullet_type follows when armed); weapon + part attaches the part;
 // same stackable ids merge up to maxNum; otherwise the combination table (herb mixes etc.)
 // replaces a with the product. Returns 1 when something happened.
-int cItemMgr::combine(ItemWork* a, ItemWork* b, int flag)
+int cItemMgr::combine(cItem* a, cItem* b, int flag)
 {
     u16 newId;
     int ret = 0;
@@ -2321,7 +2321,7 @@ int cItemMgr::combine(ItemWork* a, ItemWork* b, int flag)
                     }
                     a->bullet = (inv << 13) | (n & 0x1FFF);
                     {
-                        register ItemWork* arm asm("r0"); // COMPILER-DIFF: 17 (local-alloc fake-lifetime parity: the m_pWep load reuses r0 right after the x8 store's value dies)
+                        register cItem* arm asm("r0"); // COMPILER-DIFF: 17 (local-alloc fake-lifetime parity: the m_pWep load reuses r0 right after the x8 store's value dies)
 
                         arm = m_pWep;
                         if (a == arm) {
@@ -2361,7 +2361,7 @@ int cItemMgr::combine(ItemWork* a, ItemWork* b, int flag)
                     }
                     b->bullet = (inv << 13) | (n & 0x1FFF);
                     {
-                        register ItemWork* arm asm("r0"); // COMPILER-DIFF: 17 (local-alloc fake-lifetime parity: the m_pWep load reuses r0 right after the x8 store's value dies)
+                        register cItem* arm asm("r0"); // COMPILER-DIFF: 17 (local-alloc fake-lifetime parity: the m_pWep load reuses r0 right after the x8 store's value dies)
 
                         arm = m_pWep;
                         if (b == arm) {
@@ -2419,12 +2419,12 @@ end:
 // Attaches a weapon part (stock/scope) to a weapon: detaches it from its previous weapon and any
 // same-kind part already on the target, records the weapon slot in part->bullet; the armed weapon
 // id is recomputed.
-int cItemMgr::partsCombine(ItemWork* pWeapon, ItemWork* pParts)
+int cItemMgr::partsCombine(cItem* pWeapon, cItem* pParts)
 {
     u16 newId;
-    ItemWork* list[2];
-    ItemWork* p;
-    ItemWork** lp;
+    cItem* list[2];
+    cItem* p;
+    cItem** lp;
     int ret;
     int idx;
     int n;
@@ -2515,7 +2515,7 @@ u16 bareHand()
 
 // Equips a weapon/knife/grenade slot (NULL = bare hands): sets m_pWep, m_wep_id (with parts) and
 // the pG weapon level values. 0 when the item is not equippable.
-int cItemMgr::arm(ItemWork* p)
+int cItemMgr::arm(cItem* p)
 {
     if (p == 0) {
         m_pWep = p;
@@ -2551,7 +2551,7 @@ int cItemMgr::reloadable()
 
 // 1 when the weapon is not full and ammo of its current (or, for flag, the other) attribute is
 // carried; the rocket launcher 0x52 counts loose rockets; debug infinite ammo always 1.
-int cItemMgr::reloadable(ItemWork* p, int flag)
+int cItemMgr::reloadable(cItem* p, int flag)
 {
     int ret = 0;
     u16 id;
@@ -2594,7 +2594,7 @@ int cItemMgr::reload()
 // Reloads weapon p from the smallest ammo stacks until full; flag != 0 lets the mine thrower /
 // 0xAB switch to the other ammo attribute when the current one is out. Debug infinite ammo fills
 // it directly. Returns 1 when any rounds were loaded.
-int cItemMgr::reload(ItemWork* p, int flag)
+int cItemMgr::reload(cItem* p, int flag)
 {
     int ret = 0;
     u16 id;
@@ -2631,7 +2631,7 @@ done:
 }
 
 // Moves rounds from the ammo stack into the weapon up to `max` loaded; returns 1 when any moved.
-int reload_main(ItemWork* pItem_A, ItemWork* pItem_B, int charge_num)
+int reload_main(cItem* pItem_A, cItem* pItem_B, int charge_num)
 {
     int have = BULLET(pItem_A);
     int room = charge_num - have;
@@ -2665,7 +2665,7 @@ int cItemMgr::trigger()
         return trigger(m_pWep);
     case 3:
     case 6: {
-        ItemWork* p = m_pWep;
+        cItem* p = m_pWep;
         register int id asm("r9"); // COMPILER-DIFF: #2 (the original masks the u16 member before the call)
         id = m_wep_id;
         asm("" : "+r"(id));
@@ -2681,7 +2681,7 @@ int cItemMgr::trigger()
 
 // Consumes one round of a weapon (rocket launcher: a loose rocket; disposable 0x35 is dropped and
 // unarmed) or one grenade; 0 when empty. Debug_flg[2] 0x00400000 = infinite.
-int cItemMgr::trigger(ItemWork* p)
+int cItemMgr::trigger(cItem* p)
 {
     if (DbgFlagChk(pG, DBG_INF_BULLET)) {
         return 1;
@@ -2722,10 +2722,10 @@ int cItemMgr::trigger(ItemWork* p)
 
 // The effective weapon id of a slot: the base id combined with every attached part (stock/scope
 // variants); non-weapons return their own id.
-u16 cItemMgr::weaponId(ItemWork* p)
+u16 cItemMgr::weaponId(cItem* p)
 {
     u16 id;
-    ItemWork* q = m_pItem;
+    cItem* q = m_pItem;
     int idx = searchAt(p);
     int i;
 
@@ -2744,9 +2744,9 @@ u16 cItemMgr::weaponId(ItemWork* p)
 }
 
 // The no-th part attached to weapon slot p (0 when none).
-ItemWork* cItemMgr::weaponParts(ItemWork* p, int no)
+cItem* cItemMgr::weaponParts(cItem* p, int no)
 {
-    ItemWork* q = m_pItem;
+    cItem* q = m_pItem;
     int idx = searchAt(p);
     int cnt = 0;
     int i;
@@ -2803,7 +2803,7 @@ u16 cItemMgr::bulletNumCurrent()
 // Loaded rounds summed over every slot of weapon `id`.
 u16 cItemMgr::bulletNum(ITEM_ID id)
 {
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     u16 total = 0;
     int i;
 
@@ -2820,7 +2820,7 @@ u16 cItemMgr::bulletNum(ITEM_ID id)
 
 // Loaded rounds of a weapon slot (rocket launcher: loose rockets; grenades/knife: count); debug
 // infinite ammo returns 100.
-u16 cItemMgr::bulletNum(ItemWork* p)
+u16 cItemMgr::bulletNum(cItem* p)
 {
     int n;
 
@@ -2858,16 +2858,16 @@ u16 cItemMgr::bulletNum(ItemWork* p)
 // Size of the item save block.
 int cItemMgr::saveDataSize()
 {
-    return sizeof(ItemSaveData);
+    return sizeof(_ITEM_SAVE_DATA);
 }
 
 // Writes every slot to the save block (id with the set bit, levels/bullets for weapons and parts,
 // counts, case position) plus the armed slot index and weapon id.
 void cItemMgr::save(void* pData)
 {
-    ItemSaveData* sd = (ItemSaveData*) pData;
+    _ITEM_SAVE_DATA* sd = (_ITEM_SAVE_DATA*) pData;
     ItemSaveWork* s = sd->item_list;
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     int i;
 
     sd->arm_no = 0xFFFF;
@@ -2915,9 +2915,9 @@ void cItemMgr::save(void* pData)
 // Restores the slots from the save block and re-arms the saved slot.
 void cItemMgr::load(void* pData)
 {
-    ItemSaveData* sd = (ItemSaveData*) pData;
+    _ITEM_SAVE_DATA* sd = (_ITEM_SAVE_DATA*) pData;
     ItemSaveWork* s = sd->item_list;
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     int i;
 
     m_pWep = 0;
@@ -2969,9 +2969,9 @@ void cItemMgr::load(void* pData)
 
 // Discards every case item left on the spare board (board == 0) except `keep` (closing the
 // attache case); unarms a discarded weapon.
-int cItemMgr::offboardDump(ItemWork* p_get_item)
+int cItemMgr::offboardDump(cItem* p_get_item)
 {
-    ItemWork* p = m_pItem;
+    cItem* p = m_pItem;
     int i;
 
     for (i = 0; i < m_array_num; i++, p++) {
@@ -3009,7 +3009,7 @@ void cItemMgr::takeOver()
         return;
     }
     for (i = 0; i < ItemMgr.m_array_num; i++) {
-        ItemWork* p = ItemMgr.at(i);
+        cItem* p = ItemMgr.at(i);
 
         if (p->isAlive(1)) {
             switch (itemType(p->id)) {
@@ -3040,7 +3040,7 @@ void cItemMgr::takeOver()
                 break;
             }
             case 12: {
-                ItemWork* q = ItemMgr.search(p->id);
+                cItem* q = ItemMgr.search(p->id);
 
                 if (q != 0) {
                     u16 max;
@@ -3067,7 +3067,7 @@ int cItemMgr::countFiles()
     int i;
 
     for (i = 0; i < ItemMgr.m_array_num; i++) {
-        ItemWork* p = ItemMgr.at(i);
+        cItem* p = ItemMgr.at(i);
 
         if (!p->isAlive(m_char)) {
             if (itemType(p->id) == 10) {
@@ -3242,7 +3242,7 @@ void cItemMgr::debugNumDisp(int print_page)
 // Debug: arms weapon `id`, picking one up first when it is not owned (levels untouched).
 void cItemMgr::debugWeapon(ITEM_ID id)
 {
-    ItemWork* p = search(id);
+    cItem* p = search(id);
 
     if (p != 0) {
         m_pWep = p;

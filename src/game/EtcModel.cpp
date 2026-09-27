@@ -185,14 +185,14 @@ int getRoomEtcBreak(int no, cEm** out, int flag);
 int setRoomEtcDisp(int no, int on, int flag);
 static int setRoomEtcBreakDisp(int no, int on, int flag);
 int getRoomEtcWindow(int no, cEmWindow** out, int flag);
-int getRoomEtcBox(int no, cEm** out, int flag);
+int getRoomEtcBox(int no, cEmBox** out, int flag);
 int getRoomEtcDoor(int no, cEmDoor** out, int flag);
-int getRoomEtcRack(int no, cEm** out, int flag);
+int getRoomEtcRack(int no, cEmRack** out, int flag);
 int getRoomEtcLadder(int no, cObjLadder** out, int flag);
-int getRoomEtcTorch(int no, cEm** out, int flag);
-int getRoomEtcSwitch(int no, cEm** out, int flag);
-int getRoomEtcBarred(int no, cEm** out, int flag);
-int getRoomEtcDram(int no, cEm** out, int flag);
+int getRoomEtcTorch(int no, cEmTorch** out, int flag);
+int getRoomEtcSwitch(int no, cEmSwitch** out, int flag);
+int getRoomEtcBarred(int no, cEmBarred** out, int flag);
+int getRoomEtcDram(int no, cEmBarrel** out, int flag);
 ETC_AMB_TYPE GetEtcAmbType();
 int GetEm10EyeEffectEnable();
 void EtcSetAddAmb(cModel* m, int no);
@@ -2580,19 +2580,19 @@ int getRoomEtcBreak(int no, cEm** ppEm, int bErrDisp)
     if (getRoomEtcWindow(no, (cEmWindow**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtcBox(no, ppEm, 0) == 1) {
+    if (getRoomEtcBox(no, (cEmBox**) ppEm, 0) == 1) {
         return 1;
     }
     if (getRoomEtcDoor(no, (cEmDoor**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtcTorch(no, ppEm, 0) == 1) {
+    if (getRoomEtcTorch(no, (cEmTorch**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtcRack(no, ppEm, 0) == 1) {
+    if (getRoomEtcRack(no, (cEmRack**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtcDram(no, ppEm, 0) == 1) {
+    if (getRoomEtcDram(no, (cEmBarrel**) ppEm, 0) == 1) {
         return 1;
     }
     if (bErrDisp) {
@@ -2640,7 +2640,7 @@ static int setRoomEtcBreakDisp(int no, int bDisp, int bErrDisp)
 // The torch (light-bearing etc) in slot `id`.
 int getRoomEtcOnLight(u32 no, cModel** ppEm, int bErrDisp)
 {
-    if (getRoomEtcTorch(no, (cEm**) ppEm, 0)) {
+    if (getRoomEtcTorch(no, (cEmTorch**) ppEm, 0)) {
         return 1;
     }
     if (bErrDisp) {
@@ -2746,27 +2746,27 @@ int getRoomEtcWindow(int no, cEmWindow** ppEm, int bErrDisp)
 }
 
 // The box / vase / crate (box etc ids) in slot `no`.
-int getRoomEtcBox(int no, cEm** ppEm, int bErrDisp)
+int getRoomEtcBox(int no, cEmBox** ppEm, int bErrDisp)
 {
-    if (getRoomEtc(no, ETC_WOODBOX_SML, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_WOODBOX_SML, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_WOODBOX_MDL, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_WOODBOX_MDL, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_WOODBOX_BARREL, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_WOODBOX_BARREL, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_WOODBOX_BARREL2, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_WOODBOX_BARREL2, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_NEST, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_NEST, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_TUBO_A_S, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_TUBO_A_S, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_TUBO_A_L, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_TUBO_A_L, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
     if (bErrDisp) {
@@ -2893,21 +2893,21 @@ int getRoomEtcDoor(int no, cEmDoor** ppEm, int bErrDisp)
 }
 
 // The rack / pillar (rack etc ids) in slot `no`.
-int getRoomEtcRack(int no, cEm** ppEm, int bErrDisp)
+int getRoomEtcRack(int no, cEmRack** ppEm, int bErrDisp)
 {
-    if (getRoomEtc(no, ETC_TANA00, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_TANA00, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_TANA01, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_TANA01, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_TANA_BOX, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_TANA_BOX, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_YOROI, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_YOROI, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_ZOU, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_ZOU, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
     if (bErrDisp) {
@@ -2932,30 +2932,30 @@ int getRoomEtcLadder(int no, cObjLadder** ppEm, int bErrDisp)
 }
 
 // The torch / lamp (torch etc ids) in slot `no`.
-int getRoomEtcTorch(int no, cEm** ppEm, int bErrDisp)
+int getRoomEtcTorch(int no, cEmTorch** ppEm, int bErrDisp)
 {
-    if (getRoomEtc(no, ETC_TAIMATU01, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_TAIMATU01, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_TAIMATU02, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_TAIMATU02, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_TAIMATU03, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_TAIMATU03, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_LANTERN_A, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_LANTERN_A, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_LANTERN_B, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_LANTERN_B, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_DENKYUU, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_DENKYUU, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_DENKYUU01, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_DENKYUU01, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_DENKYUU02, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_DENKYUU02, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
     if (bErrDisp) {
@@ -2965,9 +2965,9 @@ int getRoomEtcTorch(int no, cEm** ppEm, int bErrDisp)
 }
 
 // The lever switch (id 0E) in slot `no`.
-int getRoomEtcSwitch(int no, cEm** ppEm, int bErrDisp)
+int getRoomEtcSwitch(int no, cEmSwitch** ppEm, int bErrDisp)
 {
-    if (getRoomEtc(no, ETC_SWITCH, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_SWITCH, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
     if (bErrDisp) {
@@ -2977,39 +2977,39 @@ int getRoomEtcSwitch(int no, cEm** ppEm, int bErrDisp)
 }
 
 // The barred gate (gate etc ids) in slot `no`.
-int getRoomEtcBarred(int no, cEm** ppEm, int bErrDisp)
+int getRoomEtcBarred(int no, cEmBarred** ppEm, int bErrDisp)
 {
-    if (getRoomEtc(no, ETC_BARRED00, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_BARRED00, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_BARRED01, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_BARRED01, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_BARRED02, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_BARRED02, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_BARRED03, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_BARRED03, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_BARRED04, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_BARRED04, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_BARRED05, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_BARRED05, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_AUTO_DOOR, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_AUTO_DOOR, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_AUTO_DOOR2, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_AUTO_DOOR2, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_AUTO_DOOR3, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_AUTO_DOOR3, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_AUTO_DOOR4, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_AUTO_DOOR4, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_AUTO_DOOR5, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_AUTO_DOOR5, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
     if (bErrDisp) {
@@ -3019,15 +3019,15 @@ int getRoomEtcBarred(int no, cEm** ppEm, int bErrDisp)
 }
 
 // The barrel / drum (ids 12 / 2D / 3C) in slot `no`.
-int getRoomEtcDram(int no, cEm** ppEm, int bErrDisp)
+int getRoomEtcDram(int no, cEmBarrel** ppEm, int bErrDisp)
 {
-    if (getRoomEtc(no, ETC_DRAM, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_DRAM, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_BOMB_BARREL, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_BOMB_BARREL, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
-    if (getRoomEtc(no, ETC_GUS_BOMBE, ppEm, 0) == 1) {
+    if (getRoomEtc(no, ETC_GUS_BOMBE, (cEm**) ppEm, 0) == 1) {
         return 1;
     }
     if (bErrDisp) {
@@ -3037,7 +3037,7 @@ int getRoomEtcDram(int no, cEm** ppEm, int bErrDisp)
 }
 
 // The shootable item medal (id 1A) in slot `no`.
-int getRoomEtcItem(int no, EtcItem** ppEm, int bErrDisp)
+int getRoomEtcItem(int no, cEmItem** ppEm, int bErrDisp)
 {
     if (getRoomEtc(no, ETC_MEDAL00, (cEm**) ppEm, 0) == 1) {
         return 1;

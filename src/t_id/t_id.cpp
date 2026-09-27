@@ -3062,7 +3062,7 @@ static void toolIdFile(IdTool* w)
 }
 
 
-// File record of one element (IdData2 with the state word at 0).
+// File record of one element (ID_DATA_V2 with the state word at 0).
 struct IdRec {
     u32 flags;      // 0x00
     u8 mark;        // 0x04
@@ -3265,7 +3265,7 @@ int toolIdDataEncode(void* buf, IdTool* w)
     return ext - base;
 }
 
-// Version 1 record (IdData with the state word at 0, no col1).
+// Version 1 record (ID_DATA_V1 with the state word at 0, no col1).
 struct IdRec1 {
     u32 flags;      // 0x00
     u8 mark;        // 0x04

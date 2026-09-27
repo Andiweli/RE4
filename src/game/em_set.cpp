@@ -54,7 +54,7 @@ static inline cEm* EmCreate(u8 id)
 }
 
 // Copy the list entry into the fresh enemy work.
-static inline void EmSetWork(cEm* em, EmListData* d, u8 no)
+static inline void EmSetWork(cEm* em, EM_LIST* d, u8 no)
 {
     f32 kx = 1000.0f;
     f32 kr = 3.1415927f / 16384.0f;
@@ -139,7 +139,7 @@ void EmSetFromList()
     u32 i;
 
     for (i = 0; i < 256; i++) {
-        EmListData* d = &pG->Em_list[i];
+        EM_LIST* d = &pG->Em_list[i];
         cEm* em;
 
         if (!(d->be_flag & 1)) {
@@ -191,7 +191,7 @@ void EmSetFromList()
 // death bit only with chkDead. Returns the enemy, or errEm when nothing was created.
 cEm* EmSetFromList2(int no, int flag)
 {
-    EmListData* d = &pG->Em_list[no];
+    EM_LIST* d = &pG->Em_list[no];
     cEm* em;
 
     if (EM_SET_ID_NG(d->id)) {
@@ -237,7 +237,7 @@ cEm* EmSetFromList2(int no, int flag)
 }
 
 // Event enemy from a list entry outside the room list (never called in the DOL).
-cEm* EmSetEvent(EmListData* d)
+cEm* EmSetEvent(EM_LIST* d)
 {
     cEm* em;
 
@@ -276,7 +276,7 @@ cEm* GetEmPtrFromList(int no)
 }
 
 // The list entry an enemy was created from; NULL for enemies not from the list (emset_no 0xFF).
-EmListData* GetListPtrFromEm(cEm* em)
+EM_LIST* GetListPtrFromEm(cEm* em)
 {
     if (em->emset_no == 0xFF) {
         return 0;
@@ -287,7 +287,7 @@ EmListData* GetListPtrFromEm(cEm* em)
 // Enemy id of list entry `no` (0xFF for an invalid index).
 u32 GetEmIdFromList(u32 no)
 {
-    EmListData* list;
+    EM_LIST* list;
 
     if (no >= 0xFF) {
         return 0xFF;
@@ -300,7 +300,7 @@ u32 GetEmIdFromList(u32 no)
 // stage / room.
 void EmListSetAlive(int no, int on_off)
 {
-    EmListData* d = &pG->Em_list[no];
+    EM_LIST* d = &pG->Em_list[no];
 
     if (pG->stage_no != d->room >> 8) {
         return;
@@ -347,7 +347,7 @@ void EmSetRoomInit()
     int i;
 
     for (i = 0; i < 256; i++) {
-        EmListData* d = &pG->Em_list[i];
+        EM_LIST* d = &pG->Em_list[i];
 
         d->be_flag &= ~2;
     }

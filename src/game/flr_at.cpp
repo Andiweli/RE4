@@ -12,17 +12,17 @@
 
 void* GetDataExt(void* arc, const char* tag, int no);   // game/read.cpp
 
-FlrSys FlrAt_sys;
-FlrSys* pFlrSys;
+FLR_AT_SYS FlrAt_sys;
+FLR_AT_SYS* pFlrSys;
 
 // Room init: binds the room archive's "FSE" block (version 0x103) as the floor attribute list.
 void FlrAtInit()
 {
-    FlrAtHead* p;
+    FLR_AT_HEADER* p;
 
     pFlrSys = &FlrAt_sys;
     memclr_asm(&FlrAt_sys, sizeof(FlrAt_sys));
-    p = (FlrAtHead*) GetDataExt(pG->pRoom, "FSE", 0);
+    p = (FLR_AT_HEADER*) GetDataExt(pG->pRoom, "FSE", 0);
     if (p == 0) {
         return;
     }
@@ -33,17 +33,17 @@ void FlrAtInit()
         pLog->warn(0, 0, "FlrAt DATA IS OLD VERSION");
         return;
     }
-    pFlrSys->pData = p;
-    pFlrSys->pList = (FlrAt*) (p + 1);
+    pFlrSys->pHead = p;
+    pFlrSys->pData = (FLR_AT_DATA*) (p + 1);
 }
 
 // Returns the enabled floor attribute of `type` whose area contains pos (+300 y) and whose group
 // matches the current group (0xFF = any); NULL outside the main game step (Rno0 != 3), during
 // Status_flg[0] 0x10000000, or when none hits.
-FlrAt* FlrAtCheck(int id, Vec* pos, int flag)
+FLR_AT_DATA* FlrAtCheck(int id, Vec* pos, int flag)
 {
     Vec p;
-    FlrAt* at;
+    FLR_AT_DATA* at;
     u32 i;
     int hit = 0;
 
@@ -56,24 +56,24 @@ FlrAt* FlrAtCheck(int id, Vec* pos, int flag)
     if (pFlrSys == 0) {
         return 0;
     }
-    if (pFlrSys->pData == 0) {
+    if (pFlrSys->pHead == 0) {
         return 0;
     }
     p.x = pos->x;
     p.y = pos->y + 300.0f;
     p.z = pos->z;
-    for (i = 0; i < ((FlrAtHead*) pFlrSys->pData)->num; i++) {
-        at = &pFlrSys->pList[i];
+    for (i = 0; i < ((FLR_AT_HEADER*) pFlrSys->pHead)->num; i++) {
+        at = &pFlrSys->pData[i];
         if ((at->flag & 1) == 0) {
             continue;
         }
-        if (at->group != pFlrSys->group && pFlrSys->group != 0xFF) {
+        if (at->group != pFlrSys->cur_group && pFlrSys->cur_group != 0xFF) {
             continue;
         }
         if (at->type != id) {
             continue;
         }
-        if (AreaHitCheck(at->area, &p) != 1) {
+        if (AreaHitCheck(&at->area, &p) != 1) {
             continue;
         }
         if (id != 0) {
@@ -92,22 +92,22 @@ FlrAt* FlrAtCheck(int id, Vec* pos, int flag)
 // Dead-stripped by the original linker (only their strings survive in .rodata).
 static int FlrAtSetEnable(int no)
 {
-    if (pFlrSys->pData == 0) {
+    if (pFlrSys->pHead == 0) {
         pLog->err(0, 0, "FlrAtSetEnable() : AT DATA NOT FOUND");
         return 0;
     }
-    pFlrSys->pList[no].flag |= 1;
+    pFlrSys->pData[no].flag |= 1;
     return 1;
 }
 
 // Disables floor attribute entry `no`.
 static int FlrAtSetDisable(int no)
 {
-    if (pFlrSys->pData == 0) {
+    if (pFlrSys->pHead == 0) {
         pLog->err(0, 0, "FlrAtSetDisable() : AT DATA NOT FOUND");
         return 0;
     }
-    pFlrSys->pList[no].flag &= ~1;
+    pFlrSys->pData[no].flag &= ~1;
     return 1;
 }
 
@@ -119,7 +119,7 @@ int FlrAtSetDefVal(u32 group, u8 foot_se_set, u8 eff_no)
         return 0;
     }
     group = group == 0xFF ? 0x40 : group;
-    pFlrSys->foot_se[group] = foot_se_set;
-    pFlrSys->foot_esp[group] = eff_no;
+    pFlrSys->def_se_set[group] = foot_se_set;
+    pFlrSys->def_eff_set[group] = eff_no;
     return 1;
 }

@@ -36,9 +36,10 @@ static inline void ssWidgetDelete(Widget<SUB_SCREEN>* w)
 
 // ss_main.cpp
 class SsExitInit : public Widget<SUB_SCREEN> {
-public:
+private:
     int _rno;  // 0x10
 
+public:
     virtual void init(SUB_SCREEN* pWk);
     virtual void move(SUB_SCREEN* pWk);
 };
@@ -51,11 +52,14 @@ public:
 
 // Item examine screen (ss_main.cpp; ss_cap/ss_file/ss_item chain into it).
 class SsItemExamine : public Widget<SUB_SCREEN> {
-public:
+private:
     u8 _rno;          // 0x10
+public:
     u8 pad_11[3];
+private:
     ItemExamine _itemExam;  // 0x14
 
+public:
     virtual void init(SUB_SCREEN* pWk);
     virtual void move(SUB_SCREEN* pWk);
 };
@@ -301,10 +305,11 @@ public:
 // ss_term.cpp (the radio / codec call screen: Hunnigan and the partner models talk through the
 // op/opNN.das message sequences)
 class SsTermInit : public Widget<SUB_SCREEN> {
-public:
+private:
     int _counter;
     int _rno;  // 0x14  starts at 2
 
+public:
     virtual void init(SUB_SCREEN* pWk);
     virtual void move(SUB_SCREEN* pWk);
 };
@@ -424,7 +429,7 @@ void tel00ModelInit(cModel* m, SsArc* arc);
 void hunniganModelInit(cModel* m, void* data, u32 type);
 // ss_main.cpp helpers the screens share
 void clearZbuffer();
-void dispScrollBar(u32 top, u32 n, u32 num, IdUnit* bar, IdUnit* up, IdUnit* down);
+void dispScrollBar(u32 top, u32 n, u32 num, ID_UNIT* bar, ID_UNIT* up, ID_UNIT* down);
 void idMainMenuFade(SUB_SCREEN* wk, int sw);
 void weaponChangeRequest(u16 no, u16 type);
 }

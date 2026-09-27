@@ -9,7 +9,7 @@ class cSat;
 class cEmBarred;
 
 // Work of the barred gate enemy (game/emBarred.cpp), overlaid on cEm from 0x3E0.
-struct EmBarredWork {
+struct FREE_EMBARRED {
     u32 be_flag;            // 0x000 (0x3E0)  bit0: never closes (setNoClose), bit1: check what stands under it (setUnderCk)
     int Timer;            // 0x004 (0x3E4)  frames the player stayed away (R1_Set), shake frames (R1_Open/Close)
     f32 TmpF;              // 0x008 (0x3E8)  fall speed while closing
@@ -29,7 +29,7 @@ struct EmBarredWork {
     u8 Etc_no;            // 0x24E (0x62E)  etc flag number (bit0 broken, bit1 open)
 };
 
-#define EMBARRED_WK(em) ((EmBarredWork*) (((cEmBarred*) (em))->free))
+#define EMBARRED_WK(em) ((FREE_EMBARRED*) (((cEmBarred*) (em))->free))
 
 // Barred gate enemy: the iron gates / portcullises that open for the player and drop back shut.
 class cEmBarred : public cEm {

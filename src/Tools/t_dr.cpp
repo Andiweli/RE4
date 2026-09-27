@@ -21,7 +21,7 @@ int SetToolLight(int no);  // db_light_tools.cpp
 
 struct DrArea {
     u32 x0;           // 0x00
-    AreaData data;    // 0x04
+    AREA_HIT_DATA data;    // 0x04
     u8 flag;          // 0x34  bit0: in use, bit1: initialised
     u8 type;          // 0x35  load type (drTypeName)
     u8 no;            // 0x36  slot (saved)

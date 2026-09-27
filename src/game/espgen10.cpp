@@ -8,45 +8,39 @@
 #include "db_log.h"
 
 extern "C" {
-void espgen10_Update(EspgenWork* w);
-void espgen10_Move00(EspgenWork* w);
-void espgen10_Move01(EspgenWork* w);
+void espgen10_Update(cEspgen* w);
+void espgen10_Move00(cEspgen* w);
+void espgen10_Move01(cEspgen* w);
 }
 
 // Spawns record `no` of the sequence: Kind 0 -> one esp via EspSeqSet (pos is passed only when
 // flag != 0), Kind 1 -> a controller via EspgenSeqSet. In event mode (Core_flg 0x1000) the parent
 // model comes from EspEvModList[Parent_no]. Returns 0 when the spawn failed (pool full / bad kind).
-int EspgenDataSet(EspSeqData* head, int no, EspInfo* info, u32* seed, cModel* model, u16 parts, Mtx* mtx, Vec* pos,
-                  Vec* rot, EspSeqOpt* p8, int flag)
+BOOL EspgenDataSet(cEspSeqHead* pSeqHed, u32 seq_ptr, cEffectCore* pCore, u32* pRand_seed, cModel* pMod, u16 Null_Parts_no, Mtx* pMat,
+                   Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct, BOOL bUseOffset)
 {
-    // COMPILER-DIFF #13 block: the original never allocates `list` (REG_EQUIV symbol_ref) and
-    // reload materialises `lis r9; addi r11` before the compare. Here `list` is a 2-set variable
-    // (the rec offset, then the table address): no REG_EQUIV, global gives it r11, the high is
-    // a plain local-alloc qty (r9) since the addi's destination is not a hard register.
-    u32 list;
-    EspGenWork* rec;
-    int ret = 1;
+    cEspSeqTbl* rec;
+    BOOL ret = 1;
 
-    list = no * sizeof(EspGenWork) + 0x30;
-    rec = (EspGenWork*) ((u32) head + list);
-    if (info->Core_flg & 0x1000) {
+    rec = &pSeqHed->SeqTbl[seq_ptr];
+    if (pCore->Core_flg & 0x1000) {
         u32 no = rec->Parent_no;
-        model = EspEvModList.GetModelPtr(no);
+        pMod = EspEvModList.GetModelPtr(no);
     }
 
     switch (rec->Kind) {
     case 0: {
         cEsp* esp;
-        if (flag == 0) {
-            pos = NULL;
+        if (bUseOffset == 0) {
+            pOffset = NULL;
         }
-        if (EspSeqSet(rec, info, seed, model, mtx, 0, 0.0f, &esp, p8, pos) == 0) {
+        if (EspSeqSet(rec, pCore, pRand_seed, pMod, pMat, 0, 0.0f, &esp, pSct, pOffset) == 0) {
             ret = 0;
         }
         break;
     }
     case 1:
-        if (EspgenSeqSet(head, no, info, model, parts, mtx, pos, rot, p8, flag) == 0) {
+        if (EspgenSeqSet(pSeqHed, seq_ptr, pCore, pMod, Null_Parts_no, pMat, pOffset, pAng, pSct, bUseOffset) == 0) {
             ret = 0;
         }
         break;
@@ -57,20 +51,20 @@ int EspgenDataSet(EspSeqData* head, int no, EspInfo* info, u32* seed, cModel* mo
     }
     return ret;
 }
-// Fills the controller's EspInfo owner block: Core_flg = a, Call_no = b, Core_kind = c, Core_pEm = d,
+// Fills the controller's cEffectCore owner block: Core_flg = a, Call_no = b, Core_kind = c, Core_pEm = d,
 // owner = e (the ids EfmDelete / EspDelete use to find effects by owner).
-void SetEspCore(EspgenWork* pCore, int Core_flg, u32 Call_no, u8 Core_kind, void* Core_pEm, int owner)
+void SetEspCore(cEspgen* pCore, int Core_flg, u32 Call_no, u8 Core_kind, void* Core_pEm, int owner)
 {
-    pCore->info.Core_flg = Core_flg;
-    pCore->info.Core_kind = Core_kind;
-    pCore->info.Call_no = Call_no;
-    pCore->info.Core_pEm = Core_pEm;
-    pCore->info.owner = owner;
+    pCore->Eff_core.Core_flg = Core_flg;
+    pCore->Eff_core.Core_kind = Core_kind;
+    pCore->Eff_core.Call_no = Call_no;
+    pCore->Eff_core.Core_pEm = Core_pEm;
+    pCore->Eff_core.owner = owner;
 }
 
 // Takes a free controller from the pool (front == 1: from the front, drawn first) and stamps the
 // owner info on it. Returns 0 when the pool is empty.
-int PullEspEspgen(EspgenWork** ppEspgen, int Core_flg, int Core_kind, u32 Call_no, void* Core_pEm, int owner, int type)
+int PullEspEspgen(cEspgen** ppEspgen, int Core_flg, int Core_kind, u32 Call_no, void* Core_pEm, int owner, int type)
 {
     int ret;
 
@@ -89,11 +83,11 @@ int PullEspEspgen(EspgenWork** ppEspgen, int Core_flg, int Core_kind, u32 Call_n
 // parts (or Offset/Ang for 0xFE) unless Flg bit 0 says it is fixed; then spawns every record whose
 // Set_time == Time_cnt (records must be sorted, otherwise "no SORT" error) and ends the controller
 // after the last record.
-void espgen10_Update(EspgenWork* pEspgen)
+void espgen10_Update(cEspgen* pEspgen)
 {
-    Espgen10Work* p = (Espgen10Work*) pEspgen->work;
-    EspSeqData* head = p->head;
-    EspGenWork* rec = &head->rec[p->Seq_ptr];
+    ESPGEN10_WK* p = (ESPGEN10_WK*) pEspgen->Free.buff;
+    cEspSeqHead* head = p->head;
+    cEspSeqTbl* rec = &head->SeqTbl[p->Seq_ptr];
     cModel* model = p->pMod;
 
     if (model != NULL) {
@@ -152,7 +146,7 @@ void espgen10_Update(EspgenWork* pEspgen)
         if (p->Flg & 2) {
             flag = 1;
         }
-        if (!EspgenDataSet(head, p->Seq_ptr, &pEspgen->info, &p->Rand_seed, p->pMod, p->Null_parts_no, &p->Mat, &p->Offset, &p->Ang, p->p8,
+        if (!EspgenDataSet(head, p->Seq_ptr, &pEspgen->Eff_core, &p->Rand_seed, p->pMod, p->Null_parts_no, &p->Mat, &p->Offset, &p->Ang, p->p8,
                            flag)) {
             return;
         }
@@ -167,22 +161,22 @@ void espgen10_Update(EspgenWork* pEspgen)
 }
 
 // Step 0 of Espgen10MoveTbl: first frame, then step 1.
-void espgen10_Move00(EspgenWork* pEspgen)
+void espgen10_Move00(cEspgen* pEspgen)
 {
     espgen10_Update(pEspgen);
-    pEspgen->step = 1;
+    pEspgen->Rno0 = 1;
 }
 
 // Step 1 of Espgen10MoveTbl: steady state.
-void espgen10_Move01(EspgenWork* pEspgen)
+void espgen10_Move01(cEspgen* pEspgen)
 {
     espgen10_Update(pEspgen);
 }
 
-// EspgenMoveTbl entry for controller type 0x10: dispatches on w->step.
-void Espgen10_Move(EspgenWork* pEspgen)
+// EspgenMoveTbl entry for controller type 0x10: dispatches on w->Rno0.
+void Espgen10_Move(cEspgen* pEspgen)
 {
-    static void (*Espgen10MoveTbl[])(EspgenWork*) = {espgen10_Move00, espgen10_Move01};
+    static void (*Espgen10MoveTbl[])(cEspgen*) = {espgen10_Move00, espgen10_Move01};
 
-    Espgen10MoveTbl[pEspgen->step](pEspgen);
+    Espgen10MoveTbl[pEspgen->Rno0](pEspgen);
 }

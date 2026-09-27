@@ -13,7 +13,7 @@ void MotSetObj16(cObj* obj, void* mot, int a, int b);
 // Enemy head work (game/obj16.cpp `cObj16`): a head model hung on parts `partsNo` of `body` that
 // looks at the player (obj16NeckMove), bites (R1_Atk / R1_Critical) and fades out when its
 // enemies die.
-struct Obj16Work {
+struct FREE_OBJ16 {
     u32 Be_flag;            // 0x00  bit0: the lost-wait timer runs (setLostWait / clearLostWait)
     int Timer;            // 0x04  routine step timer
     int Timer2;         // 0x08  R1_Atk: attack frames left
@@ -52,7 +52,7 @@ struct Obj16Work {
 // takes damage motions (R1_Damage) and fades out once its enemies are dead.
 class cObj16 : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  Obj16Work
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ16
 
     virtual void move();
     virtual ~cObj16() {}
@@ -71,6 +71,6 @@ public:
     int ckAtkHit();
 };
 
-#define OBJ16_WK(o) ((Obj16Work*) (o)->free)
+#define OBJ16_WK(o) ((FREE_OBJ16*) (o)->free)
 
 #endif

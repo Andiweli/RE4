@@ -92,7 +92,7 @@ struct EvtFocusData {
     f32 farLevel;      // 0x80C
 };
 
-// 12-byte model name copied as words (cObj Obj18Work::evName).
+// 12-byte model name copied as words (cObj FREE_OBJ18::evName).
 struct EvtName {
     u32 w[3];
 };
@@ -300,7 +300,6 @@ int Event::EspToolSetDat()
     char nm[0x20];
     EvtPacket* pac;
     int no;
-    char* p;
 
     EvtDebug.SetNowCut(GetNowCut());
     RunTool(3, 0);
@@ -328,9 +327,8 @@ int Event::EspToolSetDat()
         }
         CalNextPacket();
     }
-    p = nm;
-    strcpy(p, (char*) pData);
-    strcmp(p, "event/evd/r120s00.evd");
+    GetNameFile(nm);
+    strcmp(nm, "event/evd/r120s00.evd");
     return 1;
 }
 
@@ -599,7 +597,7 @@ void Event::ControlTransFlag()
     u8 type;
     cModel* oya;
     int state;
-    Obj18Work* w;
+    FREE_OBJ18* w;
 
     n = ModTbl.GetNumDat();
     if (GetDelTimer() != 0) {
@@ -1014,7 +1012,7 @@ int Event::ExePacket_SetEff(Event* pEvt)
     void* dat;
     EvtPacket* pac = pEvt->pPacket;
 
-    if (pEvt->GetNoWork() == -1 || pEvt->NoWork > 1) {
+    if (pEvt->GetNoWork() == -1 || pEvt->GetNoWork() > 1) {
         pLog->err(0, 0, "Event::ExePacket_SetEff : NoWork failed");
         return 1;
     }
@@ -1022,7 +1020,7 @@ int Event::ExePacket_SetEff(Event* pEvt)
         pLog->err(0, 0, "Event::ExePacket_SetEff : dat failed");
         return 1;
     }
-    if (EspDataLoad((u32) dat, pEvt->NoWork + 0xC4, 0) == 0) {
+    if (EspDataLoad((u32) dat, pEvt->GetNoWork() + 0xC4, 0) == 0) {
         pLog->err(0, 0, "Event::ExePacket_SetEff : failed");
         return 1;
     }
@@ -1192,7 +1190,7 @@ int Event::ExePacket_Mot(Event* pEvt)
     }
     ClrShape(m);
     if (m->kindid == 1 && m->id == cObjMgr::ID_EVENT) {
-        Obj18Work* w = OBJ18_WK((cObj18*) m);
+        FREE_OBJ18* w = OBJ18_WK((cObj18*) m);
         t = w->obj18_type;
         if ((t >= 1 && t <= 4) || t == 7 || t == 8 || t == 9 || t == 0xA || t == 0x13 || t == 0x14 || t == 0x15 || t == 0x16
             || t == 0xB) {
@@ -1365,7 +1363,7 @@ int Event::ExePacket_Str(Event* pEvt)
     int no;
     int blk;
 
-    strcpy(key, pEvt->Name);
+    pEvt->GetName(key);
     blk = pac->val.no;
     no = pac->val.arg;
     if (pEvt->GetChangeNoStr() != 0) {
@@ -1630,8 +1628,8 @@ int Event::ExeFunc(int mode, int param)
         return 1;
     }
     SetFuncType(mode);
-    strcpy(a, pData->room);
-    strcpy(b, pData->no);
+    GetRoomNo(a);
+    GetEventNo(b);
     strcpy(nm, "evt_");
     strcat(nm, a);
     strcat(nm, b);
@@ -2073,7 +2071,7 @@ int EventMgr::construct(Event* pEvt, u32 id)
     e = new (pEvt) Event(id);
     if (e) {
         no = getWorkNo(e);
-        e->NoWork = no;
+        e->SetNoWork(no);
         if (no == -1 || no > 1) {
             pLog->err(0, 0, "EventMgr::construct : getWorkNo failed");
             return 1;
@@ -2212,7 +2210,7 @@ int EventMgr::IsAliveEvt(const char* pName, Event** ppEvt, int aliveEvtType)
                 continue;
             }
         }
-        strcpy(p, e->Name);
+        e->GetName(p);
         if (strcmp(p, pName) != 0) {
             continue;
         }
@@ -2608,19 +2606,19 @@ int EventMgr::DelEvt(void* pEvt, int delEvtFlag)
     int fade = evt->FlgCkStatus(EvtStfEvtCancelOn);
     int zero;
 
-    switch (evt->EndRNo1) {
+    switch (evt->GetEndRNo1()) {
     case 0:
         evt->ExeEndEvt(evt, 0);
         if (delEvtFlag == 1) {
             SysFlagOn(pG, SYS_SCREEN_STOP);
-            evt->EndRNo2 = 0;
+            evt->SetEndRNo2(0);
             evt->AddEndRNo1(1);
             return 1;
         }
         break;
     case 1:
         evt->AddEndRNo2(1);
-        if (evt->EndRNo2 <= 0) {
+        if (evt->GetEndRNo2() <= 0) {
             return 1;
         }
         SysFlagOff(pG, SYS_SCREEN_STOP);
@@ -2629,7 +2627,7 @@ int EventMgr::DelEvt(void* pEvt, int delEvtFlag)
     SysFlagOff(pG, SYS_SCREEN_STOP);
     {
         char* p = nm;
-        strcpy(p, evt->Name);
+        evt->GetName(p);
         destroyNow(evt);
         DelEvd(p);
     }
@@ -3125,12 +3123,12 @@ int DatTbl::init(int num)
         NumDatTbl = 0;
     }
 #line 5749 "D:/Bio4/Prog/event.cpp"
-    pWork = (DatTblEntry*) MEM_ALLOC(NumDatTbl * sizeof(DatTblEntry), 1, 0xD);
+    pWork = (DatTblWork*) MEM_ALLOC(NumDatTbl * sizeof(DatTblWork), 1, 0xD);
     if (pWork == 0) {
         pLog->err(0, 0, "cDatTbl::init : memory failed");
         return 0;
     }
-    memclr_asm(pWork, NumDatTbl * sizeof(DatTblEntry));
+    memclr_asm(pWork, NumDatTbl * sizeof(DatTblWork));
     return 1;
 }
 
@@ -3174,7 +3172,7 @@ int DatTbl::SetDat(const char* nm, void* dat, u8 type, void* dat2, u8 flag, int*
     }
     for (i = 0; i < NumDatTbl; i++) {
         if (!(pWork[i].FlagBe8 & 1)) {
-            memclr_asm(&pWork[i], sizeof(DatTblEntry));
+            memclr_asm(&pWork[i], sizeof(DatTblWork));
             pWork[i].FlagBe8 = flag | 1;
             strcpy(pWork[i].Name, nm);
             pWork[i].Dat = dat;
@@ -3303,7 +3301,7 @@ int DatTbl::GetDatWkNo(void** pDat, u8* pEtc, int noWork)
 // 1 when slot wkNo holds the given name.
 int DatTbl::ChkDatWkNoName(int noWork, const char* pName)
 {
-    DatTblEntry* e;
+    DatTblWork* e;
 
     if (pWork == 0) {
         pLog->err(0, 0, "cDatTbl::GetDatWkNo : memory failed[%d]", noWork);
@@ -3313,7 +3311,7 @@ int DatTbl::ChkDatWkNoName(int noWork, const char* pName)
         pLog->err(0, 0, "cDatTbl::GetDatWkNo : work_no failed[%d]", noWork);
         return 0;
     }
-    e = (DatTblEntry*) (noWork * sizeof(DatTblEntry) + (u32) pWork);
+    e = (DatTblWork*) (noWork * sizeof(DatTblWork) + (u32) pWork);
     if ((e->FlagBe8 & 1) && strcmp(e->Name, pName) == 0) {
         return 1;
     }
@@ -3337,7 +3335,7 @@ int DatTbl::DelDatWkNo(int noWork)
             if (pWork[noWork].dat2 != 0) {
                 Debug_free(pWork[noWork].dat2);
             }
-            memclr_asm(&pWork[noWork], sizeof(DatTblEntry));
+            memclr_asm(&pWork[noWork], sizeof(DatTblWork));
         }
         return 1;
     }
@@ -3365,7 +3363,7 @@ int DatTbl::DelDat(const char* pName)
                 if (pWork[i].dat2 != 0) {
                     Debug_free(pWork[i].dat2);
                 }
-                memclr_asm(&pWork[i], sizeof(DatTblEntry));
+                memclr_asm(&pWork[i], sizeof(DatTblWork));
             }
             return 1;
         }
@@ -3388,7 +3386,7 @@ int DatTbl::DelAll(int flag)
             if (pWork[i].dat2 != 0) {
                 Debug_free(pWork[i].dat2);
             }
-            memclr_asm(&pWork[i], sizeof(DatTblEntry));
+            memclr_asm(&pWork[i], sizeof(DatTblWork));
         }
     }
     return 1;

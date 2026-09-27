@@ -38,7 +38,7 @@ EmTorchFunc EmTorch_R1_move_tbl[4] = {
 cEmTorch* SetTorch(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int etcNo)
 {
     cEmTorch* em;
-    EmTorchWork* w;
+    FREE_EMTORCH* w;
     u16* flg;
 
     em = (cEmTorch*) EmMgr.create(0x47);
@@ -160,7 +160,7 @@ cEmTorch* SetTorch(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int etcNo
 // hit SE, and when the hp is gone breaks the torch with the style decided by the weapon.
 void emTorchDmCk(cEmTorch* pEm)
 {
-    EmTorchWork* w = EMTORCH_WK(pEm);
+    FREE_EMTORCH* w = EMTORCH_WK(pEm);
     u8 wep;
     int dmg;
 
@@ -305,7 +305,7 @@ void emTorchDmCk(cEmTorch* pEm)
 // (0, 1, 4 -> Rno1 2 Break), only plays the SE (2, 3), or starts the fall (5 -> Rno1 3).
 void emTorchSetBreak(cEmTorch* em, u32 kind)
 {
-    EmTorchWork* w = EMTORCH_WK(em);
+    FREE_EMTORCH* w = EMTORCH_WK(em);
 
     em->hp = 0;
     if (w->Eff_id != 0xFF && em->type != 5) {
@@ -384,7 +384,7 @@ void emTorch_R0_Move(cEmTorch* pEm)
 // Rno1 == 0: a fixed torch; builds the matrices once, then stays a hit-box-only work.
 void emTorch_R1_Set(cEmTorch* pEm)
 {
-    EmTorchWork* w = EMTORCH_WK(pEm);
+    FREE_EMTORCH* w = EMTORCH_WK(pEm);
 
     if (pEm->r_no_2 == 0) {
         RotMatrix(pEm->mat, &pEm->ang);
@@ -406,7 +406,7 @@ void emTorch_R1_Parent(cEmTorch* pEm)
     Vec v0;
     Vec v1;
     Vec v2;
-    EmTorchWork* w = EMTORCH_WK(pEm);
+    FREE_EMTORCH* w = EMTORCH_WK(pEm);
     cModel* parent = w->pParent;
 
     RotMatrix(pEm->mat, &pEm->ang);
@@ -463,7 +463,7 @@ void emTorch_R1_Parent(cEmTorch* pEm)
 // Rno1 == 2: broken; on entry sets bit0 of the etc flag, hp 0, hides the model; then hit-box-only.
 void emTorch_R1_Break(cEmTorch* pEm)
 {
-    EmTorchWork* w = EMTORCH_WK(pEm);
+    FREE_EMTORCH* w = EMTORCH_WK(pEm);
     u16* flg;
 
     if (pEm->r_no_2 == 0) {
@@ -484,7 +484,7 @@ void emTorch_R1_Break(cEmTorch* pEm)
 // volume (DmgMgr type 5) for 1500 frames and hides.
 void emTorch_R1_Fall(cEmTorch* pEm)
 {
-    EmTorchWork* w = EMTORCH_WK(pEm);
+    FREE_EMTORCH* w = EMTORCH_WK(pEm);
     u16* flg;
     f32 floor;
 
@@ -539,7 +539,7 @@ void emTorch_R1_Fall(cEmTorch* pEm)
 // (2 / 3) have none.
 void emTorchYarareInit(cEmTorch* pEm)
 {
-    EmTorchWork* w = EMTORCH_WK(pEm);
+    FREE_EMTORCH* w = EMTORCH_WK(pEm);
 
     switch (pEm->type) {
     case 0:
@@ -580,7 +580,7 @@ void cEmTorch::setDelete()
 // EffKindId) on an intact torch.
 void cEmTorch::setEff(u8 eff_id)
 {
-    EmTorchWork* w = EMTORCH_WK(this);
+    FREE_EMTORCH* w = EMTORCH_WK(this);
 
     w->Eff_id = eff_id;
     if (hp > 0) {
@@ -592,7 +592,7 @@ void cEmTorch::setEff(u8 eff_id)
 // normalisation.
 void cEmTorch::setParent(cModel* parent, int partsNo, int flag)
 {
-    EmTorchWork* w = EMTORCH_WK(this);
+    FREE_EMTORCH* w = EMTORCH_WK(this);
 
     w->pParent = parent;
     w->oya_parts = partsNo;

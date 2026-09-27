@@ -22,15 +22,15 @@
 
 
 extern "C" {
-void offsetCorrection(QfpsOfs* o);
-static void offsetArrayCorrection(QfpsOfs (*o)[3]);
+void offsetCorrection(CAMERA_POINT* o);
+static void offsetArrayCorrection(CAMERA_POINT (*o)[3]);
 }
 
 
 f32 g_crouch_cam_z_back = 600.0f;
 static f32 g_crouch_cam_y_down = 400.0f;
 
-QfpsOfs g_readyOfs[16][2][3] = {
+CAMERA_POINT g_readyOfs[16][2][3] = {
     {
         {
             {{-527.0f, 600.0f, -680.0f}, {-265.0f, 1280.0f, -350.0f}, {-220.0f, 4080.0f, 1100.0f}, 0.0f, 45.0f},
@@ -225,7 +225,7 @@ QfpsOfs g_readyOfs[16][2][3] = {
     },
 };
 
-QfpsOfs g_transOfs[TRANS_DATA_NUM][2][3] = {
+CAMERA_POINT g_transOfs[TRANS_DATA_NUM][2][3] = {
     {
         {
             {{-500.0f, 885.0f, -1050.0f}, {-240.0f, 1550.0f, -150.0f}, {0.0f, 2585.0f, 1390.0f}, 0.0f, 50.0f},
@@ -611,13 +611,13 @@ void CameraQuasiFPS::checkCameraType()
 // The frame's shoulder offset: blends old -> current tables by m_blend_ratio (counting the blend
 // down), picks the up / mid / down site by the pitch ratio m_depression_ratio (interpolating toward the
 // up or down entry), copies roll / fov, and rotates the result about y by the yaw m_direction_ratio.
-void CameraQuasiFPS::calcOffset(QfpsOfs* p_offset)
+void CameraQuasiFPS::calcOffset(CAMERA_POINT* p_offset)
 {
     Vec a;
     Vec b;
     Vec d;
     Vec c;
-    QfpsOfs o[3];
+    CAMERA_POINT o[3];
     Mtx m;
 
     if (!(m_state & 8)) {
@@ -642,7 +642,7 @@ void CameraQuasiFPS::calcOffset(QfpsOfs* p_offset)
             o[i].Fovy = r * old[i].Fovy + r1 * cur[i].Fovy;
         }
     } else {
-        QfpsOfs* p = cur;
+        CAMERA_POINT* p = cur;
         int i;
 
         for (i = 0; i < 3; i++) {
@@ -704,7 +704,7 @@ void CameraQuasiFPS::calcOffset(QfpsOfs* p_offset)
 // Places the camera in the world from the offset and pulls it in to the nearest scenery, character
 // or object hit, never closer than the close point. It also probes the frustum edges so walls do
 // not clip the view.
-void CameraQuasiFPS::hitCheck(Mtx m, QfpsOfs* ofs, CameraParam* out)
+void CameraQuasiFPS::hitCheck(Mtx m, CAMERA_POINT* ofs, CameraParam* out)
 {
     static f32 OFFSET_GAIN = 1.0f;
     Vec nrm;
@@ -885,8 +885,8 @@ void CameraQuasiFPS::hitCheck(Mtx m, QfpsOfs* ofs, CameraParam* out)
 // g_transOfs[TRANS_DATA_BLEND]).
 void CameraQuasiFPS::setBlendData(void* src, void* dst)
 {
-    QfpsOfs (*s)[3] = (QfpsOfs (*)[3]) src;
-    QfpsOfs (*d)[3] = (QfpsOfs (*)[3]) dst;
+    CAMERA_POINT (*s)[3] = (CAMERA_POINT (*)[3]) src;
+    CAMERA_POINT (*d)[3] = (CAMERA_POINT (*)[3]) dst;
     int i;
     int j;
 
@@ -899,7 +899,7 @@ void CameraQuasiFPS::setBlendData(void* src, void* dst)
 }
 
 // Reads the per-area override tables (g_readyOfs[14], g_transOfs[TRANS_DATA_AREA]) for the debug camera editor.
-void CameraQuasiFPS::getAreaData(QfpsOfs (*ready)[3], QfpsOfs (*trans)[3])
+void CameraQuasiFPS::getAreaData(CAMERA_POINT (*ready)[3], CAMERA_POINT (*trans)[3])
 {
     int i;
     int j;
@@ -913,7 +913,7 @@ void CameraQuasiFPS::getAreaData(QfpsOfs (*ready)[3], QfpsOfs (*trans)[3])
 }
 
 // Writes the per-area override tables.
-void CameraQuasiFPS::setAreaData(QfpsOfs (*ready)[3], QfpsOfs (*trans)[3])
+void CameraQuasiFPS::setAreaData(CAMERA_POINT (*ready)[3], CAMERA_POINT (*trans)[3])
 {
     int i;
     int j;
@@ -928,12 +928,12 @@ void CameraQuasiFPS::setAreaData(QfpsOfs (*ready)[3], QfpsOfs (*trans)[3])
 
 #define OFS_COPY(src, dst)                 \
     {                                      \
-        QfpsOfs (*d_)[3] = (dst);          \
-        QfpsOfs (*s_)[3] = (src);          \
+        CAMERA_POINT (*d_)[3] = (dst);          \
+        CAMERA_POINT (*s_)[3] = (src);          \
         int i_ = 2;                        \
         int j_;                            \
-        QfpsOfs* sp_;                      \
-        QfpsOfs* dp_;                      \
+        CAMERA_POINT* sp_;                      \
+        CAMERA_POINT* dp_;                      \
         while (i_--) {                     \
             dp_ = *d_;                     \
             sp_ = *s_;                     \
@@ -956,7 +956,7 @@ void CameraQuasiFPS::setAreaData(CameraCut* pCdat)
     int i;
     int j;
     int k = 0;
-    QfpsOfs* p;
+    CAMERA_POINT* p;
 
     if (pCdat == NULL) {
         return;
@@ -1007,7 +1007,7 @@ void CameraQuasiFPS::setAreaData(CameraCut* pCdat)
 
 // Keeps the close point at least 320 units behind the player along the camera direction so the
 // shoulder camera cannot start inside the model.
-void offsetCorrection(QfpsOfs* p_offset)
+void offsetCorrection(CAMERA_POINT* p_offset)
 {
     static f32 GAIN = 0.8f;
     Vec d;
@@ -1026,7 +1026,7 @@ void offsetCorrection(QfpsOfs* p_offset)
 }
 
 // offsetCorrection on the three sites of one side.
-static void offsetArrayCorrection(QfpsOfs (*o)[3])
+static void offsetArrayCorrection(CAMERA_POINT (*o)[3])
 {
     int i;
 
@@ -1198,7 +1198,7 @@ void CameraQuasiFPS::move()
     CAMERA c;
     Mtx m;
     CameraParam p2;
-    QfpsOfs ofs;
+    CAMERA_POINT ofs;
     CameraParam prm;
 
     checkCameraType();

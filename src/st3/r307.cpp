@@ -58,7 +58,7 @@ struct R307RotTbl {
 
 struct R307Work {
     u32 str;          // 0x00  SndStrReq handle of the camera cut
-    cEm* barred;      // 0x04
+    cEmBarred* barred;      // 0x04
     u32 eff[9];       // 0x08  EspPullCoreKind per piece (the piece)
     u32 eff2[9];      // 0x2C  EspPullCoreKind per piece (the frame)
     u32 effBarred;    // 0x50
@@ -362,7 +362,7 @@ static void r307_checkPuzzleTerminal()
                 EstSet(r307_work->barred, -1, 0, 0, EFF_ROOM, 2, 1, (u8) r307_work->effBarred, zero, zero);
                 SndCall(6, 7, 0, 0, 0, 0);
                 SceSleep(30);
-                ((cEmBarred*) r307_work->barred)->setLockMode(0);
+                r307_work->barred->setLockMode(0);
                 SceSleep(30);
             }
             CamCtrl.Comeback(0);
@@ -387,7 +387,7 @@ void r307_initPuzzle()
     if (RsfCheck(G_ROOM_ID, 2) == 0) {
         SceAtDataSet_exec(5, 0x12, 0, (TaskFunc) r307_checkPuzzleTerminal, 0, 1);
         if (r307_work->barred) {
-            ((cEmBarred*) r307_work->barred)->setLockMode(1);
+            r307_work->barred->setLockMode(1);
             EstSet(r307_work->barred, -1, 0, 0, EFF_ROOM, 1, 1, (u8) r307_work->effBarred, zero, zero);
         }
         for (k = 0; k < 9; k++) {

@@ -25,7 +25,7 @@
 //
 // Work of the Ganado enemy, overlaid on cEm from 0x3E0 (em10_R0_Init prints its size: 0x818).
 // Field names are the work-relative offsets; the comment gives the cEm offset.
-struct Em10Work {
+struct FREE_EM10 {
     u32 Be_flg;            // 0x000 (0x3E0)
     int Timer;               // 0x004 (0x3E4)  routine timer
     int Timer2;               // 0x008 (0x3E8)
@@ -196,18 +196,18 @@ struct Em10Work {
     u8 Ganado;              // 0x6C5 (0xAA5)  enemy class 0 / 1 / 2 (PS2 Ganado)
     u8 Se_tbl[19];        // 0x6C6 (0xAA6)  sound numbers (Em10SetSeTbl) (PS2 Se_tbl[19])
     u8 pad_6D9[3];
-    PenCloth Cloth;       // 0x6DC (0xABC)  Em18ClothSet / Em1fClothSet / em10ChainSet / em10BeltSet
+    CLOTH_INFO Cloth;       // 0x6DC (0xABC)  Em18ClothSet / Em1fClothSet / em10ChainSet / em10BeltSet
     f32 Blend;        // 0x73C (0xB1C)  em10BlendMotSet
     int Hokan;             // 0x740 (0xB20)  em10BlendMotSet: hokan frames left (low byte passed)  em10BlendMotSet: hokan frames (PS2 Hokan)
     u32 Frame;             // 0x744 (0xB24)  em10BlendMotSet: start frame (low half passed)  em10BlendMotSet: start frame (PS2 Frame)
-    MotionWorkSub Sub_mot;  // 0x748 (0xB28)
+    MOTION_INFO Sub_mot;  // 0x748 (0xB28)
 };
 
-#define EM10_WK(em) ((Em10Work*) (((cEm10*) (em))->free))
+#define EM10_WK(em) ((FREE_EM10*) (((cEm10*) (em))->free))
 
 class cObjGatling;
 
-// The enemy attached at Em10Work 0x58C lives in another module: only its virtual slots are known
+// The enemy attached at FREE_EM10 0x58C lives in another module: only its virtual slots are known
 // (docs/matching.md: a class with undefined virtuals emits no vtable). Slot names are the vtable byte offsets.
 class cEmPartner : public cEm {
 public:

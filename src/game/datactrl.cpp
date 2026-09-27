@@ -758,7 +758,7 @@ cDataUnit* cDataCtrl::getNewUnit()
             u->setCommand(0, 0, 0);
             u->setErr(0);
             u->setSize(0);
-            u->m_name[0] = 0;
+            u->getName()[0] = 0;
             u->setAddr(NULL);
             return u;
         }
@@ -886,7 +886,7 @@ void cDataCtrl::dispDebug()
                 break;
             }
             y += 0x10;
-            eprintf(0x28, y, 0, 0x17, "%08x:%s", u->m_addr, u->m_name);
+            eprintf(0x28, y, 0, 0x17, "%08x:%s", u->getAddr(), u->getName());
             x0 = (u32) ((f32) (addr - m_heap_start) * 400.0f / (f32) (m_heap_end - m_heap_start));
             x1 = (u32) ((f32) (addr + size - m_heap_start) / (f32) (m_heap_end - m_heap_start) * 400.0f);
             if (over == 0) {

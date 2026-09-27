@@ -44,8 +44,8 @@
 // barred door, the claw-man ambush and the two bells above the hall.
 
 struct R201Work {
-    cEm* sw;             // 0x00
-    cEm* barred;         // 0x04
+    cEmSwitch* sw;             // 0x00
+    cEmBarred* barred;         // 0x04
     u8 effKind;          // 0x08
     u8 pad_9[3];
     u32 snd0;            // 0x0C
@@ -174,14 +174,14 @@ void R201Init()
     getRoomEtcBarred(0x10, &r201_work->barred, 1);
     getRoomEtcSwitch(0x1C, &r201_work->sw, 1);
     if (r201_work->barred && r201_work->sw) {
-        ((cEmSwitch*) r201_work->sw)->setOpenOnly();
+        r201_work->sw->setOpenOnly();
         if (RsfCheck(G_ROOM_ID, 5) == 0) {
-            ((cEmBarred*) r201_work->barred)->setClosed();
-            ((cEmSwitch*) r201_work->sw)->setClosed();
+            r201_work->barred->setClosed();
+            r201_work->sw->setClosed();
             SceExec(0x12, (TaskFunc) r201_checkSwitch, 0, 0, SCE_PRIO_DEF_2, 0);
         } else {
-            ((cEmBarred*) r201_work->barred)->setOpened();
-            ((cEmSwitch*) r201_work->sw)->setClosed();
+            r201_work->barred->setOpened();
+            r201_work->sw->setClosed();
             SceAtSetEnable(0, 0);
             SceAtSetEnable(1, 0);
             SceAtSetEnable(3, 0);
@@ -192,7 +192,7 @@ void R201Init()
     if (!ScfFlagChk(pG, SCF_R201_EVENT00)) {
         r201_work->evd = DC.setData(EvtMgr.NameChange("evd/r201s00.evd"));
         r201_work->evd->setCommand(CMND_ARAM_LOAD, 0, 0);
-        EmReadSearch(0x1B, 0, r201_work->evd->m_size);
+        EmReadSearch(0x1B, 0, r201_work->evd->getSize());
         SceAtDataSet_exec(8, SCE_LEVEL10, 0, (TaskFunc) r201_execEvent00, 0, 1);
     } else {
         EmReadSearch(0x1B, 0, 0);
@@ -1031,7 +1031,7 @@ void r201_setSwitchEnv(int on)
     if (on == 1) {
         zero = 0;
         RsfSet(G_ROOM_ID, 5);
-        ((cEmBarred*) r201_work->barred)->setOpen(0);
+        r201_work->barred->setOpen(0);
         EffectEspgenDelete(0, r201_work->effKind, 0);
         EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, zero, zero);
         SceAtSetEnable(0, 0);
@@ -1042,7 +1042,7 @@ void r201_setSwitchEnv(int on)
     } else {
         zero = 0;
         RsfClear(G_ROOM_ID, 5);
-        ((cEmBarred*) r201_work->barred)->setClose(0);
+        r201_work->barred->setClose(0);
         EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, r201_work->effKind, zero, zero);
         SceAtSetEnable(3, 1);
         SceAtSetEnable(0x28, 1);
@@ -1067,7 +1067,7 @@ static void r201_checkSwitch(int on)
     r201_setSwitchSe(on);
     r201_setSwitchEnv(on);
     while (on != 1) {
-        if (r201_work->sw && ((cEmSwitch*) r201_work->sw)->ckOpen() == 1) {
+        if (r201_work->sw && r201_work->sw->ckOpen() == 1) {
             SndCall(6, 0x23, 0, 0, 0, 0);
             SceExec(0x12, (TaskFunc) r201_disarmTrap, 0, 0, SCE_PRIO_DEF_2, 0);
             break;
@@ -1092,13 +1092,13 @@ static void r201_execEvent00()
         SysFlagOn(pG, SYS_SCREEN_STOP);
         SceSleep(2);
         m = SearchEmModule(0x1B);
-        MemorySwap(m->pArc, (u32) r201_work->evd->m_addr, r201_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r201_work->evd->getAddr(), r201_work->evd->getSize());
         EvtMgr.SetEvt(m->pArc, &key);
-        ((Event*) key)->StatusFlag |= EvtStfBit(EvtStfPlPosNoSet);
+        ((Event*) key)->FlgOnStatus(EvtStfPlPosNoSet);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r201_work->evd->m_addr, r201_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r201_work->evd->getAddr(), r201_work->evd->getSize());
     }
     r201_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     SceEventEnd(0);

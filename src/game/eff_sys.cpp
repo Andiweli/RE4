@@ -60,9 +60,9 @@ GXTexObj* EspPullTexObj(u32 num);
 int EspDataLoad(u32 addr, u32 owner, int flag);
 int EffAreaDataLoad(SstArea* area);
 int EspDataRelease(u32 owner, int flag, int warn);
-EspTexWk* EspGetTexWk(int id, int quiet);
+ESP_TEX_WK* EspGetTexWk(int id, int quiet);
 int EspGetTexOwner(int id, u32* out);
-int espTexRegist(TEXPalette* tpl, EspAnmData* anm, u8 id, u32 owner);
+int espTexRegist(TEXPalette* tpl, cAnm* anm, u8 id, u32 owner);
 int estRegist(void* data, void* list, u32 owner);
 int sstRegist(void* data, void* list, u32 owner);
 int pathRegist(void* data, void* list, u32 owner);
@@ -230,7 +230,7 @@ void EspRoomInit()
 {
     cEspSystem* p;
     cEspSystem* sys;
-    EspTexWk* tw;
+    ESP_TEX_WK* tw;
     EspEfmWk* ew;
     SstTbl* et;
     SstTbl* st;
@@ -365,7 +365,7 @@ int EspDataLoad(u32 eff_addr, u32 owner, int MultipleOK)
     anms = (EffOfsTbl*) ((u8*) data + data->ofsAnm);
     for (i = 0; i < ids->num; i++) {
         TEXPalette* tpl = (TEXPalette*) ((u8*) tpls + tpls->ofs[i]);
-        EspAnmData* anm = (EspAnmData*) ((u8*) anms + anms->ofs[i]);
+        cAnm* anm = (cAnm*) ((u8*) anms + anms->ofs[i]);
         u16 id = ids->ent[i].id;
         espTexRegist(tpl, anm, id, owner);
     }
@@ -438,9 +438,9 @@ int EspDataRelease(u32 owner, int bCountCheck, int warn)
 }
 
 // Texture work of effect texture `id`; NULL (error unless quiet) when the id is not registered.
-EspTexWk* EspGetTexWk(int id, int bNoDispErrMsg)
+ESP_TEX_WK* EspGetTexWk(int id, int bNoDispErrMsg)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         if (bNoDispErrMsg == 0) {
@@ -455,7 +455,7 @@ EspTexWk* EspGetTexWk(int id, int bNoDispErrMsg)
 // loads the texture's matrix as texmtx 0x1E; the standard sprite texture setup.
 void EspTexSet(int id, int ptn)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         pLog->err(0, 0, "ESP : TexId[%x] no data", id);
@@ -471,7 +471,7 @@ void EspTexSet(int id, int ptn)
 // GXTexObj of pattern `ptn` of texture `id`; NULL with an error when unregistered.
 GXTexObj* EspGetTexObj(int id, int ptn_no)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         pLog->err(0, 0, "ESP : TEX_ID[%x] no data", id);
@@ -483,7 +483,7 @@ GXTexObj* EspGetTexObj(int id, int ptn_no)
 // TLUT of texture `id` for CI4 / CI8 textures; NULL otherwise (error when unregistered).
 GXTlutObj* EspGetTlutObj(int id)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         pLog->err(0, 0, "ESP : TEX_ID[%x] no data", id);
@@ -498,7 +498,7 @@ GXTlutObj* EspGetTlutObj(int id)
 // TPL of texture `id` in *out; 0 when unregistered.
 int EspGetTplAddr(int id, void** pTpl_addr)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         return 0;
@@ -510,7 +510,7 @@ int EspGetTplAddr(int id, void** pTpl_addr)
 // Owner id of texture `id` in *out; 0 when unregistered (owner 0xD2).
 int EspGetTexOwner(int id, u32* pOwner)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     *pOwner = w->Owner;
     if (w->Owner == EFF_NONE) {
@@ -521,9 +521,9 @@ int EspGetTexOwner(int id, u32* pOwner)
 
 // Texture animation table (pattern sizes, frame times, loop mode) of texture `id`; 0 when
 // unregistered.
-int EspGetAnmAddr(int id, EspAnmData** ppAnm)
+int EspGetAnmAddr(int id, cAnm** ppAnm)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         return 0;
@@ -535,7 +535,7 @@ int EspGetAnmAddr(int id, EspAnmData** ppAnm)
 // 1 when effect texture `id` is registered.
 int EspChkTexId(int id)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         return 0;
@@ -571,10 +571,10 @@ static void EspCalcTplAddr(TEXPalette* tpl)
 // Registers texture `id` for `owner`: relocates the TPL, pulls one GXTexObj per animation
 // pattern from the pool and initialises them (CI formats also get the TLUT). 0 when the id is
 // taken, the pattern counts disagree or the pool is full.
-int espTexRegist(TEXPalette* tpl, EspAnmData* anm, u8 id, u32 owner)
+int espTexRegist(TEXPalette* tpl, cAnm* anm, u8 id, u32 owner)
 {
     cEspSystem* sys = g_pEspSys;
-    EspTexWk* w = &sys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &sys->Esp_tex_tbl[id];
     TEXDescriptor* desc;
     TEXHeader* hdr;
     GXTexObj* obj;
@@ -640,7 +640,7 @@ int estRegist(void* data, void* list, u32 owner)
 // The est record block of est `id` of `owner` (EstSet's data): looks the id up in the owner's
 // list and returns the data at its offset; NULL (error unless quiet) for a bad owner, an owner
 // without data or an unknown id. Debug_flg[2] 0x80 logs every est call except core est 6.
-EspSeqData* EspGetEstAddr(u32 owner, int id, int NoErrDisp)
+cEspSeqHead* EspGetEstAddr(u32 owner, int id, int NoErrDisp)
 {
     cEspSystem* sys = g_pEspSys;
     SstTbl* t;
@@ -682,7 +682,7 @@ EspSeqData* EspGetEstAddr(u32 owner, int id, int NoErrDisp)
         }
     }
     ofs = t->data->ofs;
-    return (EspSeqData*) ((u8*) t->data + ofs[no]);
+    return (cEspSeqHead*) ((u8*) t->data + ofs[no]);
 }
 
 // The effect path data of path `id` of `owner` (esp06 / espgen02 movement paths); NULL with an
@@ -799,7 +799,7 @@ int efmRegist(void* model, void* tpl, void* mot, void* x, u8 id, u32 owner)
 int espTexRelease(u32 owner)
 {
     cEspSystem* sys = g_pEspSys;
-    EspTexWk* w = sys->Esp_tex_tbl;
+    ESP_TEX_WK* w = sys->Esp_tex_tbl;
     u32 i;
     u32 j;
     u32 start;

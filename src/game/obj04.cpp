@@ -17,7 +17,7 @@ void Efm04RotMatrix(cObj* obj, Mtx m);
 // esp sprites), floor + scenario bounces with bounceXZ/bounceY and stops below speed 15.
 void cObj04::move()
 {
-    Efm04Work* w = EFM04_WK(this);
+    OBJ04_FREE* w = EFM04_WK(this);
     cLightInfo* li;
     Vec ref;
     Vec hitPos;

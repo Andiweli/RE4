@@ -14,7 +14,7 @@ class cObj12;
 // Work of the em39 enemy (em39 module, D:/Bio4/Prog/em39.cpp; cModel::type 0/1 = knife fight,
 // 2 = the second battle), overlaid on cEm from 0x3E0. Field names are the work-relative offsets;
 // the comment gives the cEm offset.
-struct Em39Work {
+struct FREE_EM39 {
     u32 Be_flg;            // 0x000 (0x3E0)
     int Timer;               // 0x004 (0x3E4)  routine timer
     int Timer2;               // 0x008 (0x3E8)
@@ -74,13 +74,13 @@ struct Em39Work {
     f32 Blend;         // 0x6CC (0xAAC)  aim pitch, the blend rate of em39BlendMotSet (PS2 Blend, with Hokan / Frame / Sub_mot)
     int Hokan;             // 0x6D0 (0xAB0)
     int Frame;             // 0x6D4 (0xAB4)
-    MotionWorkSub Sub_mot;  // 0x6D8 (0xAB8)  em39BlendMotSet second motion
+    MOTION_INFO Sub_mot;  // 0x6D8 (0xAB8)  em39BlendMotSet second motion
     void* Mot_M;        // 0x7A8 (0xB88)  bow shot blend motions (em39BlendMotSet)
     void* Mot_L;        // 0x7AC (0xB8C)
     void* Mot_R;        // 0x7B0 (0xB90)
     void* Seq_M;        // 0x7B4 (0xB94)  sequence passed as em39BlendMotSet's 4th argument (PS2 u32 Seq_M)
     u8 pad_7B8[0xC];
-    MotionWorkSub Arm_mot;  // 0x7C4 (0xBA4)  tower form left arm motion (em39ArmControl)
+    MOTION_INFO Arm_mot;  // 0x7C4 (0xBA4)  tower form left arm motion (em39ArmControl)
     int HoseiCnt;         // 0x894 (0xC74)  frames the enemy moved less than half of the intended distance
     int Hide_timer;             // 0x898 (0xC78)
     int Back_atk_wait;             // 0x89C (0xC7C)
@@ -106,7 +106,7 @@ struct Em39Work {
     u8 EffKindIdArrow;          // 0x8C7 (0xCA7)
 };
 
-#define EM39_WK(em) ((Em39Work*) (((cEm39*) (em))->free))
+#define EM39_WK(em) ((FREE_EM39*) (((cEm39*) (em))->free))
 
 class cEm39 : public cEm {
 public:

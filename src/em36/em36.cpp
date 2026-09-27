@@ -645,7 +645,7 @@ static void em36_R0_Init(cEm36* em)
     em->Motion.flip = em36_flip;
     EspDataLoad((u32) ARC(EM36_EFF_025), EFF_EM36, 0);
 #line 966 "D:/Bio4/Prog/em36.cpp"
-    em->Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 0xD);
+    em->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xD);
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
         static const Vec size = { 2000.0f, 2000.0f, 2000.0f };
@@ -3911,7 +3911,7 @@ int em36BetweenHitCk(cEm36* em)
 void em36WeakInit(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
-    EmListData* list = &pG->Em_list[em->emset_no];
+    EM_LIST* list = &pG->Em_list[em->emset_no];
     int sum = 0;
     int a;
     int b;
@@ -4121,7 +4121,7 @@ int em36SetDmVal(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
     YARARE_INFO* part = em->dmg.m_pDamageYarare;
-    EmListData* list = &pG->Em_list[em->emset_no];
+    EM_LIST* list = &pG->Em_list[em->emset_no];
     int near;
     int dmg;
 
@@ -4183,7 +4183,7 @@ void em36SetHitMark(cEm36* em, int big)
     Vec lp2;
     Vec d;
     MtxPtr m;
-    EspSeqData* seq;
+    cEspSeqHead* seq;
     // The original zero-extends the u8 once (`clrlwi r30`) before both calls; a hard-register QImode variable
     // keeps the extension (combine drops it for a pseudo whose sets are the constants 3/4).
     register u8 kind asm("r30"); // COMPILER-DIFF: #2
@@ -4222,7 +4222,7 @@ void em36SetHitMark(cEm36* em, int big)
     seq = EspGetEstAddr(EFF_EM36, kind, 1);
     if (seq) {
         for (i = 0; i < seq->num; i++) {
-            EspGenWork* r = &seq->rec[i];
+            cEspSeqTbl* r = &seq->SeqTbl[i];
 
             r->Pos = lp;
             r->Parts_no = part->parts_no - 1;
@@ -4243,7 +4243,7 @@ void em36DoorOpenCk(cEm36* em)
 
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEmDoor* e = (cEmDoor*) EmMgr.fastAt(i);
-        EmDoorWork* dw;
+        FREE_EMDOOR* dw;
         f32 ang;
 
         if (!e->isAlive()) {

@@ -21,7 +21,7 @@ static inline const char* geo_name()
 // Unit vector perpendicular to the cone direction and world up.
 // Never called: the original linker dropped the body but kept its constant pool (one 0.0f, the
 // VECNormalize strings and the {0,1,0} template are shared with collision_point_cone_rev_play).
-static void collision_cone_axis(GeoCone* cone, Vec* axis)
+static void collision_cone_axis(GEOM_CONE_REV* cone, Vec* axis)
 {
     Vec up = {0.0f, 1.0f, 0.0f};
 
@@ -32,7 +32,7 @@ static void collision_cone_axis(GeoCone* cone, Vec* axis)
 
 // 1 when point p lies inside the cone (apex at cone->pos, axis direction, height, half angle in
 // radians) widened by `margin`; also stores the base radius in cone->radius.
-int collision_point_cone_rev_play(Vec* pPoint, GeoCone* pConeRev, f32 play)
+int collision_point_cone_rev_play(Vec* pPoint, GEOM_CONE_REV* pConeRev, f32 play)
 {
     int ret = 0;
     Vec axis;
@@ -71,7 +71,7 @@ int collision_point_cone_rev_play(Vec* pPoint, GeoCone* pConeRev, f32 play)
 
 // Cone test plus a facing test: the surface normal `face` must point back towards the cone axis
 // within `angle` radians.
-int collision_point_cone_rev_play_face(Vec* pPoint, GeoCone* pConeRev, f32 play, Vec* pDirection, f32 open_angle)
+int collision_point_cone_rev_play_face(Vec* pPoint, GEOM_CONE_REV* pConeRev, f32 play, Vec* pDirection, f32 open_angle)
 {
     Vec v;
     int ret = collision_point_cone_rev_play(pPoint, pConeRev, play);
@@ -116,7 +116,7 @@ int collision_sphere_hexahedron(GeoSphere* pSphere, GeoHexahedron* pHexahedron)
 }
 
 #line 350
-static inline int collision_fanpole_check(GeoCone* cone)
+static inline int collision_fanpole_check(GEOM_CONE_REV* cone)
 {
     Vec a = {1.0f, 0.0f, 0.5f};
     f32 b[4] = {0.0f, 0.5f, -0.5f, 0.0f};
@@ -127,7 +127,7 @@ static inline int collision_fanpole_check(GeoCone* cone)
     return a.x != b[1];
 }
 
-static inline int collision_cylinder_check(GeoCone* cone)
+static inline int collision_cylinder_check(GEOM_CONE_REV* cone)
 {
     if (cone->direction.x != 0.0f || cone->direction.z != 0.0f) {
         pLog->err(0, 0, "Cylinder is not vertical to the ground!\n");

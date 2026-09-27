@@ -8,7 +8,7 @@
 class cCtrl;
 
 // Work of the em27 enemy (em27 module, D:/Bio4/Prog/em27.cpp), overlaid on cEm from 0x3E0.
-struct Em27Work {
+struct FREE_EM27 {
     u32 Be_flg;            // 0x000 (0x3E0)  bit3: damage/die routine, bit4: waiting (no scale reset), bit6: no push,
                           //                bit7: dying (no water effect), bit8: water height set by the room
     int Timer;            // 0x004 (0x3E4)  frames left in the current routine
@@ -35,7 +35,7 @@ struct Em27Work {
     cCtrl* pCtrlPlAvoid;       // 0x0BC (0x49C)  GetCtrlCtrl11()
 };
 
-#define EM27_WK(em) ((Em27Work*) (((cEm27*) (em))->free))
+#define EM27_WK(em) ((FREE_EM27*) (((cEm27*) (em))->free))
 
 // Enemy 0x27 (the lake fish, em27 module). The stage rooms call setWaterHeight.
 class cEm27 : public cEm {

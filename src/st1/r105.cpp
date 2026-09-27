@@ -670,18 +670,18 @@ static void r105_checkDoor()
 // of the Leon model pl0000 off / on.
 extern "C" void Evt_R105S00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         setRoomEtcDisp(1, 0, 1);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
             break;
         case 0xB: {
             void* mod;
 
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 e->GetMod(&mod, "pl0000", 0, 0);
             }
             break;
@@ -690,7 +690,7 @@ extern "C" void Evt_R105S00_Func(Event* e)
         case 0xC: {
             void* mod;
 
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     cModelInfo* info = GetModelInfoAddr(((cModel*) mod)->pModelInfo, 3);
 
@@ -718,26 +718,26 @@ extern "C" void Evt_R105S10_Func(Event* e)
     cEmWindow* win;
     cEmWindow* win2;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 15) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 15) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod, 5, 0);
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod, 5, 1);
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 setRoomEtcDisp(1, 0, 1);
                 if (e->GetMod(&mod, "evm2500", 0, 0) == 1) {
                     ((cModel*) mod)->be_flag |= 0x10;
@@ -748,34 +748,34 @@ extern "C" void Evt_R105S10_Func(Event* e)
             }
             break;
         case 0x14:
-            if (e->NowFrame == 2) {
+            if (e->GetNowFrame() == 2) {
                 if (getRoomEtcWindow(5, &win, 1)) {
                     win->SetBreakModel();
                 }
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0x13:
         case 0x14:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     OBJ18_WK((cObj18*) mod)->be_flag |= 0x40;
                 }
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     OBJ18_WK((cObj18*) mod)->be_flag &= ~0x40;
                 }
             }
             break;
         }
-        if (e->NowCut == 0xE || e->NowCut == 0x13) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0xE || e->GetNowCut() == 0x13) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod)->ObjChainFlagCommon |= 0x04000000;
@@ -784,9 +784,9 @@ extern "C" void Evt_R105S10_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod)->ObjChainFlagCommon &= ~0x04000000;
@@ -796,7 +796,7 @@ extern "C" void Evt_R105S10_Func(Event* e)
             }
         }
         if (pG->game_costume == 1) {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl8200", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cObj*) mod)->be_flag &= ~2;

@@ -78,7 +78,7 @@ void R11bInit()
     Vec pos;
     Vec rot;
     Vec rot2;
-    EmListData* l;
+    EM_LIST* l;
     cObj* obj = 0;   // the zero of the EstSet data arguments and the list entry's x3 (r27)
     int one = 1;     // COMPILER-DIFF: #13 (single use: update_equiv_regs moves the li next to the store)
 
@@ -274,7 +274,7 @@ static void r11b_ThunderMove()
 // pier, un-set and alive, so they spawn there on later visits.
 extern "C" void EmSetChange()
 {
-    EmListData* l;
+    EM_LIST* l;
 
     l = EM_LIST_S(0x40);
     l->be_flag = 1;
@@ -478,15 +478,15 @@ extern "C" void Evt_R11BS00_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(0x7C, 0);
         break;
     case 1:
         SetSstAddAreaFlag(2);
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -498,7 +498,7 @@ extern "C" void Evt_R11BS00_Func(Event* e)
             }
             break;
         case 2:
-            if (e->NowFrame == 0x84) {
+            if (e->GetNowFrame() == 0x84) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -507,7 +507,7 @@ extern "C" void Evt_R11BS00_Func(Event* e)
             }
             break;
         case 3:
-            if (e->NowFrame == 0x55) {
+            if (e->GetNowFrame() == 0x55) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -516,7 +516,7 @@ extern "C" void Evt_R11BS00_Func(Event* e)
             }
             break;
         case 4:
-            if (e->NowFrame == 0x26) {
+            if (e->GetNowFrame() == 0x26) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -525,7 +525,7 @@ extern "C" void Evt_R11BS00_Func(Event* e)
             }
             break;
         case 5:
-            if (e->NowFrame == 0x5D) {
+            if (e->GetNowFrame() == 0x5D) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -539,7 +539,7 @@ extern "C" void Evt_R11BS00_Func(Event* e)
             if (skip == 0) {
                 SetNearClipDist(1.0f);
             }
-            if (e->NowFrame == 0x68) {
+            if (e->GetNowFrame() == 0x68) {
                 int skip2 = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip2 == 0) {
@@ -549,23 +549,23 @@ extern "C" void Evt_R11BS00_Func(Event* e)
             break;
         }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 6:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 r11b_evtTexRenderSet(e, mod, 1, 0);
                 r11b_evtEffDelete();
                 EstSet(0, -1, 0, 0, EFF_ROOM, 6, r11b_work->tex[1]->GetCoreFlg() | 0x3001, ESP_CORE_KIND_NONE, 0, 0);
             }
             break;
         case 7:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 r11b_evtTexRenderSet(e, mod, 0, 1);
                 r11b_evtEffDelete();
                 EstSet(0, -1, 0, 0, EFF_ROOM, 7, r11b_work->tex[1]->GetCoreFlg() | 0x3001, ESP_CORE_KIND_NONE, 0, 0);
             }
             break;
         case 8:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 r11b_evtTexRenderSet(e, mod, 1, 0);
                 r11b_evtEffDelete();
                 EstSet(0, -1, 0, 0, EFF_ROOM, 8, r11b_work->tex[1]->GetCoreFlg() | 0x3001, ESP_CORE_KIND_NONE, 0, 0);
@@ -573,7 +573,7 @@ extern "C" void Evt_R11BS00_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     TexRenderModRes((cModel*) mod, 6);
                     TexRenderModRes((cModel*) mod, 7);
@@ -583,7 +583,7 @@ extern "C" void Evt_R11BS00_Func(Event* e)
             }
             break;
         }
-        if (pG->game_costume == 1 && e->NowFrame == 0) {
+        if (pG->game_costume == 1 && e->GetNowFrame() == 0) {
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
                 ModelInfoSetTrans((cModel*) mod, 8, 0);

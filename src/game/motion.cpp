@@ -147,7 +147,7 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
     Vec v2;
     u32* tbl;
     cParts* p;
-    AttachCamera* cam;
+    ATTACH_CAMERA* cam;
     int f;
     int i;
 
@@ -609,7 +609,7 @@ u32 MotionMove(cModel* pEm, CAMERA* pCamera)
 }
 
 // Advances a secondary MotionWork (no root speed): pose, sequence, hokan. Returns its Mot_state.
-u16 MotionMoveSub(cModel* pEm, MotionWorkSub* w)
+u16 MotionMoveSub(cModel* pEm, MOTION_INFO* w)
 {
     MotionMoveCore(pEm, w, 0);
     MotionSequenceCtrl(w);
@@ -621,11 +621,11 @@ u16 MotionMoveSub(cModel* pEm, MotionWorkSub* w)
 
 // Evaluates the pose at the current sequence frame by decoding each joint's Hermite keys into its
 // parts, with the left/right flip when Mot_attr 0x40. Attach-camera channels 6/7 go to AttachCamera.
-void MotionMoveCore(cModel* pEm, MotionWorkSub* w, CAMERA* pCamera)
+void MotionMoveCore(cModel* pEm, MOTION_INFO* w, CAMERA* pCamera)
 {
     HermitePrm prm;
     HermitePrm* pp = &prm;
-    AttachCamera* cam;
+    ATTACH_CAMERA* cam;
     cParts* p;
     u16* flipTbl = MOTION(pEm)->flip;
     int n = w->Joint_num;
@@ -789,7 +789,7 @@ static inline int nearZero(f32 d, f32 eps)
 // Pose interpolation over the Hokan_frame frames after a motion change: each parts' l_mat is
 // blended between prevMat and the new pose (translation linear, rotation by quaternion slerp,
 // scale linear or cancelled by the parent's scale with flag 0x20000).
-void MotionHokan(cModel* m, MotionWorkSub* w)
+void MotionHokan(cModel* m, MOTION_INFO* w)
 {
     static int g_scale_cancel = 1;
     static f32 epsilon = 0.00002f;
@@ -942,7 +942,7 @@ void MotionHokan(cModel* m, MotionWorkSub* w)
 // the previous sample (adding/subtracting Pos_dist/Ang_dist across a loop), rotates the position
 // delta by the previous root yaw into model space, mirrors it for flipped motions, and with
 // Mot_attr 0x400 blends the XZ speed from the previous motion's speed over the hokan frames.
-void MotionGetSpeed(cModel* pEm, MotionWorkSub* w, int flg, Vec* Pos_move, Vec* Ang_move)
+void MotionGetSpeed(cModel* pEm, MOTION_INFO* w, int flg, Vec* Pos_move, Vec* Ang_move)
 {
     HermitePrm prm;
     HermitePrm* pp = &prm;
@@ -1029,7 +1029,7 @@ void MotionGetSpeed(cModel* pEm, MotionWorkSub* w, int flg, Vec* Pos_move, Vec* 
 }
 
 // Applies a root delta to the model: position rotated by the model matrix, rotation added.
-void MotionAddSpeed(cModel* pEm, MotionWorkSub* w, Vec* Pos_move, Vec* Ang_move)
+void MotionAddSpeed(cModel* pEm, MOTION_INFO* w, Vec* Pos_move, Vec* Ang_move)
 {
     Vec t;
 
@@ -1087,7 +1087,7 @@ void MotionGetPosition(cModel* pEm, Vec* pPos, Vec* pAng)
 // reverse (Mot_attr bit 1), looping (bit 2: Mot_state 1/2) or clamping at the end (Mot_state
 // 4/8); then resolves the motion frame (10.6 fixed) from the sequence table with interpolation
 // between table entries, or linearly. Returns Mot_state.
-u16 MotionSequenceCtrl(MotionWorkSub* w)
+u16 MotionSequenceCtrl(MOTION_INFO* w)
 {
     f32 f;
 
@@ -1176,7 +1176,7 @@ u16 FcvGetMaxFrame(u16* pData)
 }
 
 // Last frame of the motion (-1 without motion).
-f32 MotionGetMaxFrame(MotionWorkSub* w)
+f32 MotionGetMaxFrame(MOTION_INFO* w)
 {
     if (w->pMot == 0) {
         return -1.0f;
@@ -1185,7 +1185,7 @@ f32 MotionGetMaxFrame(MotionWorkSub* w)
 }
 
 // Current motion frame (-1 without motion).
-f32 MotionGetCurrentFrame(MotionWorkSub* w)
+f32 MotionGetCurrentFrame(MOTION_INFO* w)
 {
     if (w->pMot == 0) {
         return -1.0f;
@@ -1195,7 +1195,7 @@ f32 MotionGetCurrentFrame(MotionWorkSub* w)
 
 // 1 when the motion passed `frame` since the previous update (handles loops); 0 on the first
 // frame after a set (Mot_flag 0x04000000). Used to trigger footsteps/attacks at key frames.
-int MotionCheckCrossFrame(MotionWorkSub* w, f32 frame)
+int MotionCheckCrossFrame(MOTION_INFO* w, f32 frame)
 {
     f32 cur;
     f32 prev;

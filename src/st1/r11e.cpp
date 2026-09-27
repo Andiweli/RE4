@@ -437,7 +437,7 @@ static void r11e_EmSet_exit()
 // The giant appears: camera cuts 2 and 3 with the stream.
 static void r11e_EmSet()
 {
-    EmListData* e;
+    EM_LIST* e;
 
     RsfSet(G_ROOM_ID, 6);
     r11e_work->em.setEm(0xF1, -1, 1, 1, 1);

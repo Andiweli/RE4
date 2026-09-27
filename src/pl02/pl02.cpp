@@ -55,13 +55,13 @@ static void testHairSetAda2(cModel* pl, PlCloth* c)
     c->pModel = 0;
     c->Flag = 0x302;
     c->pPtbl = 0;
-    PenClothSet(pl, (PenCloth*) c, 100.0f);
+    PenClothSet(pl, (CLOTH_INFO*) c, 100.0f);
 }
 
 // Per-frame update of the hair chain (pendulum simulation).
 void testHairMoveAda2(cModel* pl, PlCloth* c)
 {
-    PenClothMove(pl, (PenCloth*) c);
+    PenClothMove(pl, (CLOTH_INFO*) c);
 }
 
 // Sets up the costume-2 holster strap as a pendulum chain: 5 parts (adaHolsterP: two anchors 26 /
@@ -93,13 +93,13 @@ void testHolsterSetAda2(cModel* pl, PlCloth* c)
     c->Bundle_num = 0;
     c->Flag = 0x302;
     c->pPtbl = 0;
-    PenClothSet(pl, (PenCloth*) c, 100.0f);
+    PenClothSet(pl, (CLOTH_INFO*) c, 100.0f);
 }
 
 // Per-frame update of the holster chain.
 void testHolsterMoveAda2(cModel* pl, PlCloth* c)
 {
-    PenClothMove(pl, (PenCloth*) c);
+    PenClothMove(pl, (CLOTH_INFO*) c);
 }
 
 // Costume 2 cloth set-up (cPlAda::initCloth): the hair goes into the `hair` work, the holster

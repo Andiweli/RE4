@@ -246,7 +246,7 @@ void R30fInit()
             r30f_work->bull->setNoSuspend(0);
             if (r30f_work->bull->Motion.pAttachCam == 0) {
 #line 163 "D:/Bio4/Prog/r30f.cpp"
-                r30f_work->bull->Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 0xd);
+                r30f_work->bull->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xd);
             }
         }
     }
@@ -264,7 +264,7 @@ void R30fInit()
         r30f_work->lift = SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x30), ROOM_ARC_PTR(pG->pRoom, 0x31), &zero, &zero, 0x10, 1);
         if (r30f_work->lift) {
 #line 195 "D:/Bio4/Prog/r30f.cpp"
-            r30f_work->lift->Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 0xd);
+            r30f_work->lift->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xd);
         }
     }
     r30f_work->sat1 = SatMgr.create(ROOM_ARC_PTR(pG->pRoom, 0x5), 0, (Vec*) &vecZero, (Vec*) &vecZero, 2);
@@ -1547,15 +1547,15 @@ void addPos(Vec* add, cModel* m)
 // Moves a 4-point area with the lift.
 void addPos_sca(Vec* add, SceAtWork* at)
 {
-    at->area.u.xz4.p[0].x += add->x;
-    at->area.u.xz4.p[0].z += add->z;
-    at->area.u.xz4.p[1].x += add->x;
-    at->area.u.xz4.p[1].z += add->z;
-    at->area.u.xz4.p[2].x += add->x;
-    at->area.u.xz4.p[2].z += add->z;
-    at->area.u.xz4.p[3].x += add->x;
-    at->area.u.xz4.p[3].z += add->z;
-    at->area.u.xz4.floor += add->y;
+    at->area.xz4.p[0].x += add->x;
+    at->area.xz4.p[0].z += add->z;
+    at->area.xz4.p[1].x += add->x;
+    at->area.xz4.p[1].z += add->z;
+    at->area.xz4.p[2].x += add->x;
+    at->area.xz4.p[2].z += add->z;
+    at->area.xz4.p[3].x += add->x;
+    at->area.xz4.p[3].z += add->z;
+    at->area.xz4.floor += add->y;
 }
 
 // Everything on the lift moves with it: the riders, the camera, the enemies, the scenario pieces and

@@ -60,7 +60,7 @@ CAMERA Cam;   // escape sequence camera
 cObj* SetPillar(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cObj* obj;
-    PillarWork* w;
+    FREE_PILLAR* w;
 
     obj = ObjMgr.create(cObjMgr::ID_PILLAR);
     if (obj == 0) {
@@ -117,7 +117,7 @@ void cObjPillar::move()
 // Rno0 == 0: standing (Be_flg 1): matrices and the eat collision quad placed.
 void objPillar_R0_Set(cObjPillar* pObj)
 {
-    PillarWork* w = PILLAR_WK(pObj);
+    FREE_PILLAR* w = PILLAR_WK(pObj);
 
     w->Be_flg |= 1;
     w->St_pos = pObj->pos;
@@ -132,7 +132,7 @@ void objPillar_R0_Set(cObjPillar* pObj)
 // 0x200 (the boss died).
 void objPillar_R0_Break(cObjPillar* pObj)
 {
-    PillarWork* w = PILLAR_WK(pObj);
+    FREE_PILLAR* w = PILLAR_WK(pObj);
     Mtx inv;
     Vec v;
     u8 step = pObj->r_no_2;
@@ -197,7 +197,7 @@ void objPillar_R0_Break(cObjPillar* pObj)
 // length; the escape button is offered once it is within 1000 units.
 void objPillar_R0_Throw(cObjPillar* pObj)
 {
-    PillarWork* w = PILLAR_WK(pObj);
+    FREE_PILLAR* w = PILLAR_WK(pObj);
     Vec d;
     Vec v;
     Mtx m;
@@ -330,7 +330,7 @@ void objPillar_R0_Throw(cObjPillar* pObj)
 // (it passes over him), then is removed.
 void objPillar_R0_Escape(cObjPillar* pObj)
 {
-    PillarWork* w = PILLAR_WK(pObj);
+    FREE_PILLAR* w = PILLAR_WK(pObj);
 
     switch (pObj->r_no_2) {
     case 0:
@@ -361,7 +361,7 @@ void objPillar_R0_Escape(cObjPillar* pObj)
 // motFall1 and a sound, fades out after 30 frames.
 void objPillar_R0_Fall(cObjPillar* pObj)
 {
-    PillarWork* w = PILLAR_WK(pObj);
+    FREE_PILLAR* w = PILLAR_WK(pObj);
     f32 floor;
 
     switch (pObj->r_no_2) {
@@ -430,7 +430,7 @@ int cObjPillar::ckSet()
 // escape motion mot/a; collision off.
 void cObjPillar::setBreak(Vec* pos, void* mot, void* pl_seq)
 {
-    PillarWork* w = PILLAR_WK(this);
+    FREE_PILLAR* w = PILLAR_WK(this);
 
     w->Be_flg &= ~1;
     ang.y = GetXZAngle(pos, &this->pos);
@@ -451,7 +451,7 @@ void cObjPillar::setBreak(Vec* pos, void* mot, void* pl_seq)
 // escape motion; aimed at the player when within 30 degrees.
 void cObjPillar::setThrow(void* mot0, void* mot1, void* motEscape, void* plMot, void* pl_seq)
 {
-    PillarWork* w = PILLAR_WK(this);
+    FREE_PILLAR* w = PILLAR_WK(this);
 
     w->Be_flg &= ~1;
     if (fabsf(Muku(&pos, &pPL->pos, ang.y, PI)) < 0.5235988f) {
@@ -472,7 +472,7 @@ void cObjPillar::setThrow(void* mot0, void* mot1, void* motEscape, void* plMot, 
 // Drops the pillar (fall / land motions).
 void cObjPillar::setFall(void* mot0, void* mot1)
 {
-    PillarWork* w = PILLAR_WK(this);
+    FREE_PILLAR* w = PILLAR_WK(this);
 
     w->Be_flg &= ~1;
     pos = getPartsPtr(0)->world;
@@ -490,7 +490,7 @@ void cObjPillar::setFall(void* mot0, void* mot1)
 // vibration; on the partner quake + vibration.
 void objPillarAtkCk(cObjPillar* pObj, Vec* pPos)
 {
-    PillarWork* w = PILLAR_WK(pObj);
+    FREE_PILLAR* w = PILLAR_WK(pObj);
     EmAtkInfo* atk = &ObjPillar_atk_info;
     int hit;
 
@@ -525,7 +525,7 @@ void objPillarAtkCk(cObjPillar* pObj, Vec* pPos)
 // Action button 0x25 during Break: the player dives out of the way (plemEscape), difficulty points.
 void EscapeAction(cObjPillar* ptr)
 {
-    PillarWork* w = PILLAR_WK(ptr);
+    FREE_PILLAR* w = PILLAR_WK(ptr);
     u8 one = 1;
 
     if (!ScfFlagChk(pG, SCF_R332_BOSS_DIE)) {
@@ -542,7 +542,7 @@ static void plemEscape(cPlayer* pEm)
 {
     cEm* em = (cEm*) pEm;
     cObjPillar* obj = (cObjPillar*) em->pEmCatch;
-    PillarWork* w = PILLAR_WK(obj);
+    FREE_PILLAR* w = PILLAR_WK(obj);
     f32 ang;
 
     em->dmg.m_Timer = 2;
@@ -591,7 +591,7 @@ void EscapeCamMove()
     Vec hit;
     Vec d;
     f32 len;
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
 
     Cam.param.fovy = g->Camera.param.fovy;
     p0.x = -376.0f;
@@ -630,7 +630,7 @@ void EscapeCamMove()
 // Action button 0x25 during Throw: the player ducks (plemEscape2) and the pillar goes to Escape.
 void EscapeAction2(cObjPillar* ptr)
 {
-    PillarWork* w = PILLAR_WK(ptr);
+    FREE_PILLAR* w = PILLAR_WK(ptr);
 
     if (!ScfFlagChk(pG, SCF_R332_BOSS_DIE)) {
         w->Act_ck = 1;
@@ -648,7 +648,7 @@ void plemEscape2(cPlayer* pEm)
 {
     cEm* em = (cEm*) pEm;
     cObjPillar* obj = (cObjPillar*) em->pEmCatch;
-    PillarWork* w = PILLAR_WK(obj);
+    FREE_PILLAR* w = PILLAR_WK(obj);
     u8 step;
 
     em->dmg.m_Timer = 2;
@@ -672,7 +672,7 @@ void plemEscape2(cPlayer* pEm)
 // Places the pillar's eat collision quad (created on first use) at its base.
 void objPillarEatSet(cObjPillar* pObj)
 {
-    PillarWork* w = PILLAR_WK(pObj);
+    FREE_PILLAR* w = PILLAR_WK(pObj);
     Vec poly[4];
     f32 r = 400.0f;
     f32 h = 5000.0f;

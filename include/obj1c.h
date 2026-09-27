@@ -9,7 +9,7 @@ cObj* SetFloatIsland(void* bin, void* tpl, Vec* pos, Vec* rot);
 
 // Floating island work (game/obj1c.cpp): drifts back toward its home position, plays crash
 // motions and spawns effects while the player is on it.
-struct IslandWork {
+struct FREE_OBJ1C {
     u32 Be_flg;             // 0x00
     u8 pad_4[8];            // PS2's FREE_OBJ1C has Timer/Timer2 here, unused by our code
     int Crash_wait;         // 0x0C  frames since setCrashBig (ckCrash)
@@ -29,7 +29,7 @@ struct IslandWork {
 // crash motion when hit, spawns water effects while alive.
 class cObj1c : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  IslandWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ1C
 
     virtual void move();
     void setMotion(void* idle, void* crash, void* idleBig, void* crashBig);
@@ -38,6 +38,6 @@ public:
     int ckCrash();
 };
 
-#define ISLAND_WK(o) ((IslandWork*) (o)->free)
+#define ISLAND_WK(o) ((FREE_OBJ1C*) (o)->free)
 
 #endif

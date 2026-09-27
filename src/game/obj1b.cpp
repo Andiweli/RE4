@@ -24,7 +24,7 @@ struct Obj1bNode {
     int reflect;
 };
 
-// EspSeqOpt as the spear fills it: flag byte 2, speed vector at 4.
+// ESPSEQ_CONTROL as the spear fills it: flag byte 2, speed vector at 4.
 struct SpearEstOpt {
     u8 x0;
     u8 x1;

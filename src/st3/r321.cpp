@@ -100,13 +100,13 @@ extern "C" void Evt_R321S00_Func(Event* e)
     rot.x = 0.0f;
     rot.y = 0.0f;
     rot.z = 0.0f;
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(0x17, 0);
         break;
     case 1:
-        if (e->NowCut == 1) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 1) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     cLight* light = LightMgr.getKindLight(1);
 
@@ -116,9 +116,9 @@ extern "C" void Evt_R321S00_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod2, "evm3200", 0, 0) == 1) {
                     ((cModel*) mod2)->LightInfo.EnableMask = 0x40;
                 }
@@ -137,18 +137,18 @@ extern "C" void Evt_R321S00_Func(Event* e)
             }
             break;
         case 0x1C:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0xB, 0);
             }
             break;
         }
-        if (e->NowCut > 0x10) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() > 0x10) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0xF, 0);
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0xF, 1);
             }
         }

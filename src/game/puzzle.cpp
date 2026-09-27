@@ -1,5 +1,8 @@
-// game/puzzle: the attache case packing puzzle behind the inventory (pzlBoard, pzlPiece, pzlPlayer).
-// PutInCase is the game-side entry that fits a picked-up item into the case.
+// game/puzzle: the attache case packing puzzle behind the inventory — pzlBoard is a cell grid
+// (the case, and a spare board) holding pzlPiece pieces (one per item, shapes from piece_info,
+// rotated / mirrored in 8 orientations), pzlPlayer moves a cursor and a hand piece between the
+// boards (pick / put / swap / cancel) and writes the layout back into the cItem records.
+// PutInCase is the game-side entry that fits a picked-up item into the case (or stacks ammo).
 #include "types.h"
 #include "map_obj.h"
 #include "light.h"
@@ -91,7 +94,7 @@ PieceInfo piece_info[] = {
 };
 
 // Shape record of item `id` in the piece table (ends with id 0xFFFF); 0 when the item has none.
-PieceData* searchItemPieceData(int item_id, PieceInfo* p_info)
+pieceData* searchItemPieceData(int item_id, PieceInfo* p_info)
 {
     int i;
 
@@ -259,7 +262,7 @@ void pzlPiece::mirror(int dir)
 }
 
 // Takes the piece into use with shape `p_data`, orientation 0, not on a board.
-void pzlPiece::init(PieceData* p_data)
+void pzlPiece::init(pieceData* p_data)
 {
     m_p_data = p_data;
     be_flag |= 1;
@@ -885,10 +888,10 @@ int pzlPlayer::init(int size)
     {
         int k = 0;
         for (i = 0; i < ItemMgr.m_array_num; i++) {
-            ItemWork* item = ItemMgr.at(i);
+            cItem* item = ItemMgr.at(i);
             if (item->isAlive(extraGame)) {
                 p = &m_piece[k];
-                PieceData* d = searchItemPieceData(item->id, piece_info);
+                pieceData* d = searchItemPieceData(item->id, piece_info);
                 if (d) {
                     k++;
                     p->init(d);
@@ -968,7 +971,7 @@ pzlPiece* pzlPlayer::piecePtr(int no)
 }
 
 // The piece that represents inventory item `item`, or 0.
-pzlPiece* pzlPlayer::piecePtr(ItemWork* item)
+pzlPiece* pzlPlayer::piecePtr(cItem* item)
 {
     int i;
 
@@ -984,14 +987,14 @@ pzlPiece* pzlPlayer::piecePtr(ItemWork* item)
 }
 
 // Writes every piece's position (in half cells), orientation and board (1 case, 0 spare) back into
-// its ItemWork — the layout the save game / item screen keeps.
+// its cItem — the layout the save game / item screen keeps.
 void pzlPlayer::save()
 {
     int i;
 
     for (i = 0; i < m_piece_max; i++) {
         pzlPiece* p = &m_piece[i];
-        ItemWork* item;
+        cItem* item;
         if (p->isEmpty()) {
             continue;
         }
@@ -1009,10 +1012,10 @@ void pzlPlayer::save()
 
 // Adds a new piece for `item` (a picked-up item not yet in the case) in a free slot at (0, 0) as
 // m_extra. 0 when the item has no shape or no slot is free.
-int pzlPlayer::appendExtraPiece(ItemWork* pItem)
+int pzlPlayer::appendExtraPiece(cItem* pItem)
 {
     pzlPiece* p = 0;
-    PieceData* d;
+    pieceData* d;
     int i;
 
     if (pItem == 0) {
@@ -1268,7 +1271,7 @@ pzlPiece* pzlPlayer::cmbPiece(pzlBoard* b)
 {
     pzlPiece* p;
     pzlPiece* h;
-    ItemWork* ex;
+    cItem* ex;
     int rel = 0;
     int used;
 
@@ -1567,7 +1570,7 @@ cursor:
     return ret;
 }
 
-// Drops the pieces whose item was used up (ItemWork flags 0): removed from their board, model freed.
+// Drops the pieces whose item was used up (cItem flags 0): removed from their board, model freed.
 void pzlPlayer::rehash()
 {
     int i;
@@ -1625,8 +1628,8 @@ void pzlPlayer::salvCursor()
 // give it a codeless def before get() (see docs/research/ "DOL puzzle final closer").
 int PutInCase(ITEM_ID item_id, u16 item_num, int size)
 {
-    ItemWork item;
-    ItemInfo info;
+    cItem item;
+    ITEM_INFO info;
     pzlPlayer* pl;
     u16 max;
     int total;
@@ -1634,7 +1637,7 @@ int PutInCase(ITEM_ID item_id, u16 item_num, int size)
     int j;
     int ok = 0;
     pzlPiece* p;
-    ItemWork* last;
+    cItem* last;
 
     itemInfo(item_id, &info);
     if (info.type == 1 || info.type == 9) {
@@ -1660,7 +1663,7 @@ int PutInCase(ITEM_ID item_id, u16 item_num, int size)
     if (total >= item_num) {
         u16 rest = item_num;
         for (int i = 0; i < ItemMgr.m_order_tbl_num; i++) {
-            ItemWork* w = ItemMgr.m_p_order_tbl[i].p_item;
+            cItem* w = ItemMgr.m_p_order_tbl[i].p_item;
             u16 room = max - w->num;
             if (room >= rest) {
                 w->num = rest + w->num;
@@ -1712,7 +1715,7 @@ int PutInCase(ITEM_ID item_id, u16 item_num, int size)
     }
 placed:
     pl->save();
-    last = (ItemWork*) p; // COMPILER-DIFF: codeless copy of the dead r31 value: `last` then crosses the get() call and takes the first callee-saved reg, r31
+    last = (cItem*) p; // COMPILER-DIFF: codeless copy of the dead r31 value: `last` then crosses the get() call and takes the first callee-saved reg, r31
     asm("" : "+r"(p)); // COMPILER-DIFF: makes the copy unavailable to gcse's copy propagation; flow deletes it (p is dead)
     if (ok) {
         u16 rest;
@@ -1722,7 +1725,7 @@ placed:
         n = 0;
         if (ItemMgr.m_order_tbl_num > 0) {
             do {
-                ItemWork* w = ItemMgr.m_p_order_tbl[n].p_item;
+                cItem* w = ItemMgr.m_p_order_tbl[n].p_item;
                 u16 room = max - w->num;
                 w->num = max;
                 rest -= room;

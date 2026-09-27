@@ -6,7 +6,7 @@
 #include "obj.h"
 
 // Falling pillar work (game/objPillar.cpp `cObjPillar`).
-struct PillarWork {
+struct FREE_PILLAR {
     u32 Be_flg;            // 0x00  bit0: set (ckSet), cleared by setBreak / setThrow / setFall
     int Timer;            // 0x04  frames before the fade out
     int TmpU32;              // 0x08  Rnd() & 1: action button type 3 / 4
@@ -30,7 +30,7 @@ struct PillarWork {
 // escape with the action button; the escape / die sequences run as player damage routines.
 class cObjPillar : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  PillarWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_PILLAR
 
     virtual void move();
     virtual ~cObjPillar() {}
@@ -41,6 +41,6 @@ public:
     void setFall(void* mot0, void* mot1);
 };
 
-#define PILLAR_WK(o) ((PillarWork*) (o)->free)
+#define PILLAR_WK(o) ((FREE_PILLAR*) (o)->free)
 
 #endif

@@ -443,7 +443,7 @@ void SceDestroyEm(int em_id, int em_id_end)
         }
         if (em->id >= em_id && em->id <= em_id_end) {
             if (em->isAlive()) {
-                EmListData* l = GetListPtrFromEm(em);
+                EM_LIST* l = GetListPtrFromEm(em);
                 if (l) {
                     l->be_flag &= ~1;
                 }
@@ -711,7 +711,7 @@ void getChapterSection(int no, int* chap, int* sect)
     }
 }
 
-// Reference setters: the original stores these GlobalWork fields through references (pG reloaded after each).
+// Reference setters: the original stores these GLOBAL_WK fields through references (pG reloaded after each).
 static inline void U16Zero(u16& d) { d = 0; }  // HImode zero (its own `li`), reference store
 
 // Chapter end task (SceSetChapterEnd): swaps the room data out to show the ChapterEnd screen with
@@ -1252,7 +1252,7 @@ void SceElevator(SceElevatorData* d)
     f32 move;
     int faded;
     int done;
-    FadeWork* fade;
+    FADE_WORK* fade;
     u32 white;
     int i;
     int j;

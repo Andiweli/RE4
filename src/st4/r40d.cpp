@@ -57,8 +57,8 @@ void R40dInit()
 #line 35 "D:/Bio4/Prog/r40d.cpp"
     r40d_work = (R40dWork*) MEM_CALLOC(sizeof(R40dWork), 1, 0xd);
     r40d_work->se = 0;
-    getRoomEtcBarred(0, (cEm**) &r40d_work->door[0], 1);
-    getRoomEtcBarred(1, (cEm**) &r40d_work->door[1], 1);
+    getRoomEtcBarred(0, &r40d_work->door[0], 1);
+    getRoomEtcBarred(1, &r40d_work->door[1], 1);
     r40d_work->eff[0] = EspPullCoreKind();
     r40d_work->eff[1] = EspPullCoreKind();
     r40d_work->eff[2] = EspPullCoreKind();

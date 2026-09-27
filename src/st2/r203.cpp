@@ -237,12 +237,12 @@ static void r203_EventMeetAgain()
     m = SearchEmModule(0x11);
     SceEventStart(0);
     if (r203_work->data->waitLoadOk() == 1) {
-        MemorySwap(m->pArc, (u32) r203_work->data->m_addr, r203_work->data->m_size);
+        MemorySwap(m->pArc, (u32) r203_work->data->getAddr(), r203_work->data->getSize());
         EvtMgr.SetEvt(m->pArc, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r203_work->data->m_addr, r203_work->data->m_size);
+        MemorySwap(m->pArc, (u32) r203_work->data->getAddr(), r203_work->data->getSize());
         r203_work->data->setCommand(CMND_DEL_DATA, 0, 0);
     }
     {
@@ -346,7 +346,7 @@ static void r203_StreamCheck()
 // Event r203s00 callback: light mask 2 on the pl0400 model on its first frame.
 extern "C" void Evt_R203S00_Func(Event* e)
 {
-    if (e->FuncType == 1 && e->NowCut == 0 && e->NowFrame == 0) {
+    if (e->GetFuncType() == 1 && e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
         void* mod;
 
         if (e->GetMod(&mod, "pl0400", 0, 0) == 1) {

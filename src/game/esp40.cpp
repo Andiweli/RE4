@@ -6,21 +6,21 @@
 #include "light.h"
 #include "esp.h"
 
-struct Esp40Work {
+typedef struct tagESP40_WK {
     Vec Base_Pos;      // 0x00 position kept in parent space
     f32 Ofs_y;     // 0x0C height above the water surface
     f32 Pos_y;     // 0x10 bobbing offset
     f32 Speed_y;     // 0x14
     f32 Speed_plus_y;     // 0x18
-};
+} ESP40_WK;
 
 // Effect floating on the water surface of its parent.
 class cEsp40 : public cEsp {
 public:
-    Esp40Work m_Free;  // 0xF8
+    ESP40_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x40] factory.
@@ -45,7 +45,7 @@ void cEsp40::move()
         if (!AnmMove()) {
             PushEsp(this);
         } else if (parent != pEffParentWorld && (m_Release_time == 0xff || m_Release_time > m_Life_time)) {
-            Esp40Work* w = &m_Free;
+            ESP40_WK* w = &m_Free;
             w->Base_Pos = m_Pos;
             if (m_Pos_start_cnt == 0 || m_Pos_start_cnt <= m_Life_time) {
                 w->Pos_y += w->Speed_y;
@@ -64,7 +64,7 @@ void cEsp40::move()
 
 // A parent with Release_time 0 is dropped to world space at once. Attached effects record Ofs_y,
 // Base_Pos and the y speeds; world-space effects are simply placed at water height + Pos.y.
-int cEsp40::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp40::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     f32 h;
 
@@ -73,7 +73,7 @@ int cEsp40::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
         parent = pEffParentWorld;
     }
     if (parent != pEffParentWorld && (m_Release_time == 0xff || m_Release_time <= m_Life_time)) {
-        Esp40Work* w = &m_Free;
+        ESP40_WK* w = &m_Free;
         w->Ofs_y = pSeq->Pos.y;
         w->Base_Pos = m_Pos;
         w->Speed_y = m_Speed.y;

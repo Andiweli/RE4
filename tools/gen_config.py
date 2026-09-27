@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """Generate config/<ver>/symbols.txt, splits.txt and objects.py from the RE4 debug-build Bio4.sym.
 
+symbols.txt starts here as sanitized placeholders, then sync_symbols.py/sync_rel_symbols.py
+progressively rename them to the mangled names this project's own compiled units produce (see
+sync_symbols.py's docstring). A mangled name there is this codebase's current guess, not a
+transcript of the original game's real signature; don't read it as independent evidence of one.
+Also regenerated on every build by `dtk dol split`, which drops anything it doesn't recognize
+(a plain comment line included), so that guess can't be flagged inside the file itself.
+
 usage: gen_config.py <Bio4.sym> <main.dol> <config dir>
 """
 import collections, re, struct, sys, os

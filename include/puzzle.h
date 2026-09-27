@@ -6,11 +6,11 @@
 #include "item.h"
 
 // Attache case packing puzzle (game/puzzle.cpp): pieces on a grid board.
-struct ItemWork;
+struct cItem;
 class cModel;
 
 // Piece shape data (piece_info entry + 4).
-struct PieceData {
+struct pieceData {
     s8 size_x;             // 0x00
     s8 size_y;             // 0x01
     u8 pad_2[2];
@@ -23,7 +23,7 @@ struct PieceData {
 struct PieceInfo {
     u16 id;           // 0x00  item id
     u16 pad_2;
-    PieceData data;   // 0x04
+    pieceData data;   // 0x04
     u8 model[0x28];   // 0x50  model data (searchItemModelData)
 };
 
@@ -32,10 +32,12 @@ private:
     u8 be_flag;         // 0x00  bit0 in use
     u8 pad_1[3];
 public:
-    PieceData* m_p_data;  // 0x04
+    pieceData* m_p_data;  // 0x04
     u32 x8;           // 0x08
+private:
     f32 m_center_x;           // 0x0C  rotated centre offset
     f32 m_center_y;           // 0x10
+public:
     f32 m_pos_x;            // 0x14  centre position on the board (cells)
     f32 m_pos_y;            // 0x18
     u32 x1C;
@@ -44,13 +46,13 @@ private:
     u8 m_place;         // 0x21  1 = on a board, 2 = in hand
     u8 pad_22[2];
 public:
-    ItemWork* item;   // 0x24
+    cItem* item;   // 0x24
     cModel* model;    // 0x28
 
     void orientation(int orientation_no);
     void rotate(int dir);
     void mirror(int dir);
-    void init(PieceData* p_data);
+    void init(pieceData* p_data);
     void clear() { be_flag = 0; }
     f32 ver0_x();
     f32 ver0_y();
@@ -72,10 +74,11 @@ public:
 class pzlBoard {
 private:
     u8* m_cell;        // 0x00  w * h state bytes (bit0 occupied, bit1 inside, bit6 wall)
-public:
+private:
     // read directly by two float compares in pzlPlayer::movePiece: through size_y() the
     // conversion stores the sign-extended register instead of the loaded byte
     s8 m_size_x;             // 0x04
+public:
     s8 m_size_y;             // 0x05
 private:
     u8 m_piece_max;      // 0x06
@@ -136,11 +139,11 @@ public:
     int pieceMax() { return m_piece_max; }
     pzlPiece* pieceAt(int no) { return &m_piece[no]; }
     pzlPiece* piecePtr(int no);
-    pzlPiece* piecePtr(ItemWork* item);
+    pzlPiece* piecePtr(cItem* item);
     pzlPiece* pieceInHand() { return m_inhand; }
     pzlPiece* pieceExtra() { return m_extra; }
     void save();
-    int appendExtraPiece(ItemWork* pItem);
+    int appendExtraPiece(cItem* pItem);
     int removeExtraPiece();
     void inHandExtraPiece();
     void giveupExtraPiece();
@@ -166,7 +169,7 @@ public:
 extern PieceInfo piece_info[];
 
 extern "C" {
-PieceData* searchItemPieceData(int item_id, PieceInfo* p_info);
+pieceData* searchItemPieceData(int item_id, PieceInfo* p_info);
 u8* searchItemModelData(int item_id, PieceInfo* p_info);
 int PutInCase(ITEM_ID item_id, u16 item_num, int size);
 }

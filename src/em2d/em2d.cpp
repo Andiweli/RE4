@@ -430,7 +430,7 @@ void em2dDmCk(cEm2d* em)
             EmDmBloodSet2(em, 0x25, 0x28, 0, 0, 0);
         }
         if (EmGetDmPos(em, &pos, &dir)) {
-            EspSeqData* seq = EspGetEstAddr(EFF_EM2D, 0x24, 1);
+            cEspSeqHead* seq = EspGetEstAddr(EFF_EM2D, 0x24, 1);
             if (seq) {
                 for (i = 0; i < seq->num; i++) {
                     if (EspEstSetSelect(EFF_EM2D, 0x24, i, &esp, 0)) {
@@ -462,7 +462,7 @@ void em2dDmCk(cEm2d* em)
             EmDmBloodSet2(em, 0x25, 0x22, 0, 0, 0);
         }
         if (EmGetDmPos(em, &pos, &dir)) {
-            EspSeqData* seq = EspGetEstAddr(EFF_EM2D, 0x25, 1);
+            cEspSeqHead* seq = EspGetEstAddr(EFF_EM2D, 0x25, 1);
             if (seq) {
                 for (i = 0; i < seq->num; i++) {
                     if (EspEstSetSelect(EFF_EM2D, 0x25, i, &esp2, 0)) {
@@ -5467,7 +5467,7 @@ int em2dCamMove(cEm2d* em, int mode, f32 rate)
 void em2dDieCamMove(cEm2d* em)
 {
     Em2dWork* w = EM2D_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec pos;
     Vec at;
 
@@ -5733,7 +5733,7 @@ void em2dDoorOpenCk(cEm2d* em)
     }
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEmDoor* e = (cEmDoor*) EmMgr.fastAt(i);
-        EmDoorWork* dw;
+        FREE_EMDOOR* dw;
 
         if (!e->isAlive()) {
             continue;

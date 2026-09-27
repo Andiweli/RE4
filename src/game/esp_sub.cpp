@@ -77,7 +77,7 @@ void EspCommonTrans(cEsp* esp)
 {
     static int s_proj_type;
     static int s_tex_no;
-    static EspAnmData* s_pAnm;
+    static cAnm* s_pAnm;
     static int s_ptn_no;
     Mtx inv;
     f32 sx;
@@ -274,7 +274,7 @@ void EspCommonTrans(cEsp* esp)
     GXSetCurrentMtx(0);
     if (esp->m_Tool_flg & 0x4000) {
         int no = esp->m_MaskTex_id;
-        EspTexWk* tw = EspGetTexWk(no, 1);
+        ESP_TEX_WK* tw = EspGetTexWk(no, 1);
         if (tw->Owner == EFF_NONE) {
             pLog->err(0, 0, "ESP : Mask_TexId[%x] no data", no);
         } else {
@@ -360,7 +360,7 @@ void EspCommonTransShimmer(cEsp* esp, int u_pow, u32 Blur_type)
     };
     Mtx44 proj;
     Mtx inv;
-    EspAnmData* anm;
+    cAnm* anm;
     GXColor fog;
     f32 sx;
     f32 sy;
@@ -584,7 +584,7 @@ void EspCommonTransShimmer(cEsp* esp, int u_pow, u32 Blur_type)
     GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
     if (esp->m_Tool_flg & 0x4000) {
         int no = esp->m_MaskTex_id;
-        EspTexWk* tw = EspGetTexWk(no, 1);
+        ESP_TEX_WK* tw = EspGetTexWk(no, 1);
         if (tw->Owner == EFF_NONE) {
             pLog->err(0, 0, "ESP : Mask_TexId[%x] no data", no);
         } else {
@@ -651,7 +651,7 @@ void EspCommonTransNega(cEsp* esp, u32 type)
     };
     Mtx44 proj;
     Mtx inv;
-    EspAnmData* anm;
+    cAnm* anm;
     GXColor fog;
     void* buf;
     f32 sx;
@@ -894,7 +894,7 @@ int cEsp::ColorUpdate()
 }
 
 // Base per-id parameter set-up: nothing to read (returns 1); ids with their own work override it.
-int cEsp::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     return 1;
 }
@@ -905,7 +905,7 @@ int cEsp::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
 // (m_MaskTex_id / m_MaskPtn_no) when Tool_flg 0x4000.
 int cEsp::AnmMove()
 {
-    EspAnmData* anm;
+    cAnm* anm;
     u32 time;
 
     if (!EspGetAnmAddr(m_Tex_id, &anm)) {
@@ -1101,9 +1101,9 @@ void cEsp::Destruct()
 // Core_flg bit 0 (kept through pauses). Returns 1 with *out = the esp, 0 (with the dummy) on error.
 int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend)
 {
-    EspSeqData* head;
-    EspGenWork* rec;
-    EspInfo info;
+    cEspSeqHead* head;
+    cEspSeqTbl* rec;
+    cEffectCore info;
     Mtx m;
     u8 type;
 
@@ -1117,7 +1117,7 @@ int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend)
         return 0;
     }
     u32 seed = 0x12345678;
-    rec = &head->rec[no];
+    rec = &head->SeqTbl[no];
     type = rec->Kind;
     if (type != 0) {
         if (type == 1) {
@@ -1138,8 +1138,8 @@ int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend)
 // Creates one esp from an effect record (Id 0xFC..0xFF are effect models, made by EfmSeqSet): copies
 // the record, resolves the parent, runs the id's SetFreeWork and applies the EspSeqOpt overrides.
 // Returns 1 with the new esp, or 0 with the dummy esp on failure.
-int EspSeqSet(EspGenWork* pSeq, EspInfo* pCore, u32* pRand_seed, cModel* pMod, Mtx* pMat, int flg, f32 f, cEsp** ppEsp,
-              EspSeqOpt* pSct, Vec* pOffset)
+int EspSeqSet(cEspSeqTbl* pSeq, cEffectCore* pCore, u32* pRand_seed, cModel* pMod, Mtx* pMat, int flg, f32 f, cEsp** ppEsp,
+              ESPSEQ_CONTROL* pSct, Vec* pOffset)
 {
     static int bl[6][4] = {
         {1, 4, 5, 0}, {1, 4, 1, 0}, {1, 1, 1, 0}, {1, 2, 1, 0}, {1, 2, 0, 0}, {1, 4, 3, 0},

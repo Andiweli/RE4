@@ -7,7 +7,7 @@
 // Sscrn ss_pzzl.cpp: the attache case puzzle widgets. ss_pzzl.cpp owns their vtables (key
 // functions); ss_shop.cpp creates PzzlThinking / PieceSelect / CaseChange for the case placement
 // of a bought item. Declaration order = the reverse of ss_pzzl's vtable order (CaseChange lowest).
-struct IdUnit;
+struct ID_UNIT;
 class pzlPiece;
 
 class PiecePopUp : public Widget<SUB_SCREEN> {
@@ -45,8 +45,8 @@ public:
 
 class PieceCommand : public Widget<SUB_SCREEN> {
 public:
-    IdUnit* id[16];   // 0x10
-    IdUnit* sub[11];  // 0x50
+    ID_UNIT* id[16];   // 0x10
+    ID_UNIT* sub[11];  // 0x50
     u8 pad_7C[0x90 - 0x7C];
     int mode;         // 0x90  0 command, 1 open sub menu, 2 sub menu, 3 message
     s8 num;           // 0x94
@@ -73,8 +73,8 @@ public:
 
 class CaseChange : public Widget<SUB_SCREEN> {
 public:
-    IdUnit* a;  // 0x10
-    IdUnit* b;  // 0x14
+    ID_UNIT* a;  // 0x10
+    ID_UNIT* b;  // 0x14
 
     virtual void init(SUB_SCREEN* pWk);
     virtual void quit(SUB_SCREEN* wk);

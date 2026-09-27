@@ -19,7 +19,7 @@ struct EmWepWork {
     int bounce;           // 0x010 (0x3F0)  Bomb / Flash / Grenade: first bounce sound pending
     u8 pad_14[0x20 - 0x14];
     int timer4;           // 0x020 (0x400)  Parent / Shot: frames until setFall
-    PenCloth Cloth;       // 0x024 (0x404)  setCloth chain (10 links)
+    CLOTH_INFO Cloth;       // 0x024 (0x404)  setCloth chain (10 links)
     cEm* pEm_oya;         // 0x084 (0x464)  model the weapon hangs on (setParent)
     cEm* pEm_old;          // 0x088 (0x468)  enemy that threw / shot it (setFall / setThrow keep the parent here)
     int oya_parts;          // 0x08C (0x46C)  parts of pParent

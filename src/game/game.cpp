@@ -84,7 +84,7 @@ void DbMenuExec();
 void DbMenuRoomInit();
 
 // Stores through a scalar reference: not struct-member MEMs, so GCC 2.95 assumes they may alias
-// pG and reloads it afterwards, as the original does after every GlobalWork store.
+// pG and reloads it afterwards, as the original does after every GLOBAL_WK store.
 // One flag test per call: fold would merge `(f & A) || (f & B)` on one lvalue into a single mask.
 static inline u32 Flag54(u32 b) { return pG->System_flg & b; }
 
@@ -170,7 +170,7 @@ static u32 g_at_total;
 static u32 g_at_total_cyc;
 u32 g_at2_total;
 u32 g_at2_total_cyc;
-DiedemoWork diedemo_work;
+DIEDEMO_WORK diedemo_work;
 
 void (*LightFuncTbl[17])(cLight*) = {
     Light00_Move, Light01_Move, Light02_Move, Light03_Move, Light04_Move, Light05_Move,
@@ -779,11 +779,11 @@ void GameContinue(int option_flag)
     pG->Rno3 = 0;
 }
 
-// GlobalWork 0x4FA4 .. 0x500C: the part of the save block that survives clearGlobalSaveData.
+// GLOBAL_WK 0x4FA4 .. 0x500C: the part of the save block that survives clearGlobalSaveData.
 struct GlobalKeep {
     u8 b[0x68];
 };
-// GlobalWork 0x8330 .. 0x8338: also kept.
+// GLOBAL_WK 0x8330 .. 0x8338: also kept.
 struct GlobalKeep2 {
     u32 x8330;
     u32 x8334;
@@ -949,7 +949,7 @@ SAVE_DATA_HEAD* cGameSave::alloc()
     u32 itemSize;
     SAVE_DATA_HEAD* d;
 
-    roomSize = ALIGN32(RoomData.num * 0xD8 + 0x10);
+    roomSize = ALIGN32(RoomData.getSaveDataSize());
     sscrnSize = ALIGN32(SscrnDataSize());
     sscrnOfs = roomOfs + roomSize;
     merchantSize = ALIGN32(MerchantDataSize());
@@ -1074,7 +1074,7 @@ void gameDiedemoCheck()
 // The death demo task: waits exec_frame, shows "YOU ARE DEAD" (variant when the partner is alive),
 // fades and stops the sound, after 270 frames or START shows the Continue / Load Game menu, then
 // GameContinue(0) + LVADD_DIE or the soft reset.
-void gameDiedemo(DiedemoWork* pDw)
+void gameDiedemo(DIEDEMO_WORK* pDw)
 {
     int cnt = 0;
     u32 step = 0;

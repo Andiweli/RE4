@@ -6,7 +6,7 @@
 #include "hermite.h"
 
 // Screen id (widget) unit (game/id_sys.cpp), 0x138 bytes.
-struct IdUnit {
+struct ID_UNIT {
     u8 be_flag;        // 0x00  0xFF: free; 0x01: alive, 0x02: just set, 0x04: move, 0x08: visible, 0x10: drawing
     u8 unitNo;       // 0x01  own number (parent lookup key)
     u8 classNo;         // 0x02  id table type (IDSystem::set parameter)
@@ -17,7 +17,7 @@ struct IdUnit {
     u8 rowNo;           // 0x07
     Mtx mat;         // 0x08  world matrix
     Mtx l_mat;    // 0x38
-    IdUnit* pParent;  // 0x68
+    ID_UNIT* pParent;  // 0x68
     u8 texId;        // 0x6C
     u8 maskId;       // 0x6D
     u8 texNo;           // 0x6E  texture frame (stage: digit)
@@ -58,17 +58,17 @@ struct IdUnit {
     Hermite1* curve[4];  // 0x128
 };
 
-// One entry of an id data table (IDSystem::set), version 1 = 0x88 bytes, version 2 = 0x8C bytes.
-struct IdData {
+// One entry of an id data table (IDSystem::set): ID_DATA_V1 is 0x88 bytes, ID_DATA_V2 0x8C.
+struct ID_DATA_V1 {
     u8 pad_0[3];
     u8 flags;        // 0x03
     u8 id;           // 0x04
     u8 no;           // 0x05
     u8 level;        // 0x06
     u8 parentNo;     // 0x07
-    u8 rowNo;        // 0x08  -> IdUnit::rowNo (PS2 ID_DATA_V2 rowNo)
+    u8 rowNo;        // 0x08  -> ID_UNIT::rowNo
     u8 kind;         // 0x09
-    u8 Id;           // 0x0A  (PS2 ID_DATA_V2 Id; the game does not read it)
+    u8 Id;           // 0x0A  the game does not read it
     u8 texId;        // 0x0B
     u8 vtxType;      // 0x0C
     u8 loop;         // 0x0D
@@ -81,7 +81,6 @@ struct IdData {
     f32 sizeX;       // 0x50
     f32 sizeY;       // 0x54
     u8 col0[4];      // 0x58
-    // version 1
     Vec rot;         // 0x5C
     u8 blendType;    // 0x68
     u8 transType;    // 0x69
@@ -92,16 +91,16 @@ struct IdData {
     u32 ofs[6];      // 0x70  path0, path1, curve[4] (offsets from the table start, 0 = none)
 };
 
-struct IdData2 {
+struct ID_DATA_V2 {
     u8 pad_0[3];
     u8 flags;        // 0x03
     u8 id;           // 0x04
     u8 no;           // 0x05
     u8 level;        // 0x06
     u8 parentNo;     // 0x07
-    u8 rowNo;        // 0x08  -> IdUnit::rowNo (PS2 ID_DATA_V2 rowNo)
+    u8 rowNo;        // 0x08  -> ID_UNIT::rowNo
     u8 kind;         // 0x09
-    u8 Id;           // 0x0A  (PS2 ID_DATA_V2 Id; the game does not read it)
+    u8 Id;           // 0x0A  the game does not read it
     u8 texId;        // 0x0B
     u8 vtxType;      // 0x0C
     u8 loop;         // 0x0D
@@ -190,13 +189,14 @@ enum ID_CLASS {
 };
 
 class IDSystem {
-public:
+private:
     s32 m_maxId;          // 0x00
     s32 m_nId;       // 0x04
     s32 m_levelMax;     // 0x08
     u32 m_set_flag[8];        // 0x0C  table types set
     u32 m_disp_off[8];      // 0x2C  table types hidden
-    IdUnit* m_IdUnit;    // 0x4C
+public:
+    ID_UNIT* m_IdUnit;    // 0x4C
 
     static Mtx m_scrn_mat;
 
@@ -205,20 +205,20 @@ public:
     void free();
     int setCk(int classNo);
     void dispSw(int classNo, int sw);
-    void unitPush(IdUnit* u);
-    IdUnit* unitPull();
-    void unitLevel(IdUnit* u, u8 level);
-    void unitParent(IdUnit* parent, IdUnit* child);
-    IdUnit* unitPtr(u8 id, int type);
+    void unitPush(ID_UNIT* u);
+    ID_UNIT* unitPull();
+    void unitLevel(ID_UNIT* u, u8 level);
+    void unitParent(ID_UNIT* parent, ID_UNIT* child);
+    ID_UNIT* unitPtr(u8 id, int type);
     void set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode);
     void kill(u8 id, int type);
     void stop();
     void move();
-    void beMove(IdUnit* u, int on_off);
-    void setTime(IdUnit* u, s16 time);
-    void movePos(IdUnit* u);
+    void beMove(ID_UNIT* u, int on_off);
+    void setTime(ID_UNIT* u, s16 time);
+    void movePos(ID_UNIT* u);
     void trans();
-    void unitTrans(IdUnit* u);
+    void unitTrans(ID_UNIT* u);
 };
 
 extern IDSystem IdSys;
@@ -226,24 +226,24 @@ extern void* g_pIdBuff;
 extern int IdBuffType;
 
 // game/id_tex.cpp
-struct TexWk;
+typedef struct tagTEX_WK TEX_WK;
 struct TexAnm;
 void IdTexSet(u8 id, u8 no);
 int IdGetAnmAddr(u8 id, TexAnm** ppAnm);
-void IdChannelSet(IdUnit* pIdUnit);
-TexWk* IdGetTexWk(u8 id, int bNoDispErrMsg);
+void IdChannelSet(ID_UNIT* pIdUnit);
+TEX_WK* IdGetTexWk(u8 id, int bNoDispErrMsg);
 
 extern "C" {
-void idSysMove00(IdUnit* u);
-void IdCalcVertex(IdUnit* u);
-void idSysMove01(IdUnit* u);
-void idSysMove02(IdUnit* u);
-void idSysMove03(IdUnit* u);
-void idSysMove04(IdUnit* u);
-void IdGeneralTrans(IdUnit* u);
-void IdCommonTrans(IdUnit* u);
-void IdNegativeTrans(IdUnit* u, u32 pow);
-void IdShimmerTrans(IdUnit* u, int u_pow, int Refract_type);
+void idSysMove00(ID_UNIT* u);
+void IdCalcVertex(ID_UNIT* u);
+void idSysMove01(ID_UNIT* u);
+void idSysMove02(ID_UNIT* u);
+void idSysMove03(ID_UNIT* u);
+void idSysMove04(ID_UNIT* u);
+void IdGeneralTrans(ID_UNIT* u);
+void IdCommonTrans(ID_UNIT* u);
+void IdNegativeTrans(ID_UNIT* u, u32 pow);
+void IdShimmerTrans(ID_UNIT* u, int u_pow, int Refract_type);
 void IdAllocBuffer();
 void IdFreeBuffer();
 void IdDebugAllocBuffer();

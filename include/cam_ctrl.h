@@ -77,7 +77,7 @@ struct CameraDataHeader {
 };
 
 // Per-attach-camera record registered by other units (only the frame count is used here).
-struct AttachCamera {
+struct ATTACH_CAMERA {
     u8 parts[5];    // 0x00  motion parts index feeding each channel (0xFF = none): 0/1 pos, 2/3 rot, 4 misc
     u8 type;        // 0x05  0 = off, 1 = follows the model matrix, 2 = own matrix copy (MotionSetCore)
     u8 frame;       // 0x06  (u8)(out[4].y / 100)
@@ -122,10 +122,11 @@ public:
 };
 
 class CameraSmooth : public CAMERA {
-public:
+private:
     u32 m_flag;         // 0xF8  bit 0 = reinit on next move
     f32 m_ratio;         // 0xFC
     CameraParam m_effect; // 0x100
+public:
     u8 pad_120[0x12C - 0x120];
 
     void init(CameraParam* p);
@@ -137,16 +138,19 @@ public:
 };
 
 class CameraControl {
-public:
+private:
     u8 m_attached_cam_flag_old;                        // 0x00
     u8 m_attach_cam_flag;                        // 0x01
     u8 m_attach_num;                // 0x02
+public:
     u8 x3;                        // 0x03
-    AttachCamera* m_p_attach[3];  // 0x04
+private:
+    ATTACH_CAMERA* m_p_attach[3];  // 0x04
     cModel* m_p_model[3];      // 0x10
     cModel* m_p_attach_model_old;           // 0x1C
     f32 m_scope_zoom;             // 0x20
     f32 m_scope_ang_x;             // 0x24
+public:
     u8 be_flag;                  // 0x28  bit 0 = data valid, bit 2 = disabled
     u8 pad_29[3];
     u32 m_system_flag;                 // 0x2C
@@ -197,21 +201,26 @@ public:
     int CurrentAreaNo();
     int CurrentCameraNo();
     CameraCut* DataSearch(int cameraNo);
+private:
     CameraLerp* LerpDataSearch(int srcNo, int srcSuf, int dstNo, int dstSuf);
     CameraDataHeader* calcAddr(CameraDataHeader* head);
+public:
     void RoomDataRead(CameraDataHeader* pBuff);
     void CoreDataRead(CameraDataHeader* data);
     void AreaOnOff(int No, int Suffix, int OnOff);
     void SetAreaAttr(int No, int Suffix, u8 attr);
     void UnsetAreaAttr(int No, int Suffix, u8 attr);
     void CutCall(int cutNo);
+private:
     void switchCamera(CameraAreaRec* rec);
     void areaHitCheck();
+public:
     void roomInit();
     void Check();
     void Move();
     void CalcAim(CameraCut* pCdat);
     f32 getCameraPitch();
+private:
     void r0_Wait();
     void r0_Debug();
     void r0_Fix();
@@ -221,9 +230,12 @@ public:
     void r0_UpCut();
     void r0_RailBehind();
     void r0_Free();
+public:
     void resetCameraAngle();
     f32 getCameraDirection();
+private:
     void debugDrawRail(CameraCut* pCdat);
+public:
     void UpCutCall(int cutNo, Vec* pos, Vec* ang, Vec* scale, int data_sel);
     void startPushObject();
     void endPushObject();
@@ -242,13 +254,13 @@ public:
     int IsMotionSet();
     int IsMotionEnd();
     void setMotionBaseMatPtr(Mtx* p_mat);
-    void* getMotionInfoPtr();
+    struct MOTION_INFO* getMotionInfoPtr();
     void clearAttachCamera();
-    void registAttachCamera(AttachCamera* p_attach, cModel* p_model);
-    void deleteAttachCamera(AttachCamera* p_attach, cModel* p_model);
+    void registAttachCamera(ATTACH_CAMERA* p_attach, cModel* p_model);
+    void deleteAttachCamera(ATTACH_CAMERA* p_attach, cModel* p_model);
     int getAttachCameraNum() { return m_attach_num; }
     cModel* getAttachModel(cModel* p_model);
-    AttachCamera* getAttachCamera(cModel* p_model);
+    ATTACH_CAMERA* getAttachCamera(cModel* p_model);
     void checkAttachCamera();
 
     // Empty ctor/dtor: cam_ctrl's `__static_initialization_and_destruction_0` and the

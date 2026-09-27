@@ -121,28 +121,28 @@ extern "C" void Evt_R215S00_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EvtFlgOnStatus(e, 3);
         e->SetEvtCancelCut(9);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 3:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SetShadowCamMoveSize(0.0f);
             }
             break;
         case 2:
         case 4:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 ResetShadowCamMoveSize();
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R215_EVT_MOD_LIGHT("pl0100", 1)
                 R215_EVT_MOD_LIGHT("em3700", 2)
                 R215_EVT_MOD_LIGHT("evm7400", 4)
@@ -190,33 +190,33 @@ extern "C" void Evt_R215S01_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
-        if (e->NowCut == 0x10) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0x10) {
+            if (e->GetNowFrame() == 0) {
                 SetShadowCamMoveSize(0.0f);
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 ResetShadowCamMoveSize();
             }
         }
-        if (e->NowCut == 0x11) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0x11) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x2C, 0);
                 SmdSetTrans(0x2E, 0);
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x2C, 1);
                 SmdSetTrans(0x2E, 1);
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R215_EVT_MOD_LIGHT("pl0100", 1)
                 R215_EVT_MOD_LIGHT("em3700", 2)
                 R215_EVT_MOD_LIGHT("evm7400", 4)
@@ -236,7 +236,7 @@ extern "C" void Evt_R215S01_Func(Event* e)
             }
             break;
         case 0x12:
-            if (e->NowFrame == 0x5A) {
+            if (e->GetNowFrame() == 0x5A) {
                 if (e->FlgCkStatus(EvtStfToolFrontExec) == 0) {
                     FadeSetW(2, 30, 0, 0);
                 }

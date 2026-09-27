@@ -4,7 +4,7 @@
 #include "types.h"
 #include "vec.h"
 
-// game/main.cpp globals that are not part of GlobalWork.
+// game/main.cpp globals that are not part of GLOBAL_WK.
 
 // Persistent system settings (pRK), kept across a soft reset: systemResetCommon fills it and main.cpp
 // restores pSys and pG from it on the next boot.
@@ -30,7 +30,7 @@ extern RESET_KEEP_WORK* pRK;
 
 // Logical key state (main.cpp `Key`, 0xB8 bytes), built from Joy[0] by pad.cpp PadRead through
 // Key_type_tbl. 64 logical keys, one bit each.
-struct KeyWork {
+struct KEY {
     s8 stickX;     // 0x00  copies of Joy[0] (zero while the game is stopped)
     s8 stickY;     // 0x01
     s8 substickX;    // 0x02
@@ -49,7 +49,7 @@ struct KeyWork {
     s8 rep2_timer[64];  // 0x78
 };
 
-extern KeyWork Key;
+extern KEY Key;
 
 // Logical key bits of Key.on / trg / rep for the menu screens.
 #define KEY_A 0x80000000

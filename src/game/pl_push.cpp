@@ -15,7 +15,7 @@
 // player stands on (m_Dir 0..3 in the object's frame). Returns 1 when one was caught.
 int cPlPush::catchCheck()
 {
-    cPlayer* pl = pPl;
+    cPlayer* pl = m_pEm;
     Vec bak;
     Vec pos;
     Vec rot;
@@ -39,17 +39,17 @@ int cPlPush::catchCheck()
         if (em->hp <= 0) {
             continue;
         }
-        if (fabsf(pPl->pos.y - em->pos.y) > 500.0f) {
+        if (fabsf(m_pEm->pos.y - em->pos.y) > 500.0f) {
             continue;
         }
         pos.x = em->pos.x;
         pos.y = em->pos.y + 300.0f;
         pos.z = em->pos.z;
-        if (SatMgr.hitCheck(&pPl->getPartsPtr(0)->world, &pos, 0, 0, 0, 0x800) != 0) {
+        if (SatMgr.hitCheck(&m_pEm->getPartsPtr(0)->world, &pos, 0, 0, 0, 0x800) != 0) {
             continue;
         }
-        if (At_em_rect_rect_ck(pPl, em)) {
-            m_Target = em;
+        if (At_em_rect_rect_ck(m_pEm, em)) {
+            m_Target = (cEmRack*) em;
             break;
         }
     }
@@ -86,7 +86,7 @@ int cPlPush::catchCheck()
     if (m_Dir == 4) {
         return 0;
     }
-    x8 = 0;
+    m_Ctr = 0;
     return 1;
 }
 
@@ -96,7 +96,7 @@ void cPlPush::pushTargetInit(u8 flag)
     PlArc* arc = pG->pPlayer;
 
     MotionSetCore(m_Target, &m_Target->Motion, PL_ARC_PTR(arc, 0x59), 0, 0, 5, 0);
-    x9 = flag;
+    m_Flag = flag;
 }
 
 // One push frame: plays the object's motion facing the push direction (m_Dir), lets the rack
@@ -140,7 +140,7 @@ int cPlPush::pushTarget()
     }
     ret = 0;
     m_Target->ang.y = LIMIT_ANGLE(m_Target->ang.y);
-    if (((cEmRack*) m_Target)->adjustRange(m_Dir)) {
+    if (m_Target->adjustRange(m_Dir)) {
         ret = 1;
     }
     EmAtCheck(m_Target);
@@ -163,14 +163,14 @@ void cPlPush::stopTarget()
 }
 
 // Half width / half depth of the object as seen from the push side and the world yaw of that side
-// (from the collision radii, m_Dir; x9 bit0 rotates the sides by 180 degrees).
+// (from the collision radii, m_Dir; m_Flag bit0 rotates the sides by 180 degrees).
 void cPlPush::getWHY(f32* w, f32* h, f32* dy)
 {
     f32 sz = m_Target->atari.m_radius2;
     f32 sx = m_Target->atari.m_radius;
     u8 d;
 
-    if (x9 & 1) {
+    if (m_Flag & 1) {
         switch (m_Dir) {
         default:
             pLog->err(0, 0, "cPlPush::getWHY() DIR ERR %d", m_Dir);
@@ -365,7 +365,7 @@ int cPlPush::plAdjust()
         pLog->err(0, 0, "cPlPush::plAdjust() DIR ERR %d", m_Dir);
         return 0;
     }
-    pPl->ang.y += Muku2(pPl->ang.y, ang, PI / 12.0f);
+    m_pEm->ang.y += Muku2(m_pEm->ang.y, ang, PI / 12.0f);
     return 1;
 }
 

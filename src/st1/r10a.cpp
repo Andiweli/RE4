@@ -122,7 +122,7 @@ void R10aInit()
             rock->setScale(4.2f);
         }
         {
-            EmListData d;
+            EM_LIST d;
 
             d.id = 0x12;
             d.type = 1;

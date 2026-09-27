@@ -19,21 +19,21 @@
 // db_port.cpp exports whose prototypes here differ from the definitions (parameter list, order or
 // return type): kept local, the db_port.h prototype would change the call bytes or not compile.
 extern "C" {
-void DB_DrawCursor3D(EspSeqData* head, void* seq, f32 size, int col);
+void DB_DrawCursor3D(cEspSeqHead* head, void* seq, f32 size, int col);
 void DB_DrawCross3D(Vec* pos, int col, f32 size);
 void DB_EventCamLoad(int a, int b);
 void DB_GetMouseData(DB_MOUSE* m);
-void EspToolExit(EspSeqData* head);
+void EspToolExit(cEspSeqHead* head);
 void EspToolUpdate(DB_KEYBORD* k, u8 no);
 int LightToolExec();
-void sp_sphere(EspSeqData* head, void* seq);
+void sp_sphere(cEspSeqHead* head, void* seq);
 void sp_ctrl01_trans(void* seq);
-void sp_3dgrid_trans(EspSeqData* head, void* seq);
-void sp_path_trans(EspSeqData* head, void* seq);
-void sp_path_trans2(EspSeqData* head, void* seq);
-void sp_nobigenkai_trans(EspSeqData* head, void* seq);
-void sp_PosRand_trans(EspSeqData* head, void* seq);
-void sp_PosRand_trans_1a(EspSeqData* head, void* seq);
+void sp_3dgrid_trans(cEspSeqHead* head, void* seq);
+void sp_path_trans(cEspSeqHead* head, void* seq);
+void sp_path_trans2(cEspSeqHead* head, void* seq);
+void sp_nobigenkai_trans(cEspSeqHead* head, void* seq);
+void sp_PosRand_trans(cEspSeqHead* head, void* seq);
+void sp_PosRand_trans_1a(cEspSeqHead* head, void* seq);
 }
 extern void* g_EspToolSeqHedAddr;  // eff_sys.cpp (static there; the REL link resolves the local symbol)
 
@@ -59,7 +59,7 @@ enum {
     KEY_START = 12,
 };
 
-// The tool's view of one 0x12C sequence record (EspGenWork; PS2 cEspSeqTbl gives the vendor names).
+// The tool's view of one 0x12C sequence record (PS2 cEspSeqTbl gives the vendor names).
 struct TOOL_SEQ {
     u8 stat;        // 0x00 bit0: selected row of the edit table
     u8 id;          // 0x01
@@ -249,7 +249,7 @@ static TOOL_SEQ g_editSeqWk;
 static TOOL_SEQ* g_pEditSeq;
 static TOOL_SEQ g_editSeqWk2;
 static TOOL_SEQ* g_pEditSeq2;
-static EspSeqData* g_pSeqHead;
+static cEspSeqHead* g_pSeqHead;
 static TOOL_SEQ g_seqTbl[4][64];
 static TOOL_SEQ* g_pEditTbl;
 static TOOL_SEQ g_copyWk[64];
@@ -384,9 +384,9 @@ void DeleteSelectData();
 void CutSelectData();
 void PasteSelectData();
 void PartPasteSelectData();
-void MakeExecSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq);
-int MakeSaveSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq);
-void MakeLoadSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq);
+void MakeExecSeqData(cEspSeqHead* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq);
+int MakeSaveSeqData(cEspSeqHead* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq);
+void MakeLoadSeqData(cEspSeqHead* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq);
 void MakeImmSeq(TOOL_SEQ* tbl, TOOL_SEQ* edit, TOOL_SEQ* imm);
 void AddSeq(TOOL_SEQ* tbl, TOOL_SEQ* delta, TOOL_SEQ* imm);
 void AddEditData();
@@ -5106,7 +5106,7 @@ public:
 static void BasePosPosUpdate_callback(DB_PRIMITIVE* p)
 {
     if (p->select && g_pKey->on[KEY_X] && g_pKey->trg[KEY_Y]) {
-        EspSeqData* head = g_pSeqHead;
+        cEspSeqHead* head = g_pSeqHead;
         DB_GetCamFrontPos(1500.0f, &head->pos.x, &head->pos.y, &head->pos.z);
     }
 }
@@ -5334,10 +5334,10 @@ int InitTool()
     InitSeqTbl();
     if (!DbgFlagChk(pG, DBG_ESPTOOL_MEM_USE)) {
         DbgFlagOn(pG, DBG_ESPTOOL_MEM_USE);
-        g_pSeqHead = (EspSeqData*) Debug_alloc(0x12C30, 0);
+        g_pSeqHead = (cEspSeqHead*) Debug_alloc(0x12C30, 0);
         g_EspToolSeqHedAddr = g_pSeqHead;
     } else {
-        g_pSeqHead = (EspSeqData*) g_EspToolSeqHedAddr;
+        g_pSeqHead = (cEspSeqHead*) g_EspToolSeqHedAddr;
     }
     memclr_asm(g_pSeqHead, 0x30);
     g_pSeqHead->parts = 0xFE;
@@ -5657,7 +5657,7 @@ void PartPasteSelectData()
 
 // Builds the runnable sequence: the selected records of every page copied behind the head, count
 // in head->num (the effect the tool plays).
-void MakeExecSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
+void MakeExecSeqData(cEspSeqHead* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
 {
     u32 i;
     u16* num = (u16*) head;
@@ -5670,7 +5670,7 @@ void MakeExecSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
         rec = 0;
         num[i] = 0;
     }
-    rec = (TOOL_SEQ*) head->rec; // after the clearing loop: `addi rec,head,48` sits in the second loop's preheader
+    rec = (TOOL_SEQ*) head->SeqTbl; // after the clearing loop: `addi rec,head,48` sits in the second loop's preheader
     for (j = 0; j < nSeq; j++, tbl++) {
         // g_page and the flag table pointer are read through struct views: both loads stay in the loop body (the
         // target reloads them per iteration; a fixed-scalar `g_page` read is hoisted with `&g_seqFlgNum[g_page]`
@@ -5688,7 +5688,7 @@ void MakeExecSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
 // pointer arithmetic (`((u16*) head)[i]`) is expanded with EXPAND_SUM, which puts the index product first
 struct SeqCountView { u16 n[1]; };
 // Builds the file image: header (version 0x10) + the selected records; returns the byte size.
-int MakeSaveSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
+int MakeSaveSeqData(cEspSeqHead* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
 {
     TOOL_SEQ* t;   // before j: the lower pseudo makes loop.c reduce `t + 300` ahead of `j + 1` (r31 / r4)
     u32 i, j;
@@ -5698,7 +5698,7 @@ int MakeSaveSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
     for (i = 0; i < nGroup; i++) num[i] = 0;
     head->Ver_no = 0x10;
     size = 0x30;
-    rec = (TOOL_SEQ*) head->rec; // after the clearing loop and `size`: `li r3,48; addi rec,head,48`
+    rec = (TOOL_SEQ*) head->SeqTbl; // after the clearing loop and `size`: `li r3,48; addi rec,head,48`
     for (i = 0; i < nGroup; i++) {
         t = &tbl[nSeq * i];
         for (j = 0; j < nSeq; j++, t++) {
@@ -5713,13 +5713,13 @@ int MakeSaveSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
 }
 
 // Expands a loaded file into the record table (records marked selected).
-void MakeLoadSeqData(EspSeqData* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
+void MakeLoadSeqData(cEspSeqHead* head, TOOL_SEQ* tbl, u32 nGroup, u32 nSeq)
 {
     u32 i, j;
     TOOL_SEQ* t;   // declared BEFORE rec: the lower pseudo makes loop.c reduce t's giv first, so `t + 300` is
     TOOL_SEQ* rec; // allocated ahead of `rec + 300` (r6 / r5) and the prologue copy order follows
     InitSeqTbl();
-    rec = (TOOL_SEQ*) head->rec; // after the call: rec lives in a caller-saved register
+    rec = (TOOL_SEQ*) head->SeqTbl; // after the call: rec lives in a caller-saved register
     for (i = 0; i < nGroup; i++) {
         t = &tbl[nSeq * i]; // nSeq first: `mullw r0, nSeq, i`
         for (j = 0; j < ((SeqCountView*) head)->n[i]; j++) {

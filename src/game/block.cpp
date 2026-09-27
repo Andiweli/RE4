@@ -144,7 +144,7 @@ int cBlock::checkBlockMemory()
             checkBlockConnect(c, pLink, &mramSet, &aramSet);
             for (j = 0; j < nBlock; j++) {
                 if (FlagChkVar(&mramSet, j)) {
-                    size += getUnitPtr(j)->pData->m_size;
+                    size += getUnitPtr(j)->pData->getSize();
                 }
             }
         }
@@ -203,7 +203,7 @@ void cBlock::dispAllBlock(int on)
         for (i = 0; i < nBlock; i++) {
             cBlockUnit* u = getUnitPtr(i);
             if (u->flags & 1) {
-                size += u->pData->m_size;
+                size += u->pData->getSize();
                 u->setBlockDelete();
                 u->checkBlockDelete();
             }
@@ -505,7 +505,7 @@ int cBlockUnit::checkBlockLoadToMramSet()
         if (Block.noMemCtrl == 1) {
             pData->setCommand(CMND_MRAM_LOAD, 0, arg);
         } else {
-            p = Block.getBlockMemFree(pData->m_size);
+            p = Block.getBlockMemFree(pData->getSize());
             if (p == 0) {
                 return 1;
             }
@@ -535,7 +535,7 @@ int cBlockUnit::checkBlockLoadToMram()
         Block.stopFlagSet = 1;
         break;
     case COND_MRAM_OK:
-        BlockCreate(no, (cSmd*) GetDataExt(pData->m_addr, "SMD", 0));
+        BlockCreate(no, (cSmd*) GetDataExt(pData->getAddr(), "SMD", 0));
         setTrans(1);
         state = BLOCK_CREATE;
         if (Block.allDisp == 1) {
@@ -631,10 +631,10 @@ void cBlockUnit::moveBlockData(void* dst)
 {
     int ofs;
 
-    memcpy(dst, pData->m_addr, pData->m_size);
-    ofs = (int) dst - (int) pData->m_addr;
-    pData->m_addr = dst;
-    DCFlushRange(dst, pData->m_size);
+    memcpy(dst, pData->getAddr(), pData->getSize());
+    ofs = (int) dst - (int) pData->getAddr();
+    pData->setAddr(dst);
+    DCFlushRange(dst, pData->getSize());
     recalcModelAddr(ofs);
     ((cSmd*) GetDataExt(dst, "SMD", 0))->slide(ofs);
 }
@@ -785,7 +785,7 @@ void cBlock::checkBlockMemSort()
     if (cnt != 0) {
         for (i = 0; i < cnt - 1; i++) {
             for (j = i; j < cnt; j++) {
-                if ((u32) tbl[i]->pData->m_addr > (u32) tbl[j]->pData->m_addr) {
+                if ((u32) tbl[i]->pData->getAddr() > (u32) tbl[j]->pData->getAddr()) {
                     u = tbl[j];
                     tbl[j] = tbl[i];
                     tbl[i] = u;
@@ -795,10 +795,10 @@ void cBlock::checkBlockMemSort()
         addr = (u8*) memTop;
         for (i = 0; i < cnt; i++) {
             u = tbl[i];
-            if ((u32) addr < (u32) u->pData->m_addr) {
+            if ((u32) addr < (u32) u->pData->getAddr()) {
                 u->moveBlockData(addr);
             }
-            addr += tbl[i]->pData->m_size;
+            addr += tbl[i]->pData->getSize();
         }
         memCur = addr;
     } else {

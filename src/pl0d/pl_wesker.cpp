@@ -67,13 +67,13 @@ void testJacketSetWesker(cModel* pl, PlCloth* c)
     c->Move_rate = rate;
     c->Flag = 0x100;
     c->pPtbl = 0;
-    PenClothSet(pl, (PenCloth*) c, 100.0f);
+    PenClothSet(pl, (CLOTH_INFO*) c, 100.0f);
 }
 
 // Per-frame update of the jacket chain (the sideways-linked pendulum variant).
 void testJacketMoveWesker(cModel* pl, PlCloth* c)
 {
-    PenClothMove3(pl, (PenCloth*) c);
+    PenClothMove3(pl, (CLOTH_INFO*) c);
 }
 
 // Cloth set-up (cPlWesker::initCloth): the jacket chain.

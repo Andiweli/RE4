@@ -2266,7 +2266,7 @@
   0.03141593f + luisEye.r[1])` (sum written product-first) loads 0.01 before 1.0 like the target; the `r[1] +
   product` order loads 1.0 first (case 0's `(r * 0.01f - 1.0f) * PI * 0.1f` loads 1.0 first either way).
 - Static-init key: `global constructors keyed to LuisInit` means `LuisInit` is PUBLIC and assembled before the
-  first initialised public object (`cRoutine_move_tbl`): define `void LuisInit(cEm*)` above the table (the `.sym`
+  first initialised public object (`cRoutine::move_tbl`): define `void LuisInit(cEm*)` above the table (the `.sym`
   says local; the ADDR16 fields of a .text+0 symbol are 0 either way, so sync's `scope local -> global` did not
   change the split object and the REL check stayed green). Other flipped modules keep the dtk
   `global_constructors_keyed_to_X` name in symbols.txt; the sync skips `_GLOBAL_` names.

@@ -25,7 +25,7 @@ struct EmiData {
 };
 
 // Work of the barrel enemy (game/embarrel.cpp), overlaid on cEm from 0x3E0.
-struct EmBarrelWork {
+struct FREE_EMBARREL {
     u32 Be_flg;            // 0x000 (0x3E0)
     int Timer;            // 0x004 (0x3E4)  frames until the broken barrel is destroyed
     u8 pad_8[0x40 - 8];
@@ -48,7 +48,7 @@ struct EmBarrelWork {
     u8 Etc_no;             // 0x08D (0x46D)  etc flag index (broken flag)
 };
 
-#define EMBARREL_WK(em) ((EmBarrelWork*) (((cEmBarrel*) (em))->free))
+#define EMBARREL_WK(em) ((FREE_EMBARREL*) (((cEmBarrel*) (em))->free))
 
 // Barrel enemy: explosive barrels (types 0/2) and the rolling burning barrel of room 227 (type 1).
 class cEmBarrel : public cEm {

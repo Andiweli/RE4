@@ -13,7 +13,7 @@ struct EmAtkInfo;
 
 class cObj;
 
-// Effect owner info at the head of every Efm work (esp_efm.cpp copies the caller's EspInfo,
+// Effect owner info at the head of every Efm work (esp_efm.cpp copies the caller's cEffectCore,
 // esp.h, into it; EfmDeleteSub matches flg / kind / pEm against g_Core_*).
 struct EfmCore {
     u16 flg;              // 0x00
@@ -23,7 +23,7 @@ struct EfmCore {
     cModel* pEm;          // 0x08
 };
 
-// Event object model type (PS2 OBJ18_TYPE): SetObj18 `type` / Obj18Work::type, from the model name prefix
+// Event object model type (PS2 OBJ18_TYPE): SetObj18 `type` / FREE_OBJ18::type, from the model name prefix
 // (event.cpp ExePacket_SetOm OmTbl).
 enum OBJ18_TYPE {
     OBJ18_TYPE_OBMXX = 0,
@@ -144,26 +144,32 @@ public:
         ID_NUM = 68
     };
 
+private:
     u32 Guid;
 
+public:
     cObjMgr();
+private:
     virtual void* memAlloc(u32 size) { return MemAlloc(size, 1); }
     virtual void memFree(void* p) { MemFree(p); }
     virtual void memClear(cObj* p, u32 size) { memclr_asm(p, size); }
     virtual void log(const char* fmt, ...);
+public:
     virtual void destroy(cObj* pEm);
+private:
     virtual int construct(cObj* pSat, u32 room_no);   // calls the int overload (obj.cpp)
     int construct(cObj* pSat, ID id);                 // placement-new of the per-id class, or ObjInitFunc[id]
+public:
     void move();                              // dieCheck, then objMove on every live object
 };
 
 extern cObjMgr ObjMgr;
 
-struct EspGenWork;
+struct cEspSeqTbl;
 extern "C" {
 // game/esp_efm.cpp: creates the obj04 / obj05 / obj09 effect model of a sequence record
-// (`info` is the caller's EspInfo, esp.h). esp_sub.cpp EspSeqSet is the only caller.
-cObj* EfmSeqSet(EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs);
+// (`info` is the caller's cEffectCore, esp.h). esp_sub.cpp EspSeqSet is the only caller.
+cObj* EfmSeqSet(cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs);
 // game/obj04.cpp / game/obj05.cpp: orient the model along `m`
 void Efm04RotMatrix(cObj* pObj, Mtx pMat);
 void Efm05RotMatrix(cObj* pObj, Mtx pMat);

@@ -37,96 +37,61 @@ struct DbgToolFileHeader {
     u32 xC;
 };
 
-// Replaces a button label (truncated to the allocated length).
-static inline void DbgButtonSetName(cDbgButtonBase* b, const char* s)
+// The label at column bx + m_px, row by + m_py.
+inline void cDbgButtonBase::Disp(int bx, int by)
 {
-    if (strlen(s) > b->m_strlen) {
-        u32 i;
+    eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0x10, 0, m_pStr);
+}
 
-        for (i = 0; i < b->m_strlen - 2; i++) {
-            b->m_pStr[i] = s[i];
-        }
-        b->m_pStr[i] = 0;
-    } else {
-        strcpy(b->m_pStr, s);
+// The current button: the blinking ">" before it, its label and the highlight box.
+inline void cDbgButtonBase::DispCursor(int bx, int by)
+{
+    if (pG->Frame_cnt & 4) {
+        eprintf2(8, 12, (bx + m_px - 1) * 8, (by + m_py) * 14, 0, 0, ">");
+    }
+    eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0, 0, m_pStr);
+    {
+        f32 fx = (f32) ((bx + m_px) * 8);
+        f32 fh = 14.0f;
+        f32 mgn = 2.0f;
+        f32 zero = 0.0f;
+
+        DbgDrawBoxFill(fx - mgn, (f32) ((by + m_py) * 14) - mgn, (f32) (m_strlen * 8) + zero, fh + mgn, 0.7f, 0.7f,
+                       zero, 0.3f);
     }
 }
 
-// File selector: a 0..99 file number with the name preview, "[OK]" on the second cursor row.
-class cDbgFileSelectWindow : public cDbgWindow {
-public:
-    int m_no;            // 0x238
-    const char* m_pPath;    // 0x23C  directory
-    const char* m_pFname;    // 0x240  file stem
-    const char* m_pExt;      // 0x244
-    char m_FnameBuf[0x100];  // 0x248  path1 + path2 + "%02d" + ext
-
-    void Init(int wx, int wy, const char* name, const char* path1, const char* path2, const char* ext);
-    virtual int LocalUpdate();
-    virtual ~cDbgFileSelectWindow();
-};
-
-// Init wrapper defined before Init's body: the call stays out of line in the saved RTL of this inline
-// (GCC 2.95 inlines while generating the caller's RTL), which is what the original objects show
-// (`bl cDbgFileSelectWindow::Init` after the `new`, the name literal materialised at the call).
-static inline void DbgFileSelectWindowInit(cDbgFileSelectWindow* w, int wx, int wy, const char* name,
-                                           const char* path1, const char* path2, const char* ext)
+// Decide / cancel flags of the window from the pad, then its own update.
+inline int cDbgWindowBase::Update()
 {
-    w->Init(wx, wy, name, path1, path2, ext);
+    m_IsPushed = 0;
+    m_IsCanceled = 0;
+    if (Joy[0].trg & 0x100) {
+        SetPushed();
+    }
+    if (Joy[0].trg & 0x200) {
+        SetCanceled();
+    }
+    return LocalUpdate();
 }
 
-// The selector's buttons (header-owned strings; inlined into the tool's window creation).
-static inline void DbgFileSelectWindowAddButtons(cDbgFileSelectWindow* w)
+// The window: title, single and double frame, then its own display.
+inline void cDbgWindowBase::Disp()
 {
-    w->AddButton(1, 1, "Name:                 ", 0xFFFF, 0xFFFF, 0, 0);
-    w->AddButton(8, 1, "               ", 0x10000, 0xFFFF, 0, 0);
-    w->AddButton(1, 3, "No  :", 0x10001, 0xFFFF, 0, 0);
-    w->AddButton(7, 3, " xx ", 0, 0, 0, 0);
-    w->AddButton(7, 4, "[OK]", 0, 1, 0, 0);
+    eprintf2(8, 12, m_px * 8, m_py * 14, 0x12, 0, m_pTitle);
+    DbgDrawBox(((f32) m_px - 0.5f) * 8.0f - 1.0f, (f32) (m_py * 14) - 1.0f, ((f32) m_wx + 1.5f) * 8.0f + 2.0f,
+               14.0f, 0.7f, 0.7f, 0.7f, 0.45f);
+    DbgDrawBox(((f32) m_px - 0.5f) * 8.0f - 2.0f, (f32) (m_py * 14) - 2.0f, ((f32) m_wx + 1.5f) * 8.0f + 4.0f,
+               (f32) ((m_wy + 2) * 14) + 8.0f, 0.6f, 0.6f, 0.6f, 0.7f);
+    LocalDisp();
 }
 
-inline void cDbgFileSelectWindow::Init(int wx, int wy, const char* name, const char* path1, const char* path2,
-                                       const char* ext)
+// Pad repeat moves the cursor over the button grid with wrap.
+inline void cDbgWindow::CursorMove()
 {
-    m_px = wx;
-    m_py = wy;
-    m_wx = strlen(name);
-    m_wy = 1;
-    m_max_cx = 1;
-    m_max_cy = 1;
-    m_pTitle = name;
-    x1C = 0;
-    x20 = 0;
-    m_nBut = 0;
-    // COMPILER-DIFF: #13 -- the cDbgWindow::Init region-split recipe (db_toolbase.h): the original's
-    // zero is a reload-materialised constant (no `li` in sched1, no death at its last store), so the
-    // block is issued in source order with `li 1` before `li 0`. The three dead loop notes split our
-    // sched1 regions so that the zero has <= 3 dependents in the first region (`li 1` ranks first),
-    // the dying pPath1/pPath2/pExt stores cannot pass pCur/fileName, and the last zero store stays
-    // last (18 -> 0 words in t_event, t_esp_area, t_lightarea).
-    do {
-    } while (0);
-    m_pCurrentBut = 0;
-    m_FnameBuf[0] = 0;
-    do {
-    } while (0);
-    m_pPath = path1;
-    m_pFname = path2;
-    m_pExt = ext;
-    m_pStartBut = 0;
-    m_pEndBut = 0;
-    do {
-    } while (0);
-    m_no = 0;
-}
-
-inline int cDbgFileSelectWindow::LocalUpdate()
-{
-    int ret = 1;
     int bcx;
     int bcy;
     u32 rep;
-    char buf[0xC0];
 
     bcx = GetCx();
     bcy = GetCy();
@@ -162,6 +127,11 @@ inline int cDbgFileSelectWindow::LocalUpdate()
             m_pCurrentBut = b;
         }
     }
+}
+
+// A decide press runs the current button.
+inline void cDbgWindow::ButtonPushCheck()
+{
     if (Joy[0].trg & 0x100) {
         cDbgButton* c = m_pCurrentBut;
 
@@ -169,6 +139,87 @@ inline int cDbgFileSelectWindow::LocalUpdate()
             c->m_pFuncExec(c);
         }
     }
+}
+
+// File selector: a 0..99 file number with the name preview, "[OK]" on the second cursor row.
+class cDbgFileSelectWindow : public cDbgWindow {
+private:
+    int m_no;            // 0x238
+    const char* m_pPath;    // 0x23C  directory
+    const char* m_pFname;    // 0x240  file stem
+    const char* m_pExt;      // 0x244
+    char m_FnameBuf[0x100];  // 0x248  path1 + path2 + "%02d" + ext
+
+public:
+    void Init(int wx, int wy, const char* name, const char* path1, const char* path2, const char* ext);
+    virtual int LocalUpdate();
+    virtual ~cDbgFileSelectWindow();
+    int GetFileNo() { return m_no; }
+    void SetFileNo(int no) { m_no = no; }
+    const char* GetFilename() { return m_FnameBuf; }
+};
+
+// Init wrapper defined before Init's body: the call stays out of line in the saved RTL of this inline
+// (GCC 2.95 inlines while generating the caller's RTL), which is what the original objects show
+// (`bl cDbgFileSelectWindow::Init` after the `new`, the name literal materialised at the call).
+static inline void DbgFileSelectWindowInit(cDbgFileSelectWindow* w, int wx, int wy, const char* name,
+                                           const char* path1, const char* path2, const char* ext)
+{
+    w->Init(wx, wy, name, path1, path2, ext);
+}
+
+// The selector's buttons (header-owned strings; inlined into the tool's window creation).
+static inline void DbgFileSelectWindowAddButtons(cDbgFileSelectWindow* w)
+{
+    w->AddButton(1, 1, "Name:                 ", 0xFFFF, 0xFFFF, 0, 0);
+    w->AddButton(8, 1, "               ", 0x10000, 0xFFFF, 0, 0);
+    w->AddButton(1, 3, "No  :", 0x10001, 0xFFFF, 0, 0);
+    w->AddButton(7, 3, " xx ", 0, 0, 0, 0);
+    w->AddButton(7, 4, "[OK]", 0, 1, 0, 0);
+}
+
+inline void cDbgFileSelectWindow::Init(int wx, int wy, const char* name, const char* path1, const char* path2,
+                                       const char* ext)
+{
+    m_px = wx;
+    m_py = wy;
+    m_wx = strlen(name);
+    m_wy = 1;
+    m_max_cx = 1;
+    m_max_cy = 1;
+    m_pTitle = name;
+    m_IsPushed = 0;
+    m_IsCanceled = 0;
+    m_nBut = 0;
+    // COMPILER-DIFF: #13 -- the cDbgWindow::Init region-split recipe (db_toolbase.h): the original's
+    // zero is a reload-materialised constant (no `li` in sched1, no death at its last store), so the
+    // block is issued in source order with `li 1` before `li 0`. The three dead loop notes split our
+    // sched1 regions so that the zero has <= 3 dependents in the first region (`li 1` ranks first),
+    // the dying pPath1/pPath2/pExt stores cannot pass pCur/fileName, and the last zero store stays
+    // last (18 -> 0 words in t_event, t_esp_area, t_lightarea).
+    do {
+    } while (0);
+    m_pCurrentBut = 0;
+    m_FnameBuf[0] = 0;
+    do {
+    } while (0);
+    m_pPath = path1;
+    m_pFname = path2;
+    m_pExt = ext;
+    m_pStartBut = 0;
+    m_pEndBut = 0;
+    do {
+    } while (0);
+    m_no = 0;
+}
+
+inline int cDbgFileSelectWindow::LocalUpdate()
+{
+    int ret = 1;
+    char buf[0xC0];
+
+    CursorMove();
+    ButtonPushCheck();
     ButtonAllUpdate();
     if (GetCy() == 0) {
         int step = 0;
@@ -202,11 +253,11 @@ inline int cDbgFileSelectWindow::LocalUpdate()
         if (FindButton(0x10000, 0xFFFF, &nb)) {
             sprintf(buf, "%s%02d%s", m_pFname, m_no, m_pExt);
             sprintf(m_FnameBuf, "%s%s%02d%s", m_pPath, m_pFname, m_no, m_pExt);
-            DbgButtonSetName(nb, buf);
+            nb->SetString(buf);
         }
         if (FindButton(0, 0, &nb)) {
             sprintf(buf, " %02d", m_no);
-            DbgButtonSetName(nb, buf);
+            nb->SetString(buf);
         }
     }
     if (Joy[0].trg & 0x200) {
@@ -242,8 +293,8 @@ inline void cDbgOkCancelWindow::Init(int wx, int wy, const char* name)
     m_max_cx = 1;
     m_max_cy = 1;
     m_pTitle = name;
-    x1C = 0;
-    x20 = 0;
+    m_IsPushed = 0;
+    m_IsCanceled = 0;
     m_nBut = 0;
     do { } while (0); // COMPILER-DIFF: #13 (sched region split)
     {
@@ -264,8 +315,8 @@ inline void cDbgOkCancelWindow::InitLast(int wx, int wy, const char* name)
     m_max_cx = 1;
     m_max_cy = 1;
     m_pTitle = name;
-    x1C = 0;
-    x20 = 0;
+    m_IsPushed = 0;
+    m_IsCanceled = 0;
     m_nBut = 0;
     do { } while (0); // COMPILER-DIFF: #13 (sched region split)
     m_pEndBut = m_pStartBut = m_pCurrentBut = 0;
@@ -276,51 +327,10 @@ inline void cDbgOkCancelWindow::InitLast(int wx, int wy, const char* name)
 inline int cDbgOkCancelWindow::LocalUpdate()
 {
     int ret = 1;
-    int bcx;
-    int bcy;
-    u32 rep;
     u32 trg;
-    cDbgButton* b;
 
-    bcx = GetCx();
-    bcy = GetCy();
-    rep = Joy[0].rep;
-    if (rep & 0x10001) {
-        bcx--;
-    }
-    if (rep & 0x20002) {
-        bcx++;
-    }
-    if (rep & 0x80008) {
-        bcy--;
-    }
-    if (rep & 0x40004) {
-        bcy++;
-    }
-    if (bcx < 0) {
-        bcx = m_max_cx;
-    }
-    if (bcy < 0) {
-        bcy = m_max_cy;
-    }
-    if (bcx > m_max_cx) {
-        bcx = 0;
-    }
-    if (bcy > m_max_cy) {
-        bcy = 0;
-    }
-    if (bcx != GetCx() || bcy != GetCy()) {
-        if (FindButton(bcx, bcy, &b)) {
-            m_pCurrentBut = b;
-        }
-    }
-    if (Joy[0].trg & 0x100) {
-        cDbgButton* c = m_pCurrentBut;
-
-        if (c && c->m_pFuncExec) {
-            c->m_pFuncExec(c);
-        }
-    }
+    CursorMove();
+    ButtonPushCheck();
     ButtonAllUpdate();
     trg = Joy[0].trg;
     if (trg & 0x100) {
@@ -341,6 +351,33 @@ public:
 
     cDbgButtonTemplate(int x_, int y_, const char* name, int cx_, int cy_) { Init(x_, y_, name, cx_, cy_); }
     virtual ~cDbgButtonTemplate() {}
+    // The base versions with the label dimmed when the work is not alive.
+    void Disp(int bx, int by, int alive) {
+        if (alive) {
+            eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0x10, 0, m_pStr);
+        } else {
+            eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0x14, 0, m_pStr);
+        }
+    }
+    void DispCursor(int bx, int by, int alive) {
+        if (pG->Frame_cnt & 4) {
+            eprintf2(8, 12, (bx + m_px - 1) * 8, (by + m_py) * 14, 0, 0, ">");
+        }
+        if (alive) {
+            eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0, 0, m_pStr);
+        } else {
+            eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0x14, 0, m_pStr);
+        }
+        {
+            f32 fx = (f32) ((bx + m_px) * 8);
+            f32 fh = 14.0f;
+            f32 mgn = 2.0f;
+            f32 zero = 0.0f;
+
+            DbgDrawBoxFill(fx - mgn, (f32) ((by + m_py) * 14) - mgn, (f32) (m_strlen * 8) + zero, fh + mgn, 0.7f,
+                           0.7f, zero, 0.3f);
+        }
+    }
 };
 
 // The work-list editor window: `rows` visible rows of an array of `numWork` works, scrolled by
@@ -384,8 +421,8 @@ public:
         m_max_cx = 1;
         m_max_cy = 1;
         m_pTitle = name;
-        x1C = 0;
-        x20 = 0;
+        m_IsPushed = 0;
+        m_IsCanceled = 0;
         // rows before pWork/numWork: the dying stores come out rows, pWork, numWork and the
         // rows constant (lower LUID) is the one hoisted above the strlen call
         rows = nRows;
@@ -456,7 +493,7 @@ public:
     int GetCurrentNo()
     {
         if (pCur) {
-            return pCur->m_cy + top;
+            return pCur->GetCy() + top;
         }
         return 0;
     }
@@ -485,7 +522,7 @@ public:
         buf[2] = 0;
         buf[0] = digits[n / 10];
         buf[1] = digits[n % 10];
-        DbgButtonSetName(b, buf);
+        b->SetString(buf);
     }
 
     // Cursor to the first / last selectable button (cDbgWindowBase hooks).
@@ -496,14 +533,14 @@ public:
         if (pCur == 0) {
             return 0;
         }
-        return pCur->m_cx;
+        return pCur->GetCx();
     }
     virtual int GetCy()
     {
         if (pCur == 0) {
             return 0;
         }
-        return pCur->m_cy;
+        return pCur->GetCy();
     }
     virtual void SetCurrentBottomButton() { pCur = pBottom; }
     // Runs every button's update callback with the work of its row (top + row).
@@ -513,7 +550,7 @@ public:
 
         for (i = 0; i < num; i++) {
             cDbgButtonTemplate<T>* b = pButton[i];
-            int no = b->m_cy + top;
+            int no = b->GetCy() + top;
 
             if (b) {
                 T* w = WorkPtr(no);
@@ -532,9 +569,9 @@ public:
             cDbgButtonTemplate<T>* b = pCur;
 
             if (b) {
-                int no = b->m_cy + top;
+                int no = b->GetCy() + top;
 
-                if (b->m_cx == 0) {
+                if (b->GetCx() == 0) {
                     if (IsWorkAlive(WorkPtr(no))) {
                         SetWorkAlive(WorkPtr(no), 0);
                     } else {
@@ -685,7 +722,7 @@ template <class T> int cDbgEditWindow<T>::FindButton(int bcx, int bcy, cDbgButto
 
     *out = 0;
     for (i = 0; i < num; i++) {
-        if (pButton[i]->m_cx == bcx && pButton[i]->m_cy == bcy) {
+        if (pButton[i]->GetCx() == bcx && pButton[i]->GetCy() == bcy) {
             *out = pButton[i];
             return 1;
         }
@@ -790,7 +827,7 @@ template <class T> void cDbgEditWindow<T>::LocalDisp()
     cDbgButtonTemplate<T>* cur;
 
     for (i = 0; i < num; i++) {
-        int no = pButton[i]->m_cy + top;
+        int no = pButton[i]->GetCy() + top;
 
         if (pButton[i]) {
             int alive = IsWorkAlive(WorkPtr(no));
@@ -798,37 +835,17 @@ template <class T> void cDbgEditWindow<T>::LocalDisp()
             cDbgButtonTemplate<T>* b = pButton[i];
             int bx = m_px;
 
-            if (alive) {
-                eprintf2(8, 12, (bx + b->m_px) * 8, (by + b->m_py) * 14, 0x10, 0, b->m_pStr);
-            } else {
-                eprintf2(8, 12, (bx + b->m_px) * 8, (by + b->m_py) * 14, 0x14, 0, b->m_pStr);
-            }
+            b->Disp(bx, by, alive);
         }
     }
     if (execMode == 0) {
         if (pCur) {
-            int alive = IsWorkAlive(WorkPtr(pCur->m_cy + top));
+            int alive = IsWorkAlive(WorkPtr(pCur->GetCy() + top));
             int by = m_py + 1;
             int bx = m_px;
 
             cur = pCur;
-            if (pG->Frame_cnt & 4) {
-                eprintf2(8, 12, (bx + cur->m_px - 1) * 8, (by + cur->m_py) * 14, 0, 0, ">");
-            }
-            if (alive) {
-                eprintf2(8, 12, (bx + cur->m_px) * 8, (by + cur->m_py) * 14, 0, 0, cur->m_pStr);
-            } else {
-                eprintf2(8, 12, (bx + cur->m_px) * 8, (by + cur->m_py) * 14, 0x14, 0, cur->m_pStr);
-            }
-            {
-                f32 fx = (f32) ((bx + cur->m_px) * 8);
-                f32 fh = 14.0f;
-                f32 mgn = 2.0f;
-                f32 zero = 0.0f;
-
-                DbgDrawBoxFill(fx - mgn, (f32) ((by + cur->m_py) * 14) - mgn, (f32) (cur->m_strlen * 8) + zero,
-                               fh + mgn, 0.7f, 0.7f, zero, 0.3f);
-            }
+            cur->DispCursor(bx, by, alive);
         }
     }
 }
@@ -1126,36 +1143,6 @@ public:
         Debug_free(mem);
     }
 
-    // decide / cancel flags of a window from the pad, before its LocalUpdate
-    void KeyCheck(cDbgWindowBase* w)
-    {
-        w->x1C = 0;
-        w->x20 = 0;
-        if (Joy[0].trg & 0x100) {
-            w->x1C = 1;
-        }
-        if (Joy[0].trg & 0x200) {
-            w->x20 = 1;
-        }
-    }
-    // KeyCheck + LocalUpdate through one pointer parameter: the window pointer is not re-read from
-    // the tool after KeyCheck's stores (the original keeps it in a register across them)
-    int WinUpdate(cDbgWindowBase* w)
-    {
-        KeyCheck(w);
-        return w->LocalUpdate();
-    }
-    // the active window: title, single and double frame, then its own display
-    void DispWindow(cDbgWindowBase* w)
-    {
-        eprintf2(8, 12, w->m_px * 8, w->m_py * 14, 0x12, 0, w->m_pTitle);
-        DbgDrawBox(((f32) w->m_px - 0.5f) * 8.0f - 1.0f, (f32) (w->m_py * 14) - 1.0f, ((f32) w->m_wx + 1.5f) * 8.0f + 2.0f,
-                   14.0f, 0.7f, 0.7f, 0.7f, 0.45f);
-        DbgDrawBox(((f32) w->m_px - 0.5f) * 8.0f - 2.0f, (f32) (w->m_py * 14) - 2.0f, ((f32) w->m_wx + 1.5f) * 8.0f + 4.0f,
-                   (f32) ((w->m_wy + 2) * 14) + 8.0f, 0.6f, 0.6f, 0.6f, 0.7f);
-        w->LocalDisp();
-    }
-
     // Current mode (0 menu, 1 edit, 2 load, 3 save, 4 option, 6/7 the load / save file windows, 8 exit)
     // and the edit table.
     int GetMode() { return mode; }
@@ -1171,10 +1158,10 @@ public:
         // t_event SubToolMessMove 274 -> 106, t_lightarea ToolLightAreaMain 462 -> 121 words.
         switch (mode) {
         case 0:
-            if (WinUpdate(pMenu) == 0) {
+            if (pMenu->Update() == 0) {
                 pMenu->SetCurrentBottomButton();
             }
-            if (pMenu->x1C) {
+            if (pMenu->IsPushed()) {
                 switch (pMenu->GetCy()) {
                 case 0:
                     mode = 1;
@@ -1199,7 +1186,7 @@ public:
             }
             break;
         case 1:
-            if (WinUpdate(pEdit) == 0) {
+            if (pEdit->Update() == 0) {
                 mode = 0;
             }
             break;
@@ -1209,9 +1196,9 @@ public:
                     mode = 0;
                 }
             } else {
-                r = WinUpdate(pLoad);
+                r = pLoad->Update();
                 if (r == 0) {
-                    pSave->m_no = pLoad->m_no;
+                    pSave->SetFileNo(pLoad->GetFileNo());
                     if (pLoad->GetCy() == 1) {
                         pLoadOk->SetCurrentBottomButton();
                         mode = 6;
@@ -1222,9 +1209,9 @@ public:
             }
             break;
         case 6:
-            if (WinUpdate(pLoadOk) == 0) {
+            if (pLoadOk->Update() == 0) {
                 if (pLoadOk->GetCx() == 0) {
-                    LoadData(pLoad->m_FnameBuf, pEdit->pWork, pEdit->numWork);
+                    LoadData(pLoad->GetFilename(), pEdit->pWork, pEdit->numWork);
                 }
                 mode = 0;
             }
@@ -1235,9 +1222,9 @@ public:
                     mode = 0;
                 }
             } else {
-                r = WinUpdate(pSave);
+                r = pSave->Update();
                 if (r == 0) {
-                    pLoad->m_no = pSave->m_no;
+                    pLoad->SetFileNo(pSave->GetFileNo());
                     if (pSave->GetCy() == 1) {
                         pSaveOk->SetCurrentBottomButton();
                         mode = 7;
@@ -1248,9 +1235,9 @@ public:
             }
             break;
         case 7:
-            if (WinUpdate(pSaveOk) == 0) {
+            if (pSaveOk->Update() == 0) {
                 if (pSaveOk->GetCx() == 0) {
-                    SaveData(pSave->m_FnameBuf, pEdit->pWork, pEdit->numWork);
+                    SaveData(pSave->GetFilename(), pEdit->pWork, pEdit->numWork);
                 }
                 mode = 0;
             }
@@ -1265,7 +1252,7 @@ public:
             }
             break;
         case 8:
-            r = WinUpdate(pExitOk);
+            r = pExitOk->Update();
             if (r == 0) {
                 if (pExitOk->GetCx() == 0) {
                     mode = 5;
@@ -1286,32 +1273,32 @@ public:
     {
         switch (mode) {
         case 0:
-            DispWindow(pMenu);
+            pMenu->Disp();
             break;
         case 1:
-            DispWindow(pEdit);
+            pEdit->Disp();
             break;
         case 2:
             if (pLoadFunc == 0) {
-                DispWindow(pLoad);
+                pLoad->Disp();
             }
             break;
         case 3:
             if (pSaveFunc == 0) {
-                DispWindow(pSave);
+                pSave->Disp();
             }
             break;
         case 4: // empty labels shape the compare tree (`cmpwi 4; bge` node in the original)
         case 5:
             break;
         case 6:
-            DispWindow(pLoadOk);
+            pLoadOk->Disp();
             break;
         case 7:
-            DispWindow(pSaveOk);
+            pSaveOk->Disp();
             break;
         case 8:
-            DispWindow(pExitOk);
+            pExitOk->Disp();
             break;
         }
     }

@@ -32,7 +32,7 @@ EmAtkInfo Obj15_atk_info_tbl = { 100.0f, PL_DM_AUTO, 600, 0, 10, 0 };
 cObjGatling* SetObjGatling(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cObj* obj;
-    GatlingWork* w;
+    FREE_OBJ15* w;
     obj = ObjMgr.create(cObjMgr::ID_GATLING);
     if (obj == 0) {
         return 0;
@@ -110,7 +110,7 @@ cObjGatling* SetObjGatling(void* bin, void* tpl, Vec* pos, Vec* rot)
 // the gun, target timeout.
 void cObjGatling::move()
 {
-    GatlingWork* w = GATLING_WK(this);
+    FREE_OBJ15* w = GATLING_WK(this);
 
     if (w->pEm) {
         if (!w->pEm->isAlive()) {
@@ -145,7 +145,7 @@ void cObjGatling::move()
 // out of ammo / rider gone / fire stopped, then back to 0. Fires only while the player is alive.
 void obj15_R1_Set(cObjGatling* pObj)
 {
-    GatlingWork* w = GATLING_WK(pObj);
+    FREE_OBJ15* w = GATLING_WK(pObj);
     f32 dist;
     f32 lim;
     f32 ang;
@@ -228,7 +228,7 @@ void obj15_R1_Set(cObjGatling* pObj)
 // Rno1 == 1 (broken): once spawns the explosion (est 1/0xD) and does the break work.
 void obj15_R1_Break(cObjGatling* pObj)
 {
-    GatlingWork* w = GATLING_WK(pObj);
+    FREE_OBJ15* w = GATLING_WK(pObj);
     u32 i;
 
     if (pObj->r_no_2 == 0) {
@@ -253,7 +253,7 @@ void obj15_R1_Break(cObjGatling* pObj)
 // firing (with the spin sound); stops the sound when not firing.
 void obj15BarrelMove(cObjGatling* pObj)
 {
-    GatlingWork* w = GATLING_WK(pObj);
+    FREE_OBJ15* w = GATLING_WK(pObj);
     Vec tpos;
     cCoord* parts;
 
@@ -300,7 +300,7 @@ void obj15BarrelMove(cObjGatling* pObj)
 // Rebuilds the gun matrix and parts.
 void obj15MatCalc(cObjGatling* pObj)
 {
-    GatlingWork* w = GATLING_WK(pObj);
+    FREE_OBJ15* w = GATLING_WK(pObj);
 
     if (w->pTarget == 0) {
         w->pTarget = pPL;
@@ -431,7 +431,7 @@ void cObjGatling::setReload()
 // 0 breaks the gun (R1 1) with a sound.
 void obj15DmCk(cObjGatling* pObj)
 {
-    GatlingWork* w = GATLING_WK(pObj);
+    FREE_OBJ15* w = GATLING_WK(pObj);
     u32 i;
 
     if (pObj->r_no_0 == 1 && pObj->r_no_1 == 1) {
@@ -465,7 +465,7 @@ void obj15DmCk(cObjGatling* pObj)
 // Creates the eat collision that follows the gun.
 void cObjGatling::setEat(void* data, int type)
 {
-    GatlingWork* w = GATLING_WK(this);
+    FREE_OBJ15* w = GATLING_WK(this);
 
     w->pEat = EatMgr.create(data, 0, &pos, &ang, type);
 }
@@ -491,7 +491,7 @@ void cObjGatling::setBreakMode(u8 mode)
 // Breaks the gun from the room script (break work, R1 1 without the explosion effect).
 void cObjGatling::setBreak()
 {
-    GatlingWork* w = GATLING_WK(this);
+    FREE_OBJ15* w = GATLING_WK(this);
     u32 i;
 
     if (r_no_0 == 1 && r_no_1 == 1) {

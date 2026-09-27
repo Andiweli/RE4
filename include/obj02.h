@@ -20,9 +20,11 @@ public:
     cObjScr();
     virtual void move();
 
+private:
     void moveNormal();
     void moveRotate();
     void moveSwingRot();
+public:
     void SetCallBack(void (*func)(cObj*));
     void SetSwingRot(f32 amp, f32 period, f32 phase);
 };

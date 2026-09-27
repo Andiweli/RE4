@@ -32,22 +32,30 @@ public:
     cPlNeck(cPlayer* pl);
     void init(void* motR, void* motL, int frame);   // range-checked pointers (motSet), frame passed on (PS2 parameter order: motR first)
     void move();
+private:
     void motSet(void* data, int frame);
     cEm* getTarget();
+public:
     void setMode(int mode);   // stores byte 0xE (pl_sub PlSetNeck)
     void clear() { m_MotR = 0; }
 };
 
 // Waist control (game/pl_class.cpp), 0xC bytes at cEm::pWaist.
 class cPlWaist {
-public:
+private:
     Vec m_Ang;                   // 0x00  waist twist angles; only .y (the current angle) is used (PS2 m_Ang)
 
+public:
     cPlWaist();
     // cur = cur * (1 - rate) + target * rate; returns the delta applied
     f32 set(f32 dir, f32 rate);
     void reset() { m_Ang.y = 0.0f; }
     operator f32() { return m_Ang.y; }
+    cPlWaist& operator=(f32 ang)
+    {
+        m_Ang.y = ang;
+        return *this;
+    }
 
     static const f32 ROT_LIMIT;   // pl_class.cpp (.sdata2), unused there
 };
@@ -55,19 +63,24 @@ public:
 // Three-way motion blend (game/pl_class.cpp), 0xE8 bytes; `mot3` in player.cpp: the model's own
 // motion (mot0) blended with mot1 (rate < 0) or mot2 (rate > 0) through MotionWork::blend.
 class cMot3 {
-public:
+private:
     cModel* m_pEm;       // 0x00
     f32 m_Rate;            // 0x04  last move() rate, clamped to -1..1
+public:
     void* mot0;          // 0x08
     void* mot1;          // 0x0C
     void* mot2;          // 0x10
+private:
     int m_Mode;             // 0x14  set() 7th argument: 1 = the blend work gets flags2 bit31  set() 7th argument: 1 = the blend work gets flags2 bit31 (PS2 MODE m_Mode)
-    MotionWorkSub work;  // 0x18  the blended motion (em.h)
+public:
+    MOTION_INFO work;  // 0x18  the blended motion (em.h)
 
     cMot3();
     // set(model, motion0, motion1, motion2, MotionSetCore seq, u8 mode, int, u16, u16); the PS2 set(pEm, mot0, mot1, mot2, seq, hokan, mode, attr, frame) orders / types the tail differently
     void set(cModel* m, void* m0, void* m1, void* m2, void* seq, u8 b, int c, u16 d, u16 e);
+private:
     void set0(void* m, u8 a, int b);
+public:
     void move(f32 rate);
 };
 
@@ -154,7 +167,7 @@ public:
     cFlag<u32, FLAG> stat;   // 0x420
     void** m_MotTbl;       // 0x424  motion data table ([0] walk, [2] turn, [0x5F..0x6C] set by setMotion)
     void** m_MotTbl2;    // 0x428  registered motion table (pl_sub PlRegistMotion fills [0..11])
-    MotionWorkSub m_SubMot;   // 0x42C .. 0x4FC  neck turn motion (pl_class cPlNeck::motSet), blended via blendMot
+    MOTION_INFO m_SubMot;   // 0x42C .. 0x4FC  neck turn motion (pl_class cPlNeck::motSet), blended via blendMot
     u8 m_Frame;              // 0x4FC  (pl_sub PlChangeData/PlMotionReset clear it)
     u8 m_Hokan;              // 0x4FD
     u8 m_BbtnCnt;         // 0x4FE  (PS2 cPlayer::m_BbtnCnt)
@@ -332,24 +345,26 @@ public:
     virtual void moveMatCalcBefore();
     virtual void initCloth() { PlClothSetGirl(this, &girlHair, &girlSkirt, &girlSweater, 0); }
     virtual void moveCloth() { PlClothMoveGirl(this, &girlHair, &girlSkirt, &girlSweater); }
+private:
     void moveBust();
 };
 
 void pl01weaponSet(cPlayer* pEm);  // game/pl_ashley.cpp: fills m_MotTbl from the player archive
 
 // Debug cheat ("maho") command table (game/pl_debug.cpp), 0x16C bytes, `new`ed by cPlayer::debugInit.
-struct PlMahoEntry {
-    u8 rno;               // 0x00  (PS2 cPlMahoWork::rno)
-    u8 timer;               // 0x01  (PS2 cPlMahoWork::timer)
+struct cPlMahoWork {
+    u8 rno;               // 0x00
+    u8 timer;               // 0x01
     void (*pFunc)();     // 0x04
     const char* pSpell;    // 0x08  button sequence string  button sequence string (PS2 pSpell)
 };
 
 class cPlMaho {
-public:
-    PlMahoEntry work[30]; // 0x000
+private:
+    cPlMahoWork work[30]; // 0x000
     u32 nWork;             // 0x168
 
+public:
     cPlMaho();
     void reset();
     void regist(const char* code, void (*func)());

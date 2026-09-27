@@ -8,7 +8,7 @@
 
 // Hanging / thrown object work (game/obj12.cpp `cObj12`): the obj00 layout with a life counter,
 // the landing SE moved to 0x68 and a rope `type` selecting the three rope offsets.
-struct Obj12Work {
+struct FREE_OBJ12 {
     u32 be_flag;            // 0x00  bit2: falling, bit3: blending toward the parent, bit7: keep the parent matrix, bit8: thrown, bit9: fading out after `life`
     void* pMot;           // 0x04
     int Motion_info;        // 0x08  MotionMove result of this frame
@@ -32,20 +32,24 @@ struct Obj12Work {
 // type, a life counter and a throw routine).
 class cObj12 : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  Obj12Work
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ12
 
     virtual void move();
     virtual ~cObj12() {}
     void setParent(cModel* oya, int partsNo, int noNormalize);
+private:
     void chainMove();
+public:
     void setFall(Vec* spd, u8 type);
     void setFallSe(u8 blk, u8 no, u8 id);
+private:
     void fallMove();
     void throwMove();
+public:
     void setBurn();
 };
 
-#define OBJ12_WK(o) ((Obj12Work*) (o)->free)
+#define OBJ12_WK(o) ((FREE_OBJ12*) (o)->free)
 
 cObj12* SetObj12(void* bin, void* tpl, Vec* pos, Vec* rot);
 

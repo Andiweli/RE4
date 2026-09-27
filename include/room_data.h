@@ -49,8 +49,9 @@ public:
         CTRL_STOP = 0,  // room DLL unlinked (stopRelData)
     };
 
-    u16 total;                // 0x00  rooms in all stage tables
-    u16 num;                  // 0x02  rooms with a save record
+private:
+    u16 m_RoomNum;            // 0x00  rooms in all stage tables
+    u16 m_SaveNum;            // 0x02  rooms with a save record
     cFlag<u16, CTRL_FLAG> m_CtrlFlag;  // 0x04
     u8 pad_6[2];
     OSModuleHeader* m_pModule;  // 0x08  linked room DLL (exception.cpp loads its symbols)
@@ -58,11 +59,15 @@ public:
     void* m_pModule_bss_bak;            // 0x10  bss copy kept while the DLL is unlinked
     RoomSaveHdr* m_pRoomSaveHead;    // 0x14
     u8* m_pRoomSaveData;                // 0x18  room save records, 0xD8 bytes each
+public:
     u16 m_RelNo;              // 0x1C  FileTbl index (rel_no) of the room dll loaded; cleared before linkRelData (stage.cpp)
     u16 x1E;                  // 0x1E
 
     cRoomData() { m_CtrlFlag.reset(); }
     ~cRoomData() {}  // the empty destructor is what makes GCC emit the static destructor function
+
+    u32 getSaveDataSize() { return m_SaveNum * 0xD8 + 0x10; }
+    OSModuleHeader* getModulePtr() { return m_pModule; }
 
     void init();
     void initRoomSet();
@@ -73,7 +78,9 @@ public:
     u8* getRoomSavePtr(u16 room_no);
     void execInitFunc(u16 room_no);
     void execMainFunc(u16 room_no);
+private:
     int checkRoomRange(u8 stage, u8 room);
+public:
     int checkRelRead(u16 room_no);
     void linkRelData(u16 room_no);
     void stopRelData();

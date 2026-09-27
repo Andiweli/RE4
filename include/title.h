@@ -3,9 +3,9 @@
 
 #include "types.h"
 
-struct IdUnit;
+struct ID_UNIT;
 
-// Frames of the opening timeline (PS2 TITLE_FRAME): TitleWork::counter at which each logo starts; the
+// Frames of the opening timeline (PS2 TITLE_FRAME): TITLE_WORK::counter at which each logo starts; the
 // TTL_CANCEL_* ints in title.cpp are the earliest frame START may skip to the next one.
 enum TITLE_FRAME {
     TTL_START_WARNING = 0,
@@ -19,7 +19,7 @@ enum TITLE_FRAME {
 };
 
 // Title screen task work (game/title.cpp, mem_calloc'd 0x9C bytes by Title_task).
-struct TitleWork {
+struct TITLE_WORK {
     s8 Rno0;          // 0x00  titleFuncTbl index (0 init, 1 wait, 2 nintendo, 3 warning, 4 logo, 5 main, 6 sub/omake, 7 exit)
     s8 Rno1;          // 0x01  state inside the mode
     s8 Rno2;           // 0x02  sub state (demo movie steps, stage select)
@@ -35,7 +35,7 @@ struct TitleWork {
     int counter;          // 0x20  frame counter (setTime reads its low half)
     int menu_num;      // 0x24  menu entries
     int cursor;       // 0x28
-    IdUnit* p_menu[5];  // 0x2C  menu id units
+    ID_UNIT* p_menu[5];  // 0x2C  menu id units
     int scroll;       // 0x40  1 = the background scroll follows the stick (titleLoop)
     f32 scroll_add;        // 0x44  background scroll speed
     int dbg_mode;          // 0x48  1 = the title logo time was pushed forward (debug menu)

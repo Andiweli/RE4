@@ -22,7 +22,7 @@
 
 int SetToolLight(int no);  // db_light_tools.cpp
 
-// Tool-side view of the FlrAt record (flr_at.h), 0x84 bytes.
+// Tool-side view of the FLR_AT_DATA record (flr_at.h), 0x84 bytes.
 struct TFlrAt {
     u8 be_flg;        // 0x00  bit 0 enabled, bit 1 created
     u8 id;         // 0x01  0 foot SE, 1 SE volume, 2 BGM volume, 3 thunder volume
@@ -30,7 +30,7 @@ struct TFlrAt {
     u8 group;        // 0x03
     u8 priority;     // 0x04  save order (15 first)
     u8 pad_5[0x14 - 0x05];
-    AreaData area;   // 0x14
+    AREA_HIT_DATA area;   // 0x14
     union {          // 0x44  payload by `id` (flr_at.h)
         u8 dmy[64];
         FLR_AT_SE_TYPE se;
@@ -75,15 +75,15 @@ struct FlrAtWork {
     int dispType;     // 0x38
     char path[0x40];  // 0x3C
     s8 flagCursor;    // 0x7C
-    u8 defCartridge;  // 0x7D  FlrAtHead cartridge_type
+    u8 defCartridge;  // 0x7D  FLR_AT_HEADER cartridge_type
     u8 pad_7E[2];
-    FlrAtHead head;   // 0x80
+    FLR_AT_HEADER head;   // 0x80
     TFlrAt area[256]; // 0x90
-    FlrAtHead fileHead;  // 0x8490
+    FLR_AT_HEADER fileHead;  // 0x8490
     TFlrAt file[256];    // 0x84A0
     TFlrAt copyBuf;      // 0x108A0
-    FlrSys flrSys;       // 0x10924
-    FlrSys* saveFlrSys;  // 0x109B0
+    FLR_AT_SYS flrSys;       // 0x10924
+    FLR_AT_SYS* saveFlrSys;  // 0x109B0
 };
 
 static int flrAtSaveNum;
@@ -126,7 +126,7 @@ static void preview_main();
 static void preview_exit();
 
 // Tool start: default tool flags (pause, debug displays, tool light 1), the work allocated, the
-// room's FlrAt system pointer saved (the tool installs its own records), start with DATA LOAD.
+// room's FLR_AT_DATA system pointer saved (the tool installs its own records), start with DATA LOAD.
 void flrAtInit()
 {
     int zero = 0;
@@ -165,7 +165,7 @@ void flrAtInit()
     pW->editType = -1;
 }
 
-// EXIT: restores the FlrAt system pointer, the tool light and flags, frees the work, ends the task.
+// EXIT: restores the FLR_AT_DATA system pointer, the tool light and flags, frees the work, ends the task.
 static void flrAtExit()
 {
     pG->Disp_flg = pW->saveDisp;
@@ -922,7 +922,7 @@ static inline u8 flrAtColU8(int c)
 
 // DATA LOAD: picks server (d:) / local (x:), stage and room with the d-pad, "DATA LOAD OK?" YES/NO;
 // reads r<room>.fse into the records (all, or only the edit type's) and installs them as the room's
-// FlrAt data.
+// FLR_AT_DATA data.
 static void flrAtDataLoad()
 {
     const char* title[3] = {"[ALL DATA LOAD]", "[SE DATA LOAD]", "[BGM DATA LOAD]"};
@@ -1267,9 +1267,9 @@ static void preview_init()
     pG->Disp_flg &= ~0x80000000;
     DbgFlagOff(pG, DBG_DBG_CAM);
     pFlrSys = &pW->flrSys;
-    pFlrSys->pData = &pW->head;
-    pFlrSys->pList = (FlrAt*) pW->area;
-    pFlrSys->group = 0xFF;
+    pFlrSys->pHead = &pW->head;
+    pFlrSys->pData = (FLR_AT_DATA*) pW->area;
+    pFlrSys->cur_group = 0xFF;
     pW->sub = 1;
     pW->step = 0;
     pW->step2 = 0;

@@ -14,7 +14,9 @@ class cItmSys {
 public:
     ItmSysWork work[0x100];  // 0x00
 
+private:
     void WorkClear();
+public:
     void Init();
     int DataLoad(u32 data_addr);
     int ItmRegist(void* bin, void* tpl, u8 no);

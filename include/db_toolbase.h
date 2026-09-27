@@ -17,7 +17,7 @@ void DbgDrawBox(f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a);
 void DbgDrawBoxFill(f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a);
 
 class cDbgButtonBase {
-public:
+protected:
     u32 m_px;          // 0x00  column inside the window
     u32 m_py;          // 0x04  row inside the window
     int m_cx;         // 0x08  cursor column
@@ -26,6 +26,7 @@ public:
     u32 m_strlen;    // 0x14  strlen + 1
     // 0x18 vptr
 
+public:
     virtual ~cDbgButtonBase() { delete m_pStr; }
 
     int Init(int x_, int y_, const char* name, int cx_, int cy_) {
@@ -45,18 +46,29 @@ public:
         strcpy(m_pStr, name);
         return 1;
     }
-};
+    int GetCx() { return m_cx; }
+    int GetCy() { return m_cy; }
+    // Replaces the label (truncated to the allocated length).
+    void SetString(const char* s) {
+        if (strlen(s) > m_strlen) {
+            u32 i;
 
-// The cursor mark of cDbgWindow::LocalDisp (a header inline owns it: it opens the .rodata string
-// group of every unit including this header, right after the Init message). The other display
-// strings of the group come from the file-select / ok-cancel window inlines of dbg_tool.h, which
-// every user of this header (db_toolbase.cpp included) parses after it.
-struct cDbgStr {
-    static const char* cursor() { return ">"; }
+            for (i = 0; i < m_strlen - 2; i++) {
+                m_pStr[i] = s[i];
+            }
+            m_pStr[i] = 0;
+        } else {
+            strcpy(m_pStr, s);
+        }
+    }
+    // Label at column bx + m_px, row by + m_py; DispCursor draws the current button with the blinking ">"
+    // and the highlight box (defined in dbg_tool.h)
+    void Disp(int bx, int by);
+    void DispCursor(int bx, int by);
 };
 
 class cDbgWindowBase {
-public:
+protected:
     u32 m_px;              // 0x00  window column (8 px units; unsigned: the frame conversions use the 2^52 trick without xoris)
     u32 m_py;              // 0x04  window row (14 px units)
     u32 m_wx;              // 0x08  width in columns
@@ -64,9 +76,21 @@ public:
     int m_max_cx;          // 0x10  largest button cursor column
     int m_max_cy;          // 0x14  largest button cursor row
     const char* m_pTitle;  // 0x18  title
-    int x1C;
-    int x20;
+protected:
+    int m_IsPushed;        // 0x1C  the decide button was pressed this frame
+    int m_IsCanceled;      // 0x20  the cancel button was pressed this frame
     // 0x24 vptr
+
+    void SetPushed() { m_IsPushed = 1; }
+    void SetCanceled() { m_IsCanceled = 1; }
+
+public:
+    int IsPushed() { return m_IsPushed; }
+    int IsCanceled() { return m_IsCanceled; }
+    // decide / cancel flags from the pad, then LocalUpdate; the frame and title, then LocalDisp
+    // (defined in dbg_tool.h)
+    int Update();
+    void Disp();
 
     virtual ~cDbgWindowBase() {}
     virtual int GetCx() { return 0; }
@@ -112,8 +136,8 @@ public:
         m_max_cx = 1;
         m_max_cy = 1;
         m_pTitle = name;
-        x1C = 0;
-        x20 = 0;
+        m_IsPushed = 0;
+        m_IsCanceled = 0;
         // COMPILER-DIFF: #13 -- the original stores the REG_EQUIV zero as a constant: the zero's
         // `li` is not in its sched1 (reload re-creates it after `li 1`) and the last zero store
         // carries no death. The two dead loop notes split our sched1 region so that `li 1` outranks
@@ -145,14 +169,14 @@ public:
         if (m_pCurrentBut == 0) {
             return 0;
         }
-        return m_pCurrentBut->m_cx;
+        return m_pCurrentBut->GetCx();
     }
     virtual int GetCy()
     {
         if (m_pCurrentBut == 0) {
             return 0;
         }
-        return m_pCurrentBut->m_cy;
+        return m_pCurrentBut->GetCy();
     }
     virtual void SetCurrentTopButton() { m_pCurrentBut = m_pStartBut; }
     virtual void SetCurrentBottomButton() { m_pCurrentBut = m_pEndBut; }
@@ -174,6 +198,10 @@ public:
     void AddButton(int x, int y, const char* name, int cx, int cy, void (*func)(cDbgButton*),
                    void (*update)(cDbgButton*));
     int FindButton(int cx, int cy, cDbgButton** out);
+    // pad repeat moves the cursor over the button grid with wrap; a decide press runs the current button
+    // (defined in dbg_tool.h)
+    void CursorMove();
+    void ButtonPushCheck();
 };
 
 #endif

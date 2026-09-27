@@ -8,19 +8,19 @@
 #define ESP3F_BUF_MAX 0x12
 
 // Vector buffer effect: a parent esp owns up to 0x12 child esps whose work areas hold Vec arrays.
-struct Esp3fWork {
+typedef struct tagESP3F_WK {
     u8 pad_0[2];
     u8 nWork;                     // 0x02 number of child buffers
     u8 nElem;                  // 0x03 vectors per child buffer
     cEsp* pBuf[ESP3F_BUF_MAX];   // 0x04
-};
+} ESP3F_WK;
 
 class cEsp3f : public cEsp {
 public:
-    Esp3fWork m_Free;  // 0xF8
+    ESP3F_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
     virtual void Destruct();
 };
 
@@ -45,7 +45,7 @@ void cEsp3f::move()
 void cEsp3f::Destruct()
 {
     if (m_Rno0 == 0) {
-        Esp3fWork* w = &m_Free;
+        ESP3F_WK* w = &m_Free;
         u32 i;
         for (i = 0; i < w->nWork; i++) {
             cEsp* p = w->pBuf[i];
@@ -59,7 +59,7 @@ void cEsp3f::Destruct()
 // Allocates a buffer of `num` elements of `size` bytes: `per` elements fit one child (0x58 bytes),
 // so num / per + 1 children are pulled (max 0x12, else an error). Returns 1 and the parent in
 // *out; on any pool failure everything pulled so far is released and 0 returned.
-int Esp3f_Alloc(u32 WorkSize, u32 Num, cEsp3f** ppEsp, EspInfo* pEff_core)
+int Esp3f_Alloc(u32 WorkSize, u32 Num, cEsp3f** ppEsp, cEffectCore* pEff_core)
 {
     cEsp* dmy = EspGetDmyPtr();
     u32 per = 0x58 / WorkSize;
@@ -67,7 +67,7 @@ int Esp3f_Alloc(u32 WorkSize, u32 Num, cEsp3f** ppEsp, EspInfo* pEff_core)
     cEsp* p;
     cEsp* c;
     cEsp3f* e;
-    Esp3fWork* w;
+    ESP3F_WK* w;
     u32 i;
 
     *ppEsp = 0;
@@ -107,7 +107,7 @@ int Esp3f_Alloc(u32 WorkSize, u32 Num, cEsp3f** ppEsp, EspInfo* pEff_core)
 // Address of element `no` (child no / per, slot no % per); NULL with an error when out of range.
 Vec* Esp3f_GetVecPtr(cEsp3f* pEsp, u32 idx)
 {
-    Esp3fWork* w = &pEsp->m_Free;
+    ESP3F_WK* w = &pEsp->m_Free;
     u32 per = w->nElem;
     u32 n = w->nWork;
     u32 buf = idx / per;
@@ -126,7 +126,7 @@ Vec* Esp3f_GetVecPtr(cEsp3f* pEsp, u32 idx)
 }
 
 // No generator parameters (buffers are only created through Esp3f_Alloc).
-int cEsp3f::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp3f::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     return 1;
 }

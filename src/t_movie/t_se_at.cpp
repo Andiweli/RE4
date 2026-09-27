@@ -136,7 +136,7 @@ void ToolSeAt()
 // kept (seAtSaveList) for the exit, the game camera saved; starts with DATA LOAD.
 void seAtInit()
 {
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     int zero = 0;
     CAMERA* cam = &g->Camera;
 
@@ -353,7 +353,7 @@ static void seAtAreaEdit_EditMenu()
 // record's pos follows the camera target; B back.
 static void seAtAreaEdit_AreaMove()
 {
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     JOY* joy = &Joy[0];
     Vec right;
     Vec up;

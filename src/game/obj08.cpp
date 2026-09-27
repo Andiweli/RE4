@@ -38,7 +38,7 @@ Vec obj08HitBox[8] = {
 cObj* SetObj08(cModel* parent, void* bin, void* tpl, Vec* pos, Vec* rot, int flags, void* atk)
 {
     cObj* obj;
-    Obj08Work* w;
+    FREE_OBJ08* w;
 
     obj = ObjMgr.create(cObjMgr::ID_MISSILE);
     if (obj == 0) {
@@ -92,7 +92,7 @@ cObj* SetObj08(cModel* parent, void* bin, void* tpl, Vec* pos, Vec* rot, int fla
 // Sets speed, life in frames (-1 = until it hits), gravity per frame and hit radius (min 1).
 void SetObj08Spd(cObj* obj, Vec* spd, int life, f32 grav, f32 rad)
 {
-    Obj08Work* w;
+    FREE_OBJ08* w;
 
     if (obj == 0) {
         return;
@@ -117,7 +117,7 @@ void SetObj08Spd(cObj* obj, Vec* spd, int life, f32 grav, f32 rad)
 // character hit; `flag` (hit_type) attaches the hit effect to the victim instead of the surface.
 void SetObj08Est(cObj* obj, int no0, int prm0, int no1, int prm1, int no2, int prm2, int no3, int prm3, u8 flag)
 {
-    Obj08Work* w;
+    FREE_OBJ08* w;
 
     if (obj == 0) {
         return;
@@ -143,7 +143,7 @@ void SetObj08Est(cObj* obj, int no0, int prm0, int no1, int prm1, int no2, int p
 // Sets the impact sound (block, number), played with the thrower's id.
 void SetObj08Se(cObj* obj, u16 blk, u16 no)
 {
-    Obj08Work* w;
+    FREE_OBJ08* w;
 
     if (obj == 0) {
         return;
@@ -164,7 +164,7 @@ void SetObj08Se(cObj* obj, u16 blk, u16 no)
 // be_flag bit 3.
 void cObj08::move()
 {
-    Obj08Work* w = OBJ08_WK(this);
+    FREE_OBJ08* w = OBJ08_WK(this);
 
     if (w->timer == 0) {
         if (w->eff2 && w->est2) {
@@ -203,7 +203,7 @@ void cObj08::move()
 // Gravity + move.
 void obj08AddSpeed(cObj08* pObj)
 {
-    Obj08Work* w = OBJ08_WK(pObj);
+    FREE_OBJ08* w = OBJ08_WK(pObj);
 
     w->spd.y -= w->gravity;
     PSVECAdd(&pObj->pos, &w->spd, &pObj->pos);
@@ -213,7 +213,7 @@ void obj08AddSpeed(cObj08* pObj)
 // horizontal surface) or the break effect [1] oriented by the normal, destroys the object; returns 1.
 int obj08ScrHitCk(cObj08* pObj)
 {
-    Obj08Work* w = OBJ08_WK(pObj);
+    FREE_OBJ08* w = OBJ08_WK(pObj);
     Vec hit;
     Vec nrm;
     Vec est;
@@ -252,7 +252,7 @@ int obj08ScrHitCk(cObj08* pObj)
 // mask), spawning the hit effect. Returns 1 on a hit.
 int obj08ToEmHitCk(cObj08* pObj)
 {
-    Obj08Work* w = OBJ08_WK(pObj);
+    FREE_OBJ08* w = OBJ08_WK(pObj);
     Vec box[8];
     WepTarget list[10];
     Vec ang;
@@ -324,7 +324,7 @@ int obj08ToEmHitCk(cObj08* pObj)
 // victim's hit info, sound, controller vibration. Returns 1 on a hit.
 int obj08ToPlHitCk(cObj08* pObj)
 {
-    Obj08Work* w = OBJ08_WK(pObj);
+    FREE_OBJ08* w = OBJ08_WK(pObj);
     int hit;
 
     if (w->pEm == 0) {
@@ -363,7 +363,7 @@ int obj08ToPlHitCk(cObj08* pObj)
 // surface of the hit parts (facing the projectile, clamped to 70% of the parts height), plus the sound.
 void obj08DmEstSet(cObj08* pObj, cModel* pEm, Vec* pPos, YARARE_INFO* pAt)
 {
-    Obj08Work* w = OBJ08_WK(pObj);
+    FREE_OBJ08* w = OBJ08_WK(pObj);
     Mtx m;
     Vec p;
     Vec o;

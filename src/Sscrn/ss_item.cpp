@@ -36,8 +36,8 @@ public:
 
 class ItemCommand : public Widget<SUB_SCREEN> {
 public:
-    IdUnit* id[16];    // 0x10  command menu units (setCommandId)
-    IdUnit* sub[11];   // 0x50  sub menu units
+    ID_UNIT* id[16];    // 0x10  command menu units (setCommandId)
+    ID_UNIT* sub[11];   // 0x50  sub menu units
     u8 pad_7C[0x90 - 0x7C];
     int mode;          // 0x90  0 command, 1 open sub menu, 2 sub menu
     s8 num;            // 0x94  commands
@@ -63,8 +63,8 @@ extern "C" {
 void itemNameDisp(SUB_SCREEN* wk);
 void itemCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 void sscrn_item_out_init(SUB_SCREEN* wk);
-ItemWork* ITEM_PTR(int idx, int col);
-int ITEM_AT(ItemWork* p, int col);
+cItem* ITEM_PTR(int idx, int col);
+int ITEM_AT(cItem* p, int col);
 int itemTexNo(u16 id);
 u8 frameMarkNo(int n, int col);
 void itemFrameSet(SUB_SCREEN* wk, int col);
@@ -72,7 +72,7 @@ void itemFrameInit(SUB_SCREEN* wk);
 void itemFrameMove(SUB_SCREEN* wk, int col);
 void itemListMake();
 int itemSelect(SUB_SCREEN* wk, int mode);
-void setCommandId(u8 mode, IdUnit** tbl, s8* num);
+void setCommandId(u8 mode, ID_UNIT** tbl, s8* num);
 void itemMakeInit(SUB_SCREEN* wk);
 void itemMakeMove(SUB_SCREEN* wk);
 void itemMakeDisp(SUB_SCREEN* wk, int x, int y);
@@ -90,12 +90,12 @@ static int item_num_y = 0;
 static int item_cmd_mode = 0;
 
 static int item_read_req;
-static ItemWork item_dummy;
+static cItem item_dummy;
 // Non-static: the REL's ADDR16 fields for these hold A only (global symbols), see the em35 rule.
 u8 item_list[0x180];
 s8 item_num[2];
 s8 item_total;
-ItemWork* item_sel;
+cItem* item_sel;
 int item_frame_on;
 void* item_path0[2];
 Hermite1* item_curve[2];
@@ -109,11 +109,11 @@ int item_frame_state[2];
 void itemNameDisp(SUB_SCREEN* wk)
 {
     ItemScreenWork* iw = wk->item;
-    IdUnit* u = IdSub.unitPtr(1, IDC_SSCRN_CKPT_2);
+    ID_UNIT* u = IdSub.unitPtr(1, IDC_SSCRN_CKPT_2);
     int x;
     int y;
     int del = 0;
-    ItemWork* item = ITEM_PTR(iw->idx[iw->col], iw->col);
+    cItem* item = ITEM_PTR(iw->idx[iw->col], iw->col);
     x = (int) ((u->pos.x + 320.0f) * 0.8f);
     y = (int) ((240.0f - u->pos.y) * 0.8f);
     MessageControl* pm = &cMes;
@@ -255,14 +255,14 @@ void SsItemMain::init(SUB_SCREEN* wk)
     for (int k = 0; k < 2; k++) {
         int type = k * 8 + 0x40;
         for (int n = -3; n <= 4; n++) {
-            IdUnit* parent = IdNum.unitPtr(frameMarkNo(n, k) - 0x30, IDC_SSCRN_1);
+            ID_UNIT* parent = IdNum.unitPtr(frameMarkNo(n, k) - 0x30, IDC_SSCRN_1);
             IdNum.unitParent(parent, IdNum.unitPtr(0, type));
             type++;
         }
     }
     IdSub.set(SS_ARC_PTR(wk->pItemDat, 6), 0xFF, IDC_SSCRN_2, 0xC, 4, 0);
     for (int i = 0; i < 2; i++) {
-        IdUnit* tbl[16];
+        ID_UNIT* tbl[16];
         s8 num;
         int j;
         setCommandId(i, tbl, &num);
@@ -435,7 +435,7 @@ void SsItemMain::quit(SUB_SCREEN* wk)
 // also frames the life meter out and fades the player model.
 void sscrn_item_out_init(SUB_SCREEN* wk)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     u = IdSub.unitPtr(0, IDC_SSCRN_2);
     u->rev_flag |= 1;
@@ -480,7 +480,7 @@ void sscrn_item_out_init(SUB_SCREEN* wk)
 // Exit routine (scrn_out_func): 1 once the first frame column's path animation ended (end bit 0).
 static int sscrn_item_out(SUB_SCREEN* wk)
 {
-    IdUnit* u = IdNum.unitPtr(0x40, IDC_SSCRN_1);
+    ID_UNIT* u = IdNum.unitPtr(0x40, IDC_SSCRN_1);
     int ret = 1;
     if ((u->anima_state & 1) == 0) {
         ret = 0;
@@ -490,7 +490,7 @@ static int sscrn_item_out(SUB_SCREEN* wk)
 
 // Item slot `idx` of list column `col` (0 key items, 1 treasures) from item_list, or the empty
 // item_dummy (flags 0) when out of range / 0xFF.
-ItemWork* ITEM_PTR(int idx, int col)
+cItem* ITEM_PTR(int idx, int col)
 {
     u8 no;
 
@@ -511,7 +511,7 @@ DUMMY:
 }
 
 // List index of item `p` in column `col`, -1 when it is not listed.
-int ITEM_AT(ItemWork* p, int col)
+int ITEM_AT(cItem* p, int col)
 {
     int i;
 
@@ -599,7 +599,7 @@ u8 frameMarkNo(int n, int col)
 void itemFrameSet(SUB_SCREEN* wk, int col)
 {
     ItemScreenWork* iw = wk->item;
-    IdUnit* u;
+    ID_UNIT* u;
     int n;
     int no;
 
@@ -614,8 +614,8 @@ void itemFrameSet(SUB_SCREEN* wk, int col)
     }
     no = col * 8 + 0x40;
     for (n = -3; n <= 4; n++) {
-        IdUnit* m = IdNum.unitPtr(frameMarkNo(n, col), IDC_SSCRN_1);
-        ItemWork* item = ITEM_PTR(n + iw->idx[col], col);
+        ID_UNIT* m = IdNum.unitPtr(frameMarkNo(n, col), IDC_SSCRN_1);
+        cItem* item = ITEM_PTR(n + iw->idx[col], col);
         int off;
         if (iw->comb[col] != -1 && iw->sel[col] == n + iw->idx[col]) {
             goto HIDE;
@@ -656,7 +656,7 @@ void itemFrameSet(SUB_SCREEN* wk, int col)
 // the path end and fills both columns; frame state 3 = waiting for the path end.
 void itemFrameInit(SUB_SCREEN* wk)
 {
-    IdUnit* u = 0;
+    ID_UNIT* u = 0;
     int i;
 
     item_frame_on = 0;
@@ -686,7 +686,7 @@ void itemFrameInit(SUB_SCREEN* wk)
 // the up/down path (IdNum 6/7 of 0x15) and refills the slots, 3 waits for the path end, 0 idle.
 void itemFrameMove(SUB_SCREEN* wk, int col)
 {
-    IdUnit* u = 0;
+    ID_UNIT* u = 0;
 
     switch (col) {
     case 0:
@@ -814,7 +814,7 @@ END:
             asm("" : : "r"(pin));
         }
         no = i + 1;
-        IdUnit* u = IdSub.unitPtr(no, IDC_SSCRN_2);
+        ID_UNIT* u = IdSub.unitPtr(no, IDC_SSCRN_2);
         if (i == iw->col) {
             u->be_flag |= 8;
         } else {
@@ -1116,8 +1116,8 @@ void ItemCombine::init(SUB_SCREEN* wk)
     ItemScreenWork* iw = wk->item;
     s8 col = iw->col;
     u8 base = 0;
-    ItemWork* item;
-    IdUnit* u;
+    cItem* item;
+    ID_UNIT* u;
 
     switch (col) {
     case 0:
@@ -1183,8 +1183,8 @@ void ItemCombine::move(SUB_SCREEN* wk)
         }
         transit(1, wk);
     } else if (Key.trg & 0x80000000) {
-        ItemWork* a = ITEM_PTR(iw->sel[col], col);
-        ItemWork* b = ITEM_PTR(iw->comb[col], col);
+        cItem* a = ITEM_PTR(iw->sel[col], col);
+        cItem* b = ITEM_PTR(iw->comb[col], col);
         if (b != a && ItemMgr.combine(b, a, 0)) {
             ItemMgr.makeItemList(item_list, 0, &item_num[0], &item_num[1]);
             iw->idx[col] = ITEM_AT(b, col);
@@ -1200,7 +1200,7 @@ void ItemCombine::move(SUB_SCREEN* wk)
 
 // Collects the command menu units of column `mode` (0 key items 0x20.., 1 treasures 0x30.. of
 // group 0x16): tbl[0..3] frame parts, then per command its label and highlight; *num = commands.
-void setCommandId(u8 mode, IdUnit** tbl, s8* num)
+void setCommandId(u8 mode, ID_UNIT** tbl, s8* num)
 {
     switch (mode) {
     case 0:
@@ -1254,7 +1254,7 @@ static int item_make_mes_y = -0x13;
 void itemMakeInit(SUB_SCREEN* wk)
 {
     SsItemMakeWork* mk = ITEM_MAKE_WORK(wk);
-    ItemInfo info;
+    ITEM_INFO info;
     int i;
 
     for (i = 0; i < 2; i++) {
@@ -1293,9 +1293,9 @@ void itemMakeMove(SUB_SCREEN* wk)
     ItemScreenWork* iw = wk->item;
     JOY* joy = &Joy[0];
     SsItemMakeWork* mk = ITEM_MAKE_WORK(wk);
-    ItemWork* got = 0;
-    ItemWork* cur = ITEM_PTR(iw->idx[iw->col], iw->col);
-    ItemInfo info;
+    cItem* got = 0;
+    cItem* cur = ITEM_PTR(iw->idx[iw->col], iw->col);
+    ITEM_INFO info;
     int i;
 
     if (joy->rep & 0x00080008) {
@@ -1373,7 +1373,7 @@ void itemMakeDisp(SUB_SCREEN* wk, int x, int y)
 {
     ItemScreenWork* iw = wk->item;
     SsItemMakeWork* mk = ITEM_MAKE_WORK(wk);
-    ItemWork* cur = ITEM_PTR(iw->idx[iw->col], iw->col);
+    cItem* cur = ITEM_PTR(iw->idx[iw->col], iw->col);
     int i;
     u16 id;
 

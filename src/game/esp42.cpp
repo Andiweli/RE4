@@ -10,7 +10,7 @@ public:
     u32 xF8;
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x42] factory.
@@ -31,7 +31,7 @@ void cEsp42::move()
 
 // Stores GX_BM_BLEND with the source factor bl1[Work8[0]] and destination factor bl2[Work8[1]] in
 // m_Blend_mode..m_Logic_op (read by EspCommonTrans). Fails when either index is above 8.
-int cEsp42::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp42::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     static u32 bl1[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
     static u32 bl2[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };

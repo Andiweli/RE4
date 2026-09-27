@@ -184,7 +184,7 @@ void Render_swap()
 // (Status_flg[1] 0x1000), which it consumes.
 void UpdateNearClipDist()
 {
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     if (!StaFlagChk(g, STA_NEARCLIP_TOUCH)) {
         ZNEAR = 100.0f;
     }

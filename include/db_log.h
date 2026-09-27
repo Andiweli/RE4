@@ -50,8 +50,8 @@ public:
     void disp();
     void setPos(int x, int y) { m_Bx = x; m_By = y; }
     int on(int time);
-    cLogWork* add(int flag, int errId, const char* mes, va_list ap);
-    int scrSet(s8 n);                          // scroll by `n`, clamped to [0, 100 - lines]
+    private: cLogWork* add(int flag, int errId, const char* mes, va_list ap);
+    public: int scrSet(s8 n);                          // scroll by `n`, clamped to [0, 100 - lines]
     int dispLineNum(int x, int y);
 };
 

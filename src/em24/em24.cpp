@@ -70,7 +70,7 @@ void Em24Init(cEm* em)
 // dmType 0x80 = no more damage, R0_Die).
 void em24DmCk(cEm24* em)
 {
-    Em24Work* w = EM24_WK(em);
+    FREE_EM24* w = EM24_WK(em);
     int wep;
 
     if (em->hp > 0 && !em->dmg.isDamage()) {
@@ -125,7 +125,7 @@ static EmAtkInfo em24_atk_tbl[1] = {
 // (em24SlopeMove) and the in-water splash effects (Be_flg bit5).
 void cEm24::move()
 {
-    Em24Work* w = EM24_WK(this);
+    FREE_EM24* w = EM24_WK(this);
     f32 spd;
 
     em24DmCk(this);
@@ -180,7 +180,7 @@ void cEm24::move()
 // Be_flg bit2), else Free (2).
 static void em24_R0_Init(cEm24* em)
 {
-    Em24Work* w = EM24_WK(em);
+    FREE_EM24* w = EM24_WK(em);
     cAtariInfo* at;
     f32 scale;
     int zero;
@@ -249,7 +249,7 @@ static void em24_R0_Move(cEm24* em)
 // goes Free (2).
 static void em24_R1_BoxWait(cEm24* em)
 {
-    Em24Work* w = EM24_WK(em);
+    FREE_EM24* w = EM24_WK(em);
 
     w->Be_flg |= 4;
     switch (em->r_no_2) {
@@ -349,7 +349,7 @@ static void em24_R1_CoilWait(cEm24* em)
 // frames, pauses (9 / 0xA); coils up (Coil 3) when the player comes close.
 static void em24_R1_Free(cEm24* em)
 {
-    Em24Work* w = EM24_WK(em);
+    FREE_EM24* w = EM24_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -401,7 +401,7 @@ static void em24_R1_Free(cEm24* em)
 // back to Free (2) when he moves away.
 static void em24_R1_Coil(cEm24* em)
 {
-    Em24Work* w = EM24_WK(em);
+    FREE_EM24* w = EM24_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -450,7 +450,7 @@ static void em24_R0_Damage(cEm24* em)
 // (invisible_factor -0.05, Be_flg bit4), left invisible (be_flag 0x4000).
 static void em24_R0_Die(cEm24* em)
 {
-    Em24Work* w = EM24_WK(em);
+    FREE_EM24* w = EM24_WK(em);
 
     switch (em->r_no_1) {
     case 0:
@@ -543,7 +543,7 @@ static void em24_R0_Die(cEm24* em)
 // em24_atk_tbl[no] (once per attack, Atk_ck); a player hit adds blood, quake and vibration. 1 = hit.
 int em24AtkCk(cEm24* em, Vec* a, Vec* b, int no)
 {
-    Em24Work* w = EM24_WK(em);
+    FREE_EM24* w = EM24_WK(em);
 
     if (w->Atk_ck) {
         return 0;
@@ -568,7 +568,7 @@ int em24AtkCk(cEm24* em, Vec* a, Vec* b, int no)
 // while alive.
 void em24SlopeMove(cEm24* em)
 {
-    Em24Work* w = EM24_WK(em);
+    FREE_EM24* w = EM24_WK(em);
     Vec a;
     Vec b;
     Mtx m;

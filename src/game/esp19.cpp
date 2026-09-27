@@ -8,19 +8,19 @@
 #include "math_sub.h"
 #include "esp.h"
 
-struct Esp19Work {
+typedef struct tagESP19_WK {
     Vec Vec0;  // 0x00 end point of the line
     f32 max_laser_dist;     // 0x0C maximum length
-};
+} ESP19_WK;
 
 // 3D line effect (laser sight / tracer): draws a line from the effect toward a target point,
 // fading the far end.
 class cEsp19 : public cEsp {
 public:
-    Esp19Work m_Free;  // 0xF8
+    ESP19_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x19] factory.
@@ -40,9 +40,9 @@ void cEsp19::move()
 }
 
 // End point from Vec0, maximum length from Vec1.x (0 -> 12000 units).
-int cEsp19::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp19::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp19Work* w = &m_Free;
+    ESP19_WK* w = &m_Free;
 
     w->Vec0 = pSeq->Vec0;
     if (pSeq->Vec1.x == 0.0f) {
@@ -113,7 +113,7 @@ static void Draw_line3d_local_222(Vec* p0, Vec* p1, Mtx mat, u32 col, cEsp* pEsp
 // quake offset) to Vec0.
 extern "C" void Esp19_Trans(cEsp19* esp)
 {
-    Esp19Work* w = &esp->m_Free;
+    ESP19_WK* w = &esp->m_Free;
     Vec p;
     u32 color;
 

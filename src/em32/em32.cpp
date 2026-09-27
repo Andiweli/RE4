@@ -628,7 +628,7 @@ static void em32_R0_Init(cEm32* em)
     ((cParts*) em->getPartsPtr(0x2D))->motParts.flags |= 0x1000;
     ((cParts*) em->getPartsPtr(0x33))->motParts.flags |= 0x1000;
 #line 836 "D:/Bio4/Prog/em32.cpp"
-    em->Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 0xD);
+    em->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xD);
     // Compound literals: the zero template is shared with plem32_P_CatchHit's light init.
     em->LightInfo.init2(0, 1, &((Vec) { 0.0f, 0.0f, 0.0f }), &((Vec) { 10000.0f, 10000.0f, 10000.0f }), 2);
     em->atari.init(0.0f, 0.0f, 0.0f, 800.0f, 700.0f, 700.0f, 1500.0f, 1, 0x2000, 10);
@@ -695,7 +695,7 @@ static void em32_R0_Init(cEm32* em)
     EstSet(em, -1, 0, 0, EFF_EM32, 4, 0, w->espKind[0], em, (void*) zero);
     w->mode = zero;
 #line 1000 "D:/Bio4/Prog/em32.cpp"
-    w->pMot = (MotionWorkSub*) MEM_ALLOC(0xD0, 1, 0xD);
+    w->pMot = (MOTION_INFO*) MEM_ALLOC(0xD0, 1, 0xD);
     if (w->pMot) {
         memclr_asm(w->pMot, 0xD0);
     }
@@ -3276,7 +3276,7 @@ static void plem32_P_CatchHit(cPlayer* pl)
             w->pCatchObj->atari.m_flag &= 0xFCFF;
             w->pCatchObj->pList->pParent = pPL->getPartsPtr(0xA);
             w->pCatchObj->LightInfo.init2(1, 1, &((Vec) { 0.0f, 0.0f, 0.0f }), &((Vec) { 500.0f, 0.0f, 0.0f }), 1);
-            ((cObjWep*) w->pCatchObj)->m_pParent = pPL;
+            ((cObjWep*) w->pCatchObj)->setParent(pPL);
             w->pCatchObj->getPartsPtr(1)->ang.y = 3.14159274f;
         }
         pl->m_Work0 = 15;
@@ -3740,7 +3740,7 @@ void em32ClothSet(cEm32* em)
     w->cloth.Move_rate = 0.0f;
     w->cloth.Flag = zero;
     w->cloth.pPtbl = zero;
-    PenClothSet(em, (PenCloth*) &w->cloth, 100.0f);
+    PenClothSet(em, (CLOTH_INFO*) &w->cloth, 100.0f);
 }
 
 // The last form's tail follows the cloth chain; the two tail tips copy their parents' matrices.
@@ -3756,7 +3756,7 @@ void em32ClothMove(cEm32* em)
     if (w->flags & 0x8000) {
         return;
     }
-    PenClothMove2(em, (PenCloth*) &w->cloth);
+    PenClothMove2(em, (CLOTH_INFO*) &w->cloth);
     p = em->getPartsPtr(0x16);
     p2 = em->getPartsPtr(0x51);
     PSMTXCopy(p->mat, p2->mat);

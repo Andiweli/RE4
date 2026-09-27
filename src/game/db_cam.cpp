@@ -34,8 +34,8 @@
 
 
 debugCamera CamDbg;
-QfpsOfs g_local_ready[2][3];
-QfpsOfs g_local_trans[2][3];
+CAMERA_POINT g_local_ready[2][3];
+CAMERA_POINT g_local_trans[2][3];
 f32 g_local_floor_ratio;
 f32 g_local_fovy[2];
 
@@ -45,7 +45,7 @@ static inline void Dec(int& v) { v--; }
 
 // adjust_qFPS keeps the edited shoulder offset record as a byte pointer (the original copies it
 // with memcpy and steps through it by byte offset).
-#define QOFS(p) ((QfpsOfs*) (p))
+#define QOFS(p) ((CAMERA_POINT*) (p))
 #define QOFS_CAMPOS2 0xC
 
 // Per-frame update. Z toggles the menu, otherwise any input takes the camera from the game and A
@@ -1147,7 +1147,7 @@ int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
     static int site_UMD = 0;
     static int yes_no = 0;
     static int near_far = 0;
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     CAMERA* cam = &g->Camera;
     CameraQuasiFPS* q = &CamCtrl.m_QuasiFPS;
     Mtx inv;
@@ -1367,7 +1367,7 @@ int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
             PSMTXMultVec(inv, &g->Camera.param.pos, &QOFS(p_offset)->Campos);
             PSMTXMultVec(inv, &g->Camera.param.at, &QOFS(p_offset)->Target);
             if (symmetry_flag) {
-                memcpy(p_counter, p_offset, sizeof(QfpsOfs));
+                memcpy(p_counter, p_offset, sizeof(CAMERA_POINT));
                 QOFS(p_counter)->Campos.x = -QOFS(p_counter)->Campos.x;
                 QOFS(p_counter)->Target.x = -QOFS(p_counter)->Target.x;
             }

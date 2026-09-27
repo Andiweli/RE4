@@ -6,7 +6,7 @@
 #include "em.h"
 
 // Work of the em24 enemy (em24 module, D:/Bio4/Prog/em24.cpp), overlaid on cEm from 0x3E0.
-struct Em24Work {
+struct FREE_EM24 {
     u32 Be_flg;            // 0x000 (0x3E0)  bit2: box mode (checkAir instead of the floor), bit4: die fade done, bit5: in water
     int Timer;            // 0x004 (0x3E4)
     int Timer2;        // 0x008 (0x3E8)  R1_Free: frames until the next random turn
@@ -24,7 +24,7 @@ struct Em24Work {
     u8 Atk_ck;            // 0x2AC (0x68C)  the attack already hit (em24AtkCk)
 };
 
-#define EM24_WK(em) ((Em24Work*) (((cEm24*) (em))->free))
+#define EM24_WK(em) ((FREE_EM24*) (((cEm24*) (em))->free))
 
 class cEm24 : public cEm {
 public:

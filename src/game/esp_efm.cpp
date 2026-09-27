@@ -19,9 +19,9 @@ u32 GetEfmMoveIdMax();
 u8 GetEfmMoveId(u32 no);
 void EfmDeleteSub(cObj* obj);
 void EfmDeleteEventSub(cObj* obj);
-cObj* EfmSetObj04(cObj* obj, EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs);
-cObj* EfmSetObj05(cObj* obj, EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate);
-cObj* EfmSetObj09(cObj* obj, EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate);
+cObj* EfmSetObj04(cObj* obj, cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs);
+cObj* EfmSetObj05(cObj* obj, cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate);
+cObj* EfmSetObj09(cObj* obj, cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate);
 void setModTexRender(cObj* obj, int no);
 cObj* SetEffModel(void* bin, void* tpl, Vec* pos, Vec* rot);   // embox.cpp declares it `void` locally
 }
@@ -82,21 +82,21 @@ void EfmDelete(int a, int b, void* c)
 void EfmDeleteSub(cObj* pObj)
 {
     if (pObj->id == 4) {
-        Efm04Work* w = EFM04_WK((cObj04*) pObj);
+        OBJ04_FREE* w = EFM04_WK((cObj04*) pObj);
         if ((g_Core_flg == 0 || w->Eff_core.flg == g_Core_flg) && (g_Core_kind == 0 || w->Eff_core.kind == g_Core_kind) &&
             (g_Core_pEm == 0 || w->Eff_core.pEm == g_Core_pEm)) {
             ObjMgr.destroy(pObj);
         }
     }
     if (pObj->id == 5) {
-        Efm05Work* w = EFM05_WK((cObj05*) pObj);
+        OBJ05_FREE* w = EFM05_WK((cObj05*) pObj);
         if ((g_Core_flg == 0 || w->Eff_core.flg == g_Core_flg) && (g_Core_kind == 0 || w->Eff_core.kind == g_Core_kind) &&
             (g_Core_pEm == 0 || w->Eff_core.pEm == g_Core_pEm)) {
             ObjMgr.destroy(pObj);
         }
     }
     if (pObj->id == 9) {
-        Efm09Work* w = EFM09_WK((cObj09*) pObj);
+        OBJ09_FREE* w = EFM09_WK((cObj09*) pObj);
         if ((g_Core_flg == 0 || w->Eff_core.flg == g_Core_flg) && (g_Core_kind == 0 || w->Eff_core.kind == g_Core_kind) &&
             (g_Core_pEm == 0 || w->Eff_core.pEm == g_Core_pEm)) {
             ObjMgr.destroy(pObj);
@@ -115,19 +115,19 @@ void EfmDeleteEvent()
 void EfmDeleteEventSub(cObj* pObj)
 {
     if (pObj->id == 4) {
-        Efm04Work* w = EFM04_WK((cObj04*) pObj);
+        OBJ04_FREE* w = EFM04_WK((cObj04*) pObj);
         if (!(w->Eff_core.flg & 1) && !(w->Eff_core.flg & 0x800)) {
             ObjMgr.destroy(pObj);
         }
     }
     if (pObj->id == 5) {
-        Efm05Work* w = EFM05_WK((cObj05*) pObj);
+        OBJ05_FREE* w = EFM05_WK((cObj05*) pObj);
         if (!(w->Eff_core.flg & 1) && !(w->Eff_core.flg & 0x800)) {
             ObjMgr.destroy(pObj);
         }
     }
     if (pObj->id == 9) {
-        Efm09Work* w = EFM09_WK((cObj09*) pObj);
+        OBJ09_FREE* w = EFM09_WK((cObj09*) pObj);
         if (!(w->Eff_core.flg & 1) && !(w->Eff_core.flg & 0x800)) {
             ObjMgr.destroy(pObj);
         }
@@ -145,7 +145,7 @@ void EfmArrayClear()
 
 // Generator entry for an effect model record: resolves the parent, creates the obj04/05/09 in ObjMgr
 // and calls the kind's EfmSetObj. Returns the object or 0 on any failure (logged).
-cObj* EfmSeqSet(EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs)
+cObj* EfmSeqSet(cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs)
 {
     cObj* obj = 0;
     Vec size;
@@ -295,9 +295,9 @@ const Vec efm_light_size = {1000.0f, 1000.0f, 0.0f};
 
 // Fills an obj04 (particle model) work from the record, then attaches it to the world or to parts
 // Parts_no of `parent`. Returns 0 (object destroyed) on a bad parts number.
-cObj* EfmSetObj04(cObj* obj, EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs)
+cObj* EfmSetObj04(cObj* obj, cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs)
 {
-    Efm04Work* w = EFM04_WK((cObj04*) obj);
+    OBJ04_FREE* w = EFM04_WK((cObj04*) obj);
     Vec v;
     Mtx mtx;
     void* mot;
@@ -479,9 +479,9 @@ cObj* EfmSetObj04(cObj* obj, EspGenWork* gen, EfmCore* info, u32* seed, cModel* 
 // with random spreads, scale, colours and fade timers, the scatter centre (Vec0 +- Vec2), bounce
 // (Vec1/10), pow/rangeStep/rnd/rotAmp from Work8, gravity (-xCC/10) and speed damping (1 - xD0/1000);
 // orientation from matrix m or the parent parts' matrix; each parts starts with Kaboom_flg 0.
-cObj* EfmSetObj05(cObj* obj, EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate)
+cObj* EfmSetObj05(cObj* obj, cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate)
 {
-    Efm05Work* w = EFM05_WK((cObj05*) obj);
+    OBJ05_FREE* w = EFM05_WK((cObj05*) obj);
     Vec v;
     Mtx mtx;
     f32 rnd;
@@ -635,9 +635,9 @@ cObj* EfmSetObj05(cObj* obj, EspGenWork* gen, EfmCore* info, u32* seed, cModel* 
 // Fills an obj09 (rigid body) work: start position/velocity with spreads, box size = Vec0*100+250
 // (1/1000 units), mass = volume/1e9 * mass_mul, moments of inertia of the box * moment_mul, scale
 // from the size (Efm 0x7C and 0x21 use a smaller visual scale).
-cObj* EfmSetObj09(cObj* pObj, EspGenWork* pSeq, EfmCore* pCore, u32* pRand_seed, cModel* pMod, Mtx pMat, int flg, f32 ang)
+cObj* EfmSetObj09(cObj* pObj, cEspSeqTbl* pSeq, EfmCore* pCore, u32* pRand_seed, cModel* pMod, Mtx pMat, int flg, f32 ang)
 {
-    Efm09Work* w = EFM09_WK((cObj09*) pObj);
+    OBJ09_FREE* w = EFM09_WK((cObj09*) pObj);
     static f32 mass_mul = 1.0f;
     static f32 moment_mul = 2.0f;
 
@@ -694,7 +694,7 @@ cObj* EfmSetObj09(cObj* pObj, EspGenWork* pSeq, EfmCore* pCore, u32* pRand_seed,
 cObj* SetEffModel(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cObj* obj;
-    Efm04Work* w;
+    OBJ04_FREE* w;
 
     obj = ObjMgr.createBack(cObjMgr::ID_ESP);
     if (obj) {

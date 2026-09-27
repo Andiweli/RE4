@@ -90,7 +90,7 @@ struct TSceItemWork {
     char path[0x40];    // 0x4C  d:\ path
     char pathX[0x40];   // 0x8C  x:\ path
     char xmlPath[0x40]; // 0xCC  x:\ xml export path
-    AreaData editArea;  // 0x10C  scratch area of the eye trigger editor
+    AREA_HIT_DATA editArea;  // 0x10C  scratch area of the eye trigger editor
     TSceItemFileHead head;   // 0x13C
     SceAtWork area[128];     // 0x14C
     TSceItemFile file;       // 0x4F4C  load / save image
@@ -246,7 +246,7 @@ void ToolSceItem()
 // Flag setup: pause the game, debug displays on, tool light 1.
 void tSceItemInit_base()
 {
-    *((u8*) &pG->debug_mode) = 0x11;
+    pG->debug_mode = 0x11;
     DbgFlagOn(pG, DBG_BACK_CLIP);
     pG->Stop_flg |= 0x20000000;
     pG->Stop_flg |= 0x10000000;
@@ -660,8 +660,8 @@ static void angle_arrow_disp(SceAtWork* a)
 // the item position sphere and the hit-angle arrow
 void tSceItemAreaEdit_disp()
 {
-    AreaData ad;
-    AreaData save;
+    AREA_HIT_DATA ad;
+    AREA_HIT_DATA save;
     cEm* obj;
     int i;
     u32 colA;
@@ -1155,12 +1155,12 @@ static void tSceItemDataInput_item_ETedit()
         }
         AreaDataInfoDisp(&pW->editArea, pW->x, pW->y);
         AreaDataHelpDisp(&pW->editArea, (s16) (pW->x + 0xE0), (s16) (pW->y - 0x20));
-        it->pos.x = pW->editArea.u.eye.xz;
-        it->pos.y = pW->editArea.u.eye.floor;
-        it->pos.z = pW->editArea.u.eye.z;
-        it->rot.z = pW->editArea.u.eye.open_ang;
-        it->rot.x = pW->editArea.u.eye.ang_x;
-        it->rot.y = pW->editArea.u.eye.ang_y;
+        it->pos.x = pW->editArea.eye_trigger.xz;
+        it->pos.y = pW->editArea.eye_trigger.floor;
+        it->pos.z = pW->editArea.eye_trigger.z;
+        it->rot.z = pW->editArea.eye_trigger.open_ang;
+        it->rot.x = pW->editArea.eye_trigger.ang_x;
+        it->rot.y = pW->editArea.eye_trigger.ang_y;
         if (!((u32) it->pModel < 0x80000000 || (u32) it->pModel > 0x82FFFFFF)) {
             if (it->rot.z > 0.0f) {
                 it->pModel->ang.x = it->rot.x;

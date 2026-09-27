@@ -45,7 +45,7 @@ static PlCloth Evt_luisHair;
 cObj* SetObj18(void* bin, void* tpl, Vec* pos, Vec* rot, int type)
 {
     cObj* obj;
-    Obj18Work* w;
+    FREE_OBJ18* w;
     int lightFlag;
     Vec sz;
     Vec ofs;
@@ -59,7 +59,7 @@ cObj* SetObj18(void* bin, void* tpl, Vec* pos, Vec* rot, int type)
         return 0;
     }
     w = OBJ18_WK((cObj18*) obj);
-    memset(w, 0, sizeof(Obj18Work));
+    memset(w, 0, sizeof(FREE_OBJ18));
     if (obj->modelInit(bin, tpl) == 0) {
         ObjMgr.destroy(obj);
         return 0;
@@ -273,7 +273,7 @@ int DelObj18(cObj* pObj)
 // always off in the armour costume).
 void cObj18::move()
 {
-    Obj18Work* w = OBJ18_WK(this);
+    FREE_OBJ18* w = OBJ18_WK(this);
 
     if (w->DebugFlag) {
         pLog->mes(0, 0, "cObj18:move DebugFlag");
@@ -361,7 +361,7 @@ void cObj18::move()
 // Attaches an obj18 to parts partsNo of `oya` (no catch-up blend).
 void OyaSetObj18(cObj* obj, cModel* oya, int partsNo)
 {
-    Obj18Work* w;
+    FREE_OBJ18* w;
 
     if (obj == 0) {
         return;
@@ -397,7 +397,7 @@ int obj18GetOya(cModel** pOya, cObj* pObj)
 // (be_flag bit 3) from the saved matrix; copies the parent's light class 2.
 void obj18SetOya(cObj18* pObj)
 {
-    Obj18Work* w = OBJ18_WK(pObj);
+    FREE_OBJ18* w = OBJ18_WK(pObj);
     Mtx m;
     Vec v0;
     Vec v1;

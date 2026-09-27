@@ -119,7 +119,7 @@ void R327Init()
     (r327_work->first = 1);
     if (ScfFlagChk(pG, SCF_R329_ASHLEY_HELP)) {
         for (i = 0; i < 0x100; i++) {
-            EmListData* e = &pG->Em_list[i];
+            EM_LIST* e = &pG->Em_list[i];
 
             if (e->room == 0x327 && e->id == 0x1D) {
                 e->be_flag &= ~1;

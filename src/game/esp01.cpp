@@ -10,21 +10,21 @@
 
 #define ESP_STRIP_PTS_MAX 16
 
-struct Esp01Work {
+typedef struct tagESP01_WK {
     u16 Wari_num;      // 0x00 number of strip segments (15 - gen->Work8[0], clamped)
     u16 Long_num;  // 0x02 frames between two trail points (gen->Work8[1])
     u32 x4;        // 0x04
     Vec BasePos;      // 0x08 position at the time the sprite left its parent
-};
+} ESP01_WK;
 
 // Motion trail strip: replays the speed/acceleration backwards to get the last positions and
 // draws them as a textured strip.
 class cEsp01 : public cEsp {
 public:
-    Esp01Work m_Free;  // 0xF8
+    ESP01_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -43,7 +43,7 @@ cEsp* Esp01_Create()
 // Never Z-culled.
 void cEsp01::move()
 {
-    Esp01Work* w = &m_Free;
+    ESP01_WK* w = &m_Free;
 
     if (parent != pEffParentWorld && m_Release_time != 0xFF && m_Release_time <= m_Life_time) {
         ApplyMatrix(parent->mat);
@@ -84,7 +84,7 @@ extern "C" void Esp01_Trans(cEsp01* esp)
 // the position + texcoord vertex format. Screen-mode Parts_no releases the effect.
 void EspStrip01_setup(cEsp01* pEsp)
 {
-    Esp01Work* w = &pEsp->m_Free;
+    ESP01_WK* w = &pEsp->m_Free;
     Mtx id;
     Mtx m;
 
@@ -121,7 +121,7 @@ void esp01Trans_sub(cEsp01* pEsp)
 {
     static Vec tmp_poss[48];
     static int tmp_n[ESP_STRIP_PTS_MAX];
-    Esp01Work* w = &pEsp->m_Free;
+    ESP01_WK* w = &pEsp->m_Free;
     Vec spd;
     Vec acc;
     Vec org;
@@ -236,7 +236,7 @@ void esp01Trans_sub(cEsp01* pEsp)
 // no / texRepeat along t (flag 0) or s (flag 1); Tool_flg bit1 mirrors s, bit2 mirrors t.
 void EspStrip_draw_poly(cEsp* esp, int no, Vec* v, u8 texRepeat, int flag)
 {
-    EspAnmData* anm;
+    cAnm* anm;
     f32 s;
     f32 t;
     f32 sw;
@@ -393,9 +393,9 @@ void EspStrip_draw_poly(cEsp* esp, int no, Vec* v, u8 texRepeat, int flag)
 
 // Segment count 15 - Work8[0] (2 when Work8[0] > 12, max 15), point interval Work8[1], and the
 // spawn position as pos0.
-int cEsp01::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp01::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp01Work* w = &m_Free;
+    ESP01_WK* w = &m_Free;
 
     w->BasePos = m_Pos;
     w->Wari_num = (s8)pSeq->Work8[0];

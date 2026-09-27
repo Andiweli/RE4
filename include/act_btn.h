@@ -149,26 +149,37 @@ struct ActBtnWork {
 
 // Action button prompt manager (game/act_btn.cpp `ActBtn`, 0x104 bytes).
 class cActionButton {
-public:
+private:
     u32 m_ot[16];          // 0x00
     u8 m_num;              // 0x40  works pulled this frame
     u8 m_stop_flag_old;             // 0x41  pG->flags_170 bit8 at init: prompts disabled
     u8 m_active_flag;           // 0x42  a prompt was shown this frame
     u8 pad_43;
-    ActBtnWork work[8];  // 0x44
+    ActBtnWork m_task[8];  // 0x44
 
-    cActionButton() {}
-    ~cActionButton() {}
-    void init();
-    void move();
     void disp(ActBtnWork* work);
     int checkButton(ActBtnWork* work);
     int checkPLStatus(ActBtnWork* work);
     ActBtnWork* pullWork();
+
+public:
+    cActionButton() {}
+    ~cActionButton() {}
+    void init();
+    void move();
     // set(kind, slot, func, arg, flags, btn, type, d): pulls a work, fills it and adds the prim.
     // PS2: set(ACTION_TYPE act_type, SCE_PRIORITY priority, func, param, ctrl_flag, DISP_FLAG button_type,
     // ACTION_FUNC_TYPE func_type, model); the ints are fixed by the mangled name.
     void set(int kind, int slot, void* func, void* arg, int flags, int btn, int type, int d);
+    void setStopFlagOld(int flag) { m_stop_flag_old = flag; }
+    void setActive(int on) {
+        if (on) {
+            m_active_flag = 1;
+        } else {
+            m_active_flag = 0;
+        }
+    }
+    int isActive() { return m_active_flag == 1; }
 };
 
 extern cActionButton ActBtn;

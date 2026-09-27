@@ -1615,7 +1615,7 @@ int cDvd::ErrCheck(int disc_new, int proc)
                     paused = 1;
                 }
                 PADControlMotor(0, 2);
-                if (Sofdec.isPlay()) {
+                if (Sofdec.IsActive()) {
                     Sofdec.PlayPause(1);
                 }
                 if (pG->IsMessageInit == 1) {
@@ -1646,7 +1646,7 @@ int cDvd::ErrCheck(int disc_new, int proc)
                     RomFontMessage(msg, discNo);
                 }
             }
-            if (Sofdec.isPlay()) {
+            if (Sofdec.IsActive()) {
                 ADXM_ExecMain();
             }
             if (eprintf_init == 1) {
@@ -1670,7 +1670,7 @@ int cDvd::ErrCheck(int disc_new, int proc)
         Render_swap();
         while (vsync_cnt < (int) GetSystemVcnt()) {}
         vsync_cnt = 0;
-        if (Sofdec.isPlay()) {
+        if (Sofdec.IsActive()) {
             Sofdec.PlayPause(0);
         }
     }

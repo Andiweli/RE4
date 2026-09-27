@@ -1926,7 +1926,7 @@ void em38BlendMotSet(cEm38* em, void* m0, void* m1, void* m2, void* m3, int a, i
 {
     Em38Work* w = EM38_WK(em);
     f32 rate = fabsf(w->blendRate);
-    MotionWorkSub* bm;
+    MOTION_INFO* bm;
     void* m;
     int seq;
 
@@ -2398,7 +2398,7 @@ static void plemEscape(cPlayer* pEm)
 void em38EscapeCamMove(cEm38* em)
 {
     Em38Work* w = EM38_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec a;
     Vec b;
     Vec c;

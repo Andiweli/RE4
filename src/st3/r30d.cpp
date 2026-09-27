@@ -100,8 +100,8 @@ void R30dInit()
     cEmSwitch* sw0;
     cEmSwitch* sw1;
     cEmBarred* bar;
-    cEm* b1;
-    cEm* b2;
+    cEmBarred* b1;
+    cEmBarred* b2;
     int i;
     int n;
 
@@ -109,9 +109,9 @@ void R30dInit()
 #line 57 "D:/Bio4/Prog/r30d.cpp"
     wp = (R30dWork*) MEM_CALLOC(sizeof(R30dWork), 1, 0xd);
     ScfFlagOn(pG, SCF_R30D_ENTER);
-    getRoomEtcSwitch(8, (cEm**) &sw0, 1);
-    getRoomEtcSwitch(9, (cEm**) &sw1, 1);
-    getRoomEtcBarred(0xC, (cEm**) &bar, 1);
+    getRoomEtcSwitch(8, &sw0, 1);
+    getRoomEtcSwitch(9, &sw1, 1);
+    getRoomEtcBarred(0xC, &bar, 1);
     if (sw0 && sw1 && bar) {
         sw0->setBarred(bar);
         sw0->setConnectSwitch(sw1);
@@ -122,9 +122,9 @@ void R30dInit()
         bar->setClosed();
         bar->setUnderCk();
     }
-    getRoomEtcSwitch(0xA, (cEm**) &sw0, 1);
-    getRoomEtcSwitch(0xB, (cEm**) &sw1, 1);
-    getRoomEtcBarred(0xD, (cEm**) &bar, 1);
+    getRoomEtcSwitch(0xA, &sw0, 1);
+    getRoomEtcSwitch(0xB, &sw1, 1);
+    getRoomEtcBarred(0xD, &bar, 1);
     if (sw0 && sw1 && bar) {
         sw0->setActButton(0);
         sw1->setActButton(0);
@@ -219,8 +219,8 @@ void R30dMain()
             r30d_work->cnt[i] = 0;
         }
     }
-    getRoomEtcSwitch(8, (cEm**) &sw[0], 1);
-    getRoomEtcSwitch(0xA, (cEm**) &sw[1], 1);
+    getRoomEtcSwitch(8, &sw[0], 1);
+    getRoomEtcSwitch(0xA, &sw[1], 1);
     for (n = 0; n < 1; n++) {
         if (sw[n]) {
             if (sw[n]->ckOpen() == 0) {
@@ -269,7 +269,7 @@ static void OpenBoxTreasure(int id)
 static void R30dShutterPowerMain()
 {
     Vec p;
-    cEm* bar;
+    cEmBarred* bar;
     int i;
     int j;
 
@@ -331,7 +331,7 @@ static void R30dShutterPowerMain()
 static void R30dShutterPowerEnd()
 {
     Vec p;
-    cEm* bar;
+    cEmBarred* bar;
     f32 x;
     f32 z;
 
@@ -353,7 +353,7 @@ static void R30dShutterPowerEnd()
 static void R30dShutterFrontEvent()
 {
     Vec p;
-    cEm* bar;
+    cEmBarred* bar;
     int i;
 
     if (!(R30D_SAVE_FLAGS & 0x10000000)) {

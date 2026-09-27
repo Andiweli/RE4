@@ -1103,7 +1103,7 @@ static void em2c_R0_Init(cEm2c* em)
     em2cTexrenderInit(em);
     em->Motion.flip = em2c_xflip_tbl;
 #line 1623 "D:/Bio4/Prog/em2c.cpp"
-    em->Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 13);
+    em->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 13);
     {
         static const Vec ofs = {0.0f, 0.0f, 0.0f};
         static const Vec size = {10000.0f, 10000.0f, 10000.0f};
@@ -5390,7 +5390,7 @@ void em2cDoorOpenCk(cEm2c* em)
     }
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEmDoor* e = (cEmDoor*) EmMgr.fastAt(i);
-        EmDoorWork* dw;
+        FREE_EMDOOR* dw;
 
         if (!e->isAlive()) {
             continue;
@@ -5473,7 +5473,7 @@ void em2cDoorOpenCk2(cEm2c* em)
 
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEmDoor* e = (cEmDoor*) EmMgr.fastAt(i);
-        EmDoorWork* dw;
+        FREE_EMDOOR* dw;
 
         if (!e->isAlive()) {
             continue;
@@ -5569,7 +5569,7 @@ void em2cClothSet(cEm2c* em)
     }
     w->cloth.Flag = zero;
     w->cloth.pPtbl = zero;
-    PenClothSet(em, (PenCloth*) &w->cloth, 100.0f);
+    PenClothSet(em, (CLOTH_INFO*) &w->cloth, 100.0f);
 }
 
 // Per frame: the tendril cloth update (PenClothMove) with the hide bits of the parts handled.
@@ -5586,7 +5586,7 @@ void em2cClothMove(cEm2c* em)
         em->be_flag |= 0x200000;
         return;
     }
-    PenClothMove2(em, (PenCloth*) &w->cloth);
+    PenClothMove2(em, (CLOTH_INFO*) &w->cloth);
     for (i = 0x4B; i <= 0x4C; i++) {
         p = em->getPartsPtr(i);
         PSMTXConcat(p->pParent->mat, p->l_mat, p->mat);

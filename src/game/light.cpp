@@ -35,7 +35,7 @@ struct LightCtrlWork {
     u8 idx;                  // 0x08
 };
 
-static LightFog fogNew;
+static FOG fogNew;
 
 // value unknown: the linker dropped the object, only the `_GLOBAL_.I.FarDistance__9cLightMgr` name survives
 const f32 cLightMgr::FarDistance = 100000.0f;
@@ -418,7 +418,7 @@ int cLightMgr::move()
 void cLightMgr::hokanMove()
 {
     if (m_Hokan != 0) {
-        LightFog* fog = &LightEnv.Fog;
+        FOG* fog = &LightEnv.Fog;
 
         m_Hokan--;
         fog->Start = (fog->Start * m_Hokan + fogNew.Start) / (m_Hokan + 1);
@@ -848,7 +848,7 @@ f32 cLightMgr::getFogEnd()
 // Programs GX fog from LightEnv.Fog (black when Disp_flg 0x4000 or thermal) and the view far plane.
 void cLightMgr::setFog()
 {
-    LightFog* fog = &LightEnv.Fog;
+    FOG* fog = &LightEnv.Fog;
     u8 c = 0;
 
     if (DpfFlagChk(pG, DPF_FOG) || (StaFlagChk(pG, STA_THERMO_GRAPH))) {

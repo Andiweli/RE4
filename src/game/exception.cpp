@@ -56,10 +56,10 @@ struct SymHeader {
 };
 
 // A loaded symbol file and the load address of the module it describes.
-struct SymbolInfo {
+typedef struct tagSYMBOL_INFO {
     SymHeader* symbol_ptr;  // 0x00
     u32 virtual_addr;        // 0x04
-};
+} SYMBOL_INFO;
 
 // Memory dump window state (`test`).
 struct MemDump {
@@ -74,7 +74,7 @@ struct MemDump {
 };
 
 extern "C" {
-char* excepGetSymbolNameSub(u32 addr, SymbolInfo* info);
+char* excepGetSymbolNameSub(u32 addr, SYMBOL_INFO* info);
 void excepMemoryDumpMove(MemDump* w, int y);
 void excepMemoryDump(MemDump* w, int y);
 void excepRegConsoleDump(int error, u32 dsisr, u32 dar);
@@ -92,7 +92,7 @@ OSContext sv_context;
 static OSContext* pContext = &sv_context;
 static u32 call_stack[16];
 static int call_stack_num;
-SymbolInfo symbolInfo[9];
+SYMBOL_INFO symbolInfo[9];
 static int nSymbolInfo;
 char tmp_str[256];
 static int symbol_err = 0;
@@ -219,7 +219,7 @@ int excepLoadSymbolSub(char* name, OSModuleHeader* module)
             break;
         }
     } else {
-        SymbolInfo* p = &symbolInfo[nSymbolInfo];
+        SYMBOL_INFO* p = &symbolInfo[nSymbolInfo];
         p->symbol_ptr = (SymHeader*) addr;
         nSymbolInfo++;
         if (module) {
@@ -297,13 +297,13 @@ void excepLoadSymbol()
             symbol_err = excepLoadSymbolSub("Bio4.Sscrn.sym", mod);
         }
     }
-    if (RoomData.m_pModule) {
-        OSModuleHeader* mod = RoomData.m_pModule;
+    if (RoomData.getModulePtr()) {
+        OSModuleHeader* mod = RoomData.getModulePtr();
         if ((s32) mod < 0 && (u32) mod <= 0x82FFFFFF && (s32) mod->info.sectionInfoOffset < 0) {
             strcpy(buf, FileTbl[RoomData.m_RelNo].name + 4);
             *strchr(buf, '.') = 0;
             sprintf(tmp_str, "Bio4.%s.sym", buf);
-            symbol_err = excepLoadSymbolSub(tmp_str, RoomData.m_pModule);
+            symbol_err = excepLoadSymbolSub(tmp_str, RoomData.getModulePtr());
         }
     }
 }
@@ -327,7 +327,7 @@ char* excepGetSymbolName(u32 addr)
 }
 
 // Linear search of one symbol table for the entry whose [addr, addr+size) contains the address.
-char* excepGetSymbolNameSub(u32 addr, SymbolInfo* info)
+char* excepGetSymbolNameSub(u32 addr, SYMBOL_INFO* info)
 {
     SymHeader* h = info->symbol_ptr;
     int n = h->num;

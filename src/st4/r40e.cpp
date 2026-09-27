@@ -389,7 +389,7 @@ static void gameResult()
         Sofdec.Initialize("movie/adaend_c.sfd", 0);
     }
     SceSleep(1);
-    while (Sofdec.isPlay()) {
+    while (Sofdec.IsActive()) {
         SceSleep(1);
     }
     // Loop-note barrier: FadeSetW's `li r28,0xff` (a pseudo live across later calls) is issued after
@@ -437,14 +437,14 @@ extern "C" void Evt_R40ES00_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         ZFAR = 100000000.0f;
         StaFlagOn(pG, STA_CAMERA_SET_ROOM);
         break;
     case 1:
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0d00", 0, 0) == 1) {
                     ((cModel*) mod)->LightInfo.EnableMask = 0x40;
                 }
@@ -455,7 +455,7 @@ extern "C" void Evt_R40ES00_Func(Event* e)
                     ((cModel*) mod)->LightInfo.EnableMask = 2;
                 }
                 if (e->GetMod(&mod, "pl0c00", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod)->ObjChainFlagCommon |= 0x04000000;
@@ -464,9 +464,9 @@ extern "C" void Evt_R40ES00_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 3:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evmc100", 0, 0) == 1) {
                     TexRenderModSet((cModel*) mod, 0, r40e_work->texTbl, r40e_work->tex, 1, 1, 1, 1, 1.0f);
                 }
@@ -474,7 +474,7 @@ extern "C" void Evt_R40ES00_Func(Event* e)
             EvtTexRenderCamTrans(e, 3);
             break;
         case 5:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evmc100", 0, 0) == 1) {
                     TexRenderModSet((cModel*) mod, 0, r40e_work->texTbl, r40e_work->tex, 1, 1, 1, 1, 1.0f);
                 }
@@ -482,7 +482,7 @@ extern "C" void Evt_R40ES00_Func(Event* e)
             EvtTexRenderCamTrans(e, 5);
             break;
         case 7:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evmc100", 0, 0) == 1) {
                     TexRenderModSet((cModel*) mod, 0, r40e_work->texTbl, r40e_work->tex, 1, 1, 1, 1, 1.0f);
                 }
@@ -490,7 +490,7 @@ extern "C" void Evt_R40ES00_Func(Event* e)
             EvtTexRenderCamTrans(e, 7);
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evmc100", 0, 0) == 1) {
                     TexRenderModRes((cModel*) mod, 0);
                 }
@@ -509,11 +509,8 @@ void EvtTexRenderCamTrans(Event* e, int cut)
 {
     void* mod;
     void* bin;
-    int skip = 1;
+    int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-    if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-        skip = 0;
-    }
     if (skip == 0) {
         if (e->GetMod(&mod, "pl0d00", 0, 0) == 1) {
             TexRenderModAddOt(0, (cModel*) mod);

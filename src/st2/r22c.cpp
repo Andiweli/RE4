@@ -1444,7 +1444,7 @@ void deleteAllMark()
 static void r22cSetWepMan()
 {
     if (isWepmanAlive() != 0) {
-        EmListData d;
+        EM_LIST d;
         cEm* em;
 
         memclr_asm(&d, sizeof(d));
@@ -1735,7 +1735,7 @@ void ResultScreen::highscore(int score)
     asm("" : : "r"(pin));
     score = 0;
     for (i = 6; i >= 0; i--) {
-        IdUnit* u = IdSys.unitPtr(i + 1, IDC_TITLE);
+        ID_UNIT* u = IdSys.unitPtr(i + 1, IDC_TITLE);
 
         if (score == 0 && digit[i] == 0 && i != 0) {
             u->be_flag &= ~8;
@@ -1767,9 +1767,9 @@ void ResultScreen::init()
 int ResultScreen::move(int flag)
 {
     int ret = 0;
-    IdUnit* u0;
-    IdUnit* u3;
-    IdUnit* u;
+    ID_UNIT* u0;
+    ID_UNIT* u3;
+    ID_UNIT* u;
     int n;
     int digit[6];
     int i;
@@ -1901,7 +1901,7 @@ void ScoreSet(int pt, Vec* pos)
 {
     int slot;
     int type;
-    IdUnit* u;
+    ID_UNIT* u;
     Vec scr;
     int digit[4];
     Vec v;
@@ -1934,7 +1934,7 @@ void ScoreSet(int pt, Vec* pos)
     scr.y = (scr.y - 224.0f) * -1.0714285f;
     u->pos0 = scr;
     if (pt < 0) {
-        IdUnit* m;
+        ID_UNIT* m;
 
         pt = -pt;
         r22c_work->score2.unitPtr(0xFE, type)->be_flag &= ~8;
@@ -1969,7 +1969,7 @@ void ScoreSet(int pt, Vec* pos)
         }
     }
     for (i = 3; i >= 0; i--) {
-        IdUnit* du = r22c_work->score2.unitPtr(i + 1, type);
+        ID_UNIT* du = r22c_work->score2.unitPtr(i + 1, type);
 
         if (i - n >= 0) {
             du->tex_flag = 2;

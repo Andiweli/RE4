@@ -124,11 +124,11 @@ struct R31cWork {
     cEmWrap krauser;        // 0x2B0  Krauser of the knife fight (list 0x19)
     cEmWrap krauser2;       // 0x2BC  Krauser of the second battle (list 0x13)
     cEmDoor* door8;             // 0x2C8  etc door 8 (the battle arena door)
-    cEm* rack;              // 0x2CC  etc rack 0x10
+    cEmRack* rack;              // 0x2CC  etc rack 0x10
     SCE_TASK* talkTask;      // 0x2D0  the running r31c_TalktoKrauser task
     cR31CDoor door[9];      // 0x2D4  ids 0x78 0x79 0x7C 0x7B 0x7D 0x7E 0x7F 0x80 0x6D
     cR31CCountDown countDown;  // 0x4CC
-    cEm* sw[2];             // 0x4D4  etc switches 0x11 / 0x12
+    cEmSwitch* sw[2];             // 0x4D4  etc switches 0x11 / 0x12
     cEmWrap seeker[15];     // 0x4DC  the Novistadors (lists 0x12 0x1D 0x23 0x21 0x15 0x16 0x22 0x25 0x26 0x18 0x20 0x1B 0x1E ..)
     cSat* towerSat;         // 0x590
     cSat* towerEat;         // 0x594
@@ -252,7 +252,7 @@ void R31cInit()
     r31c_work->door[8].init(0x6D);
     r31c_work->door[8].setOpened();
     if (getRoomEtcRack(0x10, &r31c_work->rack, 1)) {
-        ((cEmRack*) r31c_work->rack)->setRange(0.0f, 0.0f, 9000.0f, 5000.0f);
+        r31c_work->rack->setRange(0.0f, 0.0f, 9000.0f, 5000.0f);
     }
     if (RsfCheck(G_ROOM_ID, 0x17) == 0) {
         SmdGetObjPtr(0x6A)->pos.y = 2000.0f;
@@ -277,10 +277,10 @@ void R31cInit()
         EstSet(0, -1, 0, 0, EFF_ROOM, 0x1B, 1, ESP_CORE_KIND_ROOM03, 0, 0);
     }
     if (getRoomEtcSwitch(0x11, &r31c_work->sw[0], 1)) {
-        ((cEmSwitch*) r31c_work->sw[0])->setLongCk();
+        r31c_work->sw[0]->setLongCk();
     }
     if (getRoomEtcSwitch(0x12, &r31c_work->sw[1], 1)) {
-        ((cEmSwitch*) r31c_work->sw[1])->setLongCk();
+        r31c_work->sw[1]->setLongCk();
     }
     SceExec(0x12, (TaskFunc) r31c_LeverCheck, 0, 0, 2, 0);
     EvtMgr.SetFunc("evt_r31cs00_func", (void*) Evt_R31CS00_Func);
@@ -925,7 +925,7 @@ static void r31c_TimerDoorCountDown()
         t--;
         SceSleep(1);
     }
-    while (ActBtn.m_active_flag == 1) {
+    while (ActBtn.isActive()) {
         SceSleep(1);
     }
     while (PlGetStatus() & 0xC0080) {
@@ -1115,9 +1115,9 @@ static void r31c_SwitchPushCheckEndProc()
 // The two levers: each one usable once its door is open.
 static void r31c_LeverCheck()
 {
-    ((cEmSwitch*) r31c_work->sw[0])->setClosed();
+    r31c_work->sw[0]->setClosed();
     r31c_work->sw[0]->setNoSuspend(1);
-    ((cEmSwitch*) r31c_work->sw[1])->setClosed();
+    r31c_work->sw[1]->setClosed();
     r31c_work->sw[1]->setNoSuspend(1);
     if (RsfCheck(G_ROOM_ID, 0x10)) {
         r31c_work->door[4].setOpened();
@@ -1126,34 +1126,34 @@ static void r31c_LeverCheck()
     for (;;) {
         if (RsfCheck(G_ROOM_ID, 0x12) == 0) {
             if (r31c_work->door[4].getStatus() == 1) {
-                ((cEmSwitch*) r31c_work->sw[0])->setActButton(1);
+                r31c_work->sw[0]->setActButton(1);
             } else {
-                ((cEmSwitch*) r31c_work->sw[0])->setActButton(0);
+                r31c_work->sw[0]->setActButton(0);
             }
-            if (((cEmSwitch*) r31c_work->sw[0])->ckSwitch() == 1) {
+            if (r31c_work->sw[0]->ckSwitch() == 1) {
                 RsfSet(G_ROOM_ID, 0x12);
-                ((cEmSwitch*) r31c_work->sw[0])->setActButton(0);
+                r31c_work->sw[0]->setActButton(0);
                 SceExec(0x12, (TaskFunc) r31c_LeverOperate, 0, 0, 2, 0);
             }
         } else {
-            ((cEmSwitch*) r31c_work->sw[0])->setOpened();
-            ((cEmSwitch*) r31c_work->sw[0])->setActButton(0);
+            r31c_work->sw[0]->setOpened();
+            r31c_work->sw[0]->setActButton(0);
             r31c_work->door[4].setOpened();
         }
         if (RsfCheck(G_ROOM_ID, 0x13) == 0) {
             if (r31c_work->door[5].getStatus() == 1) {
-                ((cEmSwitch*) r31c_work->sw[1])->setActButton(1);
+                r31c_work->sw[1]->setActButton(1);
             } else {
-                ((cEmSwitch*) r31c_work->sw[1])->setActButton(0);
+                r31c_work->sw[1]->setActButton(0);
             }
-            if (((cEmSwitch*) r31c_work->sw[1])->ckSwitch() == 1) {
+            if (r31c_work->sw[1]->ckSwitch() == 1) {
                 RsfSet(G_ROOM_ID, 0x13);
-                ((cEmSwitch*) r31c_work->sw[1])->setActButton(0);
+                r31c_work->sw[1]->setActButton(0);
                 SceExec(0x12, (TaskFunc) r31c_LeverOperate, 1, 0, 2, 0);
             }
         } else {
-            ((cEmSwitch*) r31c_work->sw[1])->setOpened();
-            ((cEmSwitch*) r31c_work->sw[1])->setActButton(0);
+            r31c_work->sw[1]->setOpened();
+            r31c_work->sw[1]->setActButton(0);
             r31c_work->door[5].setOpened();
             if (ScfFlagChk(pG, SCF_R31C_TOWER_EXPLODE) == 0) {
                 r31c_work->door[6].setOpened();
@@ -1165,13 +1165,13 @@ static void r31c_LeverCheck()
             break;
         }
     }
-    ((cEmSwitch*) r31c_work->sw[0])->setOpened();
+    r31c_work->sw[0]->setOpened();
     if (ScfFlagChk(pG, SCF_R31C_TOWER_EXPLODE)) {
-        ((cEmSwitch*) r31c_work->sw[1])->setClosed();
+        r31c_work->sw[1]->setClosed();
         r31c_work->door[6].setClosed();
     }
-    ((cEmSwitch*) r31c_work->sw[0])->setActButton(0);
-    ((cEmSwitch*) r31c_work->sw[1])->setActButton(0);
+    r31c_work->sw[0]->setActButton(0);
+    r31c_work->sw[1]->setActButton(0);
 }
 
 // Lever `no`: camera cut 0x13 / 0x14 while door 1 / door 6 slides open with its effect; player-cancellable.
@@ -1290,7 +1290,7 @@ static void r31c_TowerEntranceCloseEndProc()
     SceEventEnd(0);
     SceAtDataSet_exec(0x1A, 0x12, 0, (TaskFunc) r31c_SetContinuePoint, (void*) 2, 1);
     r31c_work->door[6].setClosed();
-    ((cEmSwitch*) r31c_work->sw[1])->setClosed();
+    r31c_work->sw[1]->setClosed();
 }
 
 // Time out: the explosion cut (camera, effects, quake), the tower swapped for its ruin model.
@@ -1536,7 +1536,7 @@ static void r31cEventS01()
 // (Room_flg[0] 0x10000000 = the button was hit), area 0x1C = the tower cover, the room state.
 void r31cEventS01EndProc()
 {
-    EmListData* l;
+    EM_LIST* l;
     int i;
 
     l = &pG->Em_list[0x13];
@@ -1613,7 +1613,7 @@ static void r31cEventS02EndProc()
 // the end sets Room_flg[0] bit 31.
 static void Evt_R31CS00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SceAtItemModelPtr(0x80)->setNoSuspend(1);
         SceAtItemModelPtr(0x81)->setNoSuspend(1);
@@ -1644,7 +1644,7 @@ static int r31c_evtS01Flag = 0;
 static void Evt_R31CS01_Func(Event* e)
 {
     void* mod;
-    int mode = e->FuncType;
+    int mode = e->GetFuncType();
     int cut;
 
     // `mode` keeps the switch value live into case 1 (the `1` stores reuse it). `cut` is set before
@@ -1660,7 +1660,7 @@ static void Evt_R31CS01_Func(Event* e)
         e->SetEvtCancelCut(cut);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
             if (e->GetMod(&mod, "em3900c", 0, 0) == 1) {
                 ((cModel*) mod)->ot_type = 1;
@@ -1682,10 +1682,10 @@ static void Evt_R31CS01_Func(Event* e)
             SmdGetObjPtr(0x97)->be_flag &= ~2;
             break;
         case 7:
-            if (e->NowFrame > 0x3B) {
+            if (e->GetNowFrame() > 0x3B) {
                 if (e->GetMod(&mod, "em3900d", 0, 0) == 1) {
-                    int f = e->NowFrame - 60;
-                    int mf = e->MaxFrame - 60;
+                    int f = e->GetNowFrame() - 60;
+                    int mf = e->GetMaxFrame() - 60;
 
                     ((cModel*) mod)->invisible_factor = 1.0f - (f32) f / (f32) mf;
                 }
@@ -1693,10 +1693,10 @@ static void Evt_R31CS01_Func(Event* e)
             }
             break;
         case 0xB:
-            if (e->NowFrame == 0x66) {
+            if (e->GetNowFrame() == 0x66) {
                 r31c_evtS01Flag = 1;
             }
-            if (e->NowFrame == 0x78) {
+            if (e->GetNowFrame() == 0x78) {
                 r31c_evtS01Flag = 0;
             }
             break;
@@ -1726,7 +1726,7 @@ static void Evt_R31CS01_Func(Event* e)
 static void Evt_R31CS02_Func(Event* e)
 {
     // The empty arms keep their own compare-tree nodes: two of them return, one breaks.
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         return;
     case 1:

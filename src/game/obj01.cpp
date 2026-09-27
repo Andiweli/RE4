@@ -30,7 +30,7 @@ void cObj01::move()
 // runs out.
 void cObj01::move00()
 {
-    Obj01Work* w = OBJ01_WK(this);
+    FREE_OBJ01* w = OBJ01_WK(this);
     int life = w->timer;
     f32 wh;
 
@@ -210,7 +210,7 @@ void cObj01::dmgSet(int type)
 // the object should be destroyed.
 int obj01AddSpeed(cObj01* pObj)
 {
-    Obj01Work* w = OBJ01_WK(pObj);
+    FREE_OBJ01* w = OBJ01_WK(pObj);
     f32 wh;
     Vec ref;
     Vec nrm;
@@ -309,7 +309,7 @@ int obj01AddSpeed(cObj01* pObj)
 cObj* SetObj01(void* bin, void* tpl, Vec* pos, Vec* rot, Vec* spd, f32 grav, f32 rad, int life, int flags)
 {
     cObj* obj;
-    Obj01Work* w;
+    FREE_OBJ01* w;
 
     obj = ObjMgr.create(cObjMgr::ID_MAGAZINE);
     if (obj == 0) {
@@ -374,7 +374,7 @@ cObj* SetObj01(void* bin, void* tpl, Vec* pos, Vec* rot, Vec* spd, f32 grav, f32
 // water splash on landing, water explosion.
 void Obj01SetEst(cObj* pObj, u32 eff, u32 est, u32 action, u32 eff2, u32 est2, u32 eff3, u32 est3, u32 eff4, u32 est4)
 {
-    Obj01Work* w;
+    FREE_OBJ01* w;
 
     if (pObj == 0) {
         return;

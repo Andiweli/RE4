@@ -1,5 +1,5 @@
 // game/em_cloth.cpp: cloth / hair chain tables of the enemy costume models (obj18 type 34, 18,
-// 37, 33, 30) and the em2b short rope; PenCloth* (pendulum.cpp) does the simulation.
+// 37, 33, 30) and the em2b short rope; CLOTH_INFO* (pendulum.cpp) does the simulation.
 
 #include "obj1d.h"
 #include "pl_cloth.h"
@@ -237,13 +237,13 @@ void Em34ClothSet1(cModel* pEm, PlCloth* pCloth)
     pCloth->Rate = 0.7f;
     pCloth->Bundle_num = 14;
     pCloth->Stretchy = 1.0f;
-    PenClothSet(pEm, (PenCloth*) pCloth, 100.0f);
+    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
 }
 
 // Per-frame simulation of the enemy 34 coat (the model-driven PenClothMove3 variant).
 void Em34ClothMove1(cModel* pEm, PlCloth* pCloth)
 {
-    PenClothMove3(pEm, (PenCloth*) pCloth);
+    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
 }
 
 // Clears the model's cloth-state bits (be_flag 0x00E00000) so the chains re-seat next frame.
@@ -280,13 +280,13 @@ void Em34ClothSet2(cModel* pEm, PlCloth* pCloth)
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (PenCloth*) pCloth, 100.0f);
+    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 34 cloth 2.
 void Em34ClothMove2(cModel* pEm, PlCloth* pCloth)
 {
-    PenClothMove3(pEm, (PenCloth*) pCloth);
+    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
 }
 
 // Enemy 18 (robed ganado) costume: the 27-node robe skirt in 4 strands (bones 34..60), 15
@@ -327,13 +327,13 @@ void Em18ClothSet(cModel* pEm, PlCloth* pCloth, int mode)
         pCloth->Bundle_num = 4;
         pCloth->Stretchy = 1.0f;
     }
-    PenClothSet(pEm, (PenCloth*) pCloth, 100.0f);
+    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
 }
 
 // Per-frame simulation of the enemy 18 robe; clears the cloth-state bits afterwards.
 void Em18ClothMove(cModel* pEm, PlCloth* pCloth)
 {
-    PenClothMove3(pEm, (PenCloth*) pCloth);
+    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
     pEm->be_flag &= ~0x00E00000;
 }
 
@@ -364,13 +364,13 @@ void Em37HairSet(cModel* pEm, PlCloth* pCloth)
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (PenCloth*) pCloth, 100.0f);
+    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
 }
 
 // Per-frame simulation of the enemy 37 hair (plain PenClothMove).
 void Em37HairMove(cModel* pEm, PlCloth* pCloth)
 {
-    PenClothMove(pEm, (PenCloth*) pCloth);
+    PenClothMove(pEm, (CLOTH_INFO*) pCloth);
 }
 
 // Clears the model's cloth-state bits.
@@ -406,13 +406,13 @@ void Em37CoatSet(cModel* pEm, PlCloth* pCloth)
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (PenCloth*) pCloth, 100.0f);
+    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
 }
 
 // Per-frame simulation of the enemy 37 coat.
 void Em37CoatMove(cModel* pEm, PlCloth* pCloth)
 {
-    PenClothMove(pEm, (PenCloth*) pCloth);
+    PenClothMove(pEm, (CLOTH_INFO*) pCloth);
 }
 
 // Enemy 33 costume, cloth 1: a 60-node chain, gravity 10, damping 0.8; `small` selects the
@@ -447,13 +447,13 @@ void Em33ClothSet(cModel* pEm, PlCloth* pCloth, int mode)
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (PenCloth*) pCloth, 100.0f);
+    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 33 cloth 1.
 void Em33ClothMove(cModel* pEm, PlCloth* pCloth)
 {
-    PenClothMove3(pEm, (PenCloth*) pCloth);
+    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
 }
 
 // Enemy 33 costume, cloth 2: a 46-node chain with the same parameters; `small` as above.
@@ -487,7 +487,7 @@ void Em33ClothSet2(cModel* pEm, PlCloth* pCloth, int mode)
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (PenCloth*) pCloth, 100.0f);
+    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 33 cloth 2.
@@ -513,7 +513,7 @@ void Em33ClothMove2(cModel* pEm, PlCloth* pCloth)
     p->world.x = p->mat[0][3];
     p->world.y = p->mat[1][3];
     p->world.z = p->mat[2][3];
-    PenClothMove3(pEm, (PenCloth*) pCloth);
+    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
 }
 
 // Clears the model's cloth-state bits.
@@ -566,7 +566,7 @@ cObjChain* Em2bShortRopeSet(cModel* m, PlCloth* c, void* bin, void* tpl)
     c->Move_rate = 0.0f;
     c->Flag = 0;
     c->pPtbl = 0;
-    chain->setChain((PenCloth*) c);
+    chain->setChain((CLOTH_INFO*) c);
     pos.x = -290.0f;
     pos.y = -162.95f;
     pos.z = 655.0f;
@@ -604,13 +604,13 @@ void Em30ClothSet1(cModel* pEm, PlCloth* pCloth)
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (PenCloth*) pCloth, 100.0f);
+    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 30 cloth 1.
 void Em30ClothMove1(cModel* pEm, PlCloth* pCloth)
 {
-    PenClothMove3(pEm, (PenCloth*) pCloth);
+    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
 }
 
 // Enemy 30 costume, cloth 2: a 30-node chain, gravity 15, damping 0.5, Stretchy 0.05.
@@ -640,13 +640,13 @@ void Em30ClothSet2(cModel* pEm, PlCloth* pCloth)
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (PenCloth*) pCloth, 100.0f);
+    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 30 cloth 2.
 void Em30ClothMove2(cModel* pEm, PlCloth* pCloth)
 {
-    PenClothMove3(pEm, (PenCloth*) pCloth);
+    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
 }
 
 // Clears the model's cloth-state bits.

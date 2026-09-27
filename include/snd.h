@@ -14,7 +14,7 @@
 #define SND_BIT_CLR(a, no) { u32* p_ = (a); p_[(u32) (no) >> 5] &= ~(0x80000000 >> ((no) & 31)); }
 
 // Reverb parameters (room header `STB` efx[0] = DPL2, efx[1] = stereo).
-struct SndEfxParam {
+struct REVERB_INFO {
     u16 Aux_core;    // 0x00  default aux A per block type (low bytes)
     u16 Aux_enemy;      // 0x02
     u16 Aux_weapon;     // 0x04
@@ -29,15 +29,15 @@ struct SndEfxParam {
 
 // Room sound header (`STB` sub-file of the room archive, pSnd->hdr; DefEffTbl when missing).
 struct SndRoomHdr {
-    SndEfxParam efx[2];   // 0x00
-    u32 curve_sel[32];    // 0x40   offsets to SndCurveSel, indexed by SND_SIT::curve_no
+    REVERB_INFO efx[2];   // 0x00
+    u32 curve_sel[32];    // 0x40   offsets to SND_TBL_DATA, indexed by SND_SIT::curve_no
     u32 vol_ofs[32];      // 0xC0   offsets to SndCurveTbl (volume by distance)
     u32 pitch_ofs[32];    // 0x140  offsets to SndCurveTbl (pitch by distance)
     u32 filter_ofs[32];   // 0x1C0  offsets to SndCurveTbl (filter by distance)
 };
 
 // Which distance curves a SIT uses (SndRoomHdr::curve_sel target).
-struct SndCurveSel {
+struct SND_TBL_DATA {
     s8 svol;         // 0x00
     s8 vol;          // 0x01
     s8 pitch[2];     // 0x02  [DPL2, stereo]
@@ -143,7 +143,7 @@ struct SndEmHist {
 };
 
 // Game sound work (`Snd`, 0xAE8 bytes, pSnd).
-struct SndWork {
+struct SND_WORK {
     SndMute mute[4];         // 0x00  core/pl, em, ... (SndMuteSet bits 0x10..0x80)
     u32 blk_flag[1];         // 0x20  block loaded bits (SND_BIT_*)
     SndPlayWork bgm_state[2]; // 0x24
@@ -231,7 +231,7 @@ struct SndMemWork {
 };
 
 // Recent SndCall log (debug display, 25 entries).
-struct SndHistory {
+struct SE_HISTORY {
     s8 idx;          // 0x00
     s8 num;          // 0x01
     s8 disp_idx;          // 0x02
@@ -243,17 +243,17 @@ struct SndHistory {
     s8 span[25];     // 0x99
 };
 
-extern SndWork Snd;
+extern SND_WORK Snd;
 extern SndMemWork SndMem;
 extern u32 UseAramSize[14];
-extern SndHistory History;
+extern SE_HISTORY History;
 extern SndRoomHdr DefEffTbl;
 // no `extern u32 aram_buf[3]` here: uninitialised objects (static or not) are emitted in
 // first-declaration order, and snd.cpp's `static callErr` precedes aram_buf in the original .bss
 extern u16 StrFileTbl[2];
 extern int str_flag;
 extern u32 ARAM_FREE_BASE;
-extern SndWork* pSnd;
+extern SND_WORK* pSnd;
 extern u32 SndStrAramAddr[4];
 
 void SndInit();

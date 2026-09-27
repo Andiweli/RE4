@@ -7,7 +7,7 @@
 #include "emBarred.h"
 
 // Work of the lever switch enemy (game/emswitch.cpp), overlaid on cEm from 0x3E0.
-struct EmSwitchWork {
+struct FREE_EMSWITCH {
     u8 pad_0[0x210];
     int Status;            // 0x210 (0x5F0)  1 = open, 2 = closed, 0 = moving (ckSwitch)
     int Onoff_flag;           // 0x214 (0x5F4)  ckOpen
@@ -25,7 +25,7 @@ struct EmSwitchWork {
     int actButton;        // 0x238 (0x618)  0 = no action button prompt
 };
 
-#define EMSWITCH_WK(em) ((EmSwitchWork*) (((cEmSwitch*) (em))->free))
+#define EMSWITCH_WK(em) ((FREE_EMSWITCH*) (((cEmSwitch*) (em))->free))
 
 class cEmSwitch : public cEm {
 public:

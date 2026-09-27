@@ -31,10 +31,10 @@ void* GetDataExt(void* arc, const char* tag, int no);
 #define SND_DATA_TOP 0x80370000
 #define LOOP_IDX(x, max) ((x) < 0 ? (max) : ((x) > (max) ? 0 : (x)))
 
-SndWork Snd;
+SND_WORK Snd;
 SndMemWork SndMem;
 u32 UseAramSize[14];
-SndHistory History;
+SE_HISTORY History;
 SndRoomHdr DefEffTbl;
 static u32 callErr[14][32];
 u32 aram_buf[3];
@@ -42,7 +42,7 @@ u32 aram_buf[3];
 u16 StrFileTbl[2] = { 1, 0x5F };
 int str_flag = 1;
 u32 ARAM_FREE_BASE;
-SndWork* pSnd;
+SND_WORK* pSnd;
 u32 SndStrAramAddr[4] = { 0x700000, 0x740000, 0x780000, 0x7C0000 };
 
 
@@ -86,7 +86,7 @@ void SndInit()
     ARInit(aram_buf, 3);
     ARAlloc(0x6FC000);
     ARQInit();
-    memclr_asm(pSnd, sizeof(SndWork));
+    memclr_asm(pSnd, sizeof(SND_WORK));
 
 #line 120 SND_FILE
     r = DvdRead(0, (void*) SND_DATA_TOP, 0, 0, 0, 0x11, __FILE__, __LINE__);
@@ -141,7 +141,7 @@ void SndInit2()
 {
     int i;
 
-    memclr_asm(pSnd, sizeof(SndWork));
+    memclr_asm(pSnd, sizeof(SND_WORK));
     pSnd->mram_top = SndMem.mram_end;
     pSnd->aram_base_addr = 0x1F4100;
     for (i = 0; i < 6; i++) {
@@ -438,10 +438,10 @@ int sndWallCheckSub(Vec* pos)
 }
 
 // SEs flagged se_flag 0x20 drop to volume 1 when the player stands in a volume-control floor area
-// (FlrAt kind 1) that does not contain the source.
+// (FLR_AT_DATA kind 1) that does not contain the source.
 void sndVolCtrlAtCheck(SND_SIT* pSit, u8* vol, u8* svol, Vec* pos)
 {
-    FlrAt* at;
+    FLR_AT_DATA* at;
 
     if (pos == NULL) {
         return;
@@ -453,7 +453,7 @@ void sndVolCtrlAtCheck(SND_SIT* pSit, u8* vol, u8* svol, Vec* pos)
     if (at == NULL) {
         return;
     }
-    if (AreaHitCheck(at->area, pos) != 0) {
+    if (AreaHitCheck(&at->area, pos) != 0) {
         return;
     }
     if (*vol != 0) {
@@ -464,7 +464,7 @@ void sndVolCtrlAtCheck(SND_SIT* pSit, u8* vol, u8* svol, Vec* pos)
     }
 }
 
-// While the player is in an "inner" floor area (FlrAt kind 3), SEs with inner_vol are scaled by
+// While the player is in an "inner" floor area (FLR_AT_DATA kind 3), SEs with inner_vol are scaled by
 // that percent. Returns 1 when applied.
 int sndInnerVolCheck(SND_SIT* pSit, u8* vol, u8* svol)
 {
@@ -495,7 +495,7 @@ void seRandomCheck(int blk, u16* no);
 // effect for 0..3, else the floor system default); then the random table and existence check.
 int footSeCheck(u16* call_no, Vec* pos)
 {
-    FlrAt* at;
+    FLR_AT_DATA* at;
     int ret;
 
     if (pos != NULL) {
@@ -516,9 +516,9 @@ int footSeCheck(u16* call_no, Vec* pos)
                 *call_no += at->se.se_type * FOOT_SE_NUM;
             } else {
                 if (*call_no <= 3) {
-                    EspFootCall(*call_no >> 1, pFlrSys->foot_esp[pFlrSys->group], pos);
+                    EspFootCall(*call_no >> 1, pFlrSys->def_eff_set[pFlrSys->cur_group], pos);
                 }
-                *call_no += pFlrSys->foot_se[pFlrSys->group] * FOOT_SE_NUM;
+                *call_no += pFlrSys->def_se_set[pFlrSys->cur_group] * FOOT_SE_NUM;
             }
         }
     }
@@ -615,11 +615,11 @@ int wepSeCheck(u16* call_no, Vec* pos)
     int ret;
 
     if (pos != NULL && *call_no == 0xF) {
-        FlrAt* at = FlrAtCheck(0, pos, 4);
+        FLR_AT_DATA* at = FlrAtCheck(0, pos, 4);
         if (at != NULL) {
             *call_no += at->se.cartridge_type;
-        } else if (pFlrSys->pData != NULL) {
-            *call_no += ((FlrAtHead*) pFlrSys->pData)->cartridge_type;
+        } else if (pFlrSys->pHead != NULL) {
+            *call_no += ((FLR_AT_HEADER*) pFlrSys->pHead)->cartridge_type;
         }
     }
     ret = sndExistCheck(2, *call_no);
@@ -862,7 +862,7 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
     if (sit->aux_a == -1) {
         c->ovr_flag |= 0x20;
         if (pSnd->hdr != NULL) {
-            SndEfxParam* p = &pSnd->hdr->efx[0];
+            REVERB_INFO* p = &pSnd->hdr->efx[0];
             if (pSys->SndMode != 2) {
                 p = &pSnd->hdr->efx[1];
             }
@@ -1345,7 +1345,7 @@ void debugDisp();
 void SndWatcher()
 {
     u32 i;
-    FlrAt* at;
+    FLR_AT_DATA* at;
     FLR_AT_BGM_VOL* b;
 
     if (StaFlagChk(pG, STA_MOVIE_ON)) {
@@ -1543,7 +1543,7 @@ void SndNextRoomInit()
     nextRoomBgmCheck();
     SndSeAbsFadeOutAll_5msec(100);
     Snd_seq_fade_out_type(2, 100);
-    memclr_asm(&pSnd->room_ok, sizeof(SndWork) - 0x90);
+    memclr_asm(&pSnd->room_ok, sizeof(SND_WORK) - 0x90);
     SND_BIT_CLR(pSnd->blk_flag, 6);
     SND_BIT_CLR(pSnd->blk_flag, 5);
     memclr_asm(&Snd_iss_blk[6], sizeof(SND_ISS_BLK));
@@ -1583,7 +1583,7 @@ int SndRoomStartInit()
 {
     u32 i;
     SndRoomSave* rs;
-    SndEfxParam* e;
+    REVERB_INFO* e;
 
     pSnd->hdr = (SndRoomHdr*) GetDataExt(pG->pRoom, "STB", 0);
     memclr_asm(&DefEffTbl, sizeof(SndRoomHdr));
@@ -1646,7 +1646,7 @@ int SndRoomStartInit()
             pSnd->room_str_tbl[i] = rs->str[i];
         }
     }
-    memclr_asm(&History, sizeof(SndHistory));
+    memclr_asm(&History, sizeof(SE_HISTORY));
     History.idx = -1;
     pSnd->flrat_last_hit[0] = -1;
     pSnd->flrat_last_hit[1] = -1;
@@ -2541,7 +2541,7 @@ int SndBgmDataReadCheck(int bgm_no)
 void SndSetReverb()
 {
     SND_EFX_WORK* w = &Snd_efx_work[0];
-    SndEfxParam* p;
+    REVERB_INFO* p;
 
     if (pSys->SndMode == 2) {
         p = &pSnd->hdr->efx[0];

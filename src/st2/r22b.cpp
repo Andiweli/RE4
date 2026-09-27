@@ -53,17 +53,17 @@ extern "C" void R22bEventS00()
 // Event r22bs00 callback: fade-outs / fade-ins at fixed frames of cuts 0 and 1 (skipped when the event is skipped).
 extern "C" void Evt_R22bS00_Func(Event* e)
 {
-    if (e->FuncType == 1) {
-        switch (e->NowCut) {
+    if (e->GetFuncType() == 1) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
                     FadeSetW(0x80000002, 25, 0, 0);
                 }
             }
-            if (e->NowFrame == 0x4E) {
+            if (e->GetNowFrame() == 0x4E) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -72,14 +72,14 @@ extern "C" void Evt_R22bS00_Func(Event* e)
             }
             break;
         case 1:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
                     FadeSetW(0x80000002, 12, 0, 0);
                 }
             }
-            if (e->NowFrame == 0x7B) {
+            if (e->GetNowFrame() == 0x7B) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -88,14 +88,14 @@ extern "C" void Evt_R22bS00_Func(Event* e)
             }
             break;
         case 2:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
                     FadeSetW(2, 0, 0, 0);
                 }
             }
-            if (e->NowFrame == 6) {
+            if (e->GetNowFrame() == 6) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -104,7 +104,7 @@ extern "C" void Evt_R22bS00_Func(Event* e)
             }
             break;
         case 5:
-            if (e->NowFrame == 0x59) {
+            if (e->GetNowFrame() == 0x59) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {

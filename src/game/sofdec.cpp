@@ -36,19 +36,19 @@ void UsrSfcnt2time(int sf, int ncnt, int* hh, int* mm, int* ss, int* ff)
 }
 
 // Debug overlay: the movie's play time (h:m:s:f) and frame info.
-void disp_info(SofdecApp* app)
+void disp_info(AP_OBJ* app)
 {
     MWS_FRM* frm = &app->frm;
     int count, tscale;
     int h, m, s, f;
 
-    mwPlyGetTime(app->hn, &count, &tscale);
+    mwPlyGetTime(app->mwply, &count, &tscale);
     UsrSfcnt2time(tscale, count, &h, &m, &s, &f);
     eprintf(0x20, 0x10, 0, 0, "%s (%3d x %3d)", app->fname, frm->width, frm->height);
     eprintf(0x196, 0x10, 0, 0, "%02d:%02d:%02d.%02d", h, m, s, f);
     eprintf(0x1C6, 0x20, 0, 0, "%5d", frm->fno);
-    eprintf(0x20, 0x20, 0, 0, "DECODE SKIP : %d", mwPlyGetNumSkipDec(app->hn));
-    eprintf(0x20, 0x30, 0, 0, "DISP SKIP   : %d", mwPlyGetNumSkipDisp(app->hn));
+    eprintf(0x20, 0x20, 0, 0, "DECODE SKIP : %d", mwPlyGetNumSkipDec(app->mwply));
+    eprintf(0x20, 0x30, 0, 0, "DISP SKIP   : %d", mwPlyGetNumSkipDisp(app->mwply));
 }
 
 // Boot: initialises the CRI Sofdec player for 59.94 Hz display with the error callback.
@@ -167,12 +167,12 @@ void cSofdec::drawTex()
 
     switch (m_draw_mode) {
     case 0:
-        if (drw.tex.yuv.bufY == NULL) {
+        if (m_scn_ctrl.tex.ybuf == NULL) {
             return;
         }
-        setCamera(&drw);
-        GXLoadTexObj(&drw.tex.yuv.texY, 0);
-        GXLoadTexObj(&drw.tex.yuv.texUV, 1);
+        setCamera(&m_scn_ctrl);
+        GXLoadTexObj(&m_scn_ctrl.tex.ytobj, 0);
+        GXLoadTexObj(&m_scn_ctrl.tex.ctobj, 1);
         setTevPrm(0, 1);
         GXSetBlendMode(1, 1, 0, 0);
         PSMTXIdentity(tm);
@@ -182,10 +182,10 @@ void cSofdec::drawTex()
         GXSetVtxDesc(0xD, 1);
         GXSetVtxAttrFmt(0, 9, 1, 3, 0);
         GXSetVtxAttrFmt(0, 0xD, 1, 4, 0);
-        drawQuad(&drw);
+        drawQuad(&m_scn_ctrl);
         break;
     case 1:
-        GXLoadTexObj(&drw.tex.argb.tex, 0);
+        GXLoadTexObj(&m_scn_ctrl.tex.tobj, 0);
         GXSetNumTevStages(1);
         GXSetBlendMode(1, 4, 5, 0);
         PSMTXIdentity(tm);
@@ -195,14 +195,14 @@ void cSofdec::drawTex()
         GXSetVtxDesc(0xD, 1);
         GXSetVtxAttrFmt(0, 9, 1, 3, 0);
         GXSetVtxAttrFmt(0, 0xD, 1, 4, 0);
-        drawPolygon(&drw);
+        drawPolygon(&m_scn_ctrl);
         break;
     }
     restoreTevPrm();
 }
 
 // Screen-sized quad (texture width x height, centred) with the frame texture.
-void cSofdec::drawQuad(SofdecDraw* d)
+void cSofdec::drawQuad(SceneCtrlObj* d)
 {
     Mtx tm, m;
     s16 hw = d->tex.width / 2;
@@ -211,7 +211,7 @@ void cSofdec::drawQuad(SofdecDraw* d)
     s16 nhh = -hh;
 
     PSMTXTrans(tm, 0.0f, 0.0f, 0.0f);
-    PSMTXConcat(d->mtx, tm, m);
+    PSMTXConcat(d->cam.view, tm, m);
     GXLoadPosMtxImm(m, 0);
     GXBegin(0x80, 0, 4);
     GXPosition3s16(hw, hh, 0);
@@ -225,12 +225,12 @@ void cSofdec::drawQuad(SofdecDraw* d)
 }
 
 // The frame on a 512-unit square 800 in front of the camera (mode 1).
-void cSofdec::drawPolygon(SofdecDraw* d)
+void cSofdec::drawPolygon(SceneCtrlObj* d)
 {
     Mtx tm, m, sm, rx, ry, rz;
 
     PSMTXTrans(tm, 0.0f, 0.0f, -800.0f);
-    PSMTXConcat(d->mtx, tm, m);
+    PSMTXConcat(d->cam.view, tm, m);
     PSMTXScale(sm, 512.0f, 512.0f, 512.0f);
     PSMTXConcat(m, sm, m);
     PSMTXRotRad(rx, 'X', 0.0f);
@@ -244,7 +244,7 @@ void cSofdec::drawPolygon(SofdecDraw* d)
 }
 
 // Orthographic-like frustum for the framebuffer size, camera 400 back looking at the origin.
-void cSofdec::setCamera(SofdecDraw* d)
+void cSofdec::setCamera(SceneCtrlObj* d)
 {
     Mtx44 proj;
     Vec up = {0.0f, 1.0f, 0.0f};
@@ -256,39 +256,39 @@ void cSofdec::setCamera(SofdecDraw* d)
     hw = (f32) (Rmode.fbWidth / 2);
     C_MTXFrustum(proj, hh, -hh, -hw, hw, 400.0f, 3000.0f);
     GXSetProjection(proj, 0);
-    C_MTXLookAt(d->mtx, &pos, &up, &target);
+    C_MTXLookAt(d->cam.view, &pos, &up, &target);
 }
 
 // Converts a decoded frame into the texture buffers (Y8 + UV 4:4 planes in mode 0, ARGB8888 in
 // mode 1), allocating them on the first frame.
 void cSofdec::loadMvFrmFx(MWPLY hn, MWS_FRM* frm)
 {
-    SofdecTex* tex = &drw.tex;
+    TexObj* tex = &m_scn_ctrl.tex;
 
     switch (m_draw_mode) {
     case 0:
-        if (tex->yuv.bufY == NULL) {
+        if (tex->ybuf == NULL) {
             allocTexMem(tex, frm->width, frm->height);
         }
-        mwPlyFxSetOutBufSize(hn, drw.tex.width, tex->height);
-        mwPlyFxCnvFrmY84C44(hn, frm, tex->yuv.bufY, tex->yuv.bufUV);
-        DCFlushRangeNoSync(tex->yuv.bufY, tex->yuv.sizeY);
-        DCFlushRangeNoSync(tex->yuv.bufUV, tex->yuv.sizeUV);
+        mwPlyFxSetOutBufSize(hn, m_scn_ctrl.tex.width, tex->height);
+        mwPlyFxCnvFrmY84C44(hn, frm, tex->ybuf, tex->cbuf);
+        DCFlushRangeNoSync(tex->ybuf, tex->ybufsiz);
+        DCFlushRangeNoSync(tex->cbuf, tex->cbufsiz);
         break;
     case 1:
-        if (tex->argb.buf == NULL) {
+        if (tex->rgbbuf == NULL) {
             allocTexMem(tex, frm->width, frm->height);
         }
-        mwPlyFxSetOutBufPitchHeight(hn, drw.tex.width * 4, tex->height);
-        mwPlyFxCnvFrmARGB8888(hn, frm, tex->argb.buf);
-        DCFlushRangeNoSync(tex->argb.buf, tex->argb.size);
+        mwPlyFxSetOutBufPitchHeight(hn, m_scn_ctrl.tex.width * 4, tex->height);
+        mwPlyFxCnvFrmARGB8888(hn, frm, tex->rgbbuf);
+        DCFlushRangeNoSync(tex->rgbbuf, tex->bufsiz);
         break;
     }
 }
 
 // Allocates the frame texture (width rounded to 32; mode 0: Y plane + half-size UV plane) and
 // clears it to black.
-void cSofdec::allocTexMem(SofdecTex* tex, int w, int h)
+void cSofdec::allocTexMem(TexObj* tex, int w, int h)
 {
     switch (m_draw_mode) {
     case 0: {
@@ -297,58 +297,58 @@ void cSofdec::allocTexMem(SofdecTex* tex, int w, int h)
 
         tex->height = (u16) h;
         tex->width = (u16) (w2 * 2);
-        tex->yuv.sizeY = GXGetTexBufferSize(tex->width, tex->height, 1, 0, 0);
-        tex->yuv.sizeUV = GXGetTexBufferSize(w2, h2, 3, 0, 0);
+        tex->ybufsiz = GXGetTexBufferSize(tex->width, tex->height, 1, 0, 0);
+        tex->cbufsiz = GXGetTexBufferSize(w2, h2, 3, 0, 0);
 #line 489 "D:/Bio4/Prog/sofdec.cpp"
-        tex->yuv.bufY = MEM_ALLOC(tex->yuv.sizeY, 1, 13);
-        tex->yuv.bufUV = MEM_ALLOC(tex->yuv.sizeUV, 1, 13);
-        if (tex->yuv.bufY == NULL || tex->yuv.bufUV == NULL) {
+        tex->ybuf = (u8*) MEM_ALLOC(tex->ybufsiz, 1, 13);
+        tex->cbuf = (u8*) MEM_ALLOC(tex->cbufsiz, 1, 13);
+        if (tex->ybuf == NULL || tex->cbuf == NULL) {
             OSReport("can't allocate tex buf.\n");
             break;
         }
         clrTexMem(tex);
-        GXInitTexObj(&tex->yuv.texY, tex->yuv.bufY, tex->width, tex->height, 1, 0, 0, 0);
-        GXInitTexObj(&tex->yuv.texUV, tex->yuv.bufUV, w2, h2, 3, 0, 0, 0);
+        GXInitTexObj(&tex->ytobj, tex->ybuf, tex->width, tex->height, 1, 0, 0, 0);
+        GXInitTexObj(&tex->ctobj, tex->cbuf, w2, h2, 3, 0, 0, 0);
         break;
     }
     case 1:
         tex->height = h;
         tex->width = (w + 31) & ~31;
-        tex->argb.size = GXGetTexBufferSize(tex->width, tex->height, 6, 0, 0);
+        tex->bufsiz = GXGetTexBufferSize(tex->width, tex->height, 6, 0, 0);
 #line 518 "D:/Bio4/Prog/sofdec.cpp"
-        tex->argb.buf = MEM_ALLOC(tex->argb.size, 1, 13);
-        if (tex->argb.buf == NULL) {
+        tex->rgbbuf = (u8*) MEM_ALLOC(tex->bufsiz, 1, 13);
+        if (tex->rgbbuf == NULL) {
             OSReport("can't allocate tex buf.\n");
             break;
         }
         clrTexMem(tex);
-        GXInitTexObj(&tex->argb.tex, tex->argb.buf, tex->width, tex->height, 6, 0, 0, 0);
+        GXInitTexObj(&tex->tobj, tex->rgbbuf, tex->width, tex->height, 6, 0, 0, 0);
         break;
     }
 }
 
 // Clears the frame texture to black (Y 0, UV 0x80 / ARGB 0).
-void cSofdec::clrTexMem(SofdecTex* tex)
+void cSofdec::clrTexMem(TexObj* tex)
 {
     switch (m_draw_mode) {
     case 0:
-        if (tex->yuv.bufY != NULL) {
-            memset_asm(tex->yuv.bufY, 0, tex->yuv.sizeY);
-            memset_asm(tex->yuv.bufUV, 0x80, tex->yuv.sizeUV);
+        if (tex->ybuf != NULL) {
+            memset_asm(tex->ybuf, 0, tex->ybufsiz);
+            memset_asm(tex->cbuf, 0x80, tex->cbufsiz);
         }
         break;
     case 1:
-        if (tex->argb.buf != NULL) {
-            memset_asm(tex->argb.buf, 0, tex->argb.size);
+        if (tex->rgbbuf != NULL) {
+            memset_asm(tex->rgbbuf, 0, tex->bufsiz);
         }
         break;
     }
 }
 
 // Fresh draw state with the default camera.
-void cSofdec::initDraw(SofdecDraw* d)
+void cSofdec::initDraw(SceneCtrlObj* d)
 {
-    memclr_asm(d, sizeof(SofdecDraw));
+    memclr_asm(d, sizeof(SceneCtrlObj));
     setCamera(d);
 }
 
@@ -359,12 +359,12 @@ void cSofdec::initApp(const char* fname)
     void* buf;
     int req;
 
-    initDraw(&drw);
-    memclr_asm(&app, sizeof(SofdecApp));
-    app.disp = 1;
-    app.hn = NULL;
-    app.xE4 = 0;
-    strcpy(app.fname, fname);
+    initDraw(&m_scn_ctrl);
+    memclr_asm(&m_ap_obj, sizeof(AP_OBJ));
+    m_ap_obj.disp_flag = 1;
+    m_ap_obj.mwply = NULL;
+    m_ap_obj.term_flag = 0;
+    strcpy(m_ap_obj.fname, fname);
 #line 615 "D:/Bio4/Prog/sofdec.cpp"
     buf = MEM_ALLOC(0x5000, 1, 13);
     req = DvdReadN(fname, buf, 0, 0, 0x5000, 0x11, __FILE__, __LINE__);
@@ -379,7 +379,7 @@ void cSofdec::initApp(const char* fname)
 // and starts playback of the file. Returns 0 on failure.
 int cSofdec::startApp()
 {
-    MWS_PLY_CPRM_SFD* cprm = &app.cprm;
+    MWS_PLY_CPRM_SFD* cprm = &m_ap_obj.cprm;
     MWPLY hn;
 
     cprm->compo_mode = 0;
@@ -396,32 +396,32 @@ int cSofdec::startApp()
         ap_mwply_err_func(NULL, "Can't Malloc.");
         return 0;
     }
-    app.work = cprm->work;
+    m_ap_obj.mwsfd_wkadr = (s8*) cprm->work;
     hn = mwPlyCreateSofdec(cprm);
     if (hn == NULL) {
-        Mem_free(app.work);
+        Mem_free(m_ap_obj.mwsfd_wkadr);
         ap_mwply_err_func(NULL, "Can't Create Handle.");
         return 0;
     }
-    app.hn = hn;
-    mwPlyStartFname(hn, app.fname);
+    m_ap_obj.mwply = hn;
+    mwPlyStartFname(hn, m_ap_obj.fname);
     return 1;
 }
 
 // Playback start: screen black, VI sync every frame, the screen resized to 512 wide, texture
-// cleared; fadeIn = show the first frame when it arrives.
+// cleared; m_is_set_black stays set until the first frame arrives.
 void cSofdec::initSync()
 {
     systemVISetBlack(1);
-    fadeIn = 1;
+    m_is_set_black = 1;
     m_vcnt_save = GetSystemVcnt();
     SetSystemVcnt(1);
     if (Screen.width != 512.0f) {
-        resized = 1;
+        m_isScreenResize = 1;
         ScreenReSize(0x200, 0x1C0);
     }
-    clrTexMem(&drw.tex);
-    OSReport("Movie Play : %s \n", app.fname);
+    clrTexMem(&m_scn_ctrl.tex);
+    OSReport("Movie Play : %s \n", m_ap_obj.fname);
 }
 
 // One frame of playback: START / a button skips (m_be_flag 0x20), the CRI main tick, the newest
@@ -436,33 +436,33 @@ int cSofdec::appMain()
         return 0;
     }
     ADXM_ExecMain();
-    mwPlyGetCurFrm(app.hn, &frm);
+    mwPlyGetCurFrm(m_ap_obj.mwply, &frm);
     if (frm.bufadr != NULL) {
-        loadMvFrmFx(app.hn, &frm);
-        app.frm = frm;
-        mwPlyRelCurFrm(app.hn);
+        loadMvFrmFx(m_ap_obj.mwply, &frm);
+        m_ap_obj.frm = frm;
+        mwPlyRelCurFrm(m_ap_obj.mwply);
     }
-    stat = mwPlyGetStat(app.hn);
+    stat = mwPlyGetStat(m_ap_obj.mwply);
     if (stat == MWE_PLY_STAT_PLAYEND || stat == MWE_PLY_STAT_ERROR) {
         return 0;
     }
-    app.stat = stat;
+    m_ap_obj.mwstat = stat;
     return 1;
 }
 
 // Draws the frame once playback has started (status > 1), lifting the black screen on the first.
 void cSofdec::draw()
 {
-    if (app.stat > 1) {
+    if (m_ap_obj.mwstat > 1) {
         drawTex();
-        if (fadeIn == 1) {
+        if (m_is_set_black == 1) {
             FadeKill(0);
             systemVISetBlack(0);
-            fadeIn = 0;
+            m_is_set_black = 0;
         }
-        fno = ((u16*) &app.frm.fno)[1];
-        if (app.disp == 1) {
-            disp_info(&app);
+        m_frame_no = ((u16*) &m_ap_obj.frm.fno)[1];
+        if (m_ap_obj.disp_flag == 1) {
+            disp_info(&m_ap_obj);
         }
     }
 }
@@ -472,17 +472,17 @@ void cSofdec::draw()
 // the movie flags (Status_flg[0] 0x10000000, System_flg 0x00100000, m_be_flag bit0).
 void cSofdec::finishMovie()
 {
-    mwPlyDestroy(app.hn);
-    app.hn = NULL;
-    Mem_free(app.work);
-    if (drw.tex.yuv.bufY != NULL) {
-        Mem_free(drw.tex.yuv.bufY);
-        Mem_free(drw.tex.yuv.bufUV);
-        drw.tex.yuv.bufY = NULL;
-        drw.tex.yuv.bufUV = NULL;
+    mwPlyDestroy(m_ap_obj.mwply);
+    m_ap_obj.mwply = NULL;
+    Mem_free(m_ap_obj.mwsfd_wkadr);
+    if (m_scn_ctrl.tex.ybuf != NULL) {
+        Mem_free(m_scn_ctrl.tex.ybuf);
+        Mem_free(m_scn_ctrl.tex.cbuf);
+        m_scn_ctrl.tex.ybuf = NULL;
+        m_scn_ctrl.tex.cbuf = NULL;
     }
     systemVISetBlack(1);
-    if (resized != 0) {
+    if (m_isScreenResize != 0) {
         ScreenReSize(0x280, 0x1C0);
     }
     pG->Disp_flg = m_disp_flg_bak;
@@ -496,7 +496,7 @@ void cSofdec::finishMovie()
         MemSetCurrentHeap(m_save_cur_heap);
     }
     SysFlagOff(pG, SYS_TRANS_STOP);
-    if (!chkFlag(0x100)) {
+    if (!ckFlag(0x100)) {
         systemVISetBlack(0);
     }
     m_be_flag &= ~1;
@@ -608,5 +608,5 @@ void cSofdec::PlayPause(int sw)
     } else {
         m_be_flag &= ~4;
     }
-    mwPlyPause(app.hn, sw);
+    mwPlyPause(m_ap_obj.mwply, sw);
 }

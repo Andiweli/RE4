@@ -10,7 +10,7 @@ class cObj16;
 // Work of the em25 enemy (em25 module, D:/Bio4/Prog/em25.cpp): the parasite that bursts out of a
 // host's head (mode 1, attached to a parent enemy's parts: P_ routines) or crawls on the floor
 // (mode 0). Overlaid on cEm from 0x3E0; the comment gives the cEm offset.
-struct Em25Work {
+struct FREE_EM25 {
     u32 Be_flg;            // 0x000 (0x3E0)  bit0: route to the player found, bit3: damage routine, bit4: parasite objects set (em25SetParasite),
                           //                bit5: parent head turned away (em25_R1_P_Wait / em25OnParent); the low bits (0x2F) are cleared every frame
     int Timer;            // 0x004 (0x3E4)
@@ -48,7 +48,7 @@ struct Em25Work {
     u8 Atk_enable;         // 0x3AE (0x78E)  ckAtkEnable
 };
 
-#define EM25_WK(em) ((Em25Work*) (((cEm25*) (em))->free))
+#define EM25_WK(em) ((FREE_EM25*) (((cEm25*) (em))->free))
 
 class cEm25 : public cEm {
 public:

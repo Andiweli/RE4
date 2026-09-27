@@ -6,11 +6,12 @@
 #include "obj.h"
 
 class cSubWep : public cObj {
-public:
+protected:
     u32 effType;          // 0x328  landing effect (AtEffInfo pair by type; 0xD2 = none)
     u8 effId;             // 0x32C  (PS2 EST_ID effId)
     u8 pad_32D[3];
     s32 effFlag;          // 0x330  AtEffInfo::flags of the hit (bit31 set when known, bit0: solid ground)
+public:
     u32* pMot;            // 0x334
     u32 mot_attr;         // 0x338
     Vec rot_spd;          // 0x33C
@@ -40,13 +41,17 @@ public:
     virtual ~cSubWep() {}
     virtual void beginEvent(u32 mode);
     virtual void move();
+private:
     virtual void explode() = 0;
     virtual void waterExplode() = 0;
+public:
     void moveNormal();
     void moveWater();
     void scrAdjust();
     void dmgSet(int kind);
+private:
     void addSpeed();
+public:
     void bounce(Vec* nrm);
     int getEffectType();
     int init(Vec* rot, f32 power);
@@ -60,6 +65,7 @@ class cObjGrenade : public cSubWep {
 public:
     cObjGrenade();
     virtual ~cObjGrenade() {}
+private:
     virtual void explode();
     virtual void waterExplode();
 };
@@ -68,6 +74,7 @@ class cObjGreFire : public cSubWep {
 public:
     cObjGreFire();
     virtual ~cObjGreFire() {}
+private:
     virtual void explode();
     virtual void waterExplode();
 };
@@ -76,6 +83,7 @@ class cObjGreLight : public cSubWep {
 public:
     cObjGreLight();
     virtual ~cObjGreLight() {}
+private:
     virtual void explode();
     virtual void waterExplode();
 };
@@ -84,6 +92,7 @@ class cObjEgg : public cSubWep {
 public:
     cObjEgg();
     virtual ~cObjEgg() {}
+private:
     virtual void explode();
     virtual void waterExplode();
 };

@@ -6,7 +6,7 @@
 #include "em.h"
 
 // Work of the torch enemy (game/emtorch.cpp), overlaid on cEm from 0x3E0.
-struct EmTorchWork {
+struct FREE_EMTORCH {
     u32 Be_flg;            // 0x000 (0x3E0)  bit0: setParent flag (no matrix normalisation)
     int Timer;            // 0x004 (0x3E4)  30 after the first frame
     u8 pad_8[4];
@@ -21,7 +21,7 @@ struct EmTorchWork {
     u8 Etc_no;             // 0x066 (0x446)  etc flag index (broken / taken flag)
 };
 
-#define EMTORCH_WK(em) ((EmTorchWork*) (((cEmTorch*) (em))->free))
+#define EMTORCH_WK(em) ((FREE_EMTORCH*) (((cEmTorch*) (em))->free))
 
 // Torch enemy: a candle / brazier / lamp model that follows a parent's parts (setParent), burns
 // an effect (setEff) and breaks or falls when shot.

@@ -5,7 +5,7 @@
 
 // game/game.cpp: save data front end.
 
-// Copy of the GlobalWork tail (0x4F80 .. 0x8678) kept in the save data (cGameSave::save / load).
+// Copy of the GLOBAL_WK tail (0x4F80 .. 0x8678) kept in the save data (cGameSave::save / load).
 struct GameSaveBlock {
     u8 pad_0[4];              // 0x4F80
     s32 point;                // 0x4F84  pG->point (GamePointBossReset refreshes it)
@@ -41,7 +41,7 @@ extern SAVE_DATA_HEAD* pSaveData;  // .sbss order: pSaveData before GameSave
 extern cGameSave GameSave;
 
 // Died demo task parameter (DiedemoExec -> gameDiedemo).
-struct DiedemoWork {
+struct DIEDEMO_WORK {
     int exec_frame;   // 0x00  frames before the demo starts
     int demo_type;   // 0x04  0 normal, 1 with the sub character alive, 2 (flags_54 bit31)
 };
@@ -77,7 +77,7 @@ void GamePointBossReset();
 void PrimDispWorkNum(int x, int y, int page);
 void DiedemoExec(int time, int type);
 void gameDiedemoCheck();
-void gameDiedemo(DiedemoWork* pDw);
+void gameDiedemo(DIEDEMO_WORK* pDw);
 }
 void GameStopModeEnd();
 

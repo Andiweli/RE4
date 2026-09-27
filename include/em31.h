@@ -29,7 +29,7 @@ struct EYELID_WK {
 
 // Work of the em31 enemy (em31 module, D:/Bio4/Prog/em31.cpp): the giant. cModel::type 0 is the body,
 // type 1 the parasite tentacle on its back (em31SearchBody links the two). Overlaid on cEm from 0x3E0.
-struct Em31Work {
+struct FREE_EM31 {
     u32 Be_flg;            // 0x000 (0x3E0)  bit0: route found, bit3: damage / die routine, bit4: damage routine running,
                           //                bit6: berserk, bit7: catch / jump (no damage switch), bit8: tentacle weak hit,
                           //                bit9: appearing (cloth off), bit10: attack hit, bit11: tentacle dead (die variant),
@@ -90,7 +90,7 @@ struct Em31Work {
     u8 Down_type;          // 0x975 (0xD55)  em31DmCk: down variant 0..3
 };
 
-#define EM31_WK(em) ((Em31Work*) (((cEm31*) (em))->free))
+#define EM31_WK(em) ((FREE_EM31*) (((cEm31*) (em))->free))
 
 class cEm31 : public cEm {
 public:

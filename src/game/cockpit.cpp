@@ -108,7 +108,7 @@ static inline void approachIdx(f32* v, f32* t, int i)
 // the current life.
 void LifeMeter::roomInit()
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     IdSys.set(ARC_PTR(ofs_7C), 0xFF, IDC_LIFE_METER, 0x13, 5, 0);
     IdSys.unitPtr(0x40, IDC_LIFE_METER)->be_flag &= ~8;
@@ -172,24 +172,24 @@ void LifeMeter::move()
     f32 b[4];
     f32 c[4];
     f32 d[4];
-    IdUnit* u;
-    IdUnit* u2;
-    IdUnit* u3;
-    IdUnit* u4;
+    ID_UNIT* u;
+    ID_UNIT* u2;
+    ID_UNIT* u3;
+    ID_UNIT* u4;
     cPlayer* pl = pPL;
-    IdUnit* src = 0;
-    IdUnit* src2;
+    ID_UNIT* src = 0;
+    ID_UNIT* src2;
     f32 ang;
     f32 rate;
     int i;
 
     if (pSUB && pSUB->id == 3) {
-        IdUnit* p = IdSys.unitPtr(1, IDC_LIFE_METER);
+        ID_UNIT* p = IdSys.unitPtr(1, IDC_LIFE_METER);
         p->be_flag |= 8;
         p = IdSys.unitPtr(3, IDC_LIFE_METER);
         p->be_flag |= 8;
     } else {
-        IdUnit* p = IdSys.unitPtr(1, IDC_LIFE_METER);
+        ID_UNIT* p = IdSys.unitPtr(1, IDC_LIFE_METER);
         p->be_flag &= ~8;
         p = IdSys.unitPtr(3, IDC_LIFE_METER);
         p->be_flag &= ~8;
@@ -301,7 +301,7 @@ void LifeMeter::move()
         break;
     }
     {
-        IdUnit* p = IdSys.unitPtr(0x12, IDC_LIFE_METER);
+        ID_UNIT* p = IdSys.unitPtr(0x12, IDC_LIFE_METER);
 
         p->col0[0] = (u8) m_color0[0];
         p->col0[1] = (u8) m_color0[1];
@@ -323,7 +323,7 @@ void LifeMeter::move()
         src2 = IdSys.unitPtr(0x0F, IDC_LIFE_METER);
     }
     {
-        IdUnit* p = IdSys.unitPtr(3, IDC_LIFE_METER);
+        ID_UNIT* p = IdSys.unitPtr(3, IDC_LIFE_METER);
 
         p->col0[0] = (u8) m_color0_sub[0];
         p->col0[1] = (u8) m_color0_sub[1];
@@ -397,7 +397,7 @@ void LifeMeter::move()
 // Stops (sw 0) or restarts (sw 1) the meter's id animation timer.
 void LifeMeter::fix(int flag)
 {
-    IdUnit* u = IdSys.unitPtr(0, IDC_LIFE_METER);
+    ID_UNIT* u = IdSys.unitPtr(0, IDC_LIFE_METER);
 
     u->be_flag |= 8;
     if (flag == 0) {
@@ -415,7 +415,7 @@ void LifeMeter::fix(int flag)
 // Shows (1) / hides (0) the meter root id.
 void LifeMeter::disp(int sw)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     switch (sw) {
     case 1:
@@ -434,7 +434,7 @@ void LifeMeter::disp(int sw)
 // Starts the meter's slide-out animation (rev_flag) when the HUD leaves.
 void LifeMeter::frameOut()
 {
-    IdUnit* u = IdSys.unitPtr(0, IDC_LIFE_METER);
+    ID_UNIT* u = IdSys.unitPtr(0, IDC_LIFE_METER);
 
     u->rev_flag &= ~0xF;
     u->be_flag |= 8;
@@ -443,7 +443,7 @@ void LifeMeter::frameOut()
 // Starts the meter's slide-in animation.
 void LifeMeter::frameIn()
 {
-    IdUnit* u = IdSys.unitPtr(0, IDC_LIFE_METER);
+    ID_UNIT* u = IdSys.unitPtr(0, IDC_LIFE_METER);
 
     u->rev_flag |= 0xF;
     u->be_flag |= 8;
@@ -536,8 +536,8 @@ void BulletInfo::roomInit()
 void BulletInfo::move()
 {
     u8 digit[3];
-    IdUnit* u[3];
-    IdUnit* empty;
+    ID_UNIT* u[3];
+    ID_UNIT* empty;
     int noBullet = 0;
     cItemMgr* im = &ItemMgr;
     int wepNo;
@@ -583,7 +583,7 @@ void BulletInfo::move()
         } else {
             IdSys.kill(0xFF, IDC_BLLT_ICON);
             IdSys.set(ARC_PTR(ofs_98), mark, IDC_BLLT_ICON, 0x13, 5, 0);
-            IdUnit* p = IdSys.unitPtr(mark, IDC_BLLT_ICON);
+            ID_UNIT* p = IdSys.unitPtr(mark, IDC_BLLT_ICON);
             IdSys.unitParent(IdSys.unitPtr(0x30, IDC_LIFE_METER), p);
         }
     }
@@ -740,8 +740,8 @@ void CountDown::move()
 {
     f32 tbl[6] = {0.0f, 1.0f, -1.0f, 0.0f, 1.5f, -0.5f};
     int run = 1;
-    IdUnit* u;
-    IdUnit* p;
+    ID_UNIT* u;
+    ID_UNIT* p;
     u32 t;
     Digits d;
     s8 oldTens;
@@ -772,7 +772,7 @@ void CountDown::move()
         }
     }
     if (m_frame < m_warn_frame) {
-        IdUnit* s;
+        ID_UNIT* s;
 
         u = IdSys.unitPtr(0x10, IDC_COUNT_DOWN);
         s = IdSys.unitPtr(8, IDC_COUNT_DOWN);
@@ -838,7 +838,7 @@ void CountDown::move()
 // Shows (1) / hides (0) the count-down ids (m_state bit4 = hidden).
 void CountDown::disp(int sw)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     switch (sw) {
     case 1:
@@ -859,7 +859,7 @@ void CountDown::disp(int sw)
 // Slide-in animation of the count-down frame (30 frames).
 void CountDown::frameIn()
 {
-    IdUnit* u = IdSys.unitPtr(0x10, IDC_COUNT_DOWN);
+    ID_UNIT* u = IdSys.unitPtr(0x10, IDC_COUNT_DOWN);
 
     u->be_flag |= 8;
     u->rev_flag &= ~0xF;
@@ -877,7 +877,7 @@ void CountDown::frameOut()
 // Sets the remaining time from minutes / seconds / hundredths and starts the count-down.
 void CountDown::initTime(int m, int s, int c)
 {
-    IdUnit* u;
+    ID_UNIT* u;
 
     m_frame = TIME_FRAME(m, s, c);
     m_minute = m;

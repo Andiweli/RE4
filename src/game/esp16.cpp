@@ -9,7 +9,7 @@
 #include "rnd.h"
 #include "esp.h"
 
-struct Esp16Work {
+typedef struct tagESP16_WK {
     u32 Num;        // 0x00 number of chain points (gen->Work8[0] + 2)
     cEsp3f* pPosBuf;    // 0x04 point positions
     cEsp3f* pSpdBuf;    // 0x08 point speeds
@@ -19,17 +19,17 @@ struct Esp16Work {
     f32 del;       // 0x28 speed damping (gen->Vec0.y / 100)
     f32 max_len;        // 0x2C segment length (gen->Vec0.x)
     cParts* pParts;  // 0x30 model part the far end is attached to
-};
+} ESP16_WK;
 
 // Rope / chain: a string of points held together by distance constraints, drawn as a textured
 // strip facing the camera. The head follows the effect position, the tail can be attached to
 // a model part.
 class cEsp16 : public cEsp {
 public:
-    Esp16Work m_Free;  // 0xF8
+    ESP16_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
     virtual void Destruct();
 };
 
@@ -43,7 +43,7 @@ cEsp* Esp16_Create()
 // its predecessor. When the tail is pinned, a second pass runs from the tail toward the head.
 void cEsp16::move()
 {
-    Esp16Work* w = &m_Free;
+    ESP16_WK* w = &m_Free;
     Vec pos0;
     Vec d;
     Vec nrm;
@@ -136,7 +136,7 @@ void cEsp16::move()
 // bit1 flips s, bit2 runs t backwards.
 extern "C" void Esp16_Trans(cEsp16* esp)
 {
-    Esp16Work* w = &esp->m_Free;
+    ESP16_WK* w = &esp->m_Free;
     Mtx inv;
     Vec cam;
     Vec q0;
@@ -145,7 +145,7 @@ extern "C" void Esp16_Trans(cEsp16* esp)
     Vec toCam;
     Vec nrm;
     Vec cross;
-    EspAnmData* anm;
+    cAnm* anm;
     Vec* p0;
     Vec* p1;
     u32 n;
@@ -256,7 +256,7 @@ extern "C" void Esp16_Trans(cEsp16* esp)
 // Releases the position and speed esp3f buffers.
 void cEsp16::Destruct()
 {
-    Esp16Work* w = &m_Free;
+    ESP16_WK* w = &m_Free;
     cEsp* b;
 
     b = (cEsp*)w->pPosBuf;
@@ -271,9 +271,9 @@ void cEsp16::Destruct()
 
 // Reads the point count, optional tail parts, physics parameters, allocates both buffers (fails
 // when the pool is short) and starts every point at the effect's world position with zero speed.
-int cEsp16::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp16::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp16Work* w = &m_Free;
+    ESP16_WK* w = &m_Free;
     Vec p;
     Vec z;
     int i;

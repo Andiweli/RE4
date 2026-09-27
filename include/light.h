@@ -14,7 +14,7 @@ class cEm;
 class cCoord;
 
 // Spot block of a light (0x40 bytes, cLight+0x38 / cLightWork+0x2C). Only the direction is known.
-struct LightSpot {
+struct LIT_TYPE04_FREE {
     Vec Normal;        // 0x00 direction
     union {
         f32 A0;    // 0x0C  spot cutoff angle (GXInitLightSpot); custom: a0
@@ -60,7 +60,7 @@ public:
     u16 HitRadius;           // 0x24  hit adjust radius
     u16 Dummy82;       // 0x26  (PS2 cLightWork Dummy82)
     u32 Dummy9;        // 0x28  (PS2 cLightWork Dummy9)
-    LightSpot spot;    // 0x2C
+    LIT_TYPE04_FREE spot;    // 0x2C
     LightSub sub;      // 0x6C
     LightPath path;    // 0xEC
 
@@ -94,7 +94,7 @@ public:
     u32 Dummy9;        // 0x34  (PS2 cLight Dummy9)
     union {
         Vec normal;        // 0x38 direction
-        LightSpot spot;    // 0x38 .. 0x78
+        LIT_TYPE04_FREE spot;    // 0x38 .. 0x78
     };
     union {
         u8 work[0x40];     // 0x78 per-light-type work area
@@ -162,7 +162,7 @@ struct LightPathHeader {
 };
 
 // Fog block (cLightEnv+0x8, copied to `fogNew` by setEnv).
-struct LightFog {
+struct FOG {
     s32 Type;          // 0x00  GX fog type (0 = off)
     f32 Start;         // 0x04
     f32 End;           // 0x08
@@ -184,8 +184,8 @@ public:
 struct cLightEnv {
     GXColor AmbientScr;     // 0x00  model ambient (trans_lit LightSetModel / cloth / water; versionUp 0x23 copies it to AmbientEm / AmbientEsp)
     u32 nLight;      // 0x04
-    LightFog Fog;    // 0x08  Type: gx_sub: 0 = the background colour has no rgb (alpha only); Color: fog / background colour
-    LightFog MirrorFog;   // 0x18  mirror fog (db_light "MIRROR FOG")
+    FOG Fog;    // 0x08  Type: gx_sub: 0 = the background colour has no rgb (alpha only); Color: fog / background colour
+    FOG MirrorFog;   // 0x18  mirror fog (db_light "MIRROR FOG")
     s32 FocusZ;         // 0x28  focus depth (screen z, 0..65535)
     u8 FocusFlag;          // 0x2C
     u8 FocusLevel;          // 0x2D  focus level (0 = depth of field off)
@@ -236,21 +236,21 @@ struct EspLightList {
 
 #line 463 "D:/Bio4/Prog/light.h"
 class cLightMgr : public cManager<cLight> {
-public:
+private:
     static const f32 FarDistance;  // dead-stripped from the DOL (keys the unit's static ctor name)
 
     cLit* pLitHeader;            // 0x34  lit the cuts are taken from (the room lit by default)
     cLightEnv LightEnv;         // 0x38 .. 0x13C  current cut environment
-    u32 kindFlags[8];      // 0x13C  kind enable bits (onKind / offKind)
+    public: u32 kindFlags[8];      // 0x13C  kind enable bits (onKind / offKind)
     u8 pad_15C[0x17C - 0x15C];
-    LightPathHeader* pLitPath;  // 0x17C
+    private: LightPathHeader* pLitPath;  // 0x17C
     cLit* m_pLitCore;            // 0x180  core lit
     cLit* m_pLitRoom;            // 0x184  room lit
     cLit* m_pLitRoom2;            // 0x188  third lit
     int m_oldCutNo;             // 0x18C
     u8 m_Hokan;           // 0x190  fog interpolation frames left
     u8 m_logMode;              // 0x191
-    u8 pad_192[2];
+    public: u8 pad_192[2];
     f32 ElecPower;         // 0x194
     u8 pad_198[4];
     GXColor m_Tune[3];       // 0x19C
@@ -261,11 +261,11 @@ public:
     u32 x204;              // 0x204
 
     cLightMgr();
-    virtual void* memAlloc(u32 size) { return MEM_ALLOC(size, 1, 13); }
+    private: virtual void* memAlloc(u32 size) { return MEM_ALLOC(size, 1, 13); }
     virtual void memFree(void* p) { Mem_free(p); }
     virtual void memClear(cLight* p, u32 size) { memclr_asm(p, size); }
     virtual void log(const char* fmt, ...);
-    virtual int construct(cLight* pSat, u32 room_no);
+    public: virtual int construct(cLight* pSat, u32 room_no);
 
     void init(void (**funcTbl)(cLight*));
     void setLogMode(bool on) { m_logMode = on; }
@@ -285,8 +285,8 @@ public:
     int roomLitSet(cLit* lit);
     int roomLitCheck();
     int move();
-    void hokanMove();
-    cLightEnv* getEnvPtr();  // 0x8014EFCC: &this->env (at +0x38)
+    private: void hokanMove();
+    public: cLightEnv* getEnvPtr();  // 0x8014EFCC: &this->env (at +0x38)
     void setModel2(cModel* pMod);
     void setCloth(cModel* pMod, u32 lightNum);
     void setEsp(EspLightList* pEnv, u8 enableMask);
@@ -299,8 +299,8 @@ public:
     f32 getFogStart();
     f32 getFogEnd();
     void setFog();           // 0x8014FAC8
-    void setBlur();
-    void deleteScr();
+    private: void setBlur();
+    public: void deleteScr();
     void offScr(u8 enable);
     int countScr();
     int setEnv(cLightEnv* pLe, int hokan);

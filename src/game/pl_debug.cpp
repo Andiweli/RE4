@@ -295,7 +295,7 @@ void cPlMaho::reset()
 // Adds a cheat: `code` is the button sequence, `func` runs when it is completed.
 void cPlMaho::regist(const char* code, void (*func)())
 {
-    PlMahoEntry* e = &work[nWork];
+    cPlMahoWork* e = &work[nWork];
 
     e->rno = 0;
     e->timer = 0;

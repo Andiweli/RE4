@@ -14,13 +14,17 @@ class cDbgButtonBase {
 public:
     u32 m_px;        // 0x00  text column
     u32 m_py;        // 0x04  text row
+protected:
     int m_cx;       // 0x08  cursor cell
     int m_cy;       // 0x0C
+public:
     char* m_pStr;   // 0x10  (allocated; freed by the destructor)
     u32 m_strlen;        // 0x14  width in characters
     // 0x18 vptr
 
     virtual ~cDbgButtonBase() { delete m_pStr; }
+    int GetCx() { return m_cx; }
+    int GetCy() { return m_cy; }
     int Init(int n) {
         if (m_pStr == 0) {
             pLog->err(0, 0, "cDbgButtonBase::Init(): new failed.");

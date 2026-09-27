@@ -442,7 +442,7 @@ void tcSetBesideFloor(f32 ratio)
 }
 
 // Copies the shoulder camera ready / transition offset tables into the current cut's key data.
-void tcSetBesideOffset(QfpsOfs (*ready)[3], QfpsOfs (*trans)[3])
+void tcSetBesideOffset(CAMERA_POINT (*ready)[3], CAMERA_POINT (*trans)[3])
 {
     TcCdat* c = tcCdatPtr(pTc->cdatNo);
     int n = 0;
@@ -450,7 +450,7 @@ void tcSetBesideOffset(QfpsOfs (*ready)[3], QfpsOfs (*trans)[3])
     int j;
     // one `o` for both loops: the shared pseudo is live across loop 1's r9/r10/r11 temporaries,
     // so global alloc gives it r8 in loop 2 as well (a loop-local `o` takes r11 there)
-    QfpsOfs* o;
+    CAMERA_POINT* o;
 
     c->num = 24;
     for (i = 0; i < 4; i++) {
@@ -475,8 +475,8 @@ void tcSetBesideOffset(QfpsOfs (*ready)[3], QfpsOfs (*trans)[3])
 // quasi-FPS controller for the preview.
 void tcSetBesideCamera()
 {
-    QfpsOfs ready[2][3];
-    QfpsOfs trans[2][3];
+    CAMERA_POINT ready[2][3];
+    CAMERA_POINT trans[2][3];
     TcCdat* c = tcCdatPtr(pTc->cdatNo);
     int i;
     int j;
@@ -487,7 +487,7 @@ void tcSetBesideCamera()
     if (c->num == 24) {
         for (i = 0; i < 4; i++) {
             for (j = 0; j < 3; j++, n++) {
-                QfpsOfs* o = i <= 1 ? &ready[i][j] : &trans[i - 2][j];
+                CAMERA_POINT* o = i <= 1 ? &ready[i][j] : &trans[i - 2][j];
                 if (c->flags & 0x20) {
                     if (i > 1) continue;
                 } else if (!(c->flags & 0x10)) {
@@ -501,7 +501,7 @@ void tcSetBesideCamera()
         }
         for (i = 0; i < 4; i++) {
             for (j = 0; j < 3; j++, n++) {
-                QfpsOfs* o = i <= 1 ? &ready[i][j] : &trans[i - 2][j];
+                CAMERA_POINT* o = i <= 1 ? &ready[i][j] : &trans[i - 2][j];
                 if (c->flags & 0x20) {
                     if (i > 1) continue;
                 } else if (!(c->flags & 0x10)) {

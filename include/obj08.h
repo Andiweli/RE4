@@ -7,7 +7,7 @@
 
 // Thrown / shot object work (game/obj08.cpp): a projectile with gravity, scenario / enemy /
 // player hit checks and up to four effect sets.
-struct Obj08Work {
+struct FREE_OBJ08 {
     u32 be_flag;            // 0x00  bit0 start motion, bit1 motion running, bit3 rotate, bit4 enemy hit check, bit5 player hit check
     void* pMot;             // 0x04
     u8 pad_8[2];
@@ -37,11 +37,11 @@ struct Obj08Work {
 // the scenario, the enemies and the player for hits.
 class cObj08 : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  Obj08Work
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ08
 
     virtual void move();
 };
 
-#define OBJ08_WK(o) ((Obj08Work*) (o)->free)
+#define OBJ08_WK(o) ((FREE_OBJ08*) (o)->free)
 
 #endif

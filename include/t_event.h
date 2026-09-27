@@ -76,7 +76,7 @@ enum TefFlag {
 #define TefBit(f) (0x80000000 >> (f))
 
 class ToolEvt {
-public:
+private:
     s16 r_no_0;             // 0x00  main routine (0 menu, 1 preview, 2 exit)
     s16 r_no_1;             // 0x02  preview step
     s16 r_no_2;              // 0x04
@@ -96,19 +96,24 @@ public:
     s8 CursolSub;            // 0x26  preview menu cursor
     s8 CursolFog;            // 0x27  fog menu cursor
     s8 CursolFocus;          // 0x28  focus menu cursor
+public:
     u8 pad_29[3];
+private:
     void* PFil;           // 0x2C  event file (8,000,000 bytes)
     u8 DebugCameraFlag;           // 0x30  debug camera on
     u8 DebugCameraTimer;            // 0x31
     char ToolFileName[0x22];  // 0x32  selected file name
+public:
     EvtHdrCopy hdr;       // 0x54
     u8 pad_94[4];
+private:
     cLightTool* pTl;  // 0x98
     JOY* pJoy1;           // 0x9C  &Joy[0] (&Joy[2] while a sub tool runs)
     JOY* pJoy2;           // 0xA0  &Joy[1] (&Joy[3])
     EvtFogData DatFogWk;       // 0xA4
     EvtFocusData DatFocusWk;   // 0x8AC
     DbSctrlWork* PDatDbSctrl;  // 0x10BC  (1,000,000 bytes)
+public:
     u32 x10C0[8];         // 0x10C0
     u8 pad_10E0[0x28];
     u32 x1108;            // 0x1108
@@ -120,17 +125,24 @@ public:
 
     ToolEvt();
     ~ToolEvt();
+private:
     void EvtTaskSuspend(int task);
     void EvtTaskSignal(int task);
+public:
     void Run();
+private:
     void RunStop(ToolEvt* t, Event* ev);
+public:
     static void MainMenu(ToolEvt* t);
     static void MainPreview(ToolEvt* t);
     static void MainExit(ToolEvt* t);
+private:
     void EventDel(Event* ev);
+public:
     static void SubMenuMain(ToolEvt* t, Event* ev);
     static void SubMenuFog(ToolEvt* t, Event* ev);
     static void SubMenuFocus(ToolEvt* t, Event* ev);
+private:
     int SubMenuSelectYesNo(ToolEvt* t, const char* s1, const char* s2);
     int SubMenuEditFocusLevel(ToolEvt* t, Event* ev, const char* name, f32* level);
     int SubToolCameraMove(ToolEvt* t);

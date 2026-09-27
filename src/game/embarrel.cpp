@@ -62,7 +62,7 @@ static inline const Vec* barrelLightOfs()
 cEmBarrel* SetBarrel(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo)
 {
     cEmBarrel* em;
-    EmBarrelWork* w;
+    FREE_EMBARREL* w;
     u16* flg;
     int zero;
 
@@ -148,7 +148,7 @@ cEmBarrel* SetBarrel(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcN
 cEmBarrel* SetR227Barrel(Vec* pPos, Vec* pAng)
 {
     cEmBarrel* em;
-    EmBarrelWork* w;
+    FREE_EMBARREL* w;
     int zero;
 
     if (pG->stage_no != 2 || pG->room_no != 0x27) {
@@ -450,7 +450,7 @@ void emBarrelDmCk2(cEmBarrel* pEm)
 // Rno1 1 Break.
 void emBarrelSetBreak(cEmBarrel* em, int kind)
 {
-    EmBarrelWork* w = EMBARREL_WK(em);
+    FREE_EMBARREL* w = EMBARREL_WK(em);
 
     em->hp = 0;
     em->be_flag &= ~2;
@@ -484,7 +484,7 @@ void emBarrelSetBreak(cEmBarrel* em, int kind)
 // marks a barrel explosion this frame).
 void cEmBarrel::move()
 {
-    EmBarrelWork* w = EMBARREL_WK(this);
+    FREE_EMBARREL* w = EMBARREL_WK(this);
 
     if (type != 1) {
         emBarrelDmCk(this);
@@ -525,7 +525,7 @@ void emBarrel_R0_Move(cEmBarrel* pEm)
 // Rno1 == 0: intact barrel; builds the matrices once, then stays a hit-box-only work.
 void emBarrel_R1_Set(cEmBarrel* pEm)
 {
-    EmBarrelWork* w = EMBARREL_WK(pEm);
+    FREE_EMBARREL* w = EMBARREL_WK(pEm);
 
     if (pEm->r_no_2 == 0) {
         RotMatrix(pEm->mat, &pEm->ang);
@@ -543,7 +543,7 @@ void emBarrel_R1_Set(cEmBarrel* pEm)
 // ACTIVE; the rolling barrel destroys its work after 10 frames.
 void emBarrel_R1_Break(cEmBarrel* pEm)
 {
-    EmBarrelWork* w = EMBARREL_WK(pEm);
+    FREE_EMBARREL* w = EMBARREL_WK(pEm);
     u16* flg;
 
     switch (pEm->r_no_2) {
@@ -574,7 +574,7 @@ void emBarrel_R1_Break(cEmBarrel* pEm)
 // the player over (emBarrelRollHitCk, then explodes) or kills ganados in its path.
 void emBarrel_R1_R227Roll(cEmBarrel* pEm)
 {
-    EmBarrelWork* w = EMBARREL_WK(pEm);
+    FREE_EMBARREL* w = EMBARREL_WK(pEm);
     cParts* p;
     f32 floor;
     f32 ang;
@@ -662,7 +662,7 @@ void emBarrel_R1_R227Roll(cEmBarrel* pEm)
 // Finds the first EMI route entry of type 6 as the roll start waypoint; 0 when there is none.
 int emBarrelSetRollRoute(cEmBarrel* pEm)
 {
-    EmBarrelWork* w = EMBARREL_WK(pEm);
+    FREE_EMBARREL* w = EMBARREL_WK(pEm);
     u8* emi;
     int i;
     int idx;
@@ -696,7 +696,7 @@ int emBarrelSetRollRoute(cEmBarrel* pEm)
 // (1 = route finished), then points Roll_spd (50..150 units / frame, accelerating by 1) at it.
 int emBarrelSetRollSpd(cEmBarrel* pEm)
 {
-    EmBarrelWork* w = EMBARREL_WK(pEm);
+    FREE_EMBARREL* w = EMBARREL_WK(pEm);
     u8* emi;
     EmiEntry* e;
     int idx;
@@ -751,7 +751,7 @@ int emBarrelSetRollSpd(cEmBarrel* pEm)
 // Est id of the explosion.
 void cEmBarrel::setEff(u8 eff_id)
 {
-    EmBarrelWork* w = EMBARREL_WK(this);
+    FREE_EMBARREL* w = EMBARREL_WK(this);
 
     w->Eff_id = eff_id;
 }
@@ -761,7 +761,7 @@ void cEmBarrel::setEff(u8 eff_id)
 // camera with a power falling off with distance (10 .. 4 within 20000 units).
 void emBarrelSetBomb(cEmBarrel* pEm)
 {
-    EmBarrelWork* w = EMBARREL_WK(pEm);
+    FREE_EMBARREL* w = EMBARREL_WK(pEm);
     CAMERA* cam;
     cParts* p;
     Vec v;
@@ -816,7 +816,7 @@ void emBarrelSetBomb(cEmBarrel* pEm)
 // with a 4000 radius damage check.
 void emBarrelSetBomb2(cEmBarrel* pEm)
 {
-    EmBarrelWork* w = EMBARREL_WK(pEm);
+    FREE_EMBARREL* w = EMBARREL_WK(pEm);
     CAMERA* cam;
     cParts* p;
     Vec v;
@@ -866,7 +866,7 @@ void emBarrelSetBomb2(cEmBarrel* pEm)
 // 0x400000) at its position; the rolling barrel has none.
 void emBarrelEatSet(cEmBarrel* pEm)
 {
-    EmBarrelWork* w = EMBARREL_WK(pEm);
+    FREE_EMBARREL* w = EMBARREL_WK(pEm);
     Vec v[4];
 
     if (pEm->type == 1) {

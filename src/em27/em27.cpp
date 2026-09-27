@@ -77,7 +77,7 @@ void Em27Init(cEm* em)
 // goes to Dm_Air (R2 2), a survivor to Dm_Normal / Dm_Big (a far shotgun hit prefers the small one).
 void em27DmCk(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
     int wep;
     int dmg;
     // COMPILER-DIFF: #13 (int shape): the EstSet stack zero is a function-scope constant with one
@@ -213,7 +213,7 @@ static u16 em27_flip_tbl[24] = {
 // from the player while Esc_timer runs, otherwise home or to a random point.
 void cEm27::move()
 {
-    Em27Work* w = EM27_WK(this);
+    FREE_EM27* w = EM27_WK(this);
     Vec v;
     f32 wh;
 
@@ -285,7 +285,7 @@ void cEm27::move()
 // collision, hit boxes, home = Start_pos, the room's ctrl11 / ctrl12, Dash_wait 210..360, and Wait.
 static void em27_R0_Init(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
     cAtariInfo* at;
     Vec* pos;
     f32 scale;
@@ -364,7 +364,7 @@ static void em27_R0_Move(cEm27* em)
 // clear of the boat), Dash (2) when Dash_wait ran out, Walk (1) or Turn180 (4).
 static void em27_R1_Wait(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -402,7 +402,7 @@ static void em27_R1_Wait(cEm27* em)
 // may Jump (5) when far from the target, Bank (3), Dash (2), or return to Wait (0).
 static void em27_R1_Walk(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -442,7 +442,7 @@ static void em27_R1_Walk(cEm27* em)
 // the motion ends.
 static void em27_R1_Dash(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -471,7 +471,7 @@ static void em27_R1_Dash(cEm27* em)
 // R1 == 3 Bank: a banking turn (mirrored by the target side) towards target, then Walk (1).
 static void em27_R1_Bank(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -501,7 +501,7 @@ static void em27_R1_Bank(cEm27* em)
 // R1 == 4 Turn180: turns around (random side / motion variant), then Dash (2) or Walk (1).
 static void em27_R1_Turn180(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -537,7 +537,7 @@ static void em27_R1_Turn180(cEm27* em)
 // surface splash (em27WaterEffSet), then Dash (2) or Walk (1).
 static void em27_R1_Jump(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -579,7 +579,7 @@ static void em27_R1_Jump(cEm27* em)
 // R0 == 2: damage (Be_flg bit3), runs Em27_R2_move_tbl (Dm_Normal, Dm_Big, Dm_Air).
 static void em27_R0_Damage(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
 
     w->Be_flg |= 8;
     Em27_R2_move_tbl[em->r_no_1](em);
@@ -648,7 +648,7 @@ static void em27_R1_Dm_Big(cEm27* em)
 // back through the surface with the splash, then Die_Normal when dead or Dash (2).
 static void em27_R1_Dm_Air(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
     Mtx m;
     Vec v;
     int flag;
@@ -731,7 +731,7 @@ static void em27_R1_Dm_Air(cEm27* em)
 // R0 == 3: death (Be_flg bit3), runs Em27_R3_move_tbl (Die_Normal).
 static void em27_R0_Die(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
 
     w->Be_flg |= 8;
     Em27_R3_move_tbl[em->r_no_1](em);
@@ -742,7 +742,7 @@ static void em27_R0_Die(cEm27* em)
 // bobs there (0x1B / 0x1C) with splashes every 5..65 frames.
 static void em27_R1_Die_Normal(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
     int flag;
     int no;
 
@@ -837,7 +837,7 @@ static void em27_R1_Die_Normal(cEm27* em)
 // and keeps it between the surface (Water_h) and 300 below.
 void em27SetSPeed(cEm27* em, f32 rate)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
     Mtx m;
     Vec v;
 
@@ -858,7 +858,7 @@ void em27SetSPeed(cEm27* em, f32 rate)
 // Relaxes the fin parts 1 / 3 back to scale 1 (10% per frame) unless the routine holds them (Be_flg bit4).
 void em27ScaleReset(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
     cParts* p;
 
     if (w->Be_flg & 0x10) {
@@ -878,7 +878,7 @@ void em27ScaleReset(cEm27* em)
 // out of the player's collision radius + 100, unless Be_flg bit6 (no push).
 void em27ObaHitCk(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
     Vec d;
     f32 dist;
     f32 r;
@@ -974,7 +974,7 @@ int em27MotionMoveScale(cEm27* em)
 // off while dying (Be_flg bit7).
 void em27WaterEffSet(cEm27* em)
 {
-    Em27Work* w = EM27_WK(em);
+    FREE_EM27* w = EM27_WK(em);
     Vec v;
     f32 h;
     cParts* p;
@@ -1023,7 +1023,7 @@ int em27JumpCk(cEm27* em)
 // Room script: fixes the surface height (Be_flg bit8 stops the GetWaterHeight lookup).
 void cEm27::setWaterHeight(f32 h)
 {
-    Em27Work* w = EM27_WK(this);
+    FREE_EM27* w = EM27_WK(this);
 
     w->Water_h = h;
     w->Be_flg |= 0x100;

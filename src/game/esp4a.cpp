@@ -8,20 +8,20 @@
 #include "esp.h"
 #include "quake.h"
 
-struct Esp4aWork {
+typedef struct tagESP4a_WK {
     u8 quake_type;    // 0x00 QuakeExec axis mask (bit0 x, bit1 y, bit2 z)
     u8 pad_1[3];
     f32 range;  // 0x04 distance from the camera at which the quake fades to zero (0 = no fade)
-};
+} ESP4A_WK;
 
 
 // Camera quake driven by the effect's alpha, attenuated by the distance to the camera.
 class cEsp4a : public cEsp {
 public:
-    Esp4aWork m_Free;  // 0xF8
+    ESP4A_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x4A] factory.
@@ -34,7 +34,7 @@ cEsp* Esp4a_Create()
 // (range - camera distance) / range (zero beyond range; unattenuated when range == 0).
 void cEsp4a::move()
 {
-    Esp4aWork* w = &m_Free;
+    ESP4A_WK* w = &m_Free;
     f32 power;
 
     if (CommonMove()) {
@@ -57,9 +57,9 @@ void Esp4a_Trans()
 }
 
 // Maps Work8[0] 0/1/2 to axis mask 2/1/3 (anything else fails), fade range from Vec0.z.
-int cEsp4a::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp4a::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp4aWork* w = &m_Free;
+    ESP4A_WK* w = &m_Free;
 
     switch ((s8)pSeq->Work8[0]) {
     case 0:

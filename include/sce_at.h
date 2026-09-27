@@ -186,7 +186,7 @@ enum SCEAT_COUNTRY {
 // One area work (0x9C bytes; the AEV/ITA records have the same layout).
 struct SceAtWork {
     u32 next;         // 0x00  OTag link
-    AreaData area;    // 0x04 .. 0x34
+    AREA_HIT_DATA area;    // 0x04 .. 0x34
     u8 flag;          // 0x34  bit0 enabled, bit2 allocated (SceAtCreate*), bit3 parent rotation ignored
     u8 type;          // 0x35  SCEAT_ID area type (index into sceAtFunc_tbl)
     u8 no;            // 0x36  area number (SceAtPtr key; ITA records + 0x80)
@@ -255,7 +255,7 @@ void SceAtSetExecFlg(u32 at_no);
 void SceAtWorkLoopInit();
 void SceAtCheck();
 int sceAtCheck_main(cEm* em, int target_type);
-void sceAtGetArea(AreaData* ret_area, SceAtWork* w);
+void sceAtGetArea(AREA_HIT_DATA* ret_area, SceAtWork* w);
 int sceAtHitCheck(SceAtWork* w, cModel* pModel, Vec* pos_f, Vec* pos);
 int CheckAshleyActive();
 int CheckDoorJumpWithAshley();
@@ -310,7 +310,7 @@ void SceAtExecRoomJump(u16 room, Vec* pos, Vec* rot, int a);
 SceAtField* SceAtCheckFieldInfo(Vec* pos);
 int SceAtCheckLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height);
 int SceAtSearchLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height);
-void SceAtDataEyeTriggreCopy(AreaData* area, SceAtWork* w);
+void SceAtDataEyeTriggreCopy(AREA_HIT_DATA* area, SceAtWork* w);
 void SceAtItemFlgOn(u16 item_flg, u16 saveFlagNo);
 int SceAtItemFlgCk(u16 item_flg, u16 saveFlagNo);
 int SceAtItemFindFlgCk(int at_no);
@@ -342,7 +342,7 @@ cModel* SceAtItemModelPtr(int at_no);
 int SceAtItemHitCheck(SceAtWork* w, Vec* pos);
 int SceAtCheckSystemItemSet(u32 id, int* outId, int* outNum, Vec* pos, Vec* rot);
 void sceAtSetItem(SceAtWork* w);
-void SceAtItemAutoArea(AreaData* area, Vec* pos, f32 radius);
+void SceAtItemAutoArea(AREA_HIT_DATA* area, Vec* pos, f32 radius);
 void sceAtItemEffDelete(SceAtItem* it);
 void sceAtItemEffSet(SceAtWork* w, cModel* pModel);
 void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel);

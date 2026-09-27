@@ -44,7 +44,7 @@ struct OSHeapDescriptor {
 };
 
 // Heap table entry (main_mem.cpp `Heap[13]`).
-struct MemHeap {
+struct HEAP_TBL {
     s32 handle;  // 0x00  OSAlloc heap handle, -1 = none
     u32 start;   // 0x04
     u32 end;     // 0x08
@@ -58,7 +58,7 @@ struct MemHeap {
 // Only Heap is declared here: GCC 2.95 lays out uninitialized globals in first-declaration order,
 // and main_mem.cpp's statics sit between the others (declare arenaLo/arenaHi/CurrentHeap/
 // pMemTile/heap_backup `extern` locally where needed).
-extern MemHeap Heap[MEM_HEAP_NUM];
+extern HEAP_TBL Heap[MEM_HEAP_NUM];
 extern OSHeapCell* cell_main;
 extern OSHeapCell* cell_game;
 extern OSHeapCell* cell_dll;

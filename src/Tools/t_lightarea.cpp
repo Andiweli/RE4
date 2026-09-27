@@ -42,7 +42,7 @@ struct LIGHT_AREA {
     u8 be_flag;        // 0x01  bit 0: in use
     u8 pl_light_no;    // 0x02  light no for the player (0xFF: none)
     u8 em_light_no;    // 0x03  light no for the other characters
-    AreaData area;   // 0x04
+    AREA_HIT_DATA area;   // 0x04
     u8 x34[4];
     s8 power;        // 0x38  scale in percent (0..100)
     u8 sub_light_no;   // 0x39  light no for the sub character
@@ -98,7 +98,7 @@ void InitWork(LIGHT_AREA* w, int no)
 // Position column pressed: the shared AreaDataEdit editor on the slot's area; 0 on B.
 int PosExec_callback(int no, LIGHT_AREA* w, cDbgButtonTemplate<LIGHT_AREA>* b)
 {
-    AreaData* a = &w->area;
+    AREA_HIT_DATA* a = &w->area;
 
     AreaDataEdit(a, 0xA0FF8080, 1, 0, 2.3f);
     AreaDataInfoDisp(a, 0x28, 0x18);
@@ -119,10 +119,10 @@ void PosUpdate_callback(int no, LIGHT_AREA* w, cDbgButtonTemplate<LIGHT_AREA>* b
     if (IsWorkAlive(w)) {
         AreaGetCenterPos(&pos, &w->area);
         PSVECScale(&pos, &pos, 0.001f);
-        h = w->area.u.xz4.height / 1000.0f;
+        h = w->area.xz4.height / 1000.0f;
     }
     sprintf(buf, "%6.1f %6.1f %6.1f %6.1f", pos.x, pos.y, pos.z, h);
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // Data column pressed: rows PL NO / EM NO / SUB NO (light number for the player / enemies / partner,
@@ -156,7 +156,7 @@ int AreaNoExec_callback(int no, LIGHT_AREA* w, cDbgButtonTemplate<LIGHT_AREA>* b
     eprintf(0xAA, 0xD0, 4, 0, "POWER : ");
     eprintf(0xAA, 0xD0, 0, 0, "       %3d %", w->power);
     if (pG->Frame_cnt & 7) {
-        eprintf(0x9A, (cursor + 10) * 16, 0, 0, cDbgStr::cursor());
+        eprintf(0x9A, (cursor + 10) * 16, 0, 0, ">");
     }
     // one pad pointer for the four cases (the last one is past cse's jump-following path length), taken
     // here so that it does not live across the eprintf calls
@@ -309,7 +309,7 @@ void AreaNoUpdate_callback(int no, LIGHT_AREA* w, cDbgButtonTemplate<LIGHT_AREA>
     buf[12] = 0;
     buf[10] = digits[n / 10];
     buf[11] = digits[n % 10];
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // OPTION window: FOG on/off (Disp_flg 0x4000); B closes.
@@ -325,7 +325,7 @@ void OptionExec()
         eprintf(0xAA, 0xA0, 0, 0, "       OFF");
     }
     if (pG->Frame_cnt & 7) {
-        eprintf(0x9A, (cursor + 10) * 16, 0, 0, cDbgStr::cursor());
+        eprintf(0x9A, (cursor + 10) * 16, 0, 0, ">");
     }
     rep = Joy[0].rep;
     if (rep & 0x80008) {
@@ -448,7 +448,7 @@ void ToolLightAreaMain()
             for (i = 0; i < LIGHT_AREA_MAX; i++, w++) {
                     if (IsWorkAlive(w)) {
                     AreaGetCenterPos(&pos, &w->area);
-                    pos.y = (pos.y + w->area.u.xz4.height) * 0.5f;
+                    pos.y = (pos.y + w->area.xz4.height) * 0.5f;
                     Vec posCopy = pos;
                     if (GetScreenPos(&posCopy, &scr) == 1) {
                         if (i == tool.GetEdit()->GetCurrentNo()) {
@@ -518,7 +518,7 @@ void tLightAreaInit()
     SpfFlagOn(pG, SPF_EARTHQUAKE);
     SpfFlagOn(pG, SPF_MIST);
     DbgFlagOn(pG, DBG_DBG_CAM);
-    CamDbg.m_target_type = 4;
+    CamDbg.setTargetType(4);
     Block.dispAllBlock(1);
 }
 

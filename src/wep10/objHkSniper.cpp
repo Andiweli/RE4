@@ -42,7 +42,7 @@ void cObjHkSniper::init(cModel* parent)
 
         LightInfo.init2(1, 1, &p0, &p1, 1);
     }
-    m_pParent = parent;
+    setParent(parent);
     shotFrame[0] = hksniper_tbl[0];
     shotFrame[1] = hksniper_tbl[1];
     shotFrame[2] = hksniper_tbl[2];

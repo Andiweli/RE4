@@ -10,98 +10,84 @@
 
 #line 8 "D:/Bio4/Prog/sofdec.h"
 
+// Camera matrices of a scene: view and projection.
+struct CamObj {
+    Mtx view;    // 0x00
+    Mtx44 proj;  // 0x30
+}; // 0x70
+
 // Movie texture: the decoded frame either as Y8 + UV (IA8) planes (mode 0) or one RGBA8 texture
 // (mode 1). The two layouts share the storage after width/height.
-struct SofdecTex {
+struct TexObj {
     int width;  // 0x00  (the u16 half at +2 is what GX gets)
     int height; // 0x04
     union {
         struct {
-            GXTexObj texY;  // 0x08
-            GXTexObj texUV; // 0x28
-            void* bufY;     // 0x48
-            u32 sizeY;      // 0x4C
-            void* bufUV;    // 0x50
-            u32 sizeUV;     // 0x54
-        } yuv;
+            GXTexObj ytobj;  // 0x08
+            GXTexObj ctobj;  // 0x28
+            u8* ybuf;        // 0x48
+            u32 ybufsiz;     // 0x4C
+            u8* cbuf;        // 0x50
+            u32 cbufsiz;     // 0x54
+        };
         struct {
-            GXTexObj tex; // 0x08
-            void* buf;    // 0x28
-            u32 size;     // 0x2C
-        } argb;
+            GXTexObj tobj;   // 0x08
+            u8* rgbbuf;      // 0x28
+            u32 bufsiz;      // 0x2C
+        };
     };
 }; // 0x58
 
-// Render state: the model matrix and the movie texture.
-struct SofdecDraw {
-    Mtx mtx;         // 0x00
-    u8 pad_30[0x40]; // 0x30
-    SofdecTex tex;   // 0x70
+// Render state of a scene: the camera and the movie texture.
+struct SceneCtrlObj {
+    CamObj cam;  // 0x00
+    TexObj tex;  // 0x70
 }; // 0xC8
 
 // Player state around the MWPLY handle.
-struct SofdecApp {
-    MWPLY hn;               // 0x00
-    u8 pad_4[0x20];         // 0x04
-    MWS_PLY_CPRM_SFD cprm;  // 0x24
-    u8 pad_48[0xC];         // 0x48
-    int stat;               // 0x54
-    MWS_FRM frm;            // 0x58
-    void* work;             // 0xE0
-    int xE4;                // 0xE4
-    int disp;               // 0xE8  1: draw the debug frame info
-    char fname[0x44];       // 0xEC
+struct AP_OBJ {
+    MWPLY mwply;             // 0x00
+    MWS_PLY_INIT_SFD iprm;   // 0x04
+    MWS_PLY_CPRM_SFD cprm;   // 0x24  PS2's MwsfdCrePrm is 0x30 bytes, the SDK struct ends at 0x48
+    u8 pad_48[0xC];          // 0x48
+    int mwstat;              // 0x54
+    MWS_FRM frm;             // 0x58
+    s8* mwsfd_wkadr;         // 0xE0
+    int term_flag;           // 0xE4
+    int disp_flag;           // 0xE8  1: draw the debug frame info
+    char fname[0x40];        // 0xEC
+    u16 fno;                 // 0x12C
+    u8 pad_12E[2];
 }; // 0x130
 
 // Sofdec movie player front end (game/sofdec.cpp, `Sofdec`, 0x240 bytes). The inline range check
 // emits the file-name string into the .rodata of every unit that includes it.
 class cSofdec {
-public:
+private:
     u32 m_be_flag;         // 0x00  bit0: a movie is playing, bit2: paused, bit5: skipped, bit8: keep black
-    u32 x04;          // 0x04
-    SofdecApp app;    // 0x08
-    SofdecDraw drw;   // 0x138
+    AP_OBJ m_ap_obj;    // 0x08
+    SceneCtrlObj m_scn_ctrl;   // 0x138
     s16 m_width;        // 0x200
     s16 m_height;       // 0x202
-    int fadeIn;       // 0x204
+    int m_is_set_black;       // 0x204  1 from the start of playback until the first frame arrives
     u32 m_stop_flg_bak;      // 0x208
     u32 m_disp_flg_bak;       // 0x20C
     u32 m_clrsize;    // 0x210
     u8 m_save_cur_heap;        // 0x214
     s8 m_vcnt_save;          // 0x215
-    u16 fno;          // 0x216
-    int resized;      // 0x218
+    u16 m_frame_no;          // 0x216
+    int m_isScreenResize;      // 0x218
     int m_draw_mode;         // 0x21C
     char m_fname[0x20];  // 0x220
 
-    // playing check: `if (Sofdec.flag & 1) return 1; return 0;` form (li 0 / li 1)
-    int isPlay() {
-        if (m_be_flag & 1) {
-            return 1;
-        }
-        return 0;
-    }
-    // Byte `no` of the work after the flag word (asserts no < m_be_flag; a debug leftover).
-#line 80
-    u8* getData(u32 no) {
-        if (no >= m_be_flag) {
-            dbgAssert(__FILE__, __LINE__);
-        }
-        return (u8*) &x04 + no;
-    }
-    // 1 when `bit` is set in m_be_flag (0x100 = keep the screen black after the movie).
-    int chkFlag(u32 bit) {
-        return (m_be_flag & bit) ? 1 : 0;
-    }
-
     void drawTex();
-    void drawQuad(SofdecDraw* d);
-    void drawPolygon(SofdecDraw* d);
-    void setCamera(SofdecDraw* d);
+    void drawQuad(SceneCtrlObj* d);
+    void drawPolygon(SceneCtrlObj* d);
+    void setCamera(SceneCtrlObj* d);
     void loadMvFrmFx(MWPLY hn, MWS_FRM* frm);
-    void allocTexMem(SofdecTex* tex, int w, int h);
-    void clrTexMem(SofdecTex* tex);
-    void initDraw(SofdecDraw* d);
+    void allocTexMem(TexObj* tex, int w, int h);
+    void clrTexMem(TexObj* tex);
+    void initDraw(SceneCtrlObj* d);
     void initApp(const char* fname);
     int startApp();
     void initSync();
@@ -109,11 +95,36 @@ public:
     void draw();
     void finishMovie();
     int initWork(const char* fname);
+    int initSub(const char* fname, u32 flags);
+
+public:
     int Initialize(const char* fname, u32 flags);
     int Initialize(cString& fname, u32 flags);
-    int initSub(const char* fname, u32 flags);
     int Move();
     static void ThreadMove(cSofdec* pThis);
+
+    // playing check: `if (Sofdec.flag & 1) return 1; return 0;` form (li 0 / li 1)
+    int IsActive() {
+        if (m_be_flag & 1) {
+            return 1;
+        }
+        return 0;
+    }
+    // 1 when `bit` is set in m_be_flag (0x100 = keep the screen black after the movie).
+    int ckFlag(u32 bit) {
+        return (m_be_flag & bit) ? 1 : 0;
+    }
+    // Playback was skipped by the player (bit 5).
+    int isCancel() {
+        return (m_be_flag & 0x20) ? 1 : 0;
+    }
+    // Placeholder. Some inline in this header holds an assert whose __FILE__ string is in the .rodata of every
+    // unit that includes it, but none of the in-use inlines call the assert.
+    // Its name, body and line are unknown; this only reproduces the string.
+    void placeholder() {
+        dbgAssert(__FILE__, __LINE__);
+    }
+
     void PlayPause(int sw);
     ~cSofdec() {}
 };
@@ -124,7 +135,7 @@ extern "C" {
 void ADXM_ExecMain();
 void SofdecInit();
 void UsrSfcnt2time(int sf, int ncnt, int* hh, int* mm, int* ss, int* ff);
-void disp_info(SofdecApp* app);
+void disp_info(AP_OBJ* app);
 void setTevPrm(int mapY, int mapUV);
 void restoreTevPrm();
 void ap_mwply_err_func(void* obj, const char* errmsg);

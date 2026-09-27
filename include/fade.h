@@ -5,7 +5,7 @@
 #include "gx.h"
 
 // game/fade.cpp: up to 4 full-screen colour fades (C linkage).
-struct FadeWork {
+struct FADE_WORK {
     GXColor s_col;  // 0x00
     GXColor e_col;    // 0x04
     GXColor col;    // 0x08
@@ -17,7 +17,7 @@ struct FadeWork {
     u32 cnt;      // 0x20
 };
 
-extern FadeWork Fade[4];
+extern FADE_WORK Fade[4];
 
 extern "C" {
 void FadeSet(int no, GXColor* start, GXColor* end, u32 time, u32 z, int late);
@@ -33,7 +33,7 @@ enum FADE_NO {
 void FadeKill(int no);
 void FadeInit();
 void FadeControl(int flag);
-void fadeDraw(FadeWork* pF);
+void fadeDraw(FADE_WORK* pF);
 }
 
 // Full-screen fade between black and clear (every game-side FadeSet call). The colour pair is a

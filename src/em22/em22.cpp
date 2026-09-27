@@ -2859,7 +2859,7 @@ void em22DoorOpenCk(cEm22* em)
     }
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEmDoor* door = (cEmDoor*) EmMgr.fastAt(i);
-        EmDoorWork* dw;
+        FREE_EMDOOR* dw;
 
         if (!door->isAlive()) {
             continue;

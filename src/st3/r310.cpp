@@ -98,9 +98,9 @@ void R310Init()
         EvtMgr.EvtReadAram("event/evd/r310s00.evd", (u8) GetEmIdFromList(0x5A), 0, 1, 0);
         SceExec(0x12, (TaskFunc) R310EventS00, 0, 2, 2, 0);
     }
-    getRoomEtcSwitch(1, (cEm**) &sw0, 1);
-    getRoomEtcSwitch(2, (cEm**) &sw1, 1);
-    getRoomEtcBarred(0, (cEm**) &bar, 1);
+    getRoomEtcSwitch(1, &sw0, 1);
+    getRoomEtcSwitch(2, &sw1, 1);
+    getRoomEtcBarred(0, &bar, 1);
     if (sw0 && sw1 && bar) {
         sw0->setBarred(bar);
         sw0->setConnectSwitch(sw1);
@@ -110,9 +110,9 @@ void R310Init()
         sw1->setClosed();
         bar->setClosed();
     }
-    getRoomEtcSwitch(4, (cEm**) &sw0, 1);
-    getRoomEtcSwitch(5, (cEm**) &sw1, 1);
-    getRoomEtcBarred(3, (cEm**) &bar, 1);
+    getRoomEtcSwitch(4, &sw0, 1);
+    getRoomEtcSwitch(5, &sw1, 1);
+    getRoomEtcBarred(3, &bar, 1);
     if (sw0 && sw1 && bar) {
         sw0->setBarred(bar);
         sw0->setConnectSwitch(sw1);
@@ -143,8 +143,8 @@ static void r310_checkEmSwitch()
     u32 cnt1 = 0;
     u32 cnt4 = 0;
 
-    getRoomEtcSwitch(1, (cEm**) &sw1, 1);
-    getRoomEtcSwitch(4, (cEm**) &sw4, 1);
+    getRoomEtcSwitch(1, &sw1, 1);
+    getRoomEtcSwitch(4, &sw4, 1);
     for (;;) {
         if (sw1) {
             if (sw1->ckOpen() == 0 && SceAtHitCheck(0xB) == 1) {
@@ -776,7 +776,7 @@ static void r310_checkEmStandUp()
     cEmSwitch* sw;
 
     em.setEm(0x5A, -1, 1, 1, 1);
-    getRoomEtcSwitch(1, (cEm**) &sw, 1);
+    getRoomEtcSwitch(1, &sw, 1);
     if (sw) {
         while (sw->ckOpen() == 0) {
             SceSleep(1);
@@ -824,14 +824,11 @@ static void R310EventS00()
 // frame 50 fades again.
 static void Evt_R310S00_Func(Event* e)
 {
-    if (e->FuncType == 1 && e->NowCut == 0) {
-        if (e->NowFrame == 0) {
+    if (e->GetFuncType() == 1 && e->GetNowCut() == 0) {
+        if (e->GetNowFrame() == 0) {
             void* mod;
-            int skip = 1;
+            int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-            if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-                skip = 0;
-            }
             if (skip == 0) {
                 FadeSetW(2, 0, 0, 0);
             }
@@ -839,12 +836,9 @@ static void Evt_R310S00_Func(Event* e)
                 ((R310EvtModel*) mod)->flags |= 0x40;
             }
         }
-        if (e->NowFrame == 50) {
-            int skip = 1;
+        if (e->GetNowFrame() == 50) {
+            int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-            if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-                skip = 0;
-            }
             if (skip == 0) {
                 FadeSetW(0x80000002, 40, 0, 0);
             }

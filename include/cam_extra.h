@@ -40,9 +40,10 @@ public:
 // Scope, IdScope, AttachedToMotion, IDApplication, cCamera in the DOL's .rodata). Do not reorder.
 
 class CameraAttachedToMotion : public cCamera {
-public:
+private:
     cModel* m_pModel;  // 0xFC
 
+public:
     CameraAttachedToMotion(cModel* model);
     virtual ~CameraAttachedToMotion();
     virtual void move();
@@ -50,10 +51,11 @@ public:
 
 // Scope reticle ids (IdSys unit 0x25).
 class IdScope : public IDApplication {
-public:
+private:
     s32 m_pos_time_sav;  // 0x04
     s32 m_size_time_sav;  // 0x08
 
+public:
     virtual void init(void* size);
     virtual void move(void* zoom);
     virtual void quit(void* p);
@@ -63,11 +65,13 @@ public:
 
 // Filter0a focus blur animation.
 struct FocusAnimation {
+private:
     u8 m_anim_on;    // 0x00
     s32 m_counter;   // 0x04
     f32 m_focus_frame;   // 0x08
     u8 m_alpha_max;    // 0x0C
 
+public:
     void init(int mask_id);
     void move(int anim_flag);
     void quit();
@@ -77,15 +81,19 @@ struct FocusAnimation {
 class CameraScope : public cCamera {
 public:
     Vec pos_ofs;      // 0x0FC
+private:
     Vec m_rad;          // 0x108
+public:
     f32 angle_x;      // 0x114
     u8 pad_118[8];
     f32 angle_min;    // 0x120
     u8 pad_124[8];
     f32 angle_max;    // 0x12C
     u8 pad_130[8];
+private:
     f32 m_zoom_ratio;         // 0x138
     Vec m_rnd;         // 0x13C  (x, y used; z = x144)
+public:
     u8 pad_148[13];
     u8 type;          // 0x155
     u8 pad_156[2];
@@ -106,7 +114,7 @@ public:
 
 // Binocular ids (IdSys unit 0x27).
 class IdBinocular : public IDApplication {
-public:
+private:
     Vec m_pos0_L;    // 0x04  screen positions of the heading scale ends
     Vec m_pos0_R;    // 0x10
     Vec m_pos0_C;    // 0x1C
@@ -115,6 +123,7 @@ public:
     f32 m_meter_h0;   // 0x38
     f32 m_meter_w0;   // 0x3C
 
+public:
     void init(CAMERA* cam, void* tex, void* data);
     virtual void move(void* cam);
     virtual void quit(void* cam);
@@ -122,7 +131,7 @@ public:
 };
 
 class CameraBinocular : public cCamera {
-public:
+private:
     s32 m_flag;          // 0x0FC
     Vec m_rad;         // 0x100  view angles (x yaw, y pitch), clamped between m_rad_low / m_rad_up
     Vec m_rad_low;     // 0x10C  setRange lower limits (default -60 deg)
@@ -133,6 +142,7 @@ public:
     Vec m_campos;     // 0x178
     Vec m_target;      // 0x184
     Vec m_up_vec;      // 0x190
+public:
     void* id_a;        // 0x19C
     void* id_b;        // 0x1A0
 
@@ -154,17 +164,20 @@ public:
 class CameraLookAt : public cCamera {
 public:
     u8 pad_FC[4];
+private:
     cParts* m_target_parts;  // 0x100  hand parts looked at
 
+public:
     CameraLookAt(CAMERA* cam);
     virtual ~CameraLookAt();
     virtual void move();
 };
 
 class CameraLookDownEm : public cCamera {
-public:
+private:
     cParts* m_target_parts;  // 0xFC
 
+public:
     CameraLookDownEm(void* em, Vec* ofs);
     virtual ~CameraLookDownEm();
     virtual void move();

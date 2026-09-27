@@ -55,7 +55,7 @@ static void IdSetColLoop(IDSystem* id, int no, u8 type, int on);
 
 // 1 while a fade slot is still fading.
 // Through a pointer parameter: `&Fade[2]` stays a loop-invariant pseudo (`addi rX, Fade+0x48@l`).
-static inline int fadeIsOn(FadeWork* f)
+static inline int fadeIsOn(FADE_WORK* f)
 {
     return f->flags & 1;
 }
@@ -206,7 +206,7 @@ int MercSysInitRoom(MercInit* pMInit)
         smd->setMove(1);
         if (smd->Motion.pAttachCam == NULL) {
 #line 274 "D:/Bio4/Prog/mercenaries.cpp"
-            smd->Motion.pAttachCam = (AttachCamera*) MEM_CALLOC(0x98, 1, 13);
+            smd->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_CALLOC(0x98, 1, 13);
         }
     }
     pPL->setPos(&pMInit->pos);
@@ -835,7 +835,7 @@ int MercSysSetBonusTime(int time)
 // Shows/hides id unit (no, type).
 void IdSetTrans(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 {
-    IdUnit* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetTrans : pIdUnit is NULL");
@@ -851,7 +851,7 @@ void IdSetTrans(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 // Restarts an id unit's animation forwards (on) or backwards.
 void IdSetAnmStart(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 {
-    IdUnit* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetAnmStart : pIdUnit is NULL");
@@ -868,7 +868,7 @@ void IdSetAnmStart(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 // Resets an id unit to opaque white with no colour curve.
 void IdSetColInit(IDSystem* pIdSys, int idmNo, u8 idcNo)
 {
-    IdUnit* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetColInit : pIdUnit is NULL");
@@ -884,7 +884,7 @@ void IdSetColInit(IDSystem* pIdSys, int idmNo, u8 idcNo)
 // Sets/clears the colour curve loop bit of an id unit (flashing).
 static void IdSetColLoop(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 {
-    IdUnit* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetColInit : pIdUnit is NULL");
@@ -900,8 +900,8 @@ static void IdSetColLoop(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 // Copies the colour curve and colours of unit src onto unit no and restarts it.
 void IdSetColStart(IDSystem* pIdSys, int idmNo0, int idmNo1, u8 idcNo)
 {
-    IdUnit* u = pIdSys->unitPtr(idmNo0, idcNo);
-    IdUnit* s = pIdSys->unitPtr(idmNo1, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo0, idcNo);
+    ID_UNIT* s = pIdSys->unitPtr(idmNo1, idcNo);
 
     if (u == NULL || s == NULL) {
         pLog->err(0, 0, "IdSetColStart : pIdUnit is NULL");
@@ -936,7 +936,7 @@ void IdSetNum(IDSystem* pIdSys, int idmNo, u8 idcNo, int num, int max, int keta,
     }
     show = mode;
     for (i = keta - 1; i >= 0; i--) {
-        IdUnit* u = pIdSys->unitPtr(idmNo + i, idcNo);
+        ID_UNIT* u = pIdSys->unitPtr(idmNo + i, idcNo);
 
         if (u == NULL) {
             pLog->err(0, 0, "IdSetNum : pIdUnit is NULL");
@@ -956,7 +956,7 @@ void IdSetNum(IDSystem* pIdSys, int idmNo, u8 idcNo, int num, int max, int keta,
 // Sets an id unit's texture frame (held).
 void IdSetTexNo(IDSystem* pIdSys, int idmNo, u8 idcNo, int texNo)
 {
-    IdUnit* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetTexNo : pIdUnit is NULL");
@@ -969,7 +969,7 @@ void IdSetTexNo(IDSystem* pIdSys, int idmNo, u8 idcNo, int texNo)
 // 1 when the unit's position or size curve has ended.
 int IdIsAnimEnd(IDSystem* pIdSys, int idmNo, u8 idcNo)
 {
-    IdUnit* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
 
     if (u != NULL) {
         return (u->anima_state & 3) ? 1 : 0;

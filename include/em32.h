@@ -67,7 +67,7 @@ struct Em32Work {
     f32 blendVal;         // 0x7C8 (0xBA8)  signed blend weight of the two-motion blend (em32BlendMotSet: sign picks the motion)
     int blendCnt;         // 0x7CC (0xBAC)  counts down; its low byte is the MotionSetCore frame argument
     int blendSeq;         // 0x7D0 (0xBB0)  wraps at Motion.Seq_frame_num; its low half is the MotionSetCore last argument
-    MotionWorkSub blendMot;  // 0x7D4 (0xBB4)  second motion work (cModel::Motion.blend)
+    MOTION_INFO blendMot;  // 0x7D4 (0xBB4)  second motion work (cModel::Motion.blend)
     void* blendM0;        // 0x8A4 (0xC84)  walk blend motions (em32_R1_Walk / Dash: em32BlendMotSet arguments)
     void* blendM1;        // 0x8A8 (0xC88)
     void* blendM2;        // 0x8AC (0xC8C)
@@ -76,7 +76,7 @@ struct Em32Work {
     int blendB;           // 0x8B8 (0xC98)
     int blendC;           // 0x8BC (0xC9C)
     PlCloth cloth;        // 0x8C0 (0xCA0)  tail cloth chain (em32ClothSet)
-    MotionWorkSub* pMot;  // 0x920 (0xD00)  mem_alloc'd second motion work (em32_R0_Init)
+    MOTION_INFO* pMot;  // 0x920 (0xD00)  mem_alloc'd second motion work (em32_R0_Init)
     cModelInfo* pTexModel;  // 0x924 (0xD04)  the texture-blended model info (ARC(7))
     u8 pad_928[4];
     cObj* pDivide[2];     // 0x92C (0xD0C)  the two halves of the cut player (em32PlDivideSet)

@@ -46,7 +46,7 @@ void Em13Init(cEm* em)
 // and calls Em13WeaponSet.
 void Em13Set(cEm10* em)
 {
-    Em10Work* w = EM10_WK(em);
+    FREE_EM10* w = EM10_WK(em);
 
     switch (em->type) {
     case 0:
@@ -281,7 +281,7 @@ void Em13Set(cEm10* em)
 // stun rod, torch, bowgun and arrow, pitchfork); 0 = the weapon does not exist in this village module.
 void Em13WeaponSet(cEm10* em)
 {
-    Em10Work* w = EM10_WK(em);
+    FREE_EM10* w = EM10_WK(em);
 
     w->mot[41] = ARC(EM13_BIN_WEAPON_SET_254);
     w->mot[42] = ARC(EM13_TPL_WEAPON_SET_255);

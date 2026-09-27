@@ -11,7 +11,7 @@ struct CLOTH_AT_SET;
 // Pendulum / cloth chain work (game/pendulum.cpp), 0x60 bytes (same object as pl_cloth.h's
 // PlCloth). Field meanings from obj14ClothSet; the rest is zeroed there. Every link is one
 // model parts; the u8 tables give the parts index per link and its neighbours (0xFF = none).
-struct PenCloth {
+struct CLOTH_INFO {
     int Num;             // 0x00  number of chain links
     const u8* pCloth;    // 0x04  parts index per link
     const u8* pLeft;       // 0x08  left neighbour per link
@@ -61,12 +61,12 @@ extern Vec GlobalWind;
 extern f32 GlobalWindAdd;
 
 extern "C" {
-void PenClothSet(cModel* m, PenCloth* pInfo, f32 min_len);
-void PenClothFixSet(cModel* m, PenCloth* pInfo, int no, Vec* pos);
-void PenClothFixClear(cModel* m, PenCloth* pInfo, int no);
-void PenClothMove(cModel* m, PenCloth* pInfo);
-void PenClothMove2(cModel* m, PenCloth* pInfo);
-void PenClothMove3(cModel* m, PenCloth* c);
+void PenClothSet(cModel* m, CLOTH_INFO* pInfo, f32 min_len);
+void PenClothFixSet(cModel* m, CLOTH_INFO* pInfo, int no, Vec* pos);
+void PenClothFixClear(cModel* m, CLOTH_INFO* pInfo, int no);
+void PenClothMove(cModel* m, CLOTH_INFO* pInfo);
+void PenClothMove2(cModel* m, CLOTH_INFO* pInfo);
+void PenClothMove3(cModel* m, CLOTH_INFO* c);
 PenAtWork* penClothAtMake(cModel* m, CLOTH_AT_SET* at, int n);
 int penClothAtCk(Vec* pos, Vec* up, PenAtWork* wk);
 int penClothAtCkBorder(Vec* pos, Vec* up, PenAtWork* wk);

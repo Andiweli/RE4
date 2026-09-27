@@ -7,23 +7,23 @@
 #include "rnd.h"
 #include "esp.h"
 
-struct Esp15Work {
+typedef struct tagESP15_WK {
     f32 Range;     // 0x00 half size of the box around the camera
     f32 Del_ratio;  // 0x04 1 - (distance ratio where the alpha starts fading)
     f32 Base_alpha;     // 0x08 base alpha
     f32 Min_y;    // 0x0C the sprite may not fall below this height (0 = none)
     u8 Room_del_frame;     // 0x10 fade in frames
     u8 Room_del_cnt;        // 0x11
-};
+} ESP15_WK;
 
 // Camera-relative particle (rain / snow / dust): the position is wrapped so that it always
 // stays inside a box around the camera.
 class cEsp15 : public cEsp {
 public:
-    Esp15Work m_Free;  // 0xF8
+    ESP15_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x15] factory.
@@ -37,7 +37,7 @@ cEsp* Esp15_Create()
 // and keeps the particle above Min_y.
 void cEsp15::move()
 {
-    Esp15Work* w = &m_Free;
+    ESP15_WK* w = &m_Free;
     Vec tmp;
     Vec dir;
     Vec sc;
@@ -142,9 +142,9 @@ void cEsp15::move()
 // Delete distances from Work8[0..1] (x 10), fade ratio Work8[2] (%), indoor fade frames Work8[3],
 // box size R_pos.z (position randomised inside it), floor Vec0.x. Starts fully faded when the
 // player is already indoors.
-int cEsp15::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp15::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp15Work* w = &m_Free;
+    ESP15_WK* w = &m_Free;
 
     m_Del_far = (s8)pSeq->Work8[0] * 10;
     m_Del_near = (s8)pSeq->Work8[1] * 10;

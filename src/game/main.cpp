@@ -93,14 +93,14 @@ static inline u32 U32GetOfs(void* base, int ofs) { return *(u32*) ((u8*) base + 
 
 const Vec vecZero = {0.0f, 0.0f, 0.0f};
 
-GlobalWork Global;
+GLOBAL_WK Global;
 SYSTEM_SAVE_WORK SystemSave;
 JOY Joy[4];
-KeyWork Key;
+KEY Key;
 u32 MainOt[5];
 ScreenInfo Screen;
 
-GlobalWork* pG = &Global;
+GLOBAL_WK* pG = &Global;
 SYSTEM_SAVE_WORK* pSys = &SystemSave;
 int vsync_cnt = 0;
 
@@ -251,7 +251,7 @@ void haltExecCheck()
 // size table and messages.
 void systemStartInit()
 {
-    memclr_asm(pG, sizeof(GlobalWork));
+    memclr_asm(pG, sizeof(GLOBAL_WK));
     OSInit();
     setLanguage();
     RomFontSetting();
@@ -319,7 +319,7 @@ void systemRestartInit()
     int ret;
 
     PadInit();
-    memclr_asm(&pG->Rno0, sizeof(GlobalWork) - 0x20);
+    memclr_asm(&pG->Rno0, sizeof(GLOBAL_WK) - 0x20);
     MemReplaceHeap(0, 1);
     MemSetCurrentHeap(1);
     systemWorkInit();

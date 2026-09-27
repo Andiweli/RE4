@@ -6,7 +6,7 @@
 #include "em.h"
 
 // Work of the mine enemy (game/emmine.cpp), overlaid on cEm from 0x3E0.
-struct EmMineWork {
+struct FREE_EMMINE {
     u32 Be_flg;            // 0x000 (0x3E0)
     int Timer;            // 0x004 (0x3E4)  frames until the next beep (R1_Set / R1_Parent), bomb wait
     int Timer2;            // 0x008 (0x3E8)  beep interval, shrinks from 17 to 5
@@ -30,7 +30,7 @@ struct EmMineWork {
     u8 EffKindId;           // 0x06B (0x44B)  EspPullCoreKind at creation (trail effect owner)
 };
 
-#define EMMINE_WK(em) ((EmMineWork*) (((cEmMine*) (em))->free))
+#define EMMINE_WK(em) ((FREE_EMMINE*) (((cEmMine*) (em))->free))
 
 // Mine / arrow enemy (game/emmine.cpp): the mine thrower's mine (type 0 / 1 homing) and the
 // crossbow arrow (type 2). Flies (R1_Shot / R1_ShotArrow), sticks to the scenario or an enemy

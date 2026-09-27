@@ -649,7 +649,7 @@ void CameraControl::switchCamera(CameraAreaRec* rec)
             delete m_pProc;
         }
         m_pProc = new (m_Free) CameraMotion(CameraMotionBuffer, 0, 0, 0.0f);
-        ((CameraMotion*) m_pProc)->m_p_base_mat = NULL;
+        ((CameraMotion*) m_pProc)->setBaseMatPtr(NULL);
         r0 = 5;
         break;
     case 7:
@@ -1183,7 +1183,7 @@ void CameraControl::Move()
         CamSmth.setRatio(0.0f);
         m_pProc->move();
         cur = m_pProc->param;
-        if (((CameraMotion*) m_pProc)->m_state == 1) {
+        if (((CameraMotion*) m_pProc)->getState() == 1) {
             if (m_pProc) {
                 delete m_pProc;
             }
@@ -2378,7 +2378,7 @@ void CameraControl::MotionSet(void* motion, int frame, f32 speed)
     m_system_flag |= 0x28;
     StaFlagOn(pG, STA_CUT_CHANGE);
     m_pProc = new (m_Free) CameraMotion(motion, 0, 0, speed);
-    ((CameraMotion*) m_pProc)->m_p_base_mat = NULL;
+    ((CameraMotion*) m_pProc)->setBaseMatPtr(NULL);
     r0 = 5;
     m_Inter.set(frame, &pG->Camera.param);
 }
@@ -2408,9 +2408,9 @@ void CameraControl::setMotionBaseMatPtr(Mtx* p_mat)
 }
 
 // The playing camera motion's work (frame / state).
-void* CameraControl::getMotionInfoPtr()
+MOTION_INFO* CameraControl::getMotionInfoPtr()
 {
-    return ((CameraMotion*) m_pProc)->getInfoPtr();
+    return (MOTION_INFO*) ((CameraMotion*) m_pProc)->getInfoPtr();
 }
 
 // Forgets all registered attach cameras (motion-driven cameras of models).
@@ -2427,7 +2427,7 @@ void CameraControl::clearAttachCamera()
 }
 
 // Registers (or replaces) the attach camera of `model` (up to 3).
-void CameraControl::registAttachCamera(AttachCamera* p_attach, cModel* p_model)
+void CameraControl::registAttachCamera(ATTACH_CAMERA* p_attach, cModel* p_model)
 {
     int i;
 
@@ -2449,7 +2449,7 @@ void CameraControl::registAttachCamera(AttachCamera* p_attach, cModel* p_model)
 }
 
 // Unregisters the attach camera of `model`.
-void CameraControl::deleteAttachCamera(AttachCamera* p_attach, cModel* p_model)
+void CameraControl::deleteAttachCamera(ATTACH_CAMERA* p_attach, cModel* p_model)
 {
     int i;
 
@@ -2485,7 +2485,7 @@ cModel* CameraControl::getAttachModel(cModel* p_model)
 }
 
 // The active attach camera (any when `model` is NULL, else that model's).
-AttachCamera* CameraControl::getAttachCamera(cModel* p_model)
+ATTACH_CAMERA* CameraControl::getAttachCamera(cModel* p_model)
 {
     int i;
 
@@ -2513,7 +2513,7 @@ void CameraControl::checkAttachCamera()
     static int inter_frame;
     cModel* em[3] = {NULL, NULL, NULL};
     cModel* model = NULL;
-    AttachCamera* ac;
+    ATTACH_CAMERA* ac;
     int i;
 
     if (StaFlagChk(pG, STA_SCOPE_CAMERA)) {

@@ -84,7 +84,7 @@ static inline u32 emDoorKeyCk(u32 no)
 cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo)
 {
     cEmDoor* em;
-    EmDoorWork* w;
+    FREE_EMDOOR* w;
     u16* flg;
     Vec v;
     int zero;
@@ -220,7 +220,7 @@ static inline void emDoorChainHit(cEmDoor* em, u32 no)
 // (emDoorSetDmgDoor), and explosives / magnum / rifle break the whole door and its locks.
 void emDoorDmCkWood(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     YARARE_INFO* part;
     u8 wep;
     Vec v;
@@ -442,7 +442,7 @@ void emDoorDmCkWood(cEmDoor* pEm)
 }
 
 // Lock hit by a strong weapon: the lock hp drops by 4 in the strong mode, otherwise it breaks.
-static inline void emDoorLockHitL(cEmDoor* em, EmDoorWork* w)
+static inline void emDoorLockHitL(cEmDoor* em, FREE_EMDOOR* w)
 {
     if (w->Be_flg & 2) {
         w->Lock_L_hp -= 4;
@@ -453,7 +453,7 @@ static inline void emDoorLockHitL(cEmDoor* em, EmDoorWork* w)
 }
 
 // Right lock hit by a heavy weapon: strong locks lose 4 hp, normal ones break.
-static inline void emDoorLockHitR(cEmDoor* em, EmDoorWork* w)
+static inline void emDoorLockHitR(cEmDoor* em, FREE_EMDOOR* w)
 {
     if (w->Be_flg & 2) {
         w->Lock_R_hp -= 4;
@@ -464,7 +464,7 @@ static inline void emDoorLockHitR(cEmDoor* em, EmDoorWork* w)
 }
 
 // Lock hit by a shotgun: only from close by.
-static inline void emDoorLockHitNearL(cEmDoor* em, EmDoorWork* w)
+static inline void emDoorLockHitNearL(cEmDoor* em, FREE_EMDOOR* w)
 {
     if (em->l_pl < 25000000.0f) {
         if (w->Be_flg & 2) {
@@ -477,7 +477,7 @@ static inline void emDoorLockHitNearL(cEmDoor* em, EmDoorWork* w)
 }
 
 // Right lock hit by a shotgun: damaged only within 5000 units.
-static inline void emDoorLockHitNearR(cEmDoor* em, EmDoorWork* w)
+static inline void emDoorLockHitNearR(cEmDoor* em, FREE_EMDOOR* w)
 {
     if (em->l_pl < 25000000.0f) {
         if (w->Be_flg & 2) {
@@ -518,7 +518,7 @@ static inline void emDoorBreakLocks(cEmDoor* em)
 // everything else sparks (est 2 of Eff_id); explosives break every lock and chain.
 void emDoorDmCkIron(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     YARARE_INFO* part;
     u8 wep;
 
@@ -674,7 +674,7 @@ void emDoorDmCkIron(cEmDoor* pEm)
 // on any bullet hit.
 void emDoorDmCkIron2(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     YARARE_INFO* part;
     u8 wep;
 
@@ -850,7 +850,7 @@ void emDoorDmCkIron2(cEmDoor* pEm)
 // only sparks (it is opened by kicking, not shooting).
 void emDoorDmCkIronDown(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     YARARE_INFO* part;
     u8 wep;
 
@@ -1013,8 +1013,8 @@ static inline void emDoorHitOff(YARARE_INFO* hit)
 // flag bit2.
 void emDoorSetDmgLock_L(cEmDoor* pEm, int type)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
-    EmListData* d = &pG->Em_list[pEm->emset_no];
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
+    EM_LIST* d = &pG->Em_list[pEm->emset_no];
     YARARE_INFO* hit;
     u16* flg;
     Vec v;
@@ -1080,8 +1080,8 @@ void emDoorSetDmgLock_L(cEmDoor* pEm, int type)
 // Same for the right lock (etc flag bit1).
 void emDoorSetDmgLock_R(cEmDoor* pEm, int type)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
-    EmListData* d = &pG->Em_list[pEm->emset_no];
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
+    EM_LIST* d = &pG->Em_list[pEm->emset_no];
     YARARE_INFO* hit;
     u16* flg;
     Vec v;
@@ -1152,7 +1152,7 @@ void emDoorSetDmgLock_R(cEmDoor* pEm, int type)
 // break est (0xCB / no + 1) with the SE and sets etc flag bit 3 + no.
 void emDoorSetDmgChain(cEmDoor* pEm, u32 no)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     cParts* parts;
     u16* flg;
 
@@ -1211,9 +1211,9 @@ void emDoorSetDmgChain(cEmDoor* pEm, u32 no)
 // otherwise just the hit SE. Four broken panes break the whole door.
 void emDoorSetDmgDoor(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     YARARE_INFO* part = pEm->dmg.m_pDamageYarare;
-    EmListData* d = &pG->Em_list[pEm->emset_no];
+    EM_LIST* d = &pG->Em_list[pEm->emset_no];
     cParts* parts;
     u16* flg;
     Vec v;
@@ -1291,7 +1291,7 @@ void emDoorSetDmgDoor(cEmDoor* pEm)
 // it, others spawn the break est (5 from the front, 4 from behind) with the SE and go to Break.
 void emDoorSetBrkDoor(cEmDoor* pEm, Vec* pPos)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     f32 ang;
 
     if (pEm->hp <= 0) {
@@ -1344,7 +1344,7 @@ int emDoorBrkCk(cEmDoor* pEm)
 // and placement while intact, and the effect collision panels.
 void cEmDoor::move()
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
 
     switch (type) {
     case 4:
@@ -1401,7 +1401,7 @@ void emDoor_R0_Move(cEmDoor* pEm)
 // panes are broken), and an open door swings shut again (Close) when nobody stands in it.
 void emDoor_R1_Set(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -1427,7 +1427,7 @@ void emDoor_R1_Set(cEmDoor* pEm)
 // 0x18, 400 radius), bounces back a little and settles (flag 0x10000000 = fully open).
 void emDoor_R1_Open(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     f32 ang;
     f32 d;
     Vec v;
@@ -1531,7 +1531,7 @@ void emDoor_R1_Open(cEmDoor* pEm)
 // door plays it), drops hanging weapons nearby, then rests fully open.
 static void emDoor_R1_Open2(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -1595,7 +1595,7 @@ static void emDoor_R1_Open2(cEmDoor* pEm)
 // lands with the crash est (0xC / 0xB) and rests as Downed.
 void emDoor_R1_Down(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     u16* flg;
     f32 ang;
     f32 h;
@@ -1753,7 +1753,7 @@ void emDoor_R1_Down(cEmDoor* pEm)
 // Rno1 == 9: the fallen door lying flat (ang.x +-90 degrees by Open_flag), hp 0.
 void emDoor_R1_Downed(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
 
     if (pEm->r_no_2 == 0) {
         pEm->hp = 0;
@@ -1772,7 +1772,7 @@ void emDoor_R1_Downed(cEmDoor* pEm)
 // Rno1 == 3: swings back to base_dir over 20 frames, then Set.
 void emDoor_R1_Close(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -1799,7 +1799,7 @@ void emDoor_R1_Close(cEmDoor* pEm)
 // Rno1 == 4: destroyed: hides the door, hp 0, etc flag bit0; then stays as a hit-box-only work.
 void emDoor_R1_Break(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     u16* flg;
 
     if (pEm->r_no_2 == 0) {
@@ -1825,7 +1825,7 @@ void emDoor_R1_Break(cEmDoor* pEm)
 // rattles about base_dir for 7 frames.
 void emDoor_R1_Shock(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     f32 r;
 
     switch (pEm->r_no_2) {
@@ -1865,7 +1865,7 @@ void emDoor_R1_Shock(cEmDoor* pEm)
 // clears the lock bit before returning to Set.
 void emDoor_R1_OpenLock(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     f32 ang;
     int unlock;
 
@@ -1900,7 +1900,7 @@ void emDoor_R1_OpenLock(cEmDoor* pEm)
 // Rno1 == 7: script-closed door: swings back to base_dir over 20 frames, then waits for setNormal.
 void emDoor_R1_CloseLock(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     int unlock;
 
     switch (pEm->r_no_2) {
@@ -1932,7 +1932,7 @@ void emDoor_R1_CloseLock(cEmDoor* pEm)
 // decays them by 0.7 per frame.
 void emDoorLockBendMove(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     cParts* parts;
 
     if (w->pLockL) {
@@ -1976,7 +1976,7 @@ void emDoorLockBendMove(cEmDoor* pEm)
 // panels of types 4 / 5 (skipped once those panes are gone).
 void emDoorSatSet(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     Vec poly[4];
     f32 h;
     int attr;
@@ -2107,7 +2107,7 @@ void emDoorSatSet(cEmDoor* pEm)
 // Deactivates every effect collision panel of the door.
 void emDoorSatClear(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
 
     pEm->atari.offOba();
     if (w->pSat[1]) {
@@ -2130,7 +2130,7 @@ void emDoorSatClear(cEmDoor* pEm)
 // Positions the left / right lock and the chain objects on the door (fixed door-space offsets).
 void emDoorLockMove(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     Vec v;
     Vec rot;
 
@@ -2198,7 +2198,7 @@ void emDoorLockMove(cEmDoor* pEm)
 // 0 while something is in the way or the door is not open.
 int emDoorDoorAutoCloseCk(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     Vec v;
     f32 x0;
     f32 lim0;
@@ -2271,7 +2271,7 @@ int emDoorDoorAutoCloseCk(cEmDoor* pEm)
 // falling door (2) and type 7 have none.
 void emDoorYarareInit(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     u16 flags;
 
     if (pEm->type == 2) {
@@ -2312,7 +2312,7 @@ void emDoorYarareInit(cEmDoor* pEm)
 // broken.
 void cEmDoor::setLock(void* bin, void* tpl, int side, int strong)
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
     u16* flg;
     Mtx m;
     Vec v;
@@ -2381,7 +2381,7 @@ void cEmDoor::setLock(void* bin, void* tpl, int side, int strong)
 // 1 while a lock still holds (left or right hp > 0).
 int cEmDoor::ckLock()
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
 
     if (w->pLockL) {
         return 1;
@@ -2396,7 +2396,7 @@ int cEmDoor::ckLock()
 // broken in the etc flag start hidden.
 void cEmDoor::setChain(void* bin, void* tpl)
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
     u16* flg;
     Mtx m;
     Vec v;
@@ -2473,7 +2473,7 @@ void cEmDoor::setEff(u8 eff_id)
 // already broken in the flag word are hidden and disabled.
 void cEmDoor::setYarare()
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
     u16 flags;
     u32 bit;
     u16* flg;
@@ -2523,7 +2523,7 @@ void cEmDoor::setYarare()
 // (script lock, a lock / chain still holds, or the key is missing).
 u32 cEmDoor::ckOpen()
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
 
     if (hp <= 0) {
         return 1;
@@ -2562,7 +2562,7 @@ u32 cEmDoor::ckOpen()
 // left.
 int cEmDoor::ckKick(Vec* pPos)
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
     Mtx m;
     Vec v;
 
@@ -2591,7 +2591,7 @@ int cEmDoor::ckKick(Vec* pPos)
 // mode 1 = the paired-door / silent variant (Rno3); se_off skips the open SE.
 void cEmDoor::setOpen(Vec* pPos, int mode, int se_off, int down_ck)
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
 
     if (hp <= 0) {
         return;
@@ -2733,7 +2733,7 @@ void cEmDoor::setOpen2(int type)
 // (rattle ests / SE), mode 1 then plays the kick SE and the Shock rattle; mode 2 only bends.
 void cEmDoor::setShock(int mode, Vec* pPos, int se_off)
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
     f32 ang;
     u32 i;
     u32 no;
@@ -2856,7 +2856,7 @@ void cEmDoor::setShock(int mode, Vec* pPos, int se_off)
 // Destroys the door from `pos` (explosion): break est toward it and Break.
 void cEmDoor::setBreak(Vec* pPos)
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
     int zero;
 
     if (hp <= 0) {
@@ -2888,7 +2888,7 @@ void cEmDoor::setBreak(Vec* pPos)
 // the partner's action when the player stands on its half.
 void emDoorActEvtCk(cEmDoor* pEm)
 {
-    EmDoorWork* w = EMDOOR_WK(pEm);
+    FREE_EMDOOR* w = EMDOOR_WK(pEm);
     f32 ang;
     f32 lim;
     Vec v;
@@ -2965,7 +2965,7 @@ void emDoorActEvtCk(cEmDoor* pEm)
 // openable one opened by hand (plemDoorOpen).
 void emDoorAction(cEmDoor* ptr)
 {
-    EmDoorWork* w = EMDOOR_WK(ptr);
+    FREE_EMDOOR* w = EMDOOR_WK(ptr);
     int kick;
 
     kick = 0;
@@ -2993,7 +2993,7 @@ void emDoorAction(cEmDoor* ptr)
 // Same for the partner half of a double door (flags Status_flg[1] 0x20000000, a noise).
 void emDoorAction2(cEmDoor* ptr)
 {
-    EmDoorWork* w = EMDOOR_WK(ptr);
+    FREE_EMDOOR* w = EMDOOR_WK(ptr);
     int kick;
 
     kick = 0;
@@ -3035,7 +3035,7 @@ void plemDoorKick(cPlayer* pEm)
 {
     cEmDoor* door = (cEmDoor*) pEm->pEmCatch;
     cEmDoor* door2 = (cEmDoor*) pPL->pEmCatch;
-    EmDoorWork* w = EMDOOR_WK(door2);
+    FREE_EMDOOR* w = EMDOOR_WK(door2);
     int frame;
     Vec v;
 
@@ -3112,7 +3112,7 @@ void plemDoorOpen(cPlayer* pEm)
 {
     cEmDoor* door = (cEmDoor*) pEm->pEmCatch;
     cEmDoor* door2 = (cEmDoor*) pPL->pEmCatch;
-    EmDoorWork* w = EMDOOR_WK(door2);
+    FREE_EMDOOR* w = EMDOOR_WK(door2);
     f32 d;
     u8 flag;
     Vec v;
@@ -3206,7 +3206,7 @@ void plemDoorOpen(cPlayer* pEm)
 int cEmDoor::ckObj()
 {
     Vec v;
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
     f32 width = w->Width;
     u32 i;
 
@@ -3285,7 +3285,7 @@ int cEmDoor::ckObj()
 // Script: opens the door to the `type` side and locks it open (Be_flg bit0) until setNormal.
 void cEmDoor::setOpenLock(int type)
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
 
     r_no_0 = 1;
     r_no_1 = 6;
@@ -3298,7 +3298,7 @@ void cEmDoor::setOpenLock(int type)
 // Script: closes the door and locks it closed until setNormal.
 void cEmDoor::setCloseLock()
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
 
     r_no_0 = 1;
     r_no_1 = 7;
@@ -3311,7 +3311,7 @@ void cEmDoor::setCloseLock()
 // Script: snaps the door shut at once.
 void cEmDoor::setClose()
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
 
     ang.y = w->base_dir;
     r_no_0 = 1;
@@ -3324,7 +3324,7 @@ void cEmDoor::setClose()
 // Script: lays the door flat in direction `dir` and records it in the etc flag.
 void cEmDoor::setDowned(int type)
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
     u16* flg;
 
     w->Open_flag = type;
@@ -3365,7 +3365,7 @@ cEmDoor* DoorOpenCk(cModel* m)
 
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEmDoor* em = (cEmDoor*) EmMgr.fastAt(i);
-        EmDoorWork* w;
+        FREE_EMDOOR* w;
 
         if (!em->isAlive()) {
             continue;
@@ -3522,7 +3522,7 @@ void emDoorDropWeapon(cEmDoor* pEm)
 // Pairs two halves of a double door so kicks / opens are mirrored.
 void cEmDoor::setDoor(cEmDoor* other)
 {
-    EmDoorWork* w = EMDOOR_WK(this);
+    FREE_EMDOOR* w = EMDOOR_WK(this);
 
     if (other) {
         w->pDoor = other;

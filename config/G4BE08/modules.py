@@ -655,6 +655,8 @@ STRIP_UNUSED = {
     "t_sce/db_light.cpp", "t_movie/db_light.cpp",
     # db_sctrl.cpp starts with the pool of a dead-stripped function
     "t_id/db_sctrl.cpp", "t_event/db_sctrl.cpp",
+    # db_toolbase.cpp: cDbgWindow::CursorMove / ButtonPushCheck are inlined into LocalUpdate, no out-of-line copy
+    "Tools/db_toolbase.cpp", "t_event/db_toolbase.cpp",
     # db_widget.cpp: the never-called DB_SLIDEBAR constructor (pool kept) and the dead delete-all
     # helper that makes our cc1plus synthesize the implicit destructors
     "t_esp/db_widget.cpp",

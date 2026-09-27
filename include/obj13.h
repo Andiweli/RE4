@@ -20,7 +20,7 @@ int SubLadderClimbCk2(cEm* pEm);
 
 // Ladder work (game/obj13.cpp `cObjLadder`): a ladder the player / partner climbs (plobjLadderClimb),
 // kicks down (plobjLadderDown) and stands up again (plobjLadderReset).
-struct LadderWork {
+struct FREE_OBJ13 {
     u32 be_flag;            // 0x00  bit0 motions set, bit1 off (setOff), bit2 partner climbing, bit3 transOld
     int Status;           // 0x04  0 standing, 1 downed, 2 falling, 3 falling (timer done), 4 fall / reset motion
     class cSat* pSat;      // 0x08
@@ -42,7 +42,7 @@ struct LadderWork {
 // falls with a damage area (R1_Fall) and breaks the windows it lands on (breakWindow).
 class cObjLadder : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  LadderWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ13
 
     virtual void move();
     virtual ~cObjLadder() {}
@@ -68,6 +68,6 @@ public:
     void setCamera(int no);
 };
 
-#define LADDER_WK(o) ((LadderWork*) (o)->free)
+#define LADDER_WK(o) ((FREE_OBJ13*) (o)->free)
 
 #endif

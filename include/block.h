@@ -22,7 +22,7 @@ struct BlockLink {
 // Trigger area of the `BLK` file (stride 0x38), chained through the cBlock ordering table.
 struct BlockArea {
     u32 tag;        // 0x00  OT link
-    AreaData area;  // 0x04
+    AREA_HIT_DATA area;  // 0x04
     u8 flags;       // 0x34  bit0: active
     u8 x35;
     s8 areaNo;      // 0x36

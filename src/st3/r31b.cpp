@@ -139,9 +139,9 @@ extern "C" void Evt_R31BS00_Func(Event* e);
 // and a passed one is hidden as fallen (R31bSmdTransOff).
 void R31bInit()
 {
-    cEm* sw0;
-    cEm* sw1;
-    cEm* barred;
+    cEmSwitch* sw0;
+    cEmSwitch* sw1;
+    cEmBarred* barred;
     cEmDoor* door;
     cEmDoor* door2;
     cObj* obj;
@@ -176,25 +176,25 @@ void R31bInit()
     getRoomEtcSwitch(7, &sw1, 1);
     getRoomEtcBarred(9, &barred, 1);
     if (sw0 && sw1 && barred) {
-        ((cEmSwitch*) sw0)->setBarred((cEmBarred*) barred);
-        ((cEmSwitch*) sw0)->setConnectSwitch((cEmSwitch*) sw1);
-        ((cEmSwitch*) sw1)->setBarred((cEmBarred*) barred);
-        ((cEmSwitch*) sw1)->setConnectSwitch((cEmSwitch*) sw0);
-        ((cEmSwitch*) sw0)->setClosed();
-        ((cEmSwitch*) sw1)->setClosed();
-        ((cEmBarred*) barred)->setClosed();
+        sw0->setBarred((cEmBarred*) barred);
+        sw0->setConnectSwitch((cEmSwitch*) sw1);
+        sw1->setBarred((cEmBarred*) barred);
+        sw1->setConnectSwitch((cEmSwitch*) sw0);
+        sw0->setClosed();
+        sw1->setClosed();
+        barred->setClosed();
     }
     getRoomEtcSwitch(6, &sw0, 1);
     getRoomEtcSwitch(8, &sw1, 1);
     getRoomEtcBarred(0xA, &barred, 1);
     if (sw0 && sw1 && barred) {
-        ((cEmSwitch*) sw0)->setBarred((cEmBarred*) barred);
-        ((cEmSwitch*) sw0)->setConnectSwitch((cEmSwitch*) sw1);
-        ((cEmSwitch*) sw1)->setBarred((cEmBarred*) barred);
-        ((cEmSwitch*) sw1)->setConnectSwitch((cEmSwitch*) sw0);
-        ((cEmSwitch*) sw0)->setClosed();
-        ((cEmSwitch*) sw1)->setClosed();
-        ((cEmBarred*) barred)->setClosed();
+        sw0->setBarred((cEmBarred*) barred);
+        sw0->setConnectSwitch((cEmSwitch*) sw1);
+        sw1->setBarred((cEmBarred*) barred);
+        sw1->setConnectSwitch((cEmSwitch*) sw0);
+        sw0->setClosed();
+        sw1->setClosed();
+        barred->setClosed();
     }
     EvtMgr.SetFunc("evt_r31bs00_func", (void*) Evt_R31BS00_Func);
     R31bDoorSat(0);
@@ -441,8 +441,7 @@ static void R31bExecEventS00()
         r31b_work->em.setEm(0x14, -1, 0, 1, 1);
         em = r31b_work->em.getPtr();
         if (em) {
-            // The boss pointer the life meter shows: stored at Cckpt+0.
-            *(cEm**) &Cckpt = em;
+            Cckpt.lifeMeterBoss(em);
         }
         EstSet(0, -1, 0, 0, EFF_ROOM, 3, 0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
     }
@@ -1594,7 +1593,7 @@ static void R31bExecGondolaMain(int dir)
     int faded;
     int frame;
     int i;
-    FadeWork* fade;
+    FADE_WORK* fade;
 
     obj = SmdGetObjPtr(0xA3);
     if (obj == 0) {
@@ -1881,7 +1880,7 @@ static void R31bEmSetMain()
     em = (cEm32*) r31b_work->em.getPtr();
     if (em) {
         em->setNext(4);
-        *(cEm**) &Cckpt = em;
+        Cckpt.lifeMeterBoss(em);
     }
 }
 
@@ -2050,7 +2049,7 @@ void R31bKanaamiRoom03Trans(int no, int on)
 // swapped; pl0010 (Leon) ot_type 2 and evma300's light mask on cut 0.
 void Evt_R31BS00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete(0x2001, ESP_CORE_KIND_ROOM01);
         SmdSetTrans(0x82, 0);
@@ -2058,7 +2057,7 @@ void Evt_R31BS00_Func(Event* e)
         SmdSetTrans(0xF4, 0);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0010", 0, 0) == 1) {

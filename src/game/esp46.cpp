@@ -6,19 +6,19 @@
 #include "filter.h"
 #include "esp.h"
 
-struct Esp46Work {
+typedef struct tagESP46_WK {
     int level;   // 0x00 filter03 type
     u8 priority;      // 0x04
     u8 sp_flag;      // 0x05
-};
+} ESP46_WK;
 
 // Screen filter (filter03) driver: never drawn itself, feeds its color into the filter.
 class cEsp46 : public cEsp {
 public:
-    Esp46Work m_Free;  // 0xF8
+    ESP46_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x46] factory.
@@ -39,7 +39,7 @@ void cEsp46::move()
 // alpha; nothing is drawn here.
 void Esp46_Trans(cEsp46* pEsp)
 {
-    Esp46Work* w = &pEsp->m_Free;
+    ESP46_WK* w = &pEsp->m_Free;
     f32 a = pEsp->m_Col_a * (1.0f / 255.0f);
 
     Filter03SetParam(w->level, (u8)(pEsp->m_Col_r * a), (u8)(pEsp->m_Col_g * a), (u8)(pEsp->m_Col_b * a), w->priority, w->sp_flag);
@@ -47,9 +47,9 @@ void Esp46_Trans(cEsp46* pEsp)
 
 // Reads the filter type (Work8[0]), priority (Work8[1]) and special flag (Work8[2], 0/1) and puts
 // the effect on the screen-first layer (m_Parts_no 0xF8).
-int cEsp46::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp46::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp46Work* w = &m_Free;
+    ESP46_WK* w = &m_Free;
 
     w->level = (s8)pSeq->Work8[0];
     w->priority = pSeq->Work8[1];

@@ -61,7 +61,7 @@ public:
     u32 satAttr;              // 0x438  scenario attribute of the wall in front (anaSatInfo)
     Vec satCross;             // 0x43C  hit point of the action wall check (actionCheck)
     Vec satNorm;              // 0x448  its normal
-    MotionWorkSub subMot;     // 0x454 .. 0x524  look-back motion blended in (backCheckSet -> blendMot)
+    MOTION_INFO subMot;     // 0x454 .. 0x524  look-back motion blended in (backCheckSet -> blendMot)
     cModelInfo* m_pModRHand;  // 0x524  hand model infos (pl11 cSubAshley::setHand)
     cModelInfo* m_pModLHand;  // 0x528
     f32 fWork0;               // 0x52C  fence / window action direction
@@ -90,13 +90,18 @@ public:
     cMotBase m_MotBase;       // 0x58C .. 0x5C4  (SetSubDamage sets 0x40 in its first byte)
     u32 m_StopSe;             // 0x5C4  SndCall handle of the bulldozer SEs (objBull Sub_bull_*)
     f32 Route_h;              // 0x5C8  (obj13 SubLadderClimbCk: the partner climbs only while >= 1000)
+private:
     YARARE_INFO m_Yarare[10]; // 0x5CC .. 0x7D4  hit boxes (the first three added in cSubChar::init)
     cLight* m_pLiF;           // 0x7D4  back light (cLightMgr::createBack)
+protected:
     cModelInfo* m_pFace;      // 0x7D8  face model info the ShapeMove work runs on (NULL = none)
+public:
     void (*m_pFunc)();        // 0x7DC  routine 4 (damage) handler (cSubChar::move)
+private:
     Vec posBustR;             // 0x7E0  rest positions of parts 0x1D, 0x1E, 0x1A (moveBust)
     Vec posBustL;             // 0x7EC
     Vec posScarf;             // 0x7F8
+public:
     cSubChar();
     virtual ~cSubChar();
     virtual void beginEvent(u32 flag);
@@ -109,27 +114,37 @@ public:
     virtual void moveCloth();
     virtual void setEmFunc(void (*pFunc)());   // pl_sub SetSubDamage (Ashley)
 
+private:
     static const Vec atckPos;    // offset behind the player while he aims (moveBehind)
     static const Vec atckPos2;   // the same for the two-handed weapons
 
+public:
     int mot_ck();                // 1 while the partner's life is at or below half
     void init();
     void moveCore();
     void moveFootwork();
     void moveMove();
+private:
     int readyOkCheck();
+public:
     void moveBehind();
     void moveKagamu();
     void movePants();
     void moveDown();
+private:
     int getScrActionPoint(Vec* initPos, Vec* initAng, u32 actAttr);
+public:
     void moveFance();
+private:
     int landCheck();
+public:
     void moveFall();
     void moveAction();
     void moveLadder();
+private:
     f32 getJumpAdjY();
     void jumpAdjust();
+public:
     void moveBack();
     void moveAux();
     void moveHide();
@@ -137,16 +152,21 @@ public:
     void moveFallWait();
     void moveLadderWait();
     void moveWindowWait();
+private:
     u32 checkSatAttr(f32 length);
     f32 getAdjustX(int n);
+public:
     void moveDamage();
     void moveDie();
     void moveBull();
     void moveEvent();
     void moveDijection();
     void movePos(Vec* toPos, f32 spd);
+private:
     void neckInit();
+private:
     void neckCtrl();
+private:
     void neckSet(Vec* pos);
     int actCheck();
     int cautionCheck();
@@ -167,25 +187,34 @@ public:
     void backCheckCtrlFootwork();
     void backCheckCtrlMove();
     int checkBackEm();
+public:
     void analyze();
+private:
     void frontCheck();
     void anaSatInfo();
+public:
     void control(int mode);
+private:
     int checkAnotherRoute();
     int moveAnotherRoute();
     void damageCheck();
     // scenario damage area hit (sce_at sceAtFunc_damage)
+public:
     void setDamage(u8 kind, int arg, f32 power, int a, int b);
     void registPlAction(Vec* pos, f32 y, u8 a);
+private:
     void moveBust();
     void moveFace();
     void shadowCtrl();
     void dmgCheck();
+public:
     void beginDamage();
     void endDamage();
     void interrupt();
+private:
     void inSat();
     void debugMove();
+public:
     int farCheck();   // never called; dead-stripped in the DOL, only its pool word (1000) survives
 };
 

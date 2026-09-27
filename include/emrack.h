@@ -41,7 +41,7 @@ void emRack_R1_Break(cEmRack* pEm);
 void emRack_R1_Shock(cEmRack* pEm);
 void emRackSatSet(cEmRack* pEm);
 void emRackSatClear(cEmRack* pEm);
-void emRackYarareInit(cEmRack* pEm);
+void emRackYarareInit(cEm* pEm);
 }
 
 #endif

@@ -33,6 +33,7 @@
 #include "sscrn.h"
 #include "fade.h"
 #include "cSceObj.h"
+#include "embox.h"
 
 // Room 2-27 (D:/Bio4/Prog/r227.cpp): the entrance event, the cargo lift with its enemy waves and
 // falling crates, the gondola and the shelf items.
@@ -40,15 +41,15 @@
 struct R227Work {
     cDataUnit* evd[3];    // 0x000  r227s00 / s01 / s02 event data
     u8 pad_0C[0x40];
-    cEm* sw;              // 0x04C  lever (cEmSwitch)
+    cEmSwitch* sw;              // 0x04C  lever (cEmSwitch)
     cObj* elv;            // 0x050  the lift
     cObj* elv2;           // 0x054  its cage
     f32 elvY0;            // 0x058  start heights
     f32 elv2Y0;           // 0x05C
     cSat* sat;            // 0x060
     cSat* eat;            // 0x064
-    cEm* rack[2];         // 0x068  the two crate racks
-    cEm* box[3];          // 0x070  crates riding the lift
+    cEmRack* rack[2];         // 0x068  the two crate racks
+    cEmBox* box[3];          // 0x070  crates riding the lift
     f32 boxY0[3];         // 0x07C
     u32 emOnElvCnt;       // 0x088  enemies dropped onto the lift so far
     cEm* emFall[16];      // 0x08C  enemies that die when they fall off the lift
@@ -104,8 +105,8 @@ void R227Init()
     }
     getRoomEtcSwitch(4, &r227_work->sw, 1);
     if (r227_work->sw) {
-        ((cEmSwitch*) r227_work->sw)->setAutoOpen();
-        ((cEmSwitch*) r227_work->sw)->setBarrel();
+        r227_work->sw->setAutoOpen();
+        r227_work->sw->setBarrel();
     }
     if (DebugTrg(1)) {
         RsfClear(G_ROOM_ID, 0);
@@ -214,7 +215,7 @@ static void r227_checkBox0Fall()
         }
         SceSleep(1);
     }
-    ((cEmRack*) r227_work->rack[0])->setBreak(&r227_work->rack[0]->pos);
+    r227_work->rack[0]->setBreak(&r227_work->rack[0]->pos);
 }
 
 // Task: rack 1, the same the other way round.
@@ -248,7 +249,7 @@ static void r227_checkBox1Fall()
         }
         SceSleep(1);
     }
-    ((cEmRack*) r227_work->rack[1])->setBreak(&r227_work->rack[1]->pos);
+    r227_work->rack[1]->setBreak(&r227_work->rack[1]->pos);
 }
 
 // Clear the list of enemies watched for falling off the lift.
@@ -544,13 +545,13 @@ void r227_initCargoElv()
         SceAtDataSet_exec(3, SCE_LEVEL10, 0, (TaskFunc) r227_operateElv, 0, 1);
         if (getRoomEtcRack(5, &r227_work->rack[0], 1)) {
             if (RsfCheck(G_ROOM_ID, 1) == 0) {
-                ((cEmRack*) r227_work->rack[0])->setRange(0.0f, 0.0f, 3000.0f, 0.0f);
+                r227_work->rack[0]->setRange(0.0f, 0.0f, 3000.0f, 0.0f);
                 SceExec(0x12, (TaskFunc) r227_checkBox0Fall, 0, 0, SCE_PRIO_DEF_2, 0);
             }
         }
         if (getRoomEtcRack(9, &r227_work->rack[1], 1)) {
             if (RsfCheck(G_ROOM_ID, 2) == 0) {
-                ((cEmRack*) r227_work->rack[1])->setRange(0.0f, 0.0f, 0.0f, 3000.0f);
+                r227_work->rack[1]->setRange(0.0f, 0.0f, 0.0f, 3000.0f);
                 SceExec(0x12, (TaskFunc) r227_checkBox1Fall, 0, 0, SCE_PRIO_DEF_2, 0);
             }
         }
@@ -836,8 +837,8 @@ static void r227_execEvent00()
     if (r227_work->evd[0]->waitLoadOk() != 0) {
         u32 key0;
 
-        EvtMgr.SetEvt(r227_work->evd[0]->m_addr, &key0);
-        ((Event*) key0)->StatusFlag |= EvtStfBit(EvtStfPlPosNoSet);
+        EvtMgr.SetEvt(r227_work->evd[0]->getAddr(), &key0);
+        ((Event*) key0)->FlgOnStatus(EvtStfPlPosNoSet);
         r227_waitEvt();
         SysFlagOn(pG, SYS_SCREEN_STOP);
         r227_work->evd[0]->setCommand(CMND_DEL_DATA, 0, 0);
@@ -846,8 +847,8 @@ static void r227_execEvent00()
                 u32 key1;
 
                 r227_work->evd[1]->setCommand(CMND_MRAM_LOAD, 0, 1);
-                if (EvtMgr.SetEvt(r227_work->evd[1]->m_addr, &key1)) {
-                    ((Event*) key1)->StatusFlag |= EvtStfBit(EvtStfPlPosNoSet);
+                if (EvtMgr.SetEvt(r227_work->evd[1]->getAddr(), &key1)) {
+                    ((Event*) key1)->FlgOnStatus(EvtStfPlPosNoSet);
                 }
                 r227_waitEvt();
             }
@@ -856,9 +857,9 @@ static void r227_execEvent00()
                 u32 key2;
 
                 r227_work->evd[2]->setCommand(CMND_MRAM_LOAD, 0, 1);
-                if (EvtMgr.SetEvt(r227_work->evd[2]->m_addr, &key2)) {
-                    ((Event*) key2)->StatusFlag |= EvtStfBit(EvtStfEndSleepOrder);
-                    ((Event*) key2)->StatusFlag |= EvtStfBit(EvtStfDiedemo);
+                if (EvtMgr.SetEvt(r227_work->evd[2]->getAddr(), &key2)) {
+                    ((Event*) key2)->FlgOnStatus(EvtStfEndSleepOrder);
+                    ((Event*) key2)->FlgOnStatus(EvtStfDiedemo);
                 }
                 r227_waitEvt();
                 SceExit();
@@ -893,15 +894,15 @@ static void Evt_R227S00_Func(Event* e)
 {
     int v;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EvtFlgOnStatus(e, 3);
         e->SetEvtCancelCut(10);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "evm5100", 0, 0) == 1) {
@@ -916,7 +917,7 @@ static void Evt_R227S00_Func(Event* e)
         case 0xB:
             SpfFlagOff(pG, SPF_ACTBTN);
             if (!(pG->Room_flg[0] & 0x80000000)) {
-                if (e->NowFrame > 15) {
+                if (e->GetNowFrame() > 15) {
                     DpfFlagOff(pG, DPF_MESSAGE);
                     if (!(pG->Room_flg[0] & 0x40000000)) {
                         ActBtn.set(ACT_GUARD, 5, (void*) r227_succeedAction, 0, ACTCTR_ENFORCE_EXEC | ACTCTR_EXACT_KEY, DISP_A_B, ACT_FUNC_NORMAL, 0);
@@ -929,8 +930,8 @@ static void Evt_R227S00_Func(Event* e)
             }
             break;
         }
-        if (e->NowCut == 0xB) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0xB) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "evm3300", 0, 0) == 1) {
@@ -942,7 +943,7 @@ static void Evt_R227S00_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "evm3300", 0, 0) == 1) {
@@ -954,8 +955,8 @@ static void Evt_R227S00_Func(Event* e)
                 }
             }
         }
-        if (e->NowCut == 6 || e->NowCut == 0xB) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 6 || e->GetNowCut() == 0xB) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -964,7 +965,7 @@ static void Evt_R227S00_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -977,10 +978,7 @@ static void Evt_R227S00_Func(Event* e)
     case 2:
         break;
     case 3:
-        v = 1;
-        if (!(e->StatusFlag & EvtStfBit(EvtStfEvtCancelSet))) {
-            v = 0;
-        }
+        v = e->FlgCkStatus(EvtStfEvtCancelSet);
         if (v == 0) {
             EvtMgr.EvtSndStrPlay(EvtMgr.GetNowExeEvtNamePtr(), 1, 0x88, 1, 0.0f);
         }
@@ -996,13 +994,13 @@ static void Evt_R227S01_Func(Event* e)
     Vec rot = {0.0f, 0.0f, 0.0f};
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod2;
 
                 SmdSetTrans(0xA, 0);
@@ -1018,7 +1016,7 @@ static void Evt_R227S01_Func(Event* e)
             }
             break;
         case 5:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "scr0000", 0, 0) == 1) {
                     e->SetMod("scr0000", mod, 5, 0, 2, 0);
                     ((cModel*) mod)->setPos(&pos);
@@ -1028,8 +1026,8 @@ static void Evt_R227S01_Func(Event* e)
             }
             break;
         }
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod3;
 
                 if (e->GetMod(&mod3, "pl0000", 0, 0) == 1) {
@@ -1038,7 +1036,7 @@ static void Evt_R227S01_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod3;
 
                 if (e->GetMod(&mod3, "pl0000", 0, 0) == 1) {
@@ -1070,12 +1068,12 @@ static void Evt_R227S02_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType == 1) {
+    if (e->GetFuncType() == 1) {
         // Two identical arms (not `case 0: case 1:`): the original keeps the `== 0` / `== 1` tests
         // and cross-jumps the first body into the second.
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod, 2, 0);
                     ModelInfoSetTrans((cModel*) mod, 6, 0);
@@ -1083,7 +1081,7 @@ static void Evt_R227S02_Func(Event* e)
             }
             break;
         case 1:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod, 2, 0);
                     ModelInfoSetTrans((cModel*) mod, 6, 0);
@@ -1091,7 +1089,7 @@ static void Evt_R227S02_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {

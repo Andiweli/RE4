@@ -344,7 +344,7 @@ void SceElevator2Main(SceElevator2Data* d)
     int i;
     int j;
     u32* hSnd;
-    FadeWork* fade;
+    FADE_WORK* fade;
 
     obj = SmdGetObjPtr(d->objId);
     gear1 = SmdGetObjPtr(d->objId2);
@@ -628,7 +628,7 @@ void Evt_R317S00_Func(Event* e)
 {
     int on = 0;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
@@ -642,22 +642,22 @@ void Evt_R317S00_Func(Event* e)
         e->SetEvtCancelCut(3);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "em3900", 0, 0) == 1) {
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        if (e->NowCut != 5) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() != 5) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x29, 0);
                 SmdSetTrans(0x2F, 0);
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x29, 0);
@@ -667,11 +667,11 @@ void Evt_R317S00_Func(Event* e)
                 SmdSetTrans(0x28, 0);
             }
         }
-        if (e->NowCut == 0 && e->NowFrame == 1) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 1) {
             EvtMgr.EvtReadAram("event/evd/r317s07.evd", 0, 0, 0, 0);
         }
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -680,7 +680,7 @@ void Evt_R317S00_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -690,11 +690,11 @@ void Evt_R317S00_Func(Event* e)
             }
         }
         if (r317_work->hardMode == 0) {
-            if (e->NowCut > 4 && e->NowFrame >= 0) {
+            if (e->GetNowCut() > 4 && e->GetNowFrame() >= 0) {
                 on = 1;
             }
         } else {
-            if ((e->NowCut == 4 && e->NowFrame > 8) || (e->NowCut > 4 && e->NowFrame >= 0)) {
+            if ((e->GetNowCut() == 4 && e->GetNowFrame() > 8) || (e->GetNowCut() > 4 && e->GetNowFrame() >= 0)) {
                 on = 1;
             }
         }
@@ -718,7 +718,7 @@ void Evt_R317S01_Func(Event* e)
 {
     int on = 0;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
@@ -732,7 +732,7 @@ void Evt_R317S01_Func(Event* e)
         e->SetEvtCancelCut(6);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -742,8 +742,8 @@ void Evt_R317S01_Func(Event* e)
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x28, 0);
@@ -753,7 +753,7 @@ void Evt_R317S01_Func(Event* e)
                 SmdSetTrans(0x27, 0);
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x28, 0);
@@ -761,15 +761,15 @@ void Evt_R317S01_Func(Event* e)
                 SmdSetTrans(0x2F, 0);
             }
         }
-        if (e->NowCut == 0 && e->NowFrame == 1) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 1) {
             EvtMgr.EvtReadAram("event/evd/r317s03.evd", 0, 0, 0, 0);
         }
         if (r317_work->hardMode == 0) {
-            if (e->NowCut == 6 && e->NowFrame > 6) {
+            if (e->GetNowCut() == 6 && e->GetNowFrame() > 6) {
                 on = 1;
             }
         } else {
-            if (e->NowCut == 6 && e->NowFrame > 0) {
+            if (e->GetNowCut() == 6 && e->GetNowFrame() > 0) {
                 on = 1;
             }
         }
@@ -791,13 +791,13 @@ void Evt_R317S01_Func(Event* e)
 // Event r317s02 callback (no button): the Leon model's part 6 hidden, evmd200 drawn with ot_type 1.
 void Evt_R317S02_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -811,12 +811,12 @@ void Evt_R317S02_Func(Event* e)
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        if (e->NowCut == 1) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 1) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x2F, 0);
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x2F, 1);
             }
         }
@@ -833,13 +833,13 @@ void Evt_R317S03_Func(Event* e)
 {
     int on = 0;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
         if (RsfCheck(G_ROOM_ID, 2)) {
-            e->ChangeNoStr = 0x75;
-            e->ChangeNowCut = 5;
+            e->SetChangeNoStr(0x75);
+            e->SetChangeNowCut(5);
         }
         pG->Room_flg[0] |= 0x04000000;
         if (Rnd() & 0x80) {
@@ -851,7 +851,7 @@ void Evt_R317S03_Func(Event* e)
         e->SetEvtCancelCut(0x14);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -861,11 +861,11 @@ void Evt_R317S03_Func(Event* e)
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0x13:
         case 0x14:
         case 0x15:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x27, 0);
@@ -874,7 +874,7 @@ void Evt_R317S03_Func(Event* e)
             }
             break;
         case 1:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x27, 0);
@@ -885,7 +885,7 @@ void Evt_R317S03_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x27, 0);
@@ -895,16 +895,16 @@ void Evt_R317S03_Func(Event* e)
             }
             break;
         }
-        if (e->NowCut == 4) {
+        if (e->GetNowCut() == 4) {
             SmdSetTrans(0x25, 0);
         }
-        if (e->NowCut == 0 && e->NowFrame == 1) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 1) {
             EvtMgr.EvtReadAram("event/evd/r317s13.evd", 0, 0, 0, 0);
         }
         {
             void* mod;
 
-            if (e->NowCut > 0x10) {
+            if (e->GetNowCut() > 0x10) {
                 if (e->GetMod(&mod, "em3900", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod, 0, 0);
                 }
@@ -914,25 +914,25 @@ void Evt_R317S03_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0xE:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x2E, 0);
             }
             break;
         case 0xD:
         case 0xF:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x2E, 1);
             }
             break;
         }
         if (r317_work->hardMode == 0) {
-            if ((e->NowCut == 0x14 && e->NowFrame > 0x17) || (e->NowCut == 0x15 && e->NowFrame >= 0)) {
+            if ((e->GetNowCut() == 0x14 && e->GetNowFrame() > 0x17) || (e->GetNowCut() == 0x15 && e->GetNowFrame() >= 0)) {
                 on = 1;
             }
         } else {
-            if ((e->NowCut == 0x14 && e->NowFrame > 0x11) || (e->NowCut == 0x15 && e->NowFrame >= 0)) {
+            if ((e->GetNowCut() == 0x14 && e->GetNowFrame() > 0x11) || (e->GetNowCut() == 0x15 && e->GetNowFrame() >= 0)) {
                 on = 1;
             }
         }
@@ -954,13 +954,13 @@ void Evt_R317S03_Func(Event* e)
 // Event r317s04 callback (no button): Leon's part 6 and Krauser's part 7 hidden on cut 0.
 void Evt_R317S04_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -981,7 +981,7 @@ void Evt_R317S04_Func(Event* e)
 // model flags and effects.
 void Evt_R317S05_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
@@ -989,12 +989,12 @@ void Evt_R317S05_Func(Event* e)
     case 1: {
         void* mod;
 
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             if (e->GetMod(&mod, "em3900h", 0, 0) == 1) {
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
         case 1:
         case 2:
@@ -1005,7 +1005,7 @@ void Evt_R317S05_Func(Event* e)
         case 7:
         case 8:
         case 9:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -1014,7 +1014,7 @@ void Evt_R317S05_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -1023,9 +1023,9 @@ void Evt_R317S05_Func(Event* e)
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x28, 0);
@@ -1034,7 +1034,7 @@ void Evt_R317S05_Func(Event* e)
             }
             break;
         case 3:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x28, 0);
@@ -1044,7 +1044,7 @@ void Evt_R317S05_Func(Event* e)
             break;
         case 1:
         case 2:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x28, 0);
@@ -1054,7 +1054,7 @@ void Evt_R317S05_Func(Event* e)
         case 6:
         case 7:
         case 8:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x2F, 0);
@@ -1062,15 +1062,15 @@ void Evt_R317S05_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
             }
             break;
         }
-        if (e->NowCut == 0xF) {
+        if (e->GetNowCut() == 0xF) {
             SmdSetTrans(0x24, 0);
         }
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             if (e->GetMod(&mod, "evm7800", 0, 0) == 1) {
                 ((cModel*) mod)->be_flag |= 0x10;
             }
@@ -1086,13 +1086,13 @@ void Evt_R317S05_Func(Event* e)
 // Event r317s06 callback (no button): Leon's part 6 and em3900h's part 7 hidden on cut 0.
 void Evt_R317S06_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -1115,7 +1115,7 @@ void Evt_R317S07_Func(Event* e)
 {
     int on = 0;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
@@ -1129,7 +1129,7 @@ void Evt_R317S07_Func(Event* e)
         e->SetEvtCancelCut(7);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -1139,13 +1139,13 @@ void Evt_R317S07_Func(Event* e)
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
         case 1:
         case 2:
         case 3:
         case 4:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x29, 0);
@@ -1153,7 +1153,7 @@ void Evt_R317S07_Func(Event* e)
             }
             break;
         case 5:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x26, 0);
@@ -1164,7 +1164,7 @@ void Evt_R317S07_Func(Event* e)
         case 6:
         case 7:
         case 8:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x29, 0);
@@ -1172,15 +1172,15 @@ void Evt_R317S07_Func(Event* e)
             }
             break;
         }
-        if (e->NowCut == 0 && e->NowFrame == 1) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 1) {
             EvtMgr.EvtReadAram("event/evd/r317s09.evd", 0, 0, 0, 0);
         }
         if (r317_work->hardMode == 0) {
-            if ((e->NowCut == 7 && e->NowFrame > 0x4C) || (e->NowCut == 8 && e->NowFrame >= 0)) {
+            if ((e->GetNowCut() == 7 && e->GetNowFrame() > 0x4C) || (e->GetNowCut() == 8 && e->GetNowFrame() >= 0)) {
                 on = 1;
             }
         } else {
-            if ((e->NowCut == 7 && e->NowFrame > 0x46) || (e->NowCut == 8 && e->NowFrame >= 0)) {
+            if ((e->GetNowCut() == 7 && e->GetNowFrame() > 0x46) || (e->GetNowCut() == 8 && e->GetNowFrame() >= 0)) {
                 on = 1;
             }
         }
@@ -1202,13 +1202,13 @@ void Evt_R317S07_Func(Event* e)
 // Event r317s08 callback (no button): Leon's part 6 and Krauser's part 7 hidden, per-cut flags.
 void Evt_R317S08_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -1218,7 +1218,7 @@ void Evt_R317S08_Func(Event* e)
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "evmd400", 0, 0) == 1) {
@@ -1237,7 +1237,7 @@ void Evt_R317S09_Func(Event* e)
 {
     int on = 0;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
@@ -1251,7 +1251,7 @@ void Evt_R317S09_Func(Event* e)
         e->SetEvtCancelCut(8);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -1261,17 +1261,17 @@ void Evt_R317S09_Func(Event* e)
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
         case 1:
         case 2:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0x2F, 0);
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x28, 0);
@@ -1279,18 +1279,18 @@ void Evt_R317S09_Func(Event* e)
             }
             break;
         }
-        if (e->NowCut == 3) {
+        if (e->GetNowCut() == 3) {
             SmdSetTrans(0x21, 0);
         }
-        if (e->NowCut == 0 && e->NowFrame == 1) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 1) {
             EvtMgr.EvtReadAram("event/evd/r317s11.evd", 0, 0, 0, 0);
         }
         if (r317_work->hardMode == 0) {
-            if ((e->NowCut == 8 && e->NowFrame > 0xF) || (e->NowCut == 9 && e->NowFrame >= 0)) {
+            if ((e->GetNowCut() == 8 && e->GetNowFrame() > 0xF) || (e->GetNowCut() == 9 && e->GetNowFrame() >= 0)) {
                 on = 1;
             }
         } else {
-            if ((e->NowCut == 8 && e->NowFrame > 9) || (e->NowCut == 9 && e->NowFrame >= 0)) {
+            if ((e->GetNowCut() == 8 && e->GetNowFrame() > 9) || (e->GetNowCut() == 9 && e->GetNowFrame() >= 0)) {
                 on = 1;
             }
         }
@@ -1312,20 +1312,20 @@ void Evt_R317S09_Func(Event* e)
 // Event r317s10 callback (no button): Leon's part 6 hidden, evmd400 (the knife) drawn.
 void Evt_R317S10_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                 ModelInfoSetTrans((cModel*) mod, 6, 0);
             }
         }
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "evmd400", 0, 0) == 1) {
@@ -1344,7 +1344,7 @@ void Evt_R317S11_Func(Event* e)
 {
     int on = 0;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
@@ -1358,7 +1358,7 @@ void Evt_R317S11_Func(Event* e)
         e->SetEvtCancelCut(2);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -1368,21 +1368,21 @@ void Evt_R317S11_Func(Event* e)
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             R317SmdAllOn();
             SmdSetTrans(0xA, 0);
             SmdSetTrans(0x28, 0);
             SmdSetTrans(0x29, 0);
         }
-        if (e->NowCut == 0 && e->NowFrame == 1) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 1) {
             EvtMgr.EvtReadAram("event/evd/r317s01.evd", 0, 0, 0, 0);
         }
         if (r317_work->hardMode == 0) {
-            if (e->NowCut == 2 && e->NowFrame > 0x49) {
+            if (e->GetNowCut() == 2 && e->GetNowFrame() > 0x49) {
                 on = 1;
             }
         } else {
-            if (e->NowCut == 2 && e->NowFrame > 0x43) {
+            if (e->GetNowCut() == 2 && e->GetNowFrame() > 0x43) {
                 on = 1;
             }
         }
@@ -1405,20 +1405,20 @@ void Evt_R317S11_Func(Event* e)
 // evmd400 per cut.
 void Evt_R317S12_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                 ModelInfoSetTrans((cModel*) mod, 6, 0);
             }
         }
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "evmd400", 0, 0) == 1) {
@@ -1437,7 +1437,7 @@ void Evt_R317S13_Func(Event* e)
 {
     int on = 0;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
@@ -1454,7 +1454,7 @@ void Evt_R317S13_Func(Event* e)
     case 1: {
         int btn;
 
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -1464,12 +1464,12 @@ void Evt_R317S13_Func(Event* e)
                 ModelInfoSetTrans((cModel*) mod, 7, 0);
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 1:
         case 2:
         case 3:
         case 4:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x27, 0);
@@ -1480,7 +1480,7 @@ void Evt_R317S13_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R317SmdAllOn();
                 SmdSetTrans(0xA, 0);
                 SmdSetTrans(0x27, 0);
@@ -1489,21 +1489,21 @@ void Evt_R317S13_Func(Event* e)
             }
             break;
         }
-        if (e->NowCut == 0 && e->NowFrame == 1) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 1) {
             EvtMgr.EvtReadAram("event/evd/r317s05.evd", 0, 0, 0, 0);
         }
         if (r317_work->hardMode == 0) {
-            if (e->NowCut == 0xA && e->NowFrame >= 0) {
+            if (e->GetNowCut() == 0xA && e->GetNowFrame() >= 0) {
                 on = 1;
             }
         } else {
-            if ((e->NowCut == 9 && e->NowFrame > 0xE) || (e->NowCut == 0xA && e->NowFrame >= 0)) {
+            if ((e->GetNowCut() == 9 && e->GetNowFrame() > 0xE) || (e->GetNowCut() == 0xA && e->GetNowFrame() >= 0)) {
                 on = 1;
             }
         }
         if (on == 1) {
             SpfFlagOff(pG, SPF_ACTBTN);
-            if (e->NowCut == 0xA && e->NowFrame > 0x27) {
+            if (e->GetNowCut() == 0xA && e->GetNowFrame() > 0x27) {
                 btn = 0xD;
                 if ((pG->Room_flg[0] & 0x8000) == 0) {
                     btn = 2;
@@ -1542,20 +1542,20 @@ void Evt_R317S13_Func(Event* e)
 // Event r317s14 callback (the fight's last cut): Leon's part 6 / evmd400 per cut; the end restores the arena.
 void Evt_R317S14_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete2001();
         e->CancelNoSet();
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                 ModelInfoSetTrans((cModel*) mod, 6, 0);
             }
         }
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "evmd400", 0, 0) == 1) {

@@ -10,7 +10,7 @@ class cModelInfo;
 
 // Work of the em34 enemy (em34 module, D:/Bio4/Prog/em34.cpp; the em34 / em37 / em33 variants are
 // picked by cModel::type: 1 = em37, 2..3 = em33, else em34), overlaid on cEm from 0x3E0.
-struct Em34Work {
+struct FREE_EM34 {
     u32 Be_flg;            // 0x000 (0x3E0)  bit0: route to the player found, bit1: partner present, bit2: targets the partner, bit3: damage / die routine, bit4: neck follows the target
     int Timer;            // 0x004 (0x3E4)
     u8 pad_8[4];
@@ -36,7 +36,7 @@ struct Em34Work {
     u8 Atk_ck;            // 0x328 (0x708)  the attack already hit (em34AtkCk)
 };
 
-#define EM34_WK(em) ((Em34Work*) (((cEm34*) (em))->free))
+#define EM34_WK(em) ((FREE_EM34*) (((cEm34*) (em))->free))
 
 class cEm34 : public cEm {
 public:

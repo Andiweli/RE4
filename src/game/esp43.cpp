@@ -21,7 +21,7 @@ public:
     Esp43Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x43] factory.
@@ -69,7 +69,7 @@ void cEsp43::move()
 }
 
 // Remembers the est id (Work8[0], 0xFF = none) to spawn on start.
-int cEsp43::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp43::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     m_Free.EstNo = pSeq->Work8[0];
     return 1;

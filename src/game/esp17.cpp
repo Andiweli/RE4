@@ -11,7 +11,7 @@ public:
     Vec work;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x17] factory.
@@ -40,7 +40,7 @@ void cEsp17::move()
 }
 
 // Takes the generator position as the initial view-space position.
-int cEsp17::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp17::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     work = m_Pos;
     return 1;

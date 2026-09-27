@@ -6,7 +6,7 @@
 #include "math_sub.h"
 #include "esp.h"
 
-struct Esp03Work {
+typedef struct tagESP03_WK {
     s8 maxPoints;         // 0x00 number of trail points (2..6), 10: single camera-facing quad
     u8 flag;   // 0x01 bit0: stop at walls (gen->Work8[1])
     u8 pad_2[7];
@@ -14,15 +14,15 @@ struct Esp03Work {
     u16 Width;    // 0x0A line width
     Vec* pBeforePos;     // 0x0C current point
     Vec Pos[6];   // 0x10 position history (only 4 are used)
-};
+} ESP03_WK;
 
 // Line trail: keeps the last positions in a ring buffer and draws them as a line strip.
 class cEsp03 : public cEsp {
 public:
-    Esp03Work m_Free;  // 0xF8
+    ESP03_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" void Esp03_HitWall(cEsp03* esp);
@@ -37,7 +37,7 @@ cEsp* Esp03_Create()
 // buffer slot, applies scale and colour fades and life, and advances the ring index (mod 4).
 void cEsp03::move()
 {
-    Esp03Work* w = &m_Free;
+    ESP03_WK* w = &m_Free;
     Vec* p;
 
     if (parent != pEffParentWorld && m_Release_time != 0xFF && m_Release_time <= m_Life_time) {
@@ -77,7 +77,7 @@ void cEsp03::move()
 // (maxPoints 10) or the line strip through the last maxPoints history points, newest first.
 extern "C" void Esp03_Trans(cEsp03* esp)
 {
-    Esp03Work* w = &esp->m_Free;
+    ESP03_WK* w = &esp->m_Free;
     Vec* p;
     Vec* v;
     int idx;
@@ -161,9 +161,9 @@ extern "C" void Esp03_Trans(cEsp03* esp)
 }
 
 // Point count from Work8[0] (10 = quad mode), wall flag Work8[1] (0/1), never Z-culled.
-int cEsp03::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp03::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp03Work* w = &m_Free;
+    ESP03_WK* w = &m_Free;
     int n;
 
     w->pBeforePos = &w->Pos[0];
@@ -193,7 +193,7 @@ int cEsp03::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
 // life is set to expire this frame.
 void Esp03_HitWall(cEsp03* pEsp)
 {
-    Esp03Work* w = &pEsp->m_Free;
+    ESP03_WK* w = &pEsp->m_Free;
     Vec hit;
     Vec next2;
     Vec nrm;

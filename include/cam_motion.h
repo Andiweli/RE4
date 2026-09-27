@@ -29,11 +29,12 @@ struct CameraMotionWork {
 
 // Keyframed camera motion (game/cam_motion.cpp). Derives from cCamera (vptr at 0xF8).
 class CameraMotion : public cCamera {
-public:
+private:
     s32 m_state;                       // 0xFC  1 when the motion has finished
     CameraMotionWork m_info;         // 0x100 motion work (getMotionInfoPtr)
     Mtx* m_p_base_mat;                 // 0x1D0
 
+public:
     CameraMotion(void* data, int hokan, int flags, f32 frame);
     virtual ~CameraMotion();
     virtual void move();

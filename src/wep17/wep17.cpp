@@ -752,7 +752,7 @@ static void wep17_r2_next(cPlayer* pl)
     case 2:
         MotionMove(pl, 0);
         if (fabsf(pl->Waist->set(pl->m_Fwork0, 0.4f)) < 0.01f) {
-            pl->Waist->m_Ang.y = pl->m_Fwork0;
+            *pl->Waist = pl->m_Fwork0;
             pl->r_no_0 = 0;
             pl->r_no_1 = 6;
             pl->r_no_2 = 1;

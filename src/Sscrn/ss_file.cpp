@@ -554,10 +554,10 @@ void dispFileList(SUB_SCREEN* wk, int n)
     SsFileWork* fw = wk->file;
     int num = fileNum[fw->cat];
     int top = fw->scroll;
-    IdUnit* bar = IdSub.unitPtr(0xFC, IDC_SSCRN_FAR_1);
-    IdUnit* up = IdSub.unitPtr(0xFE, IDC_SSCRN_FAR_1);
-    IdUnit* u;
-    IdUnit* pos;
+    ID_UNIT* bar = IdSub.unitPtr(0xFC, IDC_SSCRN_FAR_1);
+    ID_UNIT* up = IdSub.unitPtr(0xFE, IDC_SSCRN_FAR_1);
+    ID_UNIT* u;
+    ID_UNIT* pos;
     int i;
     int k = 0;
     int x;
@@ -565,7 +565,7 @@ void dispFileList(SUB_SCREEN* wk, int n)
 
     dispScrollBar(top, n, num, bar, up, IdSub.unitPtr(0xFD, IDC_SSCRN_FAR_1));
     if (fw->mode == 0) {
-        IdUnit* c = IdSub.unitPtr(0x10, IDC_SSCRN_FAR_1);
+        ID_UNIT* c = IdSub.unitPtr(0x10, IDC_SSCRN_FAR_1);
         IdSub.unitPtr(1, IDC_SSCRN_FAR_1)->pos0 = c->pos0;
     }
     u = IdSub.unitPtr(0xF9, IDC_SSCRN_FAR_1);
@@ -592,7 +592,7 @@ void dispFileList(SUB_SCREEN* wk, int n)
         int x;
         int y;
         if (fw->mode == 1) {
-            IdUnit* c = IdSub.unitPtr(k + 0x11, IDC_SSCRN_FAR_1);
+            ID_UNIT* c = IdSub.unitPtr(k + 0x11, IDC_SSCRN_FAR_1);
             if (i == fw->cursor) {
                 IdSub.unitPtr(1, IDC_SSCRN_FAR_1)->pos0 = c->pos0;
             }
@@ -611,7 +611,7 @@ void dispFileList(SUB_SCREEN* wk, int n)
             id = fileNo2Id(no);
         }
         {
-            IdUnit* p = IdSub.unitPtr(k + 0x21, IDC_SSCRN_FAR_1);
+            ID_UNIT* p = IdSub.unitPtr(k + 0x21, IDC_SSCRN_FAR_1);
             slot = k + 8;
             x = (int) ((p->pos0.x + 320.0f) * 0.8f);
             y = (int) ((240.0f - p->pos0.y) * 0.8f);
@@ -766,8 +766,8 @@ void FileSelect::quit(SUB_SCREEN* wk)
 // the frame ids and the page-number position; picture state reset (tplFirst).
 void MessageDisplay::init(SUB_SCREEN* wk)
 {
-    IdUnit* pos = IdSub.unitPtr(0xFE, IDC_SSCRN_CKPT_2);
-    IdUnit* u;
+    ID_UNIT* pos = IdSub.unitPtr(0xFE, IDC_SSCRN_CKPT_2);
+    ID_UNIT* u;
     SsFileWork* fw;
 
     x = (int) ((pos->pos0.x + 320.0f) * 0.8f);
@@ -911,9 +911,9 @@ void MessageDisplay::move(SUB_SCREEN* wk)
         int e[2];
         int v;
         int i;
-        IdUnit* u;
-        IdUnit* a;
-        IdUnit* b;
+        ID_UNIT* u;
+        ID_UNIT* a;
+        ID_UNIT* b;
 
         v = fw->page + 1;
         for (i = 0; i < 2; i++) {
@@ -951,7 +951,7 @@ void MessageDisplay::move(SUB_SCREEN* wk)
             u->texNo = e[0];
         }
         {
-            IdUnit* p = IdSub.unitPtr(1, IDC_SSCRN_CKPT_2);
+            ID_UNIT* p = IdSub.unitPtr(1, IDC_SSCRN_CKPT_2);
             if (fw->page == 0) {
                 p->be_flag &= ~8;
             } else {

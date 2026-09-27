@@ -40,10 +40,10 @@ int DB_IsEmLoad();
 int DB_IsWorkPush();
 void DB_GetKeybordData(DB_KEYBORD* k);
 int LoadModel();
-void EspToolExitEstSet(EspSeqData* head, int on, int mode);
+void EspToolExitEstSet(cEspSeqHead* head, int on, int mode);
 void EspToolCameraMode();
 void CoreEstSet(u8 id);
-void SeqSet(EspSeqData* head, int mode);
+void SeqSet(cEspSeqHead* head, int mode);
 void sp_tex_trans(int no);
 }
 

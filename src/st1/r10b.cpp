@@ -223,20 +223,20 @@ extern "C" int readEvent(int no, int wait, void** out)
 
         if (r10b_work->evt[no]->waitLoadOk() == 0) {
             r10b_work->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);
-            pLog->err(0, 0, "readEvent() : out of memory (0x%x)", r10b_work->evt[no]->m_size);
+            pLog->err(0, 0, "readEvent() : out of memory (0x%x)", r10b_work->evt[no]->getSize());
             return 0;
         }
         EspEmDataSwapPush(0x2F);
         m = SearchEmModule(0x2F);
         max = m->size;
-        if (r10b_work->evt[no]->m_size > max) {
+        if (r10b_work->evt[no]->getSize() > max) {
             // `return 0` (not `goto fail`): at sched2 the block continues past the err call with
             // `li r3,0`, whose output dependence on the pLog load and the block-end jump rank the
             // `mr r7,size` and `lwz r3` above the string `lis`; jump2 then cross-jumps the tail.
-            pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", r10b_work->evt[no]->m_size, max);
+            pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", r10b_work->evt[no]->getSize(), max);
             return 0;
         }
-        MemorySwap(m->pArc, (u32) r10b_work->evt[no]->m_addr, r10b_work->evt[no]->m_size);
+        MemorySwap(m->pArc, (u32) r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
         *out = m->pArc;
     } else {
         r10b_work->evt[no]->setCommand(CMND_ARAM_LOAD, 0, 0);
@@ -254,7 +254,7 @@ extern "C" void freeEvent(int no)
         ReadModule* m;
 
         m = SearchEmModule(0x2F);
-        MemorySwap(m->pArc, (u32) r10b_work->evt[no]->m_addr, r10b_work->evt[no]->m_size);
+        MemorySwap(m->pArc, (u32) r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
         EspEmDataSwapPop(0x2F);
         r10b_work->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);
     }
@@ -296,7 +296,7 @@ static void R10b_chkEmDie()
             if (r10b_work->count > 14) {
                 if (readEvent(2, 1, &evt)) {
                     if (EvtMgr.SetEvt(evt, &key) != 0) {
-                        ((Event*) key)->StatusFlag |= EvtStfBit(EvtStfFadeOut);
+                        ((Event*) key)->FlgOnStatus(EvtStfFadeOut);
                     }
                     r10b_waitEvt();
                     freeEvent(2);
@@ -304,8 +304,8 @@ static void R10b_chkEmDie()
             } else {
                 if (readEvent(1, 1, &evt)) {
                     if (EvtMgr.SetEvt(evt, &key2) != 0) {
-                        ((Event*) key2)->StatusFlag |= EvtStfBit(EvtStfEndSleepOrder);
-                        ((Event*) key2)->StatusFlag |= EvtStfBit(EvtStfDiedemo);
+                        ((Event*) key2)->FlgOnStatus(EvtStfEndSleepOrder);
+                        ((Event*) key2)->FlgOnStatus(EvtStfDiedemo);
                     }
                     r10b_waitEvt();
                     return;
@@ -446,16 +446,16 @@ extern "C" void Evt_R10BS00_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         r10b_work->island[0]->setNoSuspend(1);
         r10b_work->island[2]->setNoSuspend(1);
         break;
     case 1:
         SetSstAddAreaFlag(0);
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 Evt_R10BSXX_Func_Pl0f(e);
                 Evt_R10BSXX_Func_Em2f(e);
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -467,11 +467,11 @@ extern "C" void Evt_R10BS00_Func(Event* e)
         case 1:
         case 3:
         case 7:
-            if (e->NowFrame == 0 && !StaFlagChk(pG, STA_BINOCULAR)) {
+            if (e->GetNowFrame() == 0 && !StaFlagChk(pG, STA_BINOCULAR)) {
                 StaFlagOn(pG, STA_BINOCULAR);
                 r10b_work->bino = new (&r10b_work->binoObj) IdBinocular;
                 r10b_work->bino->init(&pG->Camera, ROOM_ARC_PTR(pG->pRoom, 0x26), ROOM_ARC_PTR(pG->pRoom, 0x27));
-                if (e->NowCut != 1) {
+                if (e->GetNowCut() != 1) {
                     r10b_work->bino->cutin(0);
                 }
                 r10b_work->focus = &r10b_work->focusObj;
@@ -480,7 +480,7 @@ extern "C" void Evt_R10BS00_Func(Event* e)
             r10b_work->bino->move(&pG->Camera);
             break;
         default:
-            if (e->NowFrame == 0 && (StaFlagChk(pG, STA_BINOCULAR))) {
+            if (e->GetNowFrame() == 0 && (StaFlagChk(pG, STA_BINOCULAR))) {
                 StaFlagOff(pG, STA_BINOCULAR);
                 r10b_work->bino->quit(&pG->Camera);
                 r10b_work->bino->~IdBinocular();
@@ -586,7 +586,7 @@ extern "C" void Evt_R10BS10_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         if (DbgFlagChk(pG, DBG_EVENT_TOOL)) {
             r10b_effDelete(2);
@@ -605,7 +605,7 @@ extern "C" void Evt_R10BS10_Func(Event* e)
         break;
     case 1:
         SetSstAddAreaFlag(0);
-        if (e->NowCut == 3 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 3 && e->GetNowFrame() == 0) {
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                 cLight* l = LightMgr.getKindLight(1);
 
@@ -614,9 +614,9 @@ extern "C" void Evt_R10BS10_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod0;
 
                 Evt_R10BSXX_Func_Pl0f(e);
@@ -630,14 +630,14 @@ extern "C" void Evt_R10BS10_Func(Event* e)
             }
             break;
         case 4:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* em;
 
                 if (e->GetMod(&em, "em2f00", 0, 0) == 1) {
                     em2fTentacleMove((cEm*) em, e, 0);
                 }
             }
-            if (e->NowFrame == 40) {
+            if (e->GetNowFrame() == 40) {
                 void* em;
 
                 if (e->GetMod(&em, "em2f00", 0, 0) == 1) {
@@ -647,7 +647,7 @@ extern "C" void Evt_R10BS10_Func(Event* e)
             break;
         case 3:
         case 5:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* em;
 
                 if (e->GetMod(&em, "em2f00", 0, 0) == 1) {
@@ -677,7 +677,7 @@ extern "C" void Evt_R10BS20_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         if (DbgFlagChk(pG, DBG_EVENT_TOOL)) {
             r10b_effDelete(2);
@@ -689,9 +689,9 @@ extern "C" void Evt_R10BS20_Func(Event* e)
         break;
     case 1:
         SetSstAddAreaFlag(0);
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 Evt_R10BSXX_Func_Pl0f(e);
                 Evt_R10BSXX_Func_Em2f(e);
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -701,7 +701,7 @@ extern "C" void Evt_R10BS20_Func(Event* e)
             }
             break;
         case 9:
-            if (e->NowFrame == 100) {
+            if (e->GetNowFrame() == 100) {
                 e->BeginActBtn(0x29);
             }
             break;
@@ -728,7 +728,7 @@ extern "C" void Evt_R10BS21_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         if (DbgFlagChk(pG, DBG_EVENT_TOOL)) {
             r10b_effDelete(2);
@@ -738,7 +738,7 @@ extern "C" void Evt_R10BS21_Func(Event* e)
         break;
     case 1:
         SetSstAddAreaFlag(0);
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             Evt_R10BSXX_Func_Pl0f(e);
             if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                 ModelInfoSetTrans((cModel*) mod, 2, 0);
@@ -760,7 +760,7 @@ extern "C" void Evt_R10BS21_Func(Event* e)
 // boat stand-in on cut 0, Leon's parts per cut.
 extern "C" void Evt_R10BS22_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         if (DbgFlagChk(pG, DBG_EVENT_TOOL)) {
             r10b_effDelete(2);
@@ -771,9 +771,9 @@ extern "C" void Evt_R10BS22_Func(Event* e)
         break;
     case 1:
         SetSstAddAreaFlag(0);
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 Evt_R10BSXX_Func_Pl0f(e);
@@ -784,7 +784,7 @@ extern "C" void Evt_R10BS22_Func(Event* e)
             }
             break;
         case 1:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -836,7 +836,7 @@ extern "C" void Evt_R10BSXX_Func_Em2f(Event* e)
 // The five fish (enemy 0x27) of the lake.
 static void r10b_setEm()
 {
-    EmListData d;
+    EM_LIST d;
 
     d.rot[0] = 0;
     d.rot[2] = 0;

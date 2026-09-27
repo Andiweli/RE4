@@ -72,12 +72,12 @@ void R330Init()
 #line 48 "D:/Bio4/Prog/r330.cpp"
     r330_work = (R330Work*) MEM_CALLOC(sizeof(R330Work), 1, 0xd);
     {
-        cEm* a;
-        cEm* b;
+        cEmBarred* a;
+        cEmBarred* b;
 
         if (getRoomEtcBarred(0xA, &a, 1)) {
             if (getRoomEtcBarred(0xB, &b, 1)) {
-                ((cEmBarred*) a)->setDouble((cEmBarred*) b);
+                a->setDouble(b);
             }
         }
     }
@@ -86,17 +86,17 @@ void R330Init()
         SceAtDataSet_exec(3, 0x12, 0, (TaskFunc) R330EventS00Main, 0, 1);
         EvtMgr.EvtReadAram("event/evd/r330s00.evd", (u8) GetEmIdFromList(0xA0), 0, 0, 0);
         {
-            cEm* a;
+            cEmBarred* a;
 
             if (getRoomEtcBarred(0xA, &a, 1)) {
-                ((cEmBarred*) a)->setLockMode(1);
+                a->setLockMode(1);
             }
         }
         {
-            cEm* b;
+            cEmBarred* b;
 
             if (getRoomEtcBarred(0xB, &b, 1)) {
-                ((cEmBarred*) b)->setLockMode(1);
+                b->setLockMode(1);
             }
         }
     }
@@ -119,17 +119,17 @@ void R330EventS00Main()
         if (CheckDoorJumpWithAshley() == 0) {
             cMes.MesSet(0x67, 100, 0x150 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1, 1, 0, 0, 4);
         } else {
-            cEm* a;
-            cEm* b;
+            cEmBarred* a;
+            cEmBarred* b;
             int i;
 
             RsfSet(G_ROOM_ID, 0);
             SceAtSetEnable(3, 0);
             if (getRoomEtcBarred(0xA, &a, 1)) {
-                ((cEmBarred*) a)->setLockMode(0);
+                a->setLockMode(0);
             }
             if (getRoomEtcBarred(0xB, &b, 1)) {
-                ((cEmBarred*) b)->setLockMode(0);
+                b->setLockMode(0);
             }
             SceEventStart(0);
             SceSetEventCancel(1, (TaskFunc) R330EventS00End, 0, -1, 1);
@@ -170,21 +170,21 @@ void R330EventS00Main()
 void R330EventS00End()
 {
     {
-        cEm* a;
+        cEmBarred* a;
 
         if (getRoomEtcBarred(0xA, &a, 1)) {
             a->setNoSuspend(1);
-            ((cEmBarred*) a)->setLockMode(0);
-            ((cEmBarred*) a)->setClosed();
+            a->setLockMode(0);
+            a->setClosed();
         }
     }
     {
-        cEm* b;
+        cEmBarred* b;
 
         if (getRoomEtcBarred(0xB, &b, 1)) {
             b->setNoSuspend(1);
-            ((cEmBarred*) b)->setLockMode(0);
-            ((cEmBarred*) b)->setClosed();
+            b->setLockMode(0);
+            b->setClosed();
         }
     }
     pPL->endEvent(0);
@@ -218,7 +218,7 @@ extern "C" void Evt_R330S00_Func(Event* e)
     cObj* obj;
     SmdWork* w;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(0x1C, 0);
         SmdSetTrans(0x1D, 0);
@@ -230,27 +230,27 @@ extern "C" void Evt_R330S00_Func(Event* e)
         setRoomEtcDisp(0xA, 0, 1);
         setRoomEtcDisp(0xB, 0, 1);
         {
-            cEm* a;
+            cEmBarred* a;
 
             if (getRoomEtcBarred(0xA, &a, 1)) {
-                ((cEmBarred*) a)->setClose(0);
+                a->setClose(0);
             }
         }
         {
-            cEm* b;
+            cEmBarred* b;
 
             if (getRoomEtcBarred(0xB, &b, 1)) {
-                ((cEmBarred*) b)->setClose(0);
+                b->setClose(0);
             }
         }
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0x18:
         case 0x1A:
         case 0x1B:
         case 0x1D:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0100a", 0, 0) == 1) {
@@ -259,7 +259,7 @@ extern "C" void Evt_R330S00_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0100a", 0, 0) == 1) {
@@ -268,14 +268,14 @@ extern "C" void Evt_R330S00_Func(Event* e)
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 9:
         case 0x14:
         case 0x19:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 u32 no;
 
-                switch (e->NowCut) {
+                switch (e->GetNowCut()) {
                 default:
                 case 9:
                     no = 0;
@@ -295,7 +295,7 @@ extern "C" void Evt_R330S00_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (pG->Room_flg[0] & 0x80000000) {
                     pG->Room_flg[0] &= ~0x80000000;
                     IdR330.quit();
@@ -306,8 +306,8 @@ extern "C" void Evt_R330S00_Func(Event* e)
         {
             void* mod;
 
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evm9900", 0, 0) == 1) {
                     ((cModel*) mod)->ot_type = 1;
                 }
@@ -331,13 +331,13 @@ extern "C" void Evt_R330S00_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 6:
         case 8:
         case 0xB:
         case 0xF:
         case 0x17:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if ((mod = SmdGetObjPtr(0x22)) != 0) {
                     TexRenderModSet((cModel*) mod, 0, r330_work->texTbl0, r330_work->tex[0], 1, 1, 1, 1, 1.0f);
                 }
@@ -345,24 +345,24 @@ extern "C" void Evt_R330S00_Func(Event* e)
                     TexRenderModSet((cModel*) mod, 0, r330_work->texTbl1, r330_work->tex[1], 1, 1, 1, 1, 1.0f);
                 }
             }
-            if (e->NowCut == 6) {
+            if (e->GetNowCut() == 6) {
                 EvtTexRenderCamTrans(e, 6);
             }
-            if (e->NowCut == 8) {
+            if (e->GetNowCut() == 8) {
                 EvtTexRenderCamTrans(e, 8);
             }
-            if (e->NowCut == 0xB) {
+            if (e->GetNowCut() == 0xB) {
                 EvtTexRenderCamTrans(e, 0xB);
             }
-            if (e->NowCut == 0xF) {
+            if (e->GetNowCut() == 0xF) {
                 EvtTexRenderCamTrans(e, 0xF);
             }
-            if (e->NowCut == 0x17) {
+            if (e->GetNowCut() == 0x17) {
                 EvtTexRenderCamTrans(e, 0x17);
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if ((mod = SmdGetObjPtr(0x22)) != 0) {
                     TexRenderModRes((cModel*) mod, 0);
                     ModelInfoSetTrans((cModel*) mod, 0, 1);
@@ -407,11 +407,8 @@ void EvtTexRenderCamTrans(Event* e, int cut)
 {
     void* mod;
     void* bin;
-    int skip = 1;
+    int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-    if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-        skip = 0;
-    }
     if (skip == 0) {
         if (e->GetMod(&mod, "evm9900", 0, 0) == 1) {
             TexRenderModAddOt(0, (cModel*) mod);
@@ -515,7 +512,7 @@ void idR330::init(u32 no)
 // the percentage digit pairs up with `cnt`.
 void idR330::move()
 {
-    IdUnit* u;
+    ID_UNIT* u;
     int i;
     int a;
     int b;

@@ -60,7 +60,7 @@ void cObjFn57::init(cModel* parent)
 
         LightInfo.init2(1, 1, &p0, &p1, 1);
     }
-    m_pParent = parent;
+    setParent(parent);
     motReset[0] = WEP_ARC_PTR(0x34);
     motReset[1] = WEP_ARC_PTR(0x39);
     resetMotion();

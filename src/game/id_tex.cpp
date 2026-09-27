@@ -117,7 +117,7 @@ int IdGetAnmAddr(u8 id, TexAnm** ppAnm)
 }
 
 // Sets the material colour channel from the unit's current col[] (0..255 floats).
-void IdChannelSet(IdUnit* pIdUnit)
+void IdChannelSet(ID_UNIT* pIdUnit)
 {
     GXColor c;
 
@@ -132,7 +132,7 @@ void IdChannelSet(IdUnit* pIdUnit)
 }
 
 // Texture work (TPL + animation) of id texture `id`; quiet suppresses the not-found log.
-TexWk* IdGetTexWk(u8 id, int bNoDispErrMsg)
+TEX_WK* IdGetTexWk(u8 id, int bNoDispErrMsg)
 {
     return g_pIdTexSys->GetTexWk(id, bNoDispErrMsg);
 }

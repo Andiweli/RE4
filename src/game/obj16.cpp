@@ -54,7 +54,7 @@ EmAtkInfo obj16_atk_info[4] = {
 cObj* SetObj16(void* bin, void* tpl, cModel* target, cModel* body, int partsNo, u8 type, Vec* pos, Vec* rot)
 {
     cObj* obj;
-    Obj16Work* w;
+    FREE_OBJ16* w;
 
     if (target == 0) {
         return 0;
@@ -167,7 +167,7 @@ cObj* SetObj16(void* bin, void* tpl, cModel* target, cModel* body, int partsNo, 
 // the light class); follows the target's no-suspend flag.
 void cObj16::move()
 {
-    Obj16Work* w = OBJ16_WK(this);
+    FREE_OBJ16* w = OBJ16_WK(this);
     int alive;
     const f32 decRate = 0.9f;
     const f32 addRate = 0.1f;
@@ -408,7 +408,7 @@ void obj16_R1_Set(cObj16* obj)
 // kind 2 on parts 0x10..0x15 while spitting.
 void obj16_R1_CoreMove(cObj16* obj)
 {
-    Obj16Work* w = OBJ16_WK(obj);
+    FREE_OBJ16* w = OBJ16_WK(obj);
     int atk;
     f32 dist;
 
@@ -543,7 +543,7 @@ void obj16_R1_CoreMove(cObj16* obj)
 // (atkTimer) with obj16AtkCk kind 0/1, 3 recovery; Atk_ck reports a hit to the body.
 void obj16_R1_Atk(cObj16* obj)
 {
-    Obj16Work* w = OBJ16_WK(obj);
+    FREE_OBJ16* w = OBJ16_WK(obj);
     int atk;
     int flag;
 
@@ -657,7 +657,7 @@ void obj16_R1_Atk(cObj16* obj)
 // Timer (kills the player outright through obj16PlHeadLost).
 void obj16_R1_Critical(cObj16* obj)
 {
-    Obj16Work* w = OBJ16_WK(obj);
+    FREE_OBJ16* w = OBJ16_WK(obj);
     int atk;
     Vec head;
     Vec tgt;
@@ -776,7 +776,7 @@ void obj16_R1_Critical(cObj16* obj)
 // straight to an attack for type 2).
 void obj16_R1_Damage(cObj16* obj)
 {
-    Obj16Work* w = OBJ16_WK(obj);
+    FREE_OBJ16* w = OBJ16_WK(obj);
 
     switch (obj->r_no_2) {
     case 0:
@@ -857,7 +857,7 @@ void MotSetObj16(cObj* obj, void* mot, int a, int b)
 // the neck tracking rotation applied.
 void obj16MatCalc(cObj16* obj)
 {
-    Obj16Work* w = OBJ16_WK(obj);
+    FREE_OBJ16* w = OBJ16_WK(obj);
     cParts* p;
 
     if (w->pOya) {
@@ -908,7 +908,7 @@ void cObj16::setLostWait(int wait)
 void cObj16::setMotData(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8,
                         void* m9, void* m10)
 {
-    Obj16Work* w = OBJ16_WK(this);
+    FREE_OBJ16* w = OBJ16_WK(this);
 
     w->mot[0] = m0;
     w->mot[1] = m1;
@@ -944,7 +944,7 @@ void cObj16::setMotData(void* m0, void* m1, void* m2, void* m3, void* m4, void* 
 // Player damage motion (and sequence) played on a bite hit (plemDmMStar).
 void cObj16::setPlDmgMot(void* mot, void* seq)
 {
-    Obj16Work* w = OBJ16_WK(this);
+    FREE_OBJ16* w = OBJ16_WK(this);
 
     w->Mot_pl_dm = mot;
     w->Seq_pl_dm = seq;
@@ -1000,7 +1000,7 @@ static inline int PlIsDead()
 // (obj16PlHeadLost); a partner hit (bit 1) kills the partner (LifeDownSet 9999). Sets Atk_ck.
 int obj16AtkCk(cObj16* obj, u32 atk_type, int parts_no)
 {
-    Obj16Work* w = OBJ16_WK(obj);
+    FREE_OBJ16* w = OBJ16_WK(obj);
     cModel* body = w->pOya;
     cParts* p;
     Vec* pp;
@@ -1145,7 +1145,7 @@ int obj16AtkCk(cObj16* obj, u32 atk_type, int parts_no)
 // The head bit the player's head off: game over.
 void obj16PlHeadLost(cObj16* obj)
 {
-    Obj16Work* w = OBJ16_WK(obj);
+    FREE_OBJ16* w = OBJ16_WK(obj);
     u8 region;
 
     pG->pl_life = 0;
@@ -1186,7 +1186,7 @@ void obj16PlHeadLost(cObj16* obj)
 // Turn the neck parts (1, 2) toward the player and tilt the head (parts 0) along the body parts.
 static void obj16NeckMove(cObj16* obj)
 {
-    Obj16Work* w = OBJ16_WK(obj);
+    FREE_OBJ16* w = OBJ16_WK(obj);
     cModel* body = w->pOya;
     Vec tgt;
     Vec dir;
@@ -1290,7 +1290,7 @@ int cObj16::ckAtkHit()
 // Player damage routine while the head holds him (SetPlDamage callback).
 void plemDmMStar(cPlayer* pEm)
 {
-    Obj16Work* w = OBJ16_WK((cObj16*) pPL->pEmCatch);
+    FREE_OBJ16* w = OBJ16_WK((cObj16*) pPL->pEmCatch);
     int hokan;
 
     if (pEm->r_no_3 == 0) {

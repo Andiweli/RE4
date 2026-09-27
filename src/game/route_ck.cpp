@@ -32,9 +32,9 @@ static inline RtpData* rtpData()
 }
 
 // The point array of the RTP data.
-static inline RtpPoint* rtpPoint(RtpData* r)
+static inline RTP_POINT* rtpPoint(RtpData* r)
 {
-    return (RtpPoint*)(r->pointOfs + (u32)r);
+    return (RTP_POINT*)(r->pointOfs + (u32)r);
 }
 
 // The link array (each point's links start at its offLine).
@@ -82,8 +82,8 @@ int RouteCkToEm(cEm* pMy, cEm* pTo, Vec* pDest, int mode)
     int t;
     int next;
     int mask;
-    RtpPoint* pts;
-    RtpPoint* pt;
+    RTP_POINT* pts;
+    RTP_POINT* pt;
     s8* tbl;
     f32 d2;
 
@@ -139,7 +139,7 @@ int RouteCkToEm(cEm* pMy, cEm* pTo, Vec* pDest, int mode)
     }
     mask |= 0x80;
     pts = rtpPoint(rtpData());
-    pt = (RtpPoint*)(pMy->RckMy * sizeof(RtpPoint) + (u32)pts);
+    pt = (RTP_POINT*)(pMy->RckMy * sizeof(RTP_POINT) + (u32)pts);
     d2 = (pMy->pos.x - pt->pos.x) * (pMy->pos.x - pt->pos.x) + (pMy->pos.z - pt->pos.z) * (pMy->pos.z - pt->pos.z);
     if (d2 < 62500.0f || (next != pMy->RckMy && rckLineHitCheck(&a, &pts[next].pos, mask, mode) == 0)) {
         pMy->RckMy = next;
@@ -153,8 +153,8 @@ int RouteCkToEm(cEm* pMy, cEm* pTo, Vec* pDest, int mode)
 void RouteCkEscEm(cEm* pMy, cEm* pTo, Vec* pDest)
 {
     RtpData* rtp;
-    RtpPoint* pt;
-    RtpPoint* np;
+    RTP_POINT* pt;
+    RTP_POINT* np;
     int mask;
     u32 i;
     f32 ang;
@@ -206,8 +206,8 @@ int RouteCkToPos(cEm* pMy, Vec* pPos, Vec* pDest, int mode, f32* pMax)
     int t;
     int next;
     int mask;
-    RtpPoint* pts;
-    RtpPoint* pt;
+    RTP_POINT* pts;
+    RTP_POINT* pt;
     s8* tbl;
     f32 d2;
     f32 dmax;
@@ -288,7 +288,7 @@ int RouteCkToPos(cEm* pMy, Vec* pPos, Vec* pDest, int mode, f32* pMax)
     }
     mask |= 0x80;
     pts = rtpPoint(rtpData());
-    pt = (RtpPoint*)(pMy->RckMy * sizeof(RtpPoint) + (u32)pts);
+    pt = (RTP_POINT*)(pMy->RckMy * sizeof(RTP_POINT) + (u32)pts);
     d2 = (pMy->pos.x - pt->pos.x) * (pMy->pos.x - pt->pos.x) + (pMy->pos.z - pt->pos.z) * (pMy->pos.z - pt->pos.z);
     if (d2 < 62500.0f || (next != pMy->RckMy && rckLineHitCheck(&a, &pts[next].pos, mask, mode) == 0)) {
         pMy->RckMy = next;
@@ -331,8 +331,8 @@ int RouteCkPosToPos(Vec* pPos1, Vec* pPos2, Vec* pDest)
     int t;
     int next;
     RtpData* rtp;
-    RtpPoint* pts;
-    RtpPoint* pt;
+    RTP_POINT* pts;
+    RTP_POINT* pt;
     f32 d2;
     s8* tbl;
 
@@ -373,11 +373,11 @@ int RouteCkPosToPos(Vec* pPos1, Vec* pPos2, Vec* pDest)
     rtp = rtpData();
     {
         u32 base = (u32) rtpPoint(rtp);
-        pts = (RtpPoint*) base;
-        pt = (RtpPoint*)(p * sizeof(RtpPoint) + base);
+        pts = (RTP_POINT*) base;
+        pt = (RTP_POINT*)(p * sizeof(RTP_POINT) + base);
         d2 = (a.x - pt->pos.x) * (a.x - pt->pos.x) + (a.z - pt->pos.z) * (a.z - pt->pos.z);
         if (d2 < 62500.0f) {
-            *pDest = ((RtpPoint*)(next * sizeof(RtpPoint) + base))->pos;
+            *pDest = ((RTP_POINT*)(next * sizeof(RTP_POINT) + base))->pos;
             return 0;
         }
     }
@@ -481,8 +481,8 @@ f32 RouteCkGetDist(int n0, int n1)
 {
     f32 d = 0.0f;
     int next;
-    RtpPoint* pt;
-    RtpPoint* np;
+    RTP_POINT* pt;
+    RTP_POINT* np;
     s8* tbl;
     Vec tmp;
 
@@ -570,7 +570,7 @@ s8 getNearPoint(Vec* pPos, int mode, int flag)
     int idx[10];
     Vec p2;
     RtpData* rtp;
-    RtpPoint* pt;
+    RTP_POINT* pt;
     int* ip;
     int n;
     int m;
@@ -632,8 +632,8 @@ s8 getNearPoint(Vec* pPos, int mode, int flag)
 void Draw_rtp()
 {
     RtpData* rtp;
-    RtpPoint* pt;
-    RtpPoint* np;
+    RTP_POINT* pt;
+    RTP_POINT* np;
     Vec v0;
     Vec v1;
     Vec v2;
@@ -644,7 +644,7 @@ void Draw_rtp()
     int j;
     u32 k;
     int back;
-    GlobalWork* g;
+    GLOBAL_WK* g;
 
     rtp = rtpData();
     if (rtp == NULL) {
@@ -679,7 +679,7 @@ void Draw_rtp()
         }
         pt++;
     }
-    // The loop test refreshes a GlobalWork* local: the pG value is one pseudo through the
+    // The loop test refreshes a GLOBAL_WK* local: the pG value is one pseudo through the
     // entry copy and the latch (`mr r11,r5` twice), and the body's pRoomRtp load stays.
     for (i = 0; i < ((RtpData*)(g = pG)->Rtp)->nPoint; i++) {
         pt = &rtpPoint(rtpData())[i];

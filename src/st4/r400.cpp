@@ -440,7 +440,7 @@ void emset_boss(int no, int dir)
         tbl[(u32) no >> 5] &= ~(0x80000000 >> (no & 31));
     }
     cEmWrap em;
-    EmListData* l;
+    EM_LIST* l;
     Vec pos;
     Vec ang;
     f32 ry;

@@ -432,7 +432,7 @@ extern "C" void koyaA_destroy()
 {
     Vec pos = {113011.0f, 2270.0f, 16997.0f};
     Vec rot = {0.0f, 3.1415927f, 0.0f};
-    cEm* torch;
+    cEmTorch* torch;
 
     SndCall(8, 0x1B, &pos, 0x2B, 0, 0);
     if (RsfCheck(G_ROOM_ID, 4)) {
@@ -442,7 +442,7 @@ extern "C" void koyaA_destroy()
     }
     koyaA_delete();
     if (getRoomEtcTorch(0, &torch, 1)) {
-        ((cEmTorch*) torch)->setBreak();
+        torch->setBreak();
     }
 }
 
@@ -451,7 +451,7 @@ extern "C" void koyaB_destroy()
 {
     Vec pos = {117111.0f, 2270.0f, 17477.0f};
     Vec rot = {0.0f, 3.1415927f, 0.0f};
-    cEm* torch;
+    cEmTorch* torch;
 
     SndCall(8, 0x1B, &pos, 0x2B, 0, 0);
     if (RsfCheck(G_ROOM_ID, 5)) {
@@ -461,7 +461,7 @@ extern "C" void koyaB_destroy()
     }
     koyaB_delete();
     if (getRoomEtcTorch(1, &torch, 1)) {
-        ((cEmTorch*) torch)->setBreak();
+        torch->setBreak();
     }
 }
 
@@ -470,7 +470,7 @@ extern "C" void koyaC_destroy()
 {
     Vec pos = {121560.0f, 2270.0f, 15877.0f};
     Vec rot = {0.0f, 2.268928f, 0.0f};
-    cEm* torch;
+    cEmTorch* torch;
 
     SndCall(8, 0x1B, &pos, 0x2B, 0, 0);
     if (RsfCheck(G_ROOM_ID, 6)) {
@@ -480,7 +480,7 @@ extern "C" void koyaC_destroy()
     }
     koyaC_delete();
     if (getRoomEtcTorch(2, &torch, 1)) {
-        ((cEmTorch*) torch)->setBreak();
+        torch->setBreak();
     }
 }
 
@@ -667,7 +667,7 @@ extern "C" void Evt_R119S00_Func(Event* e)
     cObj* obj;
     SmdWork* w;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         if (RsfCheck(G_ROOM_ID, 5)) {
             YaneB_smd_delete();
@@ -677,9 +677,9 @@ extern "C" void Evt_R119S00_Func(Event* e)
         }
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if ((obj = SmdGetObjPtr(0x21)) != 0) {
                     e->SetMod("scr0000", obj, 5, 0, 2, 0);
                     obj->setPos(&pos);
@@ -721,7 +721,7 @@ extern "C" void Evt_R119S00_Func(Event* e)
             SmdSetTrans(0x24, 0);
             SmdSetTrans(0x25, 0);
         case 0x10:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(6, 0);
                 SmdSetTrans(7, 0);
                 SmdSetTrans(0xC, 0);
@@ -733,12 +733,12 @@ extern "C" void Evt_R119S00_Func(Event* e)
             }
             break;
         case 0xE:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x1D, 0);
             }
             break;
         case 0x13:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0, 0);
                 SmdSetTrans(0x1C, 0);
                 SmdSetTrans(0x1B, 0);
@@ -747,13 +747,13 @@ extern "C" void Evt_R119S00_Func(Event* e)
             }
             break;
         case 0x14:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x1B, 0);
                 SmdSetTrans(0x2D, 0);
             }
             break;
         case 0x17:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(6, 0);
                 SmdSetTrans(7, 0);
                 SmdSetTrans(8, 0);
@@ -761,7 +761,7 @@ extern "C" void Evt_R119S00_Func(Event* e)
             }
             break;
         default:
-            if (!DbgFlagChk(pG, DBG_TEST_MODE) && e->NowFrame == 0) {
+            if (!DbgFlagChk(pG, DBG_TEST_MODE) && e->GetNowFrame() == 0) {
                 r119_evtBridgeOn();
             }
             break;
@@ -801,7 +801,7 @@ extern "C" void Evt_R119S00_Func(Event* e)
 // Event r119s10 callback: show the giant model em2b00 on its first frame.
 extern "C" void Evt_R119S10_Func(Event* e)
 {
-    if (e->FuncType == 1 && e->NowCut == 0 && e->NowFrame == 0) {
+    if (e->GetFuncType() == 1 && e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
         r119_evtSetGiant(e, "em2b00");
     }
 }
@@ -814,11 +814,11 @@ extern "C" void Evt_R119S20_Func(Event* e)
     cObj* obj;
     SmdWork* w;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             if ((obj = SmdGetObjPtr(0x21)) != 0) {
                 e->SetMod("scr0000", obj, 5, 0, 2, 0);
                 obj->setPos(&pos);

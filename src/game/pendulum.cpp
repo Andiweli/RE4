@@ -12,7 +12,7 @@
 
 extern "C" {
 // static but declared with C linkage: Bio4.sym names it unmangled
-static void PenClothReset(cModel* m, PenCloth* c);
+static void PenClothReset(cModel* m, CLOTH_INFO* c);
 }
 
 Vec GlobalWind = {0.0f, 0.0f, 20.0f};
@@ -23,7 +23,7 @@ f32 GlobalWindAdd = 1.0471976f;
 // takes an index already in a register (neighbour lookups).
 #define PEN_PARTS(m, c, no) ((c)->pPtbl ? (c)->pPtbl[no] : (m)->getPartsPtr(no))
 // Parts `no` of the chain owner (through pPtbl when the owner supplied a parts table).
-static inline cParts* penPartsNo(cModel* m, PenCloth* c, int no)
+static inline cParts* penPartsNo(cModel* m, CLOTH_INFO* c, int no)
 {
     if (c->pPtbl) {
         return c->pPtbl[no];
@@ -128,7 +128,7 @@ static inline void penWindScale(Vec* wind, f32 rate)
 
 // Set up the links of a chain: the rest direction / length of every link and the half distances
 // to its side neighbours.
-void PenClothSet(cModel* m, PenCloth* c, f32 min_len)
+void PenClothSet(cModel* m, CLOTH_INFO* c, f32 min_len)
 {
     Vec v;
     cParts* parts;
@@ -205,7 +205,7 @@ void PenClothSet(cModel* m, PenCloth* c, f32 min_len)
 }
 
 // Pin link `no` at a world position.
-void PenClothFixSet(cModel* m, PenCloth* c, int no, Vec* pos)
+void PenClothFixSet(cModel* m, CLOTH_INFO* c, int no, Vec* pos)
 {
     if (c->pCloth[no] != 0xFF) {
         PEN_INFO* w = &m->getPartsPtr(c->pCloth[no])->Pen;
@@ -215,7 +215,7 @@ void PenClothFixSet(cModel* m, PenCloth* c, int no, Vec* pos)
 }
 
 // Unpin link `no` (Pen.Flag bit0 off) so it swings again.
-void PenClothFixClear(cModel* m, PenCloth* c, int no)
+void PenClothFixClear(cModel* m, CLOTH_INFO* c, int no)
 {
     if (c->pCloth[no] != 0xFF) {
         PEN_INFO* w = &m->getPartsPtr(c->pCloth[no])->Pen;
@@ -225,7 +225,7 @@ void PenClothFixClear(cModel* m, PenCloth* c, int no)
 
 // One simulation frame of a chain, called from the owner's move after the motion. Pen.At_ck is set
 // when a collision volume was touched this frame.
-void PenClothMove(cModel* m, PenCloth* c)
+void PenClothMove(cModel* m, CLOTH_INFO* c)
 {
     Mtx mtx;
     Vec v;
@@ -536,7 +536,7 @@ void PenClothMove(cModel* m, PenCloth* c)
 }
 
 // Variant with the stiffness ang (x4C) in the constraints and no motion wind.
-void PenClothMove2(cModel* m, PenCloth* c)
+void PenClothMove2(cModel* m, CLOTH_INFO* c)
 {
     Mtx mtx;
     Vec v;
@@ -823,7 +823,7 @@ void PenClothMove2(cModel* m, PenCloth* c)
 
 // Variant with the parallel collision check on every constraint and the side neighbours kept
 // above the floor too.
-void PenClothMove3(cModel* m, PenCloth* c)
+void PenClothMove3(cModel* m, CLOTH_INFO* c)
 {
     Mtx mtx;
     Vec v;
@@ -1580,7 +1580,7 @@ void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
 }
 
 // Put every link back to its rest pose (the model was warped: be_flag 0x00200000).
-static void PenClothReset(cModel* m, PenCloth* c)
+static void PenClothReset(cModel* m, CLOTH_INFO* c)
 {
     cParts* parts;
     PEN_INFO* w;

@@ -38,7 +38,7 @@ void filter0a_mask_tex()
     GXTexObj tex;
     GXTlutObj tlut;
     Mtx mtx;
-    TexWk* wk;
+    TEX_WK* wk;
     TEXDescriptor* desc;
     TEXHeader* hdr;
     CLUTHeader* clut;
@@ -52,7 +52,7 @@ void filter0a_mask_tex()
     }
     GXTexObj* pTex = &tex;
     GXTlutObj* pTlut = &tlut;
-    desc = TEXGet(wk->pTpl, 0);
+    desc = TEXGet(wk->Tpl_addr, 0);
     hdr = desc->textureHeader;
     if (hdr->format == 8 || hdr->format == 9) {
         GXInitTexObjCI(pTex, hdr->data, hdr->width, hdr->height, hdr->format, 0, 0, 0, 1);

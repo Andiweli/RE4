@@ -19,7 +19,7 @@ u32 Obj18CmfGet(cObj* pObj);
 
 // Event costume / cloth model work (game/obj18.cpp): a model that follows a parts of its parent
 // (like obj00) and runs one of the cloth simulations by `type`.
-struct Obj18Work {
+struct FREE_OBJ18 {
     u32 be_flag;            // 0x00  bit3: blending toward the parent, bit6: cloth simulation off
     u8 pad_4[0xC];
     cModel* pEm_oya;        // 0x10  parent
@@ -42,12 +42,12 @@ struct Obj18Work {
 // cloth simulation selected by `type` (player costumes, enemy cloth sets, the ribbon / rope).
 class cObj18 : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  Obj18Work
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ18
 
     virtual void move();
     virtual ~cObj18() {}
 };
 
-#define OBJ18_WK(o) ((Obj18Work*) (o)->free)
+#define OBJ18_WK(o) ((FREE_OBJ18*) (o)->free)
 
 #endif

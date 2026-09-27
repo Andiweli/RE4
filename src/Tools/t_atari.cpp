@@ -372,7 +372,7 @@ static void plmove10(AtariToolWork* w)
         // pG is read through a reference so alias analysis does not exempt the load from the `w->pos`
         // stores above. That dependence schedules the `stfs`s before the `old` copy's `stw`s, as in
         // the target. A plain `pG->` read floats above the stores.
-        GlobalWork*& gp = pG;
+        GLOBAL_WK*& gp = pG;
         Draw_local_pos(&w->pos, 1000, gp->Camera.v_mat);
     }
     if (w->joy.on & 0x400) {

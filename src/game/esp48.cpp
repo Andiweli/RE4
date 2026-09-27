@@ -6,7 +6,7 @@
 #include "math_sub.h"
 #include "esp.h"
 
-struct Esp48Work {
+typedef struct tagESP48_WK {
     f32 dist_x;    // 0x00
     f32 time_x;   // 0x04
     f32 dist_y;    // 0x08
@@ -15,15 +15,15 @@ struct Esp48Work {
     f32 time_z;   // 0x14
     f32 timer;    // 0x18
     Vec add_ang;   // 0x1C rotation added this frame
-};
+} ESP48_WK;
 
 // Effect whose rotation swings on a sine wave around the base rotation.
 class cEsp48 : public cEsp {
 public:
-    Esp48Work m_Free;  // 0xF8
+    ESP48_WK m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x48] factory.
@@ -36,7 +36,7 @@ cEsp* Esp48_Create()
 // the new per-axis sine offsets. Released when the animation ends.
 void cEsp48::move()
 {
-    Esp48Work* w = &m_Free;
+    ESP48_WK* w = &m_Free;
 
     PSVECSubtract(&m_Ang, &w->add_ang, &m_Ang);
     if (CommonMove()) {
@@ -52,9 +52,9 @@ void cEsp48::move()
 }
 
 // Amplitudes (x 0.1) and frequencies per axis from Vec0..Vec2; the timer starts at a random phase.
-int cEsp48::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp48::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp48Work* w = &m_Free;
+    ESP48_WK* w = &m_Free;
 
     w->dist_x = pSeq->Vec0.x * 0.1f;
     w->time_x = pSeq->Vec0.y;

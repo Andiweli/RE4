@@ -10,7 +10,7 @@
 // island: flies a fixed table of positions, fires its chain guns at the player's targets and its
 // rockets at the enemies it finds), overlaid on cEm from 0x3E0. The vtable adds the room interface
 // (setTarget / setTargetPos / setPatrolPos / ckMissileFire / setEmLocked / setFreeFire).
-struct Em3dWork {
+struct FREE_EM3D {
     u32 Be_flg;            // 0x000 (0x3E0)  bit0: aimed at the target, bit1: select enable, bit2: rocket ready,
                           //                bit3: an enemy locked on it (per frame), bit4: target set (per frame),
                           //                bit5: free fire, bit6: patrolling (per frame)
@@ -37,7 +37,7 @@ struct Em3dWork {
     u8 Fire_wait;          // 0x2E1 (0x6C1)  frames between chain gun shots
 };
 
-#define EM3D_WK(em) ((Em3dWork*) (((cEm3d*) (em))->free))
+#define EM3D_WK(em) ((FREE_EM3D*) (((cEm3d*) (em))->free))
 
 class cEm3d : public cEm {
 public:

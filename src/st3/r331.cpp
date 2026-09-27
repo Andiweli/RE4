@@ -126,13 +126,13 @@ extern "C" void Evt_R331S00_Func(Event* e)
     cObj* obj;
     SmdWork* w;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if ((obj = SmdGetObjPtr(0x24)) != 0) {
                     e->SetMod("scr0000", obj, 5, 0, 2, 0);
                     obj->setPos(&pos);
@@ -143,7 +143,7 @@ extern "C" void Evt_R331S00_Func(Event* e)
             }
             break;
         case 4:
-            if (e->NowFrame == e->MaxFrame - 40) {
+            if (e->GetNowFrame() == e->GetMaxFrame() - 40) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -174,14 +174,14 @@ extern "C" void Evt_R331S10_Func(Event* e)
     cObj* obj;
     SmdWork* w;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         r331_work->timer = st3_getCountDownTimer();
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 int skip;
 
                 if ((obj = SmdGetObjPtr(0x24)) != 0) {
@@ -198,7 +198,7 @@ extern "C" void Evt_R331S10_Func(Event* e)
             }
             break;
         case 2:
-            if (e->NowFrame == e->MaxFrame - 40) {
+            if (e->GetNowFrame() == e->GetMaxFrame() - 40) {
                 int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
                 if (skip == 0) {
@@ -214,7 +214,7 @@ extern "C" void Evt_R331S10_Func(Event* e)
             obj->setPos(&w->pos);
             obj->setAng(&w->rot);
         }
-        st3_setCountDownTimer(r331_work->timer - e->MaxTotalFrame);
+        st3_setCountDownTimer(r331_work->timer - e->GetMaxTotalFrame());
         st3_startCountDown();
         SysFlagOn(pG, SYS_SCREEN_STOP);
         break;

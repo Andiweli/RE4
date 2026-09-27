@@ -34,7 +34,7 @@
 #define LOOP(x, lo, hi) (((x) < (lo)) ? (hi) : ((x) > (hi)) ? (lo) : (x))
 
 // The motion work of this build: model.h's MotionWork without the trailing blend/flip/blendTbl pointers
-// (0xD0 bytes; em.h MotionWorkSub is the same block).
+// (0xD0 bytes; em.h MOTION_INFO is the same block).
 struct DbMotWork {
     MotionData* data;     // 0x00
     u32* keyTbl;          // 0x04
@@ -72,7 +72,7 @@ struct DbMotWork {
     u8 hokanCnt;          // 0xC5
     u8 pad_C6[2];
     f32 blendRate;        // 0xC8
-    AttachCamera* cam;    // 0xCC
+    ATTACH_CAMERA* cam;    // 0xCC
 };
 
 // File list of one model / texture / motion set (0x85C): names or data pointers, the load state per entry.
@@ -367,7 +367,7 @@ void init_dbEm(DB_EM* em, int start, int end)
         em->mot_num = 0;
         em->mot_cnt = 0;
         em->motInfo[0].flags = 0x15;
-        em->motInfo[0].cam = (AttachCamera*) mem_alloc(sizeof(AttachCamera), __FILE__, 0xEB, 1, 13);
+        em->motInfo[0].cam = (ATTACH_CAMERA*) mem_alloc(sizeof(ATTACH_CAMERA), __FILE__, 0xEB, 1, 13);
         dbModelSetCamera(n, &pG->Camera);
         em->motInfo[0].speedRate = 1.0f;
         em->parentNo = n;
@@ -3971,7 +3971,7 @@ void dbModelSetAng0(int no, Vec* rot)
 // Copies `cam` (pos, at, roll, fovy) into slot `no`'s motion attach camera.
 void dbModelSetCamera(int no, CAMERA* cam)
 {
-    AttachCamera* ac = dbModSlot[no].motInfo[0].cam;
+    ATTACH_CAMERA* ac = dbModSlot[no].motInfo[0].cam;
 
     ac->camera_data[0] = cam->param.pos;
     ac->camera_data[1] = cam->param.at;
