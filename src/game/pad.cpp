@@ -1,8 +1,5 @@
-// game/pad: 12/12 functions byte-identical. PadRead: `dead` (5 refs / 526 doubled insns, priority 190)
-// beats the loop-2 `&Pad_data` hoist (4 / 448, 178) in global-alloc (target r16/r17); pinned to r16, the
-// constant kept first in block 0 by a codeless `asm volatile("")` barrier (see PadRead). The Key loop preheader order (`Key.on = 0` stores before
-// the `li r0,64; mtctr` pair) is a reference store: the pSys load then depends on it (a struct-member
-// store never conflicts with a fixed scalar), which lifts the stores above the count reload.
+// game/pad: 12/12 functions byte-identical. PadRead pins `dead` to r16 behind a codeless barrier, and
+// the Key loop's `Key.on = 0` stores go through a reference so they stay above the count reload.
 #include "types.h"
 #include "global.h"
 #include "main.h"
@@ -68,11 +65,9 @@ void PadRead()
     u32 bit;
     PADStatus* pad;
     JOY* joy;
-    // `dead` (5 refs / doubled length) outranks the loop-2 `&Pad_data` hoist in global alloc and
-    // takes r17 (target: r16, allocated after the hoist); pinning it keeps the hoist's r17. The
-    // constant has no dependents in block 0 (priority 1 < the `lis Pad_data@ha` chain), so sched
-    // would issue it second; the codeless barrier after it makes every later insn depend on it,
-    // where the target issues `li r16,10` before `lis Pad_data@ha`.
+    // `dead` would outrank the loop-2 `&Pad_data` hoist in global alloc and take r17 (target r16),
+    // so it is pinned. The codeless barrier after it makes every later insn depend on it, so
+    // `li r16,10` issues before `lis Pad_data@ha` like the target.
     register int dead asm("r16");                // COMPILER-DIFF: #17
 
     dead = 10;

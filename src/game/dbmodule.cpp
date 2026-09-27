@@ -825,25 +825,9 @@ void init_corn()
 
 
 
-// Byte-identical (was 332 words). The original drives the conversions and the FIFO writes through ONE
-// function-scope `Vec* pv` (`mr r31, r24` = pv = p before each loop, `mr r31, r23` = pv = &p[2]), a
-// `u16* pidx` re-assigned per command, ONE function-scope `s16* v` for every conversion (a multi-set
-// pseudo, so the `add r11,r16,r0` is not tied to the dying shifted index), keeps `part` in r14 and
-// advances it in place, spills `obj` (0x40(r1)), `md`, `np` and caller-saves cg/ca (0x50/0x54)
-// around PSMTXMultVec, writes the loop bounds as literals (`m < 4` folds to `cmplwi 3; ble`), and
-// uses `cnt = n - 2` as the strip bound.
-// Shapes: the command loop is `do { if (cmd >= part) break; ... } while (1);` (expand_end_loop's
-// "condjump near the end" rule ends the loop early and skips the rotation: test at the top, `b top`
-// from every case, no duplicated bottom test); `DB_poly_num = DB_poly_num + part->nPoly` is a plain
-// global store (the `part->size` load stays below it with the mem-flags compiler); `idx` is an 8-byte ADDRESSOF aggregate, so its
-// element stores are written `*pidx++ = ...` (cse1 rewrites `(mem pidx)` to the addressof / frame
-// address: frame-direct `sth 56..62(r1)`, while `idx[k] = ...` creates an address temp that cse merges
-// with the `pidx = idx` pseudo -> `sth 2(r29)`); the strip's `idx[2] = idx[1]; pidx = &idx[1];` puts the
-// idx[2] address temp first in its block (gcse PRE copy from `&idx`, `sth r0,4(r27)`) and lets combine
-// fuse `pidx = &idx + 2` with the idx[1] load into `lhzu` after a reload copy `mr r29,r27`; the
-// 2-vertex strip emit loop has its own `u32 m2` counter (caller-saved r11; `m` crosses calls).
-// `vtx_size` is an unused non-static local (8-byte .rodata template between init_corn's pool and
-// this function's pool; a `static const` lands in .sdata2).
+// Byte-identical. Matching needs one function-scope `Vec* pv` and `s16* v`, the command loop written
+// as `do { if (cmd >= part) break; ... } while (1);`, the `*pidx++ = ...` stores into `idx` and a
+// separate `u32 m2` strip counter. `vtx_size` is an unused local kept for its .rodata template.
 void DrawObjWireframe(cObj* pObj, int col)
 {
     const u8 vtx_size[8] = {8, 8, 10, 12, 10, 8, 8, 0};

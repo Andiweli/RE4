@@ -1,8 +1,5 @@
-// game/shape: vertex-morph ("shape") animation of a model part — the face morphs of the player /
-// partner and the mouth / eye shapes of the enemies. A ShapeData holds per-channel Hermite key
-// tables of blend weights; up to 5 shapes play at once on a cModelInfo (info->shape[]). ShapeSet
-// starts one, ShapeMove (per frame from the model trans) advances the frames, CalculateShape_new
-// adds the weighted vertex deltas of the model's shape table onto the vertex buffer `dst`.
+// game/shape: vertex-morph ("shape") animation of a model part, used for the face morphs of the
+// player and partner and the mouth and eye shapes of the enemies.
 #include "types.h"
 #include "vec.h"
 #include "db_log.h"

@@ -1,7 +1,5 @@
-// game/room_jmp: the debug room-jump menu (RoomJump task, from the debug menu) and cRoomJmp, the
-// reader of the room info table (roomInfoAddr: per stage a list of CRoomInfo jump points with
-// position, angle, room name, screen and programmer). GetNextPos lets the scenario use a jump
-// point as the next room entry.
+// game/room_jmp: the debug room-jump menu and cRoomJmp, the reader of the room info table of jump
+// points. GetNextPos lets the scenario use a jump point as the next room entry.
 #include "types.h"
 #include "map_obj.h"
 #include "light.h"

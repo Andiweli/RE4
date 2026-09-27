@@ -1,17 +1,5 @@
 // em10/em10.cpp: the Ganado enemy library (D:/Bio4/Prog/em10.cpp), the same object in the 16 modules
-// em10..em17, em19..em1f, em20 (config/G4BE08/modules.py). cEm10 and its routines, the per-weapon
-// damage reactions, the route / attack / find checks and the player-side event routines (plem10*).
-//
-// State machine: cModel r_no_0 picks the R0 table (0 Init, 1 Move, 2 Damage, 3 Die, 4 Scenario);
-// r_no_1 indexes Em10_R1_move_tbl (110 {branch check, move} pairs: the walk / dash / goto movement,
-// the weapon attacks, the catches, the room-specific event routines), Em10_R1_dmg_tbl (22 damage
-// reactions) or Em10_R1_die_tbl (6 deaths); r_no_2 is the step inside a routine, r_no_3 a variant.
-// em10DmCk turns a weapon hit into a damage routine through Em10DmSetWep_tbl (reaction class per
-// weapon id: melee / bullet / shotgun / heavy / flash). Em10Work (include/em10.h) is the per-enemy
-// work overlaid on cEm from 0x3E0; the module's <em>_set.cpp fills its motion table mot[] and picks
-// the Ganado class (0 village, 1 castle zealot, 2 island soldier) and the voice table (Em10SetSeTbl).
-// Entry points from the DOL / rooms: the cEm10 virtuals (setGoto, setEvtMotion, setReset, ck* ...),
-// Em10SetFunc (installed by the module's _prolog) and the extern "C" helpers.
+// em10..em17, em19..em1f and em20. Each module's <em>_set.cpp fills its motion table mot[].
 
 #include "obj1d.h"
 #include "sscrn.h"
@@ -840,12 +828,9 @@ void cEm10::setNoSuspend(int on)
 }
 
 
-// Per-frame damage check, first thing in cEm10::move (r_no_0 != 0). Damage volumes (DmgMgr kind
-// 1/4/5/7 = explosions / fire) blow the Ganado away or kill it outright depending on where it is
-// (ladder, fence, gondola, down); a weapon hit (dmHit) takes em10SetDmVal off hp, dispatches the
-// reaction on the weapon id through Em10DmSetWep_tbl (rifles on a chainsaw Ganado go to the heavy
-// reaction), rings the "bell" damage notify (Status_flg[1] bit29 + SeInfo.pos), lights a bowgun
-// Ganado's arrow on a hit to its quiver part, and makes the Ganado find the player.
+// Per-frame damage check, first thing in cEm10::move. Explosions and fire blow the Ganado away or kill
+// it, and a weapon hit dispatches the reaction through Em10DmSetWep_tbl. A hit also rings the "bell"
+// damage notify (Status_flg[1] bit29) and makes the Ganado find the player.
 void em10DmCk(cEm10* em)
 {
     Em10Work* w = EM10_WK(em);
@@ -1147,11 +1132,9 @@ static void em10DmSetWep00(cEm10* em)
     }                                                                                               \
     (w)->Csaw_regist = Rnd() % 3 + 2
 
-// Damage reaction to the standard bullets (handguns, TMP, knife 0x10, ...): armour parts (em10ArmorCk)
-// do not flinch, chainsaw / parasite Ganados absorb 2..4 hits (EM10_GUARD_CK), a head shot (parts 5)
-// gives Dm_Head or, when it kills, the lost-head parasite chance (em10LostHead); legs (parts
-// 0x13/0x14/0x17/0x18) trip a dashing Ganado (Dm_DashDown), arm parts 8/0xE can knock it out; the
-// robed type 6 dies at once, type 2 / 0xA / 0xD / 0x16 use the gatling / claw reactions.
+// Damage reaction to the standard bullets (handguns, TMP, knife). Armour parts do not flinch, chainsaw
+// and parasite Ganados absorb a few hits, a killing head shot gives the lost-head parasite chance
+// (em10LostHead), and leg hits trip a dashing Ganado.
 static void em10DmSetWep02(cEm10* em)
 {
     Em10Work* w = EM10_WK(em);
@@ -2441,12 +2424,8 @@ void em10KickHitMark(cEm10* em)
     }
 }
 
-// Per-frame Ganado update: damage check, route check, the work timers (attack / dash / throw waits,
-// Lose_timer), the R0 routine table (Init / Move / Damage / Die / Scenario), then the model post
-// processing: scale return, claw / neck / waist / slope / compress / bomb-neck moves, collision and
-// scenario check (checkAir while jumping, flag 0x80000), the stuck counter HoseiCnt, shadow fade, work
-// effect cleanup per set, cloth, chainsaw idle SE, cart release, bowgun / parasite / water / foot SE,
-// the lit dynamite countdown (Fire_timer -> Die_Bomb), and the hit boxes of the core and shield.
+// Per-frame Ganado update: the damage and route checks, the work timers and the R0 routine table,
+// then the model post processing, collision, SEs, the lit dynamite countdown and the hit boxes.
 void cEm10::move()
 {
     Em10Work* w = EM10_WK(this);
@@ -6461,11 +6440,8 @@ static void em10_R1_br_Walk(cEm10* em)
     }
 }
 
-// R1 == 0x10 Walk: walks the route towards the player (Go_pos) with the walk motion (Route_type
-// variants), turning at 0.157 rad/frame; a killed Ganado goes to Dm_KnockOut, a dead player to Stay;
-// checks attack / turn-around (Turn180 when the target is behind) / stay / dash / threat / head lock
-// (Guard 0x1D or GuardWalk 0x14) / sight, the type 0xA claw Ganado gives up into FindLost; runs the
-// breath, chainsaw and behind-player SEs and the chainsaw walk attack.
+// Walk: walks the route towards the player (Go_pos) and checks the attack, turn-around, stay, dash,
+// threat, head lock and sight transitions. The type 0xA claw Ganado gives up into FindLost.
 static void em10_R1_Walk(cEm10* em)
 {
     Em10Work* w = EM10_WK(em);
@@ -13001,11 +12977,9 @@ static void em10_R1_DashCatch(cEm10* em)
         SndCall(6, 0x16, &em->pos, 0, 0, em);                                                          \
     }
 
-// R1 == 0x3A TakeAway: carries Ashley off (motion 0x29F pick-up with subem10_TakeAway on her, then
-// 0x2A0 running with her over the shoulder, flags 0x4800 | 0x4000000): runs the escape route
-// (em10SetTakeawayPos) through windows / doors / racks / climb-overs / jumps (0x92..0x97), stops when
-// the player frees her (Status_flg[1] bit16 clear); reaching the exit fades both out with the
-// take-away camera (em10CamMoveTakeaway) and sets the "Ashley taken" bit Status_flg[1] bit6.
+// TakeAway: carries Ashley off along the escape route (em10SetTakeawayPos) until the player frees
+// her. Reaching the exit fades both out with the take-away camera (em10CamMoveTakeaway) and sets the
+// "Ashley taken" bit Status_flg[1] bit6.
 static void em10_R1_TakeAway(cEm10* em)
 {
     Em10Work* w = EM10_WK(em);
@@ -13527,11 +13501,9 @@ static void em10_R0_Damage(cEm10* em)
         r3 = 0;                                                                                    \
     }
 
-// R0 2 / R1 == 0x00 Dm_Small: the flinch. Picks the motion from the hit zone (arm parts 8/0xE, hands
-// 9/0xF, thighs 0x13/0x17, shins 0x14/0x18, front or back hit; a leg hit may drop the Ganado to its
-// knees, flag 0x20 = knee), with weapon-specific variants (a hand hit drops the weapon), then turns
-// to the player, offers the melee prompt (em10ActEvtSetKick / FS by character and hit zone) and
-// returns to the walk or to DownWakeWait; may hide again (em10HideRtnCk) after 10 frames.
+// Dm_Small, the flinch. The motion depends on the hit zone and the weapon held, a hand hit drops the
+// weapon and a leg hit may drop the Ganado to its knees. Offers the melee prompt, then returns to the
+// walk or DownWakeWait, or may hide again (em10HideRtnCk).
 static void em10_R1_Dm_Small(cEm10* em)
 {
     Em10Work* w = EM10_WK(em);
@@ -16471,12 +16443,8 @@ static void em10_R1_Die_Bomb(cEm10* em)
         w->Be_flg |= 1;                                                                             \
     }
 
-// Every frame from cEm10::move. Computes the route points and angles to the player (Pl_pos / Pl_dir /
-// Pl_rot, L_pl_route), the partner (Sub_*), the guard post (L_pl_guard / L_guard from Keep_pos) and
-// the goto target (Go_* from Route_target, the wander route or the lock-on target), the line of sight
-// (flag bit0 player seen, bit1 partner seen) alternating the probe side, and picks the route target
-// (em10RouteTargetSet: flag 0x08000000 = after the partner); Route_type offsets the approach point.
-// Route bookkeeping run every frame: distances / angles to the player, partner and goto point.
+// Route bookkeeping run every frame from cEm10::move: distances and angles to the player, partner,
+// guard post and goto target, and the line of sight, which alternates the probe side.
 void em10RouteCk(cEm10* em)
 {
     Em10Work* w = EM10_WK(em);
@@ -17031,11 +16999,9 @@ extern "C" int em10SetWanderRoute(cEm10* em)
     return 1;
 }
 
-// Attack decision from the walk / dash / stay / turn routines (a = 1 from Back: allows the back-step
-// check first). A dead Ganado goes to Dm_Small; otherwise, unless the ctrl12 EM10_ATK lock or the
-// player's action scene forbids it, tries in order: the parasite, shield, axe, hoe, scythe, claw,
-// claw critical, bowgun, rocket, gatling, throw axe, throw dynamite, chainsaw, and the catch of the
-// player / partner. Returns 1 when a routine was set.
+// Attack decision from the walk, dash, stay and turn routines (a = 1 from Back allows the back-step
+// check first). The ctrl12 EM10_ATK lock or the player's action scene blocks attacks. Returns 1 when
+// a routine was set.
 int em10AtkRtnCk(cEm10* em, int a)
 {
     Em10Work* w = EM10_WK(em);
@@ -17668,12 +17634,9 @@ int em10LostHead(cEm10* em, int a, int b)
     switch ((u32) a) {
     case 0:
     default:
-        // Dead test falling through into case 1 (the store is deleted by flow, the compare stays
-        // live because gcse PRE reuses it for the `a == 3` after em10HeadSet): its block gives the
-        // case-1 label a second predecessor where the compare is already computed, so PRE inserts
-        // `cmpwi cr4, a, 3` at the end of the dispatch block and of the case-2 else arm and deletes
-        // the join's compare. Any dead local store works here; the tree still needs case 0 and
-        // case 1 as separate nodes (`cmpwi 1; beq; cmplwi 1; blt`).
+        // Dead test falling through into case 1. It gives the case-1 label a second predecessor, so
+        // gcse PRE puts `cmpwi cr4, a, 3` in the dispatch block and the case-2 else arm as in the target.
+        // Any dead local store works, but case 0 and case 1 must stay separate nodes.
         if (a == 3) {
             paras = 0;
         }
@@ -18067,11 +18030,9 @@ extern "C" void Em10SetSeTbl(cEm10* em, int type)
     }
 }
 
-// Picks the weapon in hand from the cEm::flag bits and the module's motion table: 1 hoe (bit31),
-// 2 hatchet / 0xB flail (bit29), 3 sickle (bit27), 0xA pitchfork (bit14), 4 chainsaw (bit28), 6 scythe /
-// 0xF stun rod (bit26), 7 torch / 0x10 (bit11), 8 bowgun (bit15), 9 dynamite (bit17), 5 bucket / 0xC
-// rocket launcher (bit30); bit13 means "carried as the spare" (em10WeaponSet2). Creates it with
-// em10MakeWeapon and attaches it. Claw / gatling types (0xA, 0xD, 2) carry nothing.
+// Picks the weapon in hand from the cEm::flag bits and the module's motion table, creates it with
+// em10MakeWeapon and attaches it. Flag bit13 means "carried as the spare" (em10WeaponSet2), and the
+// claw and gatling types carry nothing.
 extern "C" void em10WeaponInit(cEm10* em)
 {
     Em10Work* w = EM10_WK(em);
@@ -18881,12 +18842,9 @@ void cEm10::setHand(int no, int type)
         tpl = w->mot[13];
         break;
     case 3:
-        // Target block: `lbz wepType; lwz tpl; lwz bin; cmpwi; bne`. tpl first = LUID order of the two
-        // loads; the barrier keeps the byte compare after `lwz bin` (rank_for_schedule prefers the
-        // compare: equal priority, weight 0 vs +1, then more dependents -- no plain form ranks the
-        // load first). tpl loaded first would cost it r4 (global-alloc priority 2*5/16 vs bin's
-        // 2*6/19), so the tpl create below is weighted with a do{}while(0). `no` is r10 because of
-        // the dead x184 test below.
+        // Target block: `lbz wepType; lwz tpl; lwz bin; cmpwi; bne`. The barrier keeps the byte compare
+        // after `lwz bin`, and the do{}while(0) around the tpl create below keeps tpl's global-alloc
+        // priority from costing it r4. `no` is r10 because of the dead x184 test below.
         {
             u8 wt = w->Wep_type;
             tpl = w->mot[14];
@@ -19604,12 +19562,9 @@ int em10RackBreakCk(cEm10* em)
             continue;
         }
         {
-            // `type` loaded before the loop notes: the LOOP_BEG barrier keeps the ternary's hoisted
-            // `li 0x3D` behind the compare, so the temp shares r0 with the loaded byte (and does not
-            // inherit e's r3/r11 preferences). Two do { } while (0) levels put the four routine
-            // stores at loop depth 4: em then has 34 weighted refs and outranks e (em r31, e r30);
-            // the loop notes also keep `li r3, 1` below the stores so the hitCheck result (known 0)
-            // stays in r3 for the xFE/xFF zeros.
+            // `type` is loaded before the LOOP_BEG barrier so the hoisted `li 0x3D` stays behind the
+            // compare and shares r0. The two do { } while (0) levels put the stores at loop depth 4, so
+            // em outranks e (em r31, e r30) and `li r3, 1` stays below the stores.
             int type = e->type;
             do {
                 do {
@@ -21330,11 +21285,9 @@ void em10ScaleCompress(cEm10* em)
     }
 }
 
-// Sight check of the idle routines (a: 1 = also require the player within 2000 units of height,
-// 2 = never for the claw types). The Ganado finds the player when it sees him (flag bit0) within
-// 15000 (6000 when heading somewhere) and 60 deg, or very close, when another Ganado is being hurt
-// nearby, on the bell alarm (Status_flg[1] bit29, SeInfo.pos within 25000), when the room forces the
-// alert (Status_flg[0] bit23), or when it is dead / headless. Calls em10SetRtnFind and returns 1.
+// Sight check of the idle routines. a = 1 also requires the player within 2000 units of height and
+// a = 2 disables it for the claw types. Besides sight, a Ganado hurt nearby, the bell alarm or a room
+// alert make it find the player through em10SetRtnFind, and it returns 1.
 int em10FindCk(cEm10* em, int a)
 {
     Em10Work* w = EM10_WK(em);
@@ -21688,11 +21641,8 @@ void em10FindNotify(cEm10* em)
     }
 }
 
-// Picks the movement routine of a Ganado that knows where the player is: the room-specific post
-// routines by cEm::set (FixBomber, RocketWait, Catapult, the bombers, AttackWait, R320Gatling), Pickup
-// when a spare weapon should be taken, ignition / claw stick, Stay when the player is dead or too many
-// are already attacking, Turn180 when he is behind, the ranged weapons' keep-distance rule, then
-// Back / Stay / chainsaw walk attack / Dash checks, and finally Walk with a random Route_type.
+// Picks the movement routine of a Ganado that knows where the player is. The room-specific post
+// routines set by cEm::set come first, and Walk with a random Route_type is the fallback.
 void em10WalkRtnSet(cEm10* em)
 {
     Em10Work* w = EM10_WK(em);

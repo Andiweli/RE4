@@ -1,7 +1,5 @@
-// game/flr_at: floor attribute areas (D:/Bio4/Prog/flr_at.cpp). The room's "FSE" block lists
-// FlrAt areas (type, group, area polygon, per-type data) used for footstep sounds/effects (type 0/1),
-// sound situations (type 3) and puddles; FlrAtCheck finds the enabled area of a type containing a
-// point, FlrAtSetDefVal sets the default footstep SE / effect per group.
+// game/flr_at: floor attribute areas from the room's "FSE" block (D:/Bio4/Prog/flr_at.cpp), used
+// for footstep sounds and effects, sound situations and puddles.
 #include "map_obj.h"
 #include "light.h"
 #include "widget.h"

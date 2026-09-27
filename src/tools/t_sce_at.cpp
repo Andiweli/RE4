@@ -251,11 +251,8 @@ int loadMesName(const char* path, char* names);
     pW->step = 0;    \
     pW->step2 = 0;
 
-// SCENARIO ATARI TOOL entry (debug menu 19): edits the room's AEV trigger areas (SceAtWork records:
-// doors, messages, flags, jumps, damage, ladders, hide spots, ...). Allocates the work, loads the
-// current room's data and loops: the sub stick moves the text panel, START toggles the debug camera,
-// Z the tool light, then runs routine[mode] (main menu, area edit, preview, data load, data save,
-// exit) every frame.
+// SCENARIO ATARI TOOL entry (debug menu 19): edits the room's AEV trigger areas (SceAtWork records).
+// Loads the current room's data and runs routine[mode] every frame.
 void ToolSceAt()
 {
     void (*routine[6])() = {tSceAtMainMenu, tSceAtAreaEdit, tSceAtPreview, tSceAtDataLoad, tSceAtDataSave, tSceAtExit};
@@ -740,11 +737,9 @@ static const char* tSceAtTargetName[16] = {"",              "PL",            "  
                                             "          SUB", "PL+       SUB", "   EM+    SUB", "PL+EM+    SUB",
                                             "      OBJ+SUB", "PL+   OBJ+SUB", "   EM+OBJ+SUB", "PL+EM+OBJ+SUB"};
 
-// the eight lines every type shares (ID .. PRIORITY); `menu` gets its angle / action lines enabled
-// Nine fresh-`lis` sites of the original (the menu[5] test and the first pCur read of each case): our
-// cse1 carries the earlier high pseudo along the AROUND/taken paths into them and gcse then
-// copy-propagates the PRE reg into every later site of the case; the original kept them as
-// separate occurrences.  Distinct SYMBOL_REFs for the same object keep them apart.
+// The original has nine fresh `lis` sites (the menu[5] test and the first pCur read of each case)
+// that our cse1 and gcse would merge into one high. Distinct SYMBOL_REFs for the same object keep
+// them apart.
 extern SceAtWorkPtr sceAtCur_m5 asm("sceAtCur"); // COMPILER-DIFF: #12 (cse path / PRE copy)
 extern SceAtWorkPtr sceAtCur_c0 asm("sceAtCur"); // COMPILER-DIFF: #12 (cse path / PRE copy)
 extern SceAtWorkPtr sceAtCur_c1 asm("sceAtCur"); // COMPILER-DIFF: #12 (cse path / PRE copy)

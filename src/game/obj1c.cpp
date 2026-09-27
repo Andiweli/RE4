@@ -1,8 +1,5 @@
-// game/obj1c: object id 0x1C, the floating island / raft of the lake (D:/Bio4/Prog/obj1c.cpp):
-// drifts back to its home position (50 units/frame outside a 50-unit radius), is pushed away
-// (300 units/frame, decaying) and plays a crash motion when Del Lago hits it (setCrash /
-// setCrashBig; ckCrash reports the 15-frame crash window to the room), spawns water effects
-// every 30 frames, and is hidden with its effects during Status_flg[1] 0x80000.
+// game/obj1c (D:/Bio4/Prog/obj1c.cpp): object id 0x1C, the floating island or raft of the lake. It
+// drifts home and is pushed away when Del Lago hits it, and ckCrash reports that crash to the room.
 #include "atari.h"
 #include "light.h"
 #include "obj.h"

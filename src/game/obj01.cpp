@@ -1,8 +1,5 @@
-// game/obj01: object id 1, thrown grenade / bottle (D:/Bio4/Prog/obj01.cpp): hand, incendiary and
-// flash grenades and enemy-thrown objects. Flies under gravity with a spin, bounces off the
-// scenario (EatMgr), splashes into water, and when `life` runs out spawns the effects set by
-// Obj01SetEst and the damage (DmgMgr) of its eff_action type; can be held on a model's parts
-// until release_timer expires.
+// game/obj01: object id 1, thrown grenade / bottle (D:/Bio4/Prog/obj01.cpp), used for the hand,
+// incendiary and flash grenades and for enemy-thrown objects.
 #include "atari.h"
 #include "light.h"
 #include "dmg.h"
@@ -28,12 +25,9 @@ void cObj01::move()
     (this->*funcTbl[r_no_0])();
 }
 
-// Rno0 == 0: counts `life` down (not for type 2, which detonates on impact) and on 0 detonates by
-// eff_action: 1 hand grenade (blast effect or water burst, PlWepHitCheck2 radius 6000, rings the
-// bell), 2 flash grenade (two effects, flash damage 4/5), 3 incendiary (fire effect attached to
-// the object), 0/4 nothing; then Rno0 = 1. Plays the pending motion; while held (w->pEm) follows the parts
-// and releases after release_timer (snapping out of the wall); otherwise obj01AddSpeed moves it
-// (destroyed when it says so) and the spin is applied to parts 0.
+// Rno0 == 0: counts `life` down and detonates by eff_action when it reaches 0. Type 2 skips the
+// countdown because it detonates on impact. While held, it follows the parts until release_timer
+// runs out.
 void cObj01::move00()
 {
     Obj01Work* w = OBJ01_WK(this);

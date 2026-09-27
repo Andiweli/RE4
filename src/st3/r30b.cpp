@@ -105,11 +105,9 @@ static void SceBgmCheck();
 }
 
 
-// Room init (the crane hall): the s00 callback. With Ashley along (Status_flg[3] 0x04000000): area 3 =
-// the s00 escape event until Room_flg bit 0, area 2 off; without her: area 4 = the crane puzzle and area
-// 0x10 = its end until bit 2. The crane / magnet / cable objects, the four crane Ganados with their
-// patrols and routes, or the return layout (R30bEmReset); area 9 = the door opening from the other side
-// until bit 3, area 8 = the door switch; the door posed per bit 5; the shelf item event; the stream.
+// Room init (the crane hall), also the s00 callback. With Ashley along area 3 is the s00 escape
+// event, and without her area 4 is the crane puzzle. The four crane Ganados are set up, or the
+// return layout (R30bEmReset).
 void R30bInit()
 {
 #line 63 "D:/Bio4/Prog/r30b.cpp"

@@ -2435,11 +2435,8 @@ void SsMapInit::move(SUB_SCREEN* wk)
     }
 }
 
-// Builds the map screen: the zoom/mode widgets (MapFocus -> MapZoomIn <-> MapRead/MapZoomOut ->
-// MapEntire, MapModeSelect from Entire/Read), id textures and unit groups (0x19 room colours,
-// IdNum 0x14..0x16 typewriter/treasure/medallion marks, 0x14 character marks, 0x10 frame, 0x1D
-// button hints; hints for marks not yet available hidden), lights, the SsMapWork, viewport and
-// camera; area from the room number; state 2 / step 0 = load the area data.
+// Builds the map screen: the zoom and mode widgets, id textures, unit groups, lights, SsMapWork,
+// viewport and camera. Button hints for marks not yet available are hidden.
 void SsMapMain::init(SUB_SCREEN* wk)
 {
     focus = new MapFocus;
@@ -2574,11 +2571,9 @@ int scf_check_typewriter()
     return mark_model_tbl[SubScreenWk.map->area][4];
 }
 
-// Map screen frame. state 0 runs the zoom widget chain (in MapRead: Y / B-or-Z on the in-game map
-// exit the sub screen via link 4, B opens the main menu tab row), 1 the tab row (0 items, 1 case,
-// 2 back, 3 files, 4 exit), 2 waits for the area load. step 0 reads the area file into pMapArea,
-// 1 builds the room/door/mark models, 2 draws them every frame with the marks enabled by the mode
-// bits (map_mode) and the scf_check_* availability.
+// Map screen frame: state 0 runs the zoom widget chain, 1 the main menu tab row and 2 waits for
+// the area load. Once pMapArea is read, the room, door and mark models are built and drawn, with
+// the marks enabled by map_mode and the scf_check_* availability.
 void SsMapMain::move(SUB_SCREEN* wk)
 {
     switch (state) {

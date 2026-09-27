@@ -1,7 +1,5 @@
-// game/ctrl.cpp: the control work manager (CtrlMgr). A cCtrl is a small per-room helper object
-// (0x214 bytes) with a virtual move / trans, specialised by id at construction: 0 / 1 light
-// path controls, 0x10, 0x11 shared SE handles, 0x12 shared timers / counters / texture render
-// targets, 0x14 the dragon head statue. CtrlMgr.move runs every live control each frame.
+// game/ctrl.cpp: the control work manager (CtrlMgr), which runs the small per-room helper objects
+// (cCtrl, specialised by id at construction) every frame.
 
 #include "types.h"
 #include "cManager.h"

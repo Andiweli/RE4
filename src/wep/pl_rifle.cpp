@@ -1,15 +1,5 @@
-// Rifle player routines ("D:/Bio4/Prog/pl_rifle.cpp"; wep09/wep10/wep40/wep47 modules, first routine
-// object): routine 2 of the player while a rifle is equipped: ready, set (scope camera), fire, down,
-// reload, next target. Modelled on game/pl_knife.cpp.
-//
-// Entry: PlRifleMove is the module's WeaponMoveFunc (pl_R1_Weapon, r_no_1 == 6). r_no_2 is the
-// weapon state (0 ready, 1 set = looking through the scope, 2 fire, 3 down, 4 reload, 5 next
-// target), r_no_3 the step. The scope is a camera mode (CamCtrl.startScope / endCamera) with the
-// thermal light set for the infrared scope; the aim is the camera trajectory, so there is no
-// mot3 pitch blend while scoped (m3r is only reset). weapon_no 9 is the bolt-action rifle (a
-// bolt cycle, fire steps 2/3, after every shot), 0xA the semi-auto rifle (the weapon object plays
-// the recoil). Weapon archive slots: 0x14 draw, 0x15 scope idle, 0x16/0x19/0x1A holster from
-// the scope, 0x17/0x1D/0x1E reload by level, 0x1B bolt cycle, 0x1C holster after a reload.
+// Rifle player routines (D:/Bio4/Prog/pl_rifle.cpp) of the wep09/wep10/wep40/wep47 modules, modelled
+// on game/pl_knife.cpp. PlRifleMove is the module's WeaponMoveFunc, run from pl_R1_Weapon.
 
 #include "atari.h"
 #include "light.h"
@@ -149,11 +139,8 @@ static void wep09_r3_ready10(cPlayer* pl)
     pl->Waist->set(0.0f, 0.4f);
 }
 
-// r_no_2 == 1: the set state = looking through the scope. No laser sight; the bolt SE 2/9 once at
-// frame 2 (m_Work1), the fire delay m_Work4 counts down. Aim key released -> down (r_no_2 3, or
-// crouch 0x11) with the scope direction stored in m_VecWork0 (wepDown restores the body pitch from
-// it); fire held after the delay with rounds -> fire; trigger on an empty rifle -> reload or the
-// empty-click SE 2/3; reload key -> reload (m_Work0 = 1: manual).
+// r_no_2 == 1: the set state, looking through the scope. Releasing aim stores the scope direction in
+// m_VecWork0, from which wepDown restores the body pitch.
 static void wep09_r2_set(cPlayer* pl)
 {
     static void (*func_tbl[])(cPlayer*) = {
@@ -248,11 +235,8 @@ static void wep09_r2_fire(cPlayer* pl)
     func_tbl[pl->r_no_3](pl);
 }
 
-// fire step 0: the shot. trigger() spends the round; the bullet line is the scope camera's
-// trajectory (extended to 200 m for the semi-auto) -> PlWepHitCheck2; the bolt-action plays the
-// shot SE 2/0 itself, the semi-auto's weapon object goes to mode 2 (recoil). Controller vibration
-// from the player archive, weapon display type 1 off (the scope glass), the scope direction is
-// kept in m_VecWork0. Then step 1.
+// fire step 0: the shot along the scope camera's trajectory, extended to 200 m for the semi-auto.
+// The bolt-action plays its shot SE itself, and the semi-auto's weapon object plays the recoil.
 static void wep09_r3_fire00(cPlayer* pl)
 {
     Vec from;
@@ -360,11 +344,8 @@ static void wep09_r3_fire30(cPlayer* pl)
     }
 }
 
-// r_no_2 == 3: the down (holster) state, one frame. Ends the scope camera, seeds the mot3 pitch
-// from the elevation of the stored scope direction m_VecWork0, shows the scope glass, then the
-// holster motion when one may be set: the semi-auto's 0x16, the bolt-action's pitched 0x16/0x19/
-// 0x1A from the scope (m_Work0 == 0) or 0x1C after a bolt cycle / reload (the weapon object gets
-// its stay motion 0x24 and mode 0). Leaves to footwork sub-routine 2 (or the idle with m_Hokan = 0xF).
+// r_no_2 == 3: the down (holster) state, one frame. Ends the scope camera and seeds the mot3 pitch
+// from the stored scope direction m_VecWork0 before the holster motion.
 static void wepDown(cPlayer* pl)
 {
     f32 e;

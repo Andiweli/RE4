@@ -1,7 +1,5 @@
-// game/esp0b.cpp: effect id 0x0B, a sprite jittering in the camera plane. Each frame a new random
-// offset of up to prm.x sideways and prm.y up (camera axes) plus prm.z toward the camera replaces
-// the previous one. Core_flg 0x8000 effects (moving during pauses) apply the jitter only inside
-// the trans function so the stored position stays clean.
+// game/esp0b.cpp: effect id 0x0B, a sprite that jitters randomly in the camera plane every frame.
+// Core_flg 0x8000 effects apply the jitter only in the trans so the stored position stays clean.
 
 #include "atari.h"
 #include "global.h"

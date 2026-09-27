@@ -140,11 +140,9 @@ public:
     virtual void LocalDisp();
 };
 
-// Never called: the original REL link dead-stripped the body (modules.py STRIP_UNUSED) and kept
-// its string after MakeCol's pool. Compiled at parse time it inlines cDbgButton's implicit
-// constructor, which references `_vt.10cDbgButton`: the vtable is then written in finish_file
-// round 1 (fourth of the unit's vtables) and ~cDbgButton is the first end-of-file function, while
-// `_vt.14cDbgButtonBase` / ~cDbgButtonBase wait for round 2 (the base vptr store is elided).
+// Never called: the original REL link dead-stripped the body (modules.py STRIP_UNUSED). It is kept
+// because its inlined cDbgButton constructor makes finish_file emit `_vt.10cDbgButton` and
+// ~cDbgButton in round 1, ahead of the cDbgButtonBase vtable and destructor.
 int cDbgWindow::AddButton(int bx, int by, const char* name, int bcx, int bcy)
 {
     cDbgButton* b;

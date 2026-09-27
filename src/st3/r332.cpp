@@ -196,11 +196,9 @@ static inline void CamCtrlSetCam(CameraControl* cc, CAMERA* cam)
     }
 
 
-// Room init (the final battle arena): Ashley marked separated; area 0 = the elevator out; the s00/s10/
-// s20 callbacks. Until the boss appeared (Room_flg bit 0) the s00 event task runs and the arena is set
-// for it; after the boss is dead (bits 1/4) the revisit layout (R332EmSetMain); the special rocket area
-// 0x84 only once earned (bit 2). Both bridges posed open, the two cranes (beams still hanging per the
-// per-crane flags) with their lever areas 1/2, the render target.
+// Room init (the final battle arena), with Ashley marked separated. Until the boss appeared
+// (Room_flg bit 0) the s00 event task runs, and after his death (bits 1/4) the revisit layout
+// (R332EmSetMain) is used. The bridges and the two cranes with their lever areas are always set up.
 void R332Init()
 {
     int i;

@@ -1,11 +1,5 @@
-// wep45 module: HUNK's hand grenade (the wep19 cObjHandGre build without the weapon-specific motion
-// slots; object id 0x3C). The module object carries the class, the entry points and the grenade
-// routine registration (wep/pl_grenade.cpp).
-//
-// The same code as wep41 (HUNK's other grenade slot): the display-only cObjHandGre (model by the
-// item kind) at the hand (parts 0x11) and belt (parts 10) offsets, no damage motion set;
-// Wep45_init is the WeaponInitFunc, PlGrenadeMove the WeaponMoveFunc (itemThrow creates the
-// thrown cSubWep).
+// wep45 module: HUNK's hand grenade, the same code as wep41 (the wep19 cObjHandGre build without the
+// weapon-specific motion slots). The grenade routines are in wep/pl_grenade.cpp.
 
 #include "wep_mod.h"
 #include "light.h"

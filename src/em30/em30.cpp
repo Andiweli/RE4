@@ -1,14 +1,5 @@
 // em30 module (D:/Bio4/Prog/em30.cpp): a large stationary enemy with two cloth chains and three
-// head objects (obj16) carrying four parasites each; it turns towards the player or the partner
-// (em30RouteCk chooses the target) and dies after one damage routine.
-//
-// Em30Init is the module's EmInitFunc. Routines: r_no_0 0 init, 1 move (r_no_1 0 wait, 1 turn
-// towards the target), 2 damage (r_no_1 0), 3 die (r_no_1 0). em30DmCk converts the registered
-// hit (cEm::dmHit / dmWep) into hp loss per weapon class; the head objects and their parasites are
-// cObj16 objects hung on the model (em30SetParasite), created only when the list flag is negative.
-// Em30Work (em30.h): flags bit0 route to the player valid, bit1 partner present, bit2 target is
-// the partner, bit3 in damage / die, bit4 the head follows the player; the neck yaw neckAng is
-// applied to parts 3.
+// cObj16 heads carrying four parasites each, which turns towards the player or the partner.
 
 #include "atari.h"
 #include "light.h"
@@ -193,11 +184,9 @@ void cEm30::move()
     Em30ClothMove2(this, &w->cloth2);
 }
 
-// r_no_0 == 0: creation: the body (archive 4/5) plus five extra models (6, 8 = pInfo0 / pInfo1 the
-// hideable ones, 9, 0xA or 0xB by type, 0xC, 0xD), the em10 foot shadows, the two cloth chains,
-// a 10 m light area, a 0x2000-attribute collision cylinder, hit boxes (body + hit[0..2]), lock-on
-// on parts 2, effects (archive 0xE as group 0x28); with the list flag negative the two extra
-// models are hidden and the three heads with their parasites are created. Then wait (1/0).
+// r_no_0 == 0: creation of the body, the extra models, the cloth chains, collision and hit boxes.
+// With the list flag negative the two hideable models (pInfo0 / pInfo1) are hidden and the three
+// heads with their parasites are created.
 static void em30_R0_Init(cEm30* em)
 {
     Em30Work* w = EM30_WK(em);

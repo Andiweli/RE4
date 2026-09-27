@@ -1,7 +1,5 @@
-// game/debug.cpp: debug build helpers: the per-frame DebugControl overlays (heap usage, the
-// process time bar from ProcessTickGet marks, primitive buffer usage, pad monitor, data
-// controller page), the frame tick list, and ConfigSet, which reads debug/config.txt at boot for
-// the direct room start settings (stage, room, player, flags, sound).
+// game/debug.cpp: debug build helpers, mainly the per-frame DebugControl overlays and ConfigSet,
+// which reads debug/config.txt at boot for the direct room start settings.
 #include "types.h"
 #include "global.h"
 #include "atari.h"
@@ -203,13 +201,9 @@ void processBarDisp()
     AddPrim(&MainOt[1], (u32*) t);
     t++;
 
-    // The fourth bar's base is x0 reused as the max of x1/x2, in the if/else spelling: jump1 hoists
-    // the else arm (`mr x0,x2; cmpw x1,x2; ble; mr x0,x1`) with the compare still on x2, and x0
-    // (10 refs, len ~133) is allocated right after x2 (r29) in pass 0 among the call-crossing
-    // registers already in use: r28 (the join block's 0x8000 high), which is what the target has
-    // (`mr r28,r29 .. subf r0,r28,r0`). A separate `x3` variable (4 refs, len 29, no call) took the
-    // first free caller-saved register r8 instead; `x0 = x2; if (x1 > x2) x0 = x1;` lets cse
-    // rewrite the compare onto x0 (121 words).
+    // The fourth bar's base reuses x0 as the max of x1/x2 in the if/else spelling, which gets x0
+    // allocated to r28 as in the target. A separate `x3` variable took r8 instead, and the
+    // `x0 = x2; if (x1 > x2) x0 = x1;` form lets cse rewrite the compare onto x0.
     if (x1 > x2) {
         x0 = x1;
     } else {

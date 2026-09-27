@@ -1,8 +1,5 @@
-// game/esp12.cpp: effect id 0x12, a textured ribbon trail. The last Num (Work8[0] + 2, max 125)
-// world positions live in an esp3f vector buffer; each frame the history shifts down and the
-// current position enters slot 0. The trans draws a camera-facing triangle strip through the
-// points, tapering from Size_base_x at the head to Size_base_y at the tail, with the texture's t
-// running along the ribbon.
+// game/esp12.cpp: effect id 0x12, a textured ribbon trail through the effect's recent world
+// positions, which live in an esp3f vector buffer.
 
 #include "atari.h"
 #include "light.h"

@@ -460,11 +460,9 @@ void objTrans(cModel* m)
         PSVECAdd(&(pos), &p->world, &(pos));                         \
     }
 
-// Registers a visible model (be_flag 1 | 2 | 4; in events only be_flag 0x800 models) in the
-// ordering tables by ot_type: 0 world depth-sorted (7: plus the 0xB translucent table, drawn a
-// second time), 1 model table, 2 world, 3 / 4 / 5 fixed 0xB buckets, 6 table 0x10, 8 table 0x14;
-// frustum-culled by the light-info sphere (scaled). Then skins its vertices (commonScreenMat)
-// — a skinning failure removes the entry again.
+// Registers a visible model in the ordering tables by ot_type, culled by the light-info sphere.
+// During events only be_flag 0x800 models count. Then skins its vertices (commonScreenMat), and a
+// skinning failure removes the entry again.
 void ModelTrans(cModel* m)
 {
     Vec pos;
@@ -1016,11 +1014,8 @@ void ModelRender(cModel* m)
     }
 }
 
-// Draws every model info of `m`: the shadow-cast light when a shadow light covers it, material
-// colour, vertex descriptors / arrays (skinned buffers or the original vertices), cull mode,
-// texture objects for the TPL (+ added textures, anisotropy / mip filters, the cTexChg swaps),
-// then per part the TEV shader (shaderSetup), blend mode (blend_mode table), alpha compare and
-// the display list; foot shadows afterwards. flag bit0 = the shadow / depth pass (no alpha).
+// Draws every model info of `m` part by part, then the foot shadows. flag bit0 is the shadow /
+// depth pass, which skips alpha.
 void commonModelTrans(cModel* m, cModelInfo* info, Mtx viewMat, int flag)
 {
     static int bl[5][4] = {

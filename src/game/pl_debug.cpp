@@ -1,7 +1,5 @@
-// game/pl_debug: player debug helpers — the "maho" cheats (button sequences registered in
-// cPlMaho: no death, infinite ammo, skeleton display, collision off, kaiouken speed-ups, Ashley
-// teleport), the per-frame debug draws (scroll hit test, collision quad test, local coordinate
-// finder, damage capsules, position marker), PlWepMotSet and the DrawGage life bar.
+// game/pl_debug: player debug helpers, with the "maho" button-sequence cheats (cPlMaho), the
+// per-frame debug draws, PlWepMotSet and the DrawGage life bar.
 
 #include "player.h"
 #include "global.h"

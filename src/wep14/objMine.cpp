@@ -1,13 +1,5 @@
-// Mine thrower weapon object (wep14 module, first object; real file name unknown): fires a cEmMine
-// (SetMine) along the aim line, ejects a cartridge (SetObj10), reloads by tune level.
-//
-// cObjMine is the cObjWep (game/objWep.cpp) of the mine thrower (weapon_no 0x14): the launcher
-// body hangs on the player's left hand (parts 9), its parts 1 is the loaded mine dart, re-parented
-// to the right hand (parts 10) while the player handles it (partsSet). Driven by mode /
-// step from the module's own routines (wep14/wep14.cpp): mode 1 ready (raise + load), 2 fire
-// (setBullet launches a cEmMine), 3 down, 4 reload. weapon_type bit0 = the scope version (the
-// dart flies along the camera trajectory), pG->bullet_type picks the dart speed, weapon_lv_power
-// 3 the exclusive (homing) dart.
+// Mine thrower weapon object of the wep14 module (real file name unknown). The module's own routines
+// in wep14/wep14.cpp drive it, and setBullet launches a cEmMine.
 
 #include "wep_mod.h"
 #include "atari_init.h"

@@ -1,11 +1,5 @@
-// wep38 module: Ada's handgun (the Punisher class rebuilt without weapon types, object id 0x21).
-// The module object carries the class, the entry points and the handgun routine registration
-// (wep/pl_handgun.cpp).
-//
-// Ada's cObjRuger: one model (0x6) offset in her right hand (parts 10), driven by mode /
-// step from the handgun routines (mode 2 fire: slide motion, the loud or the suppressed SE set
-// by weapon_type, flash 0x35, cartridge; mode 4 reload with only the level-1 motion variants).
-// Wep38_init is the WeaponInitFunc, PlHandgunMove the WeaponMoveFunc.
+// wep38 module: Ada's handgun cObjRuger, the Punisher class rebuilt without weapon types (object id
+// 0x21). The handgun routines in wep/pl_handgun.cpp drive it.
 
 #include "wep_mod.h"
 #include "light.h"

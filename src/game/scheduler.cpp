@@ -1,9 +1,5 @@
-// game/scheduler: the cooperative task scheduler — 18 task slots (TASK), each an OS thread with
-// its own stack, run one after another by the main thread every frame (TaskScheduler ->
-// TaskSchedulerMain); a task runs until it calls TaskSleep / TaskExit, which hand control back.
-// Slot 0 is the game, 1 debug / sub screen / movie tasks, 4 the background (ISR) task, 5..17 the
-// scenario tasks (sce_sys). Task flags decide whether a slot keeps running during events and the
-// sub screen. (D:/Bio4/Prog/scheduler.cpp)
+// game/scheduler: the cooperative task scheduler (D:/Bio4/Prog/scheduler.cpp). The main thread runs
+// each task's OS thread in turn every frame until it calls TaskSleep or TaskExit.
 #include "types.h"
 #include "global.h"
 #include "main_mem.h"

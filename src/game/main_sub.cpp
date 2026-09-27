@@ -1,7 +1,5 @@
-// game/main_sub: render frame plumbing and system helpers (D:/Bio4/Prog/main_sub.cpp): the GX
-// render mode (Rmode, 512x448 non-AA), frame buffers and FIFO set-up (Render_init), the per-frame
-// begin/done/swap, screen/scissor size, near clip control, play-time accounting, screen shots,
-// stopwatch, VI brightness filter, TPL/texture quad drawing and REL module link/unlink.
+// game/main_sub: render frame plumbing and system helpers (D:/Bio4/Prog/main_sub.cpp), from the GX
+// and frame buffer set-up and the per-frame swap to screen shots and REL module linking.
 #include "types.h"
 #include "global.h"
 #include "gx.h"

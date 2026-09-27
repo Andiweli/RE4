@@ -1,9 +1,5 @@
-// game/exception: OS error handler with symbol lookup and register/memory dump (D:/Bio4/Prog/exception.cpp).
-// ExceptionInit installs ErrorHandler for the CPU exceptions; on a crash it saves the context,
-// walks the stack chain into call_stack, prints registers/FPSCR/heap state to the console, loads
-// the .sym files of the DOL and every loaded REL (excepLoadSymbol) to name the PC and return
-// addresses, and then loops forever drawing an on-screen dump (registers, call stack, a scrollable
-// memory viewer driven by the pad) until the reset button is pressed.
+// game/exception (D:/Bio4/Prog/exception.cpp): the OS error handler with symbol lookup and a register
+// and memory dump. ExceptionInit installs ErrorHandler for the CPU exceptions.
 #include "types.h"
 #include "map_obj.h"
 #include "light.h"
@@ -494,19 +490,9 @@ void excepRegConsoleDump(int error, u32 dsisr, u32 dar)
     OSReport("\n");
 }
 
-// The installed OS error handler: copies the context, re-enables interrupts and the scheduler, walks
-// the stack chain (up to 16 frames), dumps to the console, then loops forever rendering the
-// on-screen crash display (loading symbols after 60 frames), scrolled with the C stick, with the
-// memory viewer, until the reset button is pressed.
-// The loop-invariant `lis` of "DSISR: %08X  DAR: %08X", symbol_err_tbl and "CALL STACK (%s)" are
-// gcse PRE pseudos of equal priority, numbered (and so allocated r16/r15/r14) in hash-bucket order:
-// bucket = (h(name) + 90) % 253 with h = h*129 + c per char ("*.LCn" for a string label), 253 =
-// n_insns/2|1 buckets. Our TU numbered the strings .LC64/.LC65 (buckets 158/159, both above the
-// table's 150); the original's were .LC79/.LC80 (39/159: the only wrap that straddles 150 besides
-// .LC59/.LC60), i.e. its TU had 15 more constants before them. The 15 dead `f32 lcN = K;` locals
-// below consume 15 pool labels (force_const_mem numbers them at expand; the dead loads are deleted
-// before gcse and the unreferenced pool entries are never output, so .rodata and the insn count are
-// unchanged). The hash formula was calibrated on the -dG dump (.LC60..66 -> 154..160).
+// The installed OS error handler: dumps the crash to the console, then draws it on screen until the
+// reset button is pressed. The 15 dead `f32 lcN = K;` locals below only use up pool labels so the
+// strings get the original's .LC79/.LC80, whose gcse hash order decides their registers r16/r15/r14.
 void ErrorHandler(OSError error, OSContext* context, ...)
 {
     va_list ap;

@@ -1,10 +1,5 @@
-// VP70 weapon object (wep17 module, first object; real file name unknown): a Mauser-style handgun
-// with ready / fire motions, cartridge ejection and the reload by tune level.
-//
-// cObjVp70 is the cObjWep (game/objWep.cpp) of Ada's / Krauser's VP70 (weapon list id 3, the
-// Red9-style small lock random), hanging on the player's right hand (parts 10) and driven by
-// r_no_0 / r_no_1 from the module's own routines (wep17/wep17.cpp): mode 1 -> moveReady (the
-// gun's draw motion), 2 -> moveFire, 4 -> moveReload (ItemMgr.reload at the tune level's frame).
+// VP70 weapon object of the wep17 module (first object, real file name unknown). The module's own
+// routines in wep17/wep17.cpp drive it through r_no_0 and r_no_1 to draw, fire and reload.
 
 #include "wep_mod.h"
 #include "item.h"

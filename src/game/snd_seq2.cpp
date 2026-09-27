@@ -1,7 +1,5 @@
-// game/snd_seq2: sound driver MIDI event dispatch for the BGM sequencer — note on / off (with a
-// voice work per note so the game can count / stop them), program and control changes (CC 0x66 /
-// 0x67 mark and jump to the loop point, 0x68 channel priority, 0x69 drum channel), pitch bend and
-// the meta events (end of track, tempo); everything is forwarded to the SYN synthesizer.
+// game/snd_seq2: the MIDI event dispatch of the BGM sequencer in the sound driver, which forwards
+// note, control and meta events to the SYN synthesizer.
 #include "snd_drv.h"
 
 // Dispatches the MIDI message in ctrl->midi_msg by status type; an unknown status is a data error

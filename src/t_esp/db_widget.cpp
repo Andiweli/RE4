@@ -2,12 +2,8 @@
 #include "db_widget.h"
 
 // t_esp REL: the window-system primitives of the effect tool (file name unknown, "db_widget.cpp").
-// DB_PRIMITIVE is the tree node (parent / child / sibling, relative position, hit rect, click /
-// mouse-over / drag / keyboard / value-message virtuals); DB_WINDOW adds the keyboard focus grid
-// (DB_ACTIVE_SELECT) and callbacks; DB_WINDOW_TITLE / DB_BUTTON_CLOSE / DB_STRING / DB_BUTTON are the
-// chrome; DB_NUMERIC binds a typed variable with range, digits and flags, DB_NUMERIC2 a second
-// variable receiving the edit delta, DB_SLIDEBAR a knob. The container is db_window.cpp's
-// DB_PRIM_ARRAY, the drawing / input hooks are db_port.cpp.
+// DB_PRIMITIVE is the tree node and DB_WINDOW adds the keyboard focus grid. The container is
+// db_window.cpp's DB_PRIM_ARRAY, and the drawing and input hooks are in db_port.cpp.
 
 int primIdCounter = 0;  // global in the original (.data+0x780 reloc fields are 0 in the REL; a static keeps the offset)
 static char hexDigit[] = "0123456789ABCDEF";
@@ -664,11 +660,9 @@ DB_PRIMITIVE* DB_ACTIVE_SELECT::SetActiveDefault()
     return active;
 }
 
-// The colour temp is built inside an inline taking the destination by pointer: the block copy's
-// loads then stay frame-relative (`lwz 8..20(r1)`) while the ctor stores go through the temp's
-// `this` (`addi r9,r1,8`); written as a member assignment cse rewrites the copy's `fp+12` into
-// `this+4`. The temp's store order a, b, g is sched1's register-pressure rank of the ctor's RTL
-// order r, g, b, a: g +1, b 0 (the 0.1 pseudo dies), a -1 (the 0.3 pseudo and the temp's `this` die).
+// The colour temp is built inside an inline taking the destination by pointer so the block copy's
+// loads stay frame-relative, which cse breaks for a member assignment. The temp's store order a, b, g
+// is sched1's register-pressure ranking of the ctor's order r, g, b, a.
 static inline void DB_ColorSet(DB_COLOR* c, f32 r, f32 g, f32 b, f32 a)
 {
     *c = DB_COLOR(r, g, b, a);

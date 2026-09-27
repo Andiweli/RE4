@@ -1,11 +1,5 @@
-// wep15 module: the magnum (cObjMagnum, object id 0x2C; routines wep/pl_handgun.cpp).
-//
-// cObjMagnum is the cObjWep (game/objWep.cpp) of the Broken Butterfly revolver, hanging on the
-// player's right hand (parts 10) and driven by r_no_0 / r_no_1 from the handgun routines:
-// mode 2 -> moveFire (recoil motion, SEs, flash 0x49, strong vibration; no cartridge), mode 4 ->
-// moveReload (motion by tune level, ItemMgr.reload at frame 34). Both modes are ended by the
-// player routine. Wep15_init is the WeaponInitFunc, PlHandgunMove the WeaponMoveFunc; the module
-// object carries the class, the entry points and the ObjInitFunc slot.
+// wep15 module: cObjMagnum, the Broken Butterfly revolver. The handgun routines of
+// wep/pl_handgun.cpp drive it through r_no_0 and r_no_1 to fire and reload.
 
 #include "wep_mod.h"
 #include "light.h"

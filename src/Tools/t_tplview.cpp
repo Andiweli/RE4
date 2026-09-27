@@ -72,11 +72,9 @@ void getTplname(char* name, int no)
     sprintf(name, "d:\\bio4/Room/SubScreen/Viewer/file%02ld.tpl", no);
 }
 
-// menu tables: emitted here, between getTplname's string and the list printer's "%s" (a namespace
-// `static const` is deferred to the end of the file; a public const object is emitted at its
-// definition), but the original's relocation fields hold S+A, i.e. the tables were LOCAL symbols. The
-// `.L` assembler names keep them out of the symbol table (section-relative relocations) while the
-// declarations stay public for the emission order.
+// Menu tables, emitted here between getTplname's string and the list printer's "%s". The original's
+// relocations show they were LOCAL symbols, so the `.L` assembler names keep them out of the symbol
+// table while the public declarations keep the emission order.
 struct TplMenu3 {
     const char* s[3];
 };
@@ -90,11 +88,9 @@ const TplMenu3 tplMainMenu = {{"FiLE", "SiZE", "QUiT"}};
 const TplMenu2 tplSizeMenu = {{"WxH", "ORG"}};
 const TplMenu2 tplWhMenu = {{"FullScrn", "Texture"}};
 
-// menu list printers; inlined. The sizeMenu call wants the `tbl[i]` giv form (its init then comes
-// from loop.c, after the PRE'd "%s" high part) while the main-menu call is only reversed with the
-// `*tbl++` biv form (with `tbl[i]` gcse copy-propagates the pointer-flagged `&menu` pseudo into the
-// giv and maybe_eliminate_biv replaces the counter): two helpers, one per form (the "%s" literal is
-// shared). Not t_util.h's dispList: that one passes the string as the format.
+// Menu list printers, inlined. The sizeMenu call only matches with the `tbl[i]` form and the
+// main-menu call only with the `*tbl++` form, so there are two helpers sharing the "%s" literal.
+// Not t_util.h's dispList, which passes the string as the format.
 static inline void dispListP(int x, int y, const char** tbl, int n)
 {
     int i;

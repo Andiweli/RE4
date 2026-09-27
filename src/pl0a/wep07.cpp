@@ -1,12 +1,5 @@
-// pl0a module, first object: Krauser's build of the shotgun player routines (wep07: ready / set / fire,
-// no PlShotgunMove / set20 / set30 / set40 / reload — the routine table keeps their empty slots).
-// Real file name unknown (the weapon modules' shared routine object).
-//
-// Nothing in the module registers these routines (Krauser's weapons come from their own wep
-// modules), so the object is dead code kept by the link: the shotgun-style ready (0) / set (1) /
-// fire (2) states of r_no_2 with r_no_3 steps, but driven from the PLAYER archive (pG->pPlayer:
-// 0x8B draw, 0x8D/0x8F/0x4A aim idle, 0x8E/0x90/0x4B fire, 0x8C holster) instead of a weapon
-// archive, with no ammo, no hit check and no weapon object.
+// pl0a module, first object (real file name unknown): Krauser's build of the shotgun player
+// routines. Nothing registers them, so the object is dead code kept by the link.
 
 #include "atari.h"
 #include "light.h"

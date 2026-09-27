@@ -1,7 +1,5 @@
-// game/snd_seq1: sound driver MIDI sequencer, audio-frame side — Snd_midi_sequencer advances every
-// running sequence by the elapsed milliseconds: pending requests (volume, fades), the per-track
-// volume / pan overrides (tpr), then the MIDI events whose delta time has elapsed are fed to the
-// SYN synthesizer; a sequence faded to 0 ends (its notes released).
+// game/snd_seq1: the audio-frame side of the sound driver's MIDI sequencer. Snd_midi_sequencer
+// advances every running sequence and feeds its due MIDI events to the SYN synthesizer.
 #include "snd_drv.h"
 
 // Audio frame (every 4.995 ms): accumulates the milliseconds elapsed and runs every playing

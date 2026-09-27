@@ -1,8 +1,5 @@
-// game/esp_app: application-side glue of the effect system (D:/Bio4/Prog/esp_app.cpp): the
-// id -> Create/Trans function table (EffSetId), effect sound-effect dispatch (EspCallSeType, the
-// per-room SE callback table pSeFunc), footstep/water splash effects for the player, the effect
-// area state update (EffAreaUpdate, from the SstArea list of the room), and the laser sight /
-// gatling / em2d tex-render helpers used by the weapons and enemies.
+// game/esp_app (D:/Bio4/Prog/esp_app.cpp): application-side glue of the effect system, with the
+// effect id table, sound and footstep effects, area states and weapon / enemy render helpers.
 #include "atari.h"
 #include "light.h"
 #include "global.h"
@@ -310,11 +307,9 @@ void EffCallRoomSeFunc(int no, Vec* pPos)
     pSeFunc[no](pPos);
 }
 
-// Per-frame update of the effect area states: tests the player position (+100 y; the camera position
-// when Status_flg[2] bit 0x10000) against every SstAreaEnt of the room, ORs in cEspSystem::Add_area_bit
-// and turns each of the 32 area states on/off (EffSetAreaState). An area with flag bit 0 sets
-// Status_flg[1] bit 0x02000000 (player in a "special" effect area, also mirrored from bit 0x800).
-// Skipped while Stop_flg bit 0x20 is set. Debug_flg[3] bit 0x8000 prints the hit area numbers.
+// Per-frame update of the effect area states: tests the player position (or the camera position
+// when Status_flg[2] bit 0x10000) against every SstAreaEnt of the room and turns the 32 area states
+// on or off. An area with flag bit 0 marks the player as being in a "special" effect area.
 void EffAreaUpdate()
 {
     cEspSystem* sys = g_pEspSys;
@@ -355,12 +350,9 @@ void EffAreaUpdate()
     flag |= sys->Add_area_bit;
     asm("" : "=m"(*(u32*) &pos)); // COMPILER-DIFF: candidate (sched2 issue-slot filler)
     y = 0;
-    // y is the hit count; the row `0xE8 + y * 0x10` is a strength-reduced giv (its `li 0xE8` is
-    // the last preheader insn). The codeless asm above is an issue-slot filler: sched2 (2 insns
-    // per cycle) issues it with the `lwz sstAddAreaFlag`, so `li j` and `li 1` take cycle 2 and
-    // the hoisted `lis "%d"` is issued after the `or` like the target (the original's block had
-    // one more insn there). A scalar frame MEM (`*(u32*) &pos`) has no dependence on the in-struct
-    // load; `pos.x` (in-struct) would delay the lwz.
+    // y is the hit count, and the row `0xE8 + y * 0x10` is a strength-reduced giv. The codeless asm
+    // above fills an issue slot so sched2 orders the next insns like the target. The scalar read
+    // `*(u32*) &pos` avoids the dependence that `pos.x` would put on the lwz.
     for (j = 0; j < 32; j++) {
         if (flag & (1 << j)) {
             if (DbgFlagChk(pG, DBG_EFF_NUM_DISP)) {

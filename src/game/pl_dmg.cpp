@@ -1,7 +1,5 @@
-// game/pl_dmg: the player's damage routines — routine 0 == 1 (Pl_R0_Damage: normal hit, blown
-// away, blast stagger, each with the get-up steps) and routine 0 == 2 (Pl_R0_Die). Entered from
-// cPlayer::setDamage; r_no_3 carries the hit direction, m_Fwork0 the attacker's yaw (123 = keep),
-// and the motions come from the player archive (0x48.. hits, 0x4C death, 0x51 fly, 0x52 stagger).
+// game/pl_dmg: the player's damage and death routines (Pl_R0_Damage, Pl_R0_Die), entered from
+// cPlayer::setDamage with the hit direction in r_no_3 and the attacker's yaw in m_Fwork0 (123 = keep).
 
 #include "atari.h"
 #include "light.h"
@@ -37,11 +35,8 @@ void Pl_R0_Damage(cPlayer* pEm)
     funcTbl[pEm->r_no_1](pEm);
 }
 
-// Damage sub-routine 0: r_no_2 0 picks the hit motion by r_no_3 (0 front, 1 back, 2/4 left, 3/5
-// right; 6 = life is 0: the collapse) turned toward m_Fwork0 (the attacker's yaw; 123 = keep),
-// then 1 plays it — the player may cut it short with a key after m_Work0 frames; life 0 goes to
-// routine 2/2 (die, already lying). r_no_2 0xA/0xB: the knocked-down variant, standing up with
-// splash effects when in water. Ends with EndPlDamage and routine 0/0.
+// Damage sub-routine 0: plays the hit motion for the direction in r_no_3, turned toward the attacker's
+// yaw m_Fwork0. The player may cut it short with a key after m_Work0 frames.
 void damageNormal(cPlayer* pEm)
 {
     void* mot = 0;

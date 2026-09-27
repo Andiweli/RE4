@@ -1,8 +1,5 @@
-// game/obj18: object id 0x18, the event body / cloth model (D:/Bio4/Prog/obj18.cpp). The event
-// player creates one per SetOm packet: a character model that follows a parts of its parent
-// (OyaSetObj18, slerp catch-up) and runs the cloth simulation of its `type` (1 Leon hair/jacket/
-// holster, 2 Ashley, 3 Ada with the ribbon child, 4 Luis, 7/8/9/0xA/0x13..0x16 the enemy cloth sets,
-// 0xB the El Gigante rope child); `cmf` holds the event's model control flags (Obj18Cmf*).
+// game/obj18 (D:/Bio4/Prog/obj18.cpp): object id 0x18, the event body / cloth model. The event player
+// creates one per SetOm packet to follow a parts of its parent and run its cloth simulation.
 #include "atari.h"
 #include "event.h"
 #include "obj.h"

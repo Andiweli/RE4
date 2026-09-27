@@ -1,8 +1,5 @@
-// game/file_app: development-host file helpers over the SN ProDG PC file server (D:/Bio4/Prog/file_app.cpp):
-// HDRead* / HDWrite* read and write whole files on the host disk (x:/soft/room/... in the tools),
-// with automatic .bak backups and a per-file ".lock" ownership scheme (file_lock / file_unlock /
-// file_lock_check, keyed on pUser_name) so two developers do not overwrite each other's room data.
-// Only active when System_flg 0x20000 (host file system present); retail builds never reach it.
+// game/file_app (D:/Bio4/Prog/file_app.cpp): development-host file helpers over the SN ProDG PC file
+// server, with ".lock" files so developers do not overwrite each other's room data. Unused in retail.
 #include "types.h"
 #include "file.h"
 #include "main_mem.h"

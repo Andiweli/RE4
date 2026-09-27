@@ -1,9 +1,5 @@
-// wep39 module: Ada's machine gun (own copy of the cObjMachinegun class, routines wep/pl_machine.cpp).
-//
-// Ada's TMP: the wep27 build (fire motions / SEs per weapon_type: 0/2 loud, 1/3 suppressed) with
-// one model offset in her right hand (parts 10) and a single reload motion pair, driven by
-// r_no_0 / r_no_1 from the machine gun routines (mode 2 fire, mode 4 reload). Wep39_init is
-// the WeaponInitFunc, PlMachineMove the WeaponMoveFunc.
+// wep39 module: Ada's TMP, its own copy of the wep27 cObjMachinegun build, driven by the routines
+// in wep/pl_machine.cpp.
 
 #include "wep_mod.h"
 #include "light.h"

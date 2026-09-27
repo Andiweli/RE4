@@ -1,7 +1,5 @@
-// game/snd_main: sound driver core (Capcom sound library, -O0): system start-up (AX / MIX / AXART /
-// SYN / SEQ), the audio-frame callback that runs the ISS voice manager, stream player and MIDI
-// sequencer every 5 ms, the output mode (mono / stereo / DPL2) and the per-frame control tick
-// (Snd_iss_control) with the voice / DSP load statistics.
+// game/snd_main: sound driver core (Capcom sound library, -O0). Its audio-frame callback runs the ISS
+// voice manager, stream player and MIDI sequencer every 5 ms.
 #include "snd_drv.h"
 
 u8 zero_tbl[0x100] __attribute__((aligned(32)));

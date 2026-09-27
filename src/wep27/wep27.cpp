@@ -1,10 +1,5 @@
-// wep27 module: the Klauser machine gun (own copy of the cObjMachinegun class, routines wep/pl_machine.cpp).
-//
-// Krauser's (mercenaries) build of the TMP: the same cObjMachinegun as wep/objMachinegun.cpp with
-// its own fire motions / SEs per weapon_type (0/2: the loud type with Status_flg[0] bit23; 1/3: the
-// suppressed type) and reload frames, hanging on the player's right hand (parts 10) and driven by
-// r_no_0 / r_no_1 from the machine gun routines (mode 2 fire, mode 4 reload). Wep27_init is
-// the WeaponInitFunc, PlMachineMove the WeaponMoveFunc.
+// wep27 module: Krauser's (mercenaries) TMP, its own copy of the cObjMachinegun class with its own
+// fire motions, SEs and reload frames. The routines in wep/pl_machine.cpp drive it.
 
 #include "wep_mod.h"
 #include "light.h"

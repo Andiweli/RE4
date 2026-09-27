@@ -108,14 +108,9 @@ static void r100_mes_gaikotu();
 static void r100_mes_gaikotu_bgm_down();
 static void r100_mes_gaikotu_bgm_up();
 
-// Room init (the village approach: Leon leaves the police car). JumpPoint 1 / debug trigger 1 skips to
-// the after state (Room_flg bits 10/3/13). Outside region 0 the hanging-corpse objects are built from the
-// Ganado module (Japan hides them, area 0x17 off). Before the officers' death (bit 10): events 5/7/8/9
-// pre-read, the s03 Ganado hand-placed (EmSetEvent) with its death hook (r100_Sce_zombi_dead), the
-// police car with the two officer motion models, the officer talk areas 0x19/0x1A and the truck message
-// area 0xC; after it: the car down in the ravine, the ravine look (area 1, s40), the bridge message and
-// the ambush. Area 0xA = the look at the car (s03) once bit 3 is set; areas 0x15 (house Ganado), 0xB
-// (door), 0x1B (bridge officers); the door / window / stream watchers; the pond render target.
+// Room init for the village approach where Leon leaves the police car. The room is built before or
+// after the officers' death depending on Room_flg bit 10. The Japanese version hides the hanging
+// corpses built from the Ganado module.
 void R100Init()
 {
     cObj* o;

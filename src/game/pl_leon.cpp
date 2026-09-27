@@ -1,7 +1,5 @@
-// game/pl_leon: cPlLeon, the player class for Leon and the other gun-carrying characters (the
-// character is chosen by pl_type / costume in the archive data): model set (body, costume extras,
-// face morph head, hair, eyes, wound overlay), weapon load, the extra motions, hands and face
-// morphs, and the partner command key (checkXbutton). Cloth runs through pl_cloth.
+// game/pl_leon: cPlLeon, the player class for Leon and the other gun-carrying characters, chosen by
+// pl_type / costume in the archive data. Cloth runs through pl_cloth.
 
 #include "atari.h"
 #include "light.h"

@@ -1,18 +1,5 @@
-// Rocket launcher player routines (wep13 module, first object; real file name unknown): routine 2
-// of the player while the launcher is equipped: ready (grip + aim), set (idle / turn), fire, down,
-// next target (routine 5) and throw away (routine 6). Modelled on game/pl_knife.cpp.
-//
-// Entry: PlRocketMove is the wep13 module's WeaponMoveFunc (pl_R1_Weapon, r_no_1 == 6). r_no_2
-// is the weapon state (0 ready, 1 set = scope view, 2 fire, 3 down, 5 next target, 6 throw the
-// empty tube away), r_no_3 the step. The weapon object is the DOL's cObjLauncher (pl_wep.h): its
-// grip()/gripBack() move the launcher between the back and the shoulder, launch happens in its
-// moveFire (mode 2) along launcher.from/to = the scope camera trajectory stored by the set state.
-// weapon_type 2 is the infinite launcher (kept after a shot, back to the scope or down); any other
-// type is the single-shot one, thrown away (r_no_2 6, r_no_0 5, stat bit10 = tube gone).
-// The knife routine (0xB) shares the launcher grip: down step 3 / ready step 2 use the player
-// motion table 0x55..0x58 for the launcher <-> knife transitions. Weapon archive slots: 0x18
-// shoulder, 0xF/0x12/0x14 aim idle, 0x11/0x13/0x15 fire, 0x16 throw away, 0x19 unshoulder,
-// 0x20 the launcher's own grip motion.
+// Rocket launcher player routines (wep13 module, first object, real file name unknown). PlRocketMove
+// is the WeaponMoveFunc and drives the DOL's cObjLauncher (pl_wep.h).
 
 #include "atari.h"
 #include "light.h"
@@ -208,11 +195,8 @@ static void wep13_r3_ready30(cPlayer* pl)
     pl->motionMove();
 }
 
-// r2_set: the launcher line copy of `to` reads the frame directly (`lwz 0x18(r1)..0x20(r1)`) while
-// `from` (frame offset 0) goes through an address register; a plain `obj->hpos = to` after
-// `getTrajectory(&from, &to)` makes cse reuse the call's `&to` pseudo for the copy and gcse PRE
-// hoists it into a callee-saved register. The copy through an inline taking the address by pointer
-// keeps the frame-relative loads.
+// r2_set copies `to` with frame-relative loads. A plain `obj->hpos = to` lets cse reuse the call's
+// `&to` pseudo and gcse PRE hoist it into a callee-saved register, and this inline avoids that.
 static inline void VecCopy(Vec* d, const Vec* s)
 {
     *d = *s;

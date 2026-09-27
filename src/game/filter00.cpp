@@ -1,8 +1,5 @@
-// game/filter00: radial/motion blur and contrast filter (D:/Bio4/Prog/filter00.cpp). The frame is
-// copied into a persistent half-size buffer and blended back scaled around the centre (blur_type
-// 0/1 zoom, 2 tinted), plus an additive "spread" flash (Filter00SetAddSpread: hit/explosion glow
-// from a screen point) and a 3-level contrast pass (Filter00SetContrast). Damage / low health /
-// explosions set these through Filter00Set*.
+// game/filter00: radial/motion blur and contrast filter (D:/Bio4/Prog/filter00.cpp). Damage, low
+// health and explosions drive it through Filter00Set*.
 #include "filter.h"
 #include "gx.h"
 #include "global.h"
@@ -86,11 +83,9 @@ void Filter00Trans()
     }
 }
 
-// OT callback: when blur/spread/contrast is active, blends the previous frame's buffer back over
-// the screen (zoom scaled by blur_power/1024 for type 1, tinted for type 2, alpha blur_rate),
-// draws the spread flashes expanding from (eff_spread_center_x/y) with eff_spread_pow, then the
-// contrast pass, and copies the new frame into the buffer for the next frame (Status_flg[0]
-// 0x80000 = buffer valid). Disp_flg 0x100000 disables it.
+// OT callback: blends the previous frame's buffer back over the screen for the blur, draws the
+// spread flashes and the contrast pass, then copies the new frame into the buffer for the next
+// frame. Disp_flg 0x100000 disables it.
 void Filter00Render()
 {
     GXTexObj tex;

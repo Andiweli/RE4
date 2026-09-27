@@ -1,10 +1,5 @@
-// pl06 module (D:/Bio4/Prog/pl_hunk.cpp): HUNK, the mercenaries player: model set (body, hair, hands), the
-// Leon motion table, no face shapes and no cloth.
-//
-// cPlHunk (pl_mod.h) is the cPlayer of pl_type 3: the constructor builds the model set from the
-// player archive (4/5 body, 6/7 the mask "hair", 0x11 hand texture, 0x12 right hand, 0x14/0x15
-// left hands), loads / inits the weapon module and installs the event motions 0x5F..0x6C.
-// Pl06Init is the module's PlInitFunc. The HALT in setRightHand is line 253 of the vendor file.
+// pl06 module (D:/Bio4/Prog/pl_hunk.cpp): cPlHunk, the HUNK mercenaries player with Leon's motion
+// table. The HALT in setRightHand is line 253 of the vendor file.
 
 #include "atari.h"
 #include "light.h"

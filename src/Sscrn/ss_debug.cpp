@@ -1,9 +1,5 @@
-// Sscrn/ss_debug: sub screen debug menu (pad 3) and the attache case debug editor
-// (D:/Bio4/Prog/ss_debug.cpp). SscrnDebugMenu is run every frame by SubScreenTask (START on pad 3
-// opens it: debug disp / memory disp / debug page / reveil toggles in SUB_SCREEN::debug_menu);
-// ssDbgPzzl is the "CASE MAKE" editor SsPzzlMain opens with Z on pad 1 (item set presets, infinite
-// ammo, case size, pesetas, case model angle, boss bar side). cManager<T>::dispWorkNum prints a
-// manager's occupancy.
+// Sscrn/ss_debug (D:/Bio4/Prog/ss_debug.cpp): the sub screen debug menu that SubScreenTask runs every
+// frame (START on pad 3), and the "CASE MAKE" attache case editor that SsPzzlMain opens.
 #include "types.h"
 #include "global.h"
 #include "map_obj.h"
@@ -174,11 +170,8 @@ void ssDbgPzzl::quit(SUB_SCREEN* wk)
     }
 }
 
-// "CASE MAKE" attache case editor (ss_pzzl debug menu, pad 1): rows Item Set (cItemMgr::setUp
-// presets 0..0x16, 0x17 = saved inventory), Bullet (Debug_flg infinite ammo / no reload), Case Size
-// (gives case item 0x7C..0x7F -> board_next), Peseta (+-1000, x10 with A), Case Rot (case model
-// angle and the ss_pzzl pzzlDbgNo/pzzlDbgPos offsets) and Boss Bar (g_boss_bar_flag side).
-// Left/right edit the row; the case is rebuilt by the caller when `changed`.
+// "CASE MAKE" attache case editor from the ss_pzzl debug menu (pad 1). Left/right edit the
+// selected row, and the caller rebuilds the case when `changed` is set.
 void ssDbgPzzl::move(SUB_SCREEN* wk)
 {
     JOY* joy = &Joy[0];

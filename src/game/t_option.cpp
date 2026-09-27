@@ -1,7 +1,5 @@
-// game/t_option: the debug "option" tool task (ToolOption): a nested menu (cDbOption rno[] per
-// level) over player settings — flag edit, weapon / upgrade level swap, position move, life,
-// kill, face morphs — and scroll settings — debug display flags, block display and the scroll
-// view distances. Runs in a scheduler slot with the game task suspended.
+// game/t_option: the debug "option" tool task (ToolOption), a nested menu of player and scroll
+// settings. It runs in a scheduler slot with the game task suspended.
 #include "types.h"
 #include "vec.h"
 #include "atari.h"

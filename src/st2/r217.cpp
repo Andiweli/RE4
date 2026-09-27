@@ -103,11 +103,8 @@ static inline int r217_emDead(cEm* e)
     return dead;
 }
 
-// Room init: Room_flg bits 2/3 preset (beams 0/1 count as done); each beam hit box (Room_flg bits 2..6
-// clear) is a cEmHit cube on scroll object 0x83+i, else the beam is hidden; the 76 scaffold objects'
-// scales saved. Before the scaffold dropped (Scenario_flg[1] 0x40000000): area 5 = the lever puzzle,
-// enemy 0x11 pre-read, area 1 = the closed-door message; after: the lever posed, the third wave area 9,
-// the first three Ganados, the door object 0x26 raised.
+// Room init: beams 0 and 1 count as done from the start, and each remaining beam hit box is a cEmHit
+// cube on scroll object 0x83+i. The rest depends on whether the scaffold has dropped.
 void R217Init()
 {
 #line 174 "D:/Bio4/Prog/r217.cpp"
@@ -151,11 +148,8 @@ void R217Init()
     }
 }
 
-// Per frame: after the drop, the second wave when Room_flg[2] bit 31 (once, bit 1); each beam hit box
-// that was shot (or debug trigger 1) is marked (bits 2..6) with SE / effect and its beam hidden, all five
-// -> bit 8. Then the crossbow Ganados' repositioning: em[0]/em[2] hop between the r217_pos tables after
-// two / three shots at the player's level, em[1] alternates sides every 240 frames, all three re-alerted
-// every 360 frames.
+// Per frame: the second wave after the drop, marking and hiding each beam whose hit box was shot, and
+// moving the three crossbow Ganados between the r217_pos tables.
 void R217Main()
 {
     u32 i;

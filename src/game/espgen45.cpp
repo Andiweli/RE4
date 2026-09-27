@@ -1,9 +1,5 @@
-// game/espgen45: effect controller 45, the weather (open-air) water surface (D:/Bio4/Prog/espgen45.cpp).
-// A height-field grid (Espgen42Work: hA/hB height buffers, pos/nrm vertex arrays, a bump texture
-// and a display list) that follows the camera target, is stirred by the noise texture 0xFE and drawn
-// with a screen-copy refraction, an indirect bump stage, a specular texture and an optional mask.
-// Room code overrides position/height/size/colour/parameters through the Estgen45Set* entry points
-// (esp4c passes an Esp4cWork). Entry points: Espgen45_Move / _Trans / _SetFreeWork / _Destruct.
+// game/espgen45: effect controller 45, the open-air water surface (D:/Bio4/Prog/espgen45.cpp) that
+// follows the camera target. Room code tunes it through the Estgen45Set* entry points.
 #include "light.h"
 #include "atari.h"
 #include "global.h"
@@ -94,11 +90,9 @@ void Espgen45_static_init()
     g_sa = 0.0f;
 }
 
-// u8 -> f32 through GQR2 from a stack byte (the compiler only emits psq_l from its own fpmem slot): a volatile asm
-// is a scheduling barrier for everything in RTL order around it, which is what puts the pos/cur address adds before
-// the noise lbzx and the neighbour loads after it in the target's loop A. Loads straight into the destination
-// variable (no statement-expression temp): the target's `psq_l f10; fsubs f10,f10` is one pseudo, the
-// function-level `n`. The same definition as trans.cpp (asm stays in the unit so asmcheck.py counts it).
+// u8 to f32 through GQR2 from a stack byte, since the compiler only emits psq_l from its own fpmem slot.
+// The volatile asm is also the scheduling barrier that gives the target's order in loop A. Same definition
+// as trans.cpp, kept in this unit so asmcheck.py counts it.
 #define PSQ_L_U8_TO(dst, p) asm volatile("psq_l %0,0(%1),1,2" : "=f"(dst) : "b"(p) : "memory")
 
 // Bump texture (I8, 8x4 tiles) index of grid point (x, y). x/8 before y/4 (the two signed divisions are
@@ -108,12 +102,9 @@ void Espgen45_static_init()
 // Noise texture (0xFE) index of grid point (x, y).
 #define NOISE_INDEX(x, y) ((((y) << 6) & 0xB00) + (((x) << 2) & 0xA0) + (((y) & 3) << 3) + ((x) & 7))
 
-// Step 0 (the only step) of Espgen45MoveTbl: recentres the surface on the camera target (or the
-// override target/height), rebuilds mat/inv with the size and wave_ratio scale, then simulates one
-// frame: mode != 1 is a damped two-buffer wave equation (damp/spread) plus noise-texture excitation;
-// mode 1 is the spring model (hA height, hB velocity). Both refresh the vertex heights, normals and
-// the bump texture, then flush the arrays to memory for the GP. Sets Status_flg[0] bit 0x200
-// (water present). Debug: L trigger with Debug_flg[1] 0x00800000 drops a wave in the middle.
+// Step 0 of Espgen45MoveTbl: recentres the surface on the camera target and simulates one frame of
+// waves, a damped wave equation or, in mode 1, a spring model. Debug: L trigger with Debug_flg[1]
+// 0x00800000 drops a wave in the middle.
 void Espgen45_Move00(EspgenWork* pGen)
 {
     static f32 g45_wave_mul = 0.001f;
@@ -293,11 +284,9 @@ void Espgen45_Move00(EspgenWork* pGen)
                 nk = &nrm[k];   // the function-level pointer (see its declaration); `nrm[k].y/.z` below fold onto it in cse
                 PSVECScale(&v, nk, 1.0f / 2.3f);
                 {
-                    // BUMP_INDEX with the function-level `j7` (r24, see its declaration) as the last term.
-                    // Both signed divisions through ONE temp `t` (the target's `mr r0,j .. srawi jx,r0 | cmpwi i; mr r0,i`: the
-                    // second copy anti-depends on the first srawi in sched1, so the compare issues before it, and both temps
-                    // share r0); `jx << 5` (a shift, not `jx * 32`: a MULT in an address sum is put first by expand and would
-                    // start the add chain, the target starts it with the i term: `add r9,r9,r0`).
+                    // BUMP_INDEX with the function-level `j7` as the last term. Both divisions go through one
+                    // temp `t` so both temps share r0 as in the target, and `jx << 5` is a shift because a MULT
+                    // in an address sum would start the add chain, which the target starts with the i term.
                     int t = j;
                     if (j < 0) t = j + 7;
                     jx = t >> 3;
@@ -461,11 +450,8 @@ static inline void Vtx45(f32 nx, f32 ny, f32 nz, f32 x, f32 y, f32 z, f32 s, f32
     GXTexCoord2f32(s, t);
 }
 
-// Draws the water: lights a dummy model at the surface (5 cloth lights + ambient amb, colour overrides
-// applied), copies the screen (below the 56 px border) into draw temp buffer 0xE as the refraction
-// texture projected with the camera, adds the bump indirect stage (SetIndMtx), the environment
-// specular texture (p->texId, view-space normals) and the mask texture when flag bit 1; then, unless
-// flag bit 0, four far border quads (g45_mul cells out) and finally the grid display list.
+// Draws the water with a screen copy as the refraction texture, a bump indirect stage, the specular
+// and optional mask textures, the far border quads unless flag bit 0, then the grid display list.
 void Espgen45_TransSub(EspgenWork* w)
 {
     static f32 g45_mul = 15.0f;
@@ -1010,11 +996,8 @@ void Espgen45_Destruct(EspgenWork* pGen)
     g_pWater45 = NULL;
 }
 
-// Builds the water from the effect record: grid WorkSp8[0..1] (default 64, max 184, rounded down to a
-// multiple of 8), wave ratio WorkSp8[2], Tool_flg bit 0 = no border quads, bit 0x4000 = mask texture
-// MaskTex_id; colour Col_start, ambient Col_d*255, mode Work8[0] (2: damp/spread from Work8[1..2]),
-// specular Tex_id, indirect strengths prm.h xCE/xD2, stages Work8[3]. Registers g_pWater45 and runs
-// the first move. Returns 0 when the noise texture 0xFE or memory is missing.
+// Builds the water from the effect record, registers g_pWater45 and runs the first move. Returns 0
+// when the noise texture 0xFE or memory is missing.
 int Espgen45_SetFreeWork(EspgenWork* pGen, EspGenWork* pSeq, EspSeqData* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
                          Vec* pOffset, Vec* pAng, EspSeqOpt* pSct)
 {

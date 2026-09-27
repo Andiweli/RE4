@@ -1,10 +1,5 @@
-// game/area.cpp: trigger volumes (AreaData). An area is an XZ quadrilateral with floor / height
-// (AREA_TYPE_XZ4), a vertical cylinder (AREA_TYPE_CYLINDER) or a view-cone trigger
-// (AREA_TYPE_EYE). AreaHitCheck / AreaViewCheck are the game-side tests (effect areas, light
-// areas, floor attribute areas, scenario triggers); the rest is the debug tool editor and display
-// used by the Tools/t_* screens (pad-driven point / radius / height editing, wireframe drawing,
-// value and help text).
-// Original source: D:/Bio4/Prog/area.cpp.
+// game/area.cpp (D:/Bio4/Prog/area.cpp): trigger volumes (AreaData) tested by AreaHitCheck /
+// AreaViewCheck, plus the debug editor and display used by the Tools/t_* screens.
 #include "types.h"
 #include "vec.h"
 #include "global.h"

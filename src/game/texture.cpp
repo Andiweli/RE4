@@ -1,9 +1,5 @@
-// game/texture: cTexSys, a texture registry — a table of 256 TexWk slots indexed by texture id,
-// each owning a TPL, its animation table and a run of GX texture objects out of a shared pool.
-// Texture data files (TexData version 3: id table + TPL offsets + animation offsets) are loaded
-// per `owner` and released per owner (room, cockpit, title...); the getters return the TPL, the
-// texture object `no` of an id, the animation and the palette. Used for the room textures
-// (room_tex.cpp) and the id / cockpit textures (id_sys).
+// game/texture: cTexSys, a registry of texture slots indexed by texture id, loaded and released per
+// owner. Used for the room textures (room_tex.cpp) and the id / cockpit textures (id_sys).
 #include "types.h"
 #include "vec.h"
 #include "gx.h"

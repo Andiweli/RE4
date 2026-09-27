@@ -1,7 +1,5 @@
-// game/se_at: the room's ambient sound emitters — the "ESE" sub-file of the room archive lists
-// SeAt records (a SE block / number, a position, first-play wait, repeat count, fixed interval or
-// a random one); SeAtCheck plays them on their timers every frame during play, the room scripts
-// switch single emitters with SeAtSetOnOff / SeAtSndCall.
+// game/se_at: the room's ambient sound emitters from the "ESE" sub-file of the room archive. The
+// room scripts switch single emitters with SeAtSetOnOff / SeAtSndCall.
 #include "map_obj.h"
 #include "light.h"
 #include "widget.h"

@@ -1,10 +1,5 @@
-// game/espgen: the effect controller ("ESP_CTRL") pool (D:/Bio4/Prog/espgen.cpp). A controller is
-// an EspgenWork (0xC8 bytes) driven by id-indexed Move/Trans/SetFreeWork/Destruct tables: ids
-// 0x00..0x3F are the generic controllers (00 emitter, 01 lens flare, 02 path emitter, 10 sequence
-// player), 0x40..0x45 the application ones (42/45 water surfaces, 43 sand, 44 filter). The pool
-// (EspgenArray, nEspgen) is allocated per room; EspgenMove / EspgenTrans run every active
-// controller each frame, PullEspgen / PushEspgen allocate and release, EspgenSeqSet creates a
-// controller from a Kind-1 record of an effect sequence, EspgenDelete removes by owner.
+// game/espgen (D:/Bio4/Prog/espgen.cpp): the per-room pool of effect controllers ("ESP_CTRL"),
+// each an EspgenWork run every frame through id-indexed Move and Trans tables.
 #include "atari.h"
 #include "light.h"
 #include "global.h"

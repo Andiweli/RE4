@@ -113,11 +113,8 @@ void Wep17_move(cPlayer* pl)
     pl->Wep->lockMove();
 }
 
-// r_no_2 == 0: the ready (draw) state. r_no_3 == 100 is the re-entry from the out routine
-// (m_Work0 = 1: skip the wall check). The stick picks knifeStance (up 0, down 2, else 1). Aim key
-// released before the lock turn -> footwork (or crouch 0x11) with the weapon's enemy collision
-// (atari 0x200) cleared; reload key with rounds -> reload (m_Flag bit0, m_Work0 = 1); else the
-// shoulder camera aims at the locked enemy or the forward scenery hit.
+// r_no_2 == 0: the ready (draw) state. r_no_3 == 100 is the re-entry from the out routine, which
+// skips the wall check. The stick picks knifeStance.
 static void wep17_r2_ready(cPlayer* pl)
 {
     static void (*func_tbl[])(cPlayer*) = {
@@ -208,16 +205,9 @@ int ckEmWep(cPlayer* pl)
     return 0;
 }
 
-// ready step 0: aim start. Outside the first stage (and not coming back from the out routine) the player
-// facing a wall turns away from it (routine 6, r2_out: x3E0 = the free side) and an enemy in front is
-// faced instead. Wep->pitch from the camera pitch, aim yaw m_Fwork0 = 0, cocking SE 2/9, weapon
-// object mode 1, its enemy collision (atari 0x200) on; the wall check (Status_flg[3] bit27 set,
-// stage > 1) probes 1 m ahead at head height and picks the free side (left: m_Work0 0, right: 1)
-// for the out routine, or turns to a visible enemy (ckEmWep, side from the stick). Otherwise the
-// lock-on resets and the draw motion 0x11 starts. Forms that matter: `md` (an int holding 1) is what r_no_0 and the left tail's x3E4
-// share (r23); the x3E0 store is written first in both tails: the later use of the same register is
-// the one the scheduler issues early (its REG_DEAD lowers the register weight), so the earlier store
-// ends up last, before the call.
+// ready step 0: aim start. Outside the first stage a player facing a wall turns to its free side for
+// the out routine (r2_out), else the draw motion starts. The x3E0 store is written first in both
+// tails because the scheduler issues the later use of a register early, so it ends up last.
 static void wep17_r3_ready00(cPlayer* pl)
 {
     const f32 zero = 0.0f;
@@ -547,11 +537,8 @@ static void wep17_r2_fire(cPlayer* pl)
     PlWepLockCtrl(pl);
 }
 
-// fire step 0: the shot. trigger() spends a round; the fire motions by weapon (VP70 0x3D..0x3F,
-// Red9 stock 0x14/0x18/0x1A, Red9 0x21..0x23) replace the idle, the waist twists to the lock yaw,
-// the weapon's enemy collision is cleared, and the bullet line runs from the right hand (parts
-// 10) muzzle offset (234.5, -24, 38.33) 50 m along -X with a +-200 spread -> PlWepHitCheck2.
-// m_Work4 counts the burst rounds, weapon object mode 2, PlWepLockRand recoils the aim. Step 1.
+// fire step 0: the shot. trigger() spends a round, the waist twists to the lock yaw, and the bullet
+// line from the right hand goes to PlWepHitCheck2. m_Work4 counts the burst rounds. Then step 1.
 static void wep17_r3_fire00(cPlayer* pl)
 {
     cParts* parts;
@@ -713,12 +700,8 @@ static void wep17_r2_reload(cPlayer* pl)
     }
 }
 
-// r_no_2 == 5: the next-target state (Key.trg bit5): turn to the lock target m_pEm. Step 0: a
-// target within the waist limit is turned to by the waist alone (m_Fwork0, step 2 -> set state
-// step 1 when settled); farther round the body turns with a (missing, NULL) turn motion in step
-// 1 (0.314 rad per frame beyond 200 units, 10 frames on m_Work0) then -> set state. Another press
-// searches the next enemy from the head (SearchLockEm) and restarts, none -> set; aim released
-// -> set state (or crouch 0x11).
+// r_no_2 == 5: the next-target state (Key.trg bit5), turning to the lock target m_pEm by the waist or
+// the whole body. The body turn motion is missing (NULL). Another press searches the next enemy.
 static void wep17_r2_next(cPlayer* pl)
 {
     u8 step = pl->r_no_3;
@@ -810,14 +793,8 @@ static void wep17_r2_next(cPlayer* pl)
     }
 }
 
-// r_no_2 == 6: the "out" state: the player with his back to a wall (ready00) turns round / steps out
-// before aiming; the motions of the steps are not in the archive (null motion pointers).
-// m_Work0 is the side (0 left, 1 right), m_Work1 = 1 when a wall (not an enemy) started it. Step
-// 0/1 the turn-out motion, facing pCkEm over its last frames; step 2 the cover aim (stick turns
-// 3 degrees per frame, m_Fwork0 keeps the entry angle): fire held -> a shot from the hand with
-// the flash 0x4B and the hit line, step 3 (recoil, back to 2); aim released -> step 6 (turn back
-// to m_Fwork0, wall case) or step 5 (step back in, camera angle reset); both end in footwork idle
-// with the weapon's enemy collision cleared.
+// r_no_2 == 6: the "out" state, where the player with his back to a wall turns or steps out to aim
+// and fire from cover. The motions of its steps are not in the archive (null motion pointers).
 static void wep17_r2_out(cPlayer* pl)
 {
     switch (pl->r_no_3) {

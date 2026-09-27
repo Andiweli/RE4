@@ -1,18 +1,5 @@
-// em3a module (D:/Bio4/Prog/em3a.cpp): the helicopter. Types 0/1 patrol the room's EMI route
-// points (em3a_R1_Patrol), find the player (em3aFindPLCk), chase and shoot him with the gun
-// (em3aGunHitCk) or a missile (em3aRocketFire); type 2 is the hovering variant that hides,
-// appears and circles the player (the B_ routines) until its nearCnt runs out.
-//
-// Em3aInit is the module's EmInitFunc. Routines: r_no_0 0 init, 1 move with r_no_1 for types
-// 0/1 (the gunship; type 1 also carries a missile on parts 9): 0 patrol the EMI 0x13 points of
-// its Character, 1 attack (gun bursts / the rocket), 2 chase the player along the route network,
-// 3 fixed fly-in from em->set (a direction), 4 attack without height control, 5 die (falls, kills
-// with a blast); for type 2 (the hiding boss variant): 6 hidden wait (r_no_3 1 = wait for the
-// room's flag bit0), 7 hide, 8 appear, 9 wait, 0xA move around the player, 0xB / 0xC die
-// variants, 0xD the self-destruct blast. Em3aWork (em3a.h): flags bit0 player found, bit1 gun
-// attack running, bit2 damage smoke set, bit3 hidden; atkWait holds the attacks off (setAtkWait
-// from the rooms, 90 frames while the player is down); em->id 0x39 enemies (em39) in front block
-// the fire (em3aBossCk).
+// em3a module (D:/Bio4/Prog/em3a.cpp): the helicopter. Types 0/1 are the gunship that patrols,
+// chases and shoots the player, type 2 the hovering variant that hides and circles him.
 
 #include "atari.h"
 #include "light.h"
@@ -300,12 +287,8 @@ void cEm3a::move()
     em3aEngineSe(this);
 }
 
-// r_no_0 == 0: creation: the model (types 0/1 archive 5/6, type 2 0xB/0xC with its flip table),
-// a 10 m light area, the collision cylinder, hit boxes (gunship: body + rotor hub / tail / gun /
-// nose cubes; type 2: body + the weak spot on parts 0xB), type 1's missile on parts 9 (the pod
-// model hidden), lock-on parts 2, effects (archive 4 as group 2), the hover wobble, the patrol
-// route, the rotor tilt / idle effect, EM_STATUS_ACTIVE; the start state from em->set (gunship:
-// 0 patrol, 1..5 fixed fly-in directions; type 2: 5 hidden, 6 waiting, 7 hidden until the room's flag).
+// r_no_0 == 0: creation of the model, collision, hit boxes, effects and patrol route. em->set picks
+// the start state, patrol or a fixed fly-in for the gunship and a hidden or waiting state for type 2.
 static void em3a_R0_Init(cEm3a* em)
 {
     Em3aWork* w = EM3A_WK(em);
@@ -548,12 +531,8 @@ static inline void em3aSetAtkTimer(Em3aWork* w)
     }
 }
 
-// r_no_1 == 1 (gunship attack): steps 0/1 the gun-out motion 7 (flags bit1); 2/3 hover facing
-// the player with the warning ticks (SE + effect every 15 frames) for the rank-based wait
-// (16..76 frames; reset while the player is more than 30 degrees off, cleared when he is hidden
-// or dead); losing sight or 10 m away -> chase (2); then a 90-frame gun burst (4/5: a shot every
-// 3 frames, cut short 30 frames after a hit) or type 1's rocket (6/7); the gun-in motion 8 (8/9)
-// ends the attack with a 60-frame hold-off.
+// r_no_1 == 1, the gunship attack: hovers facing the player with warning ticks for a rank-based
+// wait, then fires a gun burst or type 1's rocket. Losing sight of the player switches to the chase.
 static void em3a_R1_Atk(cEm3a* em)
 {
     Em3aWork* w = EM3A_WK(em);
@@ -1091,11 +1070,8 @@ static void em3a_R1_B_Wait(cEm3a* em)
     }
 }
 
-// Type 2 r_no_1 == 0xA: closes in on the player along the route network: the move motion 0xE/0xF
-// (2..4 cycles) turning towards the route point, a turn motion 0x10 when more than 30 degrees
-// off, idle 0xD pauses of 60..119 frames; the player 5 m away for 90 frames (or 1 m above /
-// below) -> hide (7). Within 3 m of the player (and no em39 near) nearCnt counts with a warning
-// tick every 15 frames; past the rank limit (46..121 frames) -> the self-destruct blast (0xD).
+// Type 2 r_no_1 == 0xA: closes in on the player along the route network. It hides when the player
+// stays away, and staying within 3 m of him past the rank limit starts the self-destruct blast.
 static void em3a_R1_B_Move(cEm3a* em)
 {
     Em3aWork* w = EM3A_WK(em);

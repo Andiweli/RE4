@@ -1,8 +1,5 @@
-// game/cockpit.cpp: the in-game HUD (Cckpt): the life meter (player and partner, with the
-// green / yellow / red colour templates), the ammo counter with the bullet type icon, the
-// count-down timer of the timed sections and the action button icon. Everything is drawn
-// through id sprites (IdSys); the cockpit only updates their textures, colours and rotations.
-// Original source: D:/Bio4/Prog/cockpit.cpp.
+// game/cockpit.cpp (D:/Bio4/Prog/cockpit.cpp): the in-game HUD with the life meters, ammo counter,
+// count-down timer and action button icon. It only updates the IdSys sprites that draw them.
 #include "types.h"
 #include "global.h"
 #include "atari.h"
@@ -737,11 +734,8 @@ static inline u32 chkFlag5014(u32 b)
     return pG->Status_flg[2] & b;
 }
 
-// Per-frame count-down (mercenaries / timed events): pauses during events / stops, adds the
-// bonus seconds queued in pG->cdown_add_sec, counts m_frame down (unless Debug_flg[1] 0x10000
-// or Status_flg[0] 0x40000 freeze it), switches the digits to the warning colour below
-// m_warn_frame, and writes minutes / seconds / hundredths into the digit ids (the hundredths
-// jitter through a small table so they look busy).
+// Per-frame count-down for the mercenaries mode and timed events. The hundredths digits jitter
+// through a small table so they look busy.
 void CountDown::move()
 {
     f32 tbl[6] = {0.0f, 1.0f, -1.0f, 0.0f, 1.5f, -0.5f};

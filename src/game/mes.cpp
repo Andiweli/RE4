@@ -595,11 +595,8 @@ void MessageControl::setFontSize(int no, s16 font_w, s16 font_h)
     m_Msg[no].setFontSize(font_w, font_h);
 }
 
-// Starts message `no` in slot `slot` at (x, y): the font by `type` (0 common, 2 stage/event, 3
-// item names; attr bit 0 = core text; slot 15 uses the system font), colour mes_col_tbl[col]
-// and attribute bits (0x80 = no wait/stop, 0x10 = do not stop the game, 0x40 = instant, 0x20 = OT
-// draw, alignment bits 0x20000/0x80000/0x10000, ...). Unless attr 0x80, saves Stop_flg and
-// stops the game and input while the message runs.
+// Starts message `no` in a slot at (x, y), with slot 15 using the system font. Unless attr 0x80 is
+// set, it saves Stop_flg and stops the game and input while the message runs.
 void MessageControl::MesSet(int no, int px, int py, u32 attr, int wk, int col, int font_no)
 {
     MessageFont* font;

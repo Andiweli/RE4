@@ -58,11 +58,9 @@ static void r203_ShelfOpened();
 static void r203_StreamCheck();
 extern "C" void Evt_R203S00_Func(Event* e);
 
-// Room init: once the key item was taken (Scenario_flg[0] 0x00010000) two Ganados (0x27/0x29) plus three
-// wanderers (0x34..0x36, list 2); otherwise the nine Ganados of the table (list 2), area 0x8A = the key
-// pickup wave and the key-carrier's escape. Area 1 = the locked door with the key-use watcher until
-// Key_flg[0] 0x00020000. Until Room_flg bit 3: Ashley initialised as follower, r203s00 pre-loaded,
-// area 3 = the reunion event. Battle stream, one chest and one shelf item event.
+// Room init: the Ganado set depends on whether the key item was taken, and without it area 0x8A
+// starts the key pickup wave and the key-carrier's escape. Until Room_flg bit 3, area 3 is the
+// reunion event with Ashley.
 void R203Init()
 {
     int tbl[9][2] = {

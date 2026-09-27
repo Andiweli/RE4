@@ -1,11 +1,5 @@
-// wep28 module: Krauser's bow (cObjBow) and its arrow (cObjAllow); routines in wep/pl_bow.cpp.
-//
-// cObjBow (wep_mod.h) is the cObjWep hanging on the player's left forearm (parts 0x10); its parts
-// 4 is the nocked arrow, shown / hidden by scale (setDispAllow). cObjAllow is the arrow model held
-// in the right hand (parts 10) between shots: Wep->pObj2 and pAllow. Driven by mode /
-// step from wep/pl_bow.cpp: mode 1 -> moveReady (draw motion on both), 2 -> moveFire (the
-// arrow is launched as a cEmMine of type 2 by setAllow), 3 -> moveDown. Wep28_init is the
-// WeaponInitFunc, PlBowMove the WeaponMoveFunc.
+// wep28 module: Krauser's bow (cObjBow) and its arrow (cObjAllow), driven by the routines in
+// wep/pl_bow.cpp. setAllow launches the arrow as a cEmMine of type 2.
 
 #include "wep_mod.h"
 #include "light.h"

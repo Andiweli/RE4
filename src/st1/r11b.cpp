@@ -70,12 +70,9 @@ static void r11b_str_check();
 extern "C" void Evt_R11BS00_Func(Event* e);
 static void r11b_bort_pos_chk();
 
-// Room init (the lake shore / boat dock): System_flg 0x800; JumpPoint 1 (arriving by boat) marks the
-// s00 event seen (Room_flg bit 0); Scenario_flg[0] 8 / 2, Scenario_flg[1] 0x01000000, three door flags
-// cleared. Water hit effects, thunder task; the boat enemy (ESL 0x3C) placed at the pier the return
-// position flag (bit 2) says; the s00 event on the first visit (bit 0), else the shore Ganado list is
-// rewritten (EmSetChange); until bit 1 area 3 = the shore ambush and the battle stream; the two water
-// render targets on the lake and shore objects; the floating islands.
+// Room init for the lake shore and boat dock. The boat enemy is placed at the pier its return
+// position flag says, and the s00 event plays on the first visit, else the shore Ganado list is
+// rewritten (EmSetChange).
 void R11bInit()
 {
     Vec pos;

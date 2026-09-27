@@ -1,7 +1,5 @@
-// game/roomdata: cRoomData — the per-stage room tables (St0..St4_data_tbl: which rooms have a save
-// record, their room REL file and init / main functions), the room save buffer (one 0xD8-byte
-// RoomSave per room with "passed" bits and the room's own flags, copied into the save game), and
-// the room REL handling (linkRelData / stopRelData / restartRelData).
+// game/roomdata: cRoomData, the per-stage room tables, the room save buffer that is copied into the
+// save game, and the room REL handling.
 #include "types.h"
 #include "atari.h"
 #include "global.h"

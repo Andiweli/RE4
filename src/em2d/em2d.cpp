@@ -1,7 +1,5 @@
-// em2d module (D:/Bio4/Prog/em2d.cpp): the camouflaged insect enemy. It walks the floor, the walls
-// (W_ routines) and the ceiling (C_ routines), the type 4 variant flies (A_ routines); it jumps at
-// the player (JumpAtk / JumpKick, the player shakes it off with the button mash), spits poison and
-// bites the head off on a critical attack. em2dCamouflageMove blends the model in and out.
+// em2d module (D:/Bio4/Prog/em2d.cpp): the camouflaged insect enemy that walks floors, walls and
+// ceilings, jumps at the player, spits poison and bites the head off on a critical attack.
 
 #include "atari.h"
 #include "map_obj.h"
@@ -260,11 +258,8 @@ static inline void em2dSetAtkWaitR(Em2dWork* w, int a, int b, int c, int d, int 
     }
 }
 
-// Per-frame movement with gravity: the position follows `spd`, which falls 20 per frame, and the
-// enemy lands on the floor under its old position.
-// A macro, not an inline: integrate.c drops the RTX_UNCHANGING_P flag of an inlined body's
-// constant-pool loads, which then depend on the `spd.y` store and sink below the getFloor
-// argument moves (the em2c EM2C_DM_FALL note).
+// Per-frame movement with gravity, landing on the floor under the old position. A macro, not an
+// inline, for the same pool-load reason as EM2C_DM_FALL in em2c.
 #define em2dGravityMove(em, w)                                                    \
     {                                                                             \
         f32 fl_;                                                                  \
@@ -308,13 +303,9 @@ void Em2dInit(cEm* em)
     new (em) cEm2d();
 }
 
-// Per-frame damage check (cEm2d::move). An explosion / fire volume takes 500 every 120 frames
-// (dmGuard) and, dead or alive, sends the insect to the reaction of where it is (on a wall Dm_Wall /
-// Die_Wall, ceiling Dm_Ceiling / Die_Ceiling, flying Dm_Air / Die_Air, jumping Dm_Jump, airborne
-// Dm_Down / Die_Down, else Dm_Normal / Die_Normal). A weapon hit rings the bell alarm, takes
-// em2dSetDmVal off hp with the camouflage-breaking flag 0x200 and the blood / poison-sac effects by
-// hit part, then the same by-place dispatch: a kill dies in place, a survivor flinches (heavy
-// weapons and near shotgun hits blow it over: Dm_Blow).
+// Per-frame damage check from cEm2d::move. Explosions, fire and weapon hits send the insect to the
+// damage or die reaction for where it is (wall, ceiling, air or floor). A weapon hit also rings the
+// bell alarm and breaks the camouflage.
 void em2dDmCk(cEm2d* em)
 {
     Em2dWork* w = EM2D_WK(em);
@@ -4130,12 +4121,9 @@ static void em2d_R1_Dm_Down(cEm2d* em)
     }
 }
 
-// Fall step of the damage jumps: `spd` added twice around the floor check, 20 per frame of
-// gravity. 1 = landed / died, 0 = still falling.
-// The fall step of the damage routines, a macro (not an inline: integrate.c drops the
-// RTX_UNCHANGING_P flag of an inlined body's constant-pool loads, which then sink below the int
-// argument moves). The landing tail (`xFE = NEXT`) and the fall arm live inside it, so the caller
-// has no return-value diamond.
+// Fall step of the damage jumps. A macro, not an inline: integrate.c drops RTX_UNCHANGING_P from an
+// inlined body's pool loads, which then sink below the argument moves. The landing tail is inside
+// it so the caller has no return-value diamond.
 #define EM2D_DM_FALL(em, w, v_, fl_, A, B, DOWN, NEXT, END_INC)                                  \
     {                                                                                          \
         PSVECAdd(&(em)->pos, &(w)->spd, &(em)->pos);                                           \

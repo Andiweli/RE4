@@ -1,8 +1,5 @@
-// game/espgen10: effect controller 10, the sequence player (D:/Bio4/Prog/espgen10.cpp). Plays an
-// effect sequence (EspSeqData: records sorted by Set_time) record by record: at each frame every
-// record whose Set_time equals the frame counter is spawned, either as an esp (Kind 0) or as a
-// nested controller (Kind 1). EstSet (est.cpp) creates these controllers. Also holds the shared
-// controller allocation helpers EspgenDataSet / SetEspCore / PullEspEspgen.
+// game/espgen10 (D:/Bio4/Prog/espgen10.cpp): effect controller 10, which plays an effect sequence
+// record by record. EstSet (est.cpp) creates these controllers.
 #include "atari.h"
 #include "light.h"
 #include "esp.h"

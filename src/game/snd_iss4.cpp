@@ -1,7 +1,5 @@
-// game/snd_iss4: sound driver AX voice works (SND_AXV_WORK, one per hardware voice of a SE):
-// allocation / release, note-off with release ramp, the 5 ms envelope step and the deferred
-// parameter update (upd bits: 1 volume, 2 pan, 4 / 8 AUX, 0x10 / 0x20 LPF, 0x40 pitch, 0x100 pause,
-// 0x200 resume) pushed to the AX / MIX libraries by Snd_axv_work_control.
+// game/snd_iss4: sound driver AX voice works (SND_AXV_WORK, one per hardware voice of a SE). Their
+// parameter updates are deferred and pushed to the AX / MIX libraries by Snd_axv_work_control.
 #include "snd_drv.h"
 
 // Clears the 64 AX voice works (numbered).

@@ -99,12 +99,8 @@ static void r205_TreasureBoxOpen(int id);
 static void r205_TreasureBoxOpened(int id);
 static void r205_ContinuePointSet();
 
-// Room init (the pendulum pit): Status_flg[1] 0x400; area 0x1C = continue point once (Room_flg bit 12);
-// the render-textured object; until the drain (bit 0) area 8 = the drain lever with the flooded layout
-// and water hit effects, else the drained layout; area 3 = the first enemy cutscene once (bit 9); the
-// pendulum task and the four blade death areas (6/0xA/0xB/0x12); the two starting Ganados 0x6C/0x6D and
-// the already-spawned waves per r205_rsfTbl; doors 0x13/0x14 close-locked until their wave (bits 7/2);
-// battle stream; treasure boxes.
+// Room init (the pendulum pit). The drain (Room_flg bit 0) selects the flooded or drained layout,
+// and the Ganado waves already spawned are restored from r205_rsfTbl.
 void R205Init()
 {
     // The work address is taken before the calloc call (`lis` above the `bl`, as the plain-pointer

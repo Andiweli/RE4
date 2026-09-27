@@ -209,10 +209,8 @@ int cObjWep::reloadable()
     return ItemMgr.reloadable();
 }
 
-// Laser sight: from the marker line (getMarkerPos) finds the target (GetWepTargetPos: 1 map, 2
-// enemy), sets m_SightEm / m_ShotPos, draws the laser line (thicker in rooms 22C/228; a plain
-// line in shooting range mode) and the dot on an enemy; Status_flg[2] bit31 = "don't fire"
-// (target with EM_STATUS_DONT_FIRE, or a map hit with an AtEffInfo flag 2 surface within 20000).
+// Laser sight: finds the target along the marker line, draws the laser and the dot on an enemy, and
+// sets Status_flg[2] bit31 ("don't fire") for EM_STATUS_DONT_FIRE targets or nearby flagged surfaces.
 // In the debug collision display modes it shows satCheck() instead.
 void cObjWep::drawLaserSight(int draw, int noCalc)
 {

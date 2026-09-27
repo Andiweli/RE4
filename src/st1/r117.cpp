@@ -39,14 +39,9 @@
 #include "rnd.h"
 #include "eprintf.h"
 
-// Room 1-17 (D:/Bio4/Prog/r117.cpp): the church interior; the three coloured lights of the
-// insignia mechanism, Ashley found upstairs (s00 event, the chandelier swing) and Saddler's
-// appearance (s10 event).
-//
-// Status: 20/21 identical (.rodata/.data/.bss equal). Residue r117_EventChandelier (-4 bytes):
-// the block after the first swing loop re-materialises `pPL@ha` into a fresh callee-saved
-// register in the target while ours reuses the loop pseudo; the entry block also issues the
-// zero-init `li`s before the vtable load chain (#5 interblock region shape).
+// Room 1-17 (D:/Bio4/Prog/r117.cpp): the church interior. 20/21 identical. r117_EventChandelier is
+// 4 bytes short because the target re-materialises `pPL@ha` into a fresh register after the first
+// swing loop and issues the zero-init `li`s before the vtable load chain.
 
 void Obj18CmfOn(cObj* o, u32 n);   // game/obj18.cpp
 
@@ -123,11 +118,9 @@ extern "C" void Evt_R117S00_Func(Event* e);
 extern "C" void Evt_R117S10_Func(Event* e);
 static void R117S0_WhiteFade();
 
-// Room init (the church interior, chapter 2-1): thunder task, the chandelier rope object (SetObjSmd from
-// room archive 0x1F/0x20), the light mechanism state. Until Ashley is found (Scenario_flg[0] 0x00100000):
-// door 0 close-locked, evd r117s00 pre-loaded to ARAM, r117s10 registered with module 3 pre-read, area 7
-// = the Ashley event, area 4 = the chandelier swing, the two event callbacks. Afterwards: two Ganados
-// (ESL 0x50/0x51) on a fresh visit in Part 0, and the upstairs objects shown.
+// Room init (the church interior, chapter 2-1). Until Ashley is found (Scenario_flg[0] 0x00100000)
+// door 0 is locked and the Ashley and chandelier events are armed. Afterwards two Ganados appear on a
+// fresh visit in Part 0.
 void R117Init()
 {
 #line 63 "D:/Bio4/Prog/r117.cpp"

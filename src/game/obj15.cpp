@@ -1,9 +1,5 @@
-// game/obj15: object id 0x15, the mounted gatling gun (D:/Bio4/Prog/obj15.cpp): a turret that an
-// enemy rides (setRide); it turns towards `pTarget` (the player) limited by Rot_max, spins up (30
-// frames) and fires every third frame (obj15GunHitck: line hit against the player with
-// Obj15_atk_info_tbl damage, or a wall spark), 40 rounds per reload; three cEmHit boxes take
-// weapon damage and break it (R1 1) unless Break_mode says otherwise; an optional pEat collision
-// follows it.
+// game/obj15 (D:/Bio4/Prog/obj15.cpp): object id 0x15, the mounted gatling gun that an enemy rides
+// (setRide) and fires at the player.
 #include "atari.h"
 #include "light.h"
 #include "obj.h"

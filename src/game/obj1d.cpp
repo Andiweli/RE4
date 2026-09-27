@@ -1,7 +1,5 @@
 // game/obj1d: object id 0x1D, chain link (D:/Bio4/Prog/obj1d.cpp): a model hung between two parts
-// of a parent (position and orientation interpolated half-way between them, setParent2) or on one
-// parts (setParent), with an optional pendulum cloth (setChain); fades out (LostWait/Lost) when
-// released. Used for the El Gigante / trolley chains.
+// of a parent or on one part. Used for the El Gigante / trolley chains.
 #include "atari.h"
 #include "obj.h"
 #include "obj1d.h"

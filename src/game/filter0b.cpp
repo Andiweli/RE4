@@ -1,7 +1,5 @@
-// game/filter0b: captured-screen overlay (D:/Bio4/Prog/filter0b.cpp). Filter0bCapture copies the
-// frame into a dedicated half-size buffer (Filter0bAllocBuf) and the next frame it is blended back
-// once with filter0b_alpha inside the letterbox: the cross-fade used by the sub screens / result
-// screens.
+// game/filter0b: captured-screen overlay (D:/Bio4/Prog/filter0b.cpp). The captured frame is blended
+// back once as the cross-fade used by the sub screens and result screens.
 #include "filter.h"
 #include "light.h"
 #include "gx.h"

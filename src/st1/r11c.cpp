@@ -121,11 +121,9 @@ extern "C" void Evt_R11CS00_Func(Event* e);
 extern "C" void Evt_R11CS10_Func(Event* e);
 extern "C" void Evt_R11CS20_Func(Event* e);
 
-// Room init: thunder task, rain on the player, Status_flg[1] 0x400, the four etc ladders (all down
-// before the siege event, else only those the save block's bits 21..24 remember as knocked down); until
-// the siege is done (save flags bit 25) area 3 starts it and Luis (ESL 0xC8) waits outside; afterwards
-// areas 8/9 are off, the merchant stock (stock_r11c / _after_event) is added, area 0xC is the typewriter
-// and the gates follow the chosen route (r11c_initGate). Bonfires, room ambience effect, rack ranges.
+// Room init: thunder, rain and the four ladders. Until the siege is done (save flags bit 25) area 3
+// starts it and Luis waits outside, afterwards the merchant stock is added and the gates follow the
+// chosen route (r11c_initGate).
 void R11cInit()
 {
     cEm* rack;
@@ -637,11 +635,8 @@ static void r11c_EventBesiegedStart()
     SceSetChapterEnd(CHAPTER_2_2, -1);
 }
 
-// Thunder while the siege is not running.
-// The loop body is written in small statements on purpose: the loop is one haifa scheduling region
-// only if its LUID span (insns + notes) is <= 100, and the target shows no interblock motion (the
-// `cmpwi cnt` stays behind the flag branch, the EstSet arg `li`s stay behind `bne`), so the target's
-// loop was over that limit.
+// Thunder while the siege is not running. The loop body is written in small statements on purpose:
+// the target shows no interblock motion, so its loop was over haifa's 100-LUID region limit.
 static void r11c_ThunderMove()
 {
     int cnt = 0;

@@ -726,11 +726,9 @@ void Merchant2ndRoundInit()
     merchantChar.setChar(&merchant_info_A, merchantData, sell_price_ext, exer_price_ext, level_price);
 }
 
-// Room entry: builds the merchant's stock for the current room. On a cleared game (game_cnt != 0)
-// only the unlock extras are added (Handcannon with unlock_flg 0x20000000, Chicago Typewriter with
-// 0x10000000). Otherwise the stage's tables are added room by room as the scenario progresses
-// (each stock/level table the first time its room is passed, RoomData.checkPassed), plus the
-// debug "everything" mode (Debug_flg[3] bit 4). Finally selects merchant_info_A and the price tables.
+// Room entry: builds the merchant's stock for the current room. A cleared game only adds the unlock
+// extras (Handcannon, Chicago Typewriter). Otherwise each stage table is added the first time its
+// room is passed (RoomData.checkPassed).
 void MerchantRoomInit()
 {
     if (pG->game_cnt != 0) {
@@ -1560,11 +1558,9 @@ int Merchant::buyupPrice(u16 id, int num)
     int n;
     int type;
 
-    // The 0.5 arm is written three times (one per test group) and the last test as
-    // `id == 0xFE`: jump1 swaps that arm ahead of the 0.9 arm, so all three 0.5 loads sit
-    // on a cse1 path from block 0 and share the `half` declaration's high (4 refs: no
-    // update_equiv_regs move, global gives it r29); jump2 cross-jumps the three arms into
-    // one. Declaring `half`/`nine` first keeps the pool order [string][0.5][0.9][0x4330].
+    // The 0.5 arm is written three times and the last test as `id == 0xFE` so the three 0.5 loads
+    // share the `half` high (r29) before jump2 merges the arms. Declaring `half`/`nine` first
+    // keeps the pool order [string][0.5][0.9][0x4330].
     const f32 half = 0.5f;
     const f32 nine = 0.9f;
     p = exerciseItemId(id);

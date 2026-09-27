@@ -1,7 +1,5 @@
-// game/filter07: thermal vision filter (D:/Bio4/Prog/filter07.cpp). While Status_flg[1] 0x04000000
-// (infrared scope) is set, the frame's green channel is copied to a half-size I8 texture, blurred
-// with feedback passes and drawn back through the ThermoTlut palette; the scope noise effect
-// (est 0/0x1E, kind 0xB) is started with it and deleted when it ends.
+// game/filter07: thermal vision filter (D:/Bio4/Prog/filter07.cpp) of the infrared scope. It redraws
+// the frame's green channel, blurred, through the ThermoTlut palette.
 #include "filter.h"
 #include "light.h"
 #include "atari.h"

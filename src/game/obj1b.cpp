@@ -1,8 +1,5 @@
-// game/obj1b: object id 0x1B, the spear (D:/Bio4/Prog/obj1b.cpp) thrown by the em2f/em3x
-// spear-carriers. R1 routines: 0 Set (held, plain motion), 1 LostWait (2 s then fade), 2 Lost
-// (destroyed), 3 Parent (stuck in a parts of the victim, falls off after parentTimer), 4 Fall
-// (three-point rope fall), 5 Throw (flies along throwSpd, hits the scenario or a character through
-// GetWepTargetList2 and sticks). setParent / setFall / setThrow / setLost switch the routines.
+// game/obj1b (D:/Bio4/Prog/obj1b.cpp): object id 0x1B, the spear thrown by the em2f/em3x
+// spear-carriers. setParent / setFall / setThrow / setLost switch its routines.
 #include "atari.h"
 #include "light.h"
 #include "obj.h"

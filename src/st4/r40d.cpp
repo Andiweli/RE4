@@ -50,11 +50,8 @@ void r40d_setDoorEff(int no, int on);
 static void r40d_execDoorLock_end();
 static void r40d_execDoorLock();
 
-// Room init (the terminal room): the two barred doors and three effect kinds; until the terminal was
-// used (Room_flg bit 0) both doors show the locked effect, area 2 = the terminal, areas 3/4 off; after
-// it door 1's exit hook switches the next room's enemies (bit 5), the door effects per bits 1/2, the
-// waves A/B/C per bits 2/3/4 and the terminal SE; the key item (area 0x81, camera on area 7) until
-// taken; the shelf item event.
+// Room init (the terminal room). Until the terminal is used (Room_flg bit 0) both barred doors show
+// the locked effect. Afterwards door 1's exit hook switches the next room's enemies.
 void R40dInit()
 {
 #line 35 "D:/Bio4/Prog/r40d.cpp"

@@ -1,7 +1,5 @@
-// game/Espgen42.cpp: effect controller 42, the room water surface (see the class note below):
-// a height field simulated every frame, lit and drawn with a bump-mapped display list, with
-// the AddWaterPower / GetWaterHeight / GetWaterCrossPos entry points the rest of the game uses
-// for splashes, floating effects and bullet hits on water.
+// game/Espgen42.cpp: effect controller 42, the simulated room water surface. The rest of the game
+// uses AddWaterPower / GetWaterHeight / GetWaterCrossPos for splashes, floating and bullet hits.
 
 #include "light.h"
 #include "atari.h"
@@ -64,11 +62,8 @@ void EspWaterInit()
 }
 
 // Pushes the height field down around Chk_pos (the cell and its four neighbours). The position is a
-// BY-VALUE Vec parameter: integrate.c copies the argument into a stack temp through an address
-// pseudo (`addi r11,r1,8; stw 4(r11); stw 8(r11)`) that also feeds the PSMTXMultVec arguments
-// (`mr r4,r11`) and dies there; an inline-local `Vec v` gives frame-direct stores and `addi r4,r1,8`.
-// `h = p->hB + k` in each arm: jump2 cross-jumps the `slwi; add` tails, so the add sits in another block
-// than the load and combine cannot fold it into `lfsux` (target: `add r9,r9,r0; lfs f13,0(r9)`).
+// by-value Vec parameter to get the target's stack temp copy, and `h = p->hB + k` is in each arm so
+// combine cannot fold the add into `lfsux`.
 static inline void AddWaterPowerCore(EspgenWork* w, Vec v)
 {
     Espgen42Work* p = (Espgen42Work*) w->work;
@@ -449,27 +444,19 @@ int GetWaterCrossPos(Vec* pos, Vec* dir, Vec* Ret)
 // Noise texture (0xFE) index of grid point (x, y).
 #define NOISE_INDEX(x, y) ((((y) << 6) & 0xB00) + (((x) << 2) & 0xA0) + (((y) & 3) << 3) + ((x) & 7))
 
-// u8 -> f32 through GQR2 from a stack byte (the compiler only emits psq_l from its own fpmem slot): a volatile asm
-// is a scheduling barrier for everything in RTL order around it, which is what puts the pos/cur address adds before
-// the noise lbzx and the neighbour loads after it in the target's loop A. Loads straight into the destination
-// variable (no statement-expression temp): the target's `psq_l f10; fsubs f10,f10` is one pseudo, the
-// function-level `n`. The same definition as trans.cpp (asm stays in the unit so asmcheck.py counts it).
+// u8 to f32 through GQR2 from a stack byte. The volatile asm is a scheduling barrier that orders the
+// address adds and neighbour loads as in the target's loop A. The same definition is in trans.cpp,
+// and the asm stays in this unit so asmcheck.py counts it.
 #define PSQ_L_U8_TO(dst, p) asm volatile("psq_l %0,0(%1),1,2" : "=f"(dst) : "b"(p) : "memory")
 
-// Step 0, every frame: the wave simulation. Sets Status_flg[0] 0x200 (water present), then for
-// every interior grid point integrates the two height buffers (neighbour sum spring, damping
-// 0.92) plus the frame's noise texture (0xFE, 60 frames), writes the vertex heights, the
-// normals and the I8 bump texture (tilted by grid position so the edges shade flat). Mode 1 is
-// the cheaper single-pass variant; in the effect tool the B button drops the whole surface.
+// Step 0, every frame: the wave simulation, which also sets Status_flg[0] 0x200 (water present).
+// Mode 1 is a cheaper single-pass variant, and in the effect tool the B button drops the surface.
 void Espgen42_Move00(EspgenWork* pGen)
 {
     static f32 wt_pow = 10.0f;
-    // p at the declaration (w's only use): combine folds the parameter copy into `p = (plus r3 20)` AFTER the
-    // function-begin note, so alias.c's base for p is the hard reg r3, which the later `li r3,0`s reset to 0
-    // (unknown). With an unknown base every p-based load conflicts with the frame stores of `v` and the stores
-    // through hA/hB/next: loop B's `lhz nx` for v.z issues after `stfs v.x/v.y` and `lwz pos` after the hB
-    // stores, as in the target. `p = w->work` after the tex call keeps w's pseudo (live across the call), p's
-    // base is then the argument ADDRESS and the loads float above the frame stores (-44 words).
+    // p is set at its declaration so alias.c sees an unknown base for it, which makes the p-based loads in
+    // loop B issue after the frame and hB stores as in the target. Setting it after the tex call would let
+    // those loads float above the stores.
     Espgen42Work* p = (Espgen42Work*) pGen->work;
     Vec d0;
     Vec d1;
@@ -600,11 +587,9 @@ void Espgen42_Move00(EspgenWork* pGen)
                 nk = &nrm[k];   // the function-level pointer (see its declaration); `nrm[k].y/.z` below fold onto it in cse
                 PSVECNormalize(&v, nk);
                 {
-                    // BUMP_INDEX with the function-level `j7` (r24, see its declaration) as the last term.
-                    // Both signed divisions through ONE temp `t` (the target's `mr r0,j .. srawi jx,r0 | cmpwi i; mr r0,i`: the
-                    // second copy anti-depends on the first srawi in sched1, so the compare issues before it, and both temps
-                    // share r0); `jx << 5` (a shift, not `jx * 32`: a MULT in an address sum is put first by expand and would
-                    // start the add chain, the target starts it with the i term: `add r9,r9,r0`).
+                    // BUMP_INDEX with the function-level `j7` as the last term. Both signed divisions go through the
+                    // one temp `t` so both share r0 as in the target, and `jx << 5` is a shift because expand would put
+                    // a MULT first in the address sum, while the target starts it with the i term.
                     int t = j;
                     if (j < 0) t = j + 7;
                     jx = t >> 3;
@@ -1149,11 +1134,8 @@ void Espgen42_Destruct(EspgenWork* pGen)
     g_pWater = NULL;
 }
 
-// Espgen SetFreeWork for id 0x42 (room water from the room's effect data): grid size WorkSp8[0..1]
-// (default 64, max 184, rounded down to 8), height rate WorkSp8[2], colours / ambient from the
-// record, mode Work8[0] (2: damp / spread from Work8[1..2]), texture Tex_id, bump parameters
-// prm 0xCE / 0xD2, extra TEV stages Work8[3]. Requires the noise texture 0xFE. Runs one move
-// step at once.
+// Espgen SetFreeWork for id 0x42: sets up the room water from the room's effect data. It needs
+// the noise texture 0xFE and runs one move step at once.
 int Espgen42_SetFreeWork(EspgenWork* pGen, EspGenWork* pSeq, EspSeqData* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
                          Vec* pOffset, Vec* pAng, EspSeqOpt* pSct)
 {

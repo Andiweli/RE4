@@ -271,12 +271,9 @@ static inline void r300_setEmAng(cEmWrap* em, Vec* ang, f32 ry)
     em->setAng(ang);
 }
 
-// Room init (the island landing): Debug_flg[1] 0x20000; JumpPoint skips the landing event; the s00
-// (and s99) callback; two Key_flg[1] bits; the water render targets; the player's room motions;
-// the searchlight objects and the dropping rock (until Room_flg bit 4); the landing event once (bit
-// 0); area 1 = Ashley carried through the gate (bit 3), area 0xF = the camera post (bit 2); the gate
-// already burnt open (bit 5) or the two mirrors (areas 6/7) and the laser start (area 0xB) / the laser
-// look areas (bit 7); the gate Ganado events (areas 13/14/16), the reset waves and the stream.
+// Room init (the island landing): the landing event once, the searchlights and dropping rock, the
+// gate mirrors and laser, and the gate Ganado events, gated by Room_flg bits. JumpPoint skips the
+// landing event.
 void R300Init()
 {
 #line 185 "D:/Bio4/Prog/r300.cpp"
@@ -865,11 +862,9 @@ static void r300_find_camera_event()
     RsfSet(G_ROOM_ID, 2);
     SmdGetObjPtr(0)->type = zero;
     {
-        // x/z take f0/f13 by local-alloc lifetime: with the three stores in x/y/z order, x's load
-        // is issued before z's and its lifetime also covers the `addi r4,r1,8` and the pPL load, so
-        // z is allocated first (f0). The function-local static keeps x's .rodata word ahead of y/z
-        // (statics and pool words are emitted in creation order) while its load is expanded after
-        // z's: sched1 issues z, then x, and z's lifetime now spans x's load; the store order x/z stays.
+        // x/z take f0/f13 by local-alloc lifetime. The function-local static keeps x's .rodata word
+        // ahead of y/z while its load is expanded after z's, so sched1 issues z first and z's lifetime
+        // spans x's load.
         static const f32 k_x = -19430.0f;
         Vec pos;
         f32 fz;

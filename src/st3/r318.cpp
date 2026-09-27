@@ -231,22 +231,9 @@ static void R318ExecSitEnd()
     SceEventEnd(0);
 }
 
-// Draws the beam between the emitter's parts 2 and 4 while the lasers are on. Both `Vec` copies load
-// their first word through the copy's own address register (`mr r10,r28; lwzu r8,0x70(r10)` /
-// `mr r9,r29; lwzu r11,0x70(r9)`): combine's movsi_update of `P = p + 0x70` with `(mem P)`, which
-// needs cse not to rewrite `(mem P)` into the "costlier equivalent" `(mem (plus p 0x70))`
-// (find_best_addr) and p2/p4 kept live past the loads (no local-alloc tie of P to p, hence the `mr`).
-// - a: `pa` is the hard register r10 set to a copy of p2 and then re-set to `pa + 0x70` (cse never
-//   canonicalises a hard register and the `(plus pa 0x70)` entry mentions the re-set register), the
-//   copy `pa = q` staying a real insn because q is laundered between the copy and the increment
-//   (combine's use_crosses_set_p), so the update merges with op0 = op1 = r10.
-// - b: `pb = &p4->worldPos` blinded by the LOOP_END-blinded dead test (cse1 follows the branch around
-//   `pb = 0` and invalidates pb, cse2 folds the test and starts a fresh ebb), the `mr r9,r29` being
-//   reload's "0"-constraint copy.
-// Scheduling: `q = p2` is the no-op move r28 = r28 after allocation (p2 prefers r28), deleted before
-// sched2; at sched1 it is the loop-notes barrier that keeps D (`addi r11,r1,8`) out of the lwzu
-// cycle so `lis/lfs` take it (H short-lived -> r9), and at sched2 the barrier moves to `mr r10,r28`
-// (p4's copy alone before it, D after lfs). The trailing anchor keeps q/p4 live.
+// Draws the beam between the emitter's parts 2 and 4 while the lasers are on. The hard register `pa`,
+// the laundered copy `pa = q` and the blinded `pb` make both `Vec` copies load through their own
+// address register (`lwzu`), and `q = p2` plus the trailing anchor fix the scheduling.
 void R318LaserCallBackFunc(cObj* obj)
 {
     if ((pG->Room_flg[0] & 0x00020000) && obj->isTrans() == 1) {
@@ -367,14 +354,9 @@ void R318AutoDoorReset(int no)
     }
 }
 
-// Door task: opens while event flag `flagNo` is set, closes when it is clear. The loop never exits,
-// so gcse's PRE (the block-based lcm: anticipation is killed only by the last block) finds
-// `high(pG)` and `high(1700.0f)` anticipated at the preheader and hoists both (`lis` before the loop);
-// the target keeps `lis r9` at each use. The LOOP_END-blinded dead `return` right before the loop
-// gives the preheader an exit edge at gcse time (antin 0 -> no insertion), cse2 folds it (no code),
-// and loop.c still hoists the `1` (`li r31,1`). `k` is set at the block top so the notes' scheduling
-// barrier is the block's first insn (`lis LC`), leaving the ofs/mask/lfs order to sched2 (`ofs`
-// first so flagNo dies at the `and`, tie with the `lis 0x8000` -> LUID order).
+// Door task: opens while event flag `flagNo` is set and closes when it is clear. The dead `return`
+// before the never-exiting loop stops gcse from hoisting `high(pG)` and `high(1700.0f)`, since the
+// target keeps `lis r9` at each use. It folds away, and `k` is set at the block top for the schedule.
 void R318AutoDoor(int no, int flagNo, u32 id0, u32 id1)
 {
     R318Door* d = &r318_work->door[no];
@@ -942,12 +924,9 @@ static void R318EventLaserMove(int no)
     }
 }
 
-// Pattern end: the beams go out (sparks at the emitter parts), the next trigger flag is set. The
-// target keeps a second register for part 2 (`mr r28,r30` between the two GetPartsAddr calls) used
-// for `->mat` and `&->worldPos`, the original register only by the `worldPos.x` load: a hard-register
-// copy (cse never canonicalises it back). laser, t and p4 stay live to the end of the block (anchor):
-// laser then conflicts with p4 (r29, not the freed r31) and the two `&->worldPos` args do not kill
-// their register, so sched1 leaves them in argument order (`li r3; li r4; addi r5`).
+// Pattern end: the beams go out and the next trigger flag is set. Part 2 goes through a hard-register
+// copy like the target's second register, and the anchor keeps laser, t and p4 live to the end of
+// the block to get the target's registers and argument order.
 void R318EventLaserEnd(int no)
 {
     int i;

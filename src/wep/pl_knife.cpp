@@ -1,16 +1,5 @@
-// Knife player routines of the knife weapon modules (wep16 / wep26, first object; real file name
-// unknown): the DOL's game/pl_knife.cpp with every knife_r2_*/knife_r3_* routine `static` (the REL's
-// .data table fields hold S+A) and the -G 0 build (the DOL's .sdata routine tables land in .data).
-// Keep in sync with game/pl_knife.cpp.
-//
-// Entry: PlKnifeMove is player routine r_no_1 == 0xB (player.cpp's routine table), entered from
-// the footwork routine when the knife key (joyLKamae) is held. r_no_2 is the knife state (0 ready,
-// 1 set, 2 fire = slash, 3 down), r_no_3 the step. The knife is not a weapon module object: the
-// motions come from the player archive (pG->pPlayer: 0x23/0x24 draw, 0x81/0x83/0x85 stance idle
-// low/middle/high, 0x82/0x84/0x86 slash, 0x87 put away) or, with the rocket launcher (weapon_no 0x0D,
-// weapon_type 2) in hand, from m_MotTbl[0x55..0x5C] (the launcher is gripped back / released around
-// the slash). Wep->knifeStance (0 low, 1 middle, 2 high from the stick) picks the blend; the
-// equipped gun is hidden by setWepTrans while the knife is out; hitCheck traces the blade.
+// Knife player routines of the wep16 / wep26 modules (real file name unknown): a copy of the DOL's
+// game/pl_knife.cpp with static routines and the -G 0 build. Keep in sync with game/pl_knife.cpp.
 
 #include "atari.h"
 #include "light.h"
@@ -296,12 +285,9 @@ static void knife_r2_fire(cPlayer* pl)
     PlWepLockCtrl(pl);
 }
 
-// Blade hit check for one slash frame `no` (frame - 6): the blade line runs from the right elbow
-// (parts 2) to the knife tip (parts 9, 750 units out; 1200 for Krauser), traced as weapon type
-// 0x10 with PlWepHitCheck2 flag bit0 (no scenery effect). Unless flag bit3 (first frame of the
-// slash) it first sweeps four intermediate lines between the tip's previous position `ohpos` and
-// the new one, then the line itself and two more offset +200/+400 and -100/-200 in Y (the arc).
-// flag bit2 marks the frames outside 7..8 as secondary hits.
+// Blade hit check for one slash frame `no`: traces the blade from the right elbow to the knife tip
+// (longer for Krauser) with PlWepHitCheck2, and sweeps extra lines from the tip's previous position
+// `ohpos` to cover the arc.
 void hitCheck(cPlayer* pl, int i, u32 flag)
 {
     static Vec ohpos;

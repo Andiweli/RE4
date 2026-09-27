@@ -1,11 +1,5 @@
-// wep06 module: the Government (Matilda) handgun (cObjGovernment, object id 0x31). The module object
-// carries the class, the entry points and the handgun routine registration (wep/pl_handgun.cpp).
-//
-// cObjGovernment is the cObjWep (game/objWep.cpp) of the Matilda, hanging on the player's right
-// hand (parts 10) and driven by r_no_0 / r_no_1 from the handgun routines: mode 2 -> moveFire
-// (slide motion, SEs, flash, cartridge; the mode is left by the player routine, not by the motion
-// end), mode 4 -> moveReload. weapon_type 1 is the model with the stock (0x7, its own idle 0x39,
-// weapon list id 0x2B). Wep06_init is the WeaponInitFunc, PlHandgunMove the WeaponMoveFunc.
+// wep06 module: the Government (Matilda) handgun object cObjGovernment. The handgun routines in
+// wep/pl_handgun.cpp drive it through r_no_0 and r_no_1 to fire and reload.
 
 #include "wep_mod.h"
 #include "light.h"

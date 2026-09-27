@@ -1,8 +1,5 @@
 // game/obj08: object id 8, enemy-thrown object (D:/Bio4/Prog/obj08.cpp): the bottles, dynamite,
-// axes and other projectiles the Ganados throw. Flies under gravity with an optional spin, hits
-// the scenario (EatMgr), other enemies (GetWepTargetList box sweep, flags sign bit) and the player
-// / partner (EmAtkHitCk with the thrower's attack record, flags 0x40000000); the four est pairs
-// set by SetObj08Est give the trail, break, floor and character-hit effects.
+// axes and other projectiles the Ganados throw.
 #include "atari.h"
 #include "light.h"
 #include "obj.h"

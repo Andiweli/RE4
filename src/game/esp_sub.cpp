@@ -1,9 +1,5 @@
-// game/esp_sub: the shared part of the effect sprites (D:/Bio4/Prog/esp_sub.cpp): the cEsp base
-// class members (CommonMove life/motion/colour update, AnmMove texture animation, ChannelSet
-// colour + distance fade, ApplyMatrix), the common sprite draw EspCommonTrans with its heat
-// shimmer and frame-buffer ("nega") variants, and EspSeqSet, which turns one EspGenWork record
-// of an effect sequence into a live esp (or an effect model through EfmSeqSet). EspEstSetSelect
-// spawns one record of an est table directly (laser sight, gatling, ...).
+// game/esp_sub: the shared part of the effect sprites (D:/Bio4/Prog/esp_sub.cpp), with the cEsp base
+// members, the common sprite draw and EspSeqSet, which turns an effect sequence record into a live esp.
 #include "atari.h"
 #include "light.h"
 #include "gx.h"
@@ -74,14 +70,9 @@ void Esp1b_SpTrans(cEsp* esp);
         }                                                                                         \
     }
 
-// Default Trans (draw) entry of a sprite effect: dispatches to the shimmer / nega variants
-// (m_Shimmer_type, Tool_flg 0x2000), sets the blend mode, and when the previous OT entry was not a
-// sprite selects the projection (screen ortho 512x448 for parts 0xF8..0xFD, else the camera) and
-// the texture; then builds the sprite matrix (billboard / axis-aligned per Tool_flg, camera pan
-// for screen sprites), the colour through ChannelSet and draws the quad (mask texture stage when
-// Tool_flg 0x4000). Tool_flg 0x100000 forces the alpha compare, 0x808000 disables alpha update.
-// Shared sprite draw: the sprite quad (g_EspCommonDisplayList) with the effect's texture, an
-// optional mask texture in TEV stage 1, screen-space or camera-relative placement.
+// Default Trans (draw) entry shared by the sprite effects: dispatches to the shimmer / nega variants,
+// otherwise draws the sprite quad (g_EspCommonDisplayList) with the effect's texture, an optional
+// mask texture in TEV stage 1, and the colour from ChannelSet.
 void EspCommonTrans(cEsp* esp)
 {
     static int s_proj_type;
@@ -828,10 +819,8 @@ void cEsp::move()
 }
 
 // Per-frame update shared by every effect: detaches from the parent parts after m_Release_time
-// frames (baking the parent matrix into pos/speed), integrates speed (+Speed_plus, *D_speed) once
-// m_Pos_start_cnt has passed, scale (m_Size_mul += m_Size_plus, *D_size_plus; dies at <= 0) once
-// m_Size_start_cnt has passed, angle, colour (ColorUpdate), and kills the effect (PushEsp) when
-// m_Life_time reaches m_Life_max. Returns 0 when the effect died this frame. Updates m_Radius.
+// frames, moves, scales and colours the effect, and kills it (PushEsp) when m_Life_time reaches
+// m_Life_max. Returns 0 when the effect died this frame.
 int cEsp::CommonMove()
 {
     if (parent != pEffParentWorld && m_Release_time != 0xFF && m_Release_time <= m_Life_time) {
@@ -976,11 +965,9 @@ int cEsp::AnmMove()
     return 1;
 }
 
-// Sets the sprite's material colour for the draw: lit sprites (Tool_flg 0x40) get the effect light
-// list, Tool_flg 0x80/0x20000 select colour/alpha scaling; m_Flg bit 0 premultiplies rgb by alpha
-// (additive sprites); the final colour filter (EffGetFinalCol) is applied unless m_Flg bit 2; the
-// sprite fades out between m_Del_far and m_Del_near (x10 units along the camera axis). Returns 1
-// when the resulting alpha is non-zero (worth drawing).
+// Sets the sprite's material colour for the draw, including the light list, the final colour filter
+// (EffGetFinalCol) and the distance fade between m_Del_far and m_Del_near. Returns 1 when the
+// resulting alpha is non-zero.
 #line 1730 "D:/Bio4/Prog/esp_sub.cpp"
 int cEsp::ChannelSet()
 {
@@ -1148,14 +1135,9 @@ int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend)
     return EspSeqSet(rec, &info, &seed, 0, &m, 0, 0.0f, ppEsp, 0, 0) == 1;
 }
 
-// Creates one esp from an effect record: Id 0xFC..0xFF are effect models (EfmSeqSet); otherwise
-// pulls an esp of that id, copies the record (position/speed/acceleration/angle with the R_*
-// random spreads from `seed`, sizes, colours and fade counts, blend table, life, release time,
-// shimmer/mask ids, delete distances x10), resolves the parent (Parent_no scroll object unless
-// event mode; Parts_no 0xFF = world through *mtx, 0xF8..0xFD screen, 0xFE free, else a parts of
-// `model`, Tool_flg 0x20 = rotation only), runs the id's SetFreeWork, then the EspSeqOpt
-// overrides/multipliers (speed, size, colour). flg != 0 rotates the speed by `f` radians about y
-// (controller angle spread). Returns 1 with *out set; 0 with the dummy esp on failure.
+// Creates one esp from an effect record (Id 0xFC..0xFF are effect models, made by EfmSeqSet): copies
+// the record, resolves the parent, runs the id's SetFreeWork and applies the EspSeqOpt overrides.
+// Returns 1 with the new esp, or 0 with the dummy esp on failure.
 int EspSeqSet(EspGenWork* pSeq, EspInfo* pCore, u32* pRand_seed, cModel* pMod, Mtx* pMat, int flg, f32 f, cEsp** ppEsp,
               EspSeqOpt* pSct, Vec* pOffset)
 {

@@ -1,8 +1,5 @@
-// game/esp0a.cpp: effect id 0x0A, motion-trail sprites. Type (Work8[2]) 0: at spawn the effect
-// simulates itself 50 frames ahead and leaves a static id-0 sprite (life Work8[0]) at every
-// step, then dies. Type 1: a rim-lit sprite whose alpha drops when its speed direction lines up
-// with the view direction in front of the camera; its trans draws the trail of 50 one-frame
-// ghost copies along the predicted path each frame.
+// game/esp0a.cpp: effect id 0x0A, motion-trail sprites drawn along a path the effect predicts by
+// simulating itself 50 frames ahead.
 
 #include "atari.h"
 #include "global.h"

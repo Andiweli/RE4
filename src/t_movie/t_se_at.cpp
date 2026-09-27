@@ -446,11 +446,9 @@ static void seAtAreaEdit_DataInput()
     int n;
     int num;
 
-    // `num = 6` HERE, not at the loop: cse1's ebb from the arms' join does not know it, so the name loop's
-    // entry test `0 < num` survives gcse (the (u8) col mask is then not anticipated at the loop entry and stays
-    // in the body); gcse's cprop gives the compare its 6 and cse2 folds the test away. `v` is one
-    // function-scope variable for every case (it conflicts with the kept Joy pointer r9 of cases 1-4, so
-    // case 0's `lwz v` lands in r11 too); `n` is per-arm (ties to the dying v without a `mr`).
+    // `num = 6` is set HERE, not at the loop, so the name loop's entry test survives until gcse's cprop
+    // and cse2 fold it away, keeping the (u8) col mask in the body. `v` is one function-scope variable
+    // for every case and `n` is per-arm, which gives the target's register choice.
     num = 6;
     if (pW->input == 0) {
         if (Joy[0].trg & JOY_DOWN) {

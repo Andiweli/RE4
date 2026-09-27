@@ -129,11 +129,9 @@ static f32 r206_subCube2Y = 0.0f;
 static f32 r206_subCube2Z = 0.0f;
 static Vec r206_ashleyGoal = {5250.0f, 0.0f, -19342.0f};
 
-// Room init: the shelf item event; before the sniper sequence is done (Room_flg bit 0) Ashley is
-// initialised at the far end facing -PI and the snipe / gate tasks run, else Luis' body is laid out.
-// Returning after Ashley's section (from r20d, bit 4 once) plays the reunion event; the item take-over
-// (bit 9) when the reunion happened; the three event callbacks; door areas 7/6 with their messages, the
-// key item area removed after the reunion, Ashley's call on area 8 once (bit 6), the debug snipe-end task.
+// Room init: before the sniper sequence is done Ashley waits at the far end and the snipe / gate
+// tasks run, else Luis' body is laid out. Returning from r20d after Ashley's section plays the
+// reunion event once.
 void R206Init()
 {
 #line 102 "D:/Bio4/Prog/r206.cpp"

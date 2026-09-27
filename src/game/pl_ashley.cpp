@@ -1,7 +1,5 @@
-// game/pl_ashley: cPlAshley, the player class for the Ashley chapter (pl_type 1): builds her
-// model set (body, face, hair, skirt) from the player archive, the room-dependent motion table
-// (pl01weaponSet), the two hand models, and adds the bust bounce (moveBust) on top of cPlayer.
-// She has no weapon; the cloth (hair / skirt / sweater) runs through pl_cloth.
+// game/pl_ashley: cPlAshley, the weaponless player class for the Ashley chapter (pl_type 1). Her
+// hair, skirt and sweater cloth runs through pl_cloth.
 
 #include "atari.h"
 #include "light.h"

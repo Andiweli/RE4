@@ -1,8 +1,5 @@
-// game/snd_str2: sound driver stream data flow — the DVD reads (one read_size block at a time into
-// the MRAM ring buffer, wrapping to the loop start for looping streams) and the MRAM -> ARAM DMAs
-// (into the 8-block ARAM ring per channel), their completion callbacks, and the play-position
-// tracking that re-programs the AX voices' loop / end addresses as the ring advances (loop back
-// to the top, loop to the stream's loop point, or run out at the end).
+// game/snd_str2: sound driver stream data flow, from DVD reads into the MRAM ring buffer to DMAs into
+// the ARAM ring, with the AX voices' loop / end addresses re-programmed as the ring advances.
 #include "snd_drv.h"
 
 // Issues the next asynchronous DVD read (read_cnt pending blocks) into the MRAM buffer slot

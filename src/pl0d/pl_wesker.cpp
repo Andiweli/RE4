@@ -1,13 +1,5 @@
-// pl0d module, third object (D:/Bio4/Prog/pl_wesker.cpp): Wesker: the jacket cloth chain (allocated on
-// initCloth), the player class with Leon's motion table and model set (body, hair, head, face shapes).
-//
-// cPlWesker (pl_mod.h) is the cPlayer of pl_type 5 (Wesker in the mercenaries): the constructor
-// builds the model set from the player archive (4/5 body, 0xA extra part, 8/7 head with the face
-// shapes, 6/7 hair, 0x11 hand texture, 0x12 right hand, 0x14/0x16/0x18 left hands, 0x62/0x63 face
-// shapes), loads / inits the weapon module and installs the event motions 0x5F..0x6C. The jacket
-// is a 24-part pendulum cloth chain (weskerJacketP, 4 bundles, PenClothMove3) whose PlCloth work
-// is MemAlloc'd on initCloth. Pl0dInit is the module's PlInitFunc; the module's first two objects
-// are the Punisher class and the handgun routines rebuilt without their entry points.
+// pl0d module, third object (D:/Bio4/Prog/pl_wesker.cpp): cPlWesker, the player class of Wesker in
+// the mercenaries (pl_type 5), with Leon's motion table and a jacket cloth chain run by PenClothMove3.
 
 #include "atari.h"
 #include "light.h"

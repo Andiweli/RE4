@@ -270,11 +270,8 @@ void addMisileUseNum()
     }
 }
 
-// Room init (the base yard with the support helicopter): larger shadow pool, the item areas 0x94..0x96
-// off, Debug_flg[1] 0x00200000; the helicopter (em3d, ESL 0x64) unless the room state is past it; the
-// gates / levers / gatling towers / gun turrets posed from the save record bits; the seven appearance
-// areas (8..15, 20), the lever areas, the cable slide, the tower door, the radio, the stream, the s00/
-// s01 callbacks.
+// Room init for the base yard with the support helicopter (em3d), which is set up unless the room
+// state is past it. The gates, levers, towers and turrets are posed from the save record.
 void R320Init()
 {
     cEmWindow* win;

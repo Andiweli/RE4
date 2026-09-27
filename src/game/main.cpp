@@ -111,12 +111,8 @@ s8 system_vcnt;
 
 static void systemScreenInit();
 
-// Program entry: systemStartInit (hardware/OS/GX/sound/memory), then per (soft) reset
-// systemRestartInit, restores the reset-keep block (pRK: system flags, language, unlock flags,
-// mercenaries records), starts the title task and runs the frame loop forever: pad read, debug,
-// render set-up, TaskScheduler (game logic), id sprites, Trans (3D draw), DVD/sound watchers,
-// fades, messages, cinescope, the 2D OT, log flush, interrupt tasks, render done, vsync wait
-// (GetSystemVcnt frames), buffer swap and systemResetCheck (soft reset -> RESTART).
+// Program entry: systemStartInit, then on every soft reset restores the reset-keep block (pRK),
+// starts the title task and runs the frame loop until systemResetCheck sees the next soft reset.
 int main()
 {
     int i;

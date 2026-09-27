@@ -1,8 +1,5 @@
-// game/atariInfo.cpp: cAtariInfo, the collision body every character / object carries (cEm::atari):
-// a vertical cylinder (radius m_radius2, half height m_height) or, with m_flag bit1, a box
-// (m_radius x m_radius2) offset from the model or one of its parts. m_flag 0x100 = collides with
-// the scenario, 0x200 = collides with other characters, bits 3-4 the push priority. The size can
-// be interpolated toward a new one over m_hokan frames (crouching / dying characters).
+// game/atariInfo.cpp: cAtariInfo, the cylinder or box collision body every character and object
+// carries (cEm::atari). Its size can be interpolated toward a new one over m_hokan frames.
 
 #include "atariInfo.h"
 #include "atari.h"

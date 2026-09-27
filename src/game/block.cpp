@@ -1,9 +1,5 @@
-// game/block.cpp: room block streaming. Large rooms are split into blocks ("st%x/r%03x_%02x.dat"
-// cSmd data units) and the room's BLK file lists trigger areas plus, per area, which blocks must
-// be in MRAM (displayed), parked in ARAM or dropped. cBlock::check (game loop) finds the area
-// the player stands in and issues per-block commands; cBlockUnit runs the load / create /
-// ARAM / delete state machine through cDataUnit, driven by checkCommand / checkCondition from
-// the main task each frame. While a block loads to MRAM the game is frozen (Stop_flg forced on).
+// game/block.cpp: room block streaming, driven by cBlock::check from the game loop. The room's BLK
+// file says which blocks each area needs in MRAM, parked in ARAM or dropped.
 
 #include "atari.h"
 #include "block.h"

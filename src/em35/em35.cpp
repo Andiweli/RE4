@@ -135,15 +135,9 @@ void Em35Init(cEm* em)
     new (em) cEm35();
 }
 
-// Damage reaction of the whole body (type 0), from move(). The area damage manager (kinds 1 / 4 /
-// 5 / 7: the room's traps) once per 120 frames puts it into the frame-fall reaction (routine 2/3).
-// A weapon hit in dmHit applies em35SetDmVal (LifeDownSet2, no floor), blood and hit sound sized by
-// weapon class (the mine 0x27 sometimes leaves a spark at the hit point; shotgun / heavy hits are
-// bigger with the camera within 4 m). Death enters routine 3/0. Otherwise: damage on the weak
-// points (em35WeakDmCk) accumulates in weakDmg and past 400 triggers the spinal reaction (2/1);
-// handgun-class damage past 400 in dmgCnt the small flinch (2/0, not while attacking, flags 0x80);
-// close shotgun hits a 1-in-3 flinch (small or 1-in-8 big); magnum-class (5 / 6) always flinch; any
-// other weapon the spinal reaction. flags 8 (a reaction already running) blocks the light cases.
+// Damage reaction of the whole body (type 0), from move(). The room's traps put it into the
+// frame-fall reaction. Weapon hits on the weak points (em35WeakDmCk) build up in weakDmg towards
+// the spinal reaction, and other hits flinch it by weapon class.
 void em35DmCk(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);
@@ -382,11 +376,8 @@ void em35DmCk(cEm35* em)
     w->dmgCnt = 0;
 }
 
-// Damage reaction of the upper body (type 1), from move(). Applies em35SetDmVal with the same
-// blood / sound selection as em35DmCk (near = within 4 m). At 0 HP it dies through the fall reaction
-// (2/4). While in the air or crawling (flags 0x20) only close shotgun / rifle hits (1 in 3) or heavy
-// weapons knock it into the crawl reaction (2/5). On a beam, handgun-class damage past 400 in dmgCnt
-// (or a 1-in-4 roll on close shotgun / rifle hits) and any magnum-class hit knock it off (2/4).
+// Damage reaction of the upper body (type 1), from move(), with the same blood and sound selection
+// as em35DmCk. It dies through the fall reaction, and enough damage knocks it off its beam.
 void em35DmCkUpper(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);
@@ -761,12 +752,8 @@ CLOTH_AT_SET em35ClothAt3[5] = {
     { 0, 7, 8, 0.7f, 130.0f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
 };
 
-// Per-frame update from the enemy manager. Order: the type's damage check, clear the per-frame
-// flags, tick the attack / lock / trap timers, route to the player, the beam the upper body stands on
-// (em35GetBeamNo, shown on the debug screen), the routine table (r_no_0 0xFF = model load failed:
-// destroy), neck and breathing scale, parts, the three cloth chains, attack / collision / stage
-// collision, the whole body's voice every 60 frames or the upper body's drip effect every 14, and
-// the weak point objects.
+// Per-frame update from the enemy manager. r_no_0 0xFF means the model load failed and the enemy
+// is destroyed.
 void cEm35::move()
 {
     Em35Work* w = EM35_WK(this);
@@ -840,14 +827,8 @@ void cEm35::move()
     em35WeakMove(this);
 }
 
-// Routine 0: per-type setup on the first frame. Loads the model (archive 4 with the extra model 6
-// for the whole body, 7 the upper body, 8 the legs), the three cloth chains, the flip table, a 5 m
-// light box, a 3 m tall collision, the hit boxes (root plus the type's extras), the effect data,
-// the work (first attack right away, the double attack / hook held 300 frames), the weak point
-// objects and the active / look-at status. Start by `set` and type: set 0 = the whole body walks
-// (1/1) with its idle effects, the upper body waits on a beam (1/0xF) with the collision passed
-// through; set 1 = the whole body starts in the divide scene (1/0xE), the upper body in its own
-// divide (1/0x1F).
+// Routine 0: per-type setup on the first frame for the whole body, upper body or legs. With set 0
+// the whole body walks and the upper body waits on a beam. With set 1 both start in the divide scene.
 static void em35_R0_Init(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);
@@ -1181,13 +1162,8 @@ static void em35_R1_Wait(cEm35* em)
     }
 }
 
-// Routine 1/1 (whole body): walks at the target (the run motion beyond 7 m; r_no_3 2 starts the
-// loop mid-way), turning PI/64 per frame. A player 2 m above it gets the second-floor attack
-// (1/0xB) within 4 m, else a big step. In front at 2..3.5 m with the lock wait out it picks the
-// critical (1/9, half the time when the player is under 900 HP) or the hook / long punch / double
-// punch. walkType (rolled per walk) 1 / 2 prefer the catch (1/0xC, r_no_3 1 within 1.5 m or when the
-// player runs within 3.5 m), 0 the punch within 2.5 m (3.5 m at a running player); a target behind
-// within 2.5 m is punched; otherwise em35BigStepCk looks for a step.
+// Routine 1/1 (whole body): walks at the target and picks an attack by distance and walkType,
+// which is rolled per walk. If none applies, em35BigStepCk looks for a step.
 static void em35_R1_Walk(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);
@@ -1435,12 +1411,8 @@ static void em35_R1_Turn(cEm35* em)
     }
 }
 
-// Routine 1/4 (whole body): the punch with the arm on the player's side (r_no_3 0 right / 1 the
-// mirrored left; the wide swing with its effect when the target is more than 90 deg off). flags 0x80
-// holds off light damage for 60 frames. On motion event bit 2 the duck prompt (em35AtkEscapeAction)
-// is offered to a player in front within 5 m; the hit (attack 0 / 1) sweeps the arm and shoulder
-// parts on event bit 0. A miss awards the escape point; a hit rests 90 frames in Wait, else punch
-// behind / turn / walk.
+// Routine 1/4 (whole body): the punch with the arm on the player's side. A player in front is
+// offered the duck prompt (em35AtkEscapeAction), and a miss awards the escape point.
 static void em35_R1_Atk(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);
@@ -2084,12 +2056,9 @@ static void em35_R1_br_Critical(cEm35* em)
     }
 }
 
-// Turn towards the player with a slight lead (em35_R1_Critical). A macro, not an inline: the PI
-// pool load is issued above the preceding `timer--` store (an inlined body's pool loads lose
-// RTX_UNCHANGING_P and sink below it).
-// `ang` is the routine's variable (one pseudo for both expansions): a global pseudo takes the copy
-// preference f1 (ascending scan) where a block-local one takes f2 (allocation order), which decides
-// whether the `fmr f2,f1` argument copy sits before or after the `lis` of Muku2's limit.
+// Turn towards the player with a slight lead (em35_R1_Critical). A macro so the PI pool load stays
+// above the `timer--` store. `ang` is the routine's variable because its pseudo's copy preference
+// decides whether the `fmr f2,f1` argument copy sits before or after the `lis` of Muku2's limit.
 #define EM35_CRITICAL_TURN(em, v)                                                                   \
     {                                                                                               \
         v = LIMIT_ANGLE((em)->ang.y + Muku(&(em)->pos, &pPL->pos, (em)->ang.y, PI) + 0.05235988f);   \
@@ -3794,11 +3763,8 @@ static void em35_R1_Die_Pose(cEm35* em)
     }
 }
 
-// Per-frame target selection while alive. The upper body targets the player directly (it moves
-// on the beam graph). The whole body targets the player directly too when he is on the upper floor
-// (1 m above it), but with the route point swapped for one of three fixed spots under the walkway
-// nearest to him so it stands where the second-floor attack reaches; on the same floor it routes
-// to the player (flags bit 0 when a route exists; routeAng zero during init).
+// Per-frame target selection while alive. When the player is on the upper floor, the whole body
+// routes to the fixed spot under the walkway nearest to him, where its second-floor attack reaches.
 void em35RouteCk(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);
@@ -3938,13 +3904,9 @@ static inline void em35PlKnock(cEm35* em)
     PlSetDamage(PL_DM_AUTO, 0, 0);
 }
 
-// Tests attack `no` of em35_atk_tbl swept from part `parts`' previous to its current position
-// against the player (hit bit 0) and partner (bit 1), once per attack (atkHit). A player hit: the
-// punches / hand swipes / upper / spear knock him down facing the enemy (em35PlKnock) with the
-// blood effect of the side; the stamp (2) and hook (4) take him over (plem35DmStamp / plem35DmHook);
-// the double punch (3) only sounds (the bear hug follows); the second-floor punches (5 / 6) knock
-// him off the ledge (em35PlFallCk) or down; the critical (7) leaves him at 1 HP and marks both
-// dmType 0x80 for the kill. Any hit shakes the camera and rumbles. Returns 1 on a hit.
+// Tests attack `no` of em35_atk_tbl, swept along part `parts`, against the player and partner once
+// per attack. The double punch only sounds because the bear hug follows, and the critical leaves
+// the player at 1 HP for the kill. Returns 1 on a hit.
 int em35AtkCk(cEm35* em, u32 no, int parts)
 {
     Em35Work* w = EM35_WK(em);
@@ -4380,13 +4342,9 @@ void em35ClothMove3(cEm35* em)
     }
 }
 
-// The upper body's move selection on the beam graph, run at the end of each of its routines. A
-// player a floor above / below: jump or climb / drop towards his level. When the player aims at it
-// (em35LockCk) a quarter of the time it dodges up or down. At beam height within 5.5 m: the hand
-// attack within 1.5 m, the uppercut within 3 m when facing him, the arm swing (50 %) within 3 m
-// facing or with his back turned, the spear within 42 deg. Otherwise: an about-face when he is
-// behind, a side step towards him past 45 deg, then along the beam: a forward jump up / down (50 %),
-// a double leap (50 %, Game_level above 1), the plain leap, a side step to either side, or a step in place.
+// The upper body's move selection on the beam graph, run at the end of each of its routines. It
+// moves towards the player's floor, sometimes dodges when aimed at (em35LockCk), attacks by
+// distance at beam height, and otherwise turns or moves along the beam.
 void em35NextRtnSetUpper(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);

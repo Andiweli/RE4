@@ -1,8 +1,5 @@
-// game/esp0f.cpp: effect id 0x0F, a screen-distortion (refraction) sprite. Its trans copies the
-// current frame buffer at half resolution into temp buffer 3 and draws the sprite quad with that
-// copy projected onto it (projective texgen, or the screen matrix for screen sprites),
-// modulated by the sprite's own texture as an alpha mask; Pow (Work8[0], 0..2) is the TEV
-// brightness scale (x1, x2, x4) of the copied frame. Used for heat haze and shock rings.
+// game/esp0f.cpp: effect id 0x0F, a screen-distortion sprite that draws a half-resolution copy of
+// the frame through its own texture as an alpha mask. Used for heat haze and shock rings.
 
 #include "light.h"
 #include "atari.h"

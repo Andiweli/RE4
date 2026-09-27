@@ -1,15 +1,5 @@
-// game/emrock.cpp: rolling rock enemy (cEmRock): boulders that hang on a parent, fall, get
-// thrown, roll after the player (with the escape event) or drop on him.
-//
-// Byte-identical (DOL sweep 23b). emRockDropCamMove sets `up` before `len` (sched1's 32-entry
-// pending-memory flush otherwise lands on the up.x store).
-//
-// Camera tails: `Camera* cam = &emRockCam;` is declared BEFORE the `cp`/`ca` pointers. cse rewrites
-// `&emRockCam` from the OLDEST related constant (`emRockCam+K`) whose class still holds a register
-// (use_related_value walks the ring from the base symbol): with `ca = &emRockCam.param.at` declared
-// first, `cam` came out `ca - 176`; the original has `cp - 164` (PushCamMove: the `pos = p` block
-// copy's address pseudo) or a fresh `lis/addi` (EscapeCamMove2/DropDieCamMove: the PosToPos/PSVECAdd
-// argument registers were clobbered by the calls), i.e. `cam` was computed before `ca` existed.
+// game/emrock.cpp: rolling rock enemy (cEmRock), boulders that hang, fall, get thrown or roll after
+// the player. Byte-identical only with `cam` declared before `cp` / `ca` in the camera tails.
 
 #include "atari.h"
 #include "atari_init.h"
@@ -80,11 +70,9 @@ static EmAtkInfo emRockAtk = { 1500.0f, PL_DM_AUTO, 9999, 0, 10, 0 };
 // Event camera of the escape / drop scenes (CamCtrl.x250 points at it while they run).
 static CAMERA emRockCam = { 0 };
 
-// Creates a rolling rock enemy (id 0x4A, at the back of the pool) from a model / TPL at pos / rot.
-// type 0 the boulder El Gigante / room events throw, 1 the big (scale 4.2) rolling boulder of
-// the chase rooms (starts rolling on its own, Roll), 3 the room 11E / 300 event rocks (no atari,
-// radius 2000). 1000 hp, unlockable, its own Core_kind for the trail effects. Starts in Rno1 0
-// Set. NULL on failure.
+// Creates a rolling rock enemy from a model / TPL at pos / rot. `type` picks the boulder El Gigante
+// and room events throw, the big rolling boulder of the chase rooms, or the room event rocks.
+// NULL on failure.
 cEmRock* SetRock(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
 {
     cEmRock* em;

@@ -1,11 +1,5 @@
-// game/motion: skeletal animation playback (D:/Bio4/Prog/motion.cpp). A MotionWork plays a
-// MotionData (per joint: kind byte, Fcc key type, and per-axis Hermite key streams) on a cModel's
-// parts. MotionSetCore starts a motion (optionally through a sequence table of 10.6 fixed-point
-// frames with SE/free bytes, with `hokan` frames of blend from the previous pose); MotionMove
-// advances it each game frame: root speed applied to the model (Mot_attr bit 0), a second
-// blended MotionWork (blend/Brate), the per-parts keys (MotionMoveCore), leg IK, the pose
-// interpolation (MotionHokan) and the quaternion blend table. Fcc_get_data_* decode the ten key
-// stream layouts (f32 / s16 values and tangents).
+// game/motion (D:/Bio4/Prog/motion.cpp): skeletal animation playback of MotionData on a cModel's
+// parts. MotionSetCore starts a motion and MotionMove advances it each game frame.
 #include "motion.h"
 #include "global.h"
 #include "db_log.h"
@@ -16,11 +10,8 @@
 #include <string.h>
 
 
-// Matrix copy written out as loops (the original never calls PSMTXCopy for these), a variant of
-// MTX_COPY (vec.h). Shape matters (all four sites byte-identical only this way): dst pointer first,
-// the row counter `i_ = 2` between the two pointers, `for (; i_ != -1; i_--)` (a `while (i_--)`
-// leaves the folded `li 2` behind the source pointer), `d_++` before `s_++` (gcse numbers the
-// hoisted `+16` pseudos in that order).
+// Matrix copy written out as loops, a variant of MTX_COPY (vec.h), because the original never calls
+// PSMTXCopy here. Only this exact shape makes all four sites byte-identical.
 #define MTX_COPY_DOWN(src, dst)               \
     {                                    \
         MtxPtr d_ = (dst);               \
@@ -139,14 +130,9 @@ void MotionClear(cModel* pEm, int flag)
     MOTION(pEm)->pMot = 0;
 }
 
-// Starts motion `data` on work w (usually MOTION(m)): resets root pos/rot state, Mot_attr = flags
-// (bit 0 apply root speed, 1 reverse, 2 loop, 6 flip left/right, ...), the sequence (seq table
-// or linear over maxFrame+1 frames) starting at `frame`, the joint tables and key stream
-// pointers (relocated once), IK chains (unless Mot_flag 0x10000000), the root pos/rot joint
-// indices and attach camera channels, clears the key histories, sets the `hokan` blend frames
-// (saving the current l_mat as prevMat), and samples the root at the start/end to get the
-// motion's total displacement (Pos_dist/Ang_dist) for looping. Mot_flag 0x20000000 keeps the
-// blend motion.
+// Starts motion `data` on work w (usually MOTION(m)) at `frame` with `hokan` blend frames from the
+// current pose. Samples the root at the start and end to get the motion's total displacement
+// (Pos_dist/Ang_dist) for looping.
 void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int flags, int frame)
 {
     MotionWork* w = (MotionWork*) w_;
@@ -425,12 +411,8 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
     }
 }
 
-// One frame of the model's motion: with Mot_attr bit 0 moves the model by the root speed (mixed
-// with the blend motion by Brate), evaluates the main motion (MotionMoveCore + sequence step),
-// then the blend motion either as a matrix slerp (matBlend) or, for Mot_flag sign-bit blends, as
-// an additive pose; runs the leg IK on the unscaled model, the hokan interpolation and the
-// quaternion blend table (blendTbl: dst = slerp(c, a, percent)). Returns Mot_state (1/2 looped,
-// 4/8 ended).
+// One frame of the model's motion: root movement, the main motion, the blend motion, leg IK, the
+// hokan interpolation and the quaternion blend table. Returns Mot_state (1/2 looped, 4/8 ended).
 u32 MotionMove(cModel* pEm, CAMERA* pCamera)
 {
     static int new_add = 1;
@@ -637,11 +619,8 @@ u16 MotionMoveSub(cModel* pEm, MotionWorkSub* w)
     return w->Mot_state;
 }
 
-// Evaluates the pose at the current sequence frame: for each motion joint decodes the Hermite
-// keys of the axes it animates (kind bit 1 rotation, else rot + pos + scale) into the parts'
-// ang/pos/scale (with the left/right flip remap and mirroring when Mot_attr 0x40), skipping parts
-// flagged 0x20000000; attach-camera channels 6/7 go to the AttachCamera outputs. Rebuilds the
-// model matrix unless Mot_flag 0x40000000.
+// Evaluates the pose at the current sequence frame by decoding each joint's Hermite keys into its
+// parts, with the left/right flip when Mot_attr 0x40. Attach-camera channels 6/7 go to AttachCamera.
 void MotionMoveCore(cModel* pEm, MotionWorkSub* w, CAMERA* pCamera)
 {
     HermitePrm prm;

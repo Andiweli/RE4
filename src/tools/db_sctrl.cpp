@@ -520,11 +520,8 @@ static int sctrlMenu(DbSctrlWork* w)
     return 1;
 }
 
-// Routine 0, curve editing (pad 1): d-pad / stick move the screen cursor (x5 with the sub stick).
-// step 0 idle: A grabs a key (step 2 drag the point, 3 / 4 drag its in / out tangent handle), Y
-// on the curve grabs a key or an insertion spot (step 5: YES/NO to delete / insert), Z opens the
-// menu, B quits; step 1 appends keys (an empty curve starts here): A places one at the cursor
-// (grid-locked, range re-fitted), B ends. Returns 1.
+// Routine 0, curve editing on pad 1. The cursor drags keys and their tangent handles, Y deletes or
+// inserts a key, and an empty curve starts in the append step. Returns 1.
 static int sctrlEdit(DbSctrlWork* w)
 {
     Vec* cur = &w->pos;

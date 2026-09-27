@@ -1,7 +1,5 @@
-// em2a module (D:/Bio4/Prog/em2a.cpp): the traps. Type 0 is the bear trap that bites the player
-// (em2a_R1_Trap1Bite, with the player catch motion and a cut-in camera) or the partner
-// (em2a_R1_Trap1BiteSub, freed by the action button), types 1 and 2 are the tripwire bombs that go
-// off when the player or an enemy crosses the wire (em2aTrap2HitCk, em2aTrap2Bomb).
+// em2a module (D:/Bio4/Prog/em2a.cpp): the traps. Type 0 is the bear trap that bites the player or
+// the partner, and types 1 and 2 are tripwire bombs that go off when someone crosses the wire.
 
 #include "atari.h"
 #include "light.h"
@@ -214,11 +212,8 @@ void cEm2a::move()
     }
 }
 
-// R0 == 0: creation. Builds the model of the trap type (0 bear trap; 1 / 2 the tripwire bombs whose
-// wire parts 1 / 2 are stretched to hp/1000 * 0.5 of the model, hp = wire length), collision / hit
-// boxes (em2aYarareInit), the room's ctrl11 / ctrl12, and the start routine: the bear trap Trap1Set
-// (0), set 1 the room 100 dog trap (Trap1R100 5), set 2 an already sprung trap (Trap1Break, inactive);
-// the bombs Trap2Set (6).
+// R0 == 0: creation. Builds the model for the trap type and picks its start routine. For the
+// tripwire bombs, hp is the wire length and sets how far the wire parts are stretched.
 static void em2a_R0_Init(cEm2a* em)
 {
     Em2aWork* w = EM2A_WK(em);

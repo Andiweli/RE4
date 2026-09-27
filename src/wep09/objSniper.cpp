@@ -1,11 +1,5 @@
-// Bolt-action rifle weapon object (wep09 module, first object; real file name unknown): scoped rifle
-// with cartridge ejection after the shot and the level-dependent reload motion.
-//
-// cObjSniper is the cObjWep (game/objWep.cpp) of the rifle (weapon_no 9), hanging on the player's
-// right hand (parts 10) and driven by r_no_0 / r_no_1 from the rifle routines
-// (wep/pl_rifle.cpp): mode 2 -> moveFire is the bolt cycle (set by fire20 after the shot: the
-// gun's motion 0x21 with the cartridge ejected at frame 14), mode 4 -> moveReload (motion by tune
-// level, ItemMgr.reload at frame 10). The scope glass is display type 1 (setDisp in pl_rifle).
+// Bolt-action rifle weapon object of the wep09 module (real file name unknown). The rifle routines
+// in wep/pl_rifle.cpp drive it through r_no_0 and r_no_1 for the bolt cycle and reload.
 
 #include "wep_mod.h"
 #include "item.h"

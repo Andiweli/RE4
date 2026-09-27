@@ -1,10 +1,5 @@
-// game/main_mem: heap management over OSAlloc (D:/Bio4/Prog/main_mem.cpp). The main RAM map is
-// fixed (SystemMemMap: ELF, DVD, sound, FIFO, XFB, core/option/player/weapon archives, then the
-// heap up to 0x817F4000). Thirteen logical heaps (Heap[], MEM_HEAP_NUM) live in that range: 0
-// system, 1 game, 2 stage, 3 DLL, 4 room ... created with MemCreateHeap / carved off the end of
-// another with MemReplaceHeap; heaps can be suspended (descriptor backed up) and resumed.
-// mem_alloc tags every block with "MAD" + file(line) for MemCheckUsedHeap; Debug_alloc serves
-// the tools from the current debug heap. operator new/delete route here.
+// game/main_mem: heap management over OSAlloc (D:/Bio4/Prog/main_mem.cpp), with thirteen logical
+// heaps in a fixed main RAM map. operator new/delete route here.
 #include "types.h"
 #include "global.h"
 #include "main_mem.h"
@@ -234,11 +229,9 @@ u32 MemGetHeapEndAddr(int heap_no)
     return Heap[heap_no].end;
 }
 
-// Highest address in use by heap no (end of its last allocated cell, or the free list start when
-// nothing is allocated); 0 when inactive.
+// Highest address in use by heap no, or 0 when inactive.
 // OPEN (-4): the original places `li r3,0` between the compare and the branch and reloads
-// d->allocated for the loop init after the if/else join (ours forwards it); if/else, ternary,
-// `end = 0` first and HeapHead[h] index forms tried.
+// d->allocated for the loop init after the if/else join, where ours forwards it.
 u32 MemCheckHeapEnd(int heap_no)
 {
     int h = Heap[heap_no].handle;
@@ -251,11 +244,9 @@ u32 MemCheckHeapEnd(int heap_no)
     }
     d = HeapHead;
     d += h;
-    // `d = HeapHead; d += h;` loads HeapHead straight into d (a global pseudo), so the block's
-    // local qtys are only h*12 and the loaded `allocated` (the 3-qty partial sort would put h*12
-    // first). The two-statement then-arm keeps jump1 from hoisting `end = 0` above the branch, so
-    // cse1's path ends at the else arm and the loop init reloads `d->allocated`; jump2 hoists the
-    // `li r3,0` between the compare and the branch afterwards.
+    // `d = HeapHead; d += h;` loads HeapHead straight into d, a global pseudo. The two-statement
+    // then-arm keeps jump1 from hoisting `end = 0` above the branch, so the loop init reloads
+    // `d->allocated` and jump2 later puts the `li r3,0` between the compare and the branch.
     if (d->allocated == NULL) {
         cell = d->free;
         end = (u32) cell;
@@ -540,12 +531,9 @@ void MemFree(void* addr)
     }
 }
 
-// Debug heap display (debug page 4): one TILE per allocated cell (0x20-byte primitives).
-// Matching. Shape (same as datactrl dispDebug): y0/y1 and `x = 498` are function-scope locals
-// (y1 is reused for the end marker's height, x is a REG_EQUIV constant that reload rematerialises
-// before each `sth x0`, which is what lets the code constant's register be reused), the tile
-// stores are in datactrl's order (code, x0, y0, ...; r, g, b), `mt = &tile[0]` precedes the
-// end-marker conversion, and the cell loop starts from `hd = HeapHead + handle`.
+// Debug heap display (debug page 4): one TILE per allocated cell. Matches with the same shape as
+// datactrl's dispDebug. `x = 498` is a function-scope local so that reload rematerialises it before
+// each `sth x0`, which frees the code constant's register.
 struct MemTile {
     u32 tag;       // 0x00
     u32 code;      // 0x04

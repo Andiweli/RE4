@@ -1,11 +1,5 @@
-// wep07 module: the shotgun (cObjShotgun, object id 0x2B; routines wep/pl_shotgun.cpp).
-//
-// cObjShotgun is the cObjWep (game/objWep.cpp) of the pump shotgun (weapon_no 7), hanging on the
-// player's right hand (parts 10) and driven by r_no_0 / r_no_1 from the shotgun routines:
-// mode 2 -> moveFire (recoil motion, then the pump ejects the shell at frame 20), mode 4 ->
-// moveReload (shell-by-shell motion by tune level; the mode ends itself with the motion).
-// Wep07_init is the module's WeaponInitFunc, PlShotgunMove its WeaponMoveFunc; the module object
-// carries the class, the entry points and the ObjInitFunc slot.
+// wep07 module: the pump shotgun (cObjShotgun, object id 0x2B). The shotgun routines in
+// wep/pl_shotgun.cpp drive it through r_no_0 and r_no_1 to fire and reload.
 
 #include "wep_mod.h"
 #include "light.h"

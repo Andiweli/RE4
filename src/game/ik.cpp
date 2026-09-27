@@ -19,11 +19,8 @@ static void heel2toe(Mtx m, cParts* p, Vec* pos);
 #define BIND_Y(p) (p->lt_inv_mat[1][3])
 #define BIND_Z(p) (p->lt_inv_mat[2][3])
 
-// Called by MotionSetCore for a new motion: clears the IK flags of every parts, then for each
-// joint of the motion's joint table flagged as an IK root (kind bits 0x30) marks the chain root
-// (flags bit 2), stores the bend axis (kind >> 8), the bone lengths from the bind pose and the
-// root->effector direction, and the options: 0x20 = also correct the toe angle (ikAng), 0x80 =
-// the chain has an extra joint (0x210). A degenerate bend plane disables the chain.
+// Called by MotionSetCore for a new motion: marks the IK chains of the motion's joint table and
+// stores their bend axis, bone lengths and options. A degenerate bend plane disables the chain.
 void IKInit(cModel* pEm, MotionWorkSub* pInfo)
 {
     Vec axis;

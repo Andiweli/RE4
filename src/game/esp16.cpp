@@ -1,8 +1,5 @@
-// game/esp16.cpp: effect id 0x16, a rope / chain of Num (Work8[0] + 2) points simulated with
-// distance constraints (segment length Vec0.x, damping Vec0.y %, constraint feedback Vec0.z %,
-// gravity Vec1, jitter Vec2). Point 0 follows the effect; with Work8[1] the last point is
-// pinned to model parts Work8[1] - 1 and the chain is relaxed from that end too. Positions and
-// speeds live in two esp3f buffers; the trans draws a camera-facing textured strip through them.
+// game/esp16.cpp: effect id 0x16, a rope or chain of points simulated with distance constraints.
+// Point 0 follows the effect, and the last point can be pinned to model parts.
 
 #include "atari.h"
 #include "light.h"
@@ -42,11 +39,8 @@ cEsp* Esp16_Create()
     return new cEsp16;
 }
 
-// Base update / animation, then one relaxation pass from the head: each point moves by its speed,
-// is pulled back to max_len from its predecessor (with the along-segment speed cancelled), gets
-// the random jitter, the nen feedback split between neighbours, gravity and damping; then the
-// head is set to the effect position and, when pinned, the tail to the parts and a second pass
-// runs from the tail toward the head.
+// Base update, then one relaxation pass from the head that pulls each point back to max_len from
+// its predecessor. When the tail is pinned, a second pass runs from the tail toward the head.
 void cEsp16::move()
 {
     Esp16Work* w = &m_Free;
@@ -178,21 +172,13 @@ extern "C" void Esp16_Trans(cEsp16* esp)
     esp->ChannelSet();
     GXSetBlendMode(esp->m_Blend_mode, esp->m_Src_factor, esp->m_Dst_factor, esp->m_Logic_op);
     esp->CommonStateSet();
-    // The original sets t through an intermediate the copy never absorbed (`lfs f12, 0.0; fmr
-    // f29, f12`) and its block ends right after the zero load: `lbz partsNo`, the 1.0 high, the
-    // copy and `lfs 1.0` are scheduled as a second block (`lis; lfs f12 | lbz; lis; fmr; lfs`).
-    // The dead test below is that block boundary (compare/branch gone at flow/jump2; sched1 and
-    // sched2 both run with the blocks split); with the boundary combine cannot merge the load
-    // into the copy either, so no keep-alive is needed, and the zero dying at the copy ranks
-    // `fmr` above `lfs 1.0`. The pinned f12 is the register the original's zero took. The test's
-    // three loads (three short local qtys: r0, r9, r11 before the zero high's qty) put the high
-    // in r10 like the target; a one-load compare leaves it r9.
+    // The original sets t through an intermediate copy and ends its block right after the zero load.
+    // The dead test below is that block boundary, and f12 is pinned to the register the original's
+    // zero took. The test's three loads put the high in r10 like the target.
     z = 0.0f;                   // COMPILER-DIFF: #13
-    // Dead in the original too: only its 0x43300000 constant survives, shared through the cse
-    // path by both `(f32) w->nPt` conversions below (`lis r31, 0x4330` right after
-    // CameraCurrentProjection, `stw r31` in both arms). A signed conversion: the arms reload
-    // their unsigned magic double separately. Which expression it was is unknown. It must stay
-    // in the first block so its constant is hoisted to the top.
+    // Dead in the original too: only its 0x43300000 constant survives, shared by both `(f32) w->nPt`
+    // conversions below. Which expression it was is unknown. It must stay in the first block so its
+    // constant is hoisted to the top.
     rate = (f32)(int)n;
     if (esp->m_Life_time + w->Num + esp->m_Tex_id == 99) { // COMPILER-DIFF: candidate (sched block split)
         t = z;

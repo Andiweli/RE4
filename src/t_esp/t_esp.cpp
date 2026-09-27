@@ -357,11 +357,9 @@ static TOOL_WINDOW* g_pWorkSp2Win;
 static TOOL_WINDOW* g_pWorkSp3Win;
 static TOOL_WINDOW* g_pBasePosWin;
 DB_BUTTON* g_pMenuExitButton;
-// pass 25: the two directory buttons are one-member structs stored through a pointer (`slot->p = CreateButton(..)`):
-// the store is then MEM_IN_STRUCT_P (the ctor's `win->active = 0` load waits for it, segs 183/237 exact) and the slot
-// address is computed before the call (the high crosses the call -> sched1 filler -> the target's callee-saved r24 /
-// reload's r6/r8 at 237). A plain `g_x = f()` pins the high after the call; a plain struct member legitimises the
-// address only at the store (also after the call).
+// pass 25: the directory buttons are one-member structs stored through a pointer, so the store is
+// MEM_IN_STRUCT_P and the slot address is computed before the call, as in the target. A plain global
+// or plain struct member store computes the address after the call.
 struct DirButtonSlot { DB_BUTTON* p; };
 static DirButtonSlot g_pSaveDirButton;  // pass 29: .bss order (the save slot sits below the load slot in the target)
 static DirButtonSlot g_pLoadDirButton;
@@ -1894,12 +1892,9 @@ static inline void ModelTypeGroupSkip()
     if (g_pKey->trg[KEY_R]) dir = -1;
     if (g_pKey->trg[KEY_Z]) dir = 1;
     if (dir != 0) {
-        // both loops step the global itself; each test reads it into a block-local u16 used only for the table
-        // index (lhz + extsh), and the name bytes are compared through `a0`/`a1`. The `dir == -1` back-skip is a
-        // rotated `while` whose duplicated entry test cse2 folds away entirely (the copy's test-local pseudos are
-        // fresh, so the first loop's index/name classes are hit: the entry falls straight into the step, and the
-        // hoisted `lis` lands on the test's load, not the step's store). The `dir == -1` compare is
-        // loop-invariant and hoisted into cr7.
+        // Both loops step the global itself and read it into a block-local u16 for the table index. The
+        // `dir == -1` back-skip is a rotated `while` whose duplicated entry test cse2 folds away, and its
+        // compare is loop-invariant and hoisted into cr7.
         const char* name = g_modelNameTbl[(s16) g_modelType];
         const char* n;
         char c0 = name[0];
@@ -2614,11 +2609,9 @@ public:
             DB_POINT* ppos = &pos;  // pass 29: one `&pos` pseudo across cse1 flush F2 (cse2 folds the copy into the argument)
             f32 w = 192.0f;
             f32 h = 128.0f;
-            // pass 23: cse1 flush F2 falls between `w` and `h` above, so this `d_ = 4` heads the constant-4 class after
-            // it and the pad survives to cse2 (2 cse1-time, 1 cse2-time insn): it moves cse2's F2' from OPTION+71 to
-            // OPTION+70, out of the FOG CreateString's `this` copy -> pos.y store interval (a surviving `this` copy
-            // makes that `&pos` pseudo GENERAL-class at its entry spill and the target's seg 0 shows it BASE-class).
-            // The 2 cse1-time insns are paid back by SAVE_CHECK's pad (4 -> 2 sets).
+            // pass 23: cse1 flush F2 falls between `w` and `h` above, so this pad survives to cse2 and moves
+            // F2' out of the FOG CreateString's `this` copy interval, as the target's seg 0 needs. SAVE_CHECK's
+            // pad was cut from 4 to 2 sets to pay for it.
             { int d_; d_ = 1; d_ = 4; }
             u32 flg = DB_WIN_KEY_ESC_CLOSE;
             win = pa_->CreateNormalWindow("     Save EVENT", ppos, &w, &h, &flg);
@@ -3638,11 +3631,9 @@ static void PosStickRPosUpdateCallback(DB_PRIMITIVE* p)
 // g_pEditSeq loads stay below it (sched1), as with FSet; unlike FSet the address sits inside the MEM (one cse1-time insn
 // fewer per store: FSet's reference `addi` was folded into the store by cse1 anyway)
 #define FSTORE_AT(p, off, v) (*(f32*) ((u8*) (p) + (off)) = (v))
-// pass 29: the same store kind for every n->max/min/unit of SIZE/SPEED/COLOR/ROTATE (0xA0/0xA4/0xB8): the NEXT row's
-// g_pEditSeq/g_pEditSeq2 loads must be true-dependent on them (the target issues them after the pos.x store), and a
-// max store before min where a SetDefault call follows (the min store waits for the max value's pool load). The
-// CreateNumeric2 rows whose target copy is mr r9,r7 are pointers-first (the g_pEditSeq loads take the LSU before the
-// pos.y store, both li argument sets land after it, so reload's address copy finds r9 free).
+// pass 29: every n->max/min/unit store uses the same store kind so the next row's g_pEditSeq loads
+// depend on them, as in the target. The max store comes before min where a SetDefault call follows,
+// and the rows whose target copy is mr r9,r7 are pointers-first so reload finds r9 free.
 #define POS_MINMAX(n)                                        \
     FSTORE_AT(n, 0xA0, 327670.0f);  /* DB_NUMERIC::max */     \
     FSTORE_AT(n, 0xA4, -327680.0f); /* DB_NUMERIC::min */
@@ -4503,16 +4494,9 @@ public:
 class LIFE_WINDOW : public TOOL_WINDOW {
 public:
     LIFE_WINDOW(DB_PRIM_ARRAY* p) {
-        // pass 21: LIFE straddles cse1 flush F8 (LIFE+8), so this `d_ = 4` heads the constant-4 class after it and the pad
-        // survives to cse2 (n sets = n cse1-time, n-1 cse2-time insns); the 32 cse1-time insns are paid back by the
-        // RELEASE/ANMRATE/ROTATE/VEC0/VEC1/VEC2/SUB/WORK0 pads removed below. pass 22: 37 sets put cse2's F6' at
-        // ANMRATE+46 (seg 619's 80.0f load fresh, as in the target); the 37th cse1-time insn is paid back by ROTATE's
-        // shared `sx2` (below) so that cse1's F9 stays at ROTATE+647 and F10 at WORK0+14, which is pinned: F10 must
-        // fall between WORK0's pos.x load and its pos.y load (x shared with VEC2, y fresh, both stores via the pointer).
-        // pass 23: 39 sets put F6' at ANMRATE+44 = at the ANMRATE CreateNumeric2's `(set this &pos)` copy, no longer
-        // between it and the pos.y store (a surviving copy there made the `&pos` pseudo GENERAL-class at its entry spill;
-        // the target's seg 0 reload rotation shows it BASE-class); the 2 cse1-time insns are paid back by ROTATE's shared
-        // `sx1` (below).
+        // pass 21-23: LIFE straddles cse1 flush F8, so this pad survives to cse2 and its sets put cse2's
+        // F6' at the ANMRATE `&pos` copy as in the target. Its cse1-time insns are paid back by pads removed
+        // below and the shared `sx` variables, so cse1's F10 still falls between WORK0's pos.x and pos.y loads.
         { int d_; d_ = 1; d_ = 2; d_ = 3; d_ = 5; d_ = 6; d_ = 7; d_ = 8; d_ = 9; d_ = 10; d_ = 11; d_ = 12; d_ = 13; d_ = 14; d_ = 15; d_ = 16; d_ = 17; d_ = 18; d_ = 19; d_ = 4; } { int e_; e_ = 7101; e_ = 7102; e_ = 7103; e_ = 7104; e_ = 7105; e_ = 7106; e_ = 7107; e_ = 7108; e_ = 7109; e_ = 7110; e_ = 7111; e_ = 7112; e_ = 7113; e_ = 7114; e_ = 7115; e_ = 7116; e_ = 7117; e_ = 7118; e_ = 7119; e_ = 7120; }
         pa = p;
         win = NULL;
@@ -4639,11 +4623,8 @@ public:
         pa->CreateString(win, "X:", &DB_POINT(255.0f, 0.0f));
         pa->CreateString(win, "Y:", &DB_POINT(255.0f, c16));
         pa->CreateString(win, "Z:", &DB_POINT(255.0f, c32));
-        // pass 22: the RND_ROT column's `sx = 2` is shared through this variable by its first two rows: the second
-        // row's `int sx = 2` costs one cse1-time insn (`(set r 2)`, deleted at cse1's end) that `int sx = sx2` does not,
-        // with the same post-cse1 RTL; it pays back the LIFE pad's 37th set (see LIFE_WINDOW).
-        // pass 23: the same for the ACCELE column's `sx = 1` (rows 4-6, `sx1`): -2 cse1-time insns for the LIFE pad's
-        // sets 38/39.
+        // pass 22/23: sharing `sx` through these variables in the RND_ROT and ACCELE columns saves
+        // cse1-time insns that pay back the LIFE pad's sets 37 to 39 (see LIFE_WINDOW).
         int sx2;
         int sx1;
         {
@@ -4846,14 +4827,9 @@ public:
         }                                                                                                \
     };
 
-// pass 28: VEC0 is the first window after cse1 flush F9, so a pad ending in `d_ = 4` heads the constant-4 class and
-// survives to cse2: 7 sets = +7 cse1-time, +6 cse2-time insns, which puts cse2's F7' at SUB+41 = between SUB row 1's
-// DB_POINT `this` copy (+37) and its pos.y store (+41): the copy survives, the store and the `&pos` argument both read
-// it (one `lwz r6,slot` + `stfs f22,4(r6)` = the target's seg 692), and the 0.0 is the ROTATE copy C0 (f22), not H0.
-// With WORK0's 24-set in-block pad (below) F8' lands at WORKSP1+49, before WORKSP1 row 1's g_pEditSeq load: the
-// WORK-window g_pEditSeq/g_pEditSeq2 highs then have 19 refs each with WORKSP0 row 3 as their last use (the target's
-// 757-759 are all fresh `lis`), a 66/66 local-alloc tie that qty order resolves to g_pEditSeq r16 / g_pEditSeq2 r14.
-// The +7 cse1 is paid back by SUB's pad (24 -> 17).
+// pass 28: VEC0 follows cse1 flush F9, so this pad survives to cse2 and puts cse2's F7' between SUB
+// row 1's DB_POINT `this` copy and its pos.y store, matching the target's seg 692. With WORK0's pad it
+// also gives g_pEditSeq r16 and g_pEditSeq2 r14. SUB's pad shrinks from 24 to 17 sets to pay for it.
 #define VEC0_WINDOW_CSE_PAD() { int d_; d_ = 1; d_ = 2; d_ = 3; d_ = 5; d_ = 6; d_ = 7; d_ = 4; }
 VEC_WINDOW_CLASS(VEC0_WINDOW, " Vec0", 48.0f, vec0)
 #define VEC1_WINDOW_CSE_PAD() { }
@@ -5892,15 +5868,9 @@ void MakeImmSeq(TOOL_SEQ* tbl, TOOL_SEQ* edit, TOOL_SEQ* imm)
     ADD(field)                                                                     \
     if (tbl->field < (lo)) tbl->field = (lo);                                      \
     if (tbl->field > (hi)) tbl->field = (hi);
-// (the clamped colour paths skip the `no++`: the original's flag indices are off by one after a
-// saturated colour add)
-// the saturating colour add: the flag is read once into `f` and tested in EVERY arm of the clamp chain, the
-// imm/add choice is a nested if in the final else with ONE shared `no++`.  jump1's thread_jumps sends the
-// first `f != 0` branch straight to the imm store (`bne Limm`), cse folds the fall-through tests (f == 0
-// known: the 0 arm stores the flag register `stb r6`), and jump2 cross-jumps the imm arm's store into the add
-// arm's (`lbz; b Lst; add; Lst: stb; addi`).  With `no++` inside each arm the tail is `addi; stb` after
-// sched2 and the 255 arm's store merges into it as well (197 words).  The saturated paths skip `no++`
-// (original bug, reproduced).
+// The saturating colour add reads the flag once into `f`, tests it in every arm of the clamp chain,
+// and has one shared `no++` in the final else so jump2 cross-jumps the stores. The saturated paths
+// skip `no++`, an original bug reproduced: the flag indices are off by one after it.
 #define ADD_COLOR(field)                                                           \
     {                                                                              \
         u8 f = g_immFlg[no];                                                       \
@@ -6139,12 +6109,8 @@ void DrawPosCursor()
     }
 }
 
-// Effect editor main loop: EspToolInit, then every frame the pad -> keyboard, the embedded light
-// tool (when open), START toggles the debug camera (Y / X toggle the event camera in camera mode),
-// otherwise EspToolMain / EspToolTrans; X (repeat) replays the selected records as an effect on the
-// viewer model (MakeExecSeqData + SeqSet), R + full trigger deletes the effects; a pending model
-// load runs the db_mod menu. On exit frees the windows and hands the effect back to the game
-// (EspToolExitEstSet) or the event tool.
+// Effect editor main loop: runs the editor every frame, and START toggles the debug camera. On exit
+// it hands the effect back to the game (EspToolExitEstSet) or the event tool.
 void ToolEspMain()
 {
     g_pPrimArray = new DB_PRIM_ARRAY;

@@ -1,7 +1,5 @@
-// game/obj: the object manager (D:/Bio4/Prog/obj.cpp). ObjMgr (cObjMgr) owns the pool of 0x3D8-byte
-// cObj works; construct() placement-news the per-id class (obj00..objBull, ids 0..0x3F) so the
-// virtual move() dispatches to the unit that implements it, move() runs every alive object once a
-// frame (objMove), destroy() frees an object's model resources first.
+// game/obj (D:/Bio4/Prog/obj.cpp): the object manager. ObjMgr owns the pool of cObj works and
+// placement-news the per-id class so the virtual move() dispatches to the unit that implements it.
 #include "atari.h"
 #include "event.h"
 #include "obj.h"

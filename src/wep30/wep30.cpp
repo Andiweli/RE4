@@ -1,10 +1,5 @@
-// wep30 module: Ada's hand grenade (the wep19 cObjHandGre build for one grenade kind; object id
-// 0x3C). The module object carries the class, the entry points and the grenade routine registration
-// (wep/pl_grenade.cpp).
-//
-// Ada's build of wep19: the display-only cObjHandGre (always the hand grenade model, player
-// archive 0x6A/0x6B) hung at Ada's hand (parts 0x11) and belt (parts 10) offsets; Wep30_init is
-// the WeaponInitFunc, PlGrenadeMove the WeaponMoveFunc (itemThrow creates the thrown cSubWep).
+// wep30 module: Ada's hand grenade, her build of the wep19 cObjHandGre. The grenade routines in
+// wep/pl_grenade.cpp drive it, and itemThrow creates the thrown cSubWep.
 
 #include "wep_mod.h"
 #include "light.h"

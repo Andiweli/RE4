@@ -69,11 +69,8 @@ static void asl_chase()
     SceAtSetEnable(9, 1);
 }
 
-// Room init (the mine lift and cart platform): on a fresh entry Ashley counts as following; when she
-// is, she is initialised in chase mode. Coming from r222 (the lower level) normally she is placed at the
-// lift; area 0 = the door back (takes Ashley), 9/0xA = wait / follow, 3/4 = ride the left / right cart
-// to r212, a return from r210 itself (Part 1/2) arrives by cart; areas 5/6 = lift down / up, 7/8 re-arm
-// the lift.
+// Room init for the mine lift and cart platform. On a fresh entry Ashley counts as following, and
+// the areas handle the door, Ashley's wait / follow, the carts to r212 and the lift.
 void R210Init()
 {
 #line 53 "D:/Bio4/Prog/r210.cpp"

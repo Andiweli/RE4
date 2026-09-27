@@ -62,11 +62,9 @@ static inline void r306_setEmPos(int no, EmListData* l, f32& ry)
     r306_work->em[0].setAng(&ang);
 }
 
-// Room init: doors 0x14/0x15 paired; area 4 = the locked 308 door until Key_flg[0] 0x2000 (else
-// area 6 off) with its key-use watcher; area 5 = the 30B door until 0x100; the room effect by item flag
-// 0x20. After Scenario_flg[1] 0x1000 the two Ganados 0x30/0x31 (list 6) are set, placed at their r30B
-// list positions when the player came from there, the battle BGM table and stream watcher; else the
-// plain stream. Case / shelf item events.
+// Room init: the locked 308 and 30B doors. After Scenario_flg[1] 0x1000 the two Ganados are set,
+// placed at their r30B positions when the player came from there, with the battle BGM, otherwise the
+// plain stream plays.
 void R306Init()
 {
 #line 48 "D:/Bio4/Prog/r306.cpp"

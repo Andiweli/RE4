@@ -1,6 +1,4 @@
-// game/filter06: dust / snow / rain particle filter (D:/Bio4/Prog/filter06.cpp). Up to 0x800 line
-// particles drift with a speed around the camera and are wrapped back into a box around it; drawn
-// as lines whose alpha fades with camera distance and eases to the requested colour. Rooms start it
+// game/filter06: dust / snow / rain particle filter (D:/Bio4/Prog/filter06.cpp). Rooms start it
 // through effect controller 44 (Filter06SetParam).
 #include "filter.h"
 #include "atari.h"
@@ -15,13 +13,9 @@
 #include "rnd.h"
 #include "math_sub.h"
 
-// Dust / snow particle filter: `num` line particles drift with a speed around the camera and
-// are wrapped back into a box (LR half width x34, up half height x38, depth x3C) around it.
-//
-// cParticle06::move: the alphaBase load/product live in r11 in the original (the fast-cast address
-// pseudo of `(u8) a` took r9 first, i.e. the loadaddr sat below the `lbz` in the scheduled RTL);
-// ours hoists the loadaddr to the block top, so alphaBase is pinned (see the function). The re-read
-// mask (`clrlwi rX, rStore, 24`) is reproduced with a volatile asm on `v`.
+// Dust / snow particle filter: `num` line particles drift around the camera, wrapped into a box.
+// In cParticle06::move alphaBase is pinned to r11 because ours hoists the loadaddr to the block
+// top, and a volatile asm on `v` reproduces the original's re-read mask.
 
 class cParticle06 {
 public:

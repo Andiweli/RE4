@@ -1,15 +1,5 @@
-// em3b module (D:/Bio4/Prog/em3b.cpp): the truck (type 0) that runs into the barricade and the mine
-// carts (type 1 running down the track, type 2 stopped). The driver is another enemy (work pDriver);
-// the vehicles run over the player, the partner and any Ganado in front (em3bRunDownCk*).
-//
-// Em3bInit is the module's EmInitFunc. The vehicle sits at the origin and is placed by its
-// motion (the room's matrix). Routines: r_no_0 0 init, 1 move, 4 scenario; r_no_1 for the truck:
-// 0 wait (flag bit0 from the room starts it), 1 run (450 frames; the driver dying or the truck's
-// hp at 1 makes it veer at frame 250 / 320), 2 run into the barricade / off the road (r_no_3 =
-// direction); for the carts: 3 wait, 4 run down the track, 5 hit (explodes 80 frames after being
-// stopped), 6 lost, 7 stopped-cart explosion. em->flag bit1 = the vehicle is finished (the room
-// reads it); hp 1 / dmgWait is the "engine on fire" state (ckFire). Em3bWork (em3b.h): timer /
-// seTimer, sndId / sndId2 SE handles, espKind, pDriver, hit.
+// em3b module (D:/Bio4/Prog/em3b.cpp): the truck that runs into the barricade and the mine carts.
+// The room starts them through em->flag bit0 and reads bit1 to know a vehicle is finished.
 
 #include "atari.h"
 #include "light.h"

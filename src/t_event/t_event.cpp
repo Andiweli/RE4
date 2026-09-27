@@ -477,11 +477,8 @@ static TOOL_MENU previewMenu[3] = {
 
 static void (*subRunTbl[3])(ToolEvt*, Event*) = {ToolEvt::SubMenuMain, ToolEvt::SubMenuFog, ToolEvt::SubMenuFocus};
 
-// r_no_0 1, the preview. r_no_1 0 picks an .evd from the host list (A), 1 "DATA LOAD OK?" YES / NO
-// / CONVERT AND LOAD reads it, 2 starts the event (EvtMgr.SetEvt) and inits the fog / focus
-// curves, 3 runs it: sub tools (light, camera, fog, focus, message) take the pads, START / stick
-// stop the event (RunStop), B leaves (or ends the capture), CAPTURE writes screenshots per frame
-// to D:/bio4/Room/Sc_shot; 4 the PREVIEW MENU (SubMenuMain / Fog / Focus by r_no_0_sub).
+// r_no_0 1, the preview: picks an .evd from the host list, loads it ("DATA LOAD OK?"), then starts
+// and runs the event with the sub tools on the pads. CAPTURE writes screenshots to D:/bio4/Room/Sc_shot.
 void ToolEvt::MainPreview(ToolEvt* t)
 {
     char path[0x140];
@@ -1274,14 +1271,9 @@ void ToolEvt::SubToolMessMove(ToolEvt* t, Event* ev)
                     int j;
                     int k;
 
-                    // Back-search over the preceding -1 records, hand-peeled: the target's loop is
-                    // loop.c-shaped (`subi p; addi cnt; subic. k; blt; lwzu messNo; mr p; cmpwi; beq`)
-                    // with giv inits `(m + no*24) - 8` (reload_cse'd to `mr rT,e; subi rT,rT,8`) and
-                    // `e - 24`; no loop.c spelling found gives biv init `no` with a reduced `k - 1`
-                    // giv, so the induction variables are written out. The giv init `m + no*24` is
-                    // spelled `m - (-(no*24))` so cse does not fold it into `e` (a different
-                    // expression until combine makes it `add T,m,A`, which reload_cse then rewrites
-                    // to the target's `mr T,e`); a plain `(u8*) m + ofs` is cse'd to `subi T,e,8`.
+                    // Back-search over the preceding -1 records, hand-peeled with the induction
+                    // variables written out because no loop.c spelling gives the target's loop. The
+                    // giv init is spelled `m - (-(no*24))` so cse does not fold it into `e`.
                     k = no - 1;
                     if (k >= 0 && (p = &m->elem[k])->MessNo == -1) {
                         EventMessageData::MessElem* q = e - 1;

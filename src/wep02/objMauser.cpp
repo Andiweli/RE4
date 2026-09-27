@@ -1,11 +1,5 @@
-// Red9 (Mauser) weapon object (wep02 module, first object; real file name unknown): model by weapon
-// type, ready / fire / down motions, cartridge ejection, the two-step reload (magazine then pin).
-//
-// cObjMauser is the cObjWep (game/objWep.cpp) of the Red9 (weapon_no 3), hanging on the player's
-// right hand (parts 10) and driven by r_no_0 / r_no_1 from the handgun routines
-// (wep/pl_handgun.cpp): mode 1 -> moveReady (the gun's own draw motion), 2 -> moveFire, 3 ->
-// moveDown, 4 -> moveReload (magazine at reloadFrame, the stripper pin ejected at pinFrame).
-// weapon_type 2 is the model with the stock (0x7, weapon list id 0x26, much smaller lock random).
+// Red9 (Mauser) weapon object of the wep02 module (real file name unknown). The handgun routines in
+// wep/pl_handgun.cpp drive it through r_no_0 and r_no_1, including its two-step reload.
 
 #include "wep_mod.h"
 #include "item.h"

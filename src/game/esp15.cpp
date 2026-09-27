@@ -1,9 +1,5 @@
-// game/esp15.cpp: effect id 0x15, a camera-relative weather particle (rain, snow, dust). The
-// sprite lives in a box of size Range (R_pos.z) around the camera: whenever it drifts out on the
-// camera's side / up axes it is wrapped back by 1.2 x Range, along the view axis by Range. The
-// alpha fades over the far Del_ratio (Work8[2] %) part of the box, and fades out over
-// Room_del_frame frames while the player is in a weather-off area (Status_flg[1] 0x02000000).
-// Vec0.x is a floor height the particle may not fall below.
+// game/esp15.cpp: effect id 0x15, a camera-relative weather particle (rain, snow, dust) that wraps
+// around inside a box of size Range around the camera.
 
 #include "atari.h"
 #include "global.h"

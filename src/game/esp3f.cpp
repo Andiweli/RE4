@@ -1,7 +1,5 @@
 // game/esp3f.cpp: effect id 0x3F, not a visible effect but a vector buffer carved out of the esp
-// pool. Esp3f_Alloc pulls one parent esp plus up to 0x12 child esps (Rno0 == 1) whose 0x58 byte
-// work areas hold `nElem` Vecs each; esp12/esp16 use it for their per-particle position/speed
-// arrays. Releasing the parent releases the children.
+// pool. esp12/esp16 use it for their per-particle position and speed arrays.
 
 #include "atari.h"
 #include "light.h"

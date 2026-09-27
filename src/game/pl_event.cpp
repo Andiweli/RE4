@@ -1,7 +1,5 @@
-// game/pl_event: the player's event routine (routine 0 == 5, Pl_R0_Event): the scenario / event
-// system owns the player — Normal plays a set motion (m_Flag 0x100 returns control when it ends),
-// ToWalk turns and walks to m_VecWork0, Smooth changes motion with a footwork. Entered / left through
-// cPlayer::beginAction / endEvent0 (pl_class).
+// game/pl_event: the player's event routine (Pl_R0_Event), in which the scenario / event system
+// controls the player. Entered and left through cPlayer::beginAction / endEvent0 (pl_class).
 
 #include "player.h"
 #include "atari.h"

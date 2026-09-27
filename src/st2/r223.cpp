@@ -104,12 +104,7 @@ static void r223_StrCheck();
         m_->setAng(&(v));           \
     }
 
-// Room init (the mine cart start / lift platform): Debug_flg[1] 0x20000 (silence cEmWrap errors);
-// JumpPoint 1 presets the lift state by debug trigger 1; Room_flg bit 6 (cart available) set; areas 3/4
-// = levers 2/3, area 5 = the escape check; the cart and lift objects; the initial Ganados (list 5) and
-// the wave task; item area 0x80 (the lift key item) enabled once the lift came down (bit 9); area 0x11
-// = using item 0x8D on the platform until bit 10 (else the bomb areas are off); the ambient stream; the
-// lift group posed by bits 7/9 (cart gone / lift down); two more Ganados 0xE0/0xE1.
+// Room init (the mine cart start / lift platform). Debug_flg[1] 0x20000 silences cEmWrap errors.
 void R223Init()
 {
     f32 h;

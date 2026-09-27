@@ -1,11 +1,5 @@
-// Sscrn/ss_item: the key items / treasures screen of the sub screen DLL (D:/Bio4/Prog/ss_item.cpp):
-// main menu tab 0. Two scrolling columns (item_list from cItemMgr::makeItemList: key items, then
-// treasures) of eight slot frames each (IdNum 0x40.. digits parented to the frame units), a cursor
-// in SUB_SCREEN::pItemWk (ItemScreenWork), the command menu (use / combine / examine), the combine
-// target pick and the item examine view. Data: SS/<lang>/ss_item.dat (id textures, IdSub/IdNum
-// tables, item names). Widgets: SsItemInit (load) -> SsItemMain running ItemSelect -> ItemCommand
-// -> ItemCombine / SsItemExamine; links 0 case, 2 map, 3 files, 4 bottle caps, 5 exit. Also the
-// debug ITEM MAKE menu (Z on pad 1).
+// Sscrn/ss_item: the key items and treasures screen of the sub screen DLL (D:/Bio4/Prog/ss_item.cpp),
+// tab 0 of the main menu. It also holds the debug ITEM MAKE menu (Z on pad 1).
 #include "types.h"
 #include "global.h"
 #include "map_obj.h"
@@ -305,11 +299,8 @@ void SsItemMain::init(SUB_SCREEN* wk)
     SndCall(0, 0x1E, 0, 0, 0, 0);
 }
 
-// Key items / treasures screen frame: state 0 runs the child widget (ItemSelect state 1 = exit the
-// sub screen via link 5, 2 = up to the main menu; ItemCommand state 1 = item used -> exit, 2 = show
-// the cap screen via link 4; R (Key bit 23) jumps to the attache case), state 1 runs the main menu
-// tab row (0 back here, 1 case, 2 map, 3 files, 4 exit; down returns to the list). Z on pad 1 (with
-// a second pad when System_flg bit 3) toggles the debug item-make menu, B closes it.
+// Key items screen frame: runs the item list widgets or the main menu tab row. Z on pad 1 toggles
+// the debug item-make menu and B closes it.
 void SsItemMain::move(SUB_SCREEN* wk)
 {
     int i;

@@ -1,7 +1,5 @@
-// game/espgen00: effect controller 00, the repeating emitter (D:/Bio4/Prog/espgen00.cpp). A
-// controller record of Kind 1 / Espgen_type 0 spawns its esp record `num+1` times every `wait`
-// frames for `life` frames, following a parts of its model, with per-emission scale/speed/alpha
-// curves (Calc_D256). Entry points: Espgen00_Move (EspgenMoveTbl), Espgen00_SetFreeWork.
+// game/espgen00 (D:/Bio4/Prog/espgen00.cpp): effect controller 00, the repeating emitter, which
+// espgen runs through EspgenMoveTbl.
 #include "atari.h"
 #include "light.h"
 #include "global.h"

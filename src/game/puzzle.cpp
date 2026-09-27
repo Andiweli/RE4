@@ -1,8 +1,5 @@
-// game/puzzle: the attache case packing puzzle behind the inventory — pzlBoard is a cell grid
-// (the case, and a spare board) holding pzlPiece pieces (one per item, shapes from piece_info,
-// rotated / mirrored in 8 orientations), pzlPlayer moves a cursor and a hand piece between the
-// boards (pick / put / swap / cancel) and writes the layout back into the ItemWork records.
-// PutInCase is the game-side entry that fits a picked-up item into the case (or stacks ammo).
+// game/puzzle: the attache case packing puzzle behind the inventory (pzlBoard, pzlPiece, pzlPlayer).
+// PutInCase is the game-side entry that fits a picked-up item into the case.
 #include "types.h"
 #include "map_obj.h"
 #include "light.h"
@@ -318,11 +315,9 @@ none:
     return 0;
 }
 
-// The last arm's `neg; extsb; blr` tail is cross-jumped into the previous arm in the original:
-// jump2 only pairs RETURN insns, so every arm returns on its own (the `break` form's last arm falls
-// into the shared return and is never a candidate). With per-arm returns the byte value prefers r3
-// (global.c's sign_extend preference); the original keeps it in r0.
-// Signed height in cells for the current orientation.
+// Signed height in cells for the current orientation. Every arm returns on its own because jump2
+// only cross-jumps RETURN insns, as the original does with the last arm's tail. Our byte value
+// then prefers r3, while the original keeps it in r0.
 int pzlPiece::size_y()
 {
     register s8 size asm("r0");  // COMPILER-DIFF: #17 (value pin)
@@ -816,11 +811,9 @@ static void dispCell(pzlBoard* b, int x, int y)
     eprintf(x, y, 0, 0, "%c", (b->cellState(x, y) & 1) ? '1' : '0');
 }
 
-// Case sizes: the switch is on an unsigned index with a `case 0` sharing the default label
-// (balanced tree root 1, `cmplwi/blt` to default for 0, case bodies laid out 3, 2, 1, default).
-// One `p` for both piece loops (its priority then beats `item`'s: p r31, item r30); the flag
-// clear loop has its own counter (r10, no call crossed); item positions are stored halved
-// (save() doubles them back).
+// The switch is on an unsigned index with a `case 0` sharing the default label to get the original
+// case tree. One `p` serves both piece loops so it gets r31 ahead of `item`. Item positions are
+// stored halved (save() doubles them back).
 int pzlPlayer::init(int size)
 {
     int w;
@@ -1319,22 +1312,9 @@ pzlPiece* pzlPlayer::cmbPiece(pzlBoard* b)
     return 0;
 }
 
-// Structure notes (bytes): the Joy arms set `ret = 2` and `goto cursor` past the wall block (a
-// `do {} while (0)` would be a loop: its invariants get hoisted), so they skip the `Key.rep & 0x0F000000` test and fall into the cursor
-// update; `Joy` is read through a pointer (`&Joy` materialised in block 0); `out` is `== 1`
-// (`xori; subfic; adde`); the board swap writes `ny` (0.0f on the impossible third path, the step
-// is the -2.0f constant); `edge` and `step` are ints converted with the double trick; the
-// `size_y < 0` clamp adds `cur->h` implicitly (int -> float, magic) where the compare casts (psq_l);
-// the `dir` shuffle is a two-case switch. Pass 2: both dir switches have `case 0:` (their lower
-// halves cross-jump), the compares convert the member `cur->h` directly (raw byte to psq_l) while
-// the stores use the int, `caseBoard` goes through a local before the swap (load order). Pass 4
-// (matched): the y clamp uses two ints. `ch` (compare arm only, single set -> r9) and `h`, declared
-// with `edge` and set in BOTH y arms (`h = (int)(fabsf(...) - 1.0f) - 1` and `h = edge - sy`): a
-// multi-set pseudo cannot be tied to the fix result (so the fix ties to the fctiwz temp, r9, and
-// the `- 1` lands in the global r0), and its `subf` gets no r3 suggestion (`subf r0,r3,r30`). Arm 2
-// re-extends and increments `edge` itself (`extsb r30,r30; addi r30,r30,1`); the volatile launder
-// after the size_y call keeps those two below the call (edge crosses calls, so the scheduler has no
-// anti-dependence to hold them there) and keeps the (s8) from folding away.
+// Structure notes: the Joy arms `goto cursor` past the wall block because a `do {} while (0)` would
+// be a loop and get its invariants hoisted. The volatile launder after the size_y call keeps arm 2's
+// re-extend and increment of `edge` below the call and keeps the (s8) from folding away.
 int pzlPlayer::movePiece()
 {
     pzlPiece* p = m_inhand;

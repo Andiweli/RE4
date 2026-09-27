@@ -1,10 +1,5 @@
-// game/trans_lit: GX lighting set-up for the model draws. A model carries up to 8 cLight pointers
-// picked by the light manager (LightInfo.pLight); LightSetModel turns them into GX light objects
-// (position in camera space, colour x alpha scaled by the enemy's light area, attenuation by the
-// light's type xD: 0 constant, 1 linear, 2 quadratic, 3 spot, 4 custom, 5 parallel, 6 spot-quad,
-// 7 local ambient) and sets the ambient (scenery / effect / enemy ambient, plus the model's
-// AddAmb) and material colours. The common*LightSet variants do the same for cloth, water and
-// effects; LightDisable draws unlit.
+// game/trans_lit: GX lighting set-up for the model draws. LightSetModel turns the cLight pointers
+// that the light manager picks for a model (LightInfo.pLight) into GX light objects.
 #include "types.h"
 #include "vec.h"
 #include "gx.h"
@@ -61,11 +56,8 @@ void LightSetInit()
     GXInitLightAttn(&lightObjBlack, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
 }
 
-// Lighting for a model draw: unlit when LightInfo.Flag bit2; each of its lights (none when be_flag
-// 0x8000) becomes a GX light by type (type 7 only raises the ambient), the light mask is loaded;
-// self-lit models (data flags 0x40000000) use their colour as ambient; else the environment
-// ambient chosen by EnableMask (0x10 scenery, 8 effects, else enemies) plus AddAmb (be_flag 8),
-// material = the model colour.
+// Lighting for a model draw: each of the model's lights becomes a GX light by type, except type 7,
+// which only raises the ambient. Self-lit models use their own colour as the ambient.
 void LightSetModel(cModel* pMod)
 {
     LIGHT_FUNC_TABLE;

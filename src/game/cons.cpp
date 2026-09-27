@@ -1,7 +1,5 @@
-// game/cons.cpp: per-room constants ("cons" table): the work pool sizes the room start uses
-// (game.cpp: 0 enemies, 1 objects, 2 esp, 3 espgen, 4 ctrl, 5 lights, 6 / 7 model and parts
-// pools, 8 primitives, 10 / 11 collision pieces). A room may override entries; the rest come
-// from ConsRoomDefault.
+// game/cons.cpp: the per-room "cons" table of work pool sizes used by the room start in game.cpp.
+// A room may override entries, and the rest come from ConsRoomDefault.
 
 #include "types.h"
 #include "db_log.h"

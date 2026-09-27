@@ -1,19 +1,5 @@
-// game/snd: game-side sound interface (D:/Bio4/Prog/snd.cpp, -O2). Owns the game sound work
-// (`Snd`, pSnd), the sound data memory map (`SndMem`) and the room BGM / stream tables, and calls
-// into the C sound driver (src/game/snd_*.cpp, include/snd_drv.h).
-// 92/97 byte-identical (DOL sweep 6, 2026-09-10): SndBgmTblSet reads pG through `GRefS` (the load
-// stays inside the store loop) with `r` declared before `ret`; SndCall reads the address-taken
-// parameters `blk`/`no` through `RefU16` where the target reloads them after word stores (their
-// stack slots are MEM_SCALAR_P in ours, not in the original's alias.c), tests a single-use
-// `int ok = 1` (the `li r0,1; cmpwi r0,0; bne`), and nests the curve test so `cs` is computed
-// before `curve_ok == 1`. 97/97 (DOL sweep 11): SndCall's `flags_68` test reads the field through
-// `RefU32` (an unflagged MEM conflicts with the u16 parameter stores, whose ready-delay 2 then ranks
-// them above `lwz pG`); SndSetReverb's `p` is one variable assigned in both arms (global pseudo in
-// r9, the then-arm pSnd load falls to r9 too); SndRoomBgmStart's SndCall sits in two nested
-// do-while(0)s (seq/vol/no gain two weighted refs each: allocation order seq, vol, no, w);
-// sndVolCalcSub has a dead `dist > vol` test after the `r` chain. debugDisp: the history
-// row's y is the giv `i * 0x10 + 0x20` (its init lands after the hoisted table addresses and its extra
-// loop insns keep `&History.svol` unhoisted like the target), `y2 = 0x72` before `total = 0`.
+// game/snd: game-side sound interface (D:/Bio4/Prog/snd.cpp, -O2) that calls into the C sound
+// driver (src/game/snd_*.cpp, include/snd_drv.h).
 #include "types.h"
 #include "global.h"
 #include "map_obj.h"
@@ -725,13 +711,9 @@ u32 DoorSeCall(u16 call_no)
 
 void getCam2SndAngle(f32* pan, f32* span, f32* dist, Vec* pos);
 
-// Plays SE `no` of block `blk` (SIT entry): block-specific number fix-ups, then pan / surround
-// pan from the camera angle, volume / pitch / filter from the room's distance curves (curve_sel)
-// unless the SE is 2D (srd_type 1), wall muffling, volume-control and inner areas, a fixed `vol`
-// override (low byte; bits 0x100..0x400 = ctrl flags, 0x80000000 = follow `pos` / `obj`); the
-// request goes to the driver (Snd_iss_req_para), BGM blocks 3 / 4 fill bgm_work, positional
-// sounds get a SndSurWork so sndSurroundCalc keeps updating them. Returns the sound id, 0 when not
-// played (missing SE, muted, volume 0, debug off).
+// Plays SE `no` of block `blk` with pan and volume from the camera and the room's distance curves,
+// and sends the request to the driver (Snd_iss_req_para). Positional sounds get a SndSurWork so
+// sndSurroundCalc keeps updating them. Returns the sound id, or 0 when not played.
 u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
 {
     SND_CTRL_WORK* c = &Snd_ctrl_work;
@@ -1357,11 +1339,9 @@ void sndSurroundCalc();
 void debug_mute_check();
 void debugDisp();
 
-// Once per frame (main loop): positional SE update and ambient emitters (unless Stop_flg 0x800),
-// the driver tick, house-keeping of the BGM / stream slots (finished ones freed, a stream paused
-// for 300 frames is stopped), the enemy SE history timers, and the floor-attribute BGM control
-// (FlrAt kind 2: per-slot volume set / reset and a stream start / stop while the player stands on
-// it). Skipped while Status_flg[0] 0x10000000.
+// Once per frame from the main loop: positional SE and ambient emitter updates, the driver tick,
+// BGM / stream slot house-keeping and the floor-attribute BGM control. A stream paused for 300
+// frames is stopped.
 void SndWatcher()
 {
     u32 i;

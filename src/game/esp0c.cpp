@@ -1,9 +1,5 @@
-// game/esp0c.cpp: effect id 0x0C, an est (effect set) spawner. It never draws: on its first move
-// it starts est id Work8[1] of owner Work8[0] at its position (or the water variant prm 0xD3 /
-// 0xCF when the point was raised onto the water surface) with a control block that adds the
-// sprite's speed and multiplies size (x 0.005) and colour, then releases itself. Work8[2] snaps
-// the position to the floor (1) or floor / water (2); Work8[3] == 1 discards points inside the
-// room's effect area.
+// game/esp0c.cpp: effect id 0x0C, an est (effect set) spawner that never draws. On its first move
+// it starts est id Work8[1] of owner Work8[0] at its position, then releases itself.
 
 #include "atari.h"
 #include "light.h"

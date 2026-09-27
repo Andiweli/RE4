@@ -186,18 +186,9 @@ void R307Main()
 {
 }
 
-// Tests the two solution patterns; the matched pieces light up. 1 when a pattern is complete.
-// The inner loop reads `r307_pattern[i].num` in its condition and exit test (one hoisted load, the
-// `i*12` giv kept beside the base) and `zero` is declared inside the second loop body (init order).
-// The tail's `eff` read is `add r9, r9, r10` = (plus sym pat*12), the sum tied to the dying sym
-// register: cse swaps a (plus A B) to put a constant-equivalent A second, and it knows the fresh
-// `r307_pattern` address (lo_sum of a high it folds) in any ebb that contains it, so the read goes
-// through `tbl` (an array member through a pointer keeps the base first at expand) and the
-// LOOP_END-blinded dead test `k`: cse1 ends its ebb at the `do {} while (0)` LOOP_END, so it cannot
-// fold `k != 2` and follows the branch AROUND `tbl = 0`, invalidating `tbl`; cse2 folds the test
-// into an unconditional jump and skips the rest of the tail, and jump/flow delete the test, the
-// label and `k` before sched1 (the loop notes sit between two calls: the barrier they impose on
-// `li r3, 15` changes nothing). The `ok != 1` arm first blocks jump1's range swap.
+// Tests the two solution patterns and lights the matched pieces, returning 1 when one is complete.
+// The tail reads `eff` through `tbl` and the dead test on `k`, which cse1 cannot fold past the
+// `do {} while (0)` LOOP_END, so the sum keeps the target's `add r9, r9, r10` order.
 int r307_checkPiece()
 {
     u32 i;

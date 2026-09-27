@@ -1,10 +1,5 @@
-// Sscrn/ss_file: the files screen of the sub screen DLL (D:/Bio4/Prog/ss_file.cpp): main menu tab
-// 3. Three categories (fileNum: 12 / 10 / 8 files, one per stage) of file items (fileId2No), row 0
-// of each list being the radio log of the last codec call; a file opens as paged text (fileInfo:
-// first message, colour, attribute, layout) with per-page pictures read into the 0x20000-byte
-// TPL buffer. Data: SS/<lang>/ss_file.dat (id textures, list / frame tables, file texts, the 24
-// radio-log message blocks). Widgets: SsFileInit (load) -> SsFileMain running FileSelect
-// (category row / file list, SsFileWork cursor) and MessageDisplay (the reader).
+// Sscrn/ss_file: the files screen of the sub screen DLL (D:/Bio4/Prog/ss_file.cpp), main menu tab 3.
+// SsFileMain runs FileSelect for the file lists and MessageDisplay for the paged reader.
 #include "types.h"
 #include "global.h"
 #include "map_obj.h"
@@ -637,11 +632,8 @@ void FileSelect::init(SUB_SCREEN* wk)
 {
 }
 
-// File list input. mode 0 (category row): Y/B-to-game -> state 1, B/up -> main menu (state 2, not
-// for SS_OPEN_FILE), A/down enter the list, left/right change the category (0..2, limited by the
-// stage). mode 1 (files): B or up on row 0 back to the category row, up/down move the cursor with a
-// 5-row scroll window, A opens an owned file (fileInfo -> SsFileWork page setup) or the radio log
-// (row 0, the last OpeGetMdtNo call's messages) in MessageDisplay; error sound otherwise.
+// File list input for the category row and the file list. A opens an owned file or the radio log
+// (row 0, the last OpeGetMdtNo call's messages) in MessageDisplay.
 void FileSelect::move(SUB_SCREEN* wk)
 {
     SsFileWork* fw = wk->file;
@@ -810,11 +802,9 @@ void MessageDisplay::init(SUB_SCREEN* wk)
     tplFirst = 1;
 }
 
-// File reader: state 0 A advances a page (past the last page closes), left/right turn pages, B
-// closes; 1/2 play the frame's close animation then return to FileSelect. Reads the page's picture
-// (SS/<lang>/fNNx.tpl, x = 'a' + picture index, into pTplDat; tplState 0 shown -> 1 request ->
-// 2 reading, a page change cancels a stale read) when it changes and draws it, then the
-// "page/total" digits and the prev/next arrows.
+// File reader: A and left/right turn pages, and B or paging past the end closes back to FileSelect.
+// Each page's picture is read into pTplDat when the page changes, and a page change cancels a
+// stale read.
 void MessageDisplay::move(SUB_SCREEN* wk)
 {
     SsFileWork* fw = wk->file;

@@ -1,7 +1,5 @@
-// game/objYagura: the ladder object (yagura = tower/scaffold) placed by the room scripts
-// (SetYagura, ObjMgr id 0x39): a static model with a pass-through collision box whose only
-// behaviour is the vibration motion the room hands it (setMotionVib / setVib) when the player
-// climbs or kicks it; the climbing itself is the player's ladder routine (pl_R1_Ladder).
+// game/objYagura: the ladder object (yagura = tower/scaffold) placed by the room scripts. It only
+// vibrates when the room tells it to, and the climbing is the player's ladder routine (pl_R1_Ladder).
 #include "atari.h"
 #include "atari_init.h"
 #include "light.h"

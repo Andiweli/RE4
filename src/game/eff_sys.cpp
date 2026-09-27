@@ -1,10 +1,5 @@
-// game/eff_sys.cpp: the effect system core. Owns the cEspSystem work (g_pEspSys, allocated per room
-// by EspRoomInit) and registers the effect data files (EspDataLoad, version 0xB: textures with
-// their animation tables, est tables, room effect (sst) tables, paths and effect models) per
-// owner id (owner_name_tbl: 0 core, 1 room, enemies, weapons, ET room-event owners, 0xD2 =
-// free). The lookups the esp/espgen units use every frame (EspGetTexObj, EspGetEstAddr,
-// EspGetPathAddr, EspGetEfmAddr ...) index these tables. Also the per-room effect area states,
-// the final colour, the tool state (room thunder callbacks) and the generator pre-run loop.
+// game/eff_sys.cpp: the effect system core, which registers effect data files per owner id in the
+// cEspSystem work (g_pEspSys) for the lookups the esp and espgen units make every frame.
 
 #include "atari.h"
 #include "light.h"
@@ -17,12 +12,8 @@
 #include "os_vi.h"
 #include "db_log.h"
 
-// Matching. EspDataLoad takes the data address as a `u32` (not a pointer): with a pointer-flagged
-// base the table offsets are index registers (GENERAL_REGS, r0 first); with an integer base
-// regclass counts base/index equally and the offsets prefer BASE_REGS (r9/r11).
-// Effect system core: the cEspSystem work (g_pEspSys), per-owner registration of the effect
-// data files (textures, effect set tables, room effect tables, paths, effect models) and the
-// small state accessors the game code uses.
+// EspDataLoad takes the data address as a `u32`, not a pointer, so that regclass puts the table
+// offsets in BASE_REGS (r9/r11) instead of index registers starting at r0.
 
 #define EFF_TEXOBJ_MAX 0x1F4
 
@@ -232,11 +223,9 @@ void EspInit()
     DCStoreRange(g_EspCommonDisplayList, sizeof(g_EspCommonDisplayList));
 }
 
-// Room start: allocates and clears the cEspSystem, marks every texture / model / est / sst / path
-// table entry free (owner 0xD2), sets the world parent coordinate and defaults, loads the core
-// effect data (owner 0) and the subscreen data (owner 0xD1) from the main archive, and requests
-// a 200-frame generator pre-run (g_nLoop) so ambient effects are already settled on the first
-// frame.
+// Room start: allocates the cEspSystem, frees every effect table entry and loads the core and
+// subscreen effect data. It requests a generator pre-run (g_nLoop) so ambient effects are already
+// settled on the first frame.
 void EspRoomInit()
 {
     cEspSystem* p;

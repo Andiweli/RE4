@@ -1,14 +1,5 @@
-// Machine gun player routines (wep11/wep12/wep27/wep29/wep39 modules, first routine object; real
-// file name unknown): routine 2 of the player while a machine gun is equipped: ready, set (idle /
-// turn), fire (burst with recoil), down, reload. Modelled on game/pl_knife.cpp.
-//
-// Entry: PlMachineMove is the module's WeaponMoveFunc (pl_R1_Weapon, r_no_1 == 6). r_no_2 is the
-// weapon state (0 ready, 1 set, 2 fire, 3 down, 4 reload), r_no_3 the step, mirrored into the
-// weapon object's r_no_0 / r_no_1. Full auto: the fire state loops step 1 -> 0 every 3 frames
-// while the fire key is held and rounds remain. Weapon archive slots: 0x1A draw, 0x1B/0x1F/0x21
-// aim idle down/level/up (mot3 pitch blend on m3r), 0x1C/0x20/0x22 fire, 0x1D holster,
-// 0x1E/0x23/0x24 reload by weapon_lv_reload. weapon_no 0xB is the TMP (cocking SE on the draw).
-// lockCtr (pl_wep.h) is defined here: the lock-on frame counter PlWepLockCtrl uses.
+// Machine gun player routines of the wep11/wep12/wep27/wep29/wep39 modules (real file name unknown).
+// PlMachineMove is the modules' WeaponMoveFunc, and it mirrors its state into the weapon object.
 
 #include "atari.h"
 #include "light.h"
@@ -294,11 +285,8 @@ static inline void wep11_hitCheck(cPlayer* pl)
     PlWepHitCheck2(pl, &p0, &p1, pG->weapon_no, 0, 6000.0f);
 }
 
-// fire step 0: one round. trigger() spends it and fires the weapon object; the fire motions
-// 0x1C/0x20/0x22 start (cut, no blend); the bullet line runs from the right hand (parts 10),
-// muzzle offset (-265.5, -24, 38.33), 50 m along -X with a +-200 random spread -> PlWepHitCheck2
-// (6 m range). Weapon object mode 2, m_Work4/m_Work5 = 1, PlWepLockRand recoils the aim pitch /
-// yaw, the laser is redrawn. Then step 1.
+// fire step 0: one round. trigger() spends it and fires the weapon object, the bullet line from
+// the right hand goes to PlWepHitCheck2, and PlWepLockRand recoils the aim. Then step 1.
 static void wep11_r3_fire00(cPlayer* pl)
 {
     static Vec p0;

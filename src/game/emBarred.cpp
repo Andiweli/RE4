@@ -38,11 +38,9 @@ EmBarredFunc EmBarred_R1_move_tbl[4] = {
 };
 
 
-// Creates a barred gate enemy (id 0x4E) from a model / TPL at pos / rot unless room etc flag
-// `flagNo` bit0 says it was destroyed. type 1..9 selects the gate size (atari cylinder, hit
-// boxes, Height / Width of the lifting frame): 5 / 6 / 8 / 9 are the automatic gates that rise
-// when someone comes near (start closed, Status 2), the others start open (Status 1) and are
-// scripted; type 6 also has shootable bars (Rno1 3 Break). 1000 hp. NULL on failure.
+// Creates a barred gate enemy unless bit0 of room etc flag `flagNo` says it was destroyed. Types
+// 5 / 6 / 8 / 9 are automatic gates that rise when someone comes near, the others are scripted.
+// Type 6 also has shootable bars. Returns NULL on failure.
 cEmBarred* SetEmBarred(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo, int type)
 {
     cEmBarred* em;

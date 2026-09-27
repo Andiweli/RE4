@@ -99,12 +99,8 @@ void st3_checkCountDown();
 void st3_endCountDown();
 
 
-// Room init (the jet ski escape, the last room): the result id data; a fresh entry marks Ashley as
-// following and gives the jet ski key (item 0x88); JumpPoint 2 skips to the escape event. Area 0xE =
-// the key prompt with its use watcher, the (empty) shake and wind tasks; area 1 = the ride start (s00)
-// until Room_flg bit 0, area 2 = the escape (s10) until bit 1, area 4 = the way collapsing until bit 3,
-// area 0x11 = continue point until bit 2; the cave-fall effect areas (0, 0x10, 6, 8, 0xA, 0xC); the
-// collapsed objects hidden; the water render target.
+// Room init (the jet ski escape, the last room). A fresh entry marks Ashley as following and gives
+// the jet ski key, and JumpPoint 2 skips to the escape event. The shake and wind tasks are empty.
 void R333Init()
 {
     int zero;

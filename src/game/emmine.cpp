@@ -53,11 +53,8 @@ static EmMineFunc EmMine_R1_move_tbl[9] = {
     emMine_R1_Lost,
 };
 
-// Creates a mine / arrow enemy (id 0x4F) from a model / TPL at `pos` flying with speed `spd`
-// (NULL: a random forward throw). type 0 mine, 1 homing mine (picks its target at once), 2
-// crossbow arrow; a firepower level above 2 forces em->type to 1 whatever was asked. Records the weapon
-// level for the blast radius, a Core_kind for the trail effects and the default explosion est
-// 0x36 / SE. Starts in Rno1 0 Shot (mine) or 1 ShotArrow. NULL on failure.
+// Creates a mine / arrow enemy (id 0x4F) at `pos` flying with `spd` (NULL for a random forward
+// throw). A firepower level above 2 forces em->type to 1 whatever was asked. NULL on failure.
 cEmMine* SetMine(void* bin, void* tpl, Vec* pos, Vec* spd, int type)
 {
     cEmMine* em;
@@ -217,11 +214,8 @@ void emMine_R0_Move(cEmMine* pEm)
     EmMine_R1_move_tbl[pEm->r_no_1](pEm);
 }
 
-// Rno1 == 0: the mine in flight: starts the trail est 0x38, explodes after 210 frames, homes on
-// its target every frame (type 1, retargeting every Homing_wait frames), moves by Spd; hitting an
-// enemy sticks the mine to it (emMineHitCk -> Parent), hitting the scenery sticks it there (Set,
-// with the surface effect and the explosion est / SE chosen by the surface's AtEffInfo; attribute
-// 0x40 surfaces detonate at once), landing in water sinks it (SetWater with a splash).
+// Rno1 == 0: the mine in flight. It homes on its target (type 1), explodes after 210 frames, sticks
+// to an enemy (emMineHitCk) or the scenery, and sinks in water.
 void emMine_R1_Shot(cEmMine* pEm)
 {
     EmMineWork* w = EMMINE_WK(pEm);
@@ -1221,11 +1215,8 @@ void cEmMine::setFall()
     r_no_3 = 0;
 }
 
-// Enemy hit test along the last move (GetWepTargetList2 with weapon type 0xE mine / 0x1C
-// arrow): registers the hit on the enemy's damage info, embeds the projectile in the hit part
-// (aimed 50 units back along the hit direction; objects use the flight direction), doubles its
-// scale, plays the stick SE (0x50 on objects, 0x54 for arrows on flesh) and parents it. 1 when
-// something was hit.
+// Enemy hit test along the last move (GetWepTargetList2): registers the hit, embeds the mine or
+// arrow in the hit part and parents it there. Returns 1 when something was hit.
 int emMineHitCk(cEmMine* pEm)
 {
     Vec hit;

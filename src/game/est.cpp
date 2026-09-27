@@ -1,9 +1,5 @@
 // game/est: the effect set ("EST") front end (D:/Bio4/Prog/est.cpp). EstSet(owner, id) is how
-// game code starts an effect: it looks the est table up in the loaded effect data
-// (EspGetEstAddr) and starts a controller 10 sequence player on it. Also the room "SST" effects
-// (per-room effect lists started by area / room key), the effect deletion front ends
-// (EffectEspDelete / EffectDeleteAll / EventCutEffDelete ...), the eat (hit) effects
-// (EspSetEatEffect) and a few water helpers. EspEvModList maps event model numbers to models.
+// game code starts an effect, and the file also holds the room "SST" effects and effect deletion.
 #include "atari.h"
 #include "light.h"
 #include "global.h"

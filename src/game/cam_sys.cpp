@@ -1,7 +1,5 @@
-// game/cam_sys.cpp: Camera orientation maths shared by every camera routine. A Camera holds pos /
-// at / roll / fovy (param) and the derived orientation matrix `mat` (columns Right, up, Look =
-// pos - at). CameraSetOrientation* rebuild the matrix from the parameters; the Rot / Dolly /
-// Distance helpers move pos or at and rebuild.
+// game/cam_sys.cpp: Camera orientation maths shared by every camera routine. The helpers move pos
+// or at and rebuild the orientation matrix `mat`.
 
 #include "types.h"
 #include "vec.h"

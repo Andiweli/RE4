@@ -1,7 +1,5 @@
-// game/filter02: Z-masked depth-of-field filter (D:/Bio4/Prog/filter02.cpp). The frame is blurred by
-// repeated half/quarter-size feedback copies (Filter02DrawBuffer) and blended back through a C8 mask
-// derived from the Z buffer (Filter02DrawBuffer2: pixels beyond f02_start_no are progressively
-// blurred). Disabled in the retail build (use_filter2 == 0).
+// game/filter02: Z-masked depth-of-field filter (D:/Bio4/Prog/filter02.cpp), disabled in the retail
+// build (use_filter2 == 0).
 #include "filter.h"
 #include "light.h"
 #include "gx.h"

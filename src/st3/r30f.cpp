@@ -155,11 +155,8 @@ static void em_set2();
 static void gate_open();
 }
 
-// Room init (the bulldozer ride): the lift adjust vector zeroed; enemy 0x1F pre-read; area 0x17 rides
-// on object 0x1E; area layout 1; most areas off, area 0xF = the lift-yard Ganados. JumpPoint 1..4
-// skips ahead to that gate (the area layouts and gates already broken); otherwise the ride task starts
-// and the bulldozer (cObjBull, SetBull) is created with its motions; the truck hit boxes, the lift
-// objects and the rest of the setup follow.
+// Room init (the bulldozer ride). JumpPoint 1..4 skips ahead to that gate, otherwise the ride task
+// starts and the bulldozer (cObjBull, SetBull) is created.
 void R30fInit()
 {
     R30fWork*& wp = r30f_work;   // reference: `lis work@ha` before the call (the Debug_alloc idiom)

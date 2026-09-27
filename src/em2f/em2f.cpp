@@ -1,9 +1,6 @@
 #include "obj1c.h"
-// em2f module (D:/Bio4/Prog/em2f.cpp): the lake monster. It swims along the room's EMI route points
-// (em2fSetNextRoute / em2fChangeRoute), dives and surfaces (em2fWaterEffSet), rams the boat from
-// below (em2f_R1_RisingDragon), swallows the player (em2f_R1_Packman), hides until the harpoons hit
-// (em2f_R1_HideMode), drags the player under when it dies (em2f_R1_Critical with its camera) and
-// breaks the floating islands it runs into (em2fIslandCrashCk); its tentacles are cObj16 objects.
+// em2f module (D:/Bio4/Prog/em2f.cpp): the lake monster. It swims the room's EMI route, rams the
+// boat, swallows the player and drags him under when it dies. Its tentacles are cObj16 objects.
 
 #include "atari.h"
 #include "light.h"

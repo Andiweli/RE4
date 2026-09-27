@@ -1,8 +1,5 @@
-// game/camera.cpp: the game camera front end. pG->Camera is the Camera used for rendering; CameraMove
-// (game loop) lets the camera controller (CamCtrl, cam_ctrl.cpp) compute the frame's camera,
-// applies the quake offset and the debug camera, rebuilds the projection / view matrices and
-// updates the view frustum. Also small helpers: stick direction in camera space, up / look
-// vectors, screen point to world ray.
+// game/camera.cpp: the game camera front end. CameraMove lets the camera controller (cam_ctrl.cpp)
+// compute the frame's camera and builds pG->Camera, the camera used for rendering.
 
 #include "types.h"
 #include "vec.h"
@@ -70,12 +67,9 @@ void CameraRoomInit()
     CamDbg.m_move_gain = 1.0f;
 }
 
-// Per-frame camera update (game loop): CamCtrl.Check / Move produce the frame's camera, copied
-// into pG->Camera when the camera is live (Status_flg[0] 0x100) and not overridden by the debug
-// camera (Debug_flg[0] 0x10000000; an extra camera pointer wins), then the quake offset (unless
-// Stop_flg 0x10000), the debug camera pad handling, projection (fovy 0 is an error -> 50), dist,
-// the look-at matrix, the view frustum and the camera debug text. Stop_flg 0x40000000 freezes
-// the controller.
+// Per-frame camera update from the game loop: copies the controller's camera into pG->Camera
+// unless the debug camera overrides it, then builds the projection and view. A fovy of 0 is an
+// error and is replaced by 50.
 void CameraMove()
 {
     CAMERA* cam = &pG->Camera;

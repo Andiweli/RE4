@@ -92,11 +92,8 @@ static void funcAshleySwitch(cEm* p);
 static void funcAshleyShutter(cEm* p);
 static void SceBgmCheck();
 
-// Room init: Scenario_flg[1] 0x400; the two coop switches (etc 8/9) linked to each other and to the
-// barred gate 0xC; the power shutter (area 0x14) and the front shutter Ashley crawls under (area 0x18)
-// per the save record's bits 0x10000000 / 0x08000000; the coop gate (areas 0x10/0x11 with area 1 = the
-// door check) until Key_flg[0] 0x400; three treasure item events; two Ganados (0x5E/0x5C) per flags;
-// the battle stream.
+// Room init. The two coop switches are linked to each other and to the barred gate 0xC, and the
+// power shutter and the front shutter Ashley crawls under follow the save record's bits.
 void R30dInit()
 {
     Vec v;
@@ -621,12 +618,9 @@ static void R30dCoopSwitch()
                         for (int k = 0; k < 4; k++) {
                             EstSet(0, -1, 0, 0, EFF_ROOM, r30d_digit[k], 1, ESP_CORE_KIND_ROOM00, 0, 0);
                         }
-                        // The final `COOP_ACTIVE(c) = 0` stores the reversed digit-loop counter (`stw r31`): its zero
-                        // is a pseudo set here, in the block after the loop exit, and used in the store's block, so
-                        // loop.c scan_loop skips it (not reg_in_basic_block_p while maybe_never) instead of merging it
-                        // into the while loop's hoisted zero, and cse2 canonicalizes it to the counter it knows is 0
-                        // on the `bne` fall-through (record_jump_equiv). A literal 0 at the store is a same-block
-                        // movable and merges.
+                        // The final `COOP_ACTIVE(c) = 0` stores the digit-loop counter (`stw r31`). This `zero` is set
+                        // after the loop exit so loop.c does not merge it into the loop's hoisted zero, and cse2 then
+                        // replaces it with the counter it knows is 0. A literal 0 at the store would merge.
                         int zero = 0;
                         if (!(pG->Room_flg[0] & 0x10000000)) {
                             SndCall(6, 9, 0, 0, 0, 0);

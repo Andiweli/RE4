@@ -1,7 +1,5 @@
-// game/esp4c.cpp: effect id 0x4C, the controller for est generator 45 (Espgen45: rain / snow /
-// dust weather particles around the camera). It is invisible; every frame it feeds its position,
-// size, colour and fade into the generator through the Estgen45Set* interface, and with Tool_flg
-// bit0 also the extended parameter block (reflection type, shimmer, spread/damp, mask texture).
+// game/esp4c.cpp: effect id 0x4C, the invisible controller for est generator 45 (Espgen45, weather
+// particles around the camera). It feeds its parameters through the Estgen45Set* interface.
 
 #include "atari.h"
 #include "light.h"

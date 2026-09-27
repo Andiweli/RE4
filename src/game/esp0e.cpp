@@ -1,9 +1,5 @@
-// game/esp0e.cpp: effect id 0x0E, a lens-flare style glow sprite. The world position (parent
-// parts + m_Pos) is projected every frame and the sprite is drawn as a screen sprite there,
-// jittered by R_pos; the alpha is the product of a screen-centre falloff (Vec0.x %), the facing
-// cone test (Vec2: x/y direction in degrees, z cone angle), the camera distance fade (Vec0.z)
-// and a 12-sample Z-buffer visibility test of radius Vec1.x run after the frame is rendered.
-// Vec0.y is how much the alpha also shrinks the sprite.
+// game/esp0e.cpp: effect id 0x0E, a lens-flare style glow drawn as a screen sprite at its projected
+// world position, faded by facing, distance and a Z-buffer visibility test.
 
 #include "atari.h"
 #include "global.h"

@@ -67,11 +67,8 @@ static void r30c_ItemBoxOpened(int no);
 static void r30c_StrStart();
 static void r30c_StrCheck();
 
-// Room init (Ashley's cell): door 1 takes key item 0x13; until unlocked (Key_flg[0] 0x1000) area 3 =
-// the cell door with its key watcher. Until the s00 event (Room_flg bit 0): it is pre-loaded (enemy of
-// ESL 0x40), Ashley initialised and locked in the cell (mode 5) with her shout task and, on the first
-// visit of the stage, the cell cut on area 5; after it: until the plane crashed (bit 3) area 6 = the
-// plane with its stream; the battle stream. One item box; the plane's item area 0x82 only after the crash.
+// Room init (Ashley's cell): the locked cell door, Ashley locked in the cell until the s00 event,
+// and the plane's areas before and after its crash.
 void R30cInit()
 {
     // The store's address is computed before the calloc call (a reference bound first): the `li r5`

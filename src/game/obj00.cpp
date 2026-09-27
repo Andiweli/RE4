@@ -1,7 +1,5 @@
-// game/obj00: object id 0, the hanging object (D:/Bio4/Prog/obj00.cpp): lamps, signs and other
-// props that hang from a parts of a parent model (OyaSetObj00) with a slerp catch-up, fall as a
-// three-point rope simulation when cut (Obj00Work be_flag bit 2) and fade out when flagged
-// (bit 5). SetObj00 creates it from a bin/tpl; MotSetObj00 plays a motion on it.
+// game/obj00 (D:/Bio4/Prog/obj00.cpp): object id 0, a lamp, sign or other prop hanging from a
+// parts of a parent model (OyaSetObj00). It falls as a rope simulation when cut.
 #include "atari.h"
 #include "atari_init.h"
 #include "obj.h"

@@ -257,11 +257,9 @@ ShadowMng* getShadowMng()
     return mng;
 }
 
-// Once per frame (render setup): resets the managers, then for every type 4 (shadow) light —
-// fixed lights (xD 2) collect the models in their frustum (FixShadowLightSet); the per-model
-// lights (xD 0 fit / 1 parallel) get one manager per casting enemy / object (be_flag 0x10; self
-// shadows for be_flag 0x04000000 unless Disp_flg 0x8000); during an event only be_flag 0x800
-// models cast. Status_flg[2] 0x00100000 = shadow lights exist. Queues the receiver render pass.
+// Once per frame at render setup: assigns shadow managers for every type 4 (shadow) light. Fixed
+// lights collect the models in their frustum, per-model lights get one manager per casting enemy or
+// object, and during an event only be_flag 0x800 models cast.
 void ShadowTrans()
 {
     int found;
@@ -968,11 +966,8 @@ f32 shd_tex_scale_x = 0.0003f;  // trans.cpp SelfShadowSetup reads it
 
 #define SHD_NO_SELF(mng) (!isSelfUse || !((mng)->self & 1))
 
-// Renders the manager's shadow map: the casting models drawn from the light (lookAt, per-model
-// alpha fading with the distance for lights with a radius; the model's own shadow model info when
-// it has one; self shadows use the depth variant), optional light-map texture multiplied in
-// (flags bit0 room texture / fixed-light texId), soft blur, then copied to the I8 texture; sets
-// Status_flg[1] 0x4000 when the light asks (setStatus).
+// Renders the manager's shadow map: the casting models drawn from the light, an optional light-map
+// texture, a soft blur, then a copy to the I8 texture.
 void make_shadow_texture(ShadowMng* mng)
 {
     ShadowLightWork* w = (ShadowLightWork*) mng->pLight->work;

@@ -1,7 +1,5 @@
-// wep09 module entry: the bolt-action rifle (class in objSniper.cpp, routines wep/pl_rifle.cpp).
-// Wep09_init is the module's WeaponInitFunc (creates the cObjSniper, object id 0x28, as the
-// player's weapon and loads the effects), PlRifleMove its WeaponMoveFunc; _prolog registers both
-// and the ObjInitFunc slot.
+// wep09 module entry: the bolt-action rifle, with its class in objSniper.cpp and its routines in
+// wep/pl_rifle.cpp.
 
 #include "wep_mod.h"
 #include "light.h"

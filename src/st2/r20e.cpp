@@ -104,14 +104,9 @@ static R20eWork* r20e_work;
 // `&p->piece[i]` as integer arithmetic, index first (`mulli; add idx, p; addi 0x10`): the array
 // subscript folds the 0x10 into the product and puts the pointer first in the add.
 #define PUZZLE_PIECE(p, i) ((R20ePiece*) ((i) * sizeof(R20ePiece) + (u32) (p) + 0x10))
-// `&p->cell[x][y]` as integer arithmetic, `(x*48 + 0x178) + p + y*16`: fold moves the constant to
-// the other operand (`(V+C)+A -> V+(A+C)`), so the tree is `x*48 + (p + 0x178) + y*16`, which is what
-// the puzzleMove loops need: `PUZZLE_CELL(p, 0, cy)` gives `p + (cy*16 + 0x178)` (`addi r0,r11,0x178;
-// add r9,r30,r0`), `PUZZLE_CELL(p, cx, 0)` gives `cx*48 + (p + 0x178)`, and in the slide loops
-// expand's EXPAND_SUM association makes the row `to` cell `(cy16 + (k48 + p)) + 0x148` (same operand
-// order as `from`, so reload_cse turns the second `add` into `mr r9,r11`) but the column `to` cell
-// `((cx48 + p) + k16) + 0x168` (the other order: a separate `add r9,r9,r6`).  The `y*16` is never
-// grouped with 0x178 (`(k-1)*16` must distribute to `k*16 - 16` under EXPAND_SUM).
+// `&p->cell[x][y]` as integer arithmetic, so that fold and EXPAND_SUM give the operand order the
+// puzzleMove and slide loops need. The `y*16` is never grouped with 0x178 so that `(k-1)*16`
+// distributes to `k*16 - 16`.
 #define PUZZLE_CELL(p, x, y) ((R20eCell*) ((x) * sizeof(R20eCell[3]) + 0x178 + (u32) (p) + (y) * sizeof(R20eCell)))
 
 
@@ -900,11 +895,8 @@ static inline int r20e_checkSolved(R20ePuzzle* p)
     return 1;
 }
 
-// One frame of a piece's slide; returns whether it is moving.  `frames` is the int->float
-// conversion of `cnt`, declared BEFORE `one`: cse folds the conversion to 4.0 and loop.c
-// re-materialises it as a pool load when it hoists the movable, so the 4.0 pool entry is created
-// after 1.0 (pool order 10.0, 1.0, 4.0) while the hoisted loads come out frames-first (loop body
-// order) -- the first-loaded constant gets f30, so `one` is f31 (`fdivs f1,f31,f30`).
+// One frame of a piece's slide, returning whether it is moving. `frames` is declared before `one`
+// so the hoisted constant loads come out in the target's order and `one` gets f31.
 static inline int r20e_movePiece(R20ePiece* pc)
 {
     int cnt = 4;
@@ -935,15 +927,9 @@ static inline int r20e_movePiece(R20ePiece* pc)
     return 0;
 }
 
-// The cell-address chain: a pointer PARAMETER of an inline receives its argument through
-// `copy_to_mode_reg` of the EXPAND_SUM sum, i.e. `force_operand` computes the sum INTO the
-// parameter pseudo (`c = cy16 + cxp; c = c + 0x178`).  cse cannot rewrite the copy's first word
-// `(mem c)` into `(mem (plus X 0x178))` because the `(plus c 0x178)` table entry mentions the
-// re-set register (REG_IN_TABLE != REG_TICK), so combine forms `lwzu r11,0x178(r9)`; a local
-// pointer variable or a direct `->pos` goes through fresh pseudos and cse picks the costlier
-// equivalent address (`addi r11,r9,376; lwz r10,376(r9)`).  The destination `Vec&` is the
-// caller's block-local temp (all slide blocks share 8(r1); an inline-local Vec would get its own
-// frame slot per copy).
+// A pointer parameter of an inline gets its argument sum computed into the parameter pseudo, which
+// lets combine form the target's `lwzu r11,0x178(r9)`. The destination `Vec&` is the caller's
+// block-local temp so all slide blocks share one frame slot.
 static inline void r20e_framePos(Vec& pos, R20eCell* c)
 {
     pos = c->pos;
@@ -1020,12 +1006,9 @@ static inline int r20e_puzzleMove(R20ePuzzle* p)
     if (busy) {
         return 0;
     }
-    // `cy` is a local (the row scan's cell pointer is a loop-invariant + biv step, `lbz 12(c)`
-    // with `addi c,48` at the latch: a `c + 12` giv has benefit 0 and is not reduced), `cx` is
-    // NOT: the column scan re-reads `p->cx`, gcse PREs the load at the end of the test block
-    // and cse2 turns the recomputation into the copy `mr r10,r9`.  The occupied-cell test is a
-    // nested `if` around both scans, not an early `return 0`: the return arm's `li r0,0` would be
-    // hoisted above the `beq` by jump1 instead of cross-jumping into the shared `li r0,0`.
+    // `cy` is a local but `cx` is not, so the column scan re-reads `p->cx` and cse2 turns it into
+    // the copy `mr r10,r9`. The occupied-cell test is a nested `if`, not an early `return 0`, so its
+    // `li r0,0` cross-jumps into the shared one instead of being hoisted by jump1.
     if (Key.trg & 0x00080000) {
         int cy = p->cy;
 
@@ -1142,29 +1125,9 @@ static void r20d_checkPuzzle()
     SceEventEnd(0);
 }
 
-// Places piece `pc` of cell `c`: the Vec temp is the inline's own local (integrate substitutes its
-// frame address, no PRE), while the loops and their counters belong to the caller.  Both layout
-// nests step TWO cell pointers of equal value (`c` for the pos loads, its copy `cs` for the piece
-// store, `mr r7,r11` in the preheader, two `addi ,48` in the latch): with one pointer the target's
-// split cannot be reproduced (25 forms, pass 8).  The latch order is the source order (`c += 3`
-// first, like the target); cse's `(set REG0 REG1)` special case would then swap the lo_sum's
-// destination to the later-mentioned `cs`, but it only fires when the copy `cs = c` DIRECTLY
-// follows `c`'s set, so the `x = 0` statement sits between the two.  The first layout pass in
-// r20e_initPuzzle is this macro over the function's own `x`/`y` (the target's r28 serves as y in
-// both the object loop and the layout loop): with the counter shared, `y + 1` stays a latch biv in
-// the object loop instead of being PRE'd across the inner loop (pl0f BoatControl rule), which is
-// what forms the `y*4`/`y*16` givs and the `subic.` count-down.  The else arm's layout has its own
-// block-local counters (caller-saved r8 in the target).  The table is a `u32` (not a pointer)
-// computed before the nest: `add y,tbl` keeps the written operand order (a pointer would go first),
-// and the `lis/addi` is a plain statement instead of a loop.c hoist.
-// Both nests are wrapped in `do { } while (0)`: the copy temps x/y/z (3 refs each, flow weights refs
-// by loop depth) and the `mulli` temp (2 refs) are global allocnos; the mulli temp inherits `pc`'s
-// r0 preference (expand_preferences: pc dies at the mulli) and, when it ranks BELOW x, puts r0 into
-// x's `regs_someone_prefers` so pass 0 skips r0 (ours: x r10, z r8, y r7 and the loop pointers shift
-// down one register).  At depth 3 (function + two loops) x = 3*9/11 = 2.45 outranks the temp 2*6/7 =
-// 1.71; the extra loop level makes it 3*12/11 = 3.27 vs 3*8/7 = 3.43 and x takes r0 like the target
-// (y r8, z r10, cs r7).  The do-while's loop notes are a sched1 barrier: everything the target issues
-// before `li y,0` (the table address, `lwz r20e_work`) is computed before it, the rest inside.
+// Places piece `pc` of cell `c`. Both layout nests step two equal cell pointers, `c` and its copy
+// `cs`, because one pointer cannot reproduce the target's split. The `x = 0` between them, the `u32`
+// table and the `do { } while (0)` wrappers give the target's register choices and scheduling.
 static inline void r20e_placePiece(R20ePuzzle* p, R20eCell* c, R20eCell* cs, s8 pc)
 {
     cs->piece = pc;

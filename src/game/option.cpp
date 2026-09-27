@@ -1,8 +1,5 @@
-// game/option: the option menu (pause menu in game, and from the title) — OptionScreen drives the
-// top menu (retry / load, controller, brightness, audio) and its sub menus on the option id
-// archive (pG->pOption), writing the settings into pSys->Config_flg / brightness / sound_mode; also
-// the GameResult (game clear / omake) and ChapterEnd result screens on the result id data.
-// (D:/Bio4/Prog/option.cpp)
+// game/option: the option menu, in game and from the title (D:/Bio4/Prog/option.cpp). It also holds
+// the GameResult and ChapterEnd result screens.
 #include "types.h"
 #include "global.h"
 #include "map_obj.h"

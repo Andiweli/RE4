@@ -1,7 +1,5 @@
-// game/esp47.cpp: effect id 0x47, a screen-space sprite that wraps around the screen: its
-// position is kept inside the 480 x 448 screen (with a 32 pixel left margin) and, when the
-// sprite overlaps an edge, it is drawn a second (and for corners a third) time shifted by 448
-// so the wrap is seamless. Used for full-screen scrolling overlays (rain, dust).
+// game/esp47.cpp: effect id 0x47, a screen-space sprite that wraps seamlessly around the screen
+// edges. Used for full-screen scrolling overlays such as rain and dust.
 
 #include "atari.h"
 #include "light.h"

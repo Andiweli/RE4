@@ -1,8 +1,5 @@
-// game/em_set.cpp: enemy creation from the room enemy list (ESL). pG->Em_list holds 256 EmListData
-// entries (id, type, set, flag, hp, position in 10 unit steps, rotation in 1/16384 turns, stage /
-// room); EmSetFromList creates every entry of the current room at room start and event code
-// creates single entries with EmSetFromList2. Killed list enemies are recorded per list in the
-// pG->Em_flg bit tables so they stay dead when the room is re-entered.
+// game/em_set.cpp: enemy creation from the room enemy list (ESL) in pG->Em_list. Killed list enemies
+// are recorded in the pG->Em_flg bit tables so they stay dead when the room is re-entered.
 
 #include "atari.h"
 #include "light.h"
@@ -79,12 +76,9 @@ static inline void EmSetWork(cEm* em, EmListData* d, u8 no)
     em->emset_no = no;
 }
 
-// The same body as a macro for the two straight-line creators (EmSetFromList2, EmSetEvent). A pool
-// constant expanded in the caller keeps RTX_UNCHANGING_P on its MEM; integrate.c drops it when it
-// copies an inlined body (copy_rtx_and_substitute, `map->integrating`), so the inline's `lfs` loads
-// carry true/anti dependences on every store around them and haifa cannot move them (they end up
-// as `lis; lfs` pairs at the top of the block in the original). The loop in EmSetFromList keeps the
-// inline (the invariants are hoisted differently with the macro: 11 words).
+// The same body as a macro for the two straight-line creators (EmSetFromList2, EmSetEvent): its pool
+// loads keep RTX_UNCHANGING_P, which integrate.c drops for an inlined body, and schedule like the
+// original. The loop in EmSetFromList keeps the inline.
 #define EM_SET_WORK(em, d, no)                                                            \
     do {                                                                                  \
         f32 kx = 1000.0f;                                                                 \
@@ -106,11 +100,9 @@ static inline void EmSetWork(cEm* em, EmListData* d, u8 no)
         (em)->emset_no = (no);                                                             \
     } while (0)
 
-// Squared XZ distance to the player. The `x374 = 1e16` reset is a caller statement AFTER this call:
-// inside the inline its pool load loses RTX_UNCHANGING_P (see above) and wins the sched1 tie against
-// the `dz * dz` multiply through the "independent of the last scheduled insn" class (haifa
-// rank_for_schedule), which puts the constant one insn too early and costs it f12 (local-alloc's
-// fake_birth avoids a register that died in the previous insn).
+// Squared XZ distance to the player. The `x374 = 1e16` reset is a caller statement after this call
+// because inside the inline its pool load loses RTX_UNCHANGING_P (see above), is scheduled one insn
+// too early and does not get f12.
 static inline void EmSetDist(cEm* em)
 {
     f32 dz = pPL->pos.z - em->pos.z;

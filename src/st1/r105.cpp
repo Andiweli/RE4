@@ -107,13 +107,9 @@ static void (*r105_markTbl[4])() = {
     r105_markEnd,
 };
 
-// Room init (debug trigger 1 re-arms the dial puzzle). Registers the s00/s10/s99 event callbacks, five
-// shelf/box item events (items 0x92/0x93/0x94/0x88/0x8B), the key-item camera show at area 0x1A once
-// (Room_flg bit 12), BGM task, floor hit effects; area 1 = the locked front door until Key_flg[0]
-// 0x02000000 (else object 0x23 hidden); the dial puzzle on area 6 until Room_flg bit 0 (else the door
-// parts are removed). Bit 1 = s00 seen (else pre-load r105s00), bit 2 = s10 seen (window 5 broken, area
-// 0x17 on; else pre-load r105s10 after s00); after s00 the Ganado wave (r105_EmSet) and the terminal
-// once (bit 11). Window 5 takes no damage; door 1 light mask 4; then the cesspit setup.
+// Room init: the event callbacks, item events, the locked front door, the dial puzzle, the s00 / s10
+// pre-loads and the Ganado wave after s00, all by Room_flg bits. Debug trigger 1 re-arms the dial
+// puzzle.
 void R105Init()
 {
     cEmWindow* win;

@@ -1,7 +1,5 @@
-// game/filter09: pause / stop screen filter (D:/Bio4/Prog/filter09.cpp). While the game is stopped
-// (Filter09SetbUse(1)) it keeps a half-size copy of the last frame in temp buffer 12 and blends it
-// back every frame, optionally spreading it outwards (g_bSpred: the death / option screen ripple);
-// FilterTrans skips every other filter while it is in use.
+// game/filter09 (D:/Bio4/Prog/filter09.cpp): the pause / stop screen filter that blends a copy of
+// the last frame back every frame. FilterTrans skips every other filter while it is in use.
 #include "filter.h"
 #include "light.h"
 #include "gx.h"

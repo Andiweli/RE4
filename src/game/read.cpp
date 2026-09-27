@@ -1,9 +1,5 @@
 // game/read: room / core / option / enemy / player / weapon data loading (D:/Bio4/Prog/read.cpp).
-// All 21 functions byte-identical (OptionDataRead's objdiff rows are reloc-only). readEmData: `m`
-// (14 refs / 198 insns, 2121) lost r29 to `newSize` (6 / 54, 2222) in global.c priority; the
-// `else do { ... } while (0);` loop notes around the DLL_MALLOC clear give that `m` ref weight 2
-// (15 refs -> 2272 > 2222) without adding an instruction, and that block has nothing the sched1
-// barrier could reorder (the DLL_MALLOC / DATA_MALLOC sets and the tail stores do).
+// In readEmData, the do-while(0) around the DLL_MALLOC clear gives `m` enough weight to keep r29.
 #include "types.h"
 #include "atari.h"
 #include "light.h"

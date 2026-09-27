@@ -1,11 +1,5 @@
-// game/light: the light manager (D:/Bio4/Prog/light.cpp). cLightMgr (LightMgr) owns the cLight
-// pool (cManager) and the current light environment (LightEnv: fog, background colour, blur,
-// contrast, mipmap, tune colours, wind). Light data comes as cLit blocks (core archive, room "LIT",
-// third set) holding per-camera-cut cLightEnv records each followed by cLightWork lights;
-// update(cut) swaps the room lights to a cut (fog interpolated over Hokan frames), move() runs
-// every light's type function (LightFuncTbl) and parent tracking, setModel2/setCloth/setEsp pick
-// up to 8 lights hitting a model volume. cLight adds parent attachment (enemy / scroll / etc /
-// object parts) and spot direction helpers.
+// game/light (D:/Bio4/Prog/light.cpp): the light manager. cLightMgr owns the cLight pool and the
+// current light environment, and swaps the room lights per camera cut from the cLit data.
 #include "light.h"
 #include "ctrl.h"
 #include "atari.h"

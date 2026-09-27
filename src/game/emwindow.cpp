@@ -96,11 +96,9 @@ cEmWindow* SetWindow(void* bin, void* tpl, Vec* pos, Vec* rot, int type, u8 etcN
     return em;
 }
 
-// Window crossing test for a character moving pos0 -> pos1: the target field (SceAtCheckFieldInfo
-// at pos1) must be field `id` of a window that allows this kind of fence user (player /
-// partners: kind 1, enemies: kind 2; the player cannot cross an intact type 1 window; NPCs need a
-// ladder-style approach), and the move must cross the window plane. Returns 1 with the crossing
-// direction (window -z or +z in world), the window position, its status word and the window.
+// Window crossing test for a character moving from pos0 to pos1: the target field must belong to a
+// window this kind of character may cross, and the move must cross the window plane. Returns 1 with
+// the crossing direction, the window position, its status word and the window.
 int ChkWindow(cModel* pModTar, Vec* pos0, Vec* pos1, int field_id, u16* etc_flag, Vec* pNorm, Vec* pCenter, cEmWindow** o_pEm)
 {
     SceAtField* info;

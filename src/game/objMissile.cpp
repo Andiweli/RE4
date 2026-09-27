@@ -1,7 +1,5 @@
-// game/objMissile: object id 0x38, the helicopter missile (D:/Bio4/Prog/objMissile.cpp): mounted on
-// a parts of the helicopter (R0 1 Parent), ignites (R0 2 FireWait), flies towards its target with
-// increasing speed (R0 3 Fire) and explodes on the scenery or an enemy (objMissileBomb), clearing
-// enemies with a large player-weapon hit sphere. Type 1 is the shootable variant with a hit box.
+// game/objMissile: object id 0x38, the helicopter missile (D:/Bio4/Prog/objMissile.cpp). It is mounted
+// on the helicopter, flies at its target and explodes on the scenery or an enemy (objMissileBomb).
 #include "atari.h"
 #include "atari_init.h"
 #include "light.h"

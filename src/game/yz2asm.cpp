@@ -6,11 +6,9 @@
 asm("	.text\n"
     "	.balign 4\n");
 
-// yz2Decode_Decode(ctx, dst, size, in_ev): the decode loop — a symbol from the 0x500-symbol main
-// model per step (FrequencyDecode_Decode768); low symbols are literal bytes, the higher ones
-// reference a run in the 256-entry dictionary whose extra fields come from the 0x100-symbol model
-// (FrequencyDecode_Decode); every run written is entered into the dictionary. Runs until `size`
-// output bytes. (Register-level reading of the original asm; the exact symbol split is not verified.)
+// yz2Decode_Decode(ctx, dst, size, in_ev): the decode loop. Low symbols of the main model are literal
+// bytes, higher ones copy a run from the 256-entry dictionary, and each run is added to it.
+// This is a register-level reading of the original asm, and the exact symbol split is not verified.
 asm("	.globl yz2Decode_Decode\n"
     "	.type yz2Decode_Decode,@function\n"
     "yz2Decode_Decode:\n"

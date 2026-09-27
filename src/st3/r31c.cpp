@@ -227,11 +227,8 @@ static void Evt_R31CS01_Func(Event* e);
 static void Evt_R31CS02_Func(Event* e);
 static void r31c_KrauserCorpseMes();
 
-// Room init (the ruins, Krauser's arena): the nine sliding doors (0x78 the crest door, 0x79 open,
-// 0x7B..0x80, 0x6D) and the eight shootable posts; the crest door state (the crests already set, the
-// crest-use watcher), the timer door and the tower per the room flags; the Novistador groups per
-// area, Krauser's talks / battles, the levers, the count-down, the s00/s01/s02 callbacks and their
-// areas; the continue points.
+// Room init (the ruins, Krauser's arena). The crest door, the timer door and the tower are set up
+// from the room flags.
 void R31cInit()
 {
     Vec zero = {0, 0, 0};

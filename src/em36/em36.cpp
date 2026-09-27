@@ -255,15 +255,9 @@ void Em36Init(cEm* em)
         }                                                                                          \
     }
 
-// Per-frame damage reaction, from move(). A crushing hit (em36CrashCk) takes precedence. The area
-// damage manager (kinds 1 / 4 / 5 / 7) deals 1000 once per 120 frames, killing or knocking it down
-// by state (flags 0x100 crawling -> 2/5, 0x20 on the floor -> 3/1 or 2/3, else 3/0 or 2/1). A weapon
-// hit in dmHit applies em36SetDmVal (the mine 0xD / 0x12 kill outright); at 0 HP the same
-// state-dependent death. Otherwise flags 0x40 (no reaction) just bleeds; crawling: heavy / close
-// shotgun hits may tear a limb (em36LostParts) and it flinches (2/5); on the floor: heavy hits
-// (handgun-class 1 in 10; a rifle on a marked weak limb goes to 2/4) tear a limb and it flinches
-// (2/3); standing: handgun-class 1 in 10 tears a limb (flinch 2/0), close shotgun / magnum / rifle
-// (rifle on a marked weak limb -> 2/2) tear a limb and flinch (2/0). em36BloodSet when no limb went.
+// Per-frame damage reaction, from move(). A crushing hit (em36CrashCk) takes precedence, then area
+// damage and weapon hits, where the mine kills outright. Heavy or close hits may tear off a limb
+// (em36LostParts), and the death or flinch depends on whether it stands, lies or crawls.
 void em36DmCk(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
@@ -522,13 +516,9 @@ void em36DmCk(cEm36* em)
     }
 }
 
-// Per-frame update from the enemy manager. Order: damage, clear the per-frame flags, tick the wait
-// / trap / per-limb attack timers, regenerate 1 HP per frame, route to the target (the find / voice
-// waits only run with a route), the routine table (r_no_0 0xFF = model load failed: destroy), the
-// on-floor motion flag (seFlags 0x80 -> flags 0xA0, IK off), neck, slope tilt, parts, the death
-// shrink, attack / collision (seFlags 0x20 marks the low crawl: pushes ignored, player-block off
-// for the pass) / stage collision (in the air with flags 0x400), stuckCnt, the hit-box enable
-// (em36YarareCk), weak points, regrowth, the tentacles, breath stop and the spine scale.
+// Per-frame update from the enemy manager, which also regenerates 1 HP per frame. r_no_0 0xFF means
+// the model load failed and the enemy is destroyed. seFlags 0x20 in the motion marks the low crawl,
+// which ignores pushes and passes the player.
 void cEm36::move()
 {
     Em36Work* w = EM36_WK(this);
@@ -612,12 +602,9 @@ void cEm36::move()
     em36SpineScaleMove(this);
 }
 
-// Routine 0: one-time setup. Loads the model of the type (archive 4 with texture 0x13 / 0x14 for
-// types 0 / 1, 0x15 / 0x24 for the spined 2 / 3), attaches the seven limb models (em36PartsSet), the
-// flip table, effect data, a 2 m light box, a 1 m collision, the body hit box plus the extras, the
-// weak point objects, the work (find wait 150..300, first voice 450..1050 frames), and the start by
-// `set`: 0 active idle, 1 the bed scene (R307Bed), 2 the R307 appearance, 3 the R309 appearance
-// (inactive), 4 the R308 appearance (inactive).
+// Routine 0: one-time setup of the model, the limb models (em36PartsSet), hit boxes and weak points.
+// `set` picks the start between the active idle, the R307 bed scene and the R307, R309 and R308
+// appearances.
 static void em36_R0_Init(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
@@ -1013,11 +1000,9 @@ static inline void em36WalkTail(cEm36* em)
     }
 }
 
-// Routine 1/1: the walk towards the target (the spined types' own motion; yaw at PI/32 per frame).
-// After 6..11 loops with a route it pauses in Threat (1/6) for 30 frames. Each frame: the attack
-// selection (em36AtkRtnCk), a turn past 135 deg, and on types 0 / 1 with the voice wait out a dash at
-// 5..10 m. Then the shared tail: regrowth, back to Wait if the player is dead, doors, the jump down /
-// fence checks, breathing, and the spined types' rattle every 60 frames.
+// Routine 1/1: the walk towards the target, pausing in Threat now and then. Each frame runs the
+// attack selection (em36AtkRtnCk) and the turn and dash checks, then the shared tail of regrowth,
+// door, jump-down and fence checks.
 static void em36_R1_Walk(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
@@ -1353,11 +1338,8 @@ static void em36_R1_Crash(cEm36* em)
         } \
     }
 
-// Routine 1/8: the arm swing (mirrored when the right arm is lost, flags2 bit 0): the front swing
-// homing on the target 5 / 20 / 30 frames by Game_level, or the back swing when the target is behind.
-// On motion event bit 0 the stamp attack (0) is swept along the swinging arm's parts and its hand
-// down to knee height (em36AtkCk2). flags 0x1A000 / 0x2A000 mark which arm is attacking. A miss
-// awards the escape point and walks on, a hit roars (Threat).
+// Routine 1/8: the arm swing, mirrored when the right arm is lost. The stamp attack is swept along
+// the swinging arm (em36AtkCk2). A miss awards the escape point, and a hit roars (Threat).
 static void em36_R1_Atk(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
@@ -1665,11 +1647,8 @@ static void em36_R1_Catch(cEm36* em)
     EffectEspgenDelete(1, (w)->espKind[no], em); \
     EffectEfmDelete(1, (w)->espKind[no], em)
 
-// Routine 1/0xB: the player is held (EmCatchPLSet: he follows the enemy's motion). Step 0/1: the
-// grab and bite; after 25 frames the button mash runs and costs 20 HP per frame, a mash count over
-// 30 (or the motion ending with the player alive) frees him (step 4: the throw-off with its effects,
-// then Walk), else step 2: the kill bite (its effects, then Threat). The appearance effects are
-// removed for the scene.
+// Routine 1/0xB: the player is held and follows the enemy's motion (EmCatchPLSet). Enough button
+// mashing frees him, otherwise the kill bite ends it.
 static void em36_R1_CatchHit(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
@@ -2346,11 +2325,8 @@ static void em36_R1_RegeneFoot(cEm36* em)
     }
 }
 
-// Routine 1/0x10: lying on the floor with the legs lost (flags 0xB0: on the floor, no damage
-// reaction), the crawl idle. Regrows the legs (1/0x19) once their timers are out, wakes up (1/0x16)
-// if they are back; otherwise with a live player: the crawl grab (1/0x14) when facing him within
-// 6 m (types 0 / 1) or the spine attack (1/0x13) within 1.5 m (spined types), a crawl turn (1/0x12)
-// past 30 deg, and the spined types crawl after a player beyond 1.5 m (1/0x11).
+// Routine 1/0x10: the crawl idle while lying on the floor with the legs lost. Regrows the legs and
+// wakes up, or crawls, turns and attacks from the floor by type and the player's distance.
 static void em36_R1_D_Wait(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
@@ -3300,11 +3276,8 @@ static void em36_R1_Die_Down(cEm36* em)
     em36DieCore(em, 0x89, 0x8A);
 }
 
-// Per-frame target selection while alive: routes to the player (routeAng / routePos, zero during
-// init), the route distance, and the line-of-sight flags: bit 0 clear at head height (1.3 m), 0x1000
-// clear of the 0x4000-class obstacles, 0x800 clear at 50 cm against the stage; the partner's route
-// / distance / angle and her line of sight (bit 1) when present. The player is the target unless the
-// partner is present, not protected (Status_flg[0] 0x800) and more than 1 m nearer by route (flags bit 2).
+// Per-frame target selection while alive, from the routes and lines of sight to the player and the
+// partner. The partner becomes the target only when she is unprotected and more than 1 m nearer by route.
 void em36RouteCk(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
@@ -3933,11 +3906,8 @@ int em36BetweenHitCk(cEm36* em)
     return 0;
 }
 
-// Creates the parasite weak points (cObj00 on em36_weak_parts, 1000 HP each) and sets the enemy's
-// HP to their sum. Which of the five slots exist is rolled once per enemy and kept in the em list
-// flag bits 31..27 (flag 0x04000000 = already rolled, for reloads): types 0 / 1 skip one or two
-// random slots (two distinct ones on the easier ranks, up to Game_level 7) and slot 4 on Game_level
-// up to 9. Each existing one enables its hit box.
+// Creates the parasite weak points and sets the enemy's HP to their sum. Which of the five slots
+// exist is rolled once per enemy and kept in the em list flag bits 31..27, so a reload keeps them.
 void em36WeakInit(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
@@ -4320,13 +4290,9 @@ void em36DoorOpenCk(cEm36* em)
     }
 }
 
-// The attack selection of the walking routines (target predicted 18 frames ahead, or its actual
-// position when headless or on Game_level up to 2). Against the partner: the arm swing within 1.5 m
-// (arm regrowth first when both arms are gone). Against the player: the stretched grab (1/0xC) from
-// 1.5..3.5 m in front with both arms and a clear line (always on Game_level above 9, else 20 % / 40 %
-// for the spined types); within 1.5 m at the same height: the grab (1/0xA) or the spine burst (1/9)
-// half the time with both arms, the arm swing (1/8) with a clear line, the armless bite (1/0xF) or
-// the spined types' burst. Returns 1 when an attack routine was set.
+// The attack selection of the walking routines, aimed at the target's position 18 frames ahead.
+// Picks among the grabs, the arm swing, the spine burst and the armless bite by distance, the arms
+// left and Game_level. Returns 1 when an attack routine was set.
 int em36AtkRtnCk(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);
@@ -4554,11 +4520,9 @@ void em36PartsSet(cEm36* em, int no, int on)
         }
         break;
     }
-    // The create call is INSIDE each type arm: jump2 cross-jumps the three identical tails
-    // (`lis/addi ModInfoMgr; add r5; bl create; mr r31,r3`) into one copy that falls into the join,
-    // so the result copy and the join's `cmpwi r31,0` are in different blocks at combine time (no
-    // `mr.` fusion), `info` is a multi-set pseudo (takes r31, em falls to r30), and the merged tail
-    // is ordered by sched2 (`lis; addi; add`). One call after a tpl-offset switch gives `mr. r30,r3`.
+    // The create call is inside each type arm so jump2 cross-jumps the three identical tails into
+    // one copy. That keeps the result copy and the join's `cmpwi r31,0` in different blocks (no `mr.`
+    // fusion). One call after a tpl-offset switch gives `mr. r30,r3` instead.
     switch (em->type) {
     case 0:
     default:
@@ -4996,11 +4960,8 @@ int em36JumpDownCk(cEm36* em)
     return 0;
 }
 
-// From the walking routines when the collision has been blocking the walk (stuckCnt at 5 mod 10)
-// and fences are climbable (Status_flg[2] 0x08000000 clear): a fence collision (flag 0x20) within 80
-// cm ahead turns the enemy square to it and, unless both shoulders are blocked at head height,
-// starts the climb (1/5) with fanceVec = the spot to land, shifted 30 cm to the free side. Returns 1
-// when started.
+// Called from the walking routines when the collision keeps blocking the walk. Starts a climb over
+// a fence just ahead unless both shoulders are blocked. Returns 1 when the climb started.
 int em36FanceOverCk(cEm36* em)
 {
     Em36Work* w = EM36_WK(em);

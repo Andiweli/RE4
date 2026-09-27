@@ -29,11 +29,8 @@
 #include "sscrn.h"
 #include "espgen.h"
 
-// `inline`, defined BEFORE ss_main.h: a deferred inline whose address SubScreenTask takes is output
-// at the end of the file (after __static_initialization_and_destruction_0), in the order the deferred
-// functions were queued. The original queued the synthesized widget destructors when they were
-// synthesized (end of file); ours queues them at the class definition, so the definition must
-// precede the widget classes to come out first (0xD5B4 before ~Widget and the three destructors).
+// `inline` and defined before ss_main.h so this deferred inline is queued, and output at the end of
+// the file, ahead of the synthesized widget destructors, as in the original (0xD5B4 before ~Widget).
 extern "C" inline void LightSetModel2(cModel* m)
 {
     LightMgr.setModel2(m);
@@ -318,14 +315,9 @@ void SubScreenTask()
             if (ssPlMotion) {
                 MotionMove(ssPlModel, 0);
             }
-            // Dead test (never-read store): its `high pG` is set in this block and survives as the
-            // register of the 0x19/0x1F/0x20 arm (cse1 canon_reg: the arm's own high dies inside the
-            // extended block, so the earlier one stays canonical); the 0x1C arm is reached in a fresh
-            // cse block, keeps its high, and gcse PRE makes it redundant with the reaching register
-            // inserted at this block's end -> the target's two `lis pG@ha` (r29/r30) before the
-            // ssWepModel2 test, and no combine_movables hoist (both highs are used in other blocks
-            // inside the maybe_never region). The store is trivially dead, so jump folds the branch
-            // before gcse and sched2 sees one block.
+            // Dead test (never-read store) kept for register allocation: its `high pG` becomes the
+            // register of the 0x19/0x1F/0x20 arm, which gives the target's two `lis pG@ha` before the
+            // ssWepModel2 test. Jump folds the dead branch before gcse, so sched2 sees one block.
             {
                 int dmy;
                 if (pG->pl_type == 7) {

@@ -1,8 +1,5 @@
-// em25 module (D:/Bio4/Prog/em25.cpp): the parasite. It is born out of a host enemy's head
-// (cEm25::setParent / setBirth, the P_ routines keep it on the parent's parts through em25OnParent,
-// em25SetParasite attaches three tentacle objects), attacks the player from there (P_Atk, the
-// poison spit of em25SetPoison) or leaves the host (Dm_P_GoOut) and crawls after the player on the
-// floor (Wait / Walk / Run / Turn90 / JumpAtk / Bite with the plem25_Bite catch).
+// em25 module (D:/Bio4/Prog/em25.cpp): the parasite that bursts out of a host enemy's head,
+// attacks from there, or leaves the host and crawls after the player on the floor.
 
 #include "atari.h"
 #include "map_obj.h"
@@ -153,11 +150,8 @@ void Em25Init(cEm* em)
     new (em) cEm25();
 }
 
-// Per-frame damage check (cEm25::move): a floor parasite (Mode 0) in an explosion / fire volume burns
-// (Dm_Frame, R2 4). A weapon hit takes em25SetDmVal off hp with the blood effect: a dead floor
-// parasite goes to Die_Big (R3 2), a dead attached one is left at 1 hp in Dm_P_Normal (the host
-// decides its death); a surviving floor one flinches (Dm_Small / Dm_Big, half the time), an attached
-// one recoils (Dm_P_Normal).
+// Per-frame damage check from cEm25::move. A floor parasite burns in explosion and fire volumes.
+// A killing hit leaves an attached parasite at 1 hp, because the host decides its death.
 void em25DmCk(cEm25* em)
 {
     Em25Work* w = EM25_WK(em);

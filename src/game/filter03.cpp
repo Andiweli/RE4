@@ -1,7 +1,5 @@
-// game/filter03: alpha glow filter (D:/Bio4/Prog/filter03.cpp). The frame's alpha channel (written by
-// glowing surfaces) is copied to quarter-size textures, blurred by feedback passes and blended over
-// the screen in the requested colour. Rooms/enemies request it with Filter03SetParam (priority
-// ordered, 0xFF locks it); flag sets Status_flg[1] bit 0x80 while active.
+// game/filter03: alpha glow filter (D:/Bio4/Prog/filter03.cpp) that blurs the frame's alpha channel
+// and blends it over the screen. Rooms and enemies request it with Filter03SetParam.
 #include "filter.h"
 #include "light.h"
 #include "gx.h"

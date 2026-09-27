@@ -1,7 +1,5 @@
-// game/light_area: room light areas (D:/Bio4/Prog/light_area.cpp). The room's "SAR" block lists
-// areas with a light number per character class (player / enemies / partner) and a power scale;
-// every frame each character's cModelState is told which area light applies and eases its light
-// scale towards the area power (or back to 1 outside). The player's weapon and rocket copy his.
+// game/light_area: room light areas (D:/Bio4/Prog/light_area.cpp) from the room's "SAR" block. Every
+// frame each character's cModelState eases towards the light of the area it is in.
 #include "atari.h"
 #include "em.h"
 #include "area.h"

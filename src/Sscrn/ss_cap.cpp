@@ -1,9 +1,5 @@
-// Sscrn/ss_cap: the bottle cap collection screen of the sub screen DLL (D:/Bio4/Prog/ss_cap.cpp):
-// the 4 x 6 grid of shooting gallery prize caps (items 0xDC..0xF3, cap_id_tbl), entered from the
-// key items screen (SsItemMain link 4) or directly with SS_OPEN_CAP when a cap was just won.
-// Data: SS/<lang>/ss_cap.dat (id textures, IdSub table 0x14, cap names). Widgets: SsCapInit loads
-// the archive, SsCapMain runs CapSelect (grid cursor) and SsItemExamine (turntable view with the
-// cap's voice line on X).
+// Sscrn/ss_cap: the bottle cap collection screen of the sub screen DLL (D:/Bio4/Prog/ss_cap.cpp).
+// It is entered from the key items screen, or directly with SS_OPEN_CAP when a cap was just won.
 #include "types.h"
 #include "global.h"
 #include "map_obj.h"

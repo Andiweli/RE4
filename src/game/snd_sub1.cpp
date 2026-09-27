@@ -1,7 +1,5 @@
 // game/snd_sub1: sound driver voice works (SND_VOICE_WORK, 64 slots shared by SEs, sequence notes
-// and streams): a SIT names the slot range a sound may use (voice_start / voice_num); allocation
-// looks for a free slot there and otherwise steals the oldest lowest-priority voice of the same
-// kind when the priority allows (SIT flag 0x4000 = equal priority may steal).
+// and streams). Without a free slot in its SIT range, a sound steals the oldest lowest-priority voice.
 #include "snd_drv.h"
 
 // Clears the 64 voice works (numbered, no sequence note).

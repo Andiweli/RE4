@@ -1,7 +1,5 @@
-// game/snd_str1: sound driver stream player state machine, audio-frame side — Snd_stream_player
-// runs every stream's state (0 idle, 1 ready: buffering, 2 normal: read / DMA / play, 3 no-read:
-// short stream fully buffered, 4 close, 6 DVD error recovery, 7 / 8 abort) after checking the DVD
-// status and the pending requests, then pushes the parameter updates to the AX voices.
+// game/snd_str1: sound driver stream player state machine, audio-frame side. Snd_stream_player
+// runs every stream's state after checking the DVD status, then updates the AX voices.
 #include "snd_drv.h"
 
 typedef void (*SND_STR_PLAYER)(SND_STR_WORK*);

@@ -1,13 +1,5 @@
-// pl02 module (pl02.rel = pl0b.rel = pl0c.rel): Ada: the hair / holster cloth chains of costume 2, the
-// player class with Leon's motion table and model set (body, hair, head, face shapes, hands).
-//
-// cPlAda (pl_mod.h) is the cPlayer of the Ada scenarios (pl_type 2): the constructor builds the
-// model set from the player archive (pG->pPlayer: 4/5 body, 6/7 hair, 8 head with the face
-// shapes, 9/0xA extra part, 0x11 right hand, 0x12..0x15 left hands, 0x62/0x63 face shapes),
-// loads / inits the weapon module and installs the event motions 0x5F..0x6C. pl_costume 2 wears
-// the hair chain (adaHair2P, 14 parts, 4 bundles) and the holster strap (adaHolsterP, 5 parts)
-// as pendulum cloth; costume 1 has no cloth. Pl02Init is the module's PlInitFunc (em.cpp
-// cEmMgr::construct calls it for the player work).
+// pl02 module (pl02.rel = pl0b.rel = pl0c.rel): cPlAda, the player of the Ada scenarios with Leon's
+// motion table. Pl02Init is the module's PlInitFunc, called by em.cpp cEmMgr::construct.
 
 #include "atari.h"
 #include "light.h"

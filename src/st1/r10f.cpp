@@ -69,11 +69,8 @@ static void r10f_LockerOpened(int id);
 static void r10f_TreasureBoxOpen(int id);
 static void r10f_TreasureBoxOpened(int id);
 
-// Room init: the three locked doors (area 2 = the false-eye door with its key-use watcher, area 0 -> door
-// 0x11D, area 3 -> 0x11E, each until its Key_flg[0] bit), ten cObjGondola cars with their loop
-// motions phase-shifted by 0x1C2 frames and per-car sub-motion works; area 7/8 = get on (side 0/1);
-// until Room_flg bit 0 (the ride done) area 9 = get off at side 1 and Ganados 0x32/0x35 get their
-// gondola-riding motions. Window 0xC starts broken; three locker item events and one treasure box.
+// Room init: the three locked doors, ten cObjGondola cars with phase-shifted loop motions, and the
+// get-on / get-off areas. Until the ride is done (Room_flg bit 0) Ganados 0x32/0x35 ride gondolas.
 void R10fInit()
 {
     Vec pos;
@@ -152,13 +149,9 @@ struct R10fGondolaTbl {
     Vec posB[2];
 };
 
-// The setPos argument goes through two inlines: integrate.c expands an inline's argument with
-// EXPAND_SUM (`(plus (plus (mult side 12) t) 24)`, MULT first) and force_operand's it into the
-// parameter copy as a chain of sets of ONE pseudo (`mulli T; add T,T,t; addi T,T,24`) -- a
-// multi-set pseudo cse1 cannot share across the sites, so `side*12` is recomputed (GetOff) or PRE'd
-// (GetOn: the posA site is in the block after the `sub` test). The table pointer argument
-// `(R10fGondolaTbl*) mot` is `fp+8` copied into a fresh pseudo per site: in GetOff cse1 merges
-// them with the mot copy's destination, in GetOn gcse PREs them into a copy of it (`mr r23,r8`).
+// The setPos argument goes through two inlines so integrate.c expands it into a multi-set pseudo
+// that cse1 cannot share, which recomputes `side*12` in GetOff and PREs it in GetOn like the target.
+// The `(R10fGondolaTbl*) mot` argument gets a fresh pseudo per site, giving GetOn its `mr r23,r8`.
 static inline void r10f_setPos(cModel* m, Vec* p) { m->setPos(p); }
 
 // Get on the cable car at `side` (0: the village side, 1: the far side): Leon and Ashley step
@@ -394,11 +387,9 @@ static void r10f_GondolaEmSet(int idx)
     } else {
         cur = idx + 7;
     }
-    // Byte arithmetic `t + (k*6 + n*2)`: the inner sum expands to (plus n2 k6) (expr.c both_summands
-    // swaps a MULT second operand to the front) and the outer plus then keeps the base first, `(plus t
-    // (plus n2 k6))`. The peeled entry test folds n = 0 to `lhax r0,t,k6` (base first, like the target) while
-    // loop.c's simplify_giv_expr associates the address as `(plus n2 (plus k6 t))`, so the stepping
-    // pointer's init stays `add p,k6,t`. `t[k][n]` gives `(plus (mult k 6) t)` in both places.
+    // Byte arithmetic `t + (k*6 + n*2)` keeps the base first in the peeled entry test (`lhax r0,t,k6`,
+    // like the target) while loop.c keeps the stepping pointer's init as `add p,k6,t`. `t[k][n]`
+    // would give `(plus (mult k 6) t)` in both places.
     u8* t = (u8*) tbl;
 
     for (k = 0; k < 6; k++) {

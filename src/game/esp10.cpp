@@ -1,7 +1,5 @@
 // game/esp10.cpp: effect id 0x10, a ground decal. At spawn the sprite is detached from its parent
-// and snapped 65 units + Vec0.y above the floor found by a collision ray (600 up / 100000 down);
-// Work8[3] selects the extra rule: 1 = discard when the point is inside the room's effect area,
-// 2 = never below the water surface.
+// and snapped just above the floor found by a collision ray.
 
 #include "atari.h"
 #include "light.h"

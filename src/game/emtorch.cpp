@@ -33,11 +33,8 @@ EmTorchFunc EmTorch_R1_move_tbl[4] = {
     emTorch_R1_Fall,
 };
 
-// Creates a torch enemy (id 0x47) from a model / TPL at pos / rot. type: 0 brazier (1000 hp,
-// hit box only, vanishes when broken), 1 / 4 standing candle / lamp (1 hp, vanishes), 2 / 3 wall
-// lamp (1 hp, no hit box, only the flame goes out), 5 hanging lamp (1 hp, falls and burns the
-// floor). Tied to room etc flag `etcNo` (bit0 = already broken -> starts in Break). NULL on
-// failure.
+// Creates a torch enemy (id 0x47) from a model / TPL. type selects a brazier, candle, wall lamp or
+// hanging lamp, and bit0 of room etc flag `etcNo` starts it already broken. NULL on failure.
 cEmTorch* SetTorch(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int etcNo)
 {
     cEmTorch* em;

@@ -1,7 +1,5 @@
-// game/filter08: aiming zoom blur (D:/Bio4/Prog/filter08.cpp). While Status_flg[3] 0x08000000 (the
-// weapon's scope/zoom view) is set, filter08_ratio eases to 1 and the frame is blurred outwards from
-// the weapon marker position (g_cx/g_cy, jittered) by feedback copies; the last pass blends a tinted
-// (sr/sg/sb) mono copy back. Eases out when the flag drops.
+// game/filter08 (D:/Bio4/Prog/filter08.cpp): the aiming zoom blur, which blurs the frame outwards
+// from the weapon marker while the scope/zoom view flag Status_flg[3] 0x08000000 is set.
 #include "filter.h"
 #include "light.h"
 #include "atari.h"

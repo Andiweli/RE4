@@ -1,9 +1,5 @@
-// game/card.cpp: the memory card save / load screen and the boot-time card check. cCard runs a
-// state machine (MainLoop) per mode - load, save (game file or the system / options file) and
-// first check - over the async CARD SDK steps (probe, mount, check, free space, open, read,
-// write, create, delete, format), builds and verifies the 20 save files ("bh4_data%02d", CRC-32
-// protected) and shows the messages / errors; CardID drives the screen's id sprites (file list,
-// cursor). The dev kit's host disk is slot 2.
+// game/card.cpp: the memory card save / load screen and the boot-time card check, run by the cCard
+// state machine over the async CARD SDK calls. The dev kit's host disk is slot 2.
 #include "types.h"
 #include "global.h"
 #include "map_obj.h"

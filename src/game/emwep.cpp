@@ -1,7 +1,5 @@
-// game/emwep.cpp: weapon enemy (cEmWep): the weapons the enemies hold (setParent), drop (setFall,
-// a three-node rope), throw (axes, scythes, dynamite, grenades) or shoot (arrows, rockets) at the
-// player, with the player's escape routines of the grenade.
-//
+// game/emwep.cpp: weapon enemy (cEmWep), the weapons enemies hold, drop, throw or shoot at the
+// player, plus the player's escape routines for the grenade.
 
 #include "atari.h"
 #include "map_obj.h"
@@ -208,11 +206,9 @@ void cEmWep::beginEvent(u32 flag)
     }
 }
 
-// The weapon was shot (setYarare weapons, not by knife / grenades): a carried / falling weapon is
-// knocked out of the hand (setFall away from the shooter) with the damage SE / est; a thrown
-// dynamite (Rno1 9) explodes early (blast est, SE, damage on the thrower); a flying grenade
-// (Rno1 0xC) is shot down: point bonus, explosion at its position, Status_flg[1] 0x20000; any
-// scenario attribute tied to the weapon (At_no) is destroyed.
+// The weapon was shot (not by knife or grenades): a held or falling weapon is knocked out of the
+// hand, a thrown dynamite explodes early and a flying grenade is shot down. Any scenario attribute
+// tied to the weapon (At_no) is destroyed.
 void emWepDmCk(cEmWep* pEm)
 {
     EmWepWork* w = EMWEP_WK(pEm);

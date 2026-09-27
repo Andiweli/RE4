@@ -212,11 +212,9 @@ u8 r404_initEmSet()
     u8 n = Rnd() % 3;
     Vec pos[3] = {{-640.0f, 0.0f, -15890.0f}, {2734.0f, 8000.0f, -26577.0f}, {26356.0f, 3000.0f, -32655.0f}};
     Vec rot[3] = {{0.0f, 3.13f, 0.0f}, {0.0f, -2.18f, 0.0f}, {0.0f, -3.06f, 0.0f}};
-    // `&rot[n]` as the pos base plus the frame-slot distance, both computed AFTER the two template
-    // copies (the target forms `(n*12 + &pos) + 0x28`). ONE variable `t` for both address chains:
-    // `t += &pos` re-sets the (mult n 12) holder before the second `n * 12`, so cse1 keeps a second
-    // real mulli (gcse PREs only the first occurrence into the block between the template copies),
-    // and the re-set chain's output/anti dependences give the target's issue order.
+    // `&rot[n]` as the pos base plus the frame-slot distance, computed AFTER the two template copies.
+    // ONE variable `t` serves both address chains so cse1 keeps a second real mulli and the re-set
+    // chain gives the target's issue order.
     u32 t = n * 12;
     t += (u32) &pos;
     Vec* b = (Vec*) t;

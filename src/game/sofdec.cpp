@@ -1,7 +1,5 @@
-// game/sofdec: cSofdec, the Sofdec (CRI) movie player front end — loads the movie header, creates
-// the CRI handle, converts each decoded frame into a YUV (or ARGB) texture and draws it as a
-// screen quad while the game is frozen and its heap swapped out to ARAM; runs either in scheduler
-// slot 1 (ThreadMove) or inline from the caller's loop. (D:/Bio4/Prog/sofdec.cpp)
+// game/sofdec (D:/Bio4/Prog/sofdec.cpp): cSofdec, the Sofdec (CRI) movie player front end. It draws
+// decoded frames as textures while the game is frozen and its heap swapped out to ARAM.
 #include "types.h"
 #include "global.h"
 #include "main.h"

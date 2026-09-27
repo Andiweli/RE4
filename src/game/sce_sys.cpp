@@ -48,11 +48,9 @@ void ScenarioInit()
 // (Status_flg[3] 0x4000000), places the enemies from the list and sets up the areas.
 void ScenarioRoomInit()
 {
-    // Store order decides the zero registers and the schedule: the six byte zeros come first, so cse
-    // makes their QImode pseudo before any SImode zero exists (a later word zero's low part would
-    // otherwise replace it), eventCancel is the last use of that pseudo and pause the last use of
-    // the word zero (sched1 issues the dying store of each group first), and the sched2 anti-
-    // dependence of the byte stores on the pG load's r9 ranks their group and its `li` last.
+    // The store order decides the zero registers and the schedule. The six byte zeros come first so
+    // cse makes their QImode pseudo before any SImode zero exists, and eventCancel and pause are the
+    // last uses of the byte and word zeros because sched1 issues each group's dying store first.
     SceSys.event_no_cut_back = 0;
     SceSys.stop_bak_flg = 0;
     SceSys.event_start_cnt = 0;

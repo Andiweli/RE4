@@ -1,9 +1,5 @@
-// game/esp.cpp: the effect sprite (cEsp) pool. A cEsp is one live effect particle/sprite; the pool
-// (g_pEspSys->pEspBuf, nEsp slots of 0x150 bytes) is allocated per room from the cons value and
-// handed out by cEsp::operator new / PullEsp, returned by PushEsp. EspMove (game loop, after
-// EspgenMove) runs every active effect's move(); EspTrans (trans.cpp) sorts them into the ordering
-// tables by Tool_flg / Parts_no / Core_flg. Per-id create and trans functions live in
-// EspCreateTbl / EspTransTbl, filled by the esp??.cpp units through EspFuncTblSet.
+// game/esp.cpp: the effect sprite (cEsp) pool. The game loop runs every live effect through EspMove,
+// and trans.cpp sorts them into the ordering tables through EspTrans.
 
 #include "atari.h"
 #include "light.h"
@@ -120,19 +116,9 @@ int PullEsp(cEsp** ppEsp, int id)
     return ret;
 }
 
-// Pool slot search: scans the pool from the last hit (wrapping) for a free slot; if none, steals the
-// first live slot flagged Tool_flg 0x40000 (low-priority, may be recycled) after releasing it.
-// The found slot is zeroed. Returns pDmyEsp when nothing is available.
-// The target's third loop has `mr r9,r10` (a copy of the sys+0x10000 base) before the loop and in
-// its latch, with the pEspBuf load reading r9. That is cse_around_loop (cse.c): it only runs on a
-// loop with LOOP_BEG/END notes whose latch jumps straight back to the header, and it rewrites the
-// header's `sys+0x10000` into the latch's REG_LOOP_TEST_P copy. So loop3 is a real `for` loop;
-// loop.c (find_and_verify_loops) would then move the `PushEsp; goto found` block behind the found:
-// block (a guarded block ending in a jump out of the loop) and, with no call left in the loop,
-// hoist the pEspBuf load. The `do { PushEsp(esp); goto found; } while (0)` wrapper stops that: the
-// backward scan from the `goto` stops at the inner NOTE_INSN_LOOP_BEG instead of the guard jump.
-// Loops 1/2/4 as for/while loops get strength-reduced `&esp->flag` givs the target lacks, so they
-// stay goto loops.
+// Pool slot search from the last hit, stealing a live Tool_flg 0x40000 (low-priority) slot when none
+// is free. Loop 3 is a real `for` loop for cse_around_loop, with a `do { ... } while (0)` wrapper that
+// stops loop.c from moving the found block. Loops 1, 2 and 4 stay goto loops to avoid strength reduction.
 void* cEsp::operator new(unsigned int size)
 {
     static u32 old_hit = 0;
@@ -310,12 +296,9 @@ f32 EspGetCameraPan2()
     return g_pEspSys->CameraPan2;
 }
 
-// Draw registration (trans.cpp, once per frame): computes the camera pan/pitch, then queues every
-// active effect's trans function into the ordering tables: screen sprites (Parts_no 0xF8..0xFD) go
-// to fixed OT slots, Tool_flg 0x10000 selects a texture-render target by Core_flg, 0x1000/0x400/
-// 0x800/0x400000 pick the pre/post-world layers, everything else is Z-sorted by world position
-// (with m_Radius when set). Tool_flg 0x100 hides an effect in the first-person (scope /
-// binocular) view (Status_flg[0] 0x8000), 0x200 hides it outside that view.
+// Draw registration, called once per frame from trans.cpp. Queues every active effect's trans
+// function into the ordering tables by Parts_no, Tool_flg and Core_flg. Tool_flg 0x100 hides an
+// effect in the scope / binocular view, and 0x200 hides it outside that view.
 int EspTrans()
 {
     cEspSystem* sys = g_pEspSys;

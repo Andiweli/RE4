@@ -1,6 +1,4 @@
-// game/esp02.cpp: effect id 0x02, a one-segment ribbon (strip) sprite: a quad of length
-// Size_base_x along the effect's local -x and width Size_base_y, always turned to face the
-// camera, with the alpha fading as the segment points at the camera. When the effect leaves its
+// game/esp02.cpp: effect id 0x02, a one-segment camera-facing ribbon sprite. When it leaves its
 // parent it keeps the parent matrix (ParMat) so its local motion stays in that frame.
 
 #include "atari.h"

@@ -1,8 +1,5 @@
-// game/objRobo: object id 0x37, the giant Salazar statue of room r4-2 (D:/Bio4/Prog/objRobo.cpp).
-// R0 routines: waits on the gondola (its hands are switches the player shoots, TaskSwitchFront/
-// Back), walks the passage, smashes the door, then chases the player over the bridge whose plates
-// give way behind it (R0WalkBridge, Room_flg bits 0x12..0x1D); its feet carry whoever stands on
-// them (SatMove) and crush the player when they come down near him (WalkHitCk).
+// game/objRobo (D:/Bio4/Prog/objRobo.cpp): object id 0x37, the giant Salazar statue of room r4-2
+// that chases the player over the bridge whose plates give way behind it.
 #include "atari.h"
 #include "light.h"
 #include "dmg.h"
@@ -403,11 +400,9 @@ void cObjRobo::R0WalkBridge(cObjRobo* pObj)
         if (w->FallTimer == 90) {
             SndCall(6, 9, &pObj->pos, 0, 0, 0);
         }
-        // `hp` is a plain pointer (`*hp` aliases the scalar pG, so the second flag test reloads it)
-        // incremented before `i` (its `addi` leads the latch); the first flag test reads the word into
-        // the user variable `f`, so cse1 cannot thread its taken branch past the second test and the
-        // 0x80000000 constants stay per block (a threaded label would make them single-use movables
-        // that loop.c combines and hoists).
+        // `hp` is a plain pointer incremented before `i`, and the first flag test reads into the
+        // variable `f`, so cse1 cannot thread past the second test and loop.c does not hoist the
+        // 0x80000000 constants out of their blocks.
         for (i = 0, hp = w->BridgeTimer; i < 6; hp++, i++) {
             smd = SmdGetObjPtr(smdNo[i]);
             if (smd) {
@@ -520,14 +515,9 @@ void cObjRobo::WalkSequence(cObjRobo* pObj, int hitCheckFlag)
     }
 }
 
-// Scenario task (front hand switch shot / area 4): rotates the right hand parts (0x16) closed over
-// 15 frames, plays the hand motion 0x61, then opens it and returns to idle; Room_flg[0]
-// 0x80000000 while running, 0x8000 = hand closed.
-// Scenario task: the front arm swings down (or back up) over 15 frames.
-// Loop shapes (both tasks): the down arm sets `range = to` in the for-init (a preheader copy, LUID
-// between `j = 0` and gcse's `&robo->Motion` insertion: `fmr` before `lfd`/`addi`), the up arm
-// computes `range2 = from - to` inside the loop (a loop.c movable after the insertion); no `base`
-// copy (the offsets are `from`/`to` directly), so max (2 sets, x4 length) outranks the two ranges.
+// Scenario task, run when the front hand switch is shot: the front arm swings down or back up over
+// 15 frames. The down loop sets `range` in its for-init and the up loop computes `range2` inside the
+// loop, with no `base` copy, which gives the target's instruction order and register priorities.
 void cObjRobo::TaskSwitchFront(cObjRobo* pObj)
 {
     cParts* parts;
@@ -689,11 +679,8 @@ static f32 roboDead2(f32 a)
     return a * 1000.0f;
 }
 
-// Moves the foot collision `side` (0 right / 1 left) to the foot position (2000 in -x) and carries
-// the player (unless stat 0x100; the camera quake offset follows) and the Ganados standing
-// on it by the foot's displacement; also moves the hand-area dummy object.
-// Move the collision pieces of one side to the foot at `pos` and push the player / enemies
-// standing on it along.
+// Moves one side's foot collision pieces to the foot and carries the player and the Ganados
+// standing on it by the foot's displacement. Also moves the hand-area dummy object.
 void cObjRobo::SatMove(cObjRobo* pObj, Vec* pPosOld, int armNo)
 {
     RoboWork* w = ROBO_WK(pObj);

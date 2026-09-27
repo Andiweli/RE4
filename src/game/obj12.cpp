@@ -1,7 +1,5 @@
-// game/obj12: object id 0x12, throwable hanging object (D:/Bio4/Prog/obj12.cpp): an obj00 variant
-// (parent follow with slerp catch-up, three-point rope fall) that an enemy can also throw at the
-// player (throwMove: flies, hits with the obj12Atk attack record, then falls), with fall types
-// (bounce factors), a landing sound, a Lost_wait despawn timer and a burn tint.
+// game/obj12: object id 0x12, throwable hanging object (D:/Bio4/Prog/obj12.cpp), an obj00 variant
+// that an enemy can also throw at the player (throwMove).
 #include "atari.h"
 #include "obj.h"
 #include "obj12.h"

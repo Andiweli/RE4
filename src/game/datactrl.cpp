@@ -1,11 +1,5 @@
-// game/datactrl: streamed room data units in MRAM/ARAM (D:/Bio4/Prog/datactrl.cpp).
-// All functions byte-identical (the static-initializer trio is only named differently); .rodata and
-// all section sizes match.
-//  - dispDebug: `x1` is ONE function-scope variable shared by the loop's second conversion and the
-//    `over` block's bar width, so the allocno's conflicts are the union of both ranges (r0/r9/r11/r10/r8
-//    temps of the over block, r6 = x0, r7 = the `x1 - x0` temp) and it lands in r5; a block-scoped x1
-//    in the loop conflicts with nothing and takes the r7 preference set_preference inherits from the
-//    local-alloc'd `subf` temp. The loop's `x0` stays block-scoped (p=r31 via reusing `p` for the tiles).
+// game/datactrl: streamed room data units in MRAM/ARAM (D:/Bio4/Prog/datactrl.cpp). In dispDebug,
+// `x1` must be one function-scope variable shared by the loop and the `over` block to land in r5.
 #include "types.h"
 #include "global.h"
 #include "datactrl.h"

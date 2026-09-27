@@ -1,7 +1,5 @@
-// game/pl_knife: the knife (routine 1 == 0xB, PlKnifeMove): the L-trigger stance drawn from the
-// idle, held with a three-way pitch blend (mot3 / m3r), slashed with the fire key (a swept 0x10
-// hit line from the chest to the blade, frames 6-10), and sheathed — or turned straight into the
-// gun stance when the aim key is held. The gun object is hidden (setWepTrans) while the knife is out.
+// game/pl_knife: the knife routine (routine 1 == 0xB, PlKnifeMove), the L-trigger stance and slash.
+// The gun object is hidden (setWepTrans) while the knife is out.
 
 #include "atari.h"
 #include "light.h"

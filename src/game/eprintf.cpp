@@ -1,8 +1,5 @@
-// game/eprintf.cpp: the debug text printer. eprintf(x, y, colour, page, fmt...) buffers a string
-// for this frame (up to 0x300 messages / 0x4000 bytes, only when `page` is 0 or the current
-// debug page); EprintfDrawing renders them at the end of the frame with the 8 x 16 font texture
-// "etc/moji8.tpl" in an ortho projection, then the buffer is cleared. Nothing is drawn while
-// debug_mode is 0 or the font failed to load.
+// game/eprintf.cpp: the debug text printer. eprintf buffers strings for the frame and EprintfDrawing
+// draws them with the "etc/moji8.tpl" font, only while debug_mode is set.
 
 #include "types.h"
 #include "vec.h"

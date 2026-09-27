@@ -1,7 +1,5 @@
-// Sscrn/ss_model: the sub screen's character and weapon models (D:/Bio4/Prog/ss_model.cpp, no
-// range check: the real file name is unknown). Every *ModelInit builds the player model (MapMgr
-// work 0, ssPlModel) from the player archive and the weapon model (work 1, ssWepModel) from the
-// SS/cmn/ss_wepNN.dat data at SUB_SCREEN::x210.
+// Sscrn/ss_model: the sub screen's character and weapon models (real file name unknown). Every
+// *ModelInit builds the player model ssPlModel and the weapon model ssWepModel from ss_wepNN.dat.
 #include "types.h"
 #include "global.h"
 #include "map_obj.h"

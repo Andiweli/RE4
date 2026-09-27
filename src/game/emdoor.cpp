@@ -79,11 +79,8 @@ static inline u32 emDoorKeyCk(u32 no)
     return tbl[no >> 5] & (0x80000000 >> (no & 0x1F));
 }
 
-// Creates a door enemy (id 0x41) from a model / TPL at pos / rot. type 0 / 3 wooden doors with
-// breakable panes, 1 / 5 / 7 iron doors, 2 an iron door that falls flat when kicked, 4 an iron
-// door with panes, 6 a tall (4400) iron door stored as type 1. 1300 x 2300 atari, hit boxes by
-// type, 1000 hp. Room etc flag `flagNo` restores a broken door (bit0 -> Break) or a fallen one
-// (bits 6 / 7 -> Downed with its direction). Starts closed in Rno1 0 Set. NULL on failure.
+// Creates a door enemy (id 0x41) of the given type. Type 6, the tall iron door, is stored as
+// type 1. Room etc flag `flagNo` restores a broken or fallen door. Returns NULL on failure.
 cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo)
 {
     cEmDoor* em;

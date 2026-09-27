@@ -1,11 +1,5 @@
-// pl11 module (pl11.rel = pl15.rel): Ashley in the knight armour, a partner (cSubChar) with its own
-// model set, face shapes and hand models built from the partner archive.
-//
-// cSubAshley (pl_mod.h) replaces the DOL's partner class for the armour costume: the same
-// cSubChar routines (game/pl_npc.cpp), only modelSet / setFace / setHand differ (the armour body,
-// its head shapes and two hand model slots m_pModRHand / m_pModLHand). Pl11Init is registered as EmInitFunc
-// (the partner is enemy id 3 in the em list), constructs her, builds the models, runs
-// cSubChar::init and clears Status_flg[1] bit17.
+// pl11 module (pl11.rel = pl15.rel): Ashley in the knight armour. cSubAshley reuses the cSubChar
+// routines of game/pl_npc.cpp and only replaces modelSet / setFace / setHand.
 
 #include "atari.h"
 #include "light.h"

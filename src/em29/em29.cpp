@@ -1,8 +1,5 @@
-// em29 module (D:/Bio4/Prog/em29.cpp): the bats. They hang from the ceiling or sit on the ground
-// until the player comes close, fly around (em29_R1_Walk / Turn, em29SetSPeed blends the speed and
-// keeps the bat between the floor and the ceiling), dash at the player (em29_R1_AtkDash) or rush him
-// in a swarm (em29_R1_AtkRush, plem29_BatRush), and are pushed apart from each other and the player by
-// em29ObaHitCk. Their sounds go through the room's ctrl11 / ctrl12 controls.
+// em29 module (D:/Bio4/Prog/em29.cpp): the bats, which wait on the ceiling or ground until the player
+// comes close, then fly around, dash at him or rush him in a swarm.
 
 #include "atari.h"
 #include "light.h"
@@ -135,11 +132,8 @@ void Em29Init(cEm* em)
     new (em) cEm29();
 }
 
-// Per-frame damage check (cEm29::move): an explosion / fire volume kills the bat (flag bit7, the
-// room's EM29_DIE count, death squeak). A weapon hit does 999..1000 (= the whole hp) for most guns and
-// the knife, 9999 for explosives / magnum and a near shotgun hit (far: 999), the mine 0xE nothing; a
-// dead bat is counted and goes to Dm_Air / Dm_Ceiling / Dm_Land by where it was (R2 0..2), a
-// surviving one flinches the same way.
+// Per-frame damage check from cEm29::move. Explosions, fire and nearly every weapon hit kill the bat
+// outright. A dead bat is counted in the room's EM29_DIE count and falls by where it was.
 void em29DmCk(cEm29* em)
 {
     Em29Work* w = EM29_WK(em);
@@ -260,15 +254,9 @@ void em29DmCk(cEm29* em)
     do {
     } while (0);
 alive:
-    // Dead test with identical arms: jump2 cross-jumps the then-copy into the else copy and the
-    // surviving `lbz dmWep; cmpwi 0x21` is the target's dead compare. Two layout conditions make the
-    // then-copy vanish whole: (1) the else copy's last arm must end in `b END` at jump2 entry -- the
-    // `return` jumps over the `tail:` block whose store is dead (deleted in flow1, so `b END; tail: END:`
-    // reaches jump2 with the jump intact) -- otherwise the then kind-0 body's last `stb` is matched
-    // first against the code falling into END (1-insn fall-through candidate) and the whole-body
-    // match is never tried; (2) the then-copy's arms are laid out 1, 2, default (em29DmRoutineSetLate),
-    // so its kind-0 remnant `b` is not inverted around the kind-2 arm's remnant and the then-tree is
-    // cross-jumped into the else tree. The tail's `dmg = 0` is also the dead store keeping the jump.
+    // Dead test with identical arms: jump2 cross-jumps the then-copy into the else copy, leaving the
+    // target's dead `cmpwi 0x21`. This needs the `return` jumping over the dead `tail:` store and the
+    // then-copy's arms laid out 1, 2, default (em29DmRoutineSetLate).
     if (em->dmg.m_Wep == 0x21) {
         em29DmRoutineSetLate(em, kind);
     } else {

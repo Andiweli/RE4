@@ -52,15 +52,9 @@
 #include "item_model.h"
 #include "read.h"
 
-// Scenario trigger areas: the room's AEV (areas) / ITA (items) records plus the areas created at
-// run time, checked against the player, the partner and the enemies every frame.
-// Every record is a SceAtWork (sce_at.h) linked into a 16-slot ordering table (SceAtSys.ot) by its
-// otNo; `type` selects the handler in sceAtFunc_tbl (0 normal / hit list, 1 door, 2 exec a task,
-// 3 item, 4 flag, 5 message, 8 typewriter save, 9 shadow display, 0xA damage, 0xB runtime
-// collision, 0xC camera control, 0xD field info, 0xE stoop, 0xF special key, 0x10 ladder, 0x11
-// use item, 0x12 hide spot, 0x13 position jump, 0x14 item parent). Entry points: SceAtInit /
-// SceAtRoomSet at room start, SceAtCheck once per frame from the scenario move, the SceAt*
-// accessors for the room scripts (enable, exec function, parent, item drops, save items).
+// Scenario trigger areas: the room's AEV (areas) and ITA (items) records plus the areas created at
+// run time, checked against the player, the partner and the enemies every frame. Each record is a
+// SceAtWork whose `type` selects its handler in sceAtFunc_tbl.
 
 int DbMenuActiveCheck();                                 // game/db_menu.cpp
 cObj* setItemObj(void* bin, void* tpl, Vec* pos, Vec* rot);  // game/obj19.cpp
@@ -471,12 +465,9 @@ void SceAtCheck()
     StaFlagOff(pG, STA_PL_CHECK2);
 }
 
-// Area test for one model: position + 250 and a point 550 ahead (wall-clipped for the player) are
-// tested against every enabled area whose checkType matches `type`; a hit sets the hit flag and,
-// for trigger bit3 areas, registers the action button (door / hide / stoop / item rules), else
-// fires the area's handler when its trigger bits match the key state (flag: 1 in area, 2 action
-// pressed, 4 action held); exclusive handlers run only once per frame; trigger bit7 disables the
-// area after it fired. Returns 1 when a handler fired.
+// Area test for one model against every enabled area of the matching checkType. Trigger bit3 areas
+// register the action button, others fire their handler when the key state matches, and exclusive
+// handlers run only once per frame. Returns 1 when a handler fired.
 int sceAtCheck_main(cEm* em, int target_type)
 {
     Vec pos;
@@ -1020,11 +1011,8 @@ void releaseModel(SceAtWork* w, int disp_flg)
         return;                                           \
     }
 
-// Scenario task of an item pick-up with a model (SceExec 5 from sceAtFunc_item): up-cut camera,
-// adds the item (ItemMgr.get / attache case placement by type: ammo, weapon, money with bonus
-// messages, treasure, key items...), shows the "got X" message with the item zoom (itemExam; B
-// cancels), opens the sub screen when the case is full, then marks the item taken, disables the
-// area, frees the model / allocation and ends the cut.
+// Scenario task of an item pick-up with a model (SceExec 5 from sceAtFunc_item): adds the item,
+// shows the "got X" message with the item zoom, and opens the sub screen when the case is full.
 void sceAtGetItem(SceAtWork* w)
 {
     static int disp_flag_bak;
@@ -2711,11 +2699,8 @@ int SceAtSearchLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height)
     return 1;
 }
 
-// Per frame: picks the camera-control area (type 0xC) the player stands in — within its range
-// (range + range2 while it is current), 500 in height, and facing within its cone (mode 0: the
-// area's angle, 1: toward its position) — and hands it to the quasi-FPS camera (LRinfo). Without
-// one, a corner found by PlCornerCheck (2 = right) makes a temporary area at the player; the
-// current one is dropped when he moves 500 away or turns 70 degrees from it.
+// Per frame: picks the camera-control area the player stands in and hands it to the quasi-FPS
+// camera. Without one, a corner found by PlCornerCheck makes a temporary area at the player.
 void sceAtCamCtrlCheck()
 {
     static SceAtCamCtrl auto_work;
@@ -3228,11 +3213,9 @@ int SceAtCreateFieldAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f
 }
 
 #line 3995 "D:/Bio4/Prog/sce_at.cpp"
-// Drops an item into the room at run time (enemy drops, broken crates): a type 3 area with an
-// action button, model from the item table (hidden until found for the "falling" glow 8), glow
-// colour by item type. Persistent items (treasure / key, sceAtCheckSaveItem) get a save_item
-// record (saveNo -1 = allocate; -2.. = none) so they survive a room change; the others disappear
-// after 61 half-seconds. Returns the area number, -1 on failure.
+// Drops an item into the room at run time (enemy drops, broken crates). Persistent items get a
+// save_item record so they survive a room change, and the others disappear after 61 half-seconds.
+// Returns the area number, -1 on failure.
 int SceAtCreateItemAt(Vec* pos, ITEM_ID id, int num, int effType, int saveNo, cModel* parent, int parts)
 {
     SceAtWork* w;
@@ -3470,11 +3453,8 @@ void SceAtLinkEtcDead(int at_no, int etc_no, int on_off)
     }
 }
 
-// Per frame: resolves the enemy / etc-model links — linkType 1 waits for the enemy from the list
-// (EM_STATUS_ITEMSET for items, inactive / dead otherwise, or its Em_flg bit) and then enables or
-// disables the area (a non-persistent dropped item also starts its disappear timer); an item still
-// linked to a living enemy is handed to it (SceAtSetEmItem); linkType 2 waits for the etc model to
-// break.
+// Per frame: resolves the enemy and etc-model links, updating each area once its enemy is done or
+// its etc model breaks. An item still linked to a living enemy is handed to it (SceAtSetEmItem).
 void sceAtLink_check()
 {
     cEm* em;
@@ -3996,12 +3976,8 @@ fail:
     return 0;
 }
 
-// Sets up (or refreshes, from SceAtSetEnable / SceAtRoomSet) an item area: skipped when linked to
-// an enemy / etc model that has not died / broken yet (the item then appears where it died), when
-// already taken, or excluded by modeMask (1 Leon, 2 the others); special ids are resolved and a
-// changed id saved (type 1 record); action button / shot trigger; shoot-down (flag2 bit4) and
-// dropped (bit6) items already found lie on the floor; the auto area, the model (item table or the
-// default crate model; a cEmItem for shoot-down items) and the glow effect are created.
+// Sets up or refreshes an item area. An item linked to an enemy or etc model waits until it dies or
+// breaks and then appears where it died. Taken items and those excluded by modeMask are skipped.
 void sceAtSetItem(SceAtWork* w)
 {
     ItemInfo info;

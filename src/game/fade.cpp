@@ -1,7 +1,5 @@
-// game/fade: full-screen colour fades (D:/Bio4/Prog/fade.cpp). Four fade slots (Fade[]: 0 system,
-// 1 scenario, 2 room, 3 error) each interpolate a start -> end colour over `time` frames and draw a
-// screen quad (inside the 56 px letterbox) at depth z; FadeControl runs and draws them every frame
-// in two groups (normal and "late", drawn after the HUD). FadeSetW (fade.h) wraps the black in/out.
+// game/fade: full-screen colour fades (D:/Bio4/Prog/fade.cpp). FadeControl runs and draws the four
+// fade slots every frame, with the "late" group drawn after the HUD.
 #include "types.h"
 #include "vec.h"
 #include "gx.h"

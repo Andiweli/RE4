@@ -1,11 +1,5 @@
-// wep42 module: Krauser's grenades (the wep19 cObjHandGre build for the flash grenade and the eggs;
-// object id 0x3C). The module object carries the class, the entry points and the grenade routine
-// registration (wep/pl_grenade.cpp).
-//
-// Krauser's build of wep19: the display-only cObjHandGre (flash grenade or egg model by weapon
-// number) at his hand (parts 0x11) and belt (parts 10) offsets; the aim key is let through
-// regardless of the item count when Status_flg[3] bit23 is set (the Krauser fight's forced throw).
-// Wep42_init is the WeaponInitFunc, PlGrenadeMove the WeaponMoveFunc.
+// wep42 module: Krauser's flash grenade and eggs, his build of the wep19 cObjHandGre driven by
+// wep/pl_grenade.cpp. Status_flg[3] bit23 lets the aim key through for the Krauser fight's forced throw.
 
 #include "wep_mod.h"
 #include "light.h"

@@ -1,7 +1,5 @@
-// game/t_bugcheck: the debug "bug check" cheat menu (a debug-menu task): infinite ammo, player
-// speed, no death for the player / enemies, free position move, life editing, the collision and
-// event-area displays, shop unlock, sound stops and model / enemy display toggles — all through
-// the Debug_flg / Disp_flg words.
+// game/t_bugcheck: the debug "bug check" cheat menu, a debug-menu task that toggles cheats and
+// displays through the Debug_flg and Disp_flg words.
 #include "types.h"
 #include "vec.h"
 #include "atari.h"

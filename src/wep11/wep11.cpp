@@ -1,7 +1,5 @@
-// wep11 module: the TMP machine gun. Weapon class wep/objMachinegun.cpp, routines wep/pl_machine.cpp.
-// Wep11_init is the module's WeaponInitFunc (creates the cObjMachinegun, object id 0x2D, as the
-// player's weapon and loads the muzzle-flash effects), PlMachineMove its WeaponMoveFunc; _prolog
-// registers both and the ObjInitFunc slot.
+// wep11 module: the TMP machine gun. Wep11_init creates the cObjMachinegun (wep/objMachinegun.cpp)
+// and PlMachineMove (wep/pl_machine.cpp) is the module's WeaponMoveFunc.
 
 #include "wep_mod.h"
 #include "light.h"

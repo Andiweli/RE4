@@ -69,11 +69,8 @@ static void r106_setCloset();
 extern "C" void Evt_R106S00_Func(Event* ev);
 extern "C" void r106_setEm();
 
-// Room init: Scenario_flg[0] 0x800, the r106s00 event callback, floor hit effects, door 8 gets the lock
-// models; two shelf item events (items 0x85/0x86). Until Scenario_flg[0] 0x00200000 (Luis found): area 2
-// = the closet event, evd pre-loaded to ARAM, enemies 0x12/0x29/0x2A/0x2E pre-read, areas 4/5 = battle
-// stream on/off, the shaking closet; otherwise area 0xE off. Areas 8/9 post two Ganados; the boulder
-// unless Room_flg bit 2; the six hall Ganados; rack 0 range; a fixed hit piece at the far wall.
+// Room init. Until Luis is found (Scenario_flg[0] 0x00200000) the closet event and the shaking
+// closet are set up.
 void R106Init()
 {
     Vec pos;
@@ -378,13 +375,9 @@ static void r106_Event()
     SceSetChapterEnd(0, 3);
 }
 
-// The closet rocks: body tilt and back. OPEN (r103 execOpenCover has the same shape): the
-// original's loop-test blocks have their leading load / compare duplicated into both predecessors
-// (no loop notes, constants reloaded after the call); no source form gives that with our cc1plus.
-// The swing-open halves are a peeled first step + a goto loop inside the `if` (no loop notes, so the
-// step constant is reloaded per iteration like the target); the peel's own compare is what the target
-// cross-jumps into the loop's `ble` (`fadds; fcmpu; stfs; b L`). The `goto open; open:` form (jumping into
-// the loop's test) reloads rot before the compare instead.
+// The closet rocks: body tilt and back. OPEN (r103 execOpenCover has the same shape): the original
+// duplicates each loop test's load / compare into both predecessors, which no source form gives with
+// our cc1plus. The swing-open halves are a peeled first step plus a goto loop to match the target.
 static void r106_shakeClosetBody(cModel* m)
 {
     f32 lim = fRand0_1() * 0.015707962f + 0.006981317f;

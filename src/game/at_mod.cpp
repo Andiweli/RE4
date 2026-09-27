@@ -1,8 +1,5 @@
-// game/at_mod.cpp: character-to-character collision and the hit box ("yarare") setup. EmAtCheck
-// pushes a character's cAtariInfo body (cylinder or yaw-aligned box) out of every other
-// character's and object's body by push priority; EmHitCheck / ObjHitCheck trace a line against
-// those bodies (camera, aiming). The Yarare* functions build the YARARE_INFO chain of hit boxes
-// weapons test (em_sub.cpp).
+// game/at_mod.cpp: character-to-character collision, line traces against character and object
+// bodies, and the YARARE_INFO hit box chain that the weapons in em_sub.cpp test against.
 
 #include "atari.h"
 #include "at_mod.h"
@@ -22,20 +19,9 @@ static bool priorityCheck(cModel* pMod, cModel* pMod2);
 static u32 sphereRectCk(cAtariInfo* info, Vec& p, f32 rad);
 }
 
-// Matrix copy written out as loops. The row counter is a do-while starting at 2 (`i_-- != 0`): the
-// original's counter of ComnHitCheck's first copy is live across the getPartsPtr call (callee-saved
-// r30), which a `while (i_--)` from 3 cannot give (cse folds the peeled test and re-materialises
-// `li 2` after the call). The row pointers step destination first (`d_++; s_++;`): that LUID order
-// gives the target's `addi d; addi s` pairs and keeps the second copy's `sp_ = *s_` a separate
-// register copy (s_ r0, sp_ r9) -- ComnHitCheck is byte-identical with it.
-// ObaLineHitChk (matching): one PSVECMag call squared (`mag * mag`), tc/s clamped with ternaries (s in
-// place: its temporary is copied back into f30), den anchored in f0 (anchor gated by `de * ef` so the
-// hoisted `mr r3,r27` keeps its slot), and the getPartsPtr `if` written with an explicit `else pm = m`
-// so cse's extended block ends at the join and the `&p0` argument after the call stays a fresh
-// `addi r4,r1,8` (with `pm = m` hoisted before the `if`, cse skips the arm and folds `&p0` into the
-// copy's address pseudo).
-// MTX_COPY (vec.h) as a do/while with `i_ = 2` between the two pointer inits: the counter `li` is
-// issued between the `d_` and `s_` inits (ComnHitCheck).
+// MTX_COPY (vec.h) as a do/while counting from 2, with `i_ = 2` between the pointer inits and
+// `d_++` before `s_++`. This keeps ComnHitCheck's counter live across the getPartsPtr call and
+// gives its `addi d; addi s` pairs, which makes ComnHitCheck byte-identical.
 #define MTX_COPY_DO(src, dst)               \
     {                                    \
         MtxPtr d_ = (dst);               \

@@ -1,8 +1,5 @@
-// em15: the per-enemy object of a Ganado module (the real file name is not in the binary; the
-// module is em10.cpp + this file). _prolog registers the enemy's Init/Set functions with the DOL
-// (EmInitFunc) and the shared em10.cpp (Em10SetFunc); Em15Init constructs the shared cEm10 class in
-// the manager's work, Em15Set / Em15WeaponSet fill the Ganado work's motion table from the enemy
-// archive (cEm::subArc) by model type.
+// em15: the per-enemy object of a Ganado module, linked with the shared em10.cpp (real file name
+// unknown). It registers Em15Init and Em15Set, which fill the cEm10 motion table by model type.
 
 #include "types.h"
 #include "atari.h"

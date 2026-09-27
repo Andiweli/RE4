@@ -1,9 +1,5 @@
-// game/model: the model class hierarchy (D:/Bio4/Prog/model.cpp). cModel (a cCoord with parts) owns
-// a chain of cModelInfo (one per .bin model data + TPL: the body, then added parts models) and a
-// linked list of cParts (one per joint, from cPartsMgr), and carries the MotionWork, collision
-// info, light info and draw parameters used by every character/object. Also: pointer relocation
-// of model/TPL files (calcModelAddr / calcTplAddr and their inverses), bounding boxes, the parts
-// and model-info managers (PartsMgr, ModInfoMgr), and the debug skeleton display.
+// game/model (D:/Bio4/Prog/model.cpp): the model class hierarchy (cModel, cModelInfo, cParts) that
+// every character and object uses, plus model/TPL pointer relocation and the parts managers.
 #include "atari.h"
 #include "model.h"
 #include "motion.h"
@@ -254,10 +250,8 @@ void cModel::partsMatCalc()
 }
 
 // Base move: nothing.
-// Out-of-line inlines. Deferred-inline emission is definition order: ~cModelInfo, then the two
-// managers (implicit dtor + in-class memAlloc/memFree/memClear, model.h), ~cParts, ~cModel, then
-// these three and getPartsPtr, then the cManager::destroy instantiations and the ~cManager
-// instantiations the synthesized manager dtors request in finish_file.
+// Out-of-line inlines. Deferred inlines are emitted in definition order, which places these three
+// and getPartsPtr after ~cModel and before the cManager instantiations.
 inline void cModel::move()
 {
 }

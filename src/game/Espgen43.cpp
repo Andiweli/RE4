@@ -1,7 +1,5 @@
-// game/Espgen43.cpp: effect controller 43, a deformable sand / mud surface. An nx x ny height
-// grid (Vec per point) rendered as lit triangle strips through a display list; AddSandPower
-// dents the surface at a point (footprints, impacts) with three widening rings, GetSandHeight
-// reports the surface height. Status_flg[0] bit1 marks that a sand surface exists this frame.
+// game/Espgen43.cpp: effect controller 43, a deformable sand / mud surface. AddSandPower dents it
+// for footprints and impacts, and GetSandHeight reports its height.
 
 #include "light.h"
 #include "atari.h"

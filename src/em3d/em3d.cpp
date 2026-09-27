@@ -1,19 +1,5 @@
-// em3d module (D:/Bio4/Prog/em3d.cpp): the support helicopter. It patrols a fixed position table
-// (em3d_R1_Patrol), flies to the position the room selects (em3d_R1_TargetMove, setTarget) and
-// hovers there shooting its chain guns at the room targets or the enemies it finds
-// (em3d_R1_Atk, em3dChainGunMove, em3dGetTargetEm) before it fires a rocket; the rooms drive it
-// through the extra virtuals of cEm3d.
-//
-// Em3dInit is the module's EmInitFunc. Routines: r_no_0 0 init, 1 move with r_no_1: 0 patrol
-// (hover at Patrol_pos, then circle), 1 fly to Em3d_pos_tbl[Target_area], 2 attack (hover 240
-// frames shooting at Em3d_target_tbl[Target_area] / the nearest enemy near it, then a rocket,
-// then the next area), 3 warp-in (setTargetPos). Em3dWork (em3d.h): Be_flg bit0 guns may fire
-// (aimed at the target), bit1 the room may select a target (ckSelectEnable), bit2 the rocket is
-// about to fire (ckMissileFire), bit3 an enemy locked on it (setEmLocked -> the "under fire"
-// radio line), bit4 a target was requested, bit5 free fire (the player far from the patrol
-// point), bit6 patrolling; Spd is the hover speed, Se_wait the radio message hold, pMissile[]
-// the four rockets on parts 0xC..0xF. The helicopter itself cannot be killed (hp stays 1;
-// weapon hits only trigger the pilot's radio lines).
+// em3d module (D:/Bio4/Prog/em3d.cpp): the support helicopter, which cannot be killed and guns the
+// room targets or nearby enemies. The rooms drive it through the extra virtuals of cEm3d.
 
 #include "atari.h"
 #include "light.h"
@@ -268,11 +254,8 @@ void cEm3d::move()
     w->Be_flg &= ~0x8;
 }
 
-// r_no_0 == 0: creation: the model (archive 5/6), a 10 m light area, the collision cylinder (no
-// enemy collision bits), not lockable, Ashley does not ask for help, a big hit box behind the
-// nose, lock-on parts 2, effects (archive 4 as group 0x32), a random hover wobble phase / speed,
-// search range 12 m, the four rockets hung on parts 0xC..0xF, the first patrol position, the
-// rotor effects and SE; then patrol (1/0).
+// r_no_0 == 0: creation of the model, collision, hit box, effects, the four rockets and the rotor
+// effects, then patrol. The helicopter is not lockable and Ashley does not ask for help.
 static void em3d_R0_Init(cEm3d* em)
 {
     Em3dWork* w = EM3D_WK(em);
@@ -346,11 +329,9 @@ static void em3d_R0_Move(cEm3d* em)
     Em3d_R1_move_tbl[em->r_no_1](em);
 }
 
-// r_no_1 == 0: patrol: hovers facing Patrol_pos for 90..179 frames (the room may select a target
-// once the 30-frame entry delay from an attack has passed: Be_flg bit1), then circles forward /
-// climbing (up to 25 m) for 120..149 frames; in free-fire mode (bit5) the guns fire when the
-// player is farther than 5 m from the patrol point. A setTarget request (Target_ck) -> fly to
-// the target (1).
+// r_no_1 == 0: patrol. Hovers facing Patrol_pos, then circles forward and climbs, until a setTarget
+// request (Target_ck) sends it to the target. In free-fire mode (bit5) the guns fire when the player
+// is far from the patrol point.
 static void em3d_R1_Patrol(cEm3d* em)
 {
     Em3dWork* w = EM3D_WK(em);
@@ -483,12 +464,8 @@ static void em3d_R1_TargetMove(cEm3d* em)
     }
 }
 
-// r_no_1 == 2: the attack: hovers at the flight height facing the area's target for 240 frames,
-// picking enemies near the target to gun (em3dGetTargetEm; `count` = kills claimed); the player
-// within 8 m of the target gets the "get clear" line and the timer restarts once; the last 30
-// frames arm the rocket warning (Be_flg bit2), then the rocket fires; 45 more frames, then the
-// next area (wrapping 0..7), a result line (6 with 3+ targets, else 5) and back to patrol with
-// the 30-frame delay. Be_flg bit0 (guns may fire) while facing the target within 30 degrees.
+// r_no_1 == 2: the attack. Hovers facing the area's target and guns enemies near it (em3dGetTargetEm),
+// warns a player within 8 m of the target, then fires the rocket and returns to patrol for the next area.
 static void em3d_R1_Atk(cEm3d* em)
 {
     Em3dWork* w = EM3D_WK(em);
@@ -626,13 +603,9 @@ void em3dRoterMove(cEm3d* em)
     p->ang.y = LIMIT_ANGLE(p->ang.y);
 }
 
-// Aim one gun mount at `aim`: the mount (parts `gun`) pitches, the barrel (parts `gun` + 1) yaws,
-// each towards the helicopter's own angle plus the offset to the target, limited to +/- lim. Macros
-// (like EM3D_TURN_TO): the constants are loaded where they are used and shared by cse between the
-// two identical mounts, an inline's parameters would be live across the whole function. The
-// temporaries (p, len, angX, angY, m) are the FUNCTION's variables: one multi-set `angY` pseudo
-// conflicts with every shared clamp constant and is allocated after `limY` (f29 below f30);
-// macro-local variables give a short block-local angY that takes f30 first.
+// Aim one gun mount at `aim`, limited to +/- lim. A macro, not an inline, so the constants are loaded
+// where they are used and shared by cse between the two mounts. The temporaries are the function's
+// variables because macro-local ones give a short block-local angY that takes f30 first.
 #define EM3D_GUN_AIM(em, aim, d, mount, gun, rotX, rotY, limX, nlimX, limY, nlimY)     \
     {                                                                                   \
         p = (em)->getPartsPtr(mount);                                                   \
@@ -693,11 +666,8 @@ void em3dRoterMove(cEm3d* em)
         }                                                                               \
     }
 
-// Aims the two chain gun mounts (parts 4/2, 7/5; +-30 / +-20 degrees) at the locked enemy (1 m
-// above it) or the area target (the patrol point while patrolling), spins the barrels, aims the
-// rocket pod (parts 9/8, +-45 degrees) at the area target; while Be_flg bit0 both guns fire every
-// 3 frames: muzzle effects, SE, and a random hit line per gun (weapon 0xA, no player damage
-// flags) with a wall-hit effect (and SE for the first gun).
+// Aims the two chain gun mounts at the locked enemy or the area target and the rocket pod at the
+// area target. While Be_flg bit0 is set, both guns fire a random hit line every 3 frames.
 void em3dChainGunMove(cEm3d* em)
 {
     Em3dWork* w = EM3D_WK(em);

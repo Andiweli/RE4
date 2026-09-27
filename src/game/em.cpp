@@ -71,12 +71,8 @@ void cEmMgr::log(const char* pStr, ...)
     pLog->vwarn(6, 0, pStr, ap);
 }
 
-// Places the class for character `id` into the fresh work: id 0 the player (cPlLeon / cPlAshley
-// by pG->pl_type, other player types through PlInitFunc), 1..0xE and every enemy id through the
-// loaded enemy module (EmReadSearch + EmInitFunc; 0 when the module is not loaded), 0x40..0x51
-// the object classes (door, weapon, box, rack, window, torch, barrel, tree, rock, switch, item,
-// hit, barred, mine, shield, bar), 0xFF a bare cEm. Then assigns the serial, be_flag 0x40 |
-// 0x02000000, emset_no 0xFF and stores the read table entry.
+// Places the class for character `id` into the fresh work: the player class, an enemy class from
+// the loaded enemy module (0 when the module is not loaded), an object class, or a bare cEm.
 int cEmMgr::construct(cEm* pEm, u32 id)
 {
     switch (id) {
@@ -349,11 +345,8 @@ void cEm::setNoItem()
     itemFlag = 0;
 }
 
-// Per-character frame step for every work but the player: skips hidden works during an event
-// pause (Status_flg[1] 0x10000000 unless be_flag 0x800) and the frozen partner; caches the
-// squared distance to the player (l_pl), ticks the damage info, runs the virtual move(), then
-// the shape (skeleton) update, the queued SE (seNo), old position update, hit box debug display
-// and bounding boxes, and resets invisible_factor2.
+// Per-character frame step for every work but the player. It skips hidden works during an event
+// pause and the frozen partner, then runs the virtual move() and the shape (skeleton) update.
 void emMove(cEm* pEm)
 {
     f32 dx;

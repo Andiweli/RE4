@@ -209,11 +209,8 @@ static u16 em27_flip_tbl[24] = {
     0, 1, 2, 3, 4, 5, 6, 8, 7, 9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 0x10, 0x11, 0x12, 0x13, 0x14, 0, 0, 0,
 };
 
-// Per-frame update: room 10B hides the fish while the lake boss fight is on (Status_flg[1] bit21);
-// damage check, the dash / escape timers, the water surface height (GetWaterHeight unless the room
-// set it), the swim target: away from the player while Esc_timer runs (started when he comes within
-// 500 units, on the room alert, or at random), else home or a random point within 10000; then the R0
-// table, the fin scale relax, collision, the push-apart (em27ObaHitCk) and the airborne scenario check.
+// Per-frame update. Room 10B hides the fish while the lake boss fight is on. The fish swims away
+// from the player while Esc_timer runs, otherwise home or to a random point.
 void cEm27::move()
 {
     Em27Work* w = EM27_WK(this);

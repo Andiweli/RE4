@@ -126,12 +126,8 @@ static void r104_succeedAction();
 static void Evt_R104S00_Func(Event* e);
 static void Evt_R104S01_Func(Event* e);
 
-// Room init: doors 1/2 paired as a double door with be_flag 8 and an ambient boost; the s00/s01 event
-// callbacks. First visit (Room_flg bit 1 clear, debug trigger 1 skips) runs the arrival event, else the
-// kill-count reset waves and the patrols start at once. Area 0x11 = event s10 once (bit 21), area 0x12 =
-// event s20 once (bit 22, pre-loaded after s00). Item area 0x97 is the door-107 key, hidden until
-// Key_flg[0] 0x00400000 (area 0 = locked door message + key-use watcher). Area 0xA = the view once
-// (bit 14), area 0xE = the dash-in wave once (bit 15); three shelf and two box item events; BGM task.
+// Room init: doors 1/2 act as a double door, and the first visit runs the arrival event before the
+// waves and patrols start. Item area 0x97 is the door-107 key, hidden until Key_flg[0] 0x00400000.
 void R104Init()
 {
     cModel* m;

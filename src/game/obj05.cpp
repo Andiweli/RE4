@@ -1,7 +1,5 @@
-// game/obj05: object id 5, the scattering effect model Efm05 (D:/Bio4/Prog/obj05.cpp): a
-// multi-parts model whose parts burst away from `center` one by one as the burst radius grows
-// (rangeStep per frame), each flying with its own speed/spin (stored in the parts), bouncing off
-// the scenario/floor (flags bit 1) and settling flat (flags bit 3); the body scales/fades like Efm04.
+// game/obj05: object id 5, the scattering effect model Efm05 (D:/Bio4/Prog/obj05.cpp), whose parts
+// burst away from `center` one by one as the burst radius grows.
 #include "atari.h"
 #include "obj.h"
 #include "obj05.h"

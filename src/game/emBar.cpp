@@ -365,11 +365,9 @@ void cEmBar::setMotion(void* mot)
     EMBAR_WK(this)->Mot = mot;
 }
 
-// Melee / explosion check at the bar centre and +-400 along its length (radius 500): a grenade
-// blast or a knife / melee hit (PlWepHitCheck2 type 0x12) breaks the bar (style 2) and returns 1.
-// em / p (= &parts->mat): global.c priority is floor_log2(refs)*refs/live_length, ours em 6 refs /
-// 83 insns (1445) vs p 4 / 53 (1509) would give p r31. The `do {} while (0)` around emBarSetBreak
-// doubles that em ref's weight (7 refs -> 1686) and em takes r31 like the original; no code changes.
+// Melee / explosion check along the bar: a grenade blast or a knife / melee hit breaks it and
+// returns 1. The `do {} while (0)` around emBarSetBreak weights that em ref so em takes r31 like
+// the original instead of p. It generates no code.
 int emBarHitCk(cEmBar* pEm)
 {
     Vec v;

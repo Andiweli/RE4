@@ -1,7 +1,5 @@
 // game/espgen02: effect controller 02, the path emitter (D:/Bio4/Prog/espgen02.cpp). Like
-// controller 00 but each emitted esp is placed at a (random) fraction of an effect path
-// (EspGetPathAddr / PathGetPos), optionally scaled/rotated and oriented along the path tangent
-// (mode bits). Entry points: Espgen02_Move, Espgen02_SetFreeWork.
+// controller 00 but each emitted esp is placed along an effect path.
 #include "atari.h"
 #include "light.h"
 #include "global.h"
@@ -121,14 +119,9 @@ static f32 Calc_D256(Espgen02Work* p, u8 d, f32 rate)
     return ret;
 }
 
-// One emitter frame: same life/wait/curve logic as espgen00, but every emission picks a point on
-// the path at Start_ratio (+random Rnd_ratio) percent of its length (weighted paths follow pMod),
-// applies PathScale / PathRot_x,y (1/256 turns) and, for mode bit 0 or 1, a basis along the path
-// tangent (up = +y or -y), then ApplyMatrix on the spawned esp.
-// The shared 0.0f is loaded into spdR and copied to scaleR and colR. The FPR order scaleR f25 /
-// colR f24 / spdR f23 is a global-alloc live-length knife edge (all three have 6 weighted refs):
-// with the copies between the `bScale` and `bSpd` zero stores (the original's sched order) colR
-// loses to spdR (f23/f24 swapped); colR is therefore pinned (see the tag below).
+// One emitter frame: like espgen00, but each emission is placed at a point along the effect path.
+// colR is pinned (see the tag below) because scaleR, colR and spdR all have 6 weighted refs, and
+// without the pin colR loses to spdR in global-alloc (f23/f24 swapped).
 void espgen02_Update(EspgenWork* pEspgen)
 {
     Espgen02Work* p = (Espgen02Work*) pEspgen->work;

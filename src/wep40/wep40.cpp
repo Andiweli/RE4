@@ -1,10 +1,5 @@
-// wep40 module: Ada's semi-auto rifle (own copy of the cObjHkSniper class, object id 0x30; routines
-// wep/pl_rifle.cpp).
-//
-// Ada's cObjHkSniper: model 0xA or 0xB by weapon_type, offset in her right hand (parts 10), driven
-// by r_no_0 / r_no_1 from the rifle routines (mode 2 fire: SEs and vibration only, mode 4
-// reload: one motion, ItemMgr.reload at frame 34; both ended by the player routine). Wep40_init
-// is the WeaponInitFunc, PlRifleMove the WeaponMoveFunc.
+// wep40 module: Ada's semi-auto rifle, its own copy of the cObjHkSniper class. The rifle routines in
+// wep/pl_rifle.cpp drive it through r_no_0 and r_no_1.
 
 #include "wep_mod.h"
 #include "light.h"

@@ -1,8 +1,5 @@
-// game/view: the camera view frustum used for culling (VIEW / View): the full frustum and a
-// half-width one (for the split-screen / mirror passes) as 6 planes + 8 corner points in camera
-// and world space, plus the frustum's bounding sphere; rebuilt each frame from the camera fovy /
-// far plane (initPerspective) and orientation (orientation). Models and effects test against
-// View.world* / _sphere_outer before drawing.
+// game/view: the camera view frustum (VIEW / View) rebuilt each frame from the camera. Models and
+// effects test against it before drawing.
 #include "types.h"
 #include "vec.h"
 #include "global.h"
@@ -54,35 +51,9 @@ void VIEW::setFarPlane(f32 far_plane)
     _zfar = far_plane;
 }
 
-// initPerspective: the original's algorithm -- three Vec temporaries (the second normal block uses
-// t1/t3), `Vec q[4]` for the sphere points, the frustum points halved with an indexed loop, and
-// the circumsphere numerators written with the point differences inline (recomputed from the q
-// copies after the PSVECSquareMag calls).
-// Shape (from the target's asm): ONE frustum pointer `b` for both halves (`b = &localFull`, then
-// `b = &local; *b = localFull;` before the halving loop, then `b = &localFull` again for the
-// sphere block). The two halves' `&b->point[k]`/`&b->normal[k]` are then the SAME gcse
-// expressions: their hash-table indexes come from the first half's first occurrences (the order of
-// the 13 `addi rX,r31,K` in the halving loop's preheader), the second half's occurrences are
-// redundant after the loop and are inserted there, and the first half's PRE pattern (only
-// `&point[4]` carried G1 -> G2, `mr r23,r29`) is what block LCM gives with the `b = &local` kill
-// and the second-half occurrences in the same problem. Two distinct pointers (`b`/`c`) make the
-// second half a separate expression set and the first half PREs every recurring address.
-// `b = &local` is set before the 0xc0-byte copy loop so cse cannot fold `b + K` to `this + K`
-// after it. Halving loop plain (`b->point[i].x *= 0.5f; ...`), no pointer locals; q copies
-// field-wise (a struct copy forces `&b->point[k]` into a pseudo that cse folds to `this + K` and
-// gcse then hoists).
-// Sphere block: `s = &sphere` (a ViewSphere*) for the centre/radius stores and the Distance
-// argument -- `&sphere` is then one gcse expression (PRE'd into the copy-loop preheader, r18,
-// 5 refs, so it outranks `&q[1..3]` in global-alloc and `&q[2]`/`&q[3]` are the ones spilled);
-// cse2's find_best_addr rewrites `(mem s)` (center.x) to the class member with the higher rtx
-// cost, `this + 892`, while `s->center.y/.z`, `s->radius` stay s-based. The denominator is
-// `2.0f * det` inline (folded to det + det; a fresh pseudo that does not cross the SquareMag calls,
-// so sched anchors the fadds after the last call and the centre's FP pseudos allocate f27..f31).
-// `zfar = zfar_` before `znear = znear_` (the two dying-argument stores issue in LUID order).
-// Frustum point stores: one `z` variable holds -zn and then -zf (a two-set pseudo, allocated f11 in both
-// blocks), `w` is likewise shared, the far block has its own `h2` (block-local, tied to the dying `t` in
-// f31); each point is stored z, x, y (the far block's `lfs zf` depends on all twelve near stores, so the
-// store order inside a block is the sched1 order: the dying store first, then source order).
+// initPerspective: ONE frustum pointer `b` serves both halves so their point and normal addresses
+// are the same gcse expressions, as in the target. `s = &sphere` makes `&sphere` one expression,
+// and the shared `z` and `w` temporaries and the store order follow the target's scheduling.
 void VIEW::initPerspective(f32 fovy, f32 aspect, f32 n, f32 f)
 {
     Vec t1;

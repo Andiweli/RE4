@@ -1,13 +1,5 @@
-// em34 module (D:/Bio4/Prog/em34.cpp): the em34 / em37 / em33 enemies in one module, selected by
-// cModel::type (1 = em37, 2..3 = em33, else em34). A large enemy that turns towards its target
-// (em34RouteCk: the player or the partner), walks up to it and bites (em34AtkCk).
-//
-// Em34Init is the module's EmInitFunc. Routines: r_no_0 0 init, 1 move (r_no_1 0 wait, 1 walk /
-// turn towards the target, 2 bite), 2 damage, 3 die. Each type has its own model set (archive
-// 4..8 em34, 9..0xB em37, 0xC..0xF em33), cloth chains and motion slots (em34: 0x11 idle / 0x12
-// walk; em37: 0x14 idle / 0x13 walk / 0x15 bite; em33: 0x17 idle / 0x18 walk). Em34Work (em34.h):
-// Be_flg bit0 route to the player valid, bit1 partner present, bit2 target is the partner, bit3
-// in damage / die, bit4 the head follows the player; Go_pos / Go_dir / L_go the target of the frame.
+// em34 module (D:/Bio4/Prog/em34.cpp): the em34, em37 and em33 enemies, selected by cModel::type.
+// A large enemy that turns towards the player or its partner, walks up to it and bites.
 
 #include "atari.h"
 #include "light.h"
@@ -546,11 +538,8 @@ static void em34_R1_Die_Normal(cEm34* em)
     }
 }
 
-// Target choice of the frame (alive only): the route point towards the player (Be_flg bit0 when
-// reachable) and its angle become Go_pos / Go_dir / Go_rot / L_go with pEm = the player; with a
-// partner present (bit1) and the player unreachable or farther than the partner (l_sub) the
-// partner's route data is the target (bit2). During init the angles are zeroed and the player
-// distance forced far.
+// Picks the frame's target while alive: the player, or the partner when one is present and the
+// player is unreachable or farther away.
 void em34RouteCk(cEm34* em)
 {
     Em34Work* w = EM34_WK(em);

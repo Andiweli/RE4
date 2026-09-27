@@ -1,8 +1,5 @@
-// game/yz2code: set-up side of Capcom's yz2 decompressor (the room archives "rNNN.das" are yz2
-// streams: a text header "<packed hex> <unpacked hex>" then the bit stream at the next 32-byte
-// boundary). Yz2DecodeSet parses the header, Yz2DecodeExec builds the adaptive frequency models
-// (a 0x500-symbol main model and a 0x100-symbol one) and the 256-entry dictionary in a work
-// buffer, then hands over to the assembly decoder (yz2asm.cpp yz2Decode_Decode).
+// game/yz2code: the set-up side of Capcom's yz2 decompressor for the room archives ("rNNN.das").
+// It hands over to the assembly decoder yz2Decode_Decode in yz2asm.cpp.
 #include "types.h"
 #include <string.h>
 #include <stdlib.h>

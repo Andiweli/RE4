@@ -1,8 +1,5 @@
-// game/objGondola: object id 0x35, the cable car of the castle (D:/Bio4/Prog/objGondola.cpp). It
-// travels along its motion (R0 1 Move without / 2 Down / 3 Up with the player), carrying the
-// player, the partner and up to five enemies by the displacement of its floor point (4828 below
-// parts 1), places a floor collision quad under them, and can break (R0 4) with a camera change and
-// the player's death. setRidePL / setRideEm / setMoveMotion are the room script entry points.
+// game/objGondola: object id 0x35, the castle's cable car (D:/Bio4/Prog/objGondola.cpp). The room
+// script drives it through setRidePL / setRideEm / setMoveMotion.
 #include "atari.h"
 #include "atari_init.h"
 #include "light.h"

@@ -99,11 +99,9 @@ static void r207_ShelfOpen(int id);
 static void r207_ShelfOpened(int id);
 static void r207_StrCheck();
 
-// Room init (the two-swords hall): first visit presets Room_flg bits 0/5/6 (the swords start on the
-// right-hand mounts); the wall sword offset. Wall open (bit 1): the wall object 0x18 posed open, item
-// areas off; else the sword mounts: the use-from-inventory watcher, areas 0xF/2 = the empty mount
-// prompts, 0xD/0xE = take a sword, each sword item model (slots 0x80 / 0x87) placed on the mount its
-// flags (4/5, 6/7) say. Then the enemy event, patrol / stream tasks, two shelf item events, the terminal.
+// Room init (the two-swords hall). The first visit presets Room_flg bits 0/5/6 so the swords start
+// on the right-hand mounts. With the wall open (bit 1) the wall object is posed open, otherwise the
+// sword mounts are set up with each sword on the mount its flags say.
 void R207Init()
 {
     // One pointer local for the sword item models: NULL for the wall-open state, the at item

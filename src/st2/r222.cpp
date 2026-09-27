@@ -100,11 +100,8 @@ void em_reset();
     r222_work->hit[no] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &SmdGetObjPtr(objId)->pos, &SmdGetObjPtr(objId)->ang, 1); \
     YarareInitCube(r222_work->hit[no], 0.0f, -3500.0f, 0.0f, 550.0f, 1300.0f, 550.0f, 0, YAT_FLAG_ON)
 
-// Room init (the dragon hall): Debug_flg[1] 0x20000, Status_flg[1] bit 0, no water splashes, the moving
-// objects marked script-moved. Per dragon (Room_flg bits 0/1/2 = fallen): fallen -> its collision
-// pieces and the boxes it revealed, else its two shot-target hit boxes (r222_setHit) and the dragon enemy
-// (0x16 / 0x14 / 0x15). The entrance cut once (bit 4), the side dragons on area 6 until bit 5, the
-// dragon watcher, item area 0x80 and the treasure box item events.
+// Room init (the dragon hall). Room_flg bits 0/1/2 mark the fallen dragons. A fallen dragon sets up
+// its collision pieces and the boxes it revealed, a standing one its hit boxes and the dragon enemy.
 void R222Init()
 {
     cModel* m;

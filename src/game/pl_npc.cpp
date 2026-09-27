@@ -3571,11 +3571,9 @@ void cSubChar::moveBust()
     parts->world.z = parts->mat[2][3];
 }
 
-// Eyelid (parts 0x1C) blink sequence on `timer` and the eye direction (parts 0x20/0x21) wander
-// (eyeDir), as in pl_class moveEyeNormal. The switch is written sorted with
-// `default` first and every case spelled out (no shared labels): cross-jumping merges the identical
-// bodies into the LAST copy, which is why the original's block order is 0,3,4,1E,58,5A,5D,5E,5F,60,
-// 61,62 while its pool is in ascending case order.
+// Eyelid blink sequence and eye direction wander, as in pl_class moveEyeNormal. The switch lists
+// `default` first and spells out every case, because cross-jumping merges identical bodies into the
+// last copy and that gives the original's block order.
 void cSubChar::moveFace()
 {
     static int timer;

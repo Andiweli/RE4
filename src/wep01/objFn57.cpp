@@ -1,11 +1,5 @@
-// FN57 (Blacktail) weapon object (wep01 module, first object; real file name unknown): model by
-// weapon type, fire with cartridge ejection, reload by tune level.
-//
-// cObjFn57 is the cObjWep (game/objWep.cpp) of the Blacktail, hanging on the player's right hand
-// (parts 10) and driven by r_no_0 / r_no_1 from the handgun routines (wep/pl_handgun.cpp):
-// mode 2 -> moveFire (slide motion, SEs, flash, cartridge), mode 4 -> moveReload (motion by tune
-// level, ItemMgr.reload at its frame). weapon_type 1 is the upgraded model 0x7 (weapon list id
-// 0x22). setMotion installs the handgun footwork motions into the player's table.
+// FN57 (Blacktail) weapon object of the wep01 module (real file name unknown). The handgun routines
+// in wep/pl_handgun.cpp drive it through r_no_0 and r_no_1 to fire and reload.
 
 #include "wep_mod.h"
 #include "item.h"

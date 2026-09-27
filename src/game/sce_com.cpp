@@ -1,8 +1,5 @@
-// game/sce_com: scenario helpers shared by the room scripts — the event brackets (SceEventStart /
-// SceEventEnd put the whole game into event mode, SceUpCutStart / End freeze it for a close-up),
-// messages with camera cuts and yes/no selection, save scratch words, enemy counting / destruction,
-// item events (an action button that reveals items), the chapter-end screen, the scenario
-// camera, container opening (OpenBoxMain) and the elevator script (SceElevator).
+// game/sce_com: scenario helpers shared by the room scripts, such as the event brackets, messages,
+// item events, the chapter-end screen and the elevator script (SceElevator).
 #include "types.h"
 #include "atari.h"
 #include "light.h"
@@ -97,11 +94,8 @@ struct SceElevatorData {
 static void* ItemEventTbl[16];
 static CAMERA SceCam;
 
-// Begins a scenario event (nestable; only the outermost call acts): the calling scenario task is
-// marked as an event task, mode 0 puts every enemy / object / damage area into event mode, kills
-// the effects and the level-5 tasks, mode 1 only stops the ladder camera task; the aim camera
-// ends, keys are stopped (0xEFCF0000 kept), the life meter and cockpit ids hide, the player is
-// invulnerable, Stop_flg 0x100 / 0x400000 and SE block 2 stops. Status_flg[0] 0x1000 = in event.
+// Begins a scenario event. Calls nest and only the outermost one acts. Mode 0 puts every enemy,
+// object and damage area into event mode, and mode 1 only stops the ladder camera task.
 void SceEventStart(int mode)
 {
     cSceSys* s;
@@ -720,11 +714,8 @@ void getChapterSection(int no, int* chap, int* sect)
 // Reference setters: the original stores these GlobalWork fields through references (pG reloaded after each).
 static inline void U16Zero(u16& d) { d = 0; }  // HImode zero (its own `li`), reference store
 
-// Chapter end task (SceSetChapterEnd): kills the running event, freezes the game, swaps the room
-// data out to load the chapter result id data ("SS/<lang>/chapNN.dat"), shows the ChapterEnd
-// screen with the "save?" message (0x80); with a door area the player is moved through it for
-// the save (pG->chapter, counters reset, GameSave.save), a yes saves to the card; then everything
-// is restored and the door executed (fade effect 2), or the BGM restarts and the pause ends.
+// Chapter end task (SceSetChapterEnd): swaps the room data out to show the ChapterEnd screen with
+// its save prompt, then restores everything and executes the door or restarts the BGM.
 void SceChapterEnd()
 {
     cDataSwap swap;
@@ -906,14 +897,9 @@ void OpenBoxMain(int type, int mode, int se, u32 id1, u32 id2, int itemNo)
     cObj* o2 = 0;
     cModel* item = 0;
     f32 dy = 0.0f;
-    // Case bodies are laid out in source order: case 0x17 (both doors, 160 deg) follows case 0 in
-    // both switches. Every loop declares its own `int i`: the two-frame waits' counters are then
-    // short-lived pseudos (5 refs / ~8 insns) that global alloc places first, taking r31 before
-    // `type` (r30) and `o1` (r29); id2 and the 30-frame counter reuse r31 afterwards. One shared
-    // `int i` (35 refs / 482 insns) sorts below them and rotates the three.
-    // Constant-pool order: the 30-frame totals, their per-frame steps (folded divisions: the
-    // decimal step literals are one ulp off) and the drop step enter the pool here; every use
-    // below is folded to the literal.
+    // Case bodies are laid out in source order. Every loop declares its own `int i` so the short wait
+    // counters take r31 before `type` and `o1`. The constants below fix the pool order, and the steps
+    // are folded divisions because the decimal literals are one ulp off.
     const f32 ryA = -1.9198622f, ryB = 1.9198622f, ryC = -2.7925267f, ryD = 2.7925267f;
     const f32 rxA = 1.7f, rxB = -1.7f, rzA = 1.5707964f, rzB = -1.5707964f, pxA = 500.0f, pxB = -500.0f;
     const f32 syA = ryA / 30.0f, syB = ryB / 30.0f, syC = ryC / 30.0f, syD = ryD / 30.0f;
@@ -1250,13 +1236,8 @@ void OpenBoxMain(int type, int mode, int se, u32 id1, u32 id2, int itemNo)
 extern "C" void SceElevator(SceElevatorData* d);
 
 
-// Shape from r225.cpp's SceElevator_r225 (SetPosXYZ / FadeSetRGBA inline helpers, the goto-entered up
-// loop, the down loop with its tail inside). Residue closed by the `jp` pin: `done` (10 refs, live
-// length 106 x4 from update_equiv_regs' two `done = 0` REG_EQUIV doublings = 424, priority 707) sorts
-// below gcse's `&d->pos` copy (9 refs / 380 = 710) in global alloc, so the copy takes r25 and done r24;
-// the target has done r25 / copy r24 (done's length there is 105 -> 420 -> 714: one pre-reload insn
-// fewer somewhere in its range). Holding `&d->jumpPos` (the target's r25 in the up loop, where done is
-// dead) in r25 makes the copy take r24 and done r25 without touching anything else.
+// Shape from r225.cpp's SceElevator_r225. Global alloc alone gives gcse's `&d->pos` copy r25 and
+// `done` r24, the reverse of the target. Holding `&d->jumpPos` in r25 (the `jp` pin) swaps them.
 void SceElevator(SceElevatorData* d)
 {
     cPlayer* pl = pPL;

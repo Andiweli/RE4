@@ -1,7 +1,5 @@
-// game/ctrl14.cpp: control 0x14, the dragon head statues of the stage 4 fire trap room: the
-// scroll models of base, head and jaws of dragon `type` (0..2) with their collision pieces, moved
-// along the rail (addWidth / addHeight) and turned (addDir) by the em10 ganados that operate
-// them, and their flame (setFire: 30 frame wind-up, 60 frame jet) that burns the player.
+// game/ctrl14.cpp: control 0x14, the dragon head statues of the stage 4 fire trap room. The em10
+// ganados that operate them move and turn them, and their flame burns the player.
 
 #include "types.h"
 #include "vec.h"

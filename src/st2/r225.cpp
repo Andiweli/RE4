@@ -547,13 +547,9 @@ void SceElevator_r225(SceElevatorData* d)
         }
         obj->setPos(&d->pos);
         pPL->setPos(&d->plPos);
-        // Up loop: a noted loop that loop.c does not process (entered by the goto below = "multiple
-        // entry points"), laid out `b TOP; SLEEP: SceSleep; spd += accel; TOP: ...`. The loop notes
-        // give flow's depth-2 ref weights (accel above minSpd in the FPR order, the faded compare's
-        // CC pseudo allocated before `done` -> cr4) and update_equiv_regs leaves `white` in bb 7;
-        // loop.c must stay out or it single-usage-replaces the pG/RoomData highs of the RsfCheck
-        // block with the gcse reaching registers (a 14th GPR). `fade`/`white` computed here are the
-        // target's `lis/addi &Fade[2]` and `li 255` before the loop.
+        // Up loop, entered by the goto below so loop.c skips it as having multiple entry points. Its
+        // loop notes give the target's register weights, and loop.c must stay out or it costs a 14th
+        // GPR. `fade` and `white` set here are the target's loads before the loop.
         fade = &Fade[2];
         white = 0xFF;
         goto up_top;
@@ -614,14 +610,9 @@ void SceElevator_r225(SceElevatorData* d)
         CamCtrl.Comeback(0);
         FadeSetRGBA(0x80000002, 0xFF, 0);
         hSnd = SndCall(6, d->seStart, &obj->pos, 0, 0, 0);
-        // Down loop: `for (;;) { body; if (done) { tail; break; } SceSleep(1); }` -- expand_end_loop
-        // rotates it (`b TOP; SLEEP; TOP: body; beq SLEEP`), the gcse insertions before the entry
-        // jump land after LOOP_BEG (loop.c: "phony", the in-loop `lis pG` stays) and behind the
-        // sched1 note barrier (`addi r29,r1,8` after the SndCall), and the tail inside the loop puts
-        // LOOP_END before the shake preheader (`lis/li` after the setAng call). `y` is only the
-        // fabs operand (__builtin_fabsf: the volatile asm would block the `fmr f12,f13` copy of the
-        // PRE'd `obj->pos.y` re-read), `move` is a second step variable so `step` dies in the up
-        // loop and `spd` stays cse-canonical there (`fneg f31,f30`).
+        // Down loop with the tail inside it, so expand_end_loop rotates it and the gcse insertions
+        // and LOOP_END land where the target has them. `y` feeds __builtin_fabsf because the volatile
+        // asm would block a copy, and `move` is a second step variable so `step` dies in the up loop.
         for (;;) {
             f32 y = obj->pos.y;
             if (__builtin_fabsf(d->pos.y - y) < stopDist) {

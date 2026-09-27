@@ -1,7 +1,5 @@
-// game/snd_iss2: sound driver audio-frame side of the SE requests — Snd_iss_manager runs every
-// 5 ms: applies the global SE controls (fade / pause / volume-down / pan-volume reset) to the AX
-// voices, then executes the pending request bank (new plays and the per-sound commands: stop,
-// pan / volume / AUX / filter / pitch changes) and updates the AX voices.
+// game/snd_iss2: sound driver audio-frame side of the SE requests. Snd_iss_manager runs every 5 ms
+// and applies the global SE controls and the pending requests to the AX voices.
 #include "snd_drv.h"
 
 typedef void (*SND_REQ_CMD)(SND_AXV_WORK*, SND_REQ_WORK*, u16);

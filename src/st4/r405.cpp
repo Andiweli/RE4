@@ -64,11 +64,8 @@ static void snd_tbl_set()
     SndBgmTblSet(0x405, 3);
 }
 
-// Room init (Assignment Ada starts here): the Ada game flag (st4_initAdaGame), game points reset, the
-// s00 / s99 callback; areas 6/8 = the first wave until Room_flg bit 1, area 9 = the second until bit 2;
-// the s00 event on the first visit (pre-loaded with the enemy of ESL 0); water hit effects; Ada's
-// (pl_type 2) or Leon's room motions; the water render targets; the exit hook; coming from r406 the
-// gate 0x42 is posed raised.
+// Room init (Assignment Ada starts here): sets the Ada game flag (st4_initAdaGame), resets the game
+// points, and sets up the two enemy waves and the s00 event on the first visit.
 void R405Init()
 {
 #line 69 "D:/Bio4/Prog/r405.cpp"

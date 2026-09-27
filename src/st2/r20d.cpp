@@ -354,12 +354,9 @@ static void r20d_setEm()
     }
 }
 
-// The switch that raises / lowers fence 0. The three 0.0 loads (the `t != 0.0` compare, `spd = 0.0`,
-// the tail `move(0.0f)`) share one high (`lis r29`, callee-saved) only when every occurrence is
-// inside the outer loop: gcse PRE then inserts the single `high(LC)` at the end of the preheader
-// and all three loads become redundant copies of it (a `z0 = 0.0f` before the loop is its own
-// non-redundant occurrence and PRE re-inserts a second high for the other two). loop.c hoists the
-// compare's load to the preheader (`lfs f27`); the other two stay in their blocks.
+// The switch that raises / lowers fence 0. The three 0.0 loads share one `lis r29` high only when
+// all of them sit inside the outer loop, where gcse PRE inserts a single high in the preheader. A
+// `z0 = 0.0f` before the loop would make PRE insert a second high.
 static void r20d_checkSwitch(int opened)
 {
     cEm* sw;
@@ -1117,11 +1114,9 @@ void cLanternUnit::throwLantern(cLanternUnit* u)
     // function's constants (an unused function-local static const array is emitted before the pool).
     static const f32 angTbl[5] = {3.1415927f, 0.7853982f, 1.5707964f, 2.7488935f, 0.3926991f};
     Vec pos;
-    // The original keeps `st` (0) in r29 for the whole head and never folds it: `stw r29,0xc(u)` then
-    // `add r29,u,r29; lwz r4,0x18(r29)` (a byte offset into mot[]), with the two stores issued before
-    // `lis pPL@ha`. Ours folds a user variable known to be 0 (cse) and lets the fixed-scalar pPL load
-    // pass the struct stores; the hard register + launder hide the value, the reference setters order
-    // the stores.
+    // The original keeps `st` (0) in r29 for the whole head and never folds it. Ours folds a user
+    // variable known to be 0, so the hard register and launder hide the value and the reference
+    // setters keep the stores before the pPL load.
     register int st asm("r29"); // COMPILER-DIFF: #12 (user variable constant not folded)
     int cnt = 0;
     // COMPILER-DIFF: #2 (value-carrying FPR pin): the 0.0 pseudo is f30 and its `turn` copy f31 in the

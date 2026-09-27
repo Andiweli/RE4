@@ -1,7 +1,5 @@
-// game/snd_seq3: sound driver sequence works (SND_SEQ_WORK, 8 slots): allocation, lookup by
-// sound id, closing when the last note has died, the variable-length delta reader, MIDI send
-// helpers, the AX volume computation and the start of a new sequence from an ISS play request
-// (synth initialised on the block's DLS / ARAM, the sequence data picked by the SIT's bank).
+// game/snd_seq3: the sound driver's sequence works (SND_SEQ_WORK), from starting a sequence on an
+// ISS play request to closing it when the last note has died.
 #include "snd_drv.h"
 
 // Clears the 8 sequence works (numbered).

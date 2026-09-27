@@ -1,8 +1,5 @@
-// game/snd_iss3: sound driver new-play of a SE — takes a voice work and an AX voice for the
-// request, resolves the SIT's program in the block's DLS wavetable (instrument / region /
-// articulation / sample / ADPCM), derives envelope, volume, pan, AUX sends, pitch and filter from
-// request overrides -> SIT -> DLS defaults, and programs the AX voice (ADPCM addresses, sample
-// rate ratio, LPF) before starting it; sequence SITs (flag 4) go to snd_seq* instead.
+// game/snd_iss3: sound driver new-play of a SE. It resolves the SIT's program in the DLS wavetable
+// and programs an AX voice, while sequence SITs (flag 4) go to snd_seq* instead.
 #include "snd_drv.h"
 
 // Executes a play request: a sequence SIT (flag 4) starts a MIDI sequence, else a sampled SE voice.

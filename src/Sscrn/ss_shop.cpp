@@ -430,11 +430,9 @@ void SsShopInit::move(SUB_SCREEN* wk)
     }
 }
 
-// Builds the shop: the Merchant session over merchantChar, the widget graph (ShopTopMenu -> Sell /
-// Buy / LvUp chains; BuyItemNum/BuyConfirm hand a piece to PzzlThinking -> PieceSelect -> BuyPuzzleEnd
-// for case placement, CaseChange for a bought case), the id groups (case 0x10, shop 0x1C..0x1F,
-// digits IdNum 0x40..), lights, the pzlPlayer of board_size, the model managers, the message
-// queue buffers, the ShopWork; starts in the top menu.
+// Builds the shop: the Merchant session over merchantChar and the widget graph of the top menu with
+// its Sell, Buy and LvUp chains. A bought item is handed to PzzlThinking and PieceSelect to be
+// placed in the case. The shop starts in the top menu.
 void SsShopMain::init(SUB_SCREEN* wk)
 {
     IdUnit* u;

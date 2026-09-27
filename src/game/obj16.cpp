@@ -1,9 +1,5 @@
-// game/obj16: object id 0x16, the plaga head (D:/Bio4/Prog/obj16.cpp): the parasite that bursts
-// from a Ganado's neck, hung on parts `parts_no` of its `body` model and owned by `target` (the
-// enemy work). `type` selects the plaga kind (2/0xB tentacle, 3/0xD head-biter, 4 spider ...).
-// R1 routines: 0 Set (plain motion), 1 CoreMove (idle / spit attack cycle), 2 Atk (bite), 3
-// Critical (the decapitating bite), 4 Damage. It tracks the player with the neck (obj16NeckMove),
-// spawns its drip/glow effects, and shrinks/fades away (Lost_wait) once the body dies.
+// game/obj16 (D:/Bio4/Prog/obj16.cpp): object id 0x16, the plaga head that bursts from a Ganado's
+// neck. It hangs on the `body` model and is owned by the enemy work `target`.
 #include "atari.h"
 #include "light.h"
 #include "ctrl.h"

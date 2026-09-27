@@ -394,11 +394,9 @@ static inline void em23FlyMove(cEm23* em, Em23Work* w)
     em23AddSpeedAir(em, em->ang.y);
 }
 
-// R1 == 0: room 20A crow sitting on the corpse: idle (hp 1), takes off (ARC 0xE) when the player comes
-// close with the wing flap SE, climbs, then Turn (4) once airborne.
-// Both motion switches are written out with ONE pair of routine-scope pointers (not the
-// em23WaitMotion/em23TakeoffMotion inlines): the shared `m1` pseudo is what makes the takeoff join's
-// subArc copy take r10 instead of r11 (global-alloc `regs_someone_prefers`).
+// R1 == 0: the room 20A crow on the corpse, which takes off when the player comes close. Both motion
+// switches share ONE pair of routine-scope pointers instead of the em23WaitMotion/em23TakeoffMotion
+// inlines, because the shared `m1` pseudo makes the takeoff join's subArc copy take r10, not r11.
 static void em23_R1_R20ALanding(cEm23* em)
 {
     Em23Work* w = EM23_WK(em);

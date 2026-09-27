@@ -1,8 +1,5 @@
-// game/TexRender.cpp: render-to-texture. Up to 8 TexRenderMng targets per frame: each owns an
-// EFB copy buffer, an effect texture id (0xF8 + slot) and an OT the callers queue their draws
-// into; TransTexRenderMgr schedules the copy after each target's pass. Models show a target
-// through their texture blend table (TexRenderModSet), and TexRenderCam* render a pass from an
-// event camera motion.
+// game/TexRender.cpp: render-to-texture into up to 8 targets per frame. Models show a target
+// through their texture blend table (TexRenderModSet).
 #include "types.h"
 #include "global.h"
 #include "event.h"

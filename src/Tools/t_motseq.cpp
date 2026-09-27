@@ -532,11 +532,9 @@ static inline void msqFrameStep(s16 cur, u32 on, int sub)
     }
 }
 
-// Mode 3, the key editor: the motion plays (A + sub stick skips frames, X/Y with the L/R
-// combinations add / delete a key at the current frame, R+Z / L+Z / L+R+Z copy / paste / cut a
-// key); up/down pick the row (frame, 8 flag bits, SE number), left/right toggle the flag or step
-// the SE; Z switches the SE bank test, B opens the file menu. SEs of the key are played on the
-// model as the sequence passes them.
+// Mode 3, the key editor: plays the motion and adds, deletes, copies, pastes or cuts keys at the
+// current frame, and edits each key's flag bits and SE number. B opens the file menu. The keys'
+// SEs play on the model as the sequence passes them.
 static void msq_R0_Sequence()
 {
     MsqWork* w = MSQ;

@@ -1,7 +1,5 @@
-// game/esp11.cpp: effect id 0x11, a light source. SetFreeWork creates a cLight (Work8[0] kind,
-// Work8[1] cut / type, Work8[2] number) flagged be_flag 0x40 (owned by an effect); with Type
-// (Work8[3]) == 1 the light's position, radius (size x 10) and colour follow the sprite every
-// frame, otherwise the sprite only counts its life. Destroying the effect destroys the light.
+// game/esp11.cpp: effect id 0x11, a light source owned by the effect. With Type 1 the light
+// follows the sprite, and destroying the effect destroys the light.
 
 #include "atari.h"
 #include "light.h"

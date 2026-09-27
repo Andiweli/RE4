@@ -637,12 +637,9 @@ void testRibbonMoveGirl(cModel* pl, PlCloth* pCloth)
     PenClothMove(pl, (PenCloth*) pCloth);
 }
 
-// One lapel of Ashley's alternate costume: the part is rotated away from the body by the angle the
-// chest (two parts, weighted) rises above it, then bent around the local Y and Z axes. The two
-// lapels are written out (the second copy's pointer locals become gcse copies of the first's).
-// A plain block, not do/while(0): a loop note makes haifa treat the next insn as a full barrier,
-// which would pin the PRE copies behind the second lapel's first call. The inner block re-derives
-// `pm1`, so the first lapel's later uses go through the PRE copy and `pm1` itself dies in bb 0.
+// One lapel of Ashley's alternate costume, rotated away from the body as the chest rises. A plain
+// block, not do/while(0), because a loop note would make haifa pin the PRE copies behind the second
+// lapel's first call. The inner block re-derives `pm1` so `pm1` itself dies in bb 0.
 #define LAPEL_MOVE(no, pa, pb, lift, sy, sz)                                        \
     {                                                                               \
         f32 ang;                                                                    \

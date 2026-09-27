@@ -1,7 +1,5 @@
-// game/filter: dispatcher of the full-screen post filters 00..0b (D:/Bio4/Prog/filter.cpp). Each
-// filter owns its state in filterXX.cpp and queues an OT type 0x12 render callback that copies the
-// frame buffer into a draw temp buffer and blends it back. FilterInit / FilterRoomInit / FilterTrans
-// call the per-filter entries in a fixed order (08 before 02: zoom blur before depth of field).
+// game/filter: dispatcher of the full-screen post filters 00..0b in filterXX.cpp
+// (D:/Bio4/Prog/filter.cpp). Filter 08 runs before 02, so zoom blur comes before depth of field.
 #include "filter.h"
 #include "main_sub.h"
 

@@ -1,8 +1,5 @@
-// game/snd_str0: sound driver streamed audio (ADPCM from disc), game-side entry points — a
-// stream work (SND_STR_WORK, 4 slots with 64 KB MRAM buffers and 128 KB ARAM per channel) is
-// prepared from a stream block's RIT / SHD entry (Snd_str_prepare / Snd_str_init: file opened,
-// block sizes, loop points, AX voices), then driven by request bits (1 ready, 2 play, 4 fade, 8
-// stop, 0x10 volume) that the audio frame executes (snd_str1..4).
+// game/snd_str0: game-side entry points of the sound driver's streamed audio (ADPCM from disc).
+// They prepare a stream work and set request bits that the audio frame executes (snd_str1..4).
 #include "snd_drv.h"
 
 // Prepares stream `req_no` of stream block `blk_no` from file `name` in slot `no` (-1 = the RIT's

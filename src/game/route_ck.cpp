@@ -1,10 +1,5 @@
-// game/route_ck: enemy route finding on the room's RTP data (pG->Rtp, the "RTP" sub-file of the
-// room archive): a set of route points with links between them and a precomputed next-hop table
-// (row = current point, column = destination). Enemies ask RouteCkToEm / RouteCkToPos for the
-// next position to walk to (a direct line when nothing blocks it, else the next route point;
-// cEm::RckMy / RckTo / RckNear cache the points, RckStat bit0 marks the near point as fresh for
-// this frame), RouteCkEscEm for the point leading away from someone, RouteCkGetDist for the path
-// length. Draw_rtp / Draw_eminfo are the debug displays of the points and the EMI placements.
+// game/route_ck: enemy route finding on the room's RTP data, a set of linked route points with a
+// precomputed next-hop table. Enemies ask it for the next position to walk to.
 #include "route_ck.h"
 #include "em.h"
 #include "player.h"
@@ -76,11 +71,8 @@ void RouteCk()
     pPL->RckStat = 0;
 }
 
-// Where `em` should walk to reach `target`: the target itself (returns 1) when there is no RTP, a
-// clear line 500 above the ground with a floor under the midpoint, or no route; else the next
-// route point toward the target's nearest point (returns 0), advancing RckMy once within 250 of
-// the current point or when the next is in clear view. flag bit0 = skip the direct test unless
-// the next hop is the last, bit1 / bit2 (forced for Ashley, id 3) widen / narrow the collision mask.
+// Where `em` should walk to reach `target`: the target itself (returns 1) when the line is clear or
+// there is no route, else the next route point toward the target's nearest point (returns 0).
 int RouteCkToEm(cEm* pMy, cEm* pTo, Vec* pDest, int mode)
 {
     Vec a;

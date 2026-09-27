@@ -1,7 +1,5 @@
-// game/snd_sub0: sound driver shared helpers — the DLS volume (0..127 -> AX attenuation) table
-// and the 24-entry low-pass filter coefficient table, sounding / soft-reset checks, the six system
-// volumes (SE / BGM / stream for the two output kinds), the random generator with the SIT's random
-// pitch range, and the sound-test work reset.
+// game/snd_sub0: sound driver shared helpers: volume and filter tables, the system volumes, the
+// random generator and the sound-test work reset.
 #include "snd_drv.h"
 
 s32 Snd_dls_vol_tbl[128] = {

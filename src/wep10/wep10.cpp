@@ -1,7 +1,5 @@
 // wep10 module entry: the semi-auto rifle (class in objHkSniper.cpp, routines wep/pl_rifle.cpp).
-// Wep10_init is the module's WeaponInitFunc (creates the cObjHkSniper, object id 0x30, as the
-// player's weapon and loads the effects), PlRifleMove its WeaponMoveFunc; _prolog registers both
-// and the ObjInitFunc slot.
+// _prolog registers Wep10_init as the WeaponInitFunc and PlRifleMove as the WeaponMoveFunc.
 
 #include "wep_mod.h"
 #include "light.h"

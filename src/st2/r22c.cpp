@@ -433,11 +433,8 @@ void ScoreClear();
 void ScoreMove();
 }
 
-// Room init (the shooting range): the result screen data file, the floating scores, the target enemy
-// (0x3E) pre-read; the game level (A..D) from the room the player came from (r204 / r211 / ... each
-// range entrance is a level); the range keeper and gate tasks, area 0 = start the game, area 7 = the
-// high-score board, area 2 = the exit door; the two range doors paired and close-locked; Ashley's wait
-// task; the bottle caps owned are counted.
+// Room init (the shooting range). The game level (A..D) comes from the room the player came from,
+// since each range entrance is a level.
 void R22cInit()
 {
 #line 1978 "D:/Bio4/Prog/r22c.cpp"

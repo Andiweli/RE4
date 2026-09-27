@@ -1,14 +1,5 @@
-// Shotgun player routines (wep07/wep08/wep33 modules, first routine object; real file name unknown):
-// routine 2 of the player while a shotgun is equipped: ready, set (idle / turn), fire (pellet spread
-// hit checks), down, reload (shell by shell). Modelled on game/pl_knife.cpp; pl0a/wep07.cpp is
-// Krauser's reduced build of the same file.
-//
-// Entry: PlShotgunMove is the module's WeaponMoveFunc (pl_R1_Weapon, r_no_1 == 6). r_no_2 is the
-// weapon state (0 ready, 1 set, 2 fire, 4 reload), r_no_3 the step, mirrored into the weapon
-// object's r_no_0 / r_no_1. Weapon archive slots (pG->pWep): 0x18 draw, 0x1A/0x20/0x22 aim
-// idle down/level/up (mot3 pitch blend on m3r), 0x1E/0x21/0x23 fire, 0x1F holster, 0x2A/0x2C/0x2E
-// reload by weapon_lv_reload. weapon_no 7 is the shotgun, 8 the Striker (faster draw, shorter
-// recoil, 19 pellets instead of 13), 0x21 the wep33 pump shotgun.
+// Shotgun player routines (wep07/wep08/wep33 modules, real file name unknown), entered through
+// PlShotgunMove while a shotgun is equipped. pl0a/wep07.cpp is Krauser's reduced build of this file.
 
 #include "atari.h"
 #include "light.h"
@@ -312,14 +303,9 @@ static void wep07_r2_fire(cPlayer* pl)
     func_tbl[pl->r_no_3](pl);
 }
 
-// fire step 0: the shot. trigger() spends the shell and fires the weapon object, the fire motions
-// 0x1E/0x21/0x23 start, then 13 pellets (19 for the Striker) are traced from the right hand
-// (parts 10) along -X for 50 m with PlWepHitCheck2 (6 m range): pellet 0 is the centre line from
-// the muzzle (small random spread; splash SE 2/0xB when the marker is under water), pellets 1..n
-// start on a hexagonal ring (150 units per ring) with a widening random spread of 1500 units per
-// 3 pellets; PlWepHitCheck2 flag bit0 (every pellet not divisible by 4) skips the scenery impact
-// effect and the noise bell, bit2 marks a secondary pellet for the target list. m_Work4/m_Work5 = 1,
-// weapon object mode 2, PlWepLockRand recoils the aim. Then step 1.
+// fire step 0: the shot. trigger() spends the shell, then 13 pellets (19 for the Striker) are traced
+// with PlWepHitCheck2, the centre one from the muzzle and the rest on widening rings. Only every 4th
+// pellet makes the scenery impact effect and the noise bell.
 static void wep07_r3_fire00(cPlayer* pl)
 {
     Vec p0;
@@ -497,11 +483,8 @@ void wepDown(cPlayer* pl)
     pl->motionMove();
 }
 
-// r_no_2 == 4: the reload state. Step 0 starts the reload motion of the reload-speed level
-// (0x2A/0x2C/0x2E), clears m_ShotCancelCtr, knifeStance = 1, weapon object mode 4 (the object
-// loads the shells on its motion). Step 1 waits for PlReloadEndTbl's frame: aiming -> step 2; else
-// footwork sub-routine 2 with m_Hokan = 9 (or crouch 0x11); a level aim (|m3r| <= 0.1) that runs
-// the motion out returns to set step 0. Steps 2/3 blend the aim idle back over 8 frames (m_Work0).
+// r_no_2 == 4: the reload state. The weapon object (mode 4) loads the shells on its motion, and
+// aiming can take over from PlReloadEndTbl's frame on.
 static void wep07_r2_reload(cPlayer* pl)
 {
     switch (pl->r_no_3) {

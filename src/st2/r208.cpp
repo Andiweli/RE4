@@ -227,12 +227,8 @@ static void incResetNum()
     }
 }
 
-// Room init (the courtyard with the water mill): hit effects, the initial Ganados (list 2; extras on
-// Game_level > 6), the group reset areas (6/7 -> A, 8/9 -> B, 0x15 -> D), Ashley's pointing on area
-// 0x10 once (Room_flg bit 14); JumpPoint presets. The bridge collision; the wall crank raised (bit 5:
-// objects 0x4E/0x4F shown, area 2 = the crank until the bridge is down, bit 6) else hidden with the
-// first Ganados walking in; the carry-over areas 0xE/0x16 until bit 9; footings A/B per bits 10/11;
-// the render target; continue point (bit 12) after a save-jump.
+// Room init for the courtyard with the water mill: the initial Ganados, with extras on higher
+// Game_level, Ashley's pointing once, and the wall crank and bridge posed from Room_flg.
 void R208Init()
 {
 #line 157 "D:/Bio4/Prog/r208.cpp"
@@ -354,11 +350,9 @@ static void em_all_destroy_task()
     SceDestroyEm(0x10, 0x20);
 }
 
-// Per frame: the stream check; the wall crank rises (once, bit 5) when both crank flags (Room_flg[0]
-// 0x02000000 / 0x01000000) are set or debug trigger 0; the two barred gates open on their Room_flg[2]
-// bits; while the crank is up and the bridge not down, enemies are fed over the wall every 320 / 590
-// frames from the list (R208_EmSetEvent) alternating sides while the reset count allows; with more than
-// five alive, the farthest Ganado is periodically sent to a new courtyard point (r208_gotoPos).
+// Per frame: raises the wall crank once both crank flags are set, then feeds enemies over the wall
+// until the bridge is down. With more than five alive, the farthest Ganado is periodically sent to a
+// new courtyard point (r208_gotoPos).
 void R208Main()
 {
     u32 alive;

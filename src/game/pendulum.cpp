@@ -1,8 +1,5 @@
-// game/pendulum.cpp: pendulum / cloth chain physics. A chain is a set of model parts (links)
-// with neighbour tables; every link keeps its world position, speed and rest length in the
-// parts' cParts::Pen (PEN_INFO). PenClothMove/Move2/Move3 are three variants of the same
-// simulation (gravity + wind, angle limit, distance constraints with collision volumes, matrix
-// update); the pl_cloth / em_cloth / obj units pick one per accessory.
+// game/pendulum.cpp: pendulum and cloth chain physics. The pl_cloth, em_cloth and obj units pick
+// one of the three simulation variants PenClothMove, Move2 or Move3 per accessory.
 
 #include "pendulum.h"
 #include "pl_cloth.h"
@@ -76,11 +73,9 @@ static inline void penWindScale(Vec* wind, f32 rate)
         }                                                                                 \
     }
 
-// Keep the link end above the floor; a link that landed exactly under its upper neighbour is
-// jittered so the constraint solver gets a direction. A do-while body: its loop notes put the
-// `w` references inside at loop depth + 1, which is what ranks `w` (r31) above the PRE'd &v
-// pseudo in global-alloc for all three Move functions (PEN_FLOOR_CK2/3 and PEN_FIX are plain
-// blocks: as do-whiles they push `uw` above `w` in Move3).
+// Keep the link end above the floor, jittering a link that landed exactly under its upper neighbour
+// so the solver gets a direction. A do-while body so its loop notes rank `w` (r31) above the PRE'd
+// &v pseudo. PEN_FLOOR_CK2/3 and PEN_FIX are plain blocks: as do-whiles they push `uw` above `w`.
 #define PEN_FLOOR_CK(m, c, w, i, floorY)                                                  \
     do { if (!((c)->Flag & 0x100)) {                                                          \
         if ((w)->Pos.y < floorY) {                                                        \
@@ -228,11 +223,8 @@ void PenClothFixClear(cModel* m, PenCloth* c, int no)
     }
 }
 
-// One simulation frame of a chain (called from the owner's move after the motion): floor from
-// parts 0 unless Flag 0x100, collision volumes unless Flag bit0, random-phase wind unless 0x40,
-// root speed / gravity unless 0x20; each link integrates its speed, is limited in angle and pulled
-// to its rest length from its parent and side neighbours, pushed out of the volumes, then its
-// matrix is rebuilt to look along the link. Pen.At_ck = a volume was touched this frame.
+// One simulation frame of a chain, called from the owner's move after the motion. Pen.At_ck is set
+// when a collision volume was touched this frame.
 void PenClothMove(cModel* m, PenCloth* c)
 {
     Mtx mtx;
@@ -1141,12 +1133,9 @@ static void penClothLinkMove(cModel* parts, PEN_INFO* w, Vec* a, Vec* b, f32 max
     Draw_sphere(&w->Pos, 3.0f, 0xFFFF0000, 1, 1);
 }
 
-// World position of a point given in a parts' space. Inline: the addresses of the frame locals
-// passed through it are set straight into the argument registers (no PRE copies). The do-while
-// (a macro body in the original) puts a loop note before the call's argument sets: the first of
-// them is a scheduling barrier, so the following call no longer anti-depends on the previous
-// call's `addi r5, r1, 8` through r1 (ours ranked it first by dependant count; the target issues
-// r4, r3, r5) and the &v0/&up/&ax pseudos get the target's callee-saved order.
+// World position of a point given in a parts' space. Inline so frame-local addresses go straight
+// into the argument registers. The do-while (a macro body in the original) adds a loop note that
+// acts as a scheduling barrier, giving the target's argument order and callee-saved registers.
 static inline void penPartsWorldPos(cParts* p, const Vec* ofs, Vec* out)
 {
     do {
@@ -1432,11 +1421,9 @@ int penClothAtCkBorder(Vec* pos, Vec* up, PenAtWork* wk)
     return ret;
 }
 
-// Push both ends of the link `up`-`pos` out of the volumes, keeping the link parallel.
-// The three-term sums (dot, d1, d0) are two statements each (`x + y; += z`): the partial sum is
-// then the variable's own pseudo (the target's `fmadds f7,..,f7`), which gives dot six refs and
-// the shortest live range, so global-alloc hands out f7/f6/f5/f4/f3 to dot, rr, p1.x/y/z in that
-// order. In the cylinder case l1/l0 are computed before ld (their loads come first), and rr last.
+// Push both ends of the link `up`-`pos` out of the volumes, keeping the link parallel. The
+// three-term sums are two statements each so the partial sum stays in the variable's own pseudo,
+// which gives global-alloc the target's float register order.
 void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
 {
     Vec p1;

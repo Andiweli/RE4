@@ -1,13 +1,5 @@
-// wep19 module: the hand grenade (cObjHandGre, object id 0x3C; also the incendiary / flash grenades
-// and the eggs by weapon number). Two grenade objects hang on the player (the one in the hand and the
-// one on the belt); the module object carries the class, the entry points and the grenade routine
-// registration (wep/pl_grenade.cpp).
-//
-// cObjHandGre is a display-only cObjWep: no fire / reload modes (the throw creates a cSubWep in
-// pl_grenade's itemThrow), just the model of the item kind (grenade / incendiary / flash / the
-// three eggs), hung on the player's parts by parentSet. The hand one is Wep->m_pWep (parts 0x11,
-// hidden when only one item is left), the belt one Wep->pObj2 (parts 10). Wep19_init is the
-// WeaponInitFunc, PlGrenadeMove the WeaponMoveFunc.
+// wep19 module: the hand grenades and eggs (cObjHandGre, object id 0x3C), a display-only cObjWep.
+// The throw itself creates a cSubWep in the itemThrow of wep/pl_grenade.cpp.
 
 #include "wep_mod.h"
 #include "light.h"

@@ -1,7 +1,5 @@
-// game/esp14.cpp: effect id 0x14, a vertical light shaft sprite. Each frame the beam is turned to
-// face the camera about the vertical axis and its length is stretched with the horizontal camera
-// distance (Work8[0] x 0.05 + 0.25 per unit), damped by the eighth power of the view elevation,
-// and clipped to an x/z box (Vec0 half extents around -Vec1) so it never leaves its room.
+// game/esp14.cpp: effect id 0x14, a vertical light shaft sprite that faces the camera, stretches
+// with the camera distance and is clipped to a box so it never leaves its room.
 
 #include "atari.h"
 #include "global.h"

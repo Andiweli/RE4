@@ -1,8 +1,5 @@
-// game/esp04.cpp: effect id 0x04, a screen-space tiled texture overlay (rain sheets, dust,
-// static). The sprite must be a screen sprite; its trans draws a grid of Size_base_x x
-// Size_base_y quads in a 512 x 448 orthographic projection, repeated across the screen on the
-// axes enabled by flag (Work8[0]) so scrolling m_Pos wraps seamlessly. Work8[1..2] jitter the
-// position randomly each frame, prm 0xCF / Work8[3] give an alpha ramp and its start delay.
+// game/esp04.cpp: effect id 0x04, a screen-space tiled texture overlay for rain sheets, dust and
+// static. The sprite must be a screen sprite, and the tiling makes a scrolling m_Pos wrap seamlessly.
 
 #include "atari.h"
 #include "light.h"

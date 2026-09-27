@@ -1,8 +1,5 @@
-// game/trans_ot: the draw ordering tables (OT) — 23 tables (OT_MAX) of depth-bucketed linked
-// lists of OtData {func, data, kind}; each frame the draw code adds callbacks into a table (by
-// camera depth for the world / model tables 17 / 13, or a fixed bucket with AddOtDirect) and the
-// render pass runs the tables back to front (ExecOt), so translucent things sort by depth. The
-// entries live in the per-frame prim buffer.
+// game/trans_ot: the draw ordering tables (OT), depth-bucketed lists of draw callbacks that the render
+// pass runs back to front (ExecOt) so translucent things sort by depth.
 #include "types.h"
 #include "vec.h"
 #include "global.h"

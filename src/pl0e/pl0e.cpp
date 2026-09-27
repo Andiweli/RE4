@@ -1,18 +1,5 @@
-// pl0e module (D:/Bio4/Prog/pl0e.cpp): the jet ski of the chase. A cEm the room script puts on a rail
-// path (setRail / set2ndRail) and the player rides (setRide): pl0ePathMove follows the path with the
-// stick steering the lateral offset, the player and partner routines (PlBoatMove / plboat_R2_*,
-// subBoat*) ride on it, pl0eCamMove drives the camera, pl0eWaveMove the wave object under it.
-//
-// The ski is an enemy work (Pl0eInit is the module's EmInitFunc; the room script creates it and
-// calls setRail / setRide / set2ndRail). Its routines: r_no_0 0 init, 1 move (r_no_1: 0 wait on
-// the water, 1 the boarding cutscene motion, 2 rail run, 3 jump, 4 crash, 5 sink, 6 jump miss;
-// 4..6 end the game with pl_life = 0 and DiedemoExec). While ridden the player runs routine 1 ==
-// 0xF (pl_R1_Boat -> BoatMoveFunc = PlBoatMove, r_no_2 = the plboat_R2_* state mirroring the
-// ski's r_no_1) and the partner's damage routine slot (SetSubDamage) runs the matching subBoat*
-// function; both take their motions from the ski's archive (subArc) and are seated by plOnJet /
-// subOnJet. Speeds are units per frame along the path: pl0e_spd_max 800 (idle), 1440 boosting
-// (up on the stick), 600 braking; the 2nd rail drains `sink` by the speed deficit until the ski
-// goes under.
+// pl0e module (D:/Bio4/Prog/pl0e.cpp): the jet ski of the chase, an enemy work the room script puts on
+// a rail path and the player rides. The player (PlBoatMove) and partner (subBoat*) routines ride on it.
 
 #include "atari.h"
 #include "light.h"
@@ -296,11 +283,8 @@ static void pl0e_R1_Ride(cPl0e* em)
     em->partsWorldCalc();
 }
 
-// r_no_1 == 2: the rail run. Step 0 resets the lean blend; step 1 follows the path
-// (pl0ePathMove), rides the water (pl0eSlopeControl) and checks, in order, a wall crash (-> 4),
-// sinking (-> 5), a fall-off area (-> 6) and a jump ramp (-> 3 with spdY 200); the first three
-// kill the player (pl_life = 0). The lean blendRate follows the stick left / right (+-31.875
-// per frame up to +-255, decays 0.9) and drives the straight / left / right idle blend 8 / 0xA / 9.
+// r_no_1 == 2: the rail run. It follows the path (pl0ePathMove) and checks for a wall crash, sinking,
+// a fall-off area and a jump ramp. The first three kill the player.
 static void pl0e_R1_RailMove(cPl0e* em)
 {
     Pl0eWork* w = PL0E_WK(em);
@@ -353,13 +337,9 @@ static void pl0e_R1_RailMove(cPl0e* em)
     em->partsWorldCalc();
 }
 
-// r_no_1 == 3: the jump. Step 0 picks the jump motion (0xB plain; with both shoulder buttons a
-// trick: 0xE the first time, 0x14 after flags bit3) and puts the player (routine 0xF state 2,
-// m_Work0 = variant) and the partner (subBoatJump, r_no_3 = variant) into their jump, SE 8/8,
-// vibration, engine SE stops after 5 frames. Step 1 flies with the rail input frozen (flags bit0)
-// until the ski has fallen and is nearly level again; step 2 sets up the landing (player state 3,
-// subBoatLanding, splash effect, SE, engine SE restarted); step 3 plays the landing blend
-// (0xC / 0x11 / 0x10) with the rail checks and returns to the rail run at its end.
+// r_no_1 == 3: the jump. It puts the player and partner (subBoatJump) into a plain jump, or a trick
+// with both shoulder buttons, freezes the rail input in the air, and plays the landing
+// (subBoatLanding) before returning to the rail run.
 static void pl0e_R1_Jump(cPl0e* em)
 {
     Pl0eWork* w = PL0E_WK(em);
@@ -662,11 +642,9 @@ static f32 pl0e_cam_dist = 5000.0f;
 static Vec pl0e_cam_pos0 = { -1500.0f, 0.0f, -3000.0f };
 static Vec pl0e_cam_pos1 = { -1500.0f, 0.0f, -5000.0f };
 
-// The chase camera (called from the player's boat states while riding; skipped while the player
-// has stat bit2): looks at the path point 15 m ahead (or 5 m ahead of the ski), sits 5 m
-// behind on the line ski -> target blended with a fixed offset (pl0e_cam_pos0 -> pos1 by camRate,
-// which rises when boosting), 1.5 m up; fovy relaxes to 40, the up vector rolls with the heading
-// change of the frame (x3); handed to CamCtrl as the extra camera.
+// The chase camera, called from the player's boat states while riding. It looks at the path point
+// ahead, sits behind and above the ski and rolls with the heading change. Handed to CamCtrl as the
+// extra camera.
 void pl0eCamMove(cPl0e* em)
 {
     Pl0eWork* w = PL0E_WK(em);
@@ -792,11 +770,9 @@ static PlBoatFunc plboat_R2_move_tbl[7] = {
     plboat_R2_JumpMiss,
 };
 
-// The player's boat routine (pl_R1_Boat -> BoatMoveFunc): the boat's motion archive replaces the
-// player's for the duration of the routine.
-// Every frame: the sub screen is held (SubScreenWait), Status_flg[1] bit21 (hands busy) set, the
-// neck mode 2, the player's atari bits 8/9 off, damage type 0x1E (boat), then the plboat_R2_*
-// state of r_no_2; the motion "no root translation" flag (Motion.Mot_flag bit30) is cleared around it.
+// The player's boat routine, called by pl_R1_Boat through BoatMoveFunc. The boat's motion archive
+// replaces the player's while it runs, and the motion "no root translation" flag (Motion.Mot_flag
+// bit30) is cleared around the plboat_R2_* state of r_no_2.
 static void PlBoatMove(cPlayer* pl)
 {
     if (pl->m_pBoat == 0) {
@@ -1335,15 +1311,9 @@ void cPl0e::setRail(void* path)
     }
 }
 
-// One frame along the rail (jump != 0: in the air, no steering / throttle). The path point at
-// `dist` is the ski's frame origin; the stick's left / right (Key.on bits 2/3) accelerates the
-// lateral speed spdX (+80 / -50 per frame, clamped +-400) which moves ofs.x; a wall (attribute
-// 0x80800) between the path and the ski pushes it back 500 units and zeroes spdX. dist advances
-// by spd: up on the stick boosts towards pl0e_spd_boost (engine pitch up to 500), down brakes to
-// pl0e_spd_slow, else back to pl0e_spd_max (25 per frame). The heading turns towards the path
-// point 15 m ahead (0.098 rad per frame). Spray effects (group 0xE: 0 wake, 3 boost, 1/2 the
-// side splash with SE 8/0xC on a stick tap), on the 2nd rail `sink` drains by the speed deficit,
-// a water-noise SE every 20 frames while alive, and the engine SE doppler pitch is updated.
+// One frame along the rail (jump != 0: in the air, no steering or throttle). The stick steers the
+// lateral offset and boosts or brakes, a wall pushes the ski back, and the heading turns towards the
+// path point 15 m ahead. On the 2nd rail `sink` drains by the speed deficit.
 void pl0ePathMove(cPl0e* em, int jump)
 {
     Pl0eWork* w = PL0E_WK(em);

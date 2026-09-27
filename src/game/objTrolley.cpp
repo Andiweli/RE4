@@ -178,11 +178,9 @@ void objTrolley_R0_Set(cObjTrolley* pObj)
     }
 }
 
-// r_no_0 == 1, the ride: r_no_2 0/1 first run motion (mot[0]) to its end -> Be_flg bit2 "stopped";
-// 3 holds until set2ndStart (bit1); 4/5 second run (mot[1]): after frame 2250 the camera flag
-// Status_flg[2] 0x08000000, 2300 the crash effect, 2865 the jump-off action button (random type
-// 3 / 4 -> objTrolleyEscapeAction); the motion ending with the player aboard is death
-// (plobjTrolleyDie). Every frame the riders are carried along and the front of the car hits enemies.
+// r_no_0 == 1, the ride: a first run, a hold until set2ndStart, then a second run with the crash
+// effect and a jump-off action button. Staying aboard to the end of the motion is death
+// (plobjTrolleyDie). The front of the car hits enemies.
 void objTrolley_R0_Move(cObjTrolley* pObj)
 {
     TrolleyWork* w = TROLLEY_WK(pObj);

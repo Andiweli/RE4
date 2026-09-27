@@ -1,7 +1,5 @@
-// game/sub2: small vector / angle helpers used everywhere: yaw between points (GetXZAngle*), the
-// clamped turning steps (Muku / Muku2 / Muku3), front cones (Front_check), distances, rotations,
-// screen projection (GetScreenPos / Get3DPosFrom2D), line-sphere tests and the parabola / stop
-// distance helpers of the throwing and movement code. (D:/Bio4/Prog/sub2.cpp)
+// game/sub2 (D:/Bio4/Prog/sub2.cpp): small vector and angle helpers used everywhere, such as yaw
+// between points, clamped turning, front cones, screen projection and line-sphere tests.
 #include "types.h"
 #include "global.h"
 #include "atari.h"

@@ -681,11 +681,8 @@ void pieceTblInit(SUB_SCREEN* wk)
     // byte-offset biv like the target (r7/r6 after r8). COMPILER-DIFF: 13.
     base = tbl;
     tbl = 0;
-    // Explicit byte-offset biv (user init: `li r8,0` precedes the hoisted 0xFFFF constant) with a
-    // separate store pointer biv based at model[4] (`stw -4(r6)`/`stw 0(r6)`); the id re-reads are
-    // volatile so that gcse's PRE does not merge the identical `(mem (plus ofs base))` loads (the
-    // `tbl[i].id` index form keeps them apart through the PRE'd `i*120` copies, but its giv init
-    // comes after the constant).
+    // Explicit byte-offset biv with a separate store pointer biv based at model[4], as in the target.
+    // The id re-reads are volatile so that gcse's PRE does not merge the identical loads.
     mp = (void**) ((u32) base + 84);
     ofs = 0;
     do {
@@ -1857,23 +1854,18 @@ void openMsgWindow(SUB_SCREEN* wk, int no)
     IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xA), 0xFF, IDC_SSCRN_CONFIRM, 0x13, 0, 0);
 }
 
-// Case cursor. A pending case size change (board_size != board_next) transits to CaseChange
-// first. state 0: Y (mode 1) leaves; B on a pick-up open leaves too, otherwise goes up to the main
-// menu (mode 2) or, in the shop (no link 3), returns to the shop (mode 4); pieces left on the space
-// board instead open the "items left" message (mode | 8, state 1). A on a piece opens PieceCommand
-// (pzzl_sel), X picks it up (PzzlThinking); d-pad moves the cursor between the case and space
-// boards. state 1 waits for the message answer (yes: continue, no: back), 2 closes the window.
+// Case cursor: A on a piece opens PieceCommand, X picks it up (PzzlThinking) and the d-pad moves
+// between the case and space boards. Leaving with pieces still on the space board first opens the
+// "items left" message.
 void PieceSelect::move(SUB_SCREEN* wk)
 {
     pzlBoard* b;
     pzlBoard* other;
     pzlBoard* space;
 
-    // x267 store first, then a block-local `pl` for the three board loads only (r11, dies at
-    // `space`); every later statement re-reads wk->puzzlePlayer (the target reloads it per call). The
-    // if/else for `other` gives the hoisted else-set `mr r26,r0` copy. `st` (the state load,
-    // r27) is the zero register of the r==2 arm's x264/x265 stores (cse's zero class on the path
-    // from `beq CASE0`); the r==1 arm's zero is the getPieceNum result `mr. r9,r3` (see `n`).
+    // x267 is stored first, then a block-local `pl` covers only the three board loads. Every later
+    // statement re-reads wk->puzzlePlayer because the target reloads it per call. The if/else for
+    // `other` and `st` as the zero register of the r==2 arm reproduce the target's register use.
     wk->cursor_mode = 1;
     {
         pzlPlayer* pl = wk->puzzlePlayer;

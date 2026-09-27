@@ -1,7 +1,5 @@
-// em21 module (D:/Bio4/Prog/em21.cpp): the village dog. It sleeps, wanders and barks until the
-// player comes close, then runs away (em21_R1_Escape, taking the other dogs along); the room 100 dog
-// waits in a bear trap (em21_R1_R100TrapWait) until the player frees it (plemTrapCancel and its
-// camera) and escapes; later it fights El Gigante at its side (em21_R1_VsElgigante).
+// em21 module (D:/Bio4/Prog/em21.cpp): the village dog, which runs from the player, waits in the
+// room 100 bear trap until freed (plemTrapCancel) and later fights El Gigante (em21_R1_VsElgigante).
 
 #include "atari.h"
 #include "dmg.h"

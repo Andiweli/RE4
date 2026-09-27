@@ -1,9 +1,5 @@
 // game/esp08.cpp: effect id 0x08, a scrolling tiled texture sprite (water flow, fog sheets, energy
-// fields). The quad is covered by Div_x x Div_y (Work8[0..1] / 10 + 1) copies of the texture,
-// scrolled by Spd_x / Spd_y (prm 0xCC / 0xD0 x 0.001) per frame and drawn tile by tile so the
-// scroll wraps; Tool_flg 0x4000 adds a mask texture (Mask_type Work8[2]), Work8[3] fades the sprite
-// out while the player is in a weather-off area. Esp08_TransShimmer is the same tiling drawn
-// through the frame-buffer copy as a heat shimmer (used by EspCommonTransShimmer in esp_sub).
+// fields). Esp08_TransShimmer draws the same tiling as a heat shimmer for EspCommonTransShimmer.
 
 #include "atari.h"
 #include "light.h"
@@ -267,12 +263,9 @@ void Esp08_TransShimmer(cEsp08* esp, int type);
         y = y1;                                                                                   \
     }
 
-// Texture coordinate corners for the sprite orientation (flags bit1: flip s, bit2: flip t;
-// screen sprites are drawn upside down). The two orientation tests are combined in one
-// condition and the corners are built from a `zero` variable: the four leaves are then jump
-// targets where cse knows neither operand of `zero + z`, which keeps the adds (with nested ifs
-// and literals cse folds 0 + z into z). The flip-s leaves add first and copy after: the add
-// reads `zero`'s register, the copies come from the copied variable.
+// Texture coordinate corners for the sprite orientation (screen sprites are drawn upside down).
+// Both orientation tests share one condition and the corners are built from a `zero` variable so
+// cse cannot fold `zero + z` and the target's adds stay.
 #define ESP08_FLIP_T(esp)                                                                         \
     ((ESP_PARTS_SCREEN(esp) && !((esp)->m_Tool_flg & 4)) || (!ESP_PARTS_SCREEN(esp) && ((esp)->m_Tool_flg & 4)))
 #define ESP08_TEXCOORD_SET()                                                                      \

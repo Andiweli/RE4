@@ -1,7 +1,5 @@
-// game/snd_sub3: sound driver data block accessors — an ISS block (per SE bank: count, DLS
-// wavetable, SIT table, sequence table) and a stream block (count, stream headers, RIT table)
-// are registered from their file headers; the getters resolve SIT / RIT / SHD entries and the
-// SIT's volume / pan with the DLS defaults where the SIT says "from the DLS" (< 0).
+// game/snd_sub3: sound driver accessors for the ISS (SE bank) and stream data blocks. A SIT volume or
+// pan below 0 means "take the DLS default".
 #include "snd_drv.h"
 
 // Registers an ISS block from its file header (count, DLS, SIT and sequence offsets).

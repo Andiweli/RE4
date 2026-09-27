@@ -1,9 +1,5 @@
-// game/stage: stage-level room set-up and the enemy list files. StageSet (from the room-change
-// routine) reloads the stage heap / room REL when the stage or the reload flags change and picks
-// the enemy list ("etc/emleonNN.esl" / omake lists, chosen per room and story flags by
-// checkEmListNo) into pG->Em_list; SubMissionCheck runs the per-stage side missions — stage 1's
-// blue medallion count (15 targets in rooms 103 / 108, the HUD counter id 0x33, the merchant
-// bonus at 10 and the flag at 15).
+// game/stage: stage-level room set-up, the enemy list files and the per-stage side missions
+// (SubMissionCheck). StageSet is called from the room-change routine.
 #include "types.h"
 #include "vec.h"
 #include "global.h"
@@ -183,11 +179,8 @@ int getEmListNum()
     return 11;
 }
 
-// Stage change: reload the stage data (heap 2) and link the room's relocatable data (heap 3).
-// Room change: when the stage changed or a reload is flagged (System_flg 0x2000 new game, 0x100
-// continue, 0x80000) the stage heap is replaced, messages re-initialised (stage 1 sets the
-// "village map" flag); when the room needs another REL the room heap is replaced and the REL
-// linked; then the enemy list is read.
+// Room change: replaces the stage heap when the stage changed or a reload is flagged, replaces the
+// room heap and links the REL when the room needs another one, then reads the enemy list.
 void StageSet()
 {
     GlobalWork* g = pG;

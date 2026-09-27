@@ -1,10 +1,5 @@
-// game/id_sys: the "ID" 2D sprite system (D:/Bio4/Prog/id_sys.cpp) that draws the HUD, menus and
-// sub-screen graphics. An id data table (IdData/IdData2 records built by the ID tool) describes
-// units: a textured quad or a group node with position/size/colour/rotation Hermite curves, an
-// optional path, a parent link and a texture animation. IDSystem::set instantiates a table's units
-// of one class (`type`) into the IdUnit pool, move() plays the curves level by level, trans()
-// queues each visible root into the OT (IdGeneralTrans: common / frame-buffer "negative" /
-// shimmer draws). IdSys is the main-screen instance; sscrn owns IdSub.
+// game/id_sys (D:/Bio4/Prog/id_sys.cpp): the "ID" 2D sprite system that draws the HUD, menus and
+// sub-screen graphics from ID tool tables. IdSys is the main-screen instance, and sscrn owns IdSub.
 #include "light.h"
 #include "id_sys.h"
 #include "global.h"
@@ -201,11 +196,8 @@ int cmp_id_no(IdData2* p_id_v2, u8 dst_no, int attr)
     return no == dst_no;
 }
 
-// Instantiates the units of id table `data` (version string at its start; 1.x IdData or 2.x IdData2
-// records) whose id matches (`id` 0xFF = all) as class `type`, OT type `ot`, priority `prio`:
-// copies geometry/colour/flags, resolves path and curve offsets, links parents by number (v2 also
-// recurses into the children of a selected id) and marks the class set. mode 1 is the recursive
-// child pass.
+// Instantiates the units of id table `data` whose id matches (`id` 0xFF for all) as class `type`.
+// It reads both 1.x and 2.x tables, and mode 1 is the recursive pass over a v2 id's children.
 void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
 {
     IdDataHeader* hdr = (IdDataHeader*) data;

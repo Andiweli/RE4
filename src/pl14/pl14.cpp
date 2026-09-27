@@ -1,17 +1,5 @@
 // pl14 module (D:/Bio4/Prog/pl14.cpp): Luis, the partner of the cabin fight (room 11C). See pl14.h.
-// Matching notes: the byte flag fields are s8 (their bit clears compile to full-width rlwinm masks);
-// `default:` comes first in most switches; two-case switches whose tree tests 1 before 0 carry an
-// empty `case 2:`; cAnalysis::move's scan is a while loop with the scan in its condition.
-//
-// Luis is the enemy work of id 3 (pSUB) during the cabin siege: LuisInit is the module's
-// EmInitFunc. Every frame cSubLuis::move runs damageCheck (the player's / enemies' hits ->
-// flags bit0), cAnalysis::move (nearest shootable enemy, route distance to the player, is the
-// player aiming a gun / grenade at him), think (picks the cAction mode), cAction::move (the mode's
-// step machine, which requests cRoutine routines) and cRoutine::move (the motion routine of
-// r_no_0: footwork, damage, die, walk, run, turn, weapon ready / set / fire / down, throw the item,
-// down / avoid / up / blast). His gun is a cObjLuisItem hung on his right hand; the thrown item
-// (routine 0xD) is another cObjLuisItem that lands as a pickup. Lines he speaks go through cVoice
-// (SE + subtitle). Room 11C positions are hard-coded (the stairs, the upper floor, the rack escape).
+// He is the enemy work of id 3 (pSUB), and LuisInit is the module's EmInitFunc.
 
 #include "atari.h"
 #include "atari_init.h"
@@ -227,14 +215,8 @@ void cSubLuis::move()
     seqSeCtrl();
 }
 
-// Picks the action mode of the frame (nothing while in damage / die). flags bit0 (hit) -> damage
-// (5) or die (6, when the event routine was running); else in priority order: a grenade aimed at
-// him (analysis bit4) -> avoid (0xA); down and no longer aimed at -> get up (9); flags bit1 (5
-// player hits) -> attack the player (4); aimed at by the player -> down (8); upstairs (set 2)
-// and not yet there -> go upstairs (3); ground floor with a rack coming -> escape it (0xC), or
-// the room 11C opening (0xB); a target -> attack (1), or every 1800 frames with the player on the
-// same floor the item gift (7); nothing -> chase the player (2). Also the worry line when the
-// player's life changed (every 90 frames) and the reaction line after enemy damage (cnt).
+// Picks the action mode of the frame in priority order, doing nothing while in damage or die. It
+// also starts his worry line when the player's life changed and his reaction line after enemy damage.
 void cSubLuis::think()
 {
     static const Vec upPos = { 112160.0f, 3182.64f, -51016.84f };
@@ -518,11 +500,8 @@ void cRoutine::moveWepSet()
     owner->motionMove();
 }
 
-// Routine 0xB: shoot at pTarget. Steps 0/1 aim (0x7C/0x94/0x98 on the elevation) and turn until
-// within 0.196 rad; step 2: a target no longer valid ends the burst (a kill after 10 / 30 dead
-// targets gets a line) -> routine 0xB restarts; else up to 10 shots per burst (fire motions
-// 0xF4/0xF8/0xFC + shot()), the 11th is the reload 0x100; step 3 plays the motion and re-enters
-// 0xB (the three arms are identical: a wall between them or a live target both re-aim).
+// Routine 0xB: aims at pTarget and fires bursts of up to 10 shots, then reloads. A target that is no
+// longer valid ends the burst and restarts the routine. Step 3's three arms are identical re-aims.
 void cRoutine::moveWepFire()
 {
     Vec d;
@@ -738,11 +717,8 @@ void cRoutine::moveTurn180()
     if (owner->motionMove()) end();
 }
 
-// Starts routine `no` when its priority allows it (1) or refuses (0).
-// Priorities: 0 for footwork / walk / run / turns / weapon ready-set-down / down / up, 1 for fire /
-// throw / avoid / blast (actions), 2 for damage. A higher priority interrupts (the interrupted
-// routine number is remembered in saved[]), an equal one replaces; the step bytes are cleared and
-// the ended flag reset.
+// Starts routine `no` when its priority allows it (1) or refuses (0). A higher priority interrupts
+// and remembers the interrupted routine in saved[], and an equal one replaces it.
 int cRoutine::set(int no)
 {
     int p;
@@ -1200,11 +1176,9 @@ int doorHitCheck(Vec* a, Vec* b)
     return 0;
 }
 
-// Per-frame analysis: one round-robin step of the enemy scan (isTarget) keeps the nearest valid
-// target in pTarget / pEmNearDist (a dead / hidden one is dropped); the route distance to the
-// player; aimCheck; every 1800 frames flags bit3 (offer an item); a grenade held near his height
-// (greThrowCheck) counts grenadeTimer up and sets flags bit4 (dodge) after 30 frames (hand grenade), 5
-// (incendiary / flash) or 1 (rocket), decaying when none is held.
+// Per-frame analysis: one round-robin step of the enemy scan keeps the nearest valid target in
+// pTarget, and a grenade held near his height (greThrowCheck) sets the dodge flag after a delay.
+// Every 1800 frames it also flags an item offer.
 void cAnalysis::move()
 {
     cEm* found;
@@ -1376,11 +1350,9 @@ void cSubLuis::seqSeCtrl()
     Motion.Seq_old.Se = 0;
 }
 
-// Damage of the frame -> flags bit0 and the routine's work[]: stat 0x0400xxxx (scenario kill) ->
-// die; a damage area hit (DmgMgr) -> flinch 3; a registered enemy / player hit (dmg.m_Flag) by weapon
-// (dmg.m_Wep): the player's guns count down m_PlAtack (at 0 flags bit1 = attack the player, at 1
-// EM_STATUS_DONT_FIRE), flinch 2 from the front / 3 from behind, pTarget = the player; grenade 0x13
-// -> blast 8; 0x17 (flash) ignored; 0x18 -> flinch 2. Returns 1 when a reaction was set.
+// Picks the reaction to this frame's damage and sets flags bit0. Hits from the player's guns count
+// down m_PlAtack, and at 0 Luis turns on the player. Flash grenades are ignored. Returns 1 when a
+// reaction was set.
 int cSubLuis::damageCheck()
 {
     int dead;

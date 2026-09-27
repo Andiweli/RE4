@@ -62,11 +62,8 @@ void Em26Init(cEm* em)
     new (em) cEm26();
 }
 
-// Per-frame damage check (cEm26::move): an explosion / fire volume kills the cow at once (flag bit5,
-// Die_Normal). A weapon hit (all but 0x14 / 0x16 / flash 0x17 / 0x2A / mine 0xE) takes GetWepDmVal
-// off hp (dmgTotal accumulates it for the bite), blood by weapon kind (big for explosives and a near
-// shotgun hit); a kill goes to Die_Normal, a hit to the head (5) or tail (0x18), or one in five
-// elsewhere, to Dm_Small.
+// Per-frame damage check (cEm26::move). An explosion or fire volume kills the cow at once, and a
+// weapon hit takes GetWepDmVal off hp. dmgTotal accumulates the damage for the bite.
 void em26DmCk(cEm26* em)
 {
     Em26Work* w = EM26_WK(em);

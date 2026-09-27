@@ -1,7 +1,5 @@
-// em2c module (D:/Bio4/Prog/em2c.cpp): the insect boss (cModel::type 0) and its tail (type 1).
-// It shares the em2d routine set (floor walking, wall / ceiling climbing, jump and tail attacks,
-// the player-catch callbacks) and adds the hide / ambush states, the freeze reaction and the
-// two-motion blends (em2cBlendMotSet).
+// em2c module (D:/Bio4/Prog/em2c.cpp): the insect boss and its tail. It shares the em2d routine set
+// and adds the hide and ambush states, the freeze reaction and two-motion blends.
 
 #include "atari.h"
 #include "map_obj.h"
@@ -4197,11 +4195,9 @@ static void em2c_R1_Dm_Down(cEm2c* em)
     }
 }
 
-// Damage fall step: the position follows `spd` with gravity; on the floor the landing motion.
-// The fall step of the damage/die routines, a macro (not an inline: integrate.c drops the
-// RTX_UNCHANGING_P flag of an inlined body's constant-pool loads, which then depend on the
-// preceding byte store and sink below the int argument moves). The landing tail (`xFE = next`)
-// and the fall arm live inside it, so the caller has no return-value diamond.
+// Fall step of the damage and die routines. A macro, not an inline: integrate.c drops
+// RTX_UNCHANGING_P from an inlined body's pool loads, which then sink below the argument moves.
+// The landing tail is inside it so the caller has no return-value diamond.
 #define EM2C_DM_FALL(em, w, v_, DM_TYPE, DOWN, ATARI_ON, NEXT, FALL_MTX, END_INC)                \
     {                                                                                          \
         f32 fl_;                                                                               \

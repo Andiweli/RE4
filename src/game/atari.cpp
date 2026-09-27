@@ -1,10 +1,5 @@
-// game/atari.cpp: the scenario collision ("atari") system. cSat is one collision piece: a SAT
-// file of triangles (floors, slopes, walls; each with a 24-bit attribute word) partitioned into
-// XZ blocks, placed by a matrix. SatMgr holds the room's pieces and the ones objects create,
-// EatMgr the effect-collision set (what bullets, thrown objects and effects hit). Queries:
-// check / checkAir push a character's body out of the scenery (scrAtCheckSphere, at_sub.cpp
-// primitives), hitCheck traces a line for the nearest polygon, getFloor probes the floor,
-// adjust sweeps a sphere; disp draws the polygons for the debug pages.
+// game/atari.cpp: the scenario collision ("atari") system. SatMgr holds the cSat pieces that push
+// characters out of the scenery, and EatMgr the set that bullets, thrown objects and effects hit.
 
 #include "atari.h"
 #include "atariInfo.h"

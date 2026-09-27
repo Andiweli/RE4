@@ -51,11 +51,8 @@ static void R316EventS00();
 static void R316EventSXX();
 extern "C" void Evt_R316S00_Func(Event* e);
 
-// Room init: System_flg 0x400 off, Debug_flg[1] 0x00040000; JumpPoint 1 skips the event (Room_flg bits
-// 0/1); Ashley no longer following. Until the event (bit 0) it runs at once (pre-loaded with the enemy of
-// ESL 0); else, until the room was left through door 1 (bit 2), the wave refills run and door 1's exit
-// hook clears the enemies. Door 0xD close-locked, the heat and falling-item watchers, the furnace
-// objects, one shelf item event.
+// Room init: until the event has run (Room_flg bit 0) it runs at once, else the wave refills run until
+// the room is left through door 1. Also sets up the heat and falling-item watchers and the furnace.
 void R316Init()
 {
     cEmDoor* door;

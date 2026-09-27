@@ -1,7 +1,5 @@
-// wep12 module: the Thompson. Weapon class wep12/objTompson.cpp, routines wep/pl_machine.cpp.
-// Wep12_init is the module's WeaponInitFunc (creates the cObjTompson, object id 0x25, as the
-// player's weapon and loads the muzzle-flash effects), PlMachineMove its WeaponMoveFunc; _prolog
-// registers both and the ObjInitFunc slot.
+// wep12 module: the Thompson, with the weapon class in wep12/objTompson.cpp and the routines in
+// wep/pl_machine.cpp. Wep12_init creates the cObjTompson as the player's weapon.
 
 #include "wep_mod.h"
 #include "light.h"

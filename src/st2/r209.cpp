@@ -251,12 +251,8 @@ static void r209_StrPlayCk();
 extern "C" int r209_InPlaceCheck(cModel* m);
 extern "C" int r209_GanadoSnipeCheck(cEmWrap* w);
 
-// Room init (the gallery): the seven room doors (four balcony doors 0xB3..0xB6, salon doors 2/3, the
-// picture lift 0xA1), the salon key door (area 2 + key watcher until Room_flg bit 2), the second battle
-// (bit 4), the leader chase until bit 3 (the leader 0x7D and its escorts, list 3; areas 0xA = it points
-// at the player, 0x16 = its escape, 0xD = stream stop; the gatling item hidden), the bridge panels and
-// their puzzle (bit 6 = solved, area 0x1E + the four panel messages), the stage flag / picture / pot
-// areas, the item events and the battle stream.
+// Room init (the gallery): the room doors, the salon key door, the leader chase, the bridge panel
+// puzzle, the item events and the battle stream.
 void R209Init()
 {
     u32 i;
@@ -406,11 +402,9 @@ void R209Main()
             }
             i++;
         } while (i < atNum);
-        // The outer counter is `i` (the same variable as the other loops keeps `i + 1` at the latch as a
-        // biv instead of a PRE-hoisted copy). The bit index is a loop.c giv of `j` written as two
-        // consecutive sets of one variable (consec_sets_giv): one giv with benefit 2 adds and no
-        // not-worth intermediate, so `j` still has only reducible givs and is eliminated into the
-        // pointer compare, and the giv init `addi bit,base8,8` is emitted after the loop's movables.
+        // The outer counter is `i`, shared with the other loops, so `i + 1` stays a biv at the latch.
+        // The bit index is written as two consecutive sets of one variable so that `j` is eliminated
+        // into the pointer compare.
         for (i = 0; i < (u32) r209_work->snipeCnt; i++) {
             u32 base8 = i * 8;
             int idx = r209_work->snipeIdx[i];
@@ -419,12 +413,9 @@ void R209Main()
                 u32 bit = j + base8;
                 bit += 8;
                 if (SceAtCheckHitModel(atNo[j], r209_work->em[idx].w.getPtr())) {
-                    // Not a pointer-base bit-set macro: the block's three local qtys (idx, amt/shift, val/or) are
-                    // hand-sorted by local-alloc, and with a pointer base the idx pseudo prefers
-                    // GENERAL_REGS and takes r0.  An integer (u32) base makes both plus operands
-                    // half-BASE_REGS, so idx takes r9 and the shift amount r0 like the target
-                    // (`lwzx r11,r9,r28`); `fb` must be read before the shift constant's first use
-                    // so the hoisted `mr r28,r20` copy keeps its LUID ahead of `lis r24,0x8000`.
+                    // Not a pointer-base bit-set macro: with an integer (u32) base, idx takes r9 and
+                    // the shift amount r0 like the target. `fb` must be read before the shift
+                    // constant's first use to keep the `mr r28,r20` copy ahead of `lis r24,0x8000`.
                     u32 fb = (u32) flags;
                     u32 ofs = ((u32) bit >> 5) << 2;
                     *(u32*) (ofs + fb) |= 0x80000000 >> (bit & 31);

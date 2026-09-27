@@ -1,8 +1,5 @@
-// game/esp07.cpp: effect id 0x07, a bouncing particle (debris, shells, drops). Every frame it
-// tests the floor (HitType 0: height probed once and cached, 1: probed every frame) or the
-// walls (HitType 2, a ray along the speed); on contact it plays SE `SeType`, then per EstCall:
-// 0 bounce with damping RefRate (Vec0 x 0.1), 1 spawn the floor / wall est and die, 2 spawn and
-// bounce, 3 die. A bounce below 10 units/frame stops the particle for good.
+// game/esp07.cpp: effect id 0x07, a bouncing particle (debris, shells, drops). On floor or wall
+// contact it bounces, spawns an effect or dies as EstCall says.
 
 #include "atari.h"
 #include "global.h"

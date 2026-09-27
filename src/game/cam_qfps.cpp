@@ -1,9 +1,5 @@
 // game/cam_qfps.cpp: the over-the-shoulder ("quasi FPS") camera, the default camera of the game.
-// Per player character / weapon / state a table of QfpsOfs offsets (camera position, a close
-// point the camera may not pass, target, roll, fov; left / right x up / mid / down sites) is
-// applied in the player's frame, blended between tables on a type change, tilted by the floor
-// slope, aimed by the C-stick, and pulled in front of the scenery / characters by hitCheck. Rooms
-// may override the tables through a camera area cut (setAreaData).
+// Rooms can override its offset tables through a camera area cut (setAreaData).
 
 #include "types.h"
 #include "vec.h"
@@ -496,11 +492,9 @@ void CameraQuasiFPS::setFloorRatio(f32 ratio)
     m_floor_ratio = ratio;
 }
 
-// Picks the offset tables for this frame: the transition type from the player character
-// (Leon / Ashley / Ada / mercenaries, or the partner state), then the ready type from the
-// weapon in hand (none, handgun / shotgun by weapon_type, rifle, grenade, knife / special,
-// mine thrower...) and the special states (Status_flg[3] 0x800000 -> 0xA). A type change starts
-// an offset blend from the previous table (setBlendData) unless blending is frozen.
+// Picks this frame's offset tables from the player character, the weapon in hand and special
+// states. A type change starts a blend from the previous table (setBlendData) unless blending is
+// frozen.
 void CameraQuasiFPS::checkCameraType()
 {
     if (SubCharGetStatus() & 0x20000000) {
@@ -707,11 +701,9 @@ void CameraQuasiFPS::calcOffset(QfpsOfs* p_offset)
     }
 }
 
-// Places the camera in the world from the offset: transforms Campos / campos2 / target by the
-// base matrix, casts from the close point toward the camera position against the scenery,
-// characters and objects (cameraHitCheck / EmHitCheck / ObjHitCheck) and pulls the camera in to
-// the nearest hit (never closer than the close point); also probes the frustum edges so walls
-// do not clip the view. Fills the camera parameters.
+// Places the camera in the world from the offset and pulls it in to the nearest scenery, character
+// or object hit, never closer than the close point. It also probes the frustum edges so walls do
+// not clip the view.
 void CameraQuasiFPS::hitCheck(Mtx m, QfpsOfs* ofs, CameraParam* out)
 {
     static f32 OFFSET_GAIN = 1.0f;
@@ -1161,11 +1153,9 @@ void CameraQuasiFPS::bindAreaCamera(CameraAreaRec* pCut)
 // dying-source stores first) — the dying-store family of emrock SetRock / obj1b SetSpear.
 void CameraQuasiFPS::init()
 {
-    // The original issues the eleven reference stores in pure source order with the constants
-    // in reload's spill registers (r10/r8/r7, the flags temp r0, both pool floats through f0):
-    // nothing dies at a store there. Pinned constants stored through plain references (the
-    // u8&/s16& setters would copy a hard register into a pseudo) plus one codeless keep-alive
-    // at the block end so no store has a dying source.
+    // The original issues the eleven reference stores in source order with no source dying at a
+    // store. Pinned constants go through plain references (the u8&/s16& setters would copy the hard
+    // register into a pseudo), and a codeless keep-alive at the block end keeps every source live.
     int one;
     register int two asm("r8");    // COMPILER-DIFF: #13 (value pin)
     register int zero asm("r7");   // COMPILER-DIFF: #13 (value pin)

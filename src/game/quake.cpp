@@ -1,7 +1,5 @@
-// game/quake: camera shake — up to 16 QuakeEntry requests (QuakeExec: delay, duration, amplitude,
-// axes) scheduled each frame; the strongest active one shakes pG->Camera by a pseudo-random offset
-// in camera space (QuakeMain). Rooms and effects request quakes for explosions, footsteps of the
-// giants and the like.
+// game/quake: camera shake. Rooms and effects queue QuakeExec requests, and QuakeMain shakes
+// pG->Camera by the strongest active one.
 #include "types.h"
 #include "vec.h"
 #include "global.h"

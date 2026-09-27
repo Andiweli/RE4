@@ -1,7 +1,5 @@
 // wep05 module entry: the civilian handgun (class in objCivilian.cpp, routines wep/pl_handgun.cpp).
-// Wep05_init is the module's WeaponInitFunc (creates the cObjCivilian, object id 0x2E, as the
-// player's weapon and loads the muzzle-flash effects), PlHandgunMove its WeaponMoveFunc; _prolog
-// registers both and the ObjInitFunc slot.
+// _prolog registers Wep05_init and PlHandgunMove as the module's WeaponInitFunc and WeaponMoveFunc.
 
 #include "wep_mod.h"
 #include "light.h"

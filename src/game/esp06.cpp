@@ -1,8 +1,5 @@
-// game/esp06.cpp: effect id 0x06, a sprite riding an effect path (EspGetPathAddr owner Work8[0],
-// id Work8[1]). Dist advances by PathSpeed (prm 0xCC, +- xD4 random, accelerated by 0xD0 / 10)
-// each frame; at the path end Flg (Work8[2]) bit0 loops (pausing StopFrame + random frames),
-// bit1 parks at the end, else the sprite dies. Vec1 (degrees) / Vec0 (scale in 10ths) build
-// PathMat, a transform applied to the path; Vec2 gives a start fraction along it.
+// game/esp06.cpp: effect id 0x06, a sprite riding an effect path. At the path end it loops, parks
+// or dies depending on Flg.
 
 #include "atari.h"
 #include "light.h"

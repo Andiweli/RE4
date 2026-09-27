@@ -1,8 +1,5 @@
-// wep13 module: the rocket launcher. The weapon object is the DOL's cObjLauncher (id 0x23); the
-// module supplies the player routines (wep/pl_rocket.cpp) and this entry object.
-// Wep13_init is the module's WeaponInitFunc (creates the launcher as the player's weapon and
-// loads the effects), PlRocketMove its WeaponMoveFunc; there is no ObjInitFunc slot to register
-// because the DOL's cObjMgr::construct already knows id 0x23.
+// wep13 module: the rocket launcher entry object, alongside the player routines in wep/pl_rocket.cpp.
+// It registers no ObjInitFunc because the DOL's cObjMgr::construct already knows cObjLauncher.
 
 #include "wep_mod.h"
 #include "light.h"

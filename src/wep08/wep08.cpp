@@ -1,11 +1,5 @@
-// wep08 module: the Striker shotgun (cObjStriker, object id 0x2F; routines wep/pl_shotgun.cpp).
-//
-// cObjStriker is the cObjWep (game/objWep.cpp) of the Striker (weapon_no 8, a semi-auto drum
-// shotgun: 19 pellets in pl_shotgun, no pump), hanging on the player's right hand (parts 10) and
-// driven by r_no_0 / r_no_1 from the shotgun routines: mode 2 -> moveFire (recoil motion, the
-// shell ejected at frame 21), mode 4 -> moveReload (one motion by tune level, ItemMgr.reload at
-// frame 35); both modes are ended by the player routine. Wep08_init is the WeaponInitFunc,
-// PlShotgunMove the WeaponMoveFunc; the module object carries the class and the entry points.
+// wep08 module: the Striker shotgun (cObjStriker, object id 0x2F), a cObjWep driven through r_no_0
+// and r_no_1 by the shotgun routines in wep/pl_shotgun.cpp.
 
 #include "wep_mod.h"
 #include "light.h"

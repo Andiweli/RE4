@@ -1,7 +1,5 @@
 // game/db_log.cpp: the on-screen debug log (pLog). Every unit reports through pLog->err / warn /
-// mes; lines go into a 100 entry ring (also echoed to the console), duplicates of the newest
-// line are collapsed, and the window (position / duration / line count from modeSet) shows the
-// last lines for m_DispTime frames after a new one (Start + Z re-opens it).
+// mes, and the lines go into a 100 entry ring that is also echoed to the console.
 
 #include "types.h"
 #include "global.h"

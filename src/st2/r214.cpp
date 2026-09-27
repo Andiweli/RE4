@@ -137,12 +137,8 @@ static const R214CatapultData r214_catTbl[3] = {
 };
 static const Vec r214_rockOfs = {0.0f, 800.0f, -2400.0f};
 
-// Room init (the castle wall with the three catapults): JumpPoint 1 skips ahead (Scenario_flg[1]
-// 0x40000000, Room_flg bits 2/5); the s00 callback; both barred gates (etc 0x11/0x12) closed. Part 2
-// (arriving on the rotating bridge) plays the bridge rotation. Before the catapults are silenced
-// (Scenario_flg[1] 0x40000000): the s00 event area once (bit 5), the two patrols (0xEC/0xED between areas
-// 0xF..0x11), area 9 = the catapult crew event until bit 0, the catapults; the third wave behind the
-// gates on area 0xD until bit 1 with the reset task (bit 4); the battle stream.
+// Room init for the castle wall with the three catapults. Until the catapults are silenced
+// (Scenario_flg[1] 0x40000000) it sets up the patrols, the catapult crew event and the third wave.
 void R214Init()
 {
     cEm* barred;
@@ -415,11 +411,8 @@ static void r214_exec3rdEmSet_end()
 }
 
 // The third wave: the gates open, the enemies come through with two camera cuts.
-// Position + angle of a wrapped enemy through ONE inline whose float arguments are all expanded at
-// the call head (integrate.c evaluates the actual arguments before the body): the angle constant is
-// loaded before the setPos call and shared by the later blocks (`lfs f30,-0.05` before `bl setPos`).
-// The Vec is the inline's own local: its frame temp is freed after each statement and reused by the
-// next expansion (one 16-byte slot), and its address is recomputed `addi r4,r1,8` per call.
+// r214_emPosAng is ONE inline because integrate.c expands its float arguments at the call head, so
+// the angle constant loads before `bl setPos` and its local Vec reuses one frame slot, as in the target.
 static inline void r214_emPosAng(cEmWrap* w, f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz)
 {
     Vec v;

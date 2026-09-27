@@ -151,11 +151,8 @@ cEmRack* SetRack(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo)
     return em;
 }
 
-// Damage check: a damage volume hit breaks types 0 / 1; a registered weapon hit (not knife /
-// grenades, and only when the rack's flag bit31 is clear) either spawns the hit est (types
-// without breakage), knocks a shelf plank off (parts scaled to 0), breaks the rack (heavy /
-// explosive weapons, or a close shotgun blast: Rno1 2 with the style in Rno3), or for handgun /
-// knife hits topples it toward the hit position (setDown).
+// Damage check: a weapon hit spawns the hit effect, knocks a shelf plank off, breaks the rack
+// (heavy or explosive weapons, or a close shotgun blast), or topples it toward the hit position.
 void emRackDmCk(cEmRack* pEm)
 {
     FREE_EMRACK* w = EMRACK_WK(pEm);

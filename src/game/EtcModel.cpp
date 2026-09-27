@@ -1,8 +1,5 @@
-// game/EtcModel.cpp: room "etc" models (doors, boxes, racks, torches, bars, ladders ...).
-// g_EtcTbl holds the 64 models a room's etc list created (EtcModelSet / Et*_init load the model,
-// texture and effect files from the room's etc archive), the getRoomEtc* functions look them up by
-// slot and id, GetEtcFlgPtr addresses the per-room etc flags in the save record and EtcSetAddAmb
-// applies the room's additive ambient colour.
+// game/EtcModel.cpp: room "etc" models such as doors, boxes, torches and ladders, created from the
+// room's etc list and archive into g_EtcTbl.
 
 #include "atari.h"
 #include "light.h"

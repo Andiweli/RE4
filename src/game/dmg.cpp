@@ -1,8 +1,5 @@
-// game/dmg.cpp: damage volumes (DmgMgr). Fire, explosions and traps register a cylinder or an
-// XZ quad with a damage kind and a lifetime; the objects (boxes, doors, items...) and characters
-// poll DmgMgr.hitCheck with their position each frame and react to the kind (1 / 4 / 5 / 7 break
-// the breakable objects, 5 is fire). Volumes expire on their own.
-// Original source: D:/Bio4/Prog/dmg.cpp.
+// game/dmg.cpp (D:/Bio4/Prog/dmg.cpp): damage volumes (DmgMgr) registered by fire, explosions and
+// traps. Objects and characters poll DmgMgr.hitCheck each frame and react to the damage kind.
 #include "types.h"
 #include "global.h"
 #include "dmg.h"

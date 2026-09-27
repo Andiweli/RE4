@@ -1,8 +1,5 @@
-// em32 module (D:/Bio4/Prog/em32.cpp): the caged boss of the container area. It appears in four
-// steps out of its cage (Parasite / LastMode / 2ndAppear .. 4thAppear), then walks the containers
-// (em2c's blended walk / dash, StepUp / StepDown, the tunnel and ceiling attacks), catches the
-// player (CatchHit / P_CatchHit / C_AtkHit with the plem32_* callbacks) and breaks the barred
-// door (BreakBarred). Three forms: `mode` 0, 1 (the parasite shows) and 2 (the last form).
+// em32 module (D:/Bio4/Prog/em32.cpp): the caged boss of the container area. It leaves its cage in
+// four steps and then fights on the containers in three forms (`mode` 0, 1 and 2).
 
 #include "atari.h"
 #include "map_obj.h"
@@ -294,15 +291,9 @@ void Em32Init(cEm* em)
     new (em) cEm32();
 }
 
-// Per-frame damage reaction, from move(). First the area damage (DmgMgr: the container falls /
-// explosions, kinds 1 / 4 / 5 / 7): 500 damage once per 120 frames (dmGuard), kept at 1 HP outside the
-// last form, and the flinch (routine 2 with dmWep 0x16) or death (routine 3) unless an appear
-// routine runs (flags 0x800). Then the weapon hit in dmHit: em32SetDmVal through LifeDownSet2
-// (again floored at 1 HP before the last form), blood and hit sound, death at 0 HP. Reactions are
-// held off by flags 0x800 / 8 / 0x100; in form 1 with the texture render on, HP at or under 3/8 of
-// max triggers the last form (routine 1/1). Otherwise a per-weapon flinch value (halved in form 1,
-// quartered in form 2) accumulates in dmgTotal, and past 100 (heavy weapons always) the flinch
-// routine 2/0 starts.
+// Per-frame damage reaction, from move(): the area damage from DmgMgr first, then the weapon hit.
+// HP is floored at 1 before the last form, and in form 1 with the texture render on, HP at or under
+// 3/8 of max triggers the last form.
 void em32DmCk(cEm32* em)
 {
     Em32Work* w = EM32_WK(em);
@@ -509,14 +500,9 @@ void em32DmCk(cEm32* em)
     em->setRno(2, 0, 0, 0);
 }
 
-// Per-frame update from the enemy manager. Order: damage, clear the per-frame flags, tick the wait
-// / attack / area-damage timers (at 1 HP before the last form the waits are pinned to 30 so it keeps
-// moving), reset the container break numbers, route (em32RouteCk) and the predicted player position
-// (em32GetPlPos), the routine table (r_no_0 0xFF = model load failed: destroy), body / neck
-// overrides, parts, the death shrink, attack / collision / stage collision (skipped with flags 0x40
-// while jumping; stuckCnt counts frames the collision halved the movement), the tail cloth, the
-// texture-blended skin, the breathing sound every 60 frames, and the shadow colour fade of the
-// invisible form (flags 0x20000: in with 0x10000, out otherwise).
+// Per-frame update from the enemy manager. At 1 HP before the last form the waits are pinned to 30
+// so it keeps moving, and r_no_0 0xFF means the model load failed and the enemy is destroyed.
+// stuckCnt counts the frames in which the collision halved the movement.
 void cEm32::move()
 {
     Em32Work* w = EM32_WK(this);
@@ -603,13 +589,8 @@ void cEm32::move()
     }
 }
 
-// Routine 0: one-time setup. Loads the body (archive 4 / 5) with the extra model 6 and the
-// texture-blended skin 7, the effect data, the cut-player halves (em32PlDivideModelInit), the ctrl12
-// controller, foot shadows and the tail cloth; marks the four claw tips as non-motion parts, a huge
-// light box, a 1.5 m collision at priority 1, three sphere obstacles on parts 0x1C..0x1E, the root
-// hit box plus the extra ones, the work (first attack in 150..300 frames, long attack in 600), the
-// idle effect, form 0, the second motion work (pMot) for the blended motions, part 0x53 hidden, hp
-// 500, and the start routine Wait (1/6) with the idle motion.
+// Routine 0: one-time setup of the models, effects, collision and work in form 0, ending in the
+// start routine Wait (1/6). A second motion work (pMot) holds the blended motions.
 static void em32_R0_Init(cEm32* em)
 {
     Em32Work* w = EM32_WK(em);
@@ -1014,12 +995,8 @@ static void em32_R1_Wait(cEm32* em)
     em32BreathSe(em);
 }
 
-// Routine 1/7: the pause between moves in which the next attack is chosen. After 15 frames: form
-// 0 (with a route and no ambush swipe pending) bites (1/0xF, 50 % within 2 m) or catches (1/0x10)
-// within 2.5 m and 60 deg, or does the long lunge (1/0x12) at 3..5 m in front; form 1 picks the
-// parasite catch (1/0x1D, 50 %) or the parasite attack (1/0x1C) within 3 m; the last form never
-// attacks from here. While the player lives it then tries a step up (flags 0x1000, or 50 % / after a
-// hit within 4 m), a jump up (form 0, 20 %), or the floor move of em32NextWalkSet.
+// Routine 1/7: the pause between moves in which the next attack is chosen. The last form never
+// attacks from here.
 static void em32_R1_Ambush(cEm32* em)
 {
     Em32Work* w = EM32_WK(em);
@@ -1134,15 +1111,9 @@ static void em32_R1_Ambush(cEm32* em)
         em32BreathSe(em);                                                            \
     }
 
-// Routine 1/8: the walk towards the target as a four-motion turn blend of the current form
-// (EM32_BLEND_TURN steers up to 45 deg; r_no_3 skips the blend-in). At each loop end it tries a step
-// up, or turns past 75 deg. Then per form: form 0 leaves for the parasite reveal (1/0) east of x 7 m
-// or on the script's flag bit 31, else the ambush swipe check, the bite / catch within 2.5 m and 60
-// deg, the long lunge at 3..5 m once longAtkWait is out, and beyond 6 m with atkWait out a 20 % jump
-// up (else a new 150..300 frame wait); form 1 goes to the last form at 3/8 HP (or script flag bit
-// 30) and picks the parasite catch / attack within 3 m; the last form switches to AtkWalk within 5 m.
-// The trample sphere (attack 4) is tested at the feet parts 0x54.. on motion event bit 0, then the
-// shared floor tail (EM32_WALK_END_CK: steps, jump up at 1 HP, rack break, the barred door when stuck).
+// Routine 1/8: the walk towards the target as a four-motion turn blend of the current form. Each
+// form picks its attacks from here, and the shared floor tail EM32_WALK_END_CK handles the steps,
+// the jump up, the rack break and the barred door.
 static void em32_R1_Walk(cEm32* em)
 {
     Em32Work* w = EM32_WK(em);
@@ -1630,12 +1601,8 @@ static void em32_R1_Turn(cEm32* em)
         return;                                                                         \
     }
 
-// Routine 1/0xD: the roar (the form's threat motion and effect; r_no_3 = no blend-in and no stage
-// collision, used right after a landing). The player-blocking collision bits are turned on here.
-// When it ends: form 0 bites / catches within 2.5 m and 60 deg, form 1 picks the parasite catch /
-// attack within 3 m, the last form does the ground attack (1/0x1F) 20 % of the time; otherwise the
-// floor move of em32NextWalkSet. A target more than 75 deg off and 3.5 m away cuts the roar short
-// with a turn. At 1 HP in the west half it looks for a jump up.
+// Routine 1/0xD: the roar, which also turns on the player-blocking collision bits. When it ends it
+// picks the current form's attack or the floor move of em32NextWalkSet.
 static void em32_R1_Threat(cEm32* em)
 {
     Em32Work* w = EM32_WK(em);
@@ -3262,11 +3229,9 @@ static void em32_R1_P_CatchHit(cEm32* em)
     em->Catch_at_adj = em->pos;
 }
 
-// Player damage callback of em32_R1_P_CatchHit (EmCatchPLSet). r_no_2 is driven by the enemy: 0/1
-// held following the enemy's motion with the blood effect (region-dependent variant); on the
-// uncensored region the player is cut in two at frame 110 (em32PlDivideSet2) and hidden; the damage
-// ends when stat stops reading 0x011E....; 2/3 shaken free: the weapon is dropped as a separate
-// object hooked to the player's hand for 15 frames (pCatchObj), then destroyed, and the damage ends.
+// Player damage callback of em32_R1_P_CatchHit (EmCatchPLSet), with r_no_2 driven by the enemy. On
+// the uncensored region the player is cut in two at frame 110 (em32PlDivideSet2). When shaken
+// free, the dropped weapon stays hooked to the player's hand for 15 frames (pCatchObj).
 static void plem32_P_CatchHit(cPlayer* pl)
 {
     Em32Work* w = EM32_WK(pl->pEmCatch);

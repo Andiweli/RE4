@@ -1,7 +1,5 @@
 // em24 module (D:/Bio4/Prog/em24.cpp): a small enemy that either waits in a box and jumps out at the
-// player (routine 1/0, work flag bit2), or wanders freely (1/2) and coils up when the player comes
-// near (1/1, 1/3). Dies to any damage volume of kind 1/4/5/7 and to most weapons; a random weapon
-// item drops at death (em24_R0_Die).
+// player, or wanders freely and coils up when the player comes near.
 
 #include "atari.h"
 #include "light.h"

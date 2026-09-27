@@ -1,13 +1,5 @@
-// Bow player routines (wep28 module, first object; real file name unknown): routine 2 of the
-// player while Krauser's bow is equipped: ready (draw the arrow), set (idle / turn), fire (shoot),
-// down. Modelled on game/pl_knife.cpp.
-//
-// Entry: PlBowMove is the wep28 module's WeaponMoveFunc (pl_R1_Weapon, r_no_1 == 6). r_no_2 is
-// the weapon state (0 ready, 1 set, 2 fire, 3 down; no reload: the arrow count is the ammo),
-// r_no_3 the step; r_no_0 / r_no_1 of the bow object follow. The arrow shown on the bow
-// (cObjBow::setDispAllow) and the arrow held in the right hand (pObj2 display type 1 plus
-// setRightHand(1)) are swapped as the draw / shoot motions play. Weapon archive slots: 0x1F draw,
-// 0x20 holster, 0x21/0x24/0x27 aim idle down/level/up (mot3 pitch on m3r), 0x22/0x25/0x28 shoot.
+// Bow player routines (wep28 module, first object, real file name unknown), run while Krauser's bow
+// is equipped. PlBowMove is the module's WeaponMoveFunc, modelled on game/pl_knife.cpp.
 
 #include "atari.h"
 #include "light.h"

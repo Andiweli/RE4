@@ -1,9 +1,5 @@
 // game/esp_efm: effect models (Efm) of the effect sequence system (D:/Bio4/Prog/esp_efm.cpp). An
-// effect record whose Id is 0xFC..0xFF creates a model object in ObjMgr instead of a sprite:
-// obj04 (particle model, Id 0xFF; 0xFC uses a scroll model), obj05 (scatter/debris model, 0xFE)
-// or obj09 (rigid body, 0xFD). EfmSeqSet is the entry point from the generator; EfmSetObj04/05/09
-// fill the object's work from the record; EfmDelete / EfmDeleteEvent / EfmArrayClear destroy them
-// by EfmCore owner, at event end and at room clear.
+// effect record whose Id is 0xFC..0xFF creates a model object in ObjMgr instead of a sprite.
 #include "light.h"
 #include "atari.h"
 #include "obj.h"
@@ -147,12 +143,8 @@ void EfmArrayClear()
     ObjMgr.applyFuncAll(EfmDeleteSub);
 }
 
-// Generator entry for an effect model record: resolves the parent (gen->Parent_no is a scroll object
-// unless info->flg bit 0x1000), maps gen->Id 0xFF/0xFE/0xFD/0xFC to move kind 0/1/2/3, fetches the
-// model+tpl (Efm table by Tex_id, or the scroll object's model for kind 3), creates the obj04/05/09
-// in ObjMgr with the light set-up from Tool_flg (0x80 -> 4, 0x20000 -> 8, else 0x10), then calls the
-// kind's EfmSetObj. info->flg bit 0 makes the object survive suspends; an owner model with
-// be_flag 0x9 passes its AddAmb colour down. Returns the object or 0 on any failure (logged).
+// Generator entry for an effect model record: resolves the parent, creates the obj04/05/09 in ObjMgr
+// and calls the kind's EfmSetObj. Returns the object or 0 on any failure (logged).
 cObj* EfmSeqSet(EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs)
 {
     cObj* obj = 0;
@@ -301,12 +293,8 @@ cObj* EfmSeqSet(EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m
 const Vec efm_light_pos = {0.0f, 0.0f, 0.0f};
 const Vec efm_light_size = {1000.0f, 1000.0f, 0.0f};
 
-// Fills an obj04 (particle model) work from the record: position/speed/acceleration/angle/rotation
-// speed with the R_* random spreads (angles in degrees -> radians), scale (Size_base*0.005), colour
-// and fade timers, blend mode, draw order (ot_type 2 when Tool_flg 0x400000, 1 when translucent),
-// then attaches it: Parts_no 0xFF world with matrix m, 0xF8..0xFE world, otherwise parts Parts_no of
-// `parent` (Tool_flg 0x20: only the parent's rotation, no follow). Tool_flg bit 2 spawns an est
-// child effect, bit 3 starts motion WorkSp8[2]. Returns 0 (object destroyed) on a bad parts number.
+// Fills an obj04 (particle model) work from the record, then attaches it to the world or to parts
+// Parts_no of `parent`. Returns 0 (object destroyed) on a bad parts number.
 cObj* EfmSetObj04(cObj* obj, EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs)
 {
     Efm04Work* w = EFM04_WK((cObj04*) obj);
@@ -443,11 +431,9 @@ cObj* EfmSetObj04(cObj* obj, EspGenWork* gen, EfmCore* info, u32* seed, cModel* 
                 w->pParts = pEffParentWorld;
                 Efm04RotMatrix(obj, mtx);
             } else {
-                // pMod/Guid_pMod stored through a word pointer: the store `(mem link)` has a
-                // register address, so cse1 (following the `beq` into this arm) treats it as
-                // aliasing `w->Parts_no` and the getPartsPtr argument is reloaded (`lbz r4,0x79(w)`);
-                // combine folds the address back into `stw 0x6C(w)`. A plain member store never
-                // conflicts (same base, disjoint offsets) and the arm reuses the switch register.
+                // pMod/Guid_pMod are stored through a word pointer so cse1 treats the store as
+                // aliasing `w->Parts_no` and reloads the getPartsPtr argument like the target. A
+                // plain member store would let the arm reuse the switch register.
                 u32* link = (u32*) &w->pMod;
                 link[0] = (u32) parent;
                 link[1] = parent->guid;

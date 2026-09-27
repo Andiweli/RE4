@@ -85,12 +85,8 @@ static void R20bEventS00();
 extern "C" void Evt_R20BS00_Func(Event* e);
 void EvtTexRenderCamTrans(Event* e, int cut);
 
-// Room init (the great hall): s00/s99 callbacks, Room_flg[0] bit 31 (lower floor) cleared, the upper
-// floor objects shown, doors 3/8 paired; until s00 (Room_flg bit 0) it is pre-loaded with the enemy of
-// list entry 0x11 and area 2 runs it (objects 0x51..0x53 swapped afterwards); doors 6/7 get lock models;
-// item area 0x8C (the key) hidden until used; until bit 1 area 4 = the locked door with the key watcher,
-// else area 5 off / insignia object 0x8F hidden; five treasure item events; the terminal once (bit 17);
-// the entry camera once (bit 21); waves, stream and floor render target.
+// Room init for the great hall. Until the s00 event has played, the room is pre-loaded with its
+// enemy and area 2 runs the event. The locked door waits for its key.
 void R20bInit()
 {
     cEmDoor* door0;

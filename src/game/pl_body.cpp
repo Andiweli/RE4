@@ -1,7 +1,5 @@
-// game/pl_body: cPlBody, the player's body helper kept at cEm::Body: the model infos of the head /
-// hands / arms, the waist twist applied to the spine parts each frame (waistMove; aiming turns the
-// upper body), the two face-morph (SPAE) records and the weapon-hand model the weapon module
-// supplies.
+// game/pl_body: cPlBody, the player's body helper kept at cEm::Body. It holds the waist twist, the
+// face morphs and the weapon-hand model the weapon module supplies.
 
 #include "pl_body.h"
 #include "atari.h"

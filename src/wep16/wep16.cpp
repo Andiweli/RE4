@@ -1,9 +1,5 @@
-// wep16 module: Leon's knife (cObjKnife; routines wep/pl_knife.cpp = the DOL's game/pl_knife.cpp).
-//
-// The knife as an equipped "weapon" (the mercenaries / Krauser-style knife slot): cObjKnife
-// (wep_mod.h) is a cObjWep hanging on the player's right hand with the player archive's knife
-// motion, no fire / reload modes of its own; PlKnifeMove (the knife routine) is registered as the
-// WeaponMoveFunc so routine 6 slashes. Wep16_init is the WeaponInitFunc.
+// wep16 module: Leon's knife as an equipped weapon (cObjKnife), with no fire or reload modes of its
+// own. PlKnifeMove from wep/pl_knife.cpp (the DOL's game/pl_knife.cpp) is its WeaponMoveFunc.
 
 #include "wep_mod.h"
 #include "light.h"

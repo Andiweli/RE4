@@ -39,14 +39,9 @@
 #include "game.h"
 #include "room_data.h"
 
-// Room 3-1b (D:/Bio4/Prog/r31b.cpp): the U-3 ("It") cage corridor: three rooms with shutter
-// pairs opened by switch pairs, a death timer, the cages that fall, and the gondola.
-//
-// STATUS: byte-identical. The three levers that closed it: the `pPL` struct-member view for the
-// setPos after a pair of `Vec = {..}` template copies (R31bMain, R31bExecEventS00), the dead
-// `zero = em` second set that keeps `zero` out of the cse2 class merge (R31bExecRoom03U3Main), and
-// the single-use `hp` constant that fills one sched1 slot in block 0 (R31bInit).
-//
+// Room 3-1b (D:/Bio4/Prog/r31b.cpp): the U-3 ("It") cage corridor of three rooms with switch-opened
+// shutters, a death timer, falling cages and the gondola. Byte-identical, closed by the `pPL` view in
+// R31bMain, the dead `zero = em` in R31bExecRoom03U3Main and the `hp` constant in R31bInit.
 struct R31bWork {
     cSat* sat[17];          // 0x000  scenario collision pieces per shutter/door object
     cSat* eat[17];          // 0x044  enemy collision pieces ([13..16] the four EatMgr planes)
@@ -65,11 +60,9 @@ static R31bWork* r31b_work;
 // Global in the original (.sym scope:global): the REL relocation carries the symbol, the ADDR16 field is 0.
 cParts* r31b_plParts;   // .bss 0x18  player parts 10 (R31bMain)
 
-// The player after the fall; the room's scroll objects ([no] = the cage room, the count in
-// r31b_objNum); the lattice (kanaami) objects, 25 per room; the room-3 lattice pair lists; the
-// gondola positions ([0] = start, [1] = stop, per direction: one 2x2 array, `r31b_gondolaPos[1]` is
-// addressed as the start table + 0x18) and the player's yaw on it. The non-static ones are global in
-// the original.
+// Room layout tables for the fall positions, cage objects, lattice (kanaami) objects and gondola.
+// `r31b_gondolaPos[1]` is addressed as the start table + 0x18. The non-static ones are global in the
+// original.
 Vec r31b_fallPlPos[3] = {{-10850.0f, 0.0f, 1000.0f}, {8150.0f, 0.0f, 1000.0f}, {26650.0f, 0.0f, 1000.0f}};
 int r31b_objNum[4] = {12, 19, 31, 0};
 int r31b_objTbl[4][31] = {
@@ -142,11 +135,8 @@ void R31bKanaamiTrans(u8 room, u8 no, int on);
 void R31bKanaamiRoom03Trans(int no, int on);
 extern "C" void Evt_R31BS00_Func(Event* e);
 
-// Room init (the U-3 cage corridor): the three cage rooms in turn — each not yet passed (Room_flg bits
-// 2/5/8) gets its two lattice switch areas, its exit door area and its collision / lattice objects,
-// else it is hidden as fallen (R31bSmdTransOff); room 3 also the escape (area 0x22) and U-3's
-// appearance (area 0x23, bit 0xB); the gondola areas 0xF/0x10 posed by bit 0xD; the s00 event on area 4
-// until bit 0xC; the start camera, the lights and the U-3 handle.
+// Room init for the U-3 cage corridor. Each cage room not yet passed gets its switch and door areas,
+// and a passed one is hidden as fallen (R31bSmdTransOff).
 void R31bInit()
 {
     cEm* sw0;
@@ -158,12 +148,9 @@ void R31bInit()
     cEmHit* hit;
     int i;
     int no = 3;
-    // A second constant local of block 0 (used once, as the stored hp value below): its `li` is a
-    // codeless sched1 filler -- cse/cprop cannot fold a constant into a store, update_equiv_regs moves
-    // the single-use init next to the store, so the bytes are the literal's -- and it takes one
-    // free slot ahead of the gcse-hoisted `addi rX,r1,N` address pseudos, which puts each of them
-    // in the target's call segment (`addi r26` after the memset argument moves, `addi r25` after
-    // the first memset). Post-reload an `addi rN,r1,N` cannot cross a call, so sched2 keeps them there.
+    // A single-use constant local whose `li` fills one sched1 slot in block 0 without changing the
+    // bytes. That pushes the hoisted `addi rX,r1,N` address pseudos into the target's call segments,
+    // where sched2 keeps them.
     int hp = 0;
 
     // A local for the allocation result: assigned to r31b_work directly, it feeds the same
@@ -1424,13 +1411,9 @@ static void R31bExecRoom03U3Main()
     if (RsfCheck(G_ROOM_ID, 0x1C) == 0) {
         cEm32* em;
         cObj* obj;
-        // The player EstSet's two zero words come from `zero`, kept in its own callee-saved register
-        // (`li r24, 0` in this block; a REG_EQUIV constant, so global allocates it last), while the
-        // enemy EstSet's literal zeros are canonicalised onto the RsfCheck `andi.` result known 0 on
-        // this path. cse1 keeps `zero` because its last mention (the dead `zero = em` below) lies
-        // beyond the ebb of the player arm (make_regs_eqv puts it first in the class); the dead
-        // set is what keeps that true at cse2 as well (the uses in the enemy arm are rewritten by
-        // cse1), and flow deletes it before local-alloc counts the sets.
+        // The player EstSet's two zero words come from `zero` in its own callee-saved register, as in
+        // the target. The dead `zero = em` below keeps cse from merging `zero` into the known-zero
+        // `andi.` result, and flow deletes it before local-alloc.
         void* zero = 0;
 
         RsfSet(G_ROOM_ID, 0x1C);

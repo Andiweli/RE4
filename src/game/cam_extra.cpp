@@ -1,8 +1,5 @@
-// game/cam_extra.cpp: the special cCamera implementations the camera controller switches to:
-// CameraAttachedToMotion (a camera track inside a model's motion), CameraScope (rifle scope
-// with zoom, pitch and reticle ids), CameraBinocular (with its HUD ids), CameraPushObject,
-// CameraLookAt (item examine) and CameraLookDownEm, plus the FocusAnimation blur used by the
-// scope and binoculars.
+// game/cam_extra.cpp: the special cCamera implementations the camera controller switches to, such
+// as the rifle scope, the binoculars and the item examine view.
 
 #include "types.h"
 #include "vec.h"
@@ -196,11 +193,9 @@ void FocusAnimation::clear()
 // CameraScope: rifle scope view.
 // ---------------------------------------------------------------------------
 
-// The wep_type filter is an if/else-if chain on a local (`t == 0`, `== 1`, `== 2`, each storing
-// `t`; jump2 cross-jumps the three `stb`s) -- a switch or `||` on one value range-folds; the 9/10/0x28
-// arm is one body (its label has a jump use, so cse reloads pG there) and the `type = 0` arm is written
-// last so its `stb` is the cross-jump survivor; `&dir` is written per use (a `Vec* dir` local
-// merges the arms' PRE copies `mr r29, ..`).
+// The wep_type filter is an if/else-if chain on a local so jump2 cross-jumps its three `stb`s, where
+// a switch or `||` range-folds. The `type = 0` arm is written last so its `stb` survives, and `&dir`
+// is written per use because a `Vec* dir` local merges the arms' PRE copies.
 #define SCOPE_WEP_TYPE()                                                                             \
     {                                                                                                \
         int t = pG->weapon_type;                                                                        \
@@ -309,11 +304,8 @@ static inline f32 scopeClamp01(f32 v)
     return v;
 }
 
-// Per-frame scope view: C-stick Y zooms (fov 45 down to the scope's limit), the main stick / D-pad
-// turns the player (yaw goes into pPL->ang.y) and pitches within the limits with a gain that
-// shrinks with zoom, a breathing sway (m_rnd) is added while aiming, the camera is placed at the
-// eye offset in the player's frame, the reticle ids update and the focus blur follows zoom
-// changes.
+// Per-frame scope view: the C-stick zooms, aiming turns the player, and a breathing sway is added
+// while aiming.
 void CameraScope::move()
 {
     static f32 ZOOM_LIMIT_0 = 9.0f;

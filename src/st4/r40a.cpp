@@ -140,11 +140,8 @@ static void em_set2()
 }
 
 // Coming from 4-06: Leon climbs down through the hatch.
-// OPEN (4 words): the setPos block's x/z constant temps swap f0/f13. Our sched1 issues the three
-// pool loads in LUID order (x, y, addi, z), so z has the shortest live range and local-alloc gives
-// it f0 first; the original has x in f0 (allocated first or outside local-alloc). All 6 statement
-// orders, f32/const f32 locals, pointer and inline-helper forms keep z first; only an
-// `asm("" : "+f"(px))` launder on the x temp (2 deaths -> global alloc -> f0) reproduces the bytes.
+// OPEN (4 words): the setPos block's x/z constant temps swap f0/f13. Only an `asm("" : "+f"(px))`
+// launder on the x temp reproduces the bytes, since every source order tried keeps z in f0.
 static void first_init()
 {
     Vec v;

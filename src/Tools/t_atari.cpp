@@ -369,11 +369,9 @@ static void plmove10(AtariToolWork* w)
     w->pos.y += (f32) w->joy.stickY * spd;
     w->pos.z = w->pos.z + (f32) w->joy.triggerRight * spd * 0.5f - (f32) w->joy.triggerLeft * spd * 0.5f;
     {
-        // pG read through a reference: a reference read is a MEM with neither the struct nor the scalar
-        // flag, so alias.c's fixed_scalar_and_varying_struct_p does not exempt it from the three `w->pos`
-        // stores above; the load then depends on the `stfs`s, which gives them a second dependent and
-        // ranks them above the `old` copy's `stw`s in sched1 (the target's stfs-before-stw order). A plain
-        // `pG->` read is a fixed scalar and floats above the stores.
+        // pG is read through a reference so alias analysis does not exempt the load from the `w->pos`
+        // stores above. That dependence schedules the `stfs`s before the `old` copy's `stw`s, as in
+        // the target. A plain `pG->` read floats above the stores.
         GlobalWork*& gp = pG;
         Draw_local_pos(&w->pos, 1000, gp->Camera.v_mat);
     }

@@ -107,11 +107,8 @@ static void r327_StrCheck();
 static void r327_BoxOpen(u32 id);
 static void r327_BoxOpened(u32 id);   // u32 (not int): an int parameter reorders the unit's functions
 
-// Room init (the Ganado camp): on a return after Scenario_flg[2] 0x40000000 the room's 0x1D enemies are
-// dropped from the list, else the first-visit tables set the eleven camp Ganados; the two lamp switches
-// (areas 4/3 until Room_flg bits 0/1, both -> the gate open), area 6 = the door check, the card reader
-// (area 0x18 + card key 0x74 watcher until bit 11), the gatling Ganado until bit 2, the goto and
-// enemy-refill tasks, seven box item events, the continue point (area 0x1B), the stream.
+// Room init (the Ganado camp). On a return after Scenario_flg[2] 0x40000000 the room's enemies are
+// dropped from the list, else the first-visit tables set the camp Ganados.
 void R327Init()
 {
     u32 i;

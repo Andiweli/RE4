@@ -1,8 +1,5 @@
-// game/objBull: object id 0x3E, the bulldozer of the island chase (D:/Bio4/Prog/objBull.cpp). Its
-// R0 routines run the scripted route (four barrier breaks, the lift, the truck collision) through
-// the room's 12 motions; parts 2 carries the player, the partner (who drives, Sub_bull_*) and the
-// enemies standing on it (objBullMoveAdjust*), the blade crushes enemies in front (objBullHitCk),
-// and the ck* queries let the room script follow the progress (BullWork::Be_flg bits).
+// game/objBull: object id 0x3E, the bulldozer of the island chase (D:/Bio4/Prog/objBull.cpp). The
+// room script follows its scripted route through the ck* queries.
 #include "atari.h"
 #include "atari_init.h"
 #include "light.h"

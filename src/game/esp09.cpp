@@ -1,8 +1,5 @@
-// game/esp09.cpp: effect id 0x09, a position trail of maxPoints (4 - Work8[0], 2..6) points kept
-// in a ring buffer, fading along its length. Without a texture (Tex_id 0xFF) it is a GX line
-// strip of width Size_base_x * Size_mul * 0.03 (thinner with distance); with a texture, a strip of
-// quads facing the camera. flg (Work8[1]) bit0 keeps the points in screen space (2D trail,
-// blanked by a Z-buffer test after the render), bit1 records a point only every other frame.
+// game/esp09.cpp: effect id 0x09, a fading position trail kept in a ring buffer, drawn as a GX line
+// strip without a texture or as camera-facing quads with one.
 
 #include "atari.h"
 #include "light.h"
@@ -299,20 +296,9 @@ void Esp09_PolyTrans(cEsp09* esp, u8 r, u8 g, u8 b, u8 a)
 
     esp->m_Size_mul = 1.0f;
     spd = esp->m_Size_plus;
-    // The next point pn is recomputed from idx: loop.c strength-reduces it as a giv of the biv idx
-    // (`addi -12` after idx--, `add r25,r14,r20` after the wrap) and its preheader init folds to
-    // the block-0 temporary `s` (kept as cse's head by the dead trailing `p = s`). The Subtract
-    // argument reads the giv register (`mr r3,r25`) and `p = pn` is a codeless asm whose input is
-    // tied to the output (a plain copy makes p a second giv; loop.c never derives a giv from an
-    // ASM_OPERANDS): regmove's matching-constraint fixup emits the one `mr r29,r25`. That copy is one
-    // insn more than the asm alone inside pp's live range (pp 14/126 = esp 17/204 = 3333 in
-    // global-alloc), so a codeless `"=m"` anchor at the loop top, outside pp's range, lengthens esp
-    // (17/205) and keeps the target's order p > pp > esp.
-    // idx-- between the two copies puts the giv `addi` before
-    // `mr pp,p`. The two codeless asms give p (2 in-loop mentions -> 17 refs) and pp (4 -> 14 refs)
-    // the target's global-alloc order p r29 > pp r28 > esp r27 (ours ranked esp first); the pp asm
-    // sits after the second PSVECAdd with a memory input written by that call so it takes no issue
-    // slot before the `bl`. The wrap-arm asm also keeps `pp = p` reading p (regmove).
+    // pn is recomputed from idx so loop.c strength-reduces it as a giv. The codeless asms, including
+    // the `"=m"` anchor at the loop top, exist only to give the target's global-alloc register order
+    // p r29 > pp r28 > esp r27 and its single `mr r29,r25`.
     s = &w->Pos[idx];
     p = s;
     for (i = 0; i < n1; i++) {

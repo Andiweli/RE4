@@ -1,11 +1,5 @@
-// wep04 module: the XD9 handgun (cObjXd9, object id 0x33). The module object carries the class,
-// the entry points and the handgun routine registration (wep/pl_handgun.cpp).
-//
-// cObjXd9 is the cObjWep (game/objWep.cpp) hanging on the player's right hand (parts 10), driven
-// by r_no_0 / r_no_1 from the handgun routines: mode 2 -> moveFire (slide motion by weapon
-// type, SEs, flash, cartridge), mode 4 -> moveReload (motion by reload tune level, ItemMgr.reload
-// at its frame). weapon_type 1 is the upgraded model 0x7 (weapon list id 0x28). Wep04_init is the
-// module's WeaponInitFunc, PlHandgunMove its WeaponMoveFunc.
+// wep04 module: the XD9 handgun weapon object (cObjXd9). The handgun routines in
+// wep/pl_handgun.cpp drive it through r_no_0 and r_no_1 to fire and reload.
 
 #include "wep_mod.h"
 #include "light.h"

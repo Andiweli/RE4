@@ -1,7 +1,5 @@
-// wep29 module: Hunk's machine gun (the wep11 objects with its own entry). Weapon class wep/objMachinegun.cpp, routines wep/pl_machine.cpp.
-// Wep29_init is the module's WeaponInitFunc (creates the cObjMachinegun, object id 0x2D, as the
-// player's weapon and loads the muzzle-flash effects), PlMachineMove its WeaponMoveFunc; _prolog
-// registers both and the ObjInitFunc slot. Byte-for-byte the wep11 entry with another name.
+// wep29 module: Hunk's machine gun, byte-for-byte the wep11 entry with another name. Weapon class
+// wep/objMachinegun.cpp, routines wep/pl_machine.cpp.
 
 #include "wep_mod.h"
 #include "light.h"

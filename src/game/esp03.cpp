@@ -1,7 +1,4 @@
-// game/esp03.cpp: effect id 0x03, a line trail. The last 4 positions are kept in a ring buffer
-// and drawn as a GX line strip of `maxPoints` (4 - Work8[0], 2..6) points with width
-// Size_base_x * Size_mul / 33; Work8[0] == 10 instead draws a single camera-facing diamond quad
-// of Size_base_x at the newest point. Work8[1] bit0 kills the trail when it hits a wall.
+// game/esp03.cpp: effect id 0x03, a line trail drawn from a ring buffer of the last positions.
 
 #include "atari.h"
 #include "gx.h"

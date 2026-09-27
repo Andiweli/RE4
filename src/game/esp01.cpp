@@ -1,8 +1,5 @@
-// game/esp01.cpp: effect id 0x01, a motion-trail strip. The sprite itself never moves its stored
-// position: the trans re-integrates speed / acceleration / D_speed for Life_time frames from
-// pos0 and samples Wari_num + 1 (15 - Work8[0], max 15) points `interval + 1` (Work8[1]) frames
-// apart, then draws a camera-facing textured strip through them tapering from Size_base_x to
-// Size_base_y. EspStrip_draw_poly is the quad emitter shared with esp02.
+// game/esp01.cpp: effect id 0x01, a motion-trail strip that the trans re-integrates from pos0 every
+// frame. EspStrip_draw_poly is the quad emitter shared with esp02.
 
 #include "atari.h"
 #include "light.h"

@@ -1,7 +1,5 @@
-// game/gx_sub: frame clear colour (D:/Bio4/Prog/gx_sub.cpp). The frame buffer is cleared to black
-// by the copy; bio4_AddBgColor draws the real background colour (the light environment's bgColor,
-// or a colour set by bio4_GXSetCopyClear) as a full-screen quad at the far plane at the start of
-// the frame.
+// game/gx_sub: frame clear colour (D:/Bio4/Prog/gx_sub.cpp). The copy clears to black and
+// bio4_AddBgColor draws the real background colour as a full-screen quad at the far plane.
 #include "types.h"
 #include "vec.h"
 #include "global.h"

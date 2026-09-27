@@ -91,11 +91,8 @@ static void Evt_R227S00_Func(Event* e);
 static void Evt_R227S01_Func(Event* e);
 static void Evt_R227S02_Func(Event* e);
 
-// Room init: JumpPoint 2 skips the entrance event (Room_flg bit 0); the lever (etc switch 4) is a
-// barrel-type auto-open switch; debug trigger 1 replays the event. First visit: a coin toss (Room_flg[0]
-// 0x40000000) picks which follow-up event (s01 / s02) the entrance QTE leads to, the three evd files
-// are pre-loaded and the event task starts; else the enemies (r227_setEm1) and, unless bit 6, the
-// return layout. The gondola, the cargo lift, two shelf item events.
+// Room init. On the first visit a coin toss picks which follow-up event (s01 or s02) the entrance
+// QTE leads to, and the event task starts. Later visits place the enemies (r227_setEm1).
 void R227Init()
 {
 #line 57 "D:/Bio4/Prog/r227.cpp"

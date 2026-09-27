@@ -1,8 +1,5 @@
-// game/esp45.cpp: effect id 0x45, a lens glow / light bloom. Nothing is drawn as geometry: the
-// effect's world (or screen) position is projected and handed to Filter00 as an additive radial
-// spread of the effect colour, with power m_Size_plus and spread type Work8[0]. The alpha is
-// reduced with camera distance (Vec0.z) and, when Vec1.x is set, by a 24-sample Z-buffer
-// visibility test around the screen position run after the frame is rendered.
+// game/esp45.cpp: effect id 0x45, a lens glow / light bloom with no geometry. Its projected position
+// is handed to Filter00 as an additive radial spread of the effect colour.
 
 #include "atari.h"
 #include "global.h"

@@ -1,14 +1,5 @@
-// wep14 module: the mine thrower (weapon number 0x14, cObjMine object id 0x36; wep14/objMine.cpp).
-// The module has its own player routine (the handgun routine of wep/pl_handgun.cpp with the
-// mine thrower's aim types: type 0 fires from the hand, the scope type (wep_type bit0) aims
-// through the camera trajectory and swaps the right hand model between the ready/reload motions).
-//
-// Entry: Wep14_init is the WeaponInitFunc, Wep14_move the WeaponMoveFunc (pl_R1_Weapon, r_no_1
-// == 6). r_no_2 is the weapon state (0 ready, 1 set, 2 fire, 3 down, 4 reload, 5 next target),
-// r_no_3 the step, mirrored into the cObjMine's r_no_0 / r_no_1 (objMine.cpp plays the
-// launcher's own motions and launches the dart in mode 2). Weapon archive slots: 0x12 draw /
-// turn, 0x13/0x17/0x19 aim idle down/level/up (mot3 pitch on m3r), 0x14/0x18/0x1A fire, 0x15
-// holster, 0x16/0x1B reload by weapon_lv_reload, 0x9/0xA the two right-hand models.
+// wep14 module: the mine thrower (weapon number 0x14, cObjMine in wep14/objMine.cpp). Its own player
+// routine is the handgun routine of wep/pl_handgun.cpp with the mine thrower's aim types.
 
 #include "wep_mod.h"
 #include "light.h"

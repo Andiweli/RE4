@@ -1,10 +1,5 @@
-// wep33 module: the pump shotgun (cObjShotgun, object id 0x2B; routines wep/pl_shotgun.cpp).
-//
-// The mercenaries' build of wep07 (weapon_no 0x21): the same cObjShotgun hanging on the player's
-// right hand (parts 10), driven by r_no_0 / r_no_1 from the shotgun routines (mode 2 fire
-// with the pump shell ejection at frame 20, mode 4 shell-by-shell reload; both end themselves),
-// with a slightly different motion table. Wep33_init is the WeaponInitFunc, PlShotgunMove the
-// WeaponMoveFunc.
+// wep33 module: the mercenaries' build of the wep07 pump shotgun (cObjShotgun, object id 0x2B) with
+// a slightly different motion table. The shotgun routines in wep/pl_shotgun.cpp drive it.
 
 #include "wep_mod.h"
 #include "light.h"

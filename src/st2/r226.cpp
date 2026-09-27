@@ -159,12 +159,9 @@ static inline void r226_setEmAll(int noSuspend)
     }
 }
 
-// Room init (the giant Salazar statue chase): JumpPoint 1 clears every room flag then presets the
-// switches / statue-awake flags. Area 0 = the elevator out (SceElevator leave data); arriving by the
-// elevator plays its arrival. Statue state per flags: awake (bit 9) -> the cObjRobo is created and, until
-// the passage walk is done (bit 13), area 5 = the walk start, 0x22 = the tower look, 0x24 = continue
-// point, the enemies; else the two passage switch areas 0x12/0x13 (bits 7/8) and area 0x17 = the statue
-// waking; area 0x18 = the statue watching once (bit 10); the chase BGM task.
+// Room init (the giant Salazar statue chase): JumpPoint 1 clears every room flag, then presets the
+// switch and statue-awake flags. Once the statue is awake (bit 9) the cObjRobo is created, otherwise
+// the passage switch areas and the statue waking area are set.
 void R226Init()
 {
     cEmDoor* door;

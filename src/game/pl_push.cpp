@@ -1,7 +1,5 @@
-// game/pl_push: cPlPush, the player's push-object control (routine 0/9, pl_R1_ObjPush): catches a
-// pushable cEmRack (id 0x45) the player walks into, remembers which side he stands on (m_Dir), and
-// each push frame plays the object's motion facing that way while checking that no wall, enemy or
-// range limit blocks it; plAdjust turns the player to the object.
+// game/pl_push: cPlPush, the player's push-object control run from routine 0/9 (pl_R1_ObjPush) to
+// push a cEmRack the player walks into.
 
 #include "pl_push.h"
 #include "global.h"

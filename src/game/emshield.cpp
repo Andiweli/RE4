@@ -1,7 +1,5 @@
-// game/emshield.cpp: shield enemy (cEmShield): a wooden shield carried by an enemy that loses its
-// planks when shot and falls to the ground as a three-node rope.
-//
-// Byte-identical.
+// game/emshield.cpp: shield enemy (cEmShield), a wooden shield carried by an enemy that loses its
+// planks when shot and falls as a three-node rope. Byte-identical.
 
 #include "atari.h"
 #include "map_obj.h"
@@ -150,24 +148,12 @@ void cEmShield::beginEvent(u32 flag)
     }
 }
 
-// Damage: every few hits a plank (hit box parts 2..10) breaks off; the fourth plank, an explosion
-// or a heavy weapon destroys the shield.
-// Byte-identical. Shape notes: the compare tree needs the default-labelled members 0..4, 0xB, 0xE,
-// 0x10, 0x11, 0x14, 0x1B, 0x1D, 0x26, 0x27, 0x2B (tools/research/casetree.py: [0,4] and [16,17] only add
-// balance weight, their compares are jump-threaded away); the two plank bodies (default arm / B arm)
-// stay separate copies only because they use different pointer variables (`parts0` = the top
-// getPartsPtr(0) variable, also the breakAll/D one, so it crosses calls and is callee-saved r31;
-// `parts` in B, `parts2` in the C continuation), the C arm falls through into D with `goto plank`
-// for its own body laid out after D, and `!(rad < K)` gives the plain `bge`. The D arm's SndCall
-// goes through a do-while(0) + void-returning alias: the loop notes give `&parts0->worldPos` a 5th
-// weighted ref (global-alloc priority above `w`: r26/r25) and the void result keeps `li r3,8`
-// ahead of the other argument `li`s inside the notes (u32 SndCall issues it last there).
+// Damage: every few hits a plank breaks off, and the fourth plank, an explosion or a heavy weapon
+// destroys the shield. Byte-identical only with the default-labelled case members, the separate
+// `parts0` / `parts` / `parts2` pointers and the do-while(0) void SndCallV alias below.
 void SndCallV(u16, u16, Vec*, int, int, cUnit*) asm("SndCall__FUsUsP3VeciiP5cUnit");
-// Weapon hit reaction (see the note above): plays the shield hit SE on the carrier, and by weapon
-// class either counts hits toward knocking off the hit plank (est 0x10/0x61, or 0x63 for parts 5,
-// the plank is scaled to 0 and its hit box disabled), breaks the whole shield on the fourth plank
-// or a heavy / explosive weapon (est 0x10/0x62, hp 0, Rno1 2 Lost), or (shotguns) decides by hit
-// distance; a body hit only spawns blood.
+// Weapon hit reaction (see the note above). Hits count towards knocking off the hit plank, and the
+// fourth plank or a heavy / explosive weapon breaks the whole shield. Shotguns decide by hit distance.
 void emShieldDmCk(cEmShield* pEm)
 {
     EmShieldWork* w = EMSHIELD_WK(pEm);

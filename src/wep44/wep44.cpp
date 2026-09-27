@@ -1,10 +1,5 @@
-// wep44 module: Wesker's handgun (cObjGovernment, object id 0x31; routines wep/pl_handgun.cpp).
-//
-// Wesker's Killer7: the wep06 cObjGovernment without weapon types (one model 0x6, weapon list id
-// 0x2A), hanging on the player's right hand (parts 10) and driven by r_no_0 / r_no_1 from the
-// handgun routines (mode 2 fire: slide motion, SEs, flash 0x3A, cartridge; mode 4 reload by tune
-// level, ItemMgr.reload at its frame; both ended by the player routine). Wep44_init is the
-// WeaponInitFunc, PlHandgunMove the WeaponMoveFunc.
+// wep44 module: Wesker's Killer7 (cObjGovernment, object id 0x31), the wep06 class without weapon
+// types, driven by the routines in wep/pl_handgun.cpp.
 
 #include "wep_mod.h"
 #include "light.h"

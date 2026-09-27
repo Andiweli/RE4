@@ -1,8 +1,5 @@
 // game/act_btn.cpp: the action button prompt (ActBtn). Game code offers actions each frame with
-// set() (message kind, button, callback); move() shows the highest-priority prompt through the
-// message system / cockpit and, when the player presses the button, runs its callback directly,
-// as a scenario task or as a scenario area action. Prompts are one-frame: everything is cleared
-// again at the end of move().
+// set(), and move() shows the top prompt, runs its callback on a press and clears all prompts.
 
 #include "atari.h"
 #include "act_btn.h"
@@ -144,19 +141,9 @@ void cActionButton::disp(ActBtnWork* work)
     Cckpt.m_ActBttn.setDispFlag(btn);
 }
 
-// 1 when the prompt's button is pressed this frame: by button kind, trigger or hold (flags
-// bit4), honouring the exclusive (bit6) and no-trigger (bit1) flags and the "button already
-// consumed" bit Status_flg[0] 0x4000.
-// Every failing test `break`s to the one `return 0` after the switch (a plain `return 0` in a two-way
-// leaf gets its `li r3,0` hoisted into a conditional return by jump1; a jump to the shared block does
-// not), and the `(u64) key & ~mask` test is written in each leaf (jump2 cross-jumps the two `!(flags &
-// 2)` copies into the first one, `mr r10,rX; b`). The `register u64 key asm("r9")` pin fixes the DI pair
-// order. Cases 9/0xA: separate case nodes (the target compares 9 and 0xA individually) that reach the ONE
-// `li r3,0; blr` block; `case 9: return 0; case 0xA: return 0;` gives a second block (its `set r3 0;
-// (return)` cannot cross-jump with the end block, whose `(use r3)` sits between the set and the return),
-// and a `break` pair is grouped into a range node. The case-9 arm ends in a codeless `asm volatile("")`:
-// a real insn in the arm keeps the nodes separate, and it also blocks jump2's `x = a; if (c) goto l;`
-// hoist that turns the case-7 tail into `or.; li r3,1; beqlr` when the `li r3,0` block is adjacent.
+// 1 when the prompt's button is pressed this frame, honouring the exclusive, no-trigger and "button
+// already consumed" flags. Failing tests `break` to the one shared `return 0` and the case-9 arm ends
+// in a codeless `asm volatile("")`, both so that jump1 / jump2 produce the target's branch layout.
 int cActionButton::checkButton(ActBtnWork* work)
 {
     u32 on = Key.on & 0x00CF0000;

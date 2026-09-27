@@ -1,7 +1,5 @@
-// game/obj10: object id 10, the player's thrown weapon item cWepItem (D:/Bio4/Prog/obj10.cpp):
-// grenades and the like thrown by the player, with the obj01 flight model (gravity, spin, bounce,
-// water) but its own landing sounds, a self-damage check on the explosion (hitCkPl) and no
-// underwater/flash variants; deleted when an event starts.
+// game/obj10: object id 10, cWepItem, the grenades and similar items the player throws
+// (D:/Bio4/Prog/obj10.cpp). It uses the obj01 flight model but its own landing sounds.
 #include "atari.h"
 #include "light.h"
 #include "dmg.h"

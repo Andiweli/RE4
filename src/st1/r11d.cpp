@@ -79,12 +79,8 @@ static void r11d_checkEmReset();
 static void r11d_ThunderMove();
 static void r11d_str_check();
 
-// Room init (the village at night, the Bella sisters): rain on the player, Status_flg[1] 0x400; the
-// enemy waves start on area 2 the first time (Room_flg bit 0) else at once; area 1 = the locked front
-// door until Key_flg[0] 0x00010000; the sister effect data; closets 3/4/5 as hide spots; the show
-// view once (bit 2) else thunder at once; area 6 = the sisters' appearance until bit 3 else they are
-// re-set from flags; the iron door (etc 0x26, key item 0xB) on area 8 with its key-use watcher until
-// Key_flg[0] 0x00100000; five two-point patrols between area pairs 0xA..0x13; ladder 1 camera 0xC.
+// Room init (the village at night, the Bella sisters): the enemy waves, the locked front door, the
+// sisters' appearance, the iron door with its key-use watcher and five patrols.
 void R11dInit()
 {
     void* zero = 0;
@@ -492,11 +488,9 @@ static void r11d_checkEmReset()
     RsfSet(G_ROOM_ID, 0);
     u8 tbl[10] = {0xD2, 0xD7, 0xD3, 0xD8, 0xD4, 0xD9, 0xD5, 0xDA, 0xD6, 0xDB};
     u8* t = tbl;
-    // Layout of the target: `bl SceSleep; b CHECK`, the 60-frame sleep falling into the wait loop's
-    // body (one SceSleep(1) copy shared by the first wait and the re-waits), the count test, setEm, and
-    // the exit as the fall-through of `bne sleep` -- no labelled empty exit block, so haifa forms one
-    // region for the whole loop and hoists setEm's `li r4..r7` above the count compare. `i++` in the
-    // test puts the `addi` between the compare and the branch; `t` keeps the array base in one pseudo.
+    // The target's 60-frame sleep falls into the wait loop's body and exits as the fall-through of
+    // `bne sleep`, so haifa forms one region and hoists setEm's `li`s above the count compare. `i++`
+    // in the test and `t` for the array base are also needed.
     SceSleep(1);
     i = 0;
     goto check;

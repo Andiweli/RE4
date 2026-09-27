@@ -1,7 +1,5 @@
-// game/em_sub.cpp: the shared enemy helper library used by the enemy modules: damage position and
-// blood effects, hit box (yarare) checks against boxes, lines and spheres, the weapon target
-// lists, life and damage entry points for the player and the partner, the catch (grab) motion
-// helpers, and the item drops.
+// game/em_sub.cpp: the shared helper library of the enemy modules for damage, hit box (yarare)
+// checks, weapon target lists, catch motions and item drops.
 
 #include "atari.h"
 #include "map_obj.h"
@@ -2467,11 +2465,9 @@ static void EmCatchSubSet(cEm* em, cEm* sub, f32 ang, u32 type, f32 x, f32 y, f3
     SetSubDamage(em, (void (*)()) ft);
 }
 
-// Per-frame motion of a caught model: follow the catcher's movement, close the catch offset by
-// `rate2`, turn by `rate` of the remaining angle.
-// One `tmp` for both the rot.y load and the turn step: a pseudo with two deaths is not a local-alloc
-// candidate, so it goes to global.c (f13) and neither the `ry = tmp` copy nor the `tmp * rate` product
-// is tied into ry / rate by local-alloc; rate then ranks below rate2 (f29 / f30).
+// Per-frame motion of a caught model: follows the catcher, closes the catch offset and turns toward
+// it. One `tmp` serves both the rot.y load and the turn step so global.c allocates it (f13) and
+// rate ranks below rate2 as in the target.
 int EmCatchMotionMove(cEm* pEm, f32 rot_rate, f32 pos_rate)
 {
     cEm* target = pEm->pEmCatch;
@@ -3114,17 +3110,9 @@ void RandomItemSet(cEm* pEm)
     SceAtCreateItemAt(&pEm->pos, id, num, -1, -1, 0, -1);
 }
 
-// Random drop table by enemy id: money (0x78), ammunition (GetDropBullet), healing items (5/6/0x19),
-// or the treasure of the special enemies; 1 with the item in outId / outNum.
-// Handgun ammo drop: four dice (the second offset by `base`) times 5, rounded down to tens; a 1/64
-// chance of `big` (or 330). Inline with the offsets as parameters: the `+ base` reaches RTL as a
-// separate add (fold would otherwise fold the literal into the sum) and the four Rnd() calls of one
-// expression are pre-expanded before any of the `% 6`.
-// The result goes through a reference to the caller's `num`: every site (and the other cases) then
-// sets ONE global pseudo, whose global.c preference comes from the sum insn's first operand (the
-// first-dice chain, local-alloc r29), so num shares r29; with an own local per inline copy each num
-// took the first free register (r30). The `* 5` is a separate statement: inside the sum the
-// preference would come from the `slwi` scratch (r0) instead.
+// Random drop table by enemy id. The handgun ammo helper is inline with the offsets as parameters so
+// `+ base` stays a separate add, and it writes through a reference to the caller's `num` so every
+// site shares one pseudo in r29. The `* 5` is a separate statement for the same register choice.
 static inline void RandomHandgunAmmo(u32& num, int base, int big)
 {
     num = (u8) (Rnd() % 6) + ((u8) (Rnd() % 6) + base) + (u8) (Rnd() % 6) + (u8) (Rnd() % 6);

@@ -1,10 +1,5 @@
-// game/cam_ctrl.cpp: the camera controller (CamCtrl). The room's camera data (B40x file: trigger
-// areas -> camera cuts, plus interpolation records) selects a cut when the player enters an area
-// (areaHitCheck, with calm / battle attribute variants); each cut type maps to an r0 routine
-// (fixed, pan, rail track / pan / behind, free, camera motion, shoulder camera = CameraQuasiFPS
-// in cam_qfps.cpp) and the extras (scope, binoculars, push object, look-down, attached motion
-// cameras in cam_extra.cpp) plug in as cCamera objects. Move() produces the frame's camera
-// through the cut interpolation and smoothing; CameraMove (camera.cpp) copies it into pG->Camera.
+// game/cam_ctrl.cpp: the camera controller (CamCtrl), which picks a cut from the room's B40x camera
+// data when the player enters an area. CameraMove (camera.cpp) copies its result into pG->Camera.
 
 #include "types.h"
 #include "vec.h"
@@ -556,11 +551,8 @@ void CameraControl::CutCall(int cutNo)
     }
 }
 
-// Activates the area record: sets up the lerp from the current camera when the data has one,
-// updates the room light area unless the area says not to, remembers area / camera numbers and
-// picks the routine from the cut type: 0 Fix, 1 Pan, 2 Track, 3 RailPan, 4 RailBehind, 5 Free,
-// 6 / 7 a CameraMotion from the room motion buffer (Motion / UpCut), 8 the shoulder camera with
-// the area's offsets (bindAreaCamera).
+// Activates the area record: sets up the lerp from the current camera and picks the routine from
+// the cut type.
 void CameraControl::switchCamera(CameraAreaRec* rec)
 {
     CameraAreaInfo* area = rec->area;
@@ -862,11 +854,8 @@ int area_hit_pN(Vec* pPos, CameraAreaInfo* pArea)
     return 0;
 }
 
-// Per-frame area check: decides the cut attribute (1 calm / 2 battle, from EmMgr.isBattle with a
-// Battle_delay, or forced by debug), and on an attribute change or when the player left the
-// current area finds the first enabled area (normal 0x20 first, then the attribute-specific
-// ones) containing the player and switches to it; with no area the shoulder camera (0xA) with
-// the default offsets takes over.
+// Per-frame area check: picks the calm or battle cut attribute and switches to the first enabled
+// area containing the player. With no area, the shoulder camera takes over.
 void CameraControl::areaHitCheck()
 {
     static u8 blink = 0;
@@ -1155,11 +1144,8 @@ void CameraControl::Check()
     }
 }
 
-// Per-frame camera computation: refreshes the aim point from the cut, runs the r0 routine (0
-// Wait, 1 Fix, 2 Pan, 3 Track, 4 RailPan, 5 Motion, 6 RailBehind, 7 Free, 8 Debug, 9 UpCut,
-// 0xA shoulder, 0xB.. the cCamera extras: 0xC binocular, 0xD look-down, 0xF push object, 0x10
-// scope, 0x11 attached motion) into `cur`, applies the cut interpolation and the smoothing, and
-// rebuilds `camera`.
+// Per-frame camera computation: runs the r0 routine into `cur`, applies the cut interpolation and
+// the smoothing, and rebuilds `camera`.
 void CameraControl::Move()
 {
     static f32 gain = 2.0f;

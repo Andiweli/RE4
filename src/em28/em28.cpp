@@ -1,8 +1,5 @@
-// em28 module (D:/Bio4/Prog/em28.cpp): the chicken (cEmMgr::idName 0x28 "CHICKEN"; the crow is em23).
-// Waits, pecks and lays a random egg item (ids 8 / 9 / 0xA) from its wait routine, walks, and flutters
-// off (dash / jump routines) when the player comes near, shoots, or the bell rings (em28EscapeCk); dies
-// on the ground (R1_Die_Normal) or falling out of the air (R1_Die_Air). Routines: R0 Init / Move /
-// Damage / Die, R1 Wait / Walk / Dash / Jump, R2 Dm_Small, R3 Die_Normal / Die_Air.
+// em28 module (D:/Bio4/Prog/em28.cpp): the chicken, named "CHICKEN" in cEmMgr::idName. It pecks,
+// lays random egg items and flutters off when the player comes near, shoots, or the bell rings.
 
 #include "atari.h"
 #include "light.h"

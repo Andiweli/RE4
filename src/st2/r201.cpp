@@ -101,13 +101,8 @@ static void r201_checkSwitch(int on);
 static void r201_execEvent00();
 static void r201_execEvent00_sub();
 
-// Room init: JumpPoint 2 skips ahead (entrance seen, switch pulled, claw-man dead, reset wave). The
-// altar (r201_initAltar); the picture item 0x80 at area 0x20 until taken; the claw-man up-cut on area
-// 0xF once (Room_flg bit 2) and its appearance on area 0x10 until it is dead (bit 0), then the reset
-// wave; the battle-area door (object 0x53) locked until the dungeon key (Key_flg[0] 0x8000) with
-// area 0xB + key watcher; the switch and barred door per bit 5; the entrance event r201s00 on area 8
-// until Scenario_flg[0] 0x10000 (area 9 = its knock reminder until bit 4); the two bells (bits 10/11);
-// two shelf item events.
+// Room init: the altar, the claw-man's appearance until it is dead, the battle-area door locked
+// until the dungeon key, and the entrance event r201s00. JumpPoint 2 skips ahead past the claw-man.
 void R201Init()
 {
 #line 52 "D:/Bio4/Prog/r201.cpp"

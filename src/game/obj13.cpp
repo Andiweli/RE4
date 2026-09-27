@@ -1,9 +1,5 @@
-// game/obj13: object id 0x13, the ladder (D:/Bio4/Prog/obj13.cpp). LadderWork status: 0 standing
-// (climbable), 1 knocked down, 2/3 falling, 4 in motion. The player climbs it (action button 8 ->
-// plobjLadderClimb, motions mot[0..3]), kicks it down (button 0xA -> plobjLadderDown, mot[5..10])
-// and puts it back up (button 0xB -> plobjLadderReset, mot[4]); the partner climbs with
-// subobjLadderClimb (mot[16..19]). R1 routines: 0 Set (standing), 1 Fall (with damage areas), 2
-// Down, 3 Reset. A paired ladder shares the collision flags; breakWindow smashes windows at the top.
+// game/obj13: object id 0x13, the ladder (D:/Bio4/Prog/obj13.cpp). The player climbs it, kicks it
+// down and puts it back up through the plobjLadder* routines, and the partner uses subobjLadderClimb.
 #include "atari.h"
 #include "atari_init.h"
 #include "light.h"

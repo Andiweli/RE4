@@ -351,12 +351,8 @@ void gameStageInit()
     pG->Rno0 = 2;
 }
 
-// Rno0 == 2: room set-up after the room archive is loaded: player/area data, every manager's room
-// init + array allocation sized by the room "CNS" counts (models, parts, enemies, objects, sprites,
-// controllers, ctrl, lights, damage, SAT/EAT collision, events), the room data blocks (SMD/SMX
-// scroll objects, LIT lights, SHD shadows, EFF effects, EAR/SAR areas, TEX/ITM/ETM models, CAM,
-// BLK, EVS, FSE, AEV/ITA scenario collision), the room SST effects, BGM, then the fade-in and
-// Rno0 = 3.
+// Rno0 == 2: room set-up after the room archive is loaded. Sizes every manager from the room "CNS"
+// counts, loads the room data blocks, then fades in and sets Rno0 = 3.
 void gameRoomInit()
 {
     int n;
@@ -564,11 +560,8 @@ void gameRoomInit()
     pG->SaveKind = 0;
 }
 
-// Rno0 == 3: one frame of play. Order: stop-mode keys, difficulty update, died-demo check,
-// scenario collision + action button, ScenarioMove, EmMgr.move (every other_slow-th frame during
-// the weapon zoom slow-motion), player move, ObjMgr/CtrlMgr, camera, effect areas/controllers/
-// sprites, lights, damage, debug displays, light areas, cockpit, sub screen; the Z (Key 0x2000)
-// button opens the option screen (Rno0 = 6) when OptionOpenCheck allows.
+// Rno0 == 3: one frame of play, running every manager in turn. The Z button opens the option
+// screen (Rno0 = 6) when OptionOpenCheck allows.
 void gameMainLoop()
 {
     static int other_slow = 3;

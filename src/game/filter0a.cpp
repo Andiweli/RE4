@@ -1,7 +1,5 @@
-// game/filter0a: masked blur filter (D:/Bio4/Prog/filter0a.cpp). Quarter-size feedback blur of the
-// frame blended back through an ID-system texture mask (filter0a_mask_id, alpha filter0a_mask_alpha):
-// the scope / binocular vignette. Runs while use_filter0a is set and the scope flag Status_flg[1]
-// 0x04000000 is off.
+// game/filter0a (D:/Bio4/Prog/filter0a.cpp): masked blur filter that blends a feedback blur of the
+// frame back through an ID-system texture mask, used for the scope and binocular vignette.
 #include "filter.h"
 #include "light.h"
 #include "gx.h"

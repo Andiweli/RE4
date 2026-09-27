@@ -95,12 +95,8 @@ static const Vec r204_chandRot0 = {0.0f, -1.5707964f, 0.0f};
 static const Vec r204_chandRot1 = {0.0f, 1.5707964f, 0.0f};
 static const Vec r204_chandOfs = {0.0f, 5826.0f, 5610.0f};
 
-// Room init (the chandelier hall): Debug_flg[1] 0x20000; JumpPoint 1 fakes an entry from r205 Part 1.
-// The s00 callback, area 2 = the chapter-end event, the terminal once the event ran (bits 0/7), the
-// switch / barred door handles, areas 5/6 = the two chandelier swings. Arriving from r205 upstairs
-// (Part 1) starts the mob chase (first cut once, bit 1); once the chase is on (bit 1) and not yet
-// escaped (bit 2): the eleven Ganados with their torch heads and flame effects, the death watcher and
-// the chase task (nige_check); else the calm layout. Areas, the water render target, box / shelf items.
+// Room init for the chandelier hall. Arriving from r205 upstairs starts the mob chase, and until the
+// player escapes the room holds the eleven torch Ganados and the chase task (nige_check).
 void R204Init()
 {
     R204Work** wp;
@@ -511,11 +507,8 @@ static void r204_first_cut()
 }
 
 
-// The chase task ("nige" = escape): counts frames from the mob's first move; camera cuts 0xF/0x10 as
-// the Ganado with the torch (em[7]) charges, scripted run orders to the far points at fixed counts, the
-// mob follows the player down; after count 0x12C the door object 0x39 lowers and door5_close runs when
-// it drops below 1800 (or after 0x1C1 frames with a Ganado far back); once all are dead the survivors'
-// orders end and the exit flags are set; the escape-through-the-door checks the player's position.
+// The chase task ("nige" = escape): counts frames from the mob's first move and runs the scripted
+// camera cuts, run orders and door close. Once all are dead the orders end and the exit flags are set.
 static void r204_nige_check()
 {
     int started = 0;

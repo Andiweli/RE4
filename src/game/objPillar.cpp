@@ -1,7 +1,5 @@
-// game/objPillar: object id 0x1F, the falling pillar of the Salazar / statue fights
-// (D:/Bio4/Prog/objPillar.cpp): stands (R0 0), topples onto the player (R0 1 Break) or is thrown
-// at him (R0 2 Throw); the player escapes with action button 0x25 (plemEscape / plemEscape2,
-// run as player damage routines) or is crushed (objPillarAtkCk); R0 4 Fall drops it as debris.
+// game/objPillar (D:/Bio4/Prog/objPillar.cpp): object id 0x1F, the falling pillar of the Salazar /
+// statue fights, which topples onto or is thrown at the player.
 #include "atari.h"
 #include "atari_init.h"
 #include "light.h"

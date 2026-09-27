@@ -1,15 +1,5 @@
-// em3e module (D:/Bio4/Prog/emmark.cpp): the shooting-gallery targets (cEmMark) of room 22c. The room
-// creates a target from an EmMarkData record; the target then runs its instruction list (begin: rise,
-// stay: wait N frames, move: walk to an integer position, end: fold down / vanish) and reports hits to
-// the room through R22cHitMark / R22cHitEffect.
-//
-// em3eInit is the module's EmInitFunc; the room (st2 r22c) then calls cEmMark::init with the
-// record. Types 0..6 are the targets (0 Ganado, 1, 2 Ashley = the "don't shoot" target that folds
-// when older targets remain, 3 the bottle, 4 / 5 tougher ones, 6 with a bonus box on hit[3]),
-// 0xA..0xF the gallery scenery walls (hp 1000, hits reported as R22cHitEffect). r_no_0 is the
-// running instruction (0 begin, 1 end, 2 stay, 3 move, 4 none), r_no_1 / r_no_2 its steps; the
-// target pops up by rotating ang.x from PI/2 to 0 and folds back down. EmMarkWork (em3e.h):
-// pInst the instruction cursor, age frames since the pop-up, timer, downTimer, hit[] boxes.
+// em3e module (D:/Bio4/Prog/emmark.cpp): the shooting-gallery targets (cEmMark) of room st2 r22c.
+// The room creates each target, which runs its instruction list and reports hits through R22cHitMark.
 
 #include "atari.h"
 #include "light.h"
@@ -55,11 +45,8 @@ void cEmMark::init(EmMarkData* d)
     init(d->type, d->inst, (f32) d->X, (f32) d->Y, (f32) d->Z);
 }
 
-// Builds the target at (x, y, z): the model by type (targets from the module archive, walls
-// 0xA..0xF from the room's scroll objects), type 5 six times larger and upside down, a light
-// area (1 m for targets, 10 m for walls), hp (1 / 5 / 10 / 1000), the effects (archive 4 as
-// group 0x33), the hit cubes (head / chest / body / legs, plus the bonus box of type 6 and the
-// wall panels), type 6's bonus glow, and the instruction cursor at `inst` with age 0.
+// Builds the target at (x, y, z). Targets take their model from the module archive and walls from
+// the room's scroll objects, and the instruction cursor starts at `inst` with age 0.
 void cEmMark::init(u8 type, EmMarkInst* inst, f32 x, f32 y, f32 z)
 {
     static const Vec ofs = { 0.0f, 0.0f, 0.0f };
@@ -430,11 +417,8 @@ static void emmark_none(cEmMark* em)
 {
 }
 
-// Hit of the frame (cEm::dmg.m_Flag set by PlWepHitCheck2): a wall reports its panel (setEffWall);
-// a target loses 1 hp; the hit kind is 5 for grenades, 2 for type 6's bonus box, 1 for the head
-// box (hitInfo), 0 for the body. Killed: the break effect and R22cHitMark(type, headshot, pos,
-// 1, age), then the end instruction; still alive: a hit effect, R22cHitMark(..., 3 / 2, ..., 0,
-// age) and the target tilts back PI/7.
+// Hit of the frame, from cEm::dmg.m_Flag set by PlWepHitCheck2. A wall reports its panel through
+// setEffWall, and a target reports the hit kind to the room through R22cHitMark.
 void cEmMark::damageCheck()
 {
     int eff;

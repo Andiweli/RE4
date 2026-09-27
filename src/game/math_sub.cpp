@@ -1,8 +1,5 @@
-// game/math_sub: vector/matrix helpers shared by the game code (D:/Bio4/Prog/math_sub.cpp):
-// orientation matrices from axes, matrix -> Euler angles, the game's rotation matrix convention
-// (RotMatrix = Rz * Ry * Rx, X applied first), interpolation
-// (hermite, B-spline basis), small dense matrix inverse, the fast SQRTF / SINF / COSF /
-// LIMIT_ANGLE used everywhere (paired-single Taylor sin/cos, angles in radians).
+// game/math_sub: vector/matrix helpers shared by the game code (D:/Bio4/Prog/math_sub.cpp). The
+// rotation convention is RotMatrix = Rz * Ry * Rx, so X is applied first.
 #include "types.h"
 #include "vec.h"
 #include "db_log.h"
@@ -502,11 +499,9 @@ int de_Boor_Cox(int n, f32* p, f32 t, int order, f32* B)
     return 1;
 }
 
-// Sign of the permutation (unused inline, only its constants survive).
-// Never called in this build. GCC 2.95 emits the string literal and the initializer templates of
-// the local aggregates of an unused inline function at parse time; the original object carries
-// exactly these bytes between de_Boor_Cox's and MtxNNLUDecomposition's constant pools (the
-// message is shared with MtxNNLUDecomposition). The body is a guess that reproduces the bytes.
+// Sign of the permutation, an unused inline. GCC 2.95 still emits its string literal and aggregate
+// initializers, which the original has between de_Boor_Cox's and MtxNNLUDecomposition's constant
+// pools. The body is a guess that reproduces the bytes.
 static inline f32 MtxNNPivotSign(int n, f32* a, int* ip)
 {
     fprintf(stderr, "Error: Can't calc Inverse Matrix !\n");

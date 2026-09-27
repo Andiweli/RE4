@@ -1,7 +1,5 @@
-// game/snd_str4: sound driver stream works (SND_STR_WORK, 4 slots): clear / lookup / close, the AX
-// volume and surround pan computation, DVD error detection (drive state, read starvation) with
-// the muted error-fade recovery, the per-frame MIX parameter update, and the pre-play parameter /
-// start position setters used by the game (snd.cpp SndStrReq).
+// game/snd_str4: sound driver stream works (SND_STR_WORK), with their volume, pan and DVD error
+// recovery, plus the setters the game uses from snd.cpp SndStrReq.
 #include "snd_drv.h"
 
 // Clears the 4 stream works (numbered).

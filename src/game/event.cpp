@@ -205,11 +205,9 @@ int Event::init(char* nm, EvtHeader* data)
     return 0;
 }
 
-// One event frame: executes every packet due at (NowCut, NowFrame), then the end-of-event
-// automatics (bit 0x400: fade to black 30 frames before the end; bit 0x200: the died demo),
-// fog/focus curves, the stream re-sync (bit 0x10000), the room's evt func (mode 1), model
-// visibility (ControlTransFlag), the action button and the frame/cut advance. Returns 0 on a
-// packet error (the manager then deletes the event).
+// One event frame: executes the packets due at (NowCut, NowFrame), the end-of-event automatics and
+// the room's evt func, then advances the frame. Returns 0 on a packet error, and the manager then
+// deletes the event.
 int Event::Run()
 {
     int flg;
@@ -1528,11 +1526,8 @@ void Event::ExeBeginEvt(Event* pEvt, int FlagCommon)
     }
 }
 
-// Event end: moves the real player to the event body's position/heading (unless bit 0x800), returns
-// the partner behind the player (unless bit 0x40), releases every registered model (player
-// endEvent0, obj18 bodies destroyed, parts destroyed, type-5 motions cleared), the effect data,
-// all event effects, restores room lighting and the camera, clears messages/shadows, runs the evt
-// func in end mode (2), reloads the stage font and ends the event sound / scenario state.
+// Event end: moves the real player to the event body's position, returns the partner, releases the
+// event's models and effects, and restores the room lighting, camera, stage font and sound state.
 void Event::ExeEndEvt(Event* pEvt, u32 FlagCommon)
 {
     Vec pos;
@@ -2404,11 +2399,8 @@ int EventMgr::EvtReadSub(char* pNameEvt, int loadType, int emId, int* pPtr, int 
     return 1;
 }
 
-// The scenario's "play event" call: marks the event state, loads the file (MRAM, into module `em`),
-// creates the event with the option bits (2 died demo + keep, 0x40 keep alive, 0x20 no player
-// reposition, 0x10 auto fade, 0x80 true scenario start, 0x100 no partner recall, 4 fade in after,
-// 0x200 wait for SceCheckEventStart), sleeps until it is gone, then frees the file and clears the
-// event state (unless kept). Returns 0 when the load failed.
+// The scenario's "play event" call: loads the event file, creates the event with the option bits,
+// sleeps until it is gone, then frees the file. Returns 0 when the load failed.
 int EventMgr::EvtReadExec(char* pNameEvt, int emId, u32 evtReadFlag)
 {
     int addr;

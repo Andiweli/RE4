@@ -1,8 +1,5 @@
-// game/filter01: depth-of-field filter (D:/Bio4/Prog/filter01.cpp). Blurs the pixels in front of
-// (Mode 0 near) or behind (Mode 1 far) a screen-Z focus plane by drawing a half-size copy of the
-// frame back shifted by level_tbl1[level] pixels with the Z test against the focus depth. Driven by
-// the room light environment (FocusLevel/FocusZ/FocusMode), the event focus curves
-// (Filter01SetParam_CamZ) and rooms (Filter01SetParam).
+// game/filter01: depth-of-field filter (D:/Bio4/Prog/filter01.cpp), driven by the room light
+// environment, the event focus curves (Filter01SetParam_CamZ) and rooms (Filter01SetParam).
 #include "filter.h"
 #include "light.h"
 #include "gx.h"

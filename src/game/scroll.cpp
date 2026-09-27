@@ -1,9 +1,5 @@
-// game/scroll: the room's static scenery ("scroll") objects. The room archive's SMD file lists
-// the models (cSmd: bin / tpl / motion tables and one SmdWork per placed model; the common SMD
-// pSmdComn holds the shared ones), the SMX file the per-id display parameters. SmdInit / SmdSetup
-// (BlockCreate) turn the works into cObj kind 2 objects, registered by scroll id in scrObjTbl
-// (250 ids; SmdGetObjPtr / SmdGetGroupObjPtr for the room scripts and effects) and per work in
-// scrTbl; BlockDestroy drops a block's objects again when the scroll block is unloaded.
+// game/scroll: the room's static scenery ("scroll") objects, built from the room archive's SMD and
+// SMX files and looked up by scroll id by the room scripts and effects.
 #include "types.h"
 #include "vec.h"
 #include "atari.h"

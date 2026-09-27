@@ -201,12 +201,9 @@ static f32 wepRate(cPlWep* w)
     return w->pitch;
 }
 
-// The player's weapon hit: `type` = damage kind (0..0x11 guns / knife 0x10, 0x12 blast, 0x13
-// grenade, 0x17 flash, 0x19 egg, ...), priority from the weapon's power level; a radius search
-// around pPos for the blast types, else the line pPos-pPos2 (GetWepTargetList2) up to `len`.
-// Every enemy hit gets dmg.set(type); the map hit spawns the surface effect / bell noise and water
-// shots unless flag bit0 (no map effects); flag bit1 = don't count / score the shot, bit2 = f4
-// (headshot-capable line); a miss gives the shooting-range points. Returns the number of enemies hit.
+// The player's weapon hit: a radius search around pPos for the blast types, else the line from
+// pPos to pPos2. Flag bit0 skips the map effects and bit1 skips counting the shot. Returns the
+// number of enemies hit.
 u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, f32 radius)
 {
     cPlayer* pl = (cPlayer*) pPl;
@@ -220,13 +217,8 @@ u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, 
     u32 n;
     u32 i;
 
-    // The decision tree (root 0xF, left root 7, right root 0x17, compares 3/1/2, 5, 0xB/9/0xD, 0x13/0x11/
-    // 0x15, 0x1F/0x1A/0x19/0x1C, 0x21/0x2D) is the balanced tree over 29 SEPARATE case nodes: every value
-    // has its own body (identical `prio = 1` bodies are only merged by the post-reload cross-jump), so
-    // no two consecutive values share a label; 4/8/0xC share one, placed AFTER 5/6 (body layout = source
-    // order). `case 7:` sits on the `default:` body: the 7 leaf is then a block also reached from the right
-    // (> 0xF) subtree where `cmpwi cr7,type,0x17` (the second switch's compare, PRE-shared with the 0x17
-    // root) is already available, so gcse's block LCM cannot delay the compare into it and inserts it at
+    // The decision tree is the balanced tree over 29 separate case nodes, so every value keeps its own
+    // body in source order. `case 7:` sits on the `default:` body so gcse inserts the 0x17 compare at
     // the end of the left-root block instead of in every left-side leaf.
     switch (weapon_no) {
     case 1:
@@ -622,11 +614,9 @@ cEm* cPlWep::lockInit()
     return pl->m_pEm;
 }
 
-// Distance penalty by direction: inlined into rangeDist; its constants precede rangeDist's own.
-// Lock-on distance score: the whole body (range clamp, far penalty, direction penalties) is one
-// inline with its constants as const locals declared first, which fixes the pool order
-// (0.87, 1.6e7, 2.25e8, 1e10, 4e10, 9e10, 1.6e11 before rangeDist's 0.0, 1e8, 1e12) and puts
-// the twice-used 1.6e7 high half into a callee-saved register hoisted above the calls.
+// Distance penalty by direction, inlined into rangeDist. Its constants are const locals declared
+// first, which puts them in the pool before rangeDist's own and hoists the twice-used 1.6e7 high
+// half into a callee-saved register above the calls.
 static inline f32 rangeAdd(Vec* pos, Vec* v, f32 d, f32& range)
 {
     const f32 angLim = 0.87266463f;

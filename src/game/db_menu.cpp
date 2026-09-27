@@ -1,8 +1,5 @@
-// game/db_menu.cpp: the debug tool menu (Start + Z style entry through DbMenuExec). Lists the
-// debug tools (`menu` table: name, the REL module that holds the tool or a built-in function,
-// and the tool id); selecting one loads the REL from disc, links it and runs the tool as a task
-// while the game is frozen (Stop_flg); DbMenuExitAfterCheck returns to the game and unlinks the
-// module.
+// game/db_menu.cpp: the debug tool menu (DbMenuExec). Selecting a tool loads and links its REL from
+// disc and runs it as a task while the game is frozen.
 
 #include "types.h"
 #include "map_obj.h"

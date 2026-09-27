@@ -68,11 +68,9 @@ extern "C" void EmSetZouenB()
     r10a_work->em[19].setEm(0x9F, 0, 0, 1, 1);
 }
 
-// Room init: water hit effects; areas 4/5 start the battle stream, area 2 the reinforcement check. Unless
-// Room_flg bit 2 (rock already fell): loads the IWA effect data, creates the cEmRock boulder at the top
-// of the slope with the 16 player crush/dodge motions from the room archive, and places three event
-// Ganados (id 0x12, types 1/0/3) pushing it. Then spawns the base wave and, per Room_flg bits 0/1,
-// the reinforcement waves already triggered.
+// Room init. Unless the rock already fell (Room_flg bit 2), creates the cEmRock boulder at the top
+// of the slope with three event Ganados pushing it. Then spawns the base wave and any reinforcement
+// waves already triggered.
 void R10aInit()
 {
 #line 92 "D:/Bio4/Prog/r10a.cpp"

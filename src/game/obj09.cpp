@@ -1,8 +1,5 @@
-// game/obj09: object id 9, the rigid-body effect model Efm09 (D:/Bio4/Prog/obj09.cpp): crates,
-// barrels and debris spawned by effect records (esp_efm.cpp EfmSetObj09) as boxes with mass and
-// moments of inertia. Each frame forces (gravity, corner spring/damper contacts with the scenario,
-// body-body contacts, player push, water/sand drag) are accumulated with AddForce and integrated
-// (Calc: velocity, RK2 angular velocity, orientation re-orthonormalised).
+// game/obj09: object id 9, the rigid-body effect model Efm09 (D:/Bio4/Prog/obj09.cpp), simulating the
+// crates, barrels and debris that effect records spawn through esp_efm.cpp EfmSetObj09.
 #include "atari.h"
 #include "light.h"
 #include "obj.h"

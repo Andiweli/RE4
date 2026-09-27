@@ -1,8 +1,5 @@
-// wep26 module: Krauser's knife (cObjKnife; routines wep/pl_knife.cpp = the DOL's game/pl_knife.cpp).
-//
-// The wep16 module rebuilt for Krauser (pl_type 4): the same cObjKnife (a cObjWep hanging on the
-// right hand with the player archive's knife motion, no fire / reload modes) with a smaller
-// footwork motion set; PlKnifeMove is the WeaponMoveFunc so routine 6 slashes (1200-unit reach).
+// wep26 module: Krauser's knife, the wep16 module rebuilt for Krauser with a smaller footwork motion
+// set. Its routines are wep/pl_knife.cpp (the DOL's game/pl_knife.cpp).
 
 #include "wep_mod.h"
 #include "light.h"

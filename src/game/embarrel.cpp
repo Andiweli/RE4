@@ -570,11 +570,8 @@ void emBarrel_R1_Break(cEmBarrel* pEm)
     }
 }
 
-// Rno1 == 2: the room 227 barrel rolls down the EMI route (type 6 entries): Rno2 0 finds the
-// route (one in four barrels burns and loops the fire SE), then each frame steers toward the next
-// waypoint, falls with gravity 10 and bounces on the floor (dust est / SE on hard bounces), turns
-// and spins with the travelled distance, runs the player over (emBarrelRollHitCk -> explode) or
-// kills ganados in its path; the route end or a lost route destroys it.
+// Rno1 == 2: the room 227 barrel rolls down the EMI route, and one in four barrels burns. It runs
+// the player over (emBarrelRollHitCk, then explodes) or kills ganados in its path.
 void emBarrel_R1_R227Roll(cEmBarrel* pEm)
 {
     EmBarrelWork* w = EMBARREL_WK(pEm);

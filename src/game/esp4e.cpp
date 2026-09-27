@@ -1,7 +1,5 @@
-// game/esp4e: effect id 0x4E, cloth sheet (D:/Bio4/Prog/esp4e.cpp). A Cloth grid pulled from the
-// cloth pool follows the effect's position/angle and is disturbed by two sine fields (along x and
-// y) modulated by a global "wind" phase plus the effect's m_Speed. Entry points: Esp4e_Create,
-// cEsp4e::move / SetFreeWork / Destruct.
+// game/esp4e (D:/Bio4/Prog/esp4e.cpp): effect id 0x4E, a cloth sheet from the cloth pool that
+// follows the effect and waves in sine fields driven by a global "wind" phase.
 #include "atari.h"
 #include "light.h"
 #include "math_sub.h"

@@ -1,19 +1,4 @@
-// game/dvd: DVD read queue, ARAM DMA queue, disc error screen (D:/Bio4/Prog/dvd.cpp).
-// 54/55 functions byte-identical (LinkQueue/MesSysMessage/ErrCheck: objdiff shows reloc-only rows);
-// every section has the original size and the data sections match. Initialize: no `n = name`
-// local; `name` is used directly after the if/else, so the `&name` copy (`mr r28,r29`) is a gcse
-// PRE copy inserted at the end of the else block, i.e. right after the DVDConvertPathToEntrynum
-// call (C++ EH ends the block at the call); a source-level copy is hoisted above the call.
-//  - ErrCheck: `pMes`/`pStr` (3 refs each, live around the loop, REG_EQUIV-doubled lengths
-//    390/386 -> priority buckets 76/77, the later-declared pStr won r21) share one bucket once the
-//    `flags_54` tests share one `msg = -1; cont = 0` body through a goto: the two duplicated arms
-//    were cross-jumped only in jump2, after global alloc, so they counted 2 extra insns in both
-//    ranges. Still off:
-//  - DiscChange (matching): the `game[4]` template copy loads words 0,8,c,4 because the first
-//    `pSys->eff_country` read goes through a reference (`SysRef`): a MEM without the scalar flag is not
-//    exempt from the preceding stack stores, so all four stores rank equally in sched2 and the
-//    copy keeps its template order (with a plain `pSys` only the word-4 store gated the load via
-//    the r9 anti-dependence and its load ranked first).
+// game/dvd: DVD read queue, ARAM DMA queue and disc error screen (D:/Bio4/Prog/dvd.cpp).
 #include "types.h"
 #include "dvd.h"
 

@@ -79,12 +79,9 @@ extern "C" void R120Event()
         ScfFlagOn(pG, SCF_R120_EVENT_CANCEL);
     }
     SceEventStart(0);
-    // Two sequential `if`s whose first test masks with a variable: the mask register keeps
-    // jump1's thread_jumps from folding the first branch into the second (REG_USERVAR_P regs are
-    // never equivalent there), so gcse sees the s01 block undominated and its EvtMgr/string highs
-    // stay fresh; cse1 then propagates the constant and the post-loop thread_jumps redirects the
-    // first `bne` past the s01 block, which merges the second test into the call block (its
-    // tail jump gives the `li r7/r8` an extra dependent, so sched puts `addi r3,r30` last).
+    // The first of the two sequential `if`s masks with a variable so jump1's thread_jumps cannot fold
+    // its branch into the second early. That keeps the EvtMgr/string highs of the s01 block fresh and
+    // gives the target's block layout, with `addi r3,r30` last.
     u32 mask = 0x10;
     if (!(pG->Scenario_flg[1] & mask)) {
         EvtMgr.EvtReadAram("event/evd/r120s01.evd", 0, 0, 0, 0);
@@ -128,12 +125,8 @@ static inline void r120_setTrans(int on)
     }
 }
 
-// Per-frame callback of event r120s00 (the drive to the village: Leon in the back of the police car).
-// funcMode 0 = setup (hide the replaced scroll objects, ID display 0x21 off); funcMode 1 = per cut/frame:
-// parents the headlight (kind-1 light) to car model obm3000c on cuts 1/8, feeds the mirror render on cut
-// 0, and sets draw flags / ot_type / CMF on the Leon model pl0010, the car interior obm3010f and the
-// villager obm1a00 per cut; the first frame of cut 0 fades in unless the event was skipped (StatusFlag
-// 0x40000000).
+// Per-frame callback of event r120s00 (the drive to the village, Leon in the back of the police car).
+// The first frame of cut 0 fades in unless the event was skipped (StatusFlag 0x40000000).
 extern "C" void Evt_R120S00_Func(Event* e)
 {
     void* lmod;
@@ -266,11 +259,8 @@ extern "C" void Evt_R120S00_Func(Event* e)
     }
 }
 
-// Per-frame callback of event r120s01 (the car stops at the village road, Leon gets out). funcMode 0
-// hides scroll objects 0x17..0x1A; funcMode 1 shows the car parts obm3000a/b/e/f (CMF on, be_flag draw)
-// on cuts 3/5/0xE, sets Leon / interior / evm0000 (the officers) flags per cut and feeds the mirror render
-// on cuts 2/6; funcMode 2 (end) restores the scroll objects, clears Disp_flg 0x08000000 and sets
-// System_flg 0x400; funcMode 3 sets Scenario_flg[1] bit 0x10 (intro seen).
+// Per-frame callback of event r120s01 (the car stops at the village road and Leon gets out).
+// funcMode 3 sets Scenario_flg[1] bit 0x10, which marks the intro as seen.
 extern "C" void Evt_R120S01_Func(Event* e)
 {
     void* mod;

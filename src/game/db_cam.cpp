@@ -1,8 +1,5 @@
-// game/db_cam.cpp: the debug camera tool (CamDbg), driven from CameraMove with pad 1. Any input
-// takes the camera away from the game (Debug_flg[0] 0x10000000, B gives it back); two control
-// layouts orbit / dolly / zoom it, A snaps the target onto the selected enemy / object / player,
-// Z opens a menu with pages for debug flags, camera cut playback, hit display switches and the
-// shoulder camera offset editor (adjust_qFPS, shared with the t_camera tool).
+// game/db_cam.cpp: the debug camera tool (CamDbg), driven from CameraMove with pad 1. Its shoulder
+// camera offset editor (adjust_qFPS) is shared with the t_camera tool.
 
 #include "types.h"
 #include "vec.h"
@@ -51,11 +48,8 @@ static inline void Dec(int& v) { v--; }
 #define QOFS(p) ((QfpsOfs*) (p))
 #define QOFS_CAMPOS2 0xC
 
-// Per-frame: Z toggles the menu (pauses the debug page), the menu page runs when open; otherwise
-// input claims the camera (Debug_flg[0] 0x10000000, B releases unless `flag` bit0), the target
-// type (EM / OBJ / PL / ORG) with A snaps the look-at to the selected work (Left / Right pick it,
-// R + A steps its motion), the layout's control routine runs, and the camera info / target cross
-// are drawn.
+// Per-frame update. Z toggles the menu, otherwise any input takes the camera from the game and A
+// snaps the look-at to the selected enemy, object or player.
 void debugCamera::move(CAMERA* pCam, JOY* pJoy, int attr)
 {
     static void (debugCamera::*camera_type_tbl[4])(CAMERA*, JOY*) = {
@@ -743,20 +737,9 @@ int debugCamera::menuFlag(JOY* pJoy)
     x = 30;
     y = 21;
     eprintf(x * 8, (y - 1) * 14, 5, 0, "------ FLAG ------");
-    // `(y + i) * 14` is written out in every row: PRE shares one `y + i` (r25) for the arms, and in
-    // the `case 6` arm cse already knows i == 6, so its `y + 6` becomes the hoisted `li r19,27`.
-    // The ON/OFF columns are locals (`xon`/`xoff` below): gcse cprop turns `x + 19` into `li 49`
-    // and loop.c keeps a 1-insn-lifetime constant in the arm (thr 71 * life 1 < ic 194, then
-    // combine folds it into `li r3,392`); a local assigned before the `if (on)` lives long enough
-    // to be hoisted (`li r20,49; slwi r3,r20,3`) and takes the extra callee-saved slot (r16..r31).
-    // The key/target j-loops compute their colour in a statement (`cj`) before the call: with the
-    // ternary inside the argument list the `(y + i) * 14` mult sits before the ternary's join label,
-    // so loop.c cannot substitute it into its single use (`no_labels_between_p`) and hoists it
-    // instead; as a statement the mult follows the join, is folded into `r4 = P * 14` (a hard-reg
-    // dest, never movable) and stays in the loop (`mulli r4,r25,14`). That keeps the shared `y + i`
-    // (r25) live across the loop calls, which lets sched1 move the PRE copy `mr r25,r4` up to the
-    // head's `addi` (REG_N_CALLS_CROSSED != 0 -> no anti-dependence on the head call), so the head's
-    // own `y + i` dies at its mult and gets r4 (`mulli r4,r4,14`).
+    // `(y + i) * 14` is written out in every row, the ON/OFF columns are the locals `xon`/`xoff`, and
+    // the j-loops compute their colour in the statement `cj` before the call. Each form controls what
+    // loop.c hoists and which registers PRE and sched1 end up with, to match the target.
     for (i = 0; i < 7; i++) {
         int col = (i == m_sel1) ? 4 : 0;
         u8 c = col;
@@ -1147,12 +1130,8 @@ void drawGround(int flag)
     Draw_line3d(&a, &b, 0xFFFFFFFF, 0);
 }
 
-// The shoulder camera offset editor: a menu (Select Site, Symmetry, Follow Grnd, Fovy, Reset)
-// over the 2 x 3 (left / right x up / mid / down) ready and transition offset tables; the stick
-// moves the selected site's camera / close / target points in player space (mirrored to the
-// other side with Symmetry), edits go into the area override tables through
-// CameraQuasiFPS::setAreaData. flag bit0 resets the editor state. Returns 1 while a value was
-// changed, -1 on exit.
+// The shoulder camera offset editor. Edits go into the area override tables through
+// CameraQuasiFPS::setAreaData. Returns 1 while a value was changed, -1 on exit.
 int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
 {
     static const char* menu_str[5] = {"Select Site", "Symmetry", "Follow Grnd", "Fovy", "Reset"};

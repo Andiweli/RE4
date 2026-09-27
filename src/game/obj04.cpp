@@ -1,7 +1,5 @@
-// game/obj04: object id 4, the effect model Efm04 (D:/Bio4/Prog/obj04.cpp): a model spawned by an
-// effect record (esp_efm.cpp EfmSetObj04) that flies with speed/acceleration/damping, spins,
-// scales and fades over its life, follows its parent parts until rotFrame, and bounces off the
-// scenario and floor (flags bit 1) until it comes to rest.
+// game/obj04 (D:/Bio4/Prog/obj04.cpp): object id 4, the effect model Efm04, spawned by EfmSetObj04
+// in esp_efm.cpp. It flies, spins and fades over its life and can bounce until it comes to rest.
 #include "atari.h"
 #include "obj.h"
 #include "obj04.h"

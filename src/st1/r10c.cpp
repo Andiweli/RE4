@@ -99,13 +99,9 @@ static void hako_down(cObj* obj);
 static void r10c_ItemGet();
 extern "C" void eat_swap();
 
-// Room init: pre-reads Ganado 0x12; JumpPoint 1 (arriving from below) sets Room_flg[0] 0x04000000 (the
-// lower bank). Creates the pool water attribute, rain on the player, thunder and water-wheel tasks, the
-// water render target; areas 3/4 = the ladder climb between banks; area 5 = the drain switch until
-// Room_flg bit 5 (then the lever is posed pulled); area 1 = the axe-thrower event until bit 1; the crate
-// hit boxes and battle-stream tasks; area 0x80 = the key item. Bit 8 / bit 5 set: the drained layout
-// (gates open, drained water attribute, ambush on area 8 unless bit 9), else the full pool with its
-// attribute sounds. Bits 11..13: the fallen crates' collision. Areas 0xC/0xD only in Japanese.
+// Room init: the pool with its drain switch, the ladders between the banks, the axe-thrower event and
+// the key item. Once drained (Room_flg bit 8 / bit 5) it uses the drained layout with an ambush.
+// Areas 0xC/0xD are only set up in Japanese.
 void R10cInit()
 {
 #line 113 "D:/Bio4/Prog/r10c.cpp"

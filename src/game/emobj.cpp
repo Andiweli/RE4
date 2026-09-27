@@ -178,11 +178,9 @@ void cEmObj::setYarare(s16 no, Vec* pos, u16 flag, int cube, f32 w, f32 h, f32 r
         p.y = pos->y;
         p.z = pos->z;
     }
-    // The original re-extends both narrow parameters at the calls (`extsh r4, r4`, `clrlwi r5, r6, 16`
-    // after `ori r6, r6, 1`): its compiler does not assume promoted incoming arguments (the
-    // narrow-argument compiler difference). Ours does (combine's setup_incoming_promotions), so every
-    // int/narrow/cast form folds the extensions away; the empty asms hide the promotion from combine
-    // and `f` is pinned to flag's incoming r6 so the `ori` stays in place.
+    // The original re-extends both narrow parameters at the calls because its compiler does not assume
+    // promoted incoming arguments. Ours does, so the empty asms hide the promotion from combine and
+    // `f` is pinned to flag's incoming r6 so the `ori` stays in place.
     register int f asm("r6") = flag;
     int n = no;
     asm("" : "+r"(n));

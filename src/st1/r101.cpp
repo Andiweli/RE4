@@ -104,13 +104,9 @@ static inline void r101_emDeadClear(int no)
     }
 }
 
-// Room init (the village, chapter 1-1): the ten reset-wave handles; first visit (Scenario_flg[0] 0x2000)
-// = typewriter + save; s21/s30 callbacks, floor hit effects, door 0xB lock models, rack ranges. Before
-// the bell (Room_flg bit 7): until the fight starts (bit 6) the find-player watcher, the Ganado voices
-// (area 0x13), the s00 binocular event (area 7), the kill counter, the door messages (areas 0/2); the
-// house event s21 on area 8 with the door watcher unless bit 8; the tower siege, chicken and terminal
-// tasks. After the bell: the post-fight layout, the stream watcher. Doors: area 1 until Key_flg[0]
-// 0x02000000, area 0x19 (door 102 with its key) until 0x20000000; item area 0xA3.
+// Room init (the village, chapter 1-1). Before the bell (Room_flg bit 7) it sets up the pre-fight
+// watchers, events and the tower siege, after the bell the post-fight layout. The first visit
+// (Scenario_flg[0] 0x2000) adds the typewriter and save.
 void R101Init()
 {
     cEmDoor* door;

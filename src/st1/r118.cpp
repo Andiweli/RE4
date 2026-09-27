@@ -50,13 +50,9 @@ static void r118_ThunderFlagOn();
 static void r118_ThunderFlagOff();
 static void r118_ThunderMove();
 
-// Room init (storm): clears System_flg 0x800, hides the lit-window object 0,
-// thunder task, rain on the player, Status_flg[1] 0x400. Item area 0x80 is the door-117 key model,
-// disabled until Key_flg[0] 0x10000000 (area 4 = the locked door message, plus the key-use watcher).
-// With Scenario_flg[0] 0x00100000 (Ashley rescued): drops ESL 0x82..0x84, spawns Ganados 0x79..0x7F and
-// the dog 0x78, starts stream 1/5, the show-view event once (Room_flg bit 0), Ashley's call on area 9,
-// else the alternate layout (object 0x1B hidden, areas 8/2 off). Then the BGM task and r108's symbol
-// puzzle on dials 0x31/0x32/0x33 with message 2.
+// Room init (storm). Item area 0x80 is the door-117 key model, disabled until Key_flg[0] 0x10000000.
+// Once Ashley is rescued (Scenario_flg[0] 0x00100000) the Ganados and the dog spawn, otherwise the
+// alternate layout is used. Also runs r108's symbol puzzle.
 void R118Init()
 {
     cModel* m;

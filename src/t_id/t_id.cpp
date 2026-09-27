@@ -1,9 +1,5 @@
-// t_id REL: ToolInterfaceDesign (2D interface / sub screen designer, D:/Bio4/Prog/t_id.cpp). Edits
-// the IDSystem element tables (the .uwf files behind IdSys / IdSub: HUD, sub screens, title ...) as
-// a tree of ID_DATA elements (texture, position with paths and jitter, size / colour / rotation
-// curves, blend, mark id, groups), draws them live through the tool's own IDSystem
-// (toolIdDataEncode every frame) and loads / saves x:\soft/Room/SubScreen/<lang>/uwf/<kind>NNN.uwf.
-// Uses db_path (paths), db_sctrl (curves) and the DbRandom jitter editor.
+// t_id REL: ToolInterfaceDesign (D:/Bio4/Prog/t_id.cpp), the debug editor for the IDSystem element
+// tables in the .uwf files behind the HUD and sub screens.
 
 #include "types.h"
 #include "model.h"
@@ -1507,11 +1503,9 @@ int idEditSize(IdTool* w, int x, int y)
             }
             switch (i) {
             case 2:
-                // one table pointer PER ARM (tbl/tbl3/tbl4, each set in its own arm): a shared multi-set
-                // `tbl` has 15 refs / 180 insns (0.250) and is allocated ahead of the PRE'd `i * 0xE` copy
-                // (11 / 133, 0.248); three single-set pointers (5 refs each) come after it and share r23.
-                // A single-set pointer is not hoisted out of the i loop because the set is in a case arm,
-                // and the last arm's set in the for-init puts `li j,0` before the `lis` (LUID order)
+                // one table pointer PER ARM (tbl/tbl3/tbl4): a shared multi-set `tbl` is allocated ahead
+                // of the PRE'd `i * 0xE` copy, while three single-set pointers come after it and share r23.
+                // The last arm's set in the for-init puts `li j,0` before the `lis` (LUID order).
                 tbl = axisName;
                 // `ofs = j * 4` as a giv with TWO uses (the name address and the `ofs * 8` column): loop.c
                 // then combines the address giv into it (`lwzx r8,rOfs,rTbl`, `addi rOfs,4`) and emits the
@@ -2005,10 +1999,8 @@ int idEditRot(IdTool* w, int x, int y)
             case 2: pr = &d->rot.z; break;
             }
             // the original loop has 5 more insns than ours at loop.c time, which keeps pass 2 from
-            // hoisting the ">" string high (71 >= insn_count), and no block boundary before the latch
-            // (the `i++` is scheduled before the eprintf call): four dead `col` sets (deleted by flow,
-            // counted by loop.c) and a codeless use of `d` (its extra ref keeps d ahead of x + 0x18 in
-            // global alloc, r26/r25)
+            // hoisting the ">" string high. Four dead `col` sets make up the count, and a codeless use
+            // of `d` keeps d ahead of x + 0x18 in global alloc.
             asm("" : : "r"(d)); // COMPILER-DIFF: 3 (loop.c pass-2 insn_count)
             eprintf(x + 0x18, yy, col, 0, "%4.0f", *pr);
             col = 7; // COMPILER-DIFF: 3 (loop.c pass-2 insn_count, dead sets)
@@ -2796,13 +2788,9 @@ static void toolIdOption(IdTool* w)
     for (i = 0; i <= 2; i++) {
         int y = (r0 + i) * 0xE;
 
-        // col/sx before the menu-name eprintf: `sx = 0x2E` is a pass-1 movable
-        // moved ahead of the optMenuName lo_sum, so the lo_sum's threshold drops
-        // to 65*1*2 = 130 < 131 real insns and it stays until loop pass 2, whose
-        // hoists land after the pass-1 langName2/Screen/pool pairs (the target's
-        // preheader order). r1/r2 stay in the same ebb as the loop top, before the
-        // if/switch so cse1 does not fold the case constants; mx/vx computed from
-        // cx right before use so they hoist in loop pass 2 (after the giv inits).
+        // col/sx before the menu-name eprintf so the optMenuName lo_sum is hoisted in loop pass 2,
+        // giving the target's preheader order. r1/r2 stay before the if/switch so cse1 does not fold
+        // the case constants, and mx/vx are computed right before use so they hoist in pass 2.
         col = (i == optCur) ? 4 : 0;
         sx = 0x2E;
         eprintf(cx << 3, y, col, 0, "%s", optMenuName[i]);
@@ -3797,11 +3785,9 @@ void toolIdSpace(u8 parentNo, u8 no, int n)
     }
     n -= i;
     {
-        // a SEPARATE counter: reusing `i` makes loop.c emit the reversed biv's final value (`i = 0xC0`)
-        // after the loop because i's first uid is the while loop's init, and that dead insn's empty block
-        // (only successor = EXIT) disables every haifa region of the function (no `cmpw cr7` hoist in the
-        // while loop). The increment inside the arm is speculated into the test block by the region
-        // scheduler (`add r11` before `cmplw`, fresh register).
+        // a SEPARATE counter: reusing `i` makes loop.c emit the reversed biv's final value after the
+        // loop, and that dead insn's empty block disables every haifa region of the function, so the
+        // while loop loses its `cmpw cr7` hoist.
         int j;
 
         for (j = 0, p = idData; j < ID_DATA_NUM; j++, p++) {

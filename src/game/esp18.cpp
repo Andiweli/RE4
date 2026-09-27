@@ -1,9 +1,5 @@
-// game/esp18.cpp: effect id 0x18, the heat shimmer / radial blur sprite. Its trans copies the
-// frame buffer (temp buffer 1, or 2 with Tool_flg 0x1000) at half resolution and redraws the
-// sprite quad esp18_lp (8) times with the copy projected onto it, each layer a little more
-// scaled (blur_rate = -Vec0.x) and offset on a circle, alpha 1 / (i + 2), with the sprite's own
-// texture as an indirect-texture distortion map. Used for heat haze, explosions and the
-// underwater / poison screen wobble.
+// game/esp18.cpp: effect id 0x18, the heat shimmer / radial blur sprite drawn from layered copies of
+// the frame buffer. Used for heat haze, explosions and the underwater / poison screen wobble.
 
 #include "atari.h"
 #include "light.h"
@@ -205,11 +201,9 @@ void Esp18_Trans(cEsp18* esp)
             t1 = s1;
         }
     }
-    // `ang = 0.0f` sits above the esp18_div guard test (its pool load is in the block before it).
-    // In the loop, texGens/stages are counters: `= 0` at the body top (the fog zero canonicalises
-    // to texGens' register), `++` per texgen/tev stage set up; the `= 2` value comes from gcse's
-    // constant propagation, so its later uses stay `mr r3,r25` / `addi r25,r25,1`, and the
-    // stack `1` of GXInitTexObjCI is not cse'd to `stages` (stages is `stages++`, unknown).
+    // `ang = 0.0f` sits above the esp18_div guard test so its pool load lands in the block before it.
+    // texGens and stages are counters rather than constants, so gcse's constant propagation keeps the
+    // target's `mr r3,r25` / `addi r25,r25,1` and does not cse the stack `1` of GXInitTexObjCI.
     static u32 esp18_lp = 8;
     ang = 0.0f;
     static f32 esp18_div = 1.0f / (f32) esp18_lp;

@@ -1,7 +1,5 @@
-// game/esp1a.cpp: effect id 0x1A, a camera-plane jitter sprite (like esp0b) that is spawned along
-// the axis of a model part: the +y axis of parts Work8[0] gives the direction, R_pos.x / .y the
-// min / max distance along it and R_pos.z the radius of a random disc around it. The sprite is
-// detached into world space at spawn; Vec0 gives the per-frame jitter amplitudes.
+// game/esp1a.cpp: effect id 0x1A, a camera-plane jitter sprite like esp0b, spawned along the +y
+// axis of a model part and then detached into world space.
 
 #include "atari.h"
 #include "global.h"

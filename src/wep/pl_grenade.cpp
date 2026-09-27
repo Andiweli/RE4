@@ -1,16 +1,7 @@
 #include "objSubWep.h"
-// Grenade player routines (the pl_grenade object of the hand grenade modules wep19/30/41/42/45,
-// byte-identical in all five; real file name unknown): routine 2 of the player while a throwable is
-// equipped: ready (draw + aim, stance by the up/down keys), set (idle / turn), fire (throw), down
-// and next target (routine 5). Modelled on game/pl_knife.cpp / wep/pl_handgun.cpp.
-//
-// Entry: PlGrenadeMove is the module's WeaponMoveFunc (pl_R1_Weapon, r_no_1 == 6). r_no_2 is the
-// weapon state (0 ready, 1 set, 2 fire = throw, 3 down, 5 next target; 4 reload is an error),
-// r_no_3 the step. The ammo is the item count (ItemMgr.bulletNum); the throw creates a cSubWep
-// object (game/objSubWep.cpp) by weapon number: 0x13 hand grenade, 0x16 incendiary, 0x17 flash,
-// 0x19/0x1F/0x20 the eggs. The grenade in the hand is the weapon's second object pObj2, the one on
-// the belt m_pWep. Weapon archive slots: 0xF draw, 0x10 holster, 0x11/0x14/0x17 aim idle
-// down/level/up (mot3 pitch on m3r), 0x12/0x15/0x18 throw, 0x13/0x16/0x19 throw of the last one.
+// Grenade player routines of the hand grenade modules wep19/30/41/42/45 (byte-identical in all five,
+// real file name unknown). PlGrenadeMove is the WeaponMoveFunc, and the throw creates a cSubWep
+// object (game/objSubWep.cpp) by weapon number.
 
 #include "atari.h"
 #include "light.h"

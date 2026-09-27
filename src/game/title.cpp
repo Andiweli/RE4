@@ -542,11 +542,8 @@ int titleLevelSelect(TitleWork* w)
     return 0;
 }
 
-// State 5, the main menu: Rno1 0 menu setup, 1 selection (new game -> the fade-out into the game
-// (Rno1 3), Ada / Mercenaries -> the omake screens (state 6) with System_flg bit31 / 0x40000000,
-// load -> the card (7), options -> the option screen (4)), 2 difficulty select, 5 / 6 the demo
-// movies after 600 idle frames (e3_jpn.sfd, then demo0 / demo1 alternating), 8 the "no save"
-// message. The background scrolls (titleLoop) meanwhile.
+// State 5, the main menu, which leads to the game, the omake screens, the card, the options or the
+// difficulty select. The demo movies play after 600 idle frames.
 void titleMain(TitleWork* w)
 {
     static int demo_loop_cnt = 0;

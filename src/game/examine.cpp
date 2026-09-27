@@ -1,9 +1,5 @@
-// game/examine: the item examine screen (D:/Bio4/Prog/examine.cpp). ItemExamine takes the item
-// or weapon model out of the inventory/merchant screen, centres it, spins it (or lets the player
-// rotate/zoom it in the treasure viewer mode 2), draws it over a blurred copy of the frame buffer
-// (store/render through the OT) with its own lights and camera, and shows the weapon level bars
-// (idSet). exam_info[] holds per-item view rotation, scale, light set and spin axis flags; modes:
-// 0 inventory, 1 merchant (ext table), 2 treasure viewer.
+// game/examine: the item examine screen (D:/Bio4/Prog/examine.cpp), used by the inventory, the
+// merchant screen and the treasure viewer to show an item model over a blurred frame.
 #include "types.h"
 #include "light.h"
 #include "atari.h"
