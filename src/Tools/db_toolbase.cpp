@@ -107,7 +107,7 @@ int cDbgWindow::FindButton(int bcx, int bcy, cDbgButton** out)
 
     *out = 0;
     for (i = 0; i < m_nBut; i++) {
-        if (m_pButList[i]->m_cx == bcx && m_pButList[i]->m_cy == bcy) {
+        if (m_pButList[i]->GetCx() == bcx && m_pButList[i]->GetCy() == bcy) {
             *out = m_pButList[i];
             return 1;
         }
@@ -120,44 +120,8 @@ int cDbgWindow::FindButton(int bcx, int bcy, cDbgButton** out)
 int cDbgWindow::LocalUpdate()
 {
     int ret = 1;
-    int bcx;
-    int bcy;
-    u32 rep;
 
-    bcx = GetCx();
-    bcy = GetCy();
-    rep = Joy[0].rep;
-    if (rep & 0x10001) {
-        bcx--;
-    }
-    if (rep & 0x20002) {
-        bcx++;
-    }
-    if (rep & 0x80008) {
-        bcy--;
-    }
-    if (rep & 0x40004) {
-        bcy++;
-    }
-    if (bcx < 0) {
-        bcx = m_max_cx;
-    }
-    if (bcy < 0) {
-        bcy = m_max_cy;
-    }
-    if (bcx > m_max_cx) {
-        bcx = 0;
-    }
-    if (bcy > m_max_cy) {
-        bcy = 0;
-    }
-    if (bcx != GetCx() || bcy != GetCy()) {
-        cDbgButton* b;
-
-        if (FindButton(bcx, bcy, &b)) {
-            m_pCurrentBut = b;
-        }
-    }
+    CursorMove();
     ButtonAllUpdate();
     if (Joy[0].trg & 0x200) {
         ret = 0;

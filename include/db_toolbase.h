@@ -45,6 +45,21 @@ public:
         strcpy(m_pStr, name);
         return 1;
     }
+    int GetCx() { return m_cx; }
+    int GetCy() { return m_cy; }
+    // Replaces the label (truncated to the allocated length).
+    void SetString(const char* s) {
+        if (strlen(s) > m_strlen) {
+            u32 i;
+
+            for (i = 0; i < m_strlen - 2; i++) {
+                m_pStr[i] = s[i];
+            }
+            m_pStr[i] = 0;
+        } else {
+            strcpy(m_pStr, s);
+        }
+    }
 };
 
 // The cursor mark of cDbgWindow::LocalDisp (a header inline owns it: it opens the .rodata string
@@ -64,9 +79,21 @@ public:
     int m_max_cx;          // 0x10  largest button cursor column
     int m_max_cy;          // 0x14  largest button cursor row
     const char* m_pTitle;  // 0x18  title
-    int x1C;
-    int x20;
+protected:
+    int m_IsPushed;        // 0x1C  the decide button was pressed this frame
+    int m_IsCanceled;      // 0x20  the cancel button was pressed this frame
     // 0x24 vptr
+
+    void SetPushed() { m_IsPushed = 1; }
+    void SetCanceled() { m_IsCanceled = 1; }
+
+public:
+    int IsPushed() { return m_IsPushed; }
+    int IsCanceled() { return m_IsCanceled; }
+    // decide / cancel flags from the pad, then LocalUpdate; the frame and title, then LocalDisp
+    // (defined in dbg_tool.h)
+    int Update();
+    void Disp();
 
     virtual ~cDbgWindowBase() {}
     virtual int GetCx() { return 0; }
@@ -112,8 +139,8 @@ public:
         m_max_cx = 1;
         m_max_cy = 1;
         m_pTitle = name;
-        x1C = 0;
-        x20 = 0;
+        m_IsPushed = 0;
+        m_IsCanceled = 0;
         // COMPILER-DIFF: #13 -- the original stores the REG_EQUIV zero as a constant: the zero's
         // `li` is not in its sched1 (reload re-creates it after `li 1`) and the last zero store
         // carries no death. The two dead loop notes split our sched1 region so that `li 1` outranks
@@ -145,14 +172,14 @@ public:
         if (m_pCurrentBut == 0) {
             return 0;
         }
-        return m_pCurrentBut->m_cx;
+        return m_pCurrentBut->GetCx();
     }
     virtual int GetCy()
     {
         if (m_pCurrentBut == 0) {
             return 0;
         }
-        return m_pCurrentBut->m_cy;
+        return m_pCurrentBut->GetCy();
     }
     virtual void SetCurrentTopButton() { m_pCurrentBut = m_pStartBut; }
     virtual void SetCurrentBottomButton() { m_pCurrentBut = m_pEndBut; }
@@ -174,6 +201,10 @@ public:
     void AddButton(int x, int y, const char* name, int cx, int cy, void (*func)(cDbgButton*),
                    void (*update)(cDbgButton*));
     int FindButton(int cx, int cy, cDbgButton** out);
+    // pad repeat moves the cursor over the button grid with wrap; a decide press runs the current button
+    // (defined in dbg_tool.h)
+    void CursorMove();
+    void ButtonPushCheck();
 };
 
 #endif

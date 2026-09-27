@@ -1439,7 +1439,7 @@ void CallbackCutNoUpdate(int no, EventMessageData::MessElem* w, cDbgButtonTempla
     char buf[0x40];
 
     sprintf(buf, "%9ld", w->CutNo);
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // Frame column pressed: left/right +-1 (A x10); 0 on B.
@@ -1457,7 +1457,7 @@ void CallbackFrameUpdate(int no, EventMessageData::MessElem* w, cDbgButtonTempla
     char buf[0x40];
 
     sprintf(buf, "%9ld", w->Frame);
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // MessNo column pressed: left/right +-1 (A x10, -1 = clear the message); 0 on B.
@@ -1478,7 +1478,7 @@ void CallbackMessNoUpdate(int no, EventMessageData::MessElem* w, cDbgButtonTempl
     char buf[0x40];
 
     sprintf(buf, "%9ld", w->MessNo);
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // Timer column pressed: left/right +-1 (A x10); 0 on B.
@@ -1496,7 +1496,7 @@ void CallbackTimerUpdate(int no, EventMessageData::MessElem* w, cDbgButtonTempla
     char buf[0x40];
 
     sprintf(buf, "%9ld", w->Timer);
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // Writes the node records of `d` as the message xml into buf and saves it as `name`.

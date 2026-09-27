@@ -122,7 +122,7 @@ void PosUpdate_callback(int no, LIGHT_AREA* w, cDbgButtonTemplate<LIGHT_AREA>* b
         h = w->area.u.xz4.height / 1000.0f;
     }
     sprintf(buf, "%6.1f %6.1f %6.1f %6.1f", pos.x, pos.y, pos.z, h);
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // Data column pressed: rows PL NO / EM NO / SUB NO (light number for the player / enemies / partner,
@@ -309,7 +309,7 @@ void AreaNoUpdate_callback(int no, LIGHT_AREA* w, cDbgButtonTemplate<LIGHT_AREA>
     buf[12] = 0;
     buf[10] = digits[n / 10];
     buf[11] = digits[n % 10];
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // OPTION window: FOG on/off (Disp_flg 0x4000); B closes.

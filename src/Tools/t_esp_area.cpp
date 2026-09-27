@@ -97,7 +97,7 @@ void PosUpdate_callback(int no, ESP_AREA* w, cDbgButtonTemplate<ESP_AREA>* b)
         h = w->area.u.xz4.height / 1000.0f;
     }
     sprintf(buf, "%6.1f %6.1f %6.1f %6.1f", pos.x, pos.y, pos.z, h);
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // Data column pressed: rows AREA NO (left/right +-1, x10 with A) and IN ROOM (toggle, flags34
@@ -176,7 +176,7 @@ void AreaNoUpdate_callback(int no, ESP_AREA* w, cDbgButtonTemplate<ESP_AREA>* b)
     buf[3] = 0;
     buf[1] = digits[n / 10];
     buf[2] = digits[n % 10];
-    DbgButtonSetName(b, buf);
+    b->SetString(buf);
 }
 
 // OPTION window: FOG on/off (Disp_flg 0x4000); B closes.
