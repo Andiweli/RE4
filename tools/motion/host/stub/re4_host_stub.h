@@ -92,7 +92,7 @@ struct MotionData {
     u8 nParts;
 };
 
-struct AttachCamera {
+struct ATTACH_CAMERA {
     u8 parts[5];
     u8 type;
     u8 frame;
@@ -103,7 +103,7 @@ struct AttachCamera {
     u16 history[5][3];
 };
 
-struct MotionWorkSub {
+struct MOTION_INFO {
     MotionData* pMot;
     u32* pHermite_data;   // u32 key pointers: the motion image lives in the low 4 GB (MAP_32BIT)
     u16 Key_hist[2][2][3];
@@ -140,11 +140,11 @@ struct MotionWorkSub {
     u8 Hokan_cnt;
     u8 pad_C6[2];
     f32 Brate;
-    AttachCamera* pAttachCam;
+    ATTACH_CAMERA* pAttachCam;
 };
 
-struct MotionWork : public MotionWorkSub {
-    MotionWorkSub* blend;
+struct MotionWork : public MOTION_INFO {
+    MOTION_INFO* blend;
     u16* flip;
     u16* blendTbl;
 };
@@ -256,8 +256,8 @@ struct Log {
 extern Log* pLog;
 
 struct CamCtrlStub {
-    void registAttachCamera(AttachCamera* cam, cModel* m);
-    void deleteAttachCamera(AttachCamera* cam, cModel* m);
+    void registAttachCamera(ATTACH_CAMERA* cam, cModel* m);
+    void deleteAttachCamera(ATTACH_CAMERA* cam, cModel* m);
 };
 extern CamCtrlStub CamCtrl;
 
@@ -294,7 +294,7 @@ void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst);
 void PSMTXMultVecSR(const Mtx m, const Vec* src, Vec* dst);
 void C_QUATMtx(Quaternion* q, const Mtx m);
 void C_QUATSlerp(const Quaternion* p, const Quaternion* q, Quaternion* r, f32 t);
-void IKInit(cModel* m, MotionWorkSub* w);
+void IKInit(cModel* m, MOTION_INFO* w);
 void InverseKinematics(cModel* m, int flag);
 void ikCalc(cParts* root, cParts* joint, cParts* eff);
 void cModel_matBlend(cModel* m, f32 rate);
@@ -306,17 +306,17 @@ void MotionPause(cModel* m);
 void MotionClear(cModel* m, int flag);
 struct CAMERA;   // camera.h; MotionMove / MotionMoveCore take a CAMERA* the host passes as NULL
 u32 MotionMove(cModel* m, CAMERA* pCamera);
-u16 MotionMoveSub(cModel* m, MotionWorkSub* w);
-void MotionMoveCore(cModel* m, MotionWorkSub* w, CAMERA* pCamera);
-void MotionHokan(cModel* m, MotionWorkSub* w);
-void MotionGetSpeed(cModel* m, MotionWorkSub* w, int flag, Vec* pos, Vec* rot);
-void MotionAddSpeed(cModel* m, MotionWorkSub* w, Vec* pos, Vec* rot);
+u16 MotionMoveSub(cModel* m, MOTION_INFO* w);
+void MotionMoveCore(cModel* m, MOTION_INFO* w, CAMERA* pCamera);
+void MotionHokan(cModel* m, MOTION_INFO* w);
+void MotionGetSpeed(cModel* m, MOTION_INFO* w, int flag, Vec* pos, Vec* rot);
+void MotionAddSpeed(cModel* m, MOTION_INFO* w, Vec* pos, Vec* rot);
 void MotionGetPosition(cModel* m, Vec* pos, Vec* rot);
-u16 MotionSequenceCtrl(MotionWorkSub* w);
+u16 MotionSequenceCtrl(MOTION_INFO* w);
 u16 FcvGetMaxFrame(u16* data);
-f32 MotionGetMaxFrame(MotionWorkSub* w);
-f32 MotionGetCurrentFrame(MotionWorkSub* w);
-int MotionCheckCrossFrame(MotionWorkSub* w, f32 frame);
+f32 MotionGetMaxFrame(MOTION_INFO* w);
+f32 MotionGetCurrentFrame(MOTION_INFO* w);
+int MotionCheckCrossFrame(MOTION_INFO* w, f32 frame);
 int MotionGetState(cModel* m);
 void eprintf(int x, int y, int a, int b, const char* fmt, ...);
 }

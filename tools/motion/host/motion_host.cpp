@@ -46,8 +46,8 @@ void Log::err(int, int, const char* fmt, ...)
     g_errors++;
 }
 
-void CamCtrlStub::registAttachCamera(AttachCamera*, cModel*) {}
-void CamCtrlStub::deleteAttachCamera(AttachCamera*, cModel*) {}
+void CamCtrlStub::registAttachCamera(ATTACH_CAMERA*, cModel*) {}
+void CamCtrlStub::deleteAttachCamera(ATTACH_CAMERA*, cModel*) {}
 
 // No scenario collision on the host: "no floor" (InverseKinematics keeps the key target).
 f32 SatMgrStub::getFloor(Vec*, u32*, f32, f32, int) { return -100000.0f; }
