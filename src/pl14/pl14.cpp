@@ -64,8 +64,7 @@ void LuisInit(cEm* em)
     luis->equipWeapon();
 }
 
-// Routine handlers by routine number (owner->r_no_0); 4 (event) calls cSubLuis::evFunc instead.
-void (cRoutine::*cRoutine_move_tbl[18])() = {
+void (cRoutine::*cRoutine::move_tbl[18])() = {
     &cRoutine::moveFootwork,
     &cRoutine::moveDamage,
     &cRoutine::moveDie,
@@ -221,11 +220,8 @@ void cSubLuis::think()
 {
     static const Vec upPos = { 112160.0f, 3182.64f, -51016.84f };
 
-    {
-        cAction* a = &action;
-        if (a->type == 5) return;
-        if (a->type == 6) return;
-    }
+    if (action.check(5)) return;
+    if (action.check(6)) return;
 
     if (status.check(F_DAMAGED)) {
         if (r_no_0 == 4) action.set(6);
@@ -264,15 +260,15 @@ void cSubLuis::think()
     if ((s16) pG->pl_life != m_LeonHp && (s16) pG->pl_life > 0 && sameFloorCheck(this, pPL)) {
         if (m_okTime == 0) {
             m_LeonHp = pG->pl_life;
-            routine.voice.set(0x5A, 0x10, 60);
+            routine.voiceSet(0x5A, 0x10, 60);
             m_okTime = 0x5A;
         }
     }
     if (m_okTime) m_okTime--;
 
     if (thankCtr == 1) {
-        if (Rnd() & 0x30) routine.voice.set(0x5B, 7, 60);
-        else routine.voice.set(0x5C, 8, 60);
+        if (Rnd() & 0x30) routine.voiceSet(0x5B, 7, 60);
+        else routine.voiceSet(0x5C, 8, 60);
     }
     if (thankCtr) thankCtr--;
 }
@@ -316,7 +312,7 @@ int cRoutine::move()
     if (owner->r_no_0 == 4) {
         owner->m_pFunc();
     } else {
-        (this->*cRoutine_move_tbl[owner->r_no_0])();
+        (this->*move_tbl[owner->r_no_0])();
     }
     voice.move();
     return 1;
@@ -895,7 +891,7 @@ void cAction::moveGo2F(cAnalysis* an, cRoutine* rt)
             rt->dist = 1000.0f;
             if (!an->status.check(cAnalysis::S_SAY_2F)) {
                 an->status.on(cAnalysis::S_SAY_2F);
-                if (pPL->pos.y < lowY) rt->voice.set(0x58, 2, 60);
+                if (pPL->pos.y < lowY) rt->voiceSet(0x58, 2, 60);
             }
             rno1 = 1;
         }
@@ -1051,7 +1047,7 @@ void cAction::moveEscRack(cAnalysis* an, cRoutine* rt)
 // farther than 5 m -> runs (6) to within 1.5 m.
 void cAction::moveChasePl(cAnalysis* an, cRoutine* rt)
 {
-    f32 plDist = an->plDist;
+    f32 plDist = an->getPlDist();
 
     switch (rno1) {
     case 0:
@@ -1431,7 +1427,7 @@ void cSubLuis::endDamage()
     if (status.check(F_KARAMI) && pEmCatch && ((cEm*) pEmCatch)->dmg.m_Timer) thankCtr = 30;
     status.off(F_KARAMI);
     action.set(0);
-    routine.end();
+    routine.endDamage();
 }
 
 

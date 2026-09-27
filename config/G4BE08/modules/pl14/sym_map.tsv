@@ -211,7 +211,7 @@ section	offset	size	unit	scope	name	demangled
 .rodata	0x00000470	0x60	pl14/pl14.cpp	global	_vt.8cSubLuis	_vt.8cSubLuis
 .rodata	0x000004D0	0x28	pl14/pl14.cpp	global	_vt.5cUnit	_vt.5cUnit
 .rodata	0x000004F8	0x8	pl14/pl14.cpp	local	lbl_pl14_rodata_4F8	lbl_pl14_rodata_4F8
-.data	0x00000000	0x90	pl14/pl14.cpp	global	cRoutine_move_tbl	cRoutine_move_tbl
+.data	0x00000000	0x90	pl14/pl14.cpp	global	_8cRoutine.move_tbl	_8cRoutine.move_tbl
 .data	0x00000090	0x4	pl14/pl14.cpp	local	luisBlink	luisBlink
 .data	0x00000094	0x4	pl14/pl14.cpp	local	luisUnused	luisUnused
 .bss	0x00000000	0x4	pl14/pl14.cpp	global	luisEyeTimer.611	luisEyeTimer.611
