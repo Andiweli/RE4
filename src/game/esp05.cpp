@@ -8,16 +8,16 @@
 #include "rnd.h"
 #include "esp.h"
 
-struct Esp05Work {
+typedef struct tagESP05_WK {
     f32 Pow;     // 0x00 wobble amplitude
     f32 Spd;  // 0x04
     f32 Theta;     // 0x08
-};
+} ESP05_WK;
 
 // Fluttering sprite (falling leaf / feather): wobbles the position with sin/cos of a random angle.
 class cEsp05 : public cEsp {
 public:
-    Esp05Work m_Free;  // 0xF8
+    ESP05_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -33,7 +33,7 @@ cEsp* Esp05_Create()
 // cos(1.9 Theta), Theta advancing by Spd x (0.2 .. 1.2). Released when the animation ends.
 void cEsp05::move()
 {
-    Esp05Work* w = &m_Free;
+    ESP05_WK* w = &m_Free;
 
     if (CommonMove()) {
         m_Pos.x += w->Pow * sinf(w->Theta);
@@ -49,7 +49,7 @@ void cEsp05::move()
 // Amplitude / speed from Vec0.x / Vec0.y (x 0.05), each randomised by Vec0.z x 10%, random phase.
 int cEsp05::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp05Work* w = &m_Free;
+    ESP05_WK* w = &m_Free;
 
     w->Pow = pSeq->Vec0.x;
     w->Spd = pSeq->Vec0.y * 0.05f;

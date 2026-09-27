@@ -70,7 +70,7 @@ static f32 Bull_dir;        // turn of this frame
 cObj* SetBull(void* bin, void* tpl, Vec* pos, Vec* rot, u32 type)
 {
     cObj* obj;
-    BullWork* w;
+    FREE_BULL* w;
     int i;
     void** p;
 
@@ -138,7 +138,7 @@ void cObjBull::move()
 // Rno0 == 0: parked at the start with mot[0] on its first frame; collision placed.
 void objBull_R0_Set(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     w->Move_frame = 0;
@@ -158,7 +158,7 @@ void objBull_R0_Set(cObjBull* pObj)
 // check in front of the blade.
 void objBull_R0_Break1st(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     switch (pObj->r_no_2) {
@@ -209,7 +209,7 @@ void objBull_R0_Break1st(cObjBull* pObj)
 // Rno0 == 2: drives to the second barrier (mot[1]), carrying the riders and hitting enemies.
 void objBull_R0_To2nd(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     switch (pObj->r_no_2) {
@@ -243,7 +243,7 @@ void objBull_R0_To2nd(cObjBull* pObj)
 // Rno0 == 3: second barrier (mot[2], Barrier_hp[1] hits, Be_flg 4).
 void objBull_R0_Break2nd(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     switch (pObj->r_no_2) {
@@ -294,7 +294,7 @@ void objBull_R0_Break2nd(cObjBull* pObj)
 // Rno0 == 4: drives onto the lift (mot[3]).
 static void objBull_R0_ToLift(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     switch (pObj->r_no_2) {
@@ -329,7 +329,7 @@ static void objBull_R0_ToLift(cObjBull* pObj)
 // 0x08000000 (the lift is called).
 void objBull_R0_LiftWait(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
     int zero;
 
     objBullPushMtx(pObj);
@@ -365,7 +365,7 @@ void objBull_R0_LiftWait(cObjBull* pObj)
 // Room_flg[0] 0x00400000.
 void objBull_R0_Lift(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
     int zero;
 
     objBullPushMtx(pObj);
@@ -410,7 +410,7 @@ void objBull_R0_Lift(cObjBull* pObj)
 // Rno0 == 7: drives off the lift to the third barrier (mot[5]).
 void objBull_R0_To3rd(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     switch (pObj->r_no_2) {
@@ -445,7 +445,7 @@ void objBull_R0_To3rd(cObjBull* pObj)
 // Rno0 == 8: third barrier (mot[6], Barrier_hp[2] hits, Be_flg 8).
 void objBull_R0_Break3rd(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     switch (pObj->r_no_2) {
@@ -496,7 +496,7 @@ void objBull_R0_Break3rd(cObjBull* pObj)
 // Rno0 == 9: drives to the fourth barrier (mot[7]).
 void objBull_R0_To4th(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     switch (pObj->r_no_2) {
@@ -530,7 +530,7 @@ void objBull_R0_To4th(cObjBull* pObj)
 // Rno0 == 10: fourth barrier (mot[8], Barrier_hp[3] hits, Be_flg 0x10).
 void objBull_R0_Break4th(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     switch (pObj->r_no_2) {
@@ -583,7 +583,7 @@ void objBull_R0_Break4th(cObjBull* pObj)
 // the wreck loop mot[11] (Be_flg 0x80).
 void objBull_R0_Collision(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     objBullPushMtx(pObj);
     switch (pObj->r_no_2) {
@@ -642,7 +642,7 @@ void objBull_R0_Collision(cObjBull* pObj)
 // Disables the bulldozer's collision (SAT, EAT, moving SAT) for this frame.
 void objBullSatClear(cObjBull* pObj)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
 
     if (w->pSat) {
         w->pSat->setDisable();
@@ -659,7 +659,7 @@ void objBullSatClear(cObjBull* pObj)
 // second SAT set (kind 8) used while driving.
 void objBullSatSet(cObjBull* pObj, int mode)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
     Vec pos;
     Vec rot;
     Vec v;
@@ -700,7 +700,7 @@ void objBullSatSet(cObjBull* pObj, int mode)
 // Installs the 12 route motions and starts mot[0].
 void cObjBull::setMotion(void** mot_tbl)
 {
-    BullWork* w = BULL_WK(this);
+    FREE_BULL* w = BULL_WK(this);
 
     w->Mot_tbl[0] = mot_tbl[0];
     w->Mot_tbl[1] = mot_tbl[1];
@@ -788,7 +788,7 @@ void objBullGetAdjust(cObjBull* pObj)
 // also shifting the extra camera.
 void objBullSetAdjust(cObjBull* pObj, cEm* pEm)
 {
-    BullWork* w = BULL_WK(pObj);
+    FREE_BULL* w = BULL_WK(pObj);
     Mtx inv;
     Vec v;
     Vec d;
@@ -939,7 +939,7 @@ int cObjBull::ckGoal()
 // Puts the player on the rider parts and marks him riding.
 void cObjBull::setRide()
 {
-    BullWork* w = BULL_WK(this);
+    FREE_BULL* w = BULL_WK(this);
     Vec p;
     cParts* parts;
     int zero = 0;
@@ -1286,7 +1286,7 @@ int cObjBull::getMoveFrameRtn()
 // Rider adjust mode (0 re-project, 1 displacement) and the room callback.
 void cObjBull::setAdjustMode(u8 mode, void (*func)(cObj*))
 {
-    BullWork* w = BULL_WK(this);
+    FREE_BULL* w = BULL_WK(this);
 
     w->Ride_mode = mode;
     w->adjust_func = func;

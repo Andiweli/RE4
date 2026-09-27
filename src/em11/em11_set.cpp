@@ -46,7 +46,7 @@ void Em11Init(cEm* em)
 // and calls Em11WeaponSet.
 void Em11Set(cEm10* em)
 {
-    Em10Work* w = EM10_WK(em);
+    FREE_EM10* w = EM10_WK(em);
 
     switch (em->type) {
     case 7:
@@ -201,7 +201,7 @@ void Em11Set(cEm10* em)
 // stun rod, torch, bowgun and arrow, pitchfork); 0 = the weapon does not exist in this castle module.
 void Em11WeaponSet(cEm10* em)
 {
-    Em10Work* w = EM10_WK(em);
+    FREE_EM10* w = EM10_WK(em);
 
     w->mot[41] = 0;
     w->mot[42] = 0;

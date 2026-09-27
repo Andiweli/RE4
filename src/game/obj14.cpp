@@ -1,5 +1,5 @@
 // game/obj14: object id 0x14, the church bell (D:/Bio4/Prog/obj14.cpp): a two-link pendulum
-// (PenCloth on parts 1/2) with a cEmHit body so shots swing it and ring it (pG->SeInfo.pos /
+// (CLOTH_INFO on parts 1/2) with a cEmHit body so shots swing it and ring it (pG->SeInfo.pos /
 // SeInfo.type 2 for 90 frames: the village Ganados react); setBreak drops it (R1 1).
 #include "atari.h"
 #include "light.h"
@@ -33,7 +33,7 @@ f32 obj14ClothMax[] = { 0.7853982f, 0.43633232f };
 cObj* SetObjBell(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cObj* obj;
-    BellWork* w;
+    FREE_OBJ14* w;
     Vec p0;
     Vec p1;
 
@@ -100,7 +100,7 @@ void cObjBell::move()
 // 250 units in front) as the ringing bell (Status_flg[1] 0x20000000, SeInfo.type 2).
 void obj14_R1_Set(cObjBell* pObj)
 {
-    BellWork* w = BELL_WK(pObj);
+    FREE_OBJ14* w = BELL_WK(pObj);
 
     obj14MatCalc(pObj);
     if (w->Bell_timer) {
@@ -121,7 +121,7 @@ void obj14_R1_Set(cObjBell* pObj)
 // Rno1 == 1: broken: hides the bell, kills its hit body and spawns the break effect (est 1/7) once.
 void obj14_R1_Break(cObjBell* pObj)
 {
-    BellWork* w = BELL_WK(pObj);
+    FREE_OBJ14* w = BELL_WK(pObj);
 
     if (pObj->r_no_2 == 0) {
         pObj->be_flag &= ~2;
@@ -148,7 +148,7 @@ void obj14MatCalc(cObjBell* pObj)
 // and a swing impulse (50/30/100 by weapon) from the hit direction on the two pendulum links.
 void obj14DmCk(cObjBell* pObj)
 {
-    BellWork* w = BELL_WK(pObj);
+    FREE_OBJ14* w = BELL_WK(pObj);
     Vec dm;
     Vec dm2;
     Vec dir;
@@ -269,7 +269,7 @@ int cObjBell::ckBreak()
 // Pendulum set-up: parts 1 -> 2 chain with max swing 45 / 25 degrees, gravity 15.
 void obj14ClothSet(cObjBell* pObj)
 {
-    BellWork* w = BELL_WK(pObj);
+    FREE_OBJ14* w = BELL_WK(pObj);
 
     w->Cloth.Num = 2;
     w->Cloth.pCloth = obj14ClothP;

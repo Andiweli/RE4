@@ -39,7 +39,7 @@ void cEsp47::move()
 // every edge (and corner) it overlaps.
 void Esp47_Trans(cEsp* pEsp)
 {
-    EspAnmData* anm;
+    cAnm* anm;
     f32 sx = pEsp->m_Size_base_x * pEsp->m_Size_mul;
     f32 sy = pEsp->m_Size_base_y * pEsp->m_Size_mul;
     f32 rx;

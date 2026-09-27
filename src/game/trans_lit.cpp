@@ -365,7 +365,7 @@ void lightSetSpotlight(cLight* pLi, GXLightObj* pLo)
     Vec cdir;
     Vec dir;
     Vec p;
-    LightSpot* sp = &pLi->spot;
+    LIT_TYPE04_FREE* sp = &pLi->spot;
     f32 refDist = 5000.0f;
     f32 d;
     f32 range;
@@ -393,7 +393,7 @@ void lightSetCustom(cLight* pLi, GXLightObj* pLo)
 {
     Vec cdir;
     Vec dir;
-    LightSpot* sp = &pLi->spot;
+    LIT_TYPE04_FREE* sp = &pLi->spot;
 
     pLi->getNormal(&sp->Normal, &dir);
     PSMTXMultVecSR(pG->Camera.v_mat, &dir, &cdir);
@@ -406,7 +406,7 @@ void lightSetCustom(cLight* pLi, GXLightObj* pLo)
 void lightSetParallel(cLight* pLi, GXLightObj* pLo)
 {
     Vec p;
-    LightSpot* sp = &pLi->spot;
+    LIT_TYPE04_FREE* sp = &pLi->spot;
     f32 d;
     f32 range;
     f32 br;
@@ -442,7 +442,7 @@ void lightSetSpotQuad(cLight* pLi, GXLightObj* pLo)
     Vec cdir;
     Vec dir;
     Vec p;
-    LightSpot* sp = &pLi->spot;
+    LIT_TYPE04_FREE* sp = &pLi->spot;
     f32 k2 = 0.1f;
     f32 d;
     f32 range;

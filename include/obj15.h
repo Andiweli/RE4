@@ -9,7 +9,7 @@
 
 // Gatling gun work (game/obj15.cpp `cObjGatling`): a mounted gun the player (or `pEm`) fires
 // at `pTarget`; three cEmHit hit boxes take the damage, `pEat` is its effect collision piece.
-struct GatlingWork {
+struct FREE_OBJ15 {
     u32 Be_flag;            // 0x00
     int Timer;              // 0x04  frames of barrel spin-down after the break
     u8 pad_8[2];
@@ -36,7 +36,7 @@ struct GatlingWork {
 // frame once spun up, takes weapon damage on three cEmHit boxes and breaks (R1_Break).
 class cObjGatling : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  GatlingWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ15
 
     virtual void move();
     virtual ~cObjGatling() {}
@@ -52,7 +52,7 @@ public:
     void setBreak();
 };
 
-#define GATLING_WK(o) ((GatlingWork*) (o)->free)
+#define GATLING_WK(o) ((FREE_OBJ15*) (o)->free)
 
 cObjGatling* SetObjGatling(void* bin, void* tpl, Vec* pos, Vec* rot);
 

@@ -443,7 +443,7 @@ void SceDestroyEm(int em_id, int em_id_end)
         }
         if (em->id >= em_id && em->id <= em_id_end) {
             if (em->isAlive()) {
-                EmListData* l = GetListPtrFromEm(em);
+                EM_LIST* l = GetListPtrFromEm(em);
                 if (l) {
                     l->be_flag &= ~1;
                 }
@@ -1252,7 +1252,7 @@ void SceElevator(SceElevatorData* d)
     f32 move;
     int faded;
     int done;
-    FadeWork* fade;
+    FADE_WORK* fade;
     u32 white;
     int i;
     int j;

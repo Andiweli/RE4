@@ -6,18 +6,18 @@
 #include "math_sub.h"
 #include "esp.h"
 
-struct Esp14Work {
+typedef struct tagESP14_WK {
     f32 Mul;  // 0x00 sizeY per unit of camera distance
     f32 Base_y;    // 0x04 base sizeY
     Vec Rimiter;       // 0x08 clip box half extents (x, z)
     Vec Rimiter_ofs;       // 0x14 clip box center (x, z)
-};
+} ESP14_WK;
 
 // Light shaft sprite: a vertical beam whose length depends on the camera view and is clipped
 // to a box around the effect.
 class cEsp14 : public cEsp {
 public:
-    Esp14Work m_Free;  // 0xF8
+    ESP14_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -34,7 +34,7 @@ cEsp* Esp14_Create()
 // box, and marks the effect as never Z-culled (huge m_Radius, m_Flg bit1).
 void cEsp14::move()
 {
-    Esp14Work* w = &m_Free;
+    ESP14_WK* w = &m_Free;
     Vec d;
     Vec cross;
     Vec camDir;
@@ -116,7 +116,7 @@ void cEsp14::move()
 // the box is inconsistent or has a y component. Sets Tool_flg bit0.
 int cEsp14::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp14Work* w = &m_Free;
+    ESP14_WK* w = &m_Free;
 
     w->Mul = (f32)(s8)pSeq->Work8[0] * 0.05f + 0.25f;
     w->Base_y = m_Size_base_y;

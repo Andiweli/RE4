@@ -187,7 +187,7 @@ static void r225_operateCrank()
     int spd = 0;
     int cur = 0;
     int acc = 0;
-    KeyWork* key;
+    KEY* key;
 
     pG->Room_flg[0] |= 0x80000000;
     {
@@ -507,7 +507,7 @@ void SceElevator_r225(SceElevatorData* d)
     f32 move;
     int faded;
     int done;
-    FadeWork* fade;
+    FADE_WORK* fade;
     u32 white;
     int i;
     int j;

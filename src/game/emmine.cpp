@@ -58,7 +58,7 @@ static EmMineFunc EmMine_R1_move_tbl[9] = {
 cEmMine* SetMine(void* bin, void* tpl, Vec* pos, Vec* spd, int type)
 {
     cEmMine* em;
-    EmMineWork* w;
+    FREE_EMMINE* w;
     cAtariInfo* at;
     Vec v;
     f32 len;
@@ -218,7 +218,7 @@ void emMine_R0_Move(cEmMine* pEm)
 // to an enemy (emMineHitCk) or the scenery, and sinks in water.
 void emMine_R1_Shot(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
     Vec d;
     Vec hit;
     f32 wh;
@@ -391,7 +391,7 @@ void emMine_R1_Shot(cEmMine* pEm)
 // the mine but it sticks silently and never explodes.
 void emMine_R1_ShotArrow(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
     Vec d;
     Vec hit;
     f32 wh;
@@ -544,7 +544,7 @@ void emMine_R1_ShotArrow(cEmMine* pEm)
 // target while it lives.
 void emMineSearchEm(cEmMine* pEm, int mode)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
     Vec dir;
     Vec v;
     f32 best;
@@ -630,7 +630,7 @@ void emMineSearchEm(cEmMine* pEm, int mode)
 // while the target is visible, unobstructed, more than 100 units away and within 145 degrees.
 void emMineHomingEm(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
     Vec axis;
     Mtx m;
     Vec dir;
@@ -681,7 +681,7 @@ void emMineHomingEm(cEmMine* pEm)
 // shrinking interval (17 -> 5 frames) and explode when Bomb_wait runs out; arrows fall instead.
 void emMine_R1_Set(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -736,7 +736,7 @@ void emMine_R1_Set(cEmMine* pEm)
 // Rno1 == 3: sunk in water: hidden, then explodes (mine) after 150 frames.
 void emMine_R1_SetWater(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -769,7 +769,7 @@ void emMine_R1_SetWater(cEmMine* pEm)
 // a vanished enemy loses the mine.
 void emMine_R1_Parent(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
     cEm* parent = w->pEm_oya;
 
     if (!parent->isAlive()) {
@@ -888,7 +888,7 @@ void emMine_R1_Parent(cEmMine* pEm)
 // along the surface normal and detonates (setBomb without Norm_ck).
 void emMine_R1_BombWait(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
     Vec v;
 
     switch (pEm->r_no_2) {
@@ -919,7 +919,7 @@ void emMine_R1_BombWait(cEmMine* pEm)
 // 0x13) with radius 2000 / 4000 / 6000 by firepower level at the mine's nose, then Lost.
 void emMine_R1_BombWait2(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
     Vec p;
     f32 r;
 
@@ -960,7 +960,7 @@ void emMine_R1_BombWait2(cEmMine* pEm)
 // collision floor, water splash once), matrix rebuilt from the nodes; lost when it comes to rest.
 void emMine_R1_Fall(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
     Vec ofs[4] = { { 0.0f, 0.0f, 600.0f }, { 0.0f, 0.0f, -600.0f }, { 300.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
     MineNode node[3];
     Vec e1;
@@ -1102,7 +1102,7 @@ void emMine_R1_Fall(cEmMine* pEm)
 // Rno1 == 8: removes the work: hidden, trail effects deleted, destroyed.
 void emMine_R1_Lost(cEmMine* pEm)
 {
-    EmMineWork* w = EMMINE_WK(pEm);
+    FREE_EMMINE* w = EMMINE_WK(pEm);
 
     if (pEm->r_no_2 == 0) {
         pEm->hp = 0;
@@ -1118,7 +1118,7 @@ void emMine_R1_Lost(cEmMine* pEm)
 // Sticks the mine / arrow to `parent` parts `partsNo_` (Rno1 4).
 void cEmMine::setParent(cEm* parent, int partsNo_)
 {
-    EmMineWork* w = EMMINE_WK(this);
+    FREE_EMMINE* w = EMMINE_WK(this);
 
     w->pEm_oya = parent;
     w->oya_parts = partsNo_;
@@ -1145,7 +1145,7 @@ void cEmMine::setLost()
 // source (SeInfo.pos / SeInfo.type, alerts enemies), then BombWait2 for the damage.
 void cEmMine::setBomb()
 {
-    EmMineWork* w = EMMINE_WK(this);
+    FREE_EMMINE* w = EMMINE_WK(this);
     Vec p;
     int hit;
 
@@ -1191,7 +1191,7 @@ void cEmMine::setBomb()
 // Starts the arrow's fall (Rno1 7): random upward node speeds, gravity 15, detached.
 void cEmMine::setFall()
 {
-    EmMineWork* w = EMMINE_WK(this);
+    FREE_EMMINE* w = EMMINE_WK(this);
     u32 i;
 
     Motion.pMot = 0;

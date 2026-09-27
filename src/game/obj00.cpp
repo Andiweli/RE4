@@ -27,7 +27,7 @@ void obj00SetOya(cObj00* obj);
 // simulation, updates the parts and collision unless flagged, fades out on be_flag 0x20.
 void cObj00::move()
 {
-    Obj00Work* w = OBJ00_WK(this);
+    FREE_OBJ00* w = OBJ00_WK(this);
 
     if (Motion.pMot) {
         MotionMove(this, 0);
@@ -64,7 +64,7 @@ void cObj00::move()
 cObj* SetObj00(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cObj* obj;
-    Obj00Work* w;
+    FREE_OBJ00* w;
 
     obj = ObjMgr.create(cObjMgr::ID_NORMAL);
     if (obj == 0) {
@@ -105,7 +105,7 @@ cObj* SetObj00(void* bin, void* tpl, Vec* pos, Vec* rot)
 // Starts motion `mot` on the object with Mot_attr prm.
 void MotSetObj00(cObj* obj, void* mot, int prm, int a)
 {
-    Obj00Work* w = OBJ00_WK((cObj00*) obj);
+    FREE_OBJ00* w = OBJ00_WK((cObj00*) obj);
 
     if (obj == 0) {
         return;
@@ -119,7 +119,7 @@ void MotSetObj00(cObj* obj, void* mot, int prm, int a)
 // Attaches the object to parts partsNo of `oya` (motion cleared, no catch-up blend).
 void OyaSetObj00(cObj* obj, cModel* oya, int partsNo)
 {
-    Obj00Work* w = OBJ00_WK((cObj00*) obj);
+    FREE_OBJ00* w = OBJ00_WK((cObj00*) obj);
 
     if (obj == 0) {
         return;
@@ -145,10 +145,10 @@ static void obj00SetRate(cObj* obj, u32 rate)
 // Fall simulation (be_flag bit 2): three rope nodes 300 units around the object fall under gravity
 // (20/frame), keep their mutual distances (30 relaxation passes), bounce on y = 30 (playing the
 // fall sound once) and give the object its new orientation and centre. Node speeds persist in
-// Obj00Work::spd (1/10 units).
+// FREE_OBJ00::spd (1/10 units).
 void obj00FallMove(cObj00* obj)
 {
-    Obj00Work* w = OBJ00_WK(obj);
+    FREE_OBJ00* w = OBJ00_WK(obj);
     Vec ofs[3] = { { 0.0f, 0.0f, 300.0f }, { 0.0f, 0.0f, -300.0f }, { 300.0f, 0.0f, 0.0f } };
     Obj00Node node[3];
     Vec vx;
@@ -274,7 +274,7 @@ void obj00FallMove(cObj00* obj)
 // copies the parent's light class 2.
 void obj00SetOya(cObj00* pObj)
 {
-    Obj00Work* w = OBJ00_WK(pObj);
+    FREE_OBJ00* w = OBJ00_WK(pObj);
     Mtx m;
     Vec v0;
     Vec v1;

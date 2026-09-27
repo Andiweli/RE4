@@ -78,7 +78,7 @@ void R11bInit()
     Vec pos;
     Vec rot;
     Vec rot2;
-    EmListData* l;
+    EM_LIST* l;
     cObj* obj = 0;   // the zero of the EstSet data arguments and the list entry's x3 (r27)
     int one = 1;     // COMPILER-DIFF: #13 (single use: update_equiv_regs moves the li next to the store)
 
@@ -274,7 +274,7 @@ static void r11b_ThunderMove()
 // pier, un-set and alive, so they spawn there on later visits.
 extern "C" void EmSetChange()
 {
-    EmListData* l;
+    EM_LIST* l;
 
     l = EM_LIST_S(0x40);
     l->be_flag = 1;

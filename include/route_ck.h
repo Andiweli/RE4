@@ -9,7 +9,7 @@
 class cEm;
 
 // One way point (16 bytes).
-struct RtpPoint {
+struct RTP_POINT {
     Vec pos;       // 0x00
     u16 offLine;   // 0x0C  first entry in the link table
     u16 nLine;     // 0x0E  linked points
@@ -26,7 +26,7 @@ struct RtpData {
     u8 pad_0[6];
     u16 nPoint;    // 0x06
     u8 pad_8[4];
-    u32 pointOfs;  // 0x0C  RtpPoint[nPoint]
+    u32 pointOfs;  // 0x0C  RTP_POINT[nPoint]
     u32 linkOfs;   // 0x10  RtpLink[]
     u32 nextOfs;   // 0x14  s8 next[nPoint][nPoint]: next hop from row to column, -1 = unreachable
 };

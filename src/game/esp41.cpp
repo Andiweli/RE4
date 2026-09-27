@@ -9,17 +9,17 @@
 #include "math_sub.h"
 #include "esp.h"
 
-struct Esp41Work {
+typedef struct tagESP41_WK {
     f32 Dist;   // 0x00 attraction range
     f32 Pow;   // 0x04
     Vec Offset;     // 0x08 offset from the target position
     u8 Type;     // 0x14
-};
+} ESP41_WK;
 
 // Effect attracted towards the player (or enemy 0 in a cutscene).
 class cEsp41 : public cEsp {
 public:
-    Esp41Work m_Free;  // 0xF8
+    ESP41_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -36,7 +36,7 @@ cEsp* Esp41_Create()
 // 0x00800000) the target is EmMgr.at(0) and nothing happens while that enemy is not alive.
 void cEsp41::move()
 {
-    Esp41Work* w = &m_Free;
+    ESP41_WK* w = &m_Free;
     Vec d;
     Vec tgt;
     f32 dist;
@@ -74,7 +74,7 @@ void cEsp41::move()
 // Range / strength from Work8[0..1], target offset from Vec0, Type from WorkSp8[0] (only 0 valid).
 int cEsp41::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp41Work* w = &m_Free;
+    ESP41_WK* w = &m_Free;
 
     w->Dist = (f32)(s8)pSeq->Work8[0] * 100.0f;
     w->Pow = (f32)(s8)pSeq->Work8[1] * 0.00005f;

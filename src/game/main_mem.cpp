@@ -36,7 +36,7 @@ struct SystemMemMap {
 };
 
 
-MemHeap Heap[MEM_HEAP_NUM];
+HEAP_TBL Heap[MEM_HEAP_NUM];
 static SystemMemMap SysMem;
 OSHeapDescriptor heap_backup[MEM_HEAP_NUM];  // OSAlloc descriptors of suspended heaps
 

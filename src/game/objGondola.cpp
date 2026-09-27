@@ -49,7 +49,7 @@ static void (*ObjGondola_R0_move_tbl[5])(cObjGondola*) = {
 cObj* SetGondola(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cObj* obj;
-    GondolaWork* w;
+    FREE_GONDOLA* w;
     int i;
     cEm** p;
 
@@ -108,7 +108,7 @@ cObj* SetGondola(void* bin, void* tpl, Vec* pos, Vec* rot)
 // Per-frame: releases the floor collision, action wait timer, R0 routine.
 void cObjGondola::move()
 {
-    GondolaWork* w = GONDOLA_WK(this);
+    FREE_GONDOLA* w = GONDOLA_WK(this);
 
     objGondolaSatClear(this);
     if (w->Act_wait) {
@@ -154,7 +154,7 @@ void objGondola_R0_Move(cObjGondola* pObj)
 // displacement (also fed to the camera quake offset), floor collision re-placed.
 void objGondola_R0_Down(cObjGondola* pObj)
 {
-    GondolaWork* w = GONDOLA_WK(pObj);
+    FREE_GONDOLA* w = GONDOLA_WK(pObj);
     Vec b;
     Vec a;
     Vec d;
@@ -188,7 +188,7 @@ void objGondola_R0_Down(cObjGondola* pObj)
 // partner are put on the platform and the ride flag cleared.
 void objGondola_R0_Up(cObjGondola* pObj)
 {
-    GondolaWork* w = GONDOLA_WK(pObj);
+    FREE_GONDOLA* w = GONDOLA_WK(pObj);
     Vec b;
     Vec a;
     Vec d;
@@ -243,7 +243,7 @@ void objGondola_R0_Up(cObjGondola* pObj)
 // at the car from the side.
 void objGondola_R0_Break(cObjGondola* pObj)
 {
-    GondolaWork* w = GONDOLA_WK(pObj);
+    FREE_GONDOLA* w = GONDOLA_WK(pObj);
     Vec b;
     Vec a;
     Vec v;
@@ -330,7 +330,7 @@ void objGondola_R0_Break(cObjGondola* pObj)
 // Disables the car's collision quads (flag 4 off) for this frame.
 void objGondolaSatClear(cObjGondola* pObj)
 {
-    GondolaWork* w = GONDOLA_WK(pObj);
+    FREE_GONDOLA* w = GONDOLA_WK(pObj);
     int i;
 
     for (i = 0; i < 5; i++) {
@@ -347,7 +347,7 @@ void objGondolaSatClear(cObjGondola* pObj)
 // position, creating it on first use; the four wall quads are compiled out (loop bound 1).
 void objGondolaSatSet(cObjGondola* pObj)
 {
-    GondolaWork* w = GONDOLA_WK(pObj);
+    FREE_GONDOLA* w = GONDOLA_WK(pObj);
     Vec pos;
     Vec rot;
     Vec v;
@@ -511,7 +511,7 @@ int cObjGondola::ckRide()
 // Puts an enemy aboard in the first free of five slots (positions 300 apart along the floor).
 void cObjGondola::setRideEm(cEm* em)
 {
-    GondolaWork* w = GONDOLA_WK(this);
+    FREE_GONDOLA* w = GONDOLA_WK(this);
     cParts* parts = getPartsPtr(0);
     Vec v;
     u32 i;
@@ -536,7 +536,7 @@ void cObjGondola::setRideEm(cEm* em)
 // Removes an enemy from the rider slots.
 void cObjGondola::setGetOffEm(cEm* em)
 {
-    GondolaWork* w = GONDOLA_WK(this);
+    FREE_GONDOLA* w = GONDOLA_WK(this);
     int i;
 
     for (i = 0; i < 5; i++) {
@@ -568,7 +568,7 @@ void cObjGondola::setBreak()
 // centre has left the car.
 void objGondolaRideEmAdjust(cObjGondola* pObj, Vec* pVec)
 {
-    GondolaWork* w = GONDOLA_WK(pObj);
+    FREE_GONDOLA* w = GONDOLA_WK(pObj);
     cParts* parts = pObj->getPartsPtr(1);
     Vec c;
     u32 i;
@@ -594,7 +594,7 @@ void objGondolaRideEmAdjust(cObjGondola* pObj, Vec* pVec)
 // the riding flag Status_flg[0] 0x20.
 void cObjGondola::setRidePL()
 {
-    GondolaWork* w = GONDOLA_WK(this);
+    FREE_GONDOLA* w = GONDOLA_WK(this);
     Vec v;
 
     MotionMove(this, 0);
@@ -635,7 +635,7 @@ void cObjGondola::setGetOffPL()
 // Installs the secondary MotionWork with the shake and break motions blended over the travel motion.
 void cObjGondola::setSubMotion(MotionWork* work, void* mot, void* breakMot)
 {
-    GondolaWork* w = GONDOLA_WK(this);
+    FREE_GONDOLA* w = GONDOLA_WK(this);
 
     w->pMot_info = work;
     w->Sub_mot1 = mot;
@@ -645,7 +645,7 @@ void cObjGondola::setSubMotion(MotionWork* work, void* mot, void* breakMot)
 // Hit shake: blends the shake motion in (rate 1, additive), quake and vibration.
 void cObjGondola::setVib()
 {
-    GondolaWork* w = GONDOLA_WK(this);
+    FREE_GONDOLA* w = GONDOLA_WK(this);
 
     if (w->pMot_info && w->Sub_mot1) {
         ((GondolaMotWork*) w->pMot_info)->flags2 |= 0x10000000;

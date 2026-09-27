@@ -23,7 +23,7 @@ struct EfmCore {
     cModel* pEm;          // 0x08
 };
 
-// Event object model type (PS2 OBJ18_TYPE): SetObj18 `type` / Obj18Work::type, from the model name prefix
+// Event object model type (PS2 OBJ18_TYPE): SetObj18 `type` / FREE_OBJ18::type, from the model name prefix
 // (event.cpp ExePacket_SetOm OmTbl).
 enum OBJ18_TYPE {
     OBJ18_TYPE_OBMXX = 0,

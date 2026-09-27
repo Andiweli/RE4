@@ -6,7 +6,7 @@
 #include "global.h"
 #include "esp.h"
 
-struct Esp11Work {
+typedef struct tagESP11_WK {
     u8 CutNo;         // 0x00 light type (gen->Work8[1])
     u8 LitNo;           // 0x01 light number (gen->Work8[2])
     u8 Kind;         // 0x02 0/1: create a light, 2: fixed type 8, 3: no light (gen->Work8[0])
@@ -14,13 +14,13 @@ struct Esp11Work {
     cLight* pLi;  // 0x04
     GXColor Base_col;     // 0x08 base color of the light
     u8 ToolState;    // 0x0C (gen->WorkSp8[0])
-};
+} ESP11_WK;
 
 // Light source effect: creates a cLight and (mode 1) drives its position and color from the
 // sprite.
 class cEsp11 : public cEsp {
 public:
-    Esp11Work m_Free;  // 0xF8
+    ESP11_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -41,7 +41,7 @@ cEsp* Esp11_Create()
 // elsewhere. Type 1: base update then Esp11_SetParam; other types: plain life countdown.
 void cEsp11::move()
 {
-    Esp11Work* w = &m_Free;
+    ESP11_WK* w = &m_Free;
 
     if (w->ToolState != 0) {
         EffSetToolState(w->ToolState);
@@ -81,7 +81,7 @@ void cEsp11::Destruct()
 // Base_col x sprite colour / 255, alpha = Base_col.a x sprite alpha / 2.
 void Esp11_SetParam(cEsp11* esp)
 {
-    Esp11Work* w = &esp->m_Free;
+    ESP11_WK* w = &esp->m_Free;
     f32 alpha;
 
     if (w->pLi == NULL) {
@@ -104,7 +104,7 @@ void Esp11_SetParam(cEsp11* esp)
 // Kind/Type. In the effect tool it also clears Stop_flg 0x01000000 so lights keep moving.
 int cEsp11::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp11Work* w = &m_Free;
+    ESP11_WK* w = &m_Free;
 
     w->Kind = pSeq->Work8[0];
     w->CutNo = pSeq->Work8[1];

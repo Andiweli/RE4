@@ -11,7 +11,7 @@
 #include "view.h"
 
 
-struct Esp45Work {
+typedef struct tagESP45_WK {
     Vec wld_pos;       // 0x00 world position
     f32 pos_x;         // 0x0C screen position x
     f32 pos_y;         // 0x10 screen position y
@@ -28,13 +28,13 @@ struct Esp45Work {
     u16 flg;      // 0x38 bit1: visibility test
     u16 delay_cnt;    // 0x3A
     f32 del_dist;       // 0x3C camera distance where the glow is gone (gen->Vec0.z)
-};
+} ESP45_WK;
 
 // Additive radial blur (Filter00 spread) at the projected position, faded by camera distance and
 // a Z-buffer visibility test.
 class cEsp45 : public cEsp {
 public:
-    Esp45Work m_Free;  // 0xF8
+    ESP45_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -57,7 +57,7 @@ cEsp* Esp45_Create()
 // the world position and queues Esp45_HideCheck in the after-render OT.
 void cEsp45::move()
 {
-    Esp45Work* w = &m_Free;
+    ESP45_WK* w = &m_Free;
 
     m_Size_mul = 1.0e22f;
     if (!CommonMove()) {
@@ -81,7 +81,7 @@ void cEsp45::move()
 void Esp45_Trans(cEsp* pEsp)
 {
     cEsp45* esp = (cEsp45*) pEsp;
-    Esp45Work* w = &esp->m_Free;
+    ESP45_WK* w = &esp->m_Free;
 
     if (esp->m_Parts_no >= ESP_PARTS_SCR_NO_END && esp->m_Parts_no <= ESP_PARTS_SCR_NO_START) {
         f32 cx = esp->m_Pos.x * 0.001953125f - 0.5f;
@@ -136,7 +136,7 @@ void Esp45_Trans(cEsp* pEsp)
 // Alpha from the distance to the camera: 1 at the camera, 0 at `dist`.
 static f32 GetDistAlpha(cEsp45* esp)
 {
-    Esp45Work* w = &esp->m_Free;
+    ESP45_WK* w = &esp->m_Free;
     Vec d;
     f32 a;
 
@@ -168,7 +168,7 @@ void Esp45_HideCheck(cEsp* esp0)
     static const f32 hide_y_tbl[12] = { 1.0f, 0.86f, 0.5f, 0.0f, -0.5f, -0.86f, -1.0f, -0.86f, -0.5f, 0.0f, 0.5f, 0.86f };
     static s32 Zs_bias45_2 = 0;  // unreferenced 4-byte .sdata word after Zs_bias45 (name unknown)
     cEsp45* esp = (cEsp45*) esp0;
-    Esp45Work* w = &esp->m_Free;
+    ESP45_WK* w = &esp->m_Free;
     Vec p;
     u32 z;
     s32 zi;
@@ -257,7 +257,7 @@ void Esp45_HideCheck(cEsp* esp0)
 // (enables flg bit1).
 int cEsp45::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp45Work* w = &m_Free;
+    ESP45_WK* w = &m_Free;
 
     w->type = pSeq->Work8[0];
     w->rate = pSeq->Blend_type;

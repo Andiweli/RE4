@@ -44,7 +44,7 @@ EmBoxFunc EmBox_R1_move_tbl[2] = {
 cEmBox* SetBox(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo)
 {
     cEmBox* em;
-    EmBoxWork* w;
+    FREE_EMBOX* w;
     u16* flg;
     int zero;
 
@@ -207,7 +207,7 @@ cEmBox* SetBox(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo)
 // (blood-style) est 3 of Eff_id.
 void emBoxDmCk(cEmBox* em)
 {
-    EmBoxWork* w = EMBOX_WK(em);
+    FREE_EMBOX* w = EMBOX_WK(em);
     u8 wep;
     int dmg;
     Vec hit;
@@ -371,7 +371,7 @@ void emBoxDmCk(cEmBox* em)
 // collision, drops the set item and moves to Rno1 1 Break.
 void emBoxSetBreak(cEmBox* em, u32 kind)
 {
-    EmBoxWork* w = EMBOX_WK(em);
+    FREE_EMBOX* w = EMBOX_WK(em);
 
     em->hp = 0;
     em->be_flag &= ~2;
@@ -499,7 +499,7 @@ void emBox_R1_Set(cEmBox* em)
 // lets the player walk through; then hit-box-only.
 void emBox_R1_Break(cEmBox* em)
 {
-    EmBoxWork* w = EMBOX_WK(em);
+    FREE_EMBOX* w = EMBOX_WK(em);
     u16* flg;
 
     if (em->r_no_2 == 0) {
@@ -520,7 +520,7 @@ void emBox_R1_Break(cEmBox* em)
 // Deactivates the box's scenario / effect collision pieces.
 void emBoxSatClear(cEmBox* em)
 {
-    EmBoxWork* w = EMBOX_WK(em);
+    FREE_EMBOX* w = EMBOX_WK(em);
 
     if (w->pSat) {
         w->pSat->setDisable();
@@ -536,7 +536,7 @@ void emBoxSatClear(cEmBox* em)
 // to reproduce that pool.
 static void emBoxSatSet(cEmBox* em)
 {
-    EmBoxWork* w = EMBOX_WK(em);
+    FREE_EMBOX* w = EMBOX_WK(em);
     f32 hx = w->size.x * 0.5f;
 
     if (hx == 0.0f) {
@@ -551,7 +551,7 @@ static void emBoxSatSet(cEmBox* em)
 // Hit boxes: the full-size cube plus a smaller inner cube (hit) for the precise hit.
 void emBoxYarareInit(cEmBox* em)
 {
-    EmBoxWork* w = EMBOX_WK(em);
+    FREE_EMBOX* w = EMBOX_WK(em);
 
     YarareInitCube((cEmHit*) em, 0.0f, 0.0f, 0.0f, w->size.x * 0.5f + 50.0f, w->size.y, w->size.z * 0.5f + 50.0f, 0, YAT_FLAG_ON);
     YarareAddCube((cEmHit*) em, &w->hit, 0.0f, 0.0f, 0.0f, w->size.x * 0.5f * 0.5f, w->size.y * 0.8f, w->size.z * 0.5f * 0.8f, 0, YAT_FLAG_ON);
@@ -561,7 +561,7 @@ void emBoxYarareInit(cEmBox* em)
 // (8 for type 5) or the break model at once.
 void cEmBox::setEff(u8 eff_id)
 {
-    EmBoxWork* w = EMBOX_WK(this);
+    FREE_EMBOX* w = EMBOX_WK(this);
 
     w->Eff_id = eff_id;
     if (hp > 0) {
@@ -582,7 +582,7 @@ void cEmBox::setEff(u8 eff_id)
 // The item (id, count, item flags, auto flags) dropped when the box breaks (-1 = none).
 void cEmBox::setItem(int no, int num, u16 c, u16 d)
 {
-    EmBoxWork* w = EMBOX_WK(this);
+    FREE_EMBOX* w = EMBOX_WK(this);
 
     w->itemNo = no;
     w->Item_num = num;
@@ -595,7 +595,7 @@ void cEmBox::setItem(int no, int num, u16 c, u16 d)
 // 0x106 (the tutorial hint rooms).
 void emBoxActEvtCk(cEmBox* em)
 {
-    EmBoxWork* w = EMBOX_WK(em);
+    FREE_EMBOX* w = EMBOX_WK(em);
     Mtx inv;
     Vec lp;
     Vec a;
@@ -684,7 +684,7 @@ void emBoxAction(cEmBox* em)
 // Spawns the set item at the box position (SceAtCreateItemAt).
 void emBoxSetItem(cEmBox* em)
 {
-    EmBoxWork* w = EMBOX_WK(em);
+    FREE_EMBOX* w = EMBOX_WK(em);
 
     if (w->itemNo != -1) {
         SceAtCreateItemAt(&em->pos, w->itemNo, w->Item_num, -1, -1, 0, -1);
@@ -694,7 +694,7 @@ void emBoxSetItem(cEmBox* em)
 // The debris model placed when the box breaks (instead of the fallback est).
 void cEmBox::setBreakModel(void* bin, void* tpl)
 {
-    EmBoxWork* w = EMBOX_WK(this);
+    FREE_EMBOX* w = EMBOX_WK(this);
 
     w->Break_bin = bin;
     w->Break_tpl = tpl;

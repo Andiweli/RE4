@@ -879,7 +879,7 @@ extern "C" void Evt_R20BS00_Func(Event* e)
         case 0x13:
             if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod2, "pl0200", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod2);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod2);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod2)->ObjChainFlagCommon |= 0x04000000;
@@ -891,7 +891,7 @@ extern "C" void Evt_R20BS00_Func(Event* e)
         default:
             if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod2, "pl0200", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod2);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod2);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod2)->ObjChainFlagCommon &= ~0x04000000;

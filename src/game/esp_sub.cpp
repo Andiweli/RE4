@@ -77,7 +77,7 @@ void EspCommonTrans(cEsp* esp)
 {
     static int s_proj_type;
     static int s_tex_no;
-    static EspAnmData* s_pAnm;
+    static cAnm* s_pAnm;
     static int s_ptn_no;
     Mtx inv;
     f32 sx;
@@ -360,7 +360,7 @@ void EspCommonTransShimmer(cEsp* esp, int u_pow, u32 Blur_type)
     };
     Mtx44 proj;
     Mtx inv;
-    EspAnmData* anm;
+    cAnm* anm;
     GXColor fog;
     f32 sx;
     f32 sy;
@@ -651,7 +651,7 @@ void EspCommonTransNega(cEsp* esp, u32 type)
     };
     Mtx44 proj;
     Mtx inv;
-    EspAnmData* anm;
+    cAnm* anm;
     GXColor fog;
     void* buf;
     f32 sx;
@@ -905,7 +905,7 @@ int cEsp::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 // (m_MaskTex_id / m_MaskPtn_no) when Tool_flg 0x4000.
 int cEsp::AnmMove()
 {
-    EspAnmData* anm;
+    cAnm* anm;
     u32 time;
 
     if (!EspGetAnmAddr(m_Tex_id, &anm)) {

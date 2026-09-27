@@ -185,7 +185,7 @@ extern "C" void r106_setRollingStone()
         rock->setScale(4.2f);
     }
     {
-        EmListData d;
+        EM_LIST d;
 
         d.id = 0x12;
         d.type = 3;
@@ -555,7 +555,7 @@ extern "C" void Evt_R106S00_Func(Event* ev)
 // The six Ganados of the hall.
 extern "C" void r106_setEm()
 {
-    EmListData d;
+    EM_LIST d;
 
     d.rot[0] = 0;
     d.rot[2] = 0;

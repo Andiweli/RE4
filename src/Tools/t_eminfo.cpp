@@ -21,7 +21,7 @@
 // direction and three work bytes per typed point) with a screen cursor, draws the points and the
 // routes/areas some enemies build from them.
 
-struct EmInfoWork {
+struct EMINFO_WK {
     u8 type;   // 0x00  0 = free slot, else workTypeName index
     u8 Work0;  // 0x01
     u8 Work1;  // 0x02
@@ -41,8 +41,8 @@ struct EmInfoTool {
     u8 pad_18[0x10];
     int num;              // 0x28  used points
     int pad_2C;
-    EmInfoWork work[256]; // 0x30
-    EmInfoWork copy;      // 0x4030  copy buffer / template for new points
+    EMINFO_WK work[256]; // 0x30
+    EMINFO_WK copy;      // 0x4030  copy buffer / template for new points
     int camMode;          // 0x4070  1: the pad drives the debug camera
     JOY joy;              // 0x4074
     s8 cursor;            // 0x42DC  menu cursor
@@ -198,7 +198,7 @@ void eminfoInit()
     W->sub = 0;
     W->cursor = 0;
     W->num = 0;
-    memclr_asm(&W->copy, sizeof(EmInfoWork));
+    memclr_asm(&W->copy, sizeof(EMINFO_WK));
     W->copy.type = 1;
     eminfoFileLoad();
     eminfoCursorCenter();
@@ -405,7 +405,7 @@ static void eminfo_r0_move()
             return;
         }
     } else if (W->cur != -1) {
-        EmInfoWork* p = &W->work[W->cur];
+        EMINFO_WK* p = &W->work[W->cur];
 
         if (W->joy.rep & JOY_SSUP) {
             p->Pos.y += 500.0f;
@@ -436,7 +436,7 @@ static void eminfo_r0_move()
 // to mode 1.
 static void eminfo_r0_catch()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
 
     if (!(W->joy.on & JOY_A) || W->cur == -1) {
         W->mode = 1;
@@ -485,7 +485,7 @@ static void Detail00Update()
 // (sub 1..8) or exits, B back; the point also becomes the copy template.
 static void Detail01UpdateSel()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
     int n = detailMenuNum[p->type];
 
     if (W->joy.trg & JOY_B) {
@@ -557,7 +557,7 @@ static void Detail01UpdateSel()
 // WorkType row: up/down pick the type name (workTypeName), A applies, B cancels.
 void Detail01UpdateWorkType()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
     int i;
 
     if (W->joy.trg & JOY_B) {
@@ -581,7 +581,7 @@ void Detail01UpdateWorkType()
         }
         W->copy = *p;
         W->copy.type = W->workType;
-        memclr_asm(p, sizeof(EmInfoWork));
+        memclr_asm(p, sizeof(EMINFO_WK));
         p->type = W->copy.type;
         p->Pos = W->copy.Pos;
         p->Dir = W->copy.Dir;
@@ -611,7 +611,7 @@ void Detail01UpdateWorkType()
 // Pos X row: up/down (repeat) +-1 unit, R x10, L x100; B back.
 void Detail01UpdatePosX()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
     f32 step;
 
     if (W->joy.trg & JOY_B) {
@@ -643,7 +643,7 @@ void Detail01UpdatePosX()
 // Pos Y row: same as Pos X.
 void Detail01UpdatePosY()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
     f32 step;
 
     if (W->joy.trg & JOY_B) {
@@ -675,7 +675,7 @@ void Detail01UpdatePosY()
 // Pos Z row: same as Pos X.
 void Detail01UpdatePosZ()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
     f32 step;
 
     if (W->joy.trg & JOY_B) {
@@ -707,7 +707,7 @@ void Detail01UpdatePosZ()
 // Dir row: up/down change the facing angle (radians, wrapped); B back.
 void Detail01UpdateDir()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
     f32 step;
 
     if (W->joy.trg & JOY_B) {
@@ -740,7 +740,7 @@ void Detail01UpdateDir()
 // Work0 row: up/down +-1 (R x8, L x16) on the type-specific byte; B back.
 void Detail01UpdateWork0()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
     int step;
 
     if (W->joy.trg & JOY_B) {
@@ -772,7 +772,7 @@ void Detail01UpdateWork0()
 // Work1 row: same as Work0.
 void Detail01UpdateWork1()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
     int step;
 
     if (W->joy.trg & JOY_B) {
@@ -804,7 +804,7 @@ void Detail01UpdateWork1()
 // Work2 row: same as Work0.
 void Detail01UpdateWork2()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
     int step;
 
     if (W->joy.trg & JOY_B) {
@@ -847,7 +847,7 @@ static void Detail01Update()
 // Mode 3: the detail editor of the selected point (detailFunc by type) and its panel.
 static void eminfo_r0_detail()
 {
-    EmInfoWork* p = &W->work[W->cur];
+    EMINFO_WK* p = &W->work[W->cur];
 
     eminfoCursorCenter();
     if (p->type < 20) {
@@ -873,7 +873,7 @@ void eminfo_menu_disp()
 // Draws the detail panel of point `no`: type name, the rows with their values, the cursor row.
 void eminfo_detail_disp(int no)
 {
-    EmInfoWork* p = &W->work[no];
+    EMINFO_WK* p = &W->work[no];
     int i;
     int y = 80;
 
@@ -923,7 +923,7 @@ void eminfoAddWork()
     int i;
 
     for (i = 0; i < 256; i++) {
-        EmInfoWork* p = &W->work[i];
+        EMINFO_WK* p = &W->work[i];
 
         if (p->type == 0) {
             W->cur = i;
@@ -946,9 +946,9 @@ void eminfoDeleteWork(int no)
     }
     W->num--;
     for (i = W->num; i < 256; i++) {
-        EmInfoWork* q = &W->work[i];
+        EMINFO_WK* q = &W->work[i];
 
-        memclr_asm(q, sizeof(EmInfoWork));
+        memclr_asm(q, sizeof(EMINFO_WK));
         q->type = 0;
     }
 }
@@ -963,7 +963,7 @@ void eminfoGetNearPoint(Vec* cursor)
     int i;
 
     for (i = 0; i < 256; i++) {
-        EmInfoWork* p = &W->work[i];
+        EMINFO_WK* p = &W->work[i];
 
         if (p->type != 0) {
             Vec posCopy = p->Pos;
@@ -984,7 +984,7 @@ void eminfoGetNearPoint(Vec* cursor)
 void eminfoCursorToWork(int no)
 {
     Vec scr;
-    EmInfoWork* p = &W->work[no];
+    EMINFO_WK* p = &W->work[no];
 
     if (p->type != 0) {
         Vec posCopy = p->Pos;
@@ -1012,7 +1012,7 @@ void eminfoDisp()
     t *= 3;
     t = (t << 16) + (t << 8) + t;
     for (i = 0; i < 256; i++) {
-        EmInfoWork* p = &W->work[i];
+        EMINFO_WK* p = &W->work[i];
 
         if (p->type != 0) {
             u32 c = 0x30508020;
@@ -1088,7 +1088,7 @@ void eminfoDispNo(Vec* pos, int no)
 // Bottom panel of point `no`: number / type, position, direction, the three work bytes.
 void eminfoTargetDisp(int no)
 {
-    EmInfoWork* p = &W->work[no];
+    EMINFO_WK* p = &W->work[no];
 
     if (no > 255) {
         return;
@@ -1118,13 +1118,13 @@ void eminfoCopyDisp()
 // by Work0.
 void eminfoEm2fRouteDisp()
 {
-    EmInfoWork* first = NULL;
-    EmInfoWork* cur = NULL;
-    EmInfoWork* prev = NULL;
+    EMINFO_WK* first = NULL;
+    EMINFO_WK* cur = NULL;
+    EMINFO_WK* prev = NULL;
     u32 i;
 
     for (i = 0; i < W->num; i++) {
-        EmInfoWork* p = &W->work[i];
+        EMINFO_WK* p = &W->work[i];
 
         if (p->type == 2) {
             if (cur == NULL) {
@@ -1176,14 +1176,14 @@ void eminfoEm39AreaDisp()
 {
     u32 i;
     u32 j;
-    EmInfoWork* q;
+    EMINFO_WK* q;
     Vec a;
     Vec b;
     u32 c1;
     u32 c2;
 
     for (i = 0; i < W->num; i++) {
-        EmInfoWork* p = &W->work[i];
+        EMINFO_WK* p = &W->work[i];
 
         if (p->type == 14) {
             if (p->Work1 == 0) {
@@ -1291,7 +1291,7 @@ void eminfoEm3aRouteDisp()
     u32 j;
 
     for (i = 0; i < W->num; i++) {
-        EmInfoWork* p = &W->work[i];
+        EMINFO_WK* p = &W->work[i];
 
         if (p->type == 19 && p->Work1 != 0) {
             if (p->Work2 == 0) {
@@ -1300,7 +1300,7 @@ void eminfoEm3aRouteDisp()
                 Draw_sphere(&p->Pos, 500.0f, 0x60606060, 1, 1);
             }
             for (j = 0; j < W->num; j++) {
-                EmInfoWork* q = &W->work[j];
+                EMINFO_WK* q = &W->work[j];
 
                 if (q->type == 19 && q->Work1 == p->Work1 && q->Work2 == p->Work2 + 1) {
                     Vec a;
@@ -1321,7 +1321,7 @@ void eminfoEm3aRouteDisp()
 void eminfoFileSave()
 {
     char path[0x100];
-    int size = W->num * sizeof(EmInfoWork) + 8;
+    int size = W->num * sizeof(EMINFO_WK) + 8;
 
     eminfoSetFileName(path);
     HDWrite(path, &W->num, size);

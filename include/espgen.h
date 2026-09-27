@@ -57,7 +57,7 @@ struct SstAreaEnt {
     u8 be_flag;//  (PS2 ESP_AREA.be_flag)
     u8 area_no;            // 0x02 display flag bit set while the player stands in the area  display flag bit set while the player stands in the area (PS2 ESP_AREA.area_no)
     u8 pad02;//  (PS2 ESP_AREA.pad02)
-    u8 area[0x30];     // 0x04 AreaHitCheck data (AreaData)
+    u8 area[0x30];     // 0x04 AreaHitCheck data (AREA_HIT_DATA)
     u32 flag;         // 0x34 bit0: the area counts as "in room" (esp_app EffAreaCheckInRoom)  (PS2 ESP_AREA.flag)
     u8 pad_38[0x98 - 0x38];
 };
@@ -77,7 +77,7 @@ struct EspTexWk {
     TEXHeader* texHdr;   // 0x14 header of texture 0
     Mtx _Mtx;             // 0x18
     TEXPalette* Tpl_addr;    // 0x48
-    EspAnmData* Anm_addr;    // 0x4C
+    cAnm* Anm_addr;    // 0x4C
     u32 Owner;           // 0x50
 };
 
@@ -134,7 +134,7 @@ struct cEspSystem {
 extern cEspSystem* g_pEspSys;
 
 // One effect generator instance (game/espgen.cpp array, stride 0xC8). Bytes 0x14.. are the
-// per-generator work (Espgen00Work, Espgen10Work, Espgen44Work, ...).
+// per-generator work (Espgen00Work, ESPGEN10_WK, Espgen44Work, ...).
 struct EspgenWork {
     cEffectCore info;      // 0x00 owner info (copied from the parent by SetEspCore)
     u8 flag;           // 0x0C bit0: in use, bit1: delete requested
@@ -148,7 +148,7 @@ struct EspgenWork {
 
 // Effect controller 10 work (game/espgen10.cpp): plays an effect sequence (cEspSeqHead) record by
 // record. est.cpp EstSet fills it directly.
-struct Espgen10Work {
+typedef struct tagESPGEN10_WK {
     cEspSeqHead* head;  // 0x14
     cModel* pMod;     // 0x18
     u32 Guid_pMod;        // 0x1C model serial the controller was set up with
@@ -163,7 +163,7 @@ struct Espgen10Work {
     Vec Ang;           // 0x68
     ESPSEQ_CONTROL opt;     // 0x74 copy of the option block p8 points at
     ESPSEQ_CONTROL* p8;     // 0x90
-};
+} ESPGEN10_WK;
 
 // Water surface work shared by generators 42 (room water, game/Espgen42.cpp) and 45 (weather water,
 // game/espgen45.cpp): a (nx+1) x (ny+1) height field with two ping-pong height buffers, drawn through

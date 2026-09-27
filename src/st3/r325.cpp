@@ -169,7 +169,7 @@ extern "C" void Evt_R325S00_Func(Event* e)
         if (e->GetNowCut() == 8) {
             if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod)->ObjChainFlagCommon |= 0x04000000;
@@ -180,7 +180,7 @@ extern "C" void Evt_R325S00_Func(Event* e)
         } else {
             if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod)->ObjChainFlagCommon &= ~0x04000000;

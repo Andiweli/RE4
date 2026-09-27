@@ -13,7 +13,7 @@ void OyaSetObj00(cObj* obj, cModel* oya, int partsNo);
 
 // Hanging object work (game/obj00.cpp): follows a parts of its parent (`oya`) with a slerp
 // blend, or falls as a three-point rope (obj00FallMove).
-struct Obj00Work {
+struct FREE_OBJ00 {
     u32 be_flag;            // 0x00  bit2: falling, bit3: blending toward the parent, bit5: fading out
     void* pMot;             // 0x04
     int pSeq;               // 0x08  MotionSetCore 4th argument
@@ -35,13 +35,13 @@ struct Obj00Work {
 // three-point rope when cut, fades out when flagged.
 class cObj00 : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  Obj00Work
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ00
 
     virtual void move();
     virtual ~cObj00() {}
     void setScrAtari(f32 r);
 };
 
-#define OBJ00_WK(o) ((Obj00Work*) (o)->free)
+#define OBJ00_WK(o) ((FREE_OBJ00*) (o)->free)
 
 #endif

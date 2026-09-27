@@ -11,7 +11,7 @@ void Obj01SetEst(cObj* pObj, u32 eff, u32 est, u32 action, u32 eff2, u32 est2, u
 
 // Grenade work (game/obj01.cpp): flies under gravity, bounces off the scenario, can be held by a
 // model (follows its parts) and explodes / lands in water after `life` frames.
-struct Obj01Work {
+struct FREE_OBJ01 {
     u32 be_flag;            // 0x00  bit0 start motion, bit1 motion running, bit2 water / bounce check, bit3 rotate parts 0
     void* pMot;           // 0x04
     u8 pad_8[2];
@@ -44,7 +44,7 @@ struct Obj01Work {
 // or drowns when its fuse runs out; can be held by a model until `holdTimer` expires.
 class cObj01 : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  Obj01Work
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ01
 
     virtual void move();
     virtual ~cObj01() {}
@@ -53,6 +53,6 @@ public:
     void dmgSet(int kind);
 };
 
-#define OBJ01_WK(o) ((Obj01Work*) (o)->free)
+#define OBJ01_WK(o) ((FREE_OBJ01*) (o)->free)
 
 #endif

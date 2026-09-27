@@ -1254,7 +1254,7 @@ static int item_make_mes_y = -0x13;
 void itemMakeInit(SUB_SCREEN* wk)
 {
     SsItemMakeWork* mk = ITEM_MAKE_WORK(wk);
-    ItemInfo info;
+    ITEM_INFO info;
     int i;
 
     for (i = 0; i < 2; i++) {
@@ -1295,7 +1295,7 @@ void itemMakeMove(SUB_SCREEN* wk)
     SsItemMakeWork* mk = ITEM_MAKE_WORK(wk);
     cItem* got = 0;
     cItem* cur = ITEM_PTR(iw->idx[iw->col], iw->col);
-    ItemInfo info;
+    ITEM_INFO info;
     int i;
 
     if (joy->rep & 0x00080008) {

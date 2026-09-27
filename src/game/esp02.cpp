@@ -11,15 +11,15 @@
 #define ESP02_STRIP_NUM 1
 #define ESP_STRIP_PTS_MAX 16
 
-struct Esp02Work {
+typedef struct tagESP02_WK {
     Mtx ParMat;   // 0x00 parent matrix at the time the sprite left its parent
     Vec BasePos;  // 0x30 local position
-};
+} ESP02_WK;
 
 // Single-segment camera-facing strip (a stretched sprite from pos along -x).
 class cEsp02 : public cEsp {
 public:
-    Esp02Work m_Free;  // 0xF8
+    ESP02_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -41,7 +41,7 @@ cEsp* Esp02_Create()
 // Trans(BasePos); m_Pos becomes the transformed base position.
 void cEsp02::move()
 {
-    Esp02Work* w = &m_Free;
+    ESP02_WK* w = &m_Free;
 
     if (parent != pEffParentWorld && m_Release_time != 0xFF && m_Release_time <= m_Life_time) {
         PSMTXCopy(parent->mat, w->ParMat);
@@ -84,7 +84,7 @@ extern "C" void Esp02_Trans(cEsp02* esp)
 // pattern, blend mode and vertex formats for the strip. Screen-mode Parts_no is an error.
 void EspStrip02_setup(cEsp02* pEsp)
 {
-    Esp02Work* w = &pEsp->m_Free;
+    ESP02_WK* w = &pEsp->m_Free;
     Mtx id;
     Mtx m;
 
@@ -193,7 +193,7 @@ void esp02Trans_sub(cEsp02* pEsp)
 // Records the base position and an identity ParMat; screen-mode Parts_no is rejected.
 int cEsp02::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp02Work* w = &m_Free;
+    ESP02_WK* w = &m_Free;
 
     w->BasePos = m_Pos;
     PSMTXIdentity(w->ParMat);

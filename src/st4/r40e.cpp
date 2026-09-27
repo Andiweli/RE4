@@ -455,7 +455,7 @@ extern "C" void Evt_R40ES00_Func(Event* e)
                     ((cModel*) mod)->LightInfo.EnableMask = 2;
                 }
                 if (e->GetMod(&mod, "pl0c00", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod)->ObjChainFlagCommon |= 0x04000000;

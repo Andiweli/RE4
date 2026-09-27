@@ -1274,7 +1274,7 @@ int cItemMgr::init()
     m_array_num = 0x180;
 #line 2508 "D:/Bio4/Prog/item.cpp"
     m_pItem = (cItem*) MEM_ALLOC(0x180 * sizeof(cItem), 1, 13);
-    m_p_order_tbl = (ItemOrder*) MEM_ALLOC(m_array_num * sizeof(ItemOrder), 1, 13);
+    m_p_order_tbl = (ITEM_ORDER*) MEM_ALLOC(m_array_num * sizeof(ITEM_ORDER), 1, 13);
     if (m_pItem == 0) {
         return 0;
     }
@@ -1302,7 +1302,7 @@ int cItemMgr::init()
 
 // Static item table: type (1 weapon, 2 ammo, 3 knife-like, 5/12 treasure, 6 grenade, 7 map, 8 money,
 // 9 weapon part, 10 file, 11 key, 13 gem, 14 ...), default pick-up count and max per slot for every id.
-void itemInfo(ITEM_ID id, ItemInfo* info)
+void itemInfo(ITEM_ID id, ITEM_INFO* info)
 {
     switch (id) {
     case 0x03:
@@ -1820,7 +1820,7 @@ cItem* cItemMgr::minimumSearch(ITEM_ID id)
 // qsort comparator: descending count.
 int order_cmp(const void* a, const void* b)
 {
-    return ((ItemOrder*) b)->num - ((ItemOrder*) a)->num;
+    return ((ITEM_ORDER*) b)->num - ((ITEM_ORDER*) a)->num;
 }
 
 // Fills m_p_order_tbl with the slots of item `id` sorted by descending count (reload order).
@@ -1838,7 +1838,7 @@ void cItemMgr::ordering(ITEM_ID id)
         }
     }
     m_order_tbl_num = n;
-    qsort(m_p_order_tbl, n, sizeof(ItemOrder), order_cmp);
+    qsort(m_p_order_tbl, n, sizeof(ITEM_ORDER), order_cmp);
 }
 
 // Adds n pesetas (capped at 99,999,999).
@@ -1856,8 +1856,8 @@ int addMoney(int n)
 // maxNum (0 when full), otherwise a new slot is constructed (m_pNew). Returns 0 when nothing was taken.
 int cItemMgr::get(ITEM_ID id, int num)
 {
-    ItemInfo info;
-    ItemInfo* pInfo = &info;
+    ITEM_INFO info;
+    ITEM_INFO* pInfo = &info;
     cItem* p;
     int max;
     int i;
@@ -2182,7 +2182,7 @@ int cItemMgr::dumpAll(cItem* p)
     return 1;
 }
 
-// Discards every item of ItemInfo type t (e.g. type 7 maps at a new round).
+// Discards every item of ITEM_INFO type t (e.g. type 7 maps at a new round).
 int cItemMgr::dumpType(int type)
 {
     cItem* p = m_pItem;
@@ -2858,14 +2858,14 @@ u16 cItemMgr::bulletNum(cItem* p)
 // Size of the item save block.
 int cItemMgr::saveDataSize()
 {
-    return sizeof(ItemSaveData);
+    return sizeof(_ITEM_SAVE_DATA);
 }
 
 // Writes every slot to the save block (id with the set bit, levels/bullets for weapons and parts,
 // counts, case position) plus the armed slot index and weapon id.
 void cItemMgr::save(void* pData)
 {
-    ItemSaveData* sd = (ItemSaveData*) pData;
+    _ITEM_SAVE_DATA* sd = (_ITEM_SAVE_DATA*) pData;
     ItemSaveWork* s = sd->item_list;
     cItem* p = m_pItem;
     int i;
@@ -2915,7 +2915,7 @@ void cItemMgr::save(void* pData)
 // Restores the slots from the save block and re-arms the saved slot.
 void cItemMgr::load(void* pData)
 {
-    ItemSaveData* sd = (ItemSaveData*) pData;
+    _ITEM_SAVE_DATA* sd = (_ITEM_SAVE_DATA*) pData;
     ItemSaveWork* s = sd->item_list;
     cItem* p = m_pItem;
     int i;

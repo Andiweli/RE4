@@ -158,7 +158,7 @@ void Em39Init(cEm* em)
 // are still alive when the boss is removed.
 cEm39::~cEm39()
 {
-    Em39Work* w = EM39_WK(this);
+    FREE_EM39* w = EM39_WK(this);
 
     if (w->pKnife && w->pKnife->isAlive()) {
         EmMgr.destroy(w->pKnife);
@@ -181,7 +181,7 @@ cEm39::~cEm39()
 // the scene is suspended (be_flag 0x800), or lets them suspend again.
 void cEm39::setNoSuspend(int on)
 {
-    Em39Work* w = EM39_WK(this);
+    FREE_EM39* w = EM39_WK(this);
 
     if (on) {
         be_flag |= 0x800;
@@ -210,7 +210,7 @@ void cEm39::setNoSuspend(int on)
 // accumulated damage. In room 0x31C the script handles his death.
 void em39DmCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     YARARE_INFO* hit;
     int dmg;
 
@@ -507,7 +507,7 @@ static EmAtkInfo em39_atk_tbl[10] = {
 // enemy. Stage collision is skipped during the jump motions (seFlags 0x40).
 void cEm39::move()
 {
-    Em39Work* w = EM39_WK(this);
+    FREE_EM39* w = EM39_WK(this);
     f32 dist;
 
     if (r_no_0) {
@@ -637,7 +637,7 @@ void cEm39::move()
 // picks the starting routine, including type 2's knife exchange outcome scenes.
 static void em39_R0_Init(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     cModelInfo* info;
     Vec pos;
     Vec rot;
@@ -776,7 +776,7 @@ static void em39_R0_Init(cEm39* em)
     em->pFsdTbl = &Em39_fs_tbl;
     em->Motion.flip = em39_flip_tbl;
 #line 1268 "D:/Bio4/Prog/em39.cpp"
-    em->Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 0xD);
+    em->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xD);
     // GNU constructor expressions: emitted at the statement like strings, and shared through the
     // constant hash (plem39_CliffAtk reuses this zero vector).
     em->LightInfo.init2(0, 1, &((Vec) { 0.0f, 0.0f, 0.0f }), &((Vec) { 10000.0f, 10000.0f, 10000.0f }), 2);
@@ -909,7 +909,7 @@ static void em39_R0_Init(cEm39* em)
 // hands), keeping the current one when unchanged (Hand_type).
 void em39HandSet(cEm39* em, int type)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     cModelInfo* info;
     void* bin;
 
@@ -998,7 +998,7 @@ static void em39_R1_br_Dummy(cEm39* em)
 // away, collision off, invulnerable (dmType 2, Be_flg 0x30) while the cutscene dialogue runs.
 static void em39_R1_Talk1st(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     em->dmg.m_Timer = 2;
     w->Be_flg |= 0x30;
@@ -1022,7 +1022,7 @@ static void em39_R1_Talk1st(cEm39* em)
 // Routine 1/1 (setTalk2nd): the same idle at the second talk spot.
 static void em39_R1_Talk2nd(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     em->dmg.m_Timer = 2;
     w->Be_flg |= 0x30;
@@ -1048,7 +1048,7 @@ static void em39_R1_Talk2nd(cEm39* em)
 // side (plem39_Success); then Be_flg 0x00800000 (ckBombCutEnable: the fight is on) and Wait.
 static void em39_R1_Success(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     em->dmg.m_Timer = 2;
     switch (em->r_no_2) {
@@ -1112,7 +1112,7 @@ static void plem39_Success(cPlayer* pl)
 // when a cliff spot is at hand (em39GetCliffPos), else Wait.
 static void em39_R1_Failure(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     em->dmg.m_Timer = 2;
     switch (em->r_no_2) {
@@ -1173,7 +1173,7 @@ static void plem39_Failure(cPlayer* pl)
 // him dodge, step or escape.
 static void em39_R1_Wait(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x30;
     if (em->type != 2 && em->r_no_2 == 0) {
@@ -1277,7 +1277,7 @@ static void em39_R1_Wait(cEm39* em)
 // attacks with the bow, the machine gun or a grenade.
 static void em39_R1_Sit(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x30;
     switch (em->r_no_2) {
@@ -1361,7 +1361,7 @@ static void em39_R1_Sit(cEm39* em)
 // hides, else crouches again (Sit) with a 90..135 frame attack wait.
 static void em39_R1_SitDown(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x30;
     switch (em->r_no_2) {
@@ -1393,7 +1393,7 @@ static void em39_R1_SitDown(cEm39* em)
 // nearby player or drawing the gun or a grenade from the wall. Be_flg 0x20000 sends him into hiding.
 static void em39_R1_WallWait(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     f32 dy;
 
     w->Be_flg |= 0x30;
@@ -1455,7 +1455,7 @@ static void em39_R1_WallWait(cEm39* em)
 // checks. Routine 1/8: the walk at the target. Route_type tracks which side of the player he is on.
 static void em39_R1_Walk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x30;
     switch (em->r_no_2) {
@@ -1566,7 +1566,7 @@ static void em39_R1_Walk(cEm39* em)
 // dodge, a step or the escape; then the jump / fence / door / goto checks and the leave-area hide.
 static void em39_R1_Run(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x30;
     switch (em->r_no_2) {
@@ -1675,7 +1675,7 @@ static void em39_R1_Run(cEm39* em)
 // early. The jump / fence / door checks and the leave-area hide run every frame.
 static void em39_R1_Goto(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x30;
     switch (em->r_no_2) {
@@ -1748,7 +1748,7 @@ static void em39_R1_Goto(cEm39* em)
 // / walk; otherwise Walk when it ends. Jump / fence / goto checks every frame.
 static void em39_R1_Turn180(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x30;
     switch (em->r_no_2) {
@@ -1799,7 +1799,7 @@ static void em39_R1_Turn180(cEm39* em)
 // at: a wall jump (30 %), a step within 5 m or the escape.
 static void em39_R1_Threat(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int end;
 
     w->Be_flg |= 0x10;
@@ -1852,7 +1852,7 @@ static void em39_R1_Threat(cEm39* em)
 // invulnerable until motion event bit 2, and sets the next escape 150..300 frames out.
 static void em39_R1_Escape(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec a;
     Vec b;
     int end;
@@ -1976,7 +1976,7 @@ static void em39_R1_Escape(cEm39* em)
 // bit 2.
 static void em39_R1_Backjump(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int jump;
 
     w->Be_flg |= 0x30;
@@ -2103,7 +2103,7 @@ static void em39_R1_Backjump(cEm39* em)
 // a wall jump / turn / dodge / run; otherwise Turn, a dodge or the run / walk at the end.
 static void em39_R1_Step(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec a;
     Vec b;
 
@@ -2202,7 +2202,7 @@ static void em39_R1_Step(cEm39* em)
 // time a turn or the melee selection; else Turn or the run / walk at the end.
 static void em39_R1_Slant(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x30;
     switch (em->r_no_2) {
@@ -2266,7 +2266,7 @@ static void em39_R1_Slant(cEm39* em)
 // 135 deg at the end).
 static void em39_R1_Slant2(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x30;
     switch (em->r_no_2) {
@@ -2327,7 +2327,7 @@ static void em39_R1_Slant2(cEm39* em)
 // sets SuperDashWait by difficulty (360..900). On event bit 2 the melee selection, else Wait step 2.
 static void em39_R1_SuperDash(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec spd;
     f32 d;
 
@@ -2386,7 +2386,7 @@ static void em39_R1_SuperDash(cEm39* em)
 // below y -4 m it hides for 200 frames; else a goto point or the run / walk. Be_flg 0x20000 hides.
 static void em39_R1_JumpDown(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int end;
     Vec v;
     f32 fl;
@@ -2469,7 +2469,7 @@ static void em39_R1_JumpDown(cEm39* em)
 // the run / walk.
 static void em39_R1_JumpUp(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Mtx m;
     Vec v;
 
@@ -2518,7 +2518,7 @@ static void em39_R1_JumpUp(cEm39* em)
 // horizontal gap a tenth per frame, facing Target_dir. Then a goto point or the run / walk.
 static void em39_R1_JumpUp2(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Mtx m;
     Vec v;
 
@@ -2594,7 +2594,7 @@ static void em39_R1_JumpUp2(cEm39* em)
 // jumps), then a goto point, or a gun burst (50 % beyond 5 m) / grenade throw from above.
 static void em39_R1_JumpUp3(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Mtx m;
     Vec v;
     f32 zf;
@@ -2722,7 +2722,7 @@ static void em39_R1_JumpUp3(cEm39* em)
 // point or Walk.
 static void em39_R1_FanceJump(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x100;
     em->setStatus(EM_STATUS_IK_OFF);
@@ -2747,7 +2747,7 @@ static void em39_R1_FanceJump(cEm39* em)
 // awards the escape point.
 static void em39_R1_AtkKnife(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x80;
     w->Be_flg &= ~0x20;
@@ -2844,7 +2844,7 @@ static void em39_R1_AtkKnife(cEm39* em)
 }
 
 // The knife swing at a door (cEmDoor): break or open it at the hit frame.
-static inline void em39DoorHit(cEm39* em, Em39Work* w)
+static inline void em39DoorHit(cEm39* em, FREE_EM39* w)
 {
     if ((em->Motion.Seq_old.Free & 1) && w->pDoor) {
         if (w->pDoor->isAlive()) {
@@ -2863,7 +2863,7 @@ static inline void em39DoorHit(cEm39* em, Em39Work* w)
 // run / walk.
 static void em39_R1_AtkDoor(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x80;
     w->Be_flg &= ~0x20;
@@ -2945,7 +2945,7 @@ static void em39_R1_br_KnifeCatch(cEm39* em)
 // A miss awards the escape point, then a wall jump, the back flip within 3 m or Wait.
 static void em39_R1_KnifeCatch(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     f32 pang = 0.0f;
 
     w->Be_flg |= 0x80;
@@ -3016,7 +3016,7 @@ static void em39_R1_KnifeCatch(cEm39* em)
 // free and the stab for 1150 damage.
 static void em39_R1_KnifeHit(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int end;
 
     switch (em->r_no_2) {
@@ -3228,7 +3228,7 @@ static void plem39_KnifeHit(cPlayer* pl)
 // an unparried swing lands for 1150 damage.
 static void em39_R1_Knife4Atk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int end;
 
     switch (em->r_no_2) {
@@ -3561,7 +3561,7 @@ static void plem39_Knife4Atk(cPlayer* pl)
 // flips away.
 static void em39_R1_Atk_MG(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec target;
     Vec a;
     Vec b;
@@ -3704,7 +3704,7 @@ static void em39_R1_Atk_MG(cEm39* em)
 // jump, Turn or Walk.
 static void em39_R1_Reload(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -3745,7 +3745,7 @@ static void em39_R1_Reload(cEm39* em)
 // flinches.
 static void em39_R1_AppearMG(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec target;
     Vec a;
     Vec b;
@@ -3891,7 +3891,7 @@ static void em39_R1_AppearMG(cEm39* em)
 // back behind cover and returns to WallWait with a 60..90 frame attack wait.
 static void em39_R1_AppearMG2(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec target;
     Vec a;
     Vec b;
@@ -4039,7 +4039,7 @@ static void em39_R1_AppearMG2(cEm39* em)
 // runs; then back to the crouch with a 90..135 frame attack wait.
 static void em39_R1_AppearGR(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec target;
     Vec a;
     Vec b;
@@ -4139,7 +4139,7 @@ static void em39_R1_AppearGR(cEm39* em)
 // distance), then back behind cover to WallWait with a 60..90 frame attack wait.
 static void em39_R1_AppearGR2(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec target;
     Vec pos;
     Vec rot;
@@ -4200,7 +4200,7 @@ static void em39_R1_AppearGR2(cEm39* em)
 // the arena he aims at fixed spots along the walkway instead of the player, repeating r_no_3 times.
 static void em39_R1_ThrowGR(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec hand;
 
     Vec p1 = { 28961.0f, 5250.0f, -2620.0f };
@@ -4333,7 +4333,7 @@ static void em39_R1_ThrowGR(cEm39* em)
 // down or leaves.
 static void em39_R1_AppearBow(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec target;
     Vec a;
     Vec b;
@@ -4521,7 +4521,7 @@ static void em39_R1_AppearBow(cEm39* em)
 // vanishes into hiding (Hide) for 200 frames.
 static void em39_R1_Flash(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec pos;
     Vec rot;
     Vec spd;
@@ -4578,7 +4578,7 @@ static void em39_R1_Flash(cEm39* em)
 // (Flash_damage) is under the phase's limit.
 static void em39_R1_Hide(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int lim;
 
     em->dmg.m_Timer = 2;
@@ -4647,7 +4647,7 @@ static void em39_R1_Hide(cEm39* em)
 // the player kept at 1 HP for it), otherwise the player bleeds and is knocked down facing the boss.
 static void em39_R1_br_T_Atk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     if (em->hp > 0 && (em->Motion.Seq_old.Free & 1) && w->Atk_ck == 0) {
         em39LeftArmAtkCk(em, 4);
@@ -4733,7 +4733,7 @@ static void em39_R1_br_T_Atk(cEm39* em)
 // miss) leads into the retreating back flip, a dead player into Wait.
 static void em39_R1_T_Atk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int end;
 
     w->Be_flg |= 0x80;
@@ -4759,7 +4759,7 @@ static void em39_R1_T_Atk(cEm39* em)
 // with the duck prompt (em39SitAction); exits as em39_R1_T_Atk.
 static void em39_R1_T_BackKnuckle(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int end;
 
     w->Be_flg |= 0x80;
@@ -4788,7 +4788,7 @@ static void em39_R1_T_BackKnuckle(cEm39* em)
 // knock-down outcome as em39_R1_br_T_Atk.
 static void em39_R1_br_T_LongAtk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     if (em->hp > 0 && (em->Motion.Seq_old.Free & 1) && w->Atk_ck == 0) {
         em39LeftArmAtkCk(em, 6);
@@ -4833,7 +4833,7 @@ static void em39_R1_br_T_LongAtk(cEm39* em)
 // while he faces the player. Exits as em39_R1_T_Atk.
 static void em39_R1_T_LongAtk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int end;
 
     w->Be_flg |= 0x80;
@@ -4904,7 +4904,7 @@ static void em39_R1_T_LongAtk(cEm39* em)
 // attack or a walk within 3 m; otherwise the retreating back flip or Wait.
 static void em39_R1_T_JumpAtk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x80;
     w->Be_flg &= ~0x20;
@@ -5042,7 +5042,7 @@ static void plem39_Stamp(cPlayer* pl)
 // a critical-hit rank point.
 static void em39SitAction(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     SetPlDamage(em, plem39Sit);
     w->Act_ck = 1;
@@ -5077,7 +5077,7 @@ static void plem39Sit(cPlayer* pl)
 // variant, step 2, when the boss is behind him), Act_ck marks the dodge, a critical-hit rank point.
 static void em39BackjumpAction(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     f32 ang = fabsf(Muku(&pPL->pos, &em->pos, pPL->ang.y, PI));
 
     SetPlDamage(em, plemBackjump);
@@ -5193,7 +5193,7 @@ static void em39_R1_br_T_Kick(cEm39* em)
 // he may chain another kick or the low kick, pick a melee attack, walk, or back flip away.
 static void em39_R1_T_Kick(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec a;
     Vec b;
 
@@ -5293,7 +5293,7 @@ static void em39_R1_br_T_LowKick(cEm39* em)
 // retreating back flip or Wait.
 static void em39_R1_T_LowKick(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int st = em->r_no_2;
 
     w->Be_flg |= 0x80;
@@ -5361,7 +5361,7 @@ static void em39_R1_T_LowKick(cEm39* em)
 // fall kills.
 static void em39_R1_T_LowKickHit(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int st = em->r_no_2;
     int end;
 
@@ -5575,7 +5575,7 @@ static u32 em39MarkerCol1 = 0x20800000;
 // a break-free, Be_flg 0x800000 marks the fight as on.
 static void em39_R1_T_CliffAtk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int st = em->r_no_2;
     Mtx mat;
     Vec a;
@@ -5856,7 +5856,7 @@ static void em39_R0_Damage(cEm39* em)
 // EM39_DM_RECOVER picks the next routine.
 static void em39_R1_Dm_Normal(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x10;
     w->Total_damage = 0;
@@ -5915,7 +5915,7 @@ static void em39_R1_Dm_Normal(cEm39* em)
 // em39_R1_Dm_Normal.
 static void em39_R1_Dm_Head(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Be_flg |= 0x10;
     w->Total_damage = 0;
@@ -5967,7 +5967,7 @@ static void em39_R1_Dm_Head(cEm39* em)
 // the recovery handling of em39_R1_Dm_Normal.
 static void em39_R1_Dm_Blow(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int rtn;
 
     w->Be_flg |= 0x10;
@@ -6079,7 +6079,7 @@ static void em39_R1_Dm_Blow(cEm39* em)
 // 8 on event bit 0.
 static void em39_R1_Dm_T_Head(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int st;
     int end;
 
@@ -6106,7 +6106,7 @@ static void em39_R1_Dm_T_Head(cEm39* em)
 // Dm_T_DownHead), then the recovery of EM39_DM_T_RECOVER.
 static void em39_R1_Dm_T_Down(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int st;
     int end;
 
@@ -6139,7 +6139,7 @@ static void em39_R1_Dm_T_Down(cEm39* em)
 // voice, invulnerable, then the same recovery choice as em39_R1_Dm_T_Head (run / walk at the end).
 static void em39_R1_Dm_T_DownHead(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int st;
     int end;
 
@@ -6204,7 +6204,7 @@ static void em39_R0_Die(cEm39* em)
 // holds the last frame, drops the item and the stream fades out.
 static void em39_R1_Die_Normal(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int st = em->r_no_2;
 
     switch (st) {
@@ -6249,7 +6249,7 @@ static void em39_R1_Die_Normal(cEm39* em)
 // bit 0) and vanishes: item dropped, collision off, unlockable and hidden; invulnerable throughout.
 static void em39_R1_Die_Flash(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int st = em->r_no_2;
     Vec pos;
     Vec rot;
@@ -6318,7 +6318,7 @@ static void em39_R1_Die_Flash(cEm39* em)
 // the target, which a goto (Goto_mode) replaces. The type 0 / 1 distance branches are dead code.
 void em39RouteCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec plPos;
     Vec a;
     Vec b;
@@ -6410,7 +6410,7 @@ void em39RouteCk(cEm39* em)
 // Neck: turn the head (parts 3 inv_offset) towards the player while flags bit 4 is set, else relax.
 void em39NeckMove(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     cParts* p = em->getPartsPtr(4);
     cParts* plp = pPL->getPartsPtr(4);
     Vec a;
@@ -6462,7 +6462,7 @@ asm(".section .rodata\n\t.long 0x3f666666, 0x3ca3d70b, 0x3f800000\n\t.text");
 // Laser marker: from the machine gun muzzle (x8B4 == 3) or the bow (x8B4 == 4) to the target.
 void em39MarkerMove(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     cParts* p;
     Vec from;
     Vec to;
@@ -6513,7 +6513,7 @@ void em39MarkerMove(cEm39* em)
 // Machine gun shot: a line from the muzzle with a random spread; hits the player or leaves a spark.
 int em39GunHitCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec from;
     Vec to;
     EmAtkInfo atk;
@@ -6762,7 +6762,7 @@ int em39AtkCk(cEm39* em, int no, int parts)
 // once per attack (Atk_ck). The player's reaction to a hit depends on the attack. Returns 1 on a hit.
 int em39AtkCk2(cEm39* em, int no, Vec* a, Vec* b)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int hit = w->Atk_ck;
     u32 res;
     f32 ang;
@@ -6842,7 +6842,7 @@ int em39AtkCk2(cEm39* em, int no, Vec* a, Vec* b)
 // Flags bit 17 when the player stands near one of the two tower bases.
 void em39PLNearTowerCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec a = { -8462.0f, -3150.0f, -7937.0f };
     Vec b = { 7111.0f, -3150.0f, -8987.0f };
 
@@ -6882,7 +6882,7 @@ void em39PLNearTowerCk(cEm39* em)
 // started.
 int em39JumpDownCk(cEm39* em, int force)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec drop = { 8941.0f, 2050.0f, -9080.0f };
     Vec a;
     Vec b;
@@ -6943,7 +6943,7 @@ int em39JumpDownCk(cEm39* em, int force)
 // Jump up: a ladder object (type 0x13) or a scenario ladder near the enemy.
 int em39JumpUpCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Mtx m;
     Vec a;
     Vec pos;
@@ -7012,7 +7012,7 @@ int em39JumpUpCk(cEm39* em)
 // Jump up along a pair of EMI type 0x11 points (state 0 at the foot, 1 at the top, same group byte).
 int em39JumpUpCk2(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     u32 i;
     u32 j;
 
@@ -7073,7 +7073,7 @@ int em39JumpUpCk2(cEm39* em)
 // Drop down along a pair of EMI type 0x11 points (sub 1).
 int em39JumpUpCk3(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     EmiData* emi = EM39_EMI;
     u32 i;
     u32 j;
@@ -7187,7 +7187,7 @@ void em39BloodSet(cEm39* em)
 // Two-motion blend: m0 as the main motion, m1 / m2 by the sign of Blend as the blended one.
 void em39BlendMotSet(cEm39* em, void* m0, void* m1, void* m2, void* seq0, void* seq1, void* seq2, u16 attr)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     MOTION_INFO* bm;
     void* m;
     void* seq;
@@ -7232,7 +7232,7 @@ void em39BlendMotSet(cEm39* em, void* m0, void* m1, void* m2, void* seq0, void* 
 // Returns 1 when he appeared.
 int em39AppearCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec plPos;
     Vec pos;
     int retry;
@@ -7366,7 +7366,7 @@ int em39AppearCk(cEm39* em)
 // The player stands on the exit point (EMI type 0xE, state 2) of the enemy's entry group.
 int em39ExitCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     EmiData* emi = EM39_EMI;
     u32 i;
 
@@ -7402,7 +7402,7 @@ int em39ExitCk(cEm39* em)
 // Move to the group's EMI type 0xE state 3 point, and retire the group's other points.
 int em39AreaMoveCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     u32 i;
     // `t`/`ofs` shared by both loops: with two sets each they are non-replaceable user-variable givs whose benefit
     // (3/5 - copy_cost 4 - add_cost 2) is negative, so loop.c leaves the outer `i*64+8` unreduced (`slwi; addi 8` per
@@ -7468,7 +7468,7 @@ int em39AreaMoveCk(cEm39* em)
 // Change the sitting point to another free EMI type 0xE point of the same group.
 int em39SitChg(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     u32 i;
 
     if (pG->pEmi == 0) {
@@ -7537,7 +7537,7 @@ int em39AreaCk(cEm39* em, int sub, int state, int group)
 // Weapon in hand: 0 none, 1 knife, 2 (grenade), 3 machine gun, 4 bow.
 void em39WepSet(cEm39* em, int no)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Wep_type = no;
     if (w->pMachineGun) {
@@ -7674,7 +7674,7 @@ void em39WepSet(cEm39* em, int no)
 // and rumbles. Returns 1 on a catch.
 int em39CatchCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     EM39_CATCH_BODY(em, w);
 }
@@ -7682,7 +7682,7 @@ int em39CatchCk(cEm39* em)
 // The kick zone test of the final form's kicks: the same box as em39CatchCk.
 int em39KickHitCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     EM39_CATCH_BODY(em, w);
 }
@@ -7690,7 +7690,7 @@ int em39KickHitCk(cEm39* em)
 // Arrow on the bow (weapon 0x37): only while no thrown knife is out.
 void em39ArrowSet(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec pos;
     Vec rot;
 
@@ -7729,7 +7729,7 @@ void em39ArrowSet(cEm39* em)
 // attack 0, the wall hit sound); the bow string relaxes and the arrow becomes free-flying.
 void em39ArrowFire(cEm39* em, Vec* target, int mode)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Mtx m;
     Vec pos;
     Vec tgt;
@@ -7799,7 +7799,7 @@ void em39ArrowFire(cEm39* em, Vec* target, int mode)
 // Bow string parts (4) drawn / hidden, arrow transparency and the aiming effect.
 void em39BowSet(cEm39* em, int on)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     cParts* p;
 
     if (w->pBow == 0) {
@@ -7830,13 +7830,13 @@ void em39BowSet(cEm39* em, int on)
 // A door (em 0x41) the knife swing can open: in front, within its frame, openable.
 int em39DoorOpenCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec p;
     u32 i;
 
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEmDoor* d = (cEmDoor*) EmMgr.fastAt(i);
-        EmDoorWork* dw;
+        FREE_EMDOOR* dw;
         f32 ang;
         u32 st;
 
@@ -7912,7 +7912,7 @@ int em39DoorOpenCk(cEm39* em)
 // the routines set through Arm_rno. Pose changes play the arm's flesh sound.
 void em39ArmControl(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     int se = 0;
     void* mot;
 
@@ -8053,7 +8053,7 @@ void em39ArmControl(cEm39* em)
 // Fence jump: a fence (attribute 0x20) right in front; the landing side is the free one.
 int em39FanceJumpCk2(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec a;
     Vec b;
     Vec hit;
@@ -8139,7 +8139,7 @@ int em39FanceJumpCk(cEm39* em)
 // Damage value of the hit (100 for the non-weapon ids), doubled at the head parts.
 int em39SetDmVal(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     YARARE_INFO* h = em->dmg.m_pDamageYarare;
     int far = 0;
     int val;
@@ -8161,7 +8161,7 @@ int em39SetDmVal(cEm39* em)
 // Attack return: what the enemy does after an attack ended.
 int em39AtkRtnCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec a;
     Vec b;
     Vec c;
@@ -8276,7 +8276,7 @@ int em39AtkRtnCk(cEm39* em)
 // there (1/0xA). Returns 1 when started.
 int em39GotoCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     if (w->Goto_mode == 0) {
         return 0;
@@ -8289,7 +8289,7 @@ int em39GotoCk(cEm39* em)
 // (Locate), damage counters reset, a 30-frame attack wait, Wait.
 void cEm39::set2ndBattle()
 {
-    register Em39Work* w asm("r29"); // COMPILER-DIFF: #13 -- w kept live past its last store (see the asm below)
+    register FREE_EM39* w asm("r29"); // COMPILER-DIFF: #13 -- w kept live past its last store (see the asm below)
     Vec p = { 31259.0f, 5250.0f, -14068.0f };
     u32 zero;
 
@@ -8311,7 +8311,7 @@ void cEm39::set2ndBattle()
 // For the level script: the first door was opened: phase 1, the appearance damage counter reset.
 void cEm39::set1stDoorClear()
 {
-    Em39Work* w = EM39_WK(this);
+    FREE_EM39* w = EM39_WK(this);
 
     w->Flash_damage = 0;
     w->Locate = 1;
@@ -8320,7 +8320,7 @@ void cEm39::set1stDoorClear()
 // For the level script: the second door was opened: phase 4, the appearance damage counter reset.
 void cEm39::set2ndDoorClear()
 {
-    Em39Work* w = EM39_WK(this);
+    FREE_EM39* w = EM39_WK(this);
 
     w->Flash_damage = 0;
     w->Locate = 4;
@@ -8373,7 +8373,7 @@ void em39VoiceMove(cEm39* em)
 // Stops the current voice and plays voice `no` at the head part 4; any queued line is dropped.
 void em39SetVoice(cEm39* em, u16 no)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     cParts* p = em->getPartsPtr(4);
 
     SndStop(w->Se_id, 0);
@@ -8385,7 +8385,7 @@ void em39SetVoice(cEm39* em, u16 no)
 // delay in Speech_wait, `time` the voice number in Speech_se).
 void em39SetSpeech(cEm39* em, int no, int time)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     w->Speech_wait = no;
     w->Speech_se = time;
@@ -8394,7 +8394,7 @@ void em39SetSpeech(cEm39* em, int no, int time)
 // Per frame: counts the queued line down and plays it when due.
 void em39SpeechMove(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     if (w->Speech_wait) {
         w->Speech_wait--;
@@ -8407,7 +8407,7 @@ void em39SpeechMove(cEm39* em)
 // Slant (side-step) towards the player from mid range; the side alternates.
 int em39SlantCk(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     Vec a;
     Vec b;
     int hit;
@@ -8449,7 +8449,7 @@ int em39SlantCk(cEm39* em)
 // Tower form: jump aside when the player aims from far enough (by difficulty / remaining hp).
 int em39SlantCk2(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
 
     if (em->type != 2) {
         return 0;
@@ -8705,7 +8705,7 @@ void em39LeftArmAtkCk(cEm39* em, int no)
 // The closest EMI type 0xD point to the player within 2000: the cliff-attack spot.
 int em39GetCliffPos(cEm39* em)
 {
-    Em39Work* w = EM39_WK(em);
+    FREE_EM39* w = EM39_WK(em);
     EmiData* emi = EM39_EMI;
     EmiEntry* best;
     f32 bestDist;
@@ -8760,7 +8760,7 @@ void cEm39::setDieCancel()
 // and has not run yet (0x80000).
 int cEm39::ckTalk1st()
 {
-    Em39Work* w = EM39_WK(this);
+    FREE_EM39* w = EM39_WK(this);
 
     if (w->Be_flg & 0x80000) {
         return 0;
@@ -8774,7 +8774,7 @@ int cEm39::ckTalk1st()
 // For the level script: starts the first talk (voice cut, invulnerable, Be_flg 0x80000, Talk1st).
 void cEm39::setTalk1st()
 {
-    Em39Work* w = EM39_WK(this);
+    FREE_EM39* w = EM39_WK(this);
 
     SndStop(w->Se_id, 0);
     dmg.m_Timer = 2;
@@ -8798,7 +8798,7 @@ void cEm39::setTalk1stCancel()
 // phase) and has not run yet (0x200000).
 int cEm39::ckTalk2nd()
 {
-    Em39Work* w = EM39_WK(this);
+    FREE_EM39* w = EM39_WK(this);
 
     if (w->Be_flg & 0x200000) {
         return 0;
@@ -8812,7 +8812,7 @@ int cEm39::ckTalk2nd()
 // For the level script: starts the second talk (voice cut, invulnerable, Be_flg 0x200000, Talk2nd).
 void cEm39::setTalk2nd()
 {
-    Em39Work* w = EM39_WK(this);
+    FREE_EM39* w = EM39_WK(this);
 
     SndStop(w->Se_id, 0);
     dmg.m_Timer = 2;

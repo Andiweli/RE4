@@ -130,7 +130,7 @@ void cSubChar::init()
     posBustL = getPartsPtr(0x1E)->pos;
     posScarf = getPartsPtr(0x1A)->pos;
 #line 231 "D:/Bio4/Prog/pl_npc.cpp"
-    Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 13);
+    Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 13);
 }
 
 // Per frame: hp mirrors pG->ashley_life, the player's routine bits are cached (plStat), damage

@@ -85,7 +85,7 @@ int PullEspEspgen(EspgenWork** ppEspgen, int Core_flg, int Core_kind, u32 Call_n
 // after the last record.
 void espgen10_Update(EspgenWork* pEspgen)
 {
-    Espgen10Work* p = (Espgen10Work*) pEspgen->work;
+    ESPGEN10_WK* p = (ESPGEN10_WK*) pEspgen->work;
     cEspSeqHead* head = p->head;
     cEspSeqTbl* rec = &head->SeqTbl[p->Seq_ptr];
     cModel* model = p->pMod;

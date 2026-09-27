@@ -105,7 +105,7 @@ void emGroupeB2_reset();
 void emGroupeC_reset();
 void emGroupeD_reset();
 cEm* R208_setEm(s16 no);
-cEm* R208_EmSetEvent(EmListData* d);
+cEm* R208_EmSetEvent(EM_LIST* d);
 u32 getUnderEmNum();
 void addUnderEmCnt();
 void r208_CarryOnShoulder();
@@ -1345,7 +1345,7 @@ extern "C" cEm* R208_setEm(s16 no)
 }
 
 // EmSetEvent only while enemy list 2 (the courtyard list) is the loaded one.
-extern "C" cEm* R208_EmSetEvent(EmListData* d)
+extern "C" cEm* R208_EmSetEvent(EM_LIST* d)
 {
     if (pG->em_list_no == 2) {
         return EmSetEvent(d);

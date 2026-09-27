@@ -10,7 +10,7 @@ struct cItem;
 class cModel;
 
 // Piece shape data (piece_info entry + 4).
-struct PieceData {
+struct pieceData {
     s8 size_x;             // 0x00
     s8 size_y;             // 0x01
     u8 pad_2[2];
@@ -23,7 +23,7 @@ struct PieceData {
 struct PieceInfo {
     u16 id;           // 0x00  item id
     u16 pad_2;
-    PieceData data;   // 0x04
+    pieceData data;   // 0x04
     u8 model[0x28];   // 0x50  model data (searchItemModelData)
 };
 
@@ -32,7 +32,7 @@ private:
     u8 be_flag;         // 0x00  bit0 in use
     u8 pad_1[3];
 public:
-    PieceData* m_p_data;  // 0x04
+    pieceData* m_p_data;  // 0x04
     u32 x8;           // 0x08
 private:
     f32 m_center_x;           // 0x0C  rotated centre offset
@@ -52,7 +52,7 @@ public:
     void orientation(int orientation_no);
     void rotate(int dir);
     void mirror(int dir);
-    void init(PieceData* p_data);
+    void init(pieceData* p_data);
     void clear() { be_flag = 0; }
     f32 ver0_x();
     f32 ver0_y();
@@ -169,7 +169,7 @@ public:
 extern PieceInfo piece_info[];
 
 extern "C" {
-PieceData* searchItemPieceData(int item_id, PieceInfo* p_info);
+pieceData* searchItemPieceData(int item_id, PieceInfo* p_info);
 u8* searchItemModelData(int item_id, PieceInfo* p_info);
 int PutInCase(ITEM_ID item_id, u16 item_num, int size);
 }

@@ -196,7 +196,7 @@ static u16 em18_flip_tbl[80] = {
 // Damage / Die), then the neck tracking, collision and scenario check and the robe cloth (Em18ClothMove).
 void cEm18::move()
 {
-    Em18Work* w = EM18_WK(this);
+    FREE_EM18* w = EM18_WK(this);
 
     if (r_no_0) {
         em18DmCk(this);
@@ -220,7 +220,7 @@ void cEm18::move()
 // sets up the cloth and starts Wait; the merchant is not "active" (Ashley never runs from him).
 static void em18_R0_Init(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
     cModelInfo* info;
     void* tpl;
     void* tplE;
@@ -295,7 +295,7 @@ static void em18_R0_Move(cEm18* em)
 // trade action button offered (em18ActEvtSetTrade).
 static void em18_R1_Wait(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -314,7 +314,7 @@ static void em18_R1_Wait(cEm18* em)
 // the coat again (0x17, farewell voice 7) and returns to Wait; damage is held meanwhile.
 static void em18_R1_Trade(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -414,7 +414,7 @@ void em18ActEvtSetTrade(cEm18* em)
 // damage held 30 frames; afterwards (and always for type 1) opens the shop sub screen directly.
 static void em18TradeAction(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
 
     if (em->type != 1) {
         if (w->Be_flg & 0x20) {
@@ -432,7 +432,7 @@ static void em18TradeAction(cEm18* em)
 // R0 == 2: damage (Be_flg bit3), runs Em18_R2_move_tbl (Dm_Normal).
 static void em18_R0_Damage(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
 
     w->Be_flg |= 8;
     Em18_R2_move_tbl[em->r_no_1](em);
@@ -442,7 +442,7 @@ static void em18_R0_Damage(cEm18* em)
 // merchant has no real flinch (every hit kills him).
 static void em18_R1_Dm_Normal(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -460,7 +460,7 @@ static void em18_R1_Dm_Normal(cEm18* em)
 // R0 == 3: death (Be_flg bit3), runs Em18_R3_move_tbl (Die_Normal).
 static void em18_R0_Die(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
 
     w->Be_flg |= 8;
     Em18_R3_move_tbl[em->r_no_1](em);
@@ -470,7 +470,7 @@ static void em18_R0_Die(cEm18* em)
 // frames 35 / 66, then inactive with the collision off; the corpse stays.
 static void em18_R1_Die_Normal(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
 
     switch (em->r_no_2) {
     case 2:
@@ -502,7 +502,7 @@ static void em18_R1_Die_Normal(cEm18* em)
 // (Neck_dir_y smoothed 10% per frame), else eases back to the motion.
 void em18NeckMove(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
     cParts* p;
     Vec v;
 
@@ -530,7 +530,7 @@ void em18NeckMove(cEm18* em)
 // Swaps the coat model (pCloth): `on` 1 the open coat ARC 0xB, 0 the closed coat ARC 0xC.
 void em18ClothPartsSet(cEm18* em, int on)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
     void* tpl = ARC(EM18_TPL_00F);
     void* bin;
     cModelInfo* info;
@@ -559,7 +559,7 @@ void em18ClothPartsSet(cEm18* em, int on)
 // Shows (1) / hides (0) the goods model ARC 0xD hanging inside the coat (pGoods; created on first use).
 void em18GoodsPartsSet(cEm18* em, int on)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
 
     if (w->pGoods == 0) {
         cModelInfo* info = ModInfoMgr.create(ARC(EM18_BIN_GOODS_PARTS_SET), ARC(EM18_TPL_006));
@@ -579,7 +579,7 @@ void em18GoodsPartsSet(cEm18* em, int on)
 // Creates / swaps the two hand models (ARC 0x12 / 0x13) into pRHand / pLHand.
 void em18HandSet(cEm18* em)
 {
-    Em18Work* w = EM18_WK(em);
+    FREE_EM18* w = EM18_WK(em);
     void* binL = ARC(EM18_BIN_HAND_SET_012);
     void* binR = ARC(EM18_BIN_HAND_SET_013);
     cModelInfo* info;

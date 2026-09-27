@@ -1616,7 +1616,7 @@ extern "C" void sp_3dgrid_trans(cEspSeqHead* head, cEspSeqTbl* gen)
     Vec pos;
     Vec v[4];
     Vec rot;
-    EspAnmData* anm;
+    cAnm* anm;
     f32 w;
     f32 h;
     f32 gw;

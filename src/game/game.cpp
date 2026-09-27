@@ -170,7 +170,7 @@ static u32 g_at_total;
 static u32 g_at_total_cyc;
 u32 g_at2_total;
 u32 g_at2_total_cyc;
-DiedemoWork diedemo_work;
+DIEDEMO_WORK diedemo_work;
 
 void (*LightFuncTbl[17])(cLight*) = {
     Light00_Move, Light01_Move, Light02_Move, Light03_Move, Light04_Move, Light05_Move,
@@ -1074,7 +1074,7 @@ void gameDiedemoCheck()
 // The death demo task: waits exec_frame, shows "YOU ARE DEAD" (variant when the partner is alive),
 // fades and stops the sound, after 270 frames or START shows the Continue / Load Game menu, then
 // GameContinue(0) + LVADD_DIE or the soft reset.
-void gameDiedemo(DiedemoWork* pDw)
+void gameDiedemo(DIEDEMO_WORK* pDw)
 {
     int cnt = 0;
     u32 step = 0;

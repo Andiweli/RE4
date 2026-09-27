@@ -9,7 +9,7 @@ cObj* SetBull(void* bin, void* tpl, Vec* pos, Vec* rot, u32 type);
 
 // Bulldozer work (game/objBull.cpp `cObjBull`): the player / partner ride parts 2 through the
 // break / lift / collision routines; one scenario piece (two while moving) and an effect piece.
-struct BullWork {
+struct FREE_BULL {
     u32 Be_flg;             // 0x00  bit0 goal, bit1..4 break 1st..4th done, bit5 lift, bit6 truck go, bit7, bit8 lift wait
     int Timer;              // 0x04  Collision: motion frames - 30
     u8 pad_8[4];
@@ -34,7 +34,7 @@ struct BullWork {
 // (Sub_bull_*) while the player shoots the pursuers (objBullHitCk).
 class cObjBull : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  BullWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_BULL
 
     virtual void move();
     virtual ~cObjBull() {}
@@ -59,6 +59,6 @@ public:
     void setBreakTruck();
 };
 
-#define BULL_WK(o) ((BullWork*) (o)->free)
+#define BULL_WK(o) ((FREE_BULL*) (o)->free)
 
 #endif

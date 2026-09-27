@@ -278,7 +278,7 @@ static void edit_light_prop_sub();
 static void edit_ambient();
 static void edit_fog();
 static void edit_mirror_fog();
-void edit_fog_common(LightFog* fog);
+void edit_fog_common(FOG* fog);
 static void edit_focus();
 void draw_tone_curve();
 static void edit_blur();
@@ -956,7 +956,7 @@ int lightPasteBlur(int no)
 int lightPasteTune(int no)
 {
     if (pTool->Lit.isCut(no) && pTool->CutTmp) {
-        *(LightFog*) ((u8*) pTool->Lit.getCut(no) + 0x30) = *(LightFog*) ((u8*) pTool->CutTmp + 0x30);
+        *(FOG*) ((u8*) pTool->Lit.getCut(no) + 0x30) = *(FOG*) ((u8*) pTool->CutTmp + 0x30);
         return 1;
     }
     return 0;
@@ -2016,7 +2016,7 @@ static void edit_light_parent()
                 eprintf(0x40, 0xD2, 0, pTool->PageNo, "OBJID %02x : SCR MODEL", 2);
                 break;
             case 0x18: {
-                Obj18Work* w;
+                FREE_OBJ18* w;
                 eprintf(0x40, 0xD2, 0, pTool->PageNo, "OBJID %02x : EVENT MODEL", 0x18);
                 w = OBJ18_WK((cObj18*) obj);
                 eprintf(0x40, 0xE0, 0, pTool->PageNo, "NAME %s", OBJ18_WK((cObj18*) obj)->NameMod);
@@ -2706,7 +2706,7 @@ static void edit_light_type_constant()
 // Quadratic / local ambient: the smooth-edge width in the spot block.
 #define EDIT_SMOOTH_EDGE()                                                              \
     cLight* cur = curLight();                                                                   \
-    LightSpot* sp = &cur->spot;                                                                 \
+    LIT_TYPE04_FREE* sp = &cur->spot;                                                                 \
     int ret = 1;                                                                                \
                                                                                                 \
     switch (pTool->rno3) {                                                                      \
@@ -2752,7 +2752,7 @@ static void edit_light_type_spotlight()
     // with one; the .sym's "global" scope at .bss+0 cannot be told from a local S+A field of 0)
     static Vec spotRot;
     cLight* cur = curLight();
-    LightSpot* sp = &cur->spot;
+    LIT_TYPE04_FREE* sp = &cur->spot;
     int ret = 1;
     Mtx m;
     Vec pos;
@@ -2855,7 +2855,7 @@ static void edit_light_type_direct()
     static int gear;
     static f32 gear_step[4] = {1e-9f, 1e-7f, 1e-5f, 1e-3f};
     cLight* cur = curLight();
-    LightSpot* sp = &cur->spot;
+    LIT_TYPE04_FREE* sp = &cur->spot;
     f32 step = (pTool->Pad1.on & JOY_A) ? 100.0f : 1.0f;
     int ret = 1;
     Mtx m;
@@ -2949,7 +2949,7 @@ static void edit_light_type_localamb()
 // Attenuation of a custom light at distance d (the angular term is evaluated at 0).
 f32 func_attn(cLight* l, f32 d)
 {
-    LightSpot* s = &l->spot;
+    LIT_TYPE04_FREE* s = &l->spot;
     f32 c = 0.0f;
     return (s->A0 + s->A1 * c + s->A2 * c) / (s->K0 + d * s->K1 + d * d * s->K2);
 }
@@ -3062,7 +3062,7 @@ static void edit_light_type_parallel()
     static Vec ang;
     const f32 k = 1000000.0f;  // pool order: 1e6 before the step constants
     cLight* cur = curLight();
-    LightSpot* sp = &cur->spot;
+    LIT_TYPE04_FREE* sp = &cur->spot;
     f32 step = (pTool->Pad1.on & JOY_A) ? 10.0f : 1.0f;
     int ret = 1;
 
@@ -3272,7 +3272,7 @@ static void edit_mirror_fog()
 
 // Fog rows: TYPE (GX fog kinds through fogTypeNext/Back), START, END (stick, A x20), COLOR
 // (editColor), FAR PLAY ratio; B back to the EDIT WORK menu.
-void edit_fog_common(LightFog* fog)
+void edit_fog_common(FOG* fog)
 {
     f32 step = (pTool->Pad1.on & JOY_A) ? 20.0f : 1.0f;
     cLightEnv* env = LightMgr.getEnvPtr();
@@ -5432,7 +5432,7 @@ void initLightWork(cLight* l)
     l->Kind = 0;
     l->Attribute = 0;
     l->Priority = 3;
-    memclr_asm(&l->spot, sizeof(LightSpot));
+    memclr_asm(&l->spot, sizeof(LIT_TYPE04_FREE));
     memclr_asm(&l->sub, 0x40);
     memclr_asm(&l->path, sizeof(LightPath));
     l->Rno0 = l->Rno1 = l->Rno2 = l->Rno3 = 0;
@@ -5456,7 +5456,7 @@ void clear_move_free()
 // Clears the current light's spot block (type change).
 void clear_type_free()
 {
-    memclr_asm(&curLight()->spot, sizeof(LightSpot));
+    memclr_asm(&curLight()->spot, sizeof(LIT_TYPE04_FREE));
 }
 
 // Light cut of the current camera: 0 with Debug_flg[0] bit 25, the camera tool's camera number

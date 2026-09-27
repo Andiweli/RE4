@@ -147,7 +147,7 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
     Vec v2;
     u32* tbl;
     cParts* p;
-    AttachCamera* cam;
+    ATTACH_CAMERA* cam;
     int f;
     int i;
 
@@ -625,7 +625,7 @@ void MotionMoveCore(cModel* pEm, MOTION_INFO* w, CAMERA* pCamera)
 {
     HermitePrm prm;
     HermitePrm* pp = &prm;
-    AttachCamera* cam;
+    ATTACH_CAMERA* cam;
     cParts* p;
     u16* flipTbl = MOTION(pEm)->flip;
     int n = w->Joint_num;

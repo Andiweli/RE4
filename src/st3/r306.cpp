@@ -46,7 +46,7 @@ static void r306_checkDoor30b();
 // Puts enemy `no` of the previous room at its list position `l` (the angle always goes to the first one).
 // The list pointer and the angle are the caller's variables (one pseudo across both calls), the Vecs the
 // inline's own (one frame slot shared by both copies, the addresses never PRE'd).
-static inline void r306_setEmPos(int no, EmListData* l, f32& ry)
+static inline void r306_setEmPos(int no, EM_LIST* l, f32& ry)
 {
     Vec pos;
     Vec ang;
@@ -92,7 +92,7 @@ void R306Init()
         r306_work->em[0].setEm(0x30, 6, 0, 1, 1);
         r306_work->em[1].setEm(0x31, 6, 0, 1, 1);
         if (pG->room_id_prev == 0x30B) {
-            EmListData* l;
+            EM_LIST* l;
             f32 ry;
 
             l = &pG->Em_list[0x2E];

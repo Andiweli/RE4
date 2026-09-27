@@ -11,7 +11,7 @@
 #include "view.h"
 
 
-struct Esp09Work {
+typedef struct tagESP09_WK {
     s8 maxPoints;         // 0x00 number of trail points (2..6)
     u8 flg;     // 0x01 bit0: screen space, bit1: record a point every other frame (gen->Work8[1])
     u8 pad_2[10];
@@ -19,12 +19,12 @@ struct Esp09Work {
     u8 nPos;       // 0x0D ring buffer index of the newest point
     s16 Width;    // 0x0E line width
     Vec Pos[6];   // 0x10 position history (screen space: z = distance to the camera)
-};
+} ESP09_WK;
 
 // Position trail drawn as a line strip (or, with a texture, as a strip of quads).
 class cEsp09 : public cEsp {
 public:
-    Esp09Work m_Free;  // 0xF8
+    ESP09_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -51,7 +51,7 @@ cEsp* Esp09_Create()
 // Fill the whole history with the current position.
 void Esp09_ClearPrevPos(cEsp09* pEsp)
 {
-    Esp09Work* w = &pEsp->m_Free;
+    ESP09_WK* w = &pEsp->m_Free;
     CAMERA* cam = &pG->Camera;
     Vec* p = &w->Pos[0];
     Vec tmp;
@@ -84,7 +84,7 @@ void Esp09_ClearPrevPos(cEsp09* pEsp)
 // for untextured trails and queues Esp09_HideCheck after the render.
 void cEsp09::move()
 {
-    Esp09Work* w = &m_Free;
+    ESP09_WK* w = &m_Free;
     CAMERA* cam = &pG->Camera;
     Vec* p;
     Vec tmp;
@@ -147,7 +147,7 @@ void cEsp09::move()
 // line strip depending on Tex_id and flg bit0.
 extern "C" void Esp09_Trans(cEsp09* esp)
 {
-    Esp09Work* w = &esp->m_Free;
+    ESP09_WK* w = &esp->m_Free;
     u8 r = (u8)esp->m_Col_r;
     u8 g = (u8)esp->m_Col_g;
     u8 b = (u8)esp->m_Col_b;
@@ -182,7 +182,7 @@ void EspChannelSet09(cEsp09* esp)
 // (3D), blend mode and the position + colour (+ texcoord when textured) vertex format.
 void Esp09_Trans_Setup(cEsp09* esp)
 {
-    Esp09Work* w = &esp->m_Free;
+    ESP09_WK* w = &esp->m_Free;
 
     GXSetZMode(1, 3, 0);
     GXSetCullMode(0);
@@ -223,7 +223,7 @@ void Esp09_Trans_Setup(cEsp09* esp)
 // the tail; skipped while the trail is hidden behind geometry.
 void Esp09_2DTrans(cEsp09* pEsp, u8 r, u8 g, u8 b, u8 a)
 {
-    Esp09Work* w = &pEsp->m_Free;
+    ESP09_WK* w = &pEsp->m_Free;
     Vec p;
     s8 n1 = w->maxPoints - 1;
     u8 step = (u8)(pEsp->m_Col_a / (f32)n1);
@@ -250,7 +250,7 @@ void Esp09_2DTrans(cEsp09* pEsp, u8 r, u8 g, u8 b, u8 a)
 // World-space line strip through the ring buffer, newest first, alpha fading toward the tail.
 void Esp09_3DTrans(cEsp09* pEsp, u8 r, u8 g, u8 b, u8 a)
 {
-    Esp09Work* w = &pEsp->m_Free;
+    ESP09_WK* w = &pEsp->m_Free;
     Vec* p;
     s8 n1 = w->maxPoints - 1;
     u8 step = (u8)(pEsp->m_Col_a / (f32)n1);
@@ -276,7 +276,7 @@ void Esp09_3DTrans(cEsp09* pEsp, u8 r, u8 g, u8 b, u8 a)
 // draws it with Esp09_StripDrawPoly.
 void Esp09_PolyTrans(cEsp09* esp, u8 r, u8 g, u8 b, u8 a)
 {
-    Esp09Work* w = &esp->m_Free;
+    ESP09_WK* w = &esp->m_Free;
     Vec d;
     Vec up;
     Vec q[2];
@@ -357,8 +357,8 @@ void Esp09_PolyTrans(cEsp09* esp, u8 r, u8 g, u8 b, u8 a)
 // caller's alpha down by one fade step for the far edge.
 void Esp09_StripDrawPoly(cEsp09* esp, int no, Vec* v, u8 r, u8 g, u8 b, u8* a)
 {
-    Esp09Work* w = &esp->m_Free;
-    EspAnmData* anm;
+    ESP09_WK* w = &esp->m_Free;
+    cAnm* anm;
     int step = (u8)(esp->m_Col_a / (w->maxPoints - 1));
     f32 s;
     f32 s2;
@@ -411,7 +411,7 @@ void Esp09_HideCheck(cEsp* esp0)
     static s32 Zs_bias = -5000;
     static s32 Zs_bias_2 = 0;  // unreferenced 4-byte .sdata word after Zs_bias (name unknown)
     cEsp09* esp = (cEsp09*)esp0;
-    Esp09Work* w = &esp->m_Free;
+    ESP09_WK* w = &esp->m_Free;
     Vec v;
     Vec s;
     Mtx m;
@@ -456,7 +456,7 @@ void Esp09_HideCheck(cEsp* esp0)
 // Point count 4 - Work8[0] clamped to 2..6, flags from Work8[1].
 int cEsp09::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp09Work* w = &m_Free;
+    ESP09_WK* w = &m_Free;
 
     w->maxPoints = 4 - pSeq->Work8[0];
     w->flg = pSeq->Work8[1];

@@ -125,7 +125,7 @@ struct TSceAtWork {
     int loaded;         // 0x48  a file was loaded: DATA SAVE enabled
     char path[0x40];    // 0x4C  d:\ path
     char pathX[0x40];   // 0x8C  x:\ path
-    AreaData editArea;  // 0xCC  scratch area of the point editors
+    AREA_HIT_DATA editArea;  // 0xCC  scratch area of the point editors
     TSceAtFileHead head;   // 0xFC
     SceAtWork area[128];   // 0x10C
     TSceAtFile file;       // 0x4F0C  load / save image
@@ -1792,9 +1792,9 @@ static void tSceAtDataInput_cam_ctrl_main()
     AreaDataDisp(&pW->editArea, 0xA0FF8080, 1, NULL);                                      \
     AreaDataInfoDisp(&pW->editArea, pW->x, pW->y);                                         \
     AreaDataHelpDisp(&pW->editArea, (s16) (pW->x + 0xE0), (s16) (pW->y - 0x20));           \
-    pos.x = pW->editArea.u.eye.xz;                                                         \
-    pos.y = pW->editArea.u.eye.floor;                                                     \
-    pos.z = pW->editArea.u.eye.z;                                                          \
+    pos.x = pW->editArea.eye_trigger.xz;                                                         \
+    pos.y = pW->editArea.eye_trigger.floor;                                                     \
+    pos.z = pW->editArea.eye_trigger.z;                                                          \
     if (Joy[0].trg & JOY_B) {                                                              \
         pW->step = 0;                                                                      \
         pW->step2 = 0;                                                                     \
@@ -1817,9 +1817,9 @@ static void tSceAtDataInput_cam_ctrl_pos_edit()
             c->range2 = 500.0f;
             c->pos_set = 1;
         } else {
-            pW->editArea.u.eye.xz = c->pos.x;
-            pW->editArea.u.eye.floor = c->pos.y;
-            pW->editArea.u.eye.z = c->pos.z;
+            pW->editArea.eye_trigger.xz = c->pos.x;
+            pW->editArea.eye_trigger.floor = c->pos.y;
+            pW->editArea.eye_trigger.z = c->pos.z;
         }
         pW->step2++;
     case 1:
@@ -2033,9 +2033,9 @@ static void tSceAtDataInput_ladder_ETedit()
         if (l->posSet == 0) {
             l->posSet = 1;
         } else {
-            pW->editArea.u.eye.xz = l->pos.x;
-            pW->editArea.u.eye.floor = l->pos.y;
-            pW->editArea.u.eye.z = l->pos.z;
+            pW->editArea.eye_trigger.xz = l->pos.x;
+            pW->editArea.eye_trigger.floor = l->pos.y;
+            pW->editArea.eye_trigger.z = l->pos.z;
         }
         pW->step2++;
     case 1:
@@ -2196,9 +2196,9 @@ static void tSceAtDataInput_hide_pos_edit()
         if (h->posSet == 0) {
             h->posSet = 1;
         } else {
-            pW->editArea.u.eye.xz = h->pos.x;
-            pW->editArea.u.eye.floor = h->pos.y;
-            pW->editArea.u.eye.z = h->pos.z;
+            pW->editArea.eye_trigger.xz = h->pos.x;
+            pW->editArea.eye_trigger.floor = h->pos.y;
+            pW->editArea.eye_trigger.z = h->pos.z;
         }
         pW->step2++;
     case 1:
@@ -2207,7 +2207,7 @@ static void tSceAtDataInput_hide_pos_edit()
     }
 }
 
-#define EDIT_PTS (*(AreaXZ4Pts*) pW->editArea.u.xz4.p)
+#define EDIT_PTS (*(AreaXZ4Pts*) pW->editArea.xz4.p)
 
 // HIDE area: square scratch area sets the four-point hide zone; B back.
 static void tSceAtDataInput_hide_area_edit()
@@ -2243,7 +2243,7 @@ static void tSceAtDataInput_hide_area_edit()
 // Prints the HIDE values beside the rows.
 void tSceAtHideDataDisp(TSceAtHide* h, int cur)
 {
-    AreaData a;
+    AREA_HIT_DATA a;
     u32 col = 0x408040;
 
     if (cur == 1) col = 0xA0FFA0;
@@ -2253,7 +2253,7 @@ void tSceAtHideDataDisp(TSceAtHide* h, int cur)
     }
     if (h->areaSet == 1) {
         AreaDataInit(&a, &h->pos, AREA_TYPE_XZ4, 1500.0f, 1000.0f);
-        *(AreaXZ4Pts*) a.u.xz4.p = h->pts;
+        *(AreaXZ4Pts*) a.xz4.p = h->pts;
         AreaDataDisp(&a, col, 1, NULL);
     }
 }
@@ -2336,9 +2336,9 @@ static void tSceAtDataInput_pos_jump_ETedit()
         if (j->posSet == 0) {
             j->posSet = 1;
         } else {
-            pW->editArea.u.eye.xz = j->pos.x;
-            pW->editArea.u.eye.floor = j->pos.y;
-            pW->editArea.u.eye.z = j->pos.z;
+            pW->editArea.eye_trigger.xz = j->pos.x;
+            pW->editArea.eye_trigger.floor = j->pos.y;
+            pW->editArea.eye_trigger.z = j->pos.z;
         }
         pW->step2++;
     case 1:

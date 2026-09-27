@@ -30,7 +30,7 @@ struct TFlrAt {
     u8 group;        // 0x03
     u8 priority;     // 0x04  save order (15 first)
     u8 pad_5[0x14 - 0x05];
-    AreaData area;   // 0x14
+    AREA_HIT_DATA area;   // 0x14
     union {          // 0x44  payload by `id` (flr_at.h)
         u8 dmy[64];
         FLR_AT_SE_TYPE se;

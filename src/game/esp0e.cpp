@@ -10,7 +10,7 @@
 #include "view.h"
 
 
-struct Esp0eWork {
+typedef struct tagESP0E_WK {
     Vec wld_pos;       // 0x00 world position
     Vec dir_vec;        // 0x0C facing direction (world)
     f32 dir_ang;      // 0x18 half angle of the visible cone (rad)
@@ -26,13 +26,13 @@ struct Esp0eWork {
     u16 delay_cnt;    // 0x4E frames the visibility test is forced to 0
     u32 Rand_seed;       // 0x50 random seed for the screen jitter
     cEspSeqTbl* gen;  // 0x54
-};
+} ESP0E_WK;
 
 // Screen-space glow (lens flare style): the sprite is drawn in screen mode at the projected
 // position, faded by distance from the screen centre, the facing direction and a Z-buffer test.
 class cEsp0e : public cEsp {
 public:
-    Esp0eWork m_Free;  // 0xF8
+    ESP0E_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -56,7 +56,7 @@ cEsp* Esp0e_Create()
 // visibility for 2 frames. Queues Esp0e_HideCheck after the render.
 void cEsp0e::move()
 {
-    Esp0eWork* w = &m_Free;
+    ESP0E_WK* w = &m_Free;
     Vec dir;
     Vec view;
     Vec scr;
@@ -148,7 +148,7 @@ void cEsp0e::move()
 // scr + random R_pos jitter with the colour alpha and size scaled by `alpha`, via EspCommonTrans.
 extern "C" void Esp0e_Trans(cEsp0e* esp)
 {
-    Esp0eWork* w = &esp->m_Free;
+    ESP0E_WK* w = &esp->m_Free;
 
     if (w->alpha > 0.01f) {
         cEsp tmp;
@@ -181,7 +181,7 @@ extern "C" void Esp0e_Trans(cEsp0e* esp)
 // Alpha from the distance to the camera: 1 at the camera, 0 at `dist`.
 static f32 GetDistAlpha(cEsp0e* esp)
 {
-    Esp0eWork* w = &esp->m_Free;
+    ESP0E_WK* w = &esp->m_Free;
     Vec d;
     f32 a;
 
@@ -207,7 +207,7 @@ static f32 GetDistAlpha(cEsp0e* esp)
 // the camera, 0 at the cone edge.
 static f32 GetDirAlpha(cEsp0e* esp, Vec* dir)
 {
-    Esp0eWork* w = &esp->m_Free;
+    ESP0E_WK* w = &esp->m_Free;
     CAMERA* cam;
     Vec d;
     f32 ang;
@@ -242,7 +242,7 @@ void Esp0e_HideCheck(cEsp* esp0)
     static const f32 hide_y_tbl[12] = { 1.0f, 0.86f, 0.5f, 0.0f, -0.5f, -0.86f, -1.0f, -0.86f, -0.5f, 0.0f, 0.5f, 0.86f };
     static s32 Zs_bias0e_2 = 0;  // unreferenced 4-byte .sdata word after Zs_bias0e (name unknown)
     cEsp0e* esp = (cEsp0e*)esp0;
-    Esp0eWork* w = &esp->m_Free;
+    ESP0E_WK* w = &esp->m_Free;
     Vec p;
     u32 z;
     s32 zi;
@@ -331,7 +331,7 @@ void Esp0e_HideCheck(cEsp* esp0)
 // screen-glow OT layer. Attached effects with Release_time 0 are kept attached forever.
 int cEsp0e::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp0eWork* w = &m_Free;
+    ESP0E_WK* w = &m_Free;
 
     m_Flg |= 8;
     w->flg = 0;

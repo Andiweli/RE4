@@ -874,7 +874,7 @@ void dispSellItemList(SUB_SCREEN* wk, int n, int cursor)
     int i;
     int end;
     cItem* item;
-    PriceEntry* pe;
+    PRICE_INFO* pe;
     int row;
 
     {
@@ -903,7 +903,7 @@ void dispSellItemList(SUB_SCREEN* wk, int n, int cursor)
         u8 slot;
 
         {
-            ItemInfo info;
+            ITEM_INFO info;
             itemInfo(pe->id, &info);
             if (info.type == 1) {
                 num = 1;
@@ -1341,7 +1341,7 @@ void dispBuyItemList(SUB_SCREEN* wk, int n, int cursor)
     int top = sw->top;
     int i;
     int end;
-    PriceEntry* pe;
+    PRICE_INFO* pe;
     int row;
 
     {

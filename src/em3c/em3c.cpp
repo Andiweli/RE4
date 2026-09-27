@@ -97,7 +97,7 @@ void Em3cInit(cEm* em)
 // outright. Nothing happens during the start / attack wait or an ongoing damage routine.
 void em3cDmCk(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     YARARE_INFO* part;
     int near;
     int kind;
@@ -398,7 +398,7 @@ asm(".section .data\n\t.balign 8\n\t.text");
 // the movement in half, and em3cDoorOpenCk keys on it.
 void cEm3c::move()
 {
-    Em3cWork* w = EM3C_WK(this);
+    FREE_EM3C* w = EM3C_WK(this);
     f32 len;
 
     if (r_no_0) {
@@ -498,7 +498,7 @@ void cEm3c::move()
 // dummy that rises (StartWait) or an ambush pose that grabs the player (AtkWait).
 static void em3c_R0_Init(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     int zero = 0;
     u32 i;
     u32 j;
@@ -606,7 +606,7 @@ static void em3c_R0_Move(cEm3c* em)
 // rising motion at full HP, marks the player found and goes to Turn180 or Walk by the route angle.
 static void em3c_R1_StartWait(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     w->Be_flg |= 0x400;
     switch (em->r_no_2) {
@@ -653,7 +653,7 @@ static void em3c_R1_StartWait(cEm3c* em)
 // The player escapes with the action button (plemEscapeAction), and the enemy dies when it ends.
 static void em3c_R1_AtkWait(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     w->Be_flg |= 0x400;
     switch (em->r_no_2) {
@@ -801,7 +801,7 @@ static void plemSurprised(cPlayer* pl)
 // damage), sits a partner within 4 m down (subemSit) and awards a critical-hit rank point.
 static void plemEscapeAction(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     w->TmpU32 = 0;
     w->Act_ck = 1;
@@ -963,7 +963,7 @@ static void subemSit()
 // attack wait is over and em3cStayCk lets it go, it turns (route angle over 120 deg) or walks.
 static void em3c_R1_Wait(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -992,7 +992,7 @@ static void em3c_R1_Wait(cEm3c* em)
 // run, and it opens doors on its way (em3cDoorOpenCk).
 static void em3c_R1_Walk(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -1061,7 +1061,7 @@ static void em3c_R1_Walk(cEm3c* em)
 // attack wait within 2.5 m also stops it. The attack / turn choice is the same as em3c_R1_Walk.
 static void em3c_R1_Run(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -1126,7 +1126,7 @@ static void em3c_R1_Run(cEm3c* em)
 // set, both it and the yaw steer towards the route point at PI/32 per frame. Ends in Wait or Walk.
 static void em3c_R1_Turn180(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -1161,7 +1161,7 @@ static void em3c_R1_Turn180(cEm3c* em)
 // grab swing that keeps homing on the route point. A miss awards the player an escape rank point.
 static void em3c_R1_MoveAtk(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     Vec pl;
     Vec v;
 
@@ -1262,7 +1262,7 @@ static void em3c_R1_MoveAtk(cEm3c* em)
 // exit is like em3c_R1_MoveAtk (attack wait then Wait on a hit, Walk otherwise).
 static void em3c_R1_CoreAtk(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -1381,7 +1381,7 @@ static void em3c_R0_Damage(cEm3c* em)
 // roll when the route to the player is over 7 m and Run_wait is out).
 static void em3c_R1_Dm_Normal(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -1451,7 +1451,7 @@ static void em3c_R1_Dm_Normal(cEm3c* em)
 // half HP that has not set its parasite yet bursts its head 60 frames in (em3cPartsBombHead).
 static void em3c_R1_Dm_Big(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -1493,7 +1493,7 @@ static void em3c_R1_Dm_Big(cEm3c* em)
 // head (em3cPartsBombHead). Same exit as em3c_R1_Dm_Normal.
 static void em3c_R1_Dm_Head(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     w->Be_flg |= 0x200;
     switch (em->r_no_2) {
@@ -1532,7 +1532,7 @@ static void em3c_R0_Die(cEm3c* em)
 // the enemy for removal.
 static void em3c_R1_Die_Normal(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     // COMPILER-DIFF: #13 (int shape): the EstSet stack zero of the then-arm is a function-scope
     // constant with one use in another block, so sched1 sees the store as a leaf (issued after
     // `mr r3`) and update_equiv_regs moves the `li` next to it, where it takes r0 like the
@@ -1599,7 +1599,7 @@ static void em3c_R1_Die_Normal(cEm3c* em)
 // (plemDmMStar). Returns 1 on a hit.
 int em3cAtkCk(cEm3c* em, Vec* pos, int no)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     EmAtkInfo* atk = &em3c_atk_tbl[no];
     cParts* p = GetPartsAddr(em->pList, 0x1A);
     int hit = EmAtkHitCk(atk, pos, &p->world_old2, no == 2);
@@ -1643,7 +1643,7 @@ int em3cAtkCk(cEm3c* em, Vec* pos, int no)
 // Returns 1 on the first hit.
 int em3cAtkCk2(cEm3c* em, int no)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     cParts* p;
     Vec v;
 
@@ -1695,7 +1695,7 @@ int em3cAtkCk2(cEm3c* em, int no)
 // L_pl_route the route distance to the player.
 void em3cRouteCk(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     Vec ofs;
     Vec top;
     Vec hit;
@@ -1780,7 +1780,7 @@ void em3cRouteCk(cEm3c* em)
 // 0xE / 0xF for 1 / 3) as attached models, at 1.2x scale.
 void em3cModelInit(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     Mtx m;
     void* bin;
     cModelInfo* info;
@@ -1913,7 +1913,7 @@ void em3cPartsBombSet(cEm3c* em, int add)
 // (em3cSetParasite). Be_flg 0x10 makes it a one-shot.
 void em3cPartsBombHead(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     cParts* p;
     PBOMB_INFO* b;
     Vec v;
@@ -1953,7 +1953,7 @@ void em3cPartsBombHead(cEm3c* em)
 // from its points, and children that are not pieces themselves follow their falling parent.
 void em3cPartsBombControl(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     Vec old[5];
     Vec cen;
     Vec a;
@@ -2141,7 +2141,7 @@ int em3cSetDmVal(cEm3c* em)
 // effect. Enables the parasite hit box hit[9].
 void em3cSetParasite(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     Vec pos;
     Vec rot;
     cObj* obj;
@@ -2290,7 +2290,7 @@ void em3cFootSe(cEm3c* em)
 // 1 otherwise) and it is either within 5 m or has a route to the player.
 int em3cStayCk(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
     u32 cnt = 0;
     u32 i;
 
@@ -2323,7 +2323,7 @@ int em3cStayCk(cEm3c* em)
 // 0x00800000) is up within 25 m of route; or the player is dead.
 int em3cFindCk(cEm3c* em)
 {
-    Em3cWork* w = EM3C_WK(em);
+    FREE_EM3C* w = EM3C_WK(em);
 
     if (w->Be_flg & 0x80) {
         return 0;
@@ -2387,7 +2387,7 @@ void em3cDoorOpenCk(cEm3c* em)
     }
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEmDoor* e = (cEmDoor*) EmMgr.fastAt(i);
-        EmDoorWork* dw;
+        FREE_EMDOOR* dw;
 
         if (!e->isAlive()) {
             continue;

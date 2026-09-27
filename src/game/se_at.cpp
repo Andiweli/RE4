@@ -14,7 +14,7 @@ void* GetDataExt(void* arc, const char* tag, int no);   // game/read.cpp
 // Room start: takes the room's ESE emitter list (version 0x100) into Snd.se_at / se_at_list.
 void SeAtInit()
 {
-    SndWork* s = &Snd;
+    SND_WORK* s = &Snd;
 
     s->pSeAtHeader = (SeAtHead*) GetDataExt(pG->pRoom, "ESE", 0);
     if (s->pSeAtHeader == 0) {
@@ -34,7 +34,7 @@ void SeAtInit()
 // fixed interval or rnd_base + random(rnd_range); `repeat` counts the plays down (1 = last, -1 done).
 void SeAtCheck()
 {
-    SndWork* s = &Snd;
+    SND_WORK* s = &Snd;
     SeAt* at;
     Vec* pos;
     int i;

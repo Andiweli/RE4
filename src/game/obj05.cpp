@@ -17,7 +17,7 @@ void Efm05RotMatrix(cObj* obj, Mtx m);
 // parts move in parent space with damping/gravity, bounce, and stop (Kaboom_flg 2) below speed 15.
 void cObj05::move()
 {
-    Efm05Work* w = EFM05_WK(this);
+    OBJ05_FREE* w = EFM05_WK(this);
     Mtx inv;
     Vec d;
     Vec old;

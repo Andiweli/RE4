@@ -228,7 +228,7 @@ struct MotionData {
     u8 nParts;     // 0x02
 };
 
-struct AttachCamera;   // cam_ctrl.h
+struct ATTACH_CAMERA;   // cam_ctrl.h
 
 // Per-model motion work (game/motion.cpp), 0xD0 bytes: what cModel::cModel clears, what
 // a blend motion (MotionWork::blend, the enemy works' blendMot) is, and the prefix of cModel::Motion.
@@ -269,7 +269,7 @@ struct MOTION_INFO {
     u8 Hokan_cnt;          // 0xC5  frames left
     u8 pad_C6[2];
     f32 Brate;        // 0xC8  weight of this work when it is another model's blend motion
-    AttachCamera* pAttachCam;    // 0xCC
+    ATTACH_CAMERA* pAttachCam;    // 0xCC
 };
 
 // cModel::Motion at cModel+0x1D8, 0xDC bytes: the motion work with the GC's three pointers after it

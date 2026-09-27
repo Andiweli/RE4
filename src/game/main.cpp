@@ -96,7 +96,7 @@ const Vec vecZero = {0.0f, 0.0f, 0.0f};
 GLOBAL_WK Global;
 SYSTEM_SAVE_WORK SystemSave;
 JOY Joy[4];
-KeyWork Key;
+KEY Key;
 u32 MainOt[5];
 ScreenInfo Screen;
 

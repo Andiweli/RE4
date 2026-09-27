@@ -6,7 +6,7 @@
 #include "em.h"
 
 // Work of the wooden bar (window board) enemy (game/emBar.cpp), overlaid on cEm from 0x3E0.
-struct EmBarWork {
+struct FREE_EMBAR {
     u32 Be_flg;            // 0x000 (0x3E0)
     int Timer;            // 0x004 (0x3E4)
     u8 pad_8[0x110 - 0x8];
@@ -17,7 +17,7 @@ struct EmBarWork {
     u8 Etc_no;            // 0x122 (0x502)  etc flag that remembers the broken bar
 };
 
-#define EMBAR_WK(em) ((EmBarWork*) (((cEmBar*) (em))->free))
+#define EMBAR_WK(em) ((FREE_EMBAR*) (((cEmBar*) (em))->free))
 
 class cEmBar : public cEm {
 public:

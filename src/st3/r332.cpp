@@ -293,7 +293,7 @@ void R332Init()
             MotionSetCore(crane, &crane->Motion, craneMot[i], 0, 0, 5, 0);
             // The reference-view store keeps the following `pG` load below it (r30c PSetPtr).
 #line 372 "D:/Bio4/Prog/r332.cpp"
-            (crane->Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 0xd));
+            (crane->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xd));
             R332_ARR_SET(hit[0], i * 4, SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), 0, 0, 1));
             if (r332_work->hit[i]) {
                 r332_work->hit[i]->setParent(crane, 4, 0);
@@ -1037,7 +1037,7 @@ static void R332RocketShootMain(int type)
                 obj->LightInfo.EnableMask |= 1;
                 obj->LightInfo.EnableMask &= ~0x10;
 #line 1648 "D:/Bio4/Prog/r332.cpp"
-                obj->Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 0xd);
+                obj->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xd);
                 obj->be_flag |= 0x1000;
                 obj->setNoSuspend(1);
                 MotionSetCore(obj, &obj->Motion, ROOM_ARC_PTR(pG->pRoom, 0x33), 0, 0, 0x200, 0);
@@ -1632,7 +1632,7 @@ void R332ScrTrans(int on)
 #define R332_PL_CHILD_TRANS(e, on)                                    \
     if ((e)->GetNowFrame() == 0) {                                    \
         if ((e)->GetMod(&mod, "pl0200", 0, 0) == 1) {                 \
-            Obj18Work* w = OBJ18_WK((cObj18*) mod);                       \
+            FREE_OBJ18* w = OBJ18_WK((cObj18*) mod);                       \
                                                                       \
             if (w && w->pObjChain) {                                      \
                 if ((on) == 0) {                                      \

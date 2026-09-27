@@ -118,23 +118,23 @@ struct cEspSeqHead {
 };
 
 // Texture animation data returned by EspGetAnmAddr (eff_sys.cpp). Partial layout.
-struct EspAnmData {
-    u16 Width;         // 0x00 texture width (PS2 cAnm::Width)
-    u16 Height;        // 0x02 texture height (PS2 cAnm::Height)
-    s16 Cx;            // 0x04 sprite width / centre x (PS2 cAnm::Cx)
-    s16 Cy;            // 0x06 sprite height / centre y (PS2 cAnm::Cy)
+struct cAnm {
+    u16 Width;         // 0x00 texture width
+    u16 Height;        // 0x02 texture height
+    s16 Cx;            // 0x04 sprite width / centre x
+    s16 Cy;            // 0x06 sprite height / centre y
     union {
-        u16 Frames;    // 0x08 number of patterns (PS2 cAnm::Frames)
+        u16 Frames;    // 0x08 number of patterns
         struct {
             u8 x8;
             u8 x9;     // 0x09 low byte of Frames
         };
     };
-    u8 Xn;             // 0x0A (PS2 cAnm::Xn)
-    u8 Loop;           // 0x0B bits 0-1: loop mode (PS2 cAnm::Loop)
-    u8 Data_num;       // 0x0C 0 = fixed pattern time (PS2 cAnm::Data_num)
+    u8 Xn;             // 0x0A
+    u8 Loop;           // 0x0B bits 0-1: loop mode
+    u8 Data_num;       // 0x0C 0 = fixed pattern time
     u8 pad_0D[3];
-    u8 Frame_cnt[1];   // 0x10 pattern table: Frames entries, then the per-pattern display times (PS2 cAnm::Frame_cnt)
+    u8 Frame_cnt[1];   // 0x10 pattern table: Frames entries, then the per-pattern display times
 };
 
 // Effect data owner: EspDataLoad/EspDataRelease/EspGetEstAddr/SstSet `owner`, cEffectCore::owner. The names are
@@ -628,7 +628,7 @@ int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend);   
 // game/esp_app.cpp: laser sight line (objWep drawLaserSight), Vec by value
 void EspDrawLaserLine(Vec lpos, Vec lcross, f32 rate);
 // game/eff_sys.cpp
-int EspGetAnmAddr(int no, EspAnmData** ppAnm);
+int EspGetAnmAddr(int no, cAnm** ppAnm);
 void EspTexSet(int anmNo, int ptn);
 void* EspGetPathAddr(u32 owner, int id);
 struct cEspSeqHead* EspGetEstAddr(u32 owner, int id, int quiet);

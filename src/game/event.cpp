@@ -92,7 +92,7 @@ struct EvtFocusData {
     f32 farLevel;      // 0x80C
 };
 
-// 12-byte model name copied as words (cObj Obj18Work::evName).
+// 12-byte model name copied as words (cObj FREE_OBJ18::evName).
 struct EvtName {
     u32 w[3];
 };
@@ -597,7 +597,7 @@ void Event::ControlTransFlag()
     u8 type;
     cModel* oya;
     int state;
-    Obj18Work* w;
+    FREE_OBJ18* w;
 
     n = ModTbl.GetNumDat();
     if (GetDelTimer() != 0) {
@@ -1190,7 +1190,7 @@ int Event::ExePacket_Mot(Event* pEvt)
     }
     ClrShape(m);
     if (m->kindid == 1 && m->id == cObjMgr::ID_EVENT) {
-        Obj18Work* w = OBJ18_WK((cObj18*) m);
+        FREE_OBJ18* w = OBJ18_WK((cObj18*) m);
         t = w->obj18_type;
         if ((t >= 1 && t <= 4) || t == 7 || t == 8 || t == 9 || t == 0xA || t == 0x13 || t == 0x14 || t == 0x15 || t == 0x16
             || t == 0xB) {
@@ -3123,12 +3123,12 @@ int DatTbl::init(int num)
         NumDatTbl = 0;
     }
 #line 5749 "D:/Bio4/Prog/event.cpp"
-    pWork = (DatTblEntry*) MEM_ALLOC(NumDatTbl * sizeof(DatTblEntry), 1, 0xD);
+    pWork = (DatTblWork*) MEM_ALLOC(NumDatTbl * sizeof(DatTblWork), 1, 0xD);
     if (pWork == 0) {
         pLog->err(0, 0, "cDatTbl::init : memory failed");
         return 0;
     }
-    memclr_asm(pWork, NumDatTbl * sizeof(DatTblEntry));
+    memclr_asm(pWork, NumDatTbl * sizeof(DatTblWork));
     return 1;
 }
 
@@ -3172,7 +3172,7 @@ int DatTbl::SetDat(const char* nm, void* dat, u8 type, void* dat2, u8 flag, int*
     }
     for (i = 0; i < NumDatTbl; i++) {
         if (!(pWork[i].FlagBe8 & 1)) {
-            memclr_asm(&pWork[i], sizeof(DatTblEntry));
+            memclr_asm(&pWork[i], sizeof(DatTblWork));
             pWork[i].FlagBe8 = flag | 1;
             strcpy(pWork[i].Name, nm);
             pWork[i].Dat = dat;
@@ -3301,7 +3301,7 @@ int DatTbl::GetDatWkNo(void** pDat, u8* pEtc, int noWork)
 // 1 when slot wkNo holds the given name.
 int DatTbl::ChkDatWkNoName(int noWork, const char* pName)
 {
-    DatTblEntry* e;
+    DatTblWork* e;
 
     if (pWork == 0) {
         pLog->err(0, 0, "cDatTbl::GetDatWkNo : memory failed[%d]", noWork);
@@ -3311,7 +3311,7 @@ int DatTbl::ChkDatWkNoName(int noWork, const char* pName)
         pLog->err(0, 0, "cDatTbl::GetDatWkNo : work_no failed[%d]", noWork);
         return 0;
     }
-    e = (DatTblEntry*) (noWork * sizeof(DatTblEntry) + (u32) pWork);
+    e = (DatTblWork*) (noWork * sizeof(DatTblWork) + (u32) pWork);
     if ((e->FlagBe8 & 1) && strcmp(e->Name, pName) == 0) {
         return 1;
     }
@@ -3335,7 +3335,7 @@ int DatTbl::DelDatWkNo(int noWork)
             if (pWork[noWork].dat2 != 0) {
                 Debug_free(pWork[noWork].dat2);
             }
-            memclr_asm(&pWork[noWork], sizeof(DatTblEntry));
+            memclr_asm(&pWork[noWork], sizeof(DatTblWork));
         }
         return 1;
     }
@@ -3363,7 +3363,7 @@ int DatTbl::DelDat(const char* pName)
                 if (pWork[i].dat2 != 0) {
                     Debug_free(pWork[i].dat2);
                 }
-                memclr_asm(&pWork[i], sizeof(DatTblEntry));
+                memclr_asm(&pWork[i], sizeof(DatTblWork));
             }
             return 1;
         }
@@ -3386,7 +3386,7 @@ int DatTbl::DelAll(int flag)
             if (pWork[i].dat2 != 0) {
                 Debug_free(pWork[i].dat2);
             }
-            memclr_asm(&pWork[i], sizeof(DatTblEntry));
+            memclr_asm(&pWork[i], sizeof(DatTblWork));
         }
     }
     return 1;

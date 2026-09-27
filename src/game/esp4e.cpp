@@ -7,7 +7,7 @@
 #include "esp.h"
 #include "cloth.h"
 
-struct Esp4eWork {
+typedef struct tagESP4E_WK {
     Cloth* pCl;      // 0x00
     GXTexObj tex;      // 0x04
     GXTlutObj tlut;    // 0x24
@@ -24,12 +24,12 @@ struct Esp4eWork {
     f32 wind_time_plus;        // 0x4C
     f32 wind_range_pow;     // 0x50
     f32 rand_ratio;           // 0x54 random factor
-};
+} ESP4E_WK;
 
 // Cloth sheet: a Cloth grid attached to the effect position, waving with a sine field.
 class cEsp4e : public cEsp {
 public:
-    Esp4eWork m_Free;       // 0xF8
+    ESP4E_WK m_Free;       // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -55,7 +55,7 @@ void cEsp4e::move()
 {
     Vec pos0 = m_Pos;
     Vec sp;
-    Esp4eWork* wk = &m_Free;
+    ESP4E_WK* wk = &m_Free;
     Cloth* c;
     f32 base;
     f32 rand;
@@ -154,7 +154,7 @@ void Esp4e_Trans()
 // created) when the texture or a cloth slot is unavailable.
 int cEsp4e::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp4eWork* wk = &m_Free;
+    ESP4E_WK* wk = &m_Free;
     void* tpl;
     int ci;
     int nx;

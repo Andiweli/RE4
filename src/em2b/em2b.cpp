@@ -114,7 +114,7 @@ static void plem2bDmBlow(cPlayer* pl);
 
 
 // The motion flip argument of the two model variants.
-static inline int em2bFlip(Em2bWork* w, int a, int b)
+static inline int em2bFlip(FREE_EM2B* w, int a, int b)
 {
     switch (w->Ft_axis) {
     case 0:
@@ -126,7 +126,7 @@ static inline int em2bFlip(Em2bWork* w, int a, int b)
 }
 
 // Variant-dependent motion (blend pair per variant).
-static inline void em2bVariantMot(cEm2b* em, Em2bWork* w, int a0, int a1, int b0, int b1, int blend, int flip)
+static inline void em2bVariantMot(cEm2b* em, FREE_EM2B* w, int a0, int a1, int b0, int b1, int blend, int flip)
 {
     void* m0;
     void* m1;
@@ -147,7 +147,7 @@ static inline void em2bVariantMot(cEm2b* em, Em2bWork* w, int a0, int a1, int b0
 
 // Attack wind-up effect by giant variant (0 the normal one: a0 / a1, 1 the chained one: b0 / b1) and
 // the hand the motion uses (Motion.Mot_attr bit6 = right).
-static inline void em2bVariantEst(cEm2b* em, Em2bWork* w, int a0, int a1, int b0, int b1)
+static inline void em2bVariantEst(cEm2b* em, FREE_EM2B* w, int a0, int a1, int b0, int b1)
 {
     switch (w->Ft_axis) {
     case 0:
@@ -169,7 +169,7 @@ static inline void em2bVariantEst(cEm2b* em, Em2bWork* w, int a0, int a1, int b0
 }
 
 // End of an attack routine: the friend (dog) fight sets the guard, a hit goes into the threat.
-static inline void em2bAtkEndSet(cEm2b* em, Em2bWork* w)
+static inline void em2bAtkEndSet(cEm2b* em, FREE_EM2B* w)
 {
     // COMPILER-DIFF: #13 -- the original never allocates the single-use `w->Dog_wait` load (a REG_EQUIV
     // mem pseudo): reload materialises it in r11, so the global `flags`/`atkHit` pseudos take r0/r9;
@@ -202,7 +202,7 @@ static inline void em2bAtkEndSet(cEm2b* em, Em2bWork* w)
 // The same for a caller that reads `em` after it (DashAtk): `em` does not die at the `mr r3,em`, so
 // arm 2 needs the tied copy below (with only the keep-alive the stores are issued first and jump2
 // cross-jumps the arms' tails: 35 words; the plain form swaps the `mr`/`stw` pair: 2 words).
-static inline void em2bAtkEndSetL(cEm2b* em, Em2bWork* w)
+static inline void em2bAtkEndSetL(cEm2b* em, FREE_EM2B* w)
 {
     register int x63c asm("r11"); // COMPILER-DIFF: #13 (see em2bAtkEndSet)
 
@@ -234,7 +234,7 @@ static inline void em2bAtkEndSetL(cEm2b* em, Em2bWork* w)
 }
 
 // Drops the parasite head object with its effects.
-static inline void em2bParasiteDelete(Em2bWork* w)
+static inline void em2bParasiteDelete(FREE_EM2B* w)
 {
     if (w->pParasite) {
         EffectEspDelete(0, w->espKind, w->pParasite, 0);
@@ -246,7 +246,7 @@ static inline void em2bParasiteDelete(Em2bWork* w)
 }
 
 // Stamp / punch landing: dust, quake, SE and the stagger check at the parts' world position.
-static inline void em2bLandingSet(cEm2b* em, Em2bWork* w, int parts, int se)
+static inline void em2bLandingSet(cEm2b* em, FREE_EM2B* w, int parts, int se)
 {
     Vec* pos = &em->getPartsPtr(parts)->world;
 
@@ -406,7 +406,7 @@ void Em2bInit(cEm* em)
 // objects of the chained variant that are still alive.
 cEm2b::~cEm2b()
 {
-    Em2bWork* w = EM2B_WK(this);
+    FREE_EM2B* w = EM2B_WK(this);
     u32 i;
 
     if (w->pParasite && w->pParasite->isAlive()) {
@@ -431,7 +431,7 @@ cEm2b::~cEm2b()
 // Suspend / resume the giant and every object hanging on it.
 void cEm2b::setNoSuspend(int on)
 {
-    Em2bWork* w = EM2B_WK(this);
+    FREE_EM2B* w = EM2B_WK(this);
     u32 i;
 
     if (on) {
@@ -481,7 +481,7 @@ void cEm2b::setNoSuspend(int on)
 // Damage reaction after a hit (em2bDmCk): blood by weapon, then the routine change.
 void em2bDmCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     YARARE_INFO* part;
     int near;
     int dmg;
@@ -703,7 +703,7 @@ void em2bDmCk(cEm2b* em)
 // debug attack override (Debug_atk_rtn), the parasite hit box (hit[9]) and the dropped tree cleanup.
 void cEm2b::move()
 {
-    Em2bWork* w = EM2B_WK(this);
+    FREE_EM2B* w = EM2B_WK(this);
     cParts* p;
     f32 fl;
     f32 spd;
@@ -850,7 +850,7 @@ void cEm2b::move()
 // R11E_Appear (bursts through the room 11E gate), 3 R224_CageWait (the caged one of room 224).
 static void em2b_R0_Init(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cAtariInfo* at;
     MotionWork* mot;
     int zero;
@@ -1033,7 +1033,7 @@ static void em2b_R0_Move(cEm2b* em)
 // Standing: the idle motion (with the tree when held), then the next action.
 static void em2b_R1_Wait(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -1072,7 +1072,7 @@ static void em2b_R1_Wait(cEm2b* em)
 // Set from an event: the appear motion with its roar.
 static void em2b_R1_FromEvent(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -1093,7 +1093,7 @@ static void em2b_R1_FromEvent(cEm2b* em)
 // r11e: breaks through the wall.
 static void em2b_R1_R11E_Appear(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     int step = em->r_no_2;
 
     switch (step) {
@@ -1110,7 +1110,7 @@ static void em2b_R1_R11E_Appear(cEm2b* em)
 // r224: waits in the cage until the event releases it.
 static void em2b_R1_R224_CageWait(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -1131,7 +1131,7 @@ static void em2b_R1_R224_CageWait(cEm2b* em)
 // Walking after the target: the walk blend by distance / difficulty (or with the tree).
 static void em2b_R1_Walk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     int atk;
 
     w->Be_flg |= 0x10;
@@ -1322,7 +1322,7 @@ static void em2b_R1_Walk(cEm2b* em)
 // R1 == 3 Turn180: turns around towards the target (variant motions 0x51 / 0x52), then back to the walk.
 static void em2b_R1_Turn180(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -1355,7 +1355,7 @@ static void em2b_R1_Turn180(cEm2b* em)
 // R1 == 4 Threat: the roar at the player (0x4C, mirrored by side), then the walk / attack choice.
 static void em2b_R1_Threat(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -1378,7 +1378,7 @@ static void em2b_R1_Threat(cEm2b* em)
 // the follow-up stamp when the player is still near.
 static void em2b_R1_Stamp(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     int step = em->r_no_2;
 
     w->Be_flg |= 0x10;
@@ -1471,7 +1471,7 @@ static void em2b_R1_Stamp(cEm2b* em)
 // (parts 0x10 / 0xA by Motion.Mot_attr bit6) on the hit frames, then the walk.
 static void em2b_R1_Punch(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -1514,7 +1514,7 @@ static void em2b_R1_Punch(cEm2b* em)
 // and forearm parts (0x10/0xF or 0xA/9), then the walk.
 static void em2b_R1_Hook(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -1558,7 +1558,7 @@ static void em2b_R1_Hook(cEm2b* em)
 // upper arm (0x10/0xF/0xE or 0xA/9/8), then the walk.
 static void em2b_R1_UpperCut(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -1605,7 +1605,7 @@ static void em2b_R1_UpperCut(cEm2b* em)
 }
 
 // Kick: the kick, then (near and by chance) a second one turning after the target.
-static inline void em2bKickStart(cEm2b* em, Em2bWork* w, int step)
+static inline void em2bKickStart(cEm2b* em, FREE_EM2B* w, int step)
 {
     if (w->Go_dir < 0.0f) {
         switch (w->Ft_axis) {
@@ -1637,7 +1637,7 @@ static inline void em2bKickStart(cEm2b* em, Em2bWork* w, int step)
 // after him; then the walk.
 static void em2b_R1_Kick(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     int step = em->r_no_2;
 
     w->Be_flg |= 0x10;
@@ -1715,7 +1715,7 @@ static void em2b_R1_Kick(cEm2b* em)
 // Charge: turns onto the target, runs until it hits the scenario three times ahead of itself.
 static void em2b_R1_DashAtk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -1865,7 +1865,7 @@ static inline void em2bHouseFlagSet(EmiEntry* h)
 }
 
 // Marks the house EMI entry (pHouse) as broken (state 3) and, in room 119, raises its room flag.
-static inline void em2bHouseBreakSet(Em2bWork* w)
+static inline void em2bHouseBreakSet(FREE_EM2B* w)
 {
     EmiEntry* h = w->pHouse;
 
@@ -1918,7 +1918,7 @@ static inline void em2bHandLandingPlCk(cParts* p)
 // Both hands slam into the house: the first blow marks it hit, the second breaks it.
 static void em2b_R1_HouseBreak(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cParts* p;
 
     if (em->r_no_2 == 0 && !(w->Be_flg & 0x20)) {
@@ -2048,7 +2048,7 @@ static void em2b_R1_HouseBreak(cEm2b* em)
 // Both hands slam onto a scroll object (em2bDashScrCk breaks it).
 static void em2b_R1_ScrollBreak(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cParts* p;
 
     w->Be_flg |= 0x10;
@@ -2095,7 +2095,7 @@ static void em2b_R1_ScrollBreak(cEm2b* em)
 // Tears the searched tree out: turns to it, hangs the tree on the hand when the motion ends.
 static void em2b_R1_GetTree(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cEmTree* tree = w->pTree;
     Vec dv;
     Mtx m; // function scope: its slot stays in use, so case 1's `s` reuses v's 16-byte slot (frame 80) instead of a merged m+v slot
@@ -2167,7 +2167,7 @@ static void em2b_R1_GetTree(cEm2b* em)
 // Swings the held tree; the tree breaks on a hit and is dropped when its timer runs out.
 static void em2b_R1_TreeAtk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cEmTree* tree = w->pTree;
 
     w->Be_flg |= 0x10;
@@ -2239,7 +2239,7 @@ static void em2b_R1_TreeAtk(cEm2b* em)
 // Tears a rock out of the ground and hangs it on the hand.
 static void em2b_R1_GetRock(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -2272,7 +2272,7 @@ static void em2b_R1_GetRock(cEm2b* em)
 // Throws the held rock at the target (the friend when fighting it).
 static void em2b_R1_ThrowRock(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -2322,7 +2322,7 @@ static void em2b_R1_ThrowRock(cEm2b* em)
 // Grab: the hand that reaches the player (or the partner) starts the strangle.
 static void em2b_R1_Catch(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     f32 d;
 
     w->Be_flg |= 0x10;
@@ -2402,7 +2402,7 @@ static void em2b_R1_Catch(cEm2b* em)
 // Strangles the caught player: the button mash escape or the death by squeezing.
 static void em2b_R1_Strangle(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -2654,7 +2654,7 @@ static void plem2b_Strangle(cPlayer* pl)
 // Partner caught: squeezed until her life runs out or the parasite timer ends, then dropped.
 static void em2b_R1_SubCatch(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -2851,7 +2851,7 @@ static void subem2b_CatchEnd(cSubChar* sub)
 // Stamps the ground next to the tower (room 224): shakes it and drops the player standing on it.
 static void em2b_R1_BaseAtk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -2887,7 +2887,7 @@ static void em2b_R1_BaseAtk(cEm2b* em)
 // Room 224 hole: climbs out at the fixed position, grabs the player who comes near the hole.
 static void em2b_R1_HoleAtk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cParts* p = em->getPartsPtr(0);
     f32 d;
 
@@ -3048,7 +3048,7 @@ static void em2b_R0_Damage(cEm2b* em)
 }
 
 // Creates the parasite head object on the neck parts (0x3E) with its idle motion and effect.
-static inline void em2bParasiteSet(cEm2b* em, Em2bWork* w, int hokan)
+static inline void em2bParasiteSet(cEm2b* em, FREE_EM2B* w, int hokan)
 {
     w->pParasite = (cObj16*) SetObj16(ARC(EM2B_BIN_0D6), ARC(EM2B_TPL_0D7), em, em, 0x3E, 8, 0, 0);
     if (w->pParasite) {
@@ -3060,7 +3060,7 @@ static inline void em2bParasiteSet(cEm2b* em, Em2bWork* w, int hokan)
 // Face damage: kneels, the parasite comes out of the neck and can be attacked while it is out.
 static void em2b_R1_Dm_Face(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     w->Be_flg |= 0x4000;
     switch (em->r_no_2) {
@@ -3155,7 +3155,7 @@ static void em2b_R1_Dm_Face(cEm2b* em)
 // Damage while holding the tree: drops the tree and the parasite comes out.
 static void em2b_R1_Dm_Tree(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cEmTree* tree = w->pTree;
 
     w->Be_flg |= 0x4000;
@@ -3211,7 +3211,7 @@ static inline void em2bParasiteDieSet(cEm2b* em)
 }
 
 // Action button prompt of the parasite attack (the button is chosen at random above rank 1).
-static inline void em2bParasiteBtnSet(Em2bWork* w)
+static inline void em2bParasiteBtnSet(FREE_EM2B* w)
 {
     if (w->Button_mode) {
         ActBtn.set(ACT_QUICK_STICK, 0xB, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_B_RAPID, ACT_FUNC_NORMAL, 0);
@@ -3223,7 +3223,7 @@ static inline void em2bParasiteBtnSet(Em2bWork* w)
 // Parasite attack: the player climbs the back and slashes the parasite while the button is mashed.
 static void em2b_R1_Dm_Parasite(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -3383,7 +3383,7 @@ static void em2b_R1_Dm_Parasite(cEm2b* em)
 // Parasite killed from outside: the parasite dies on the back and the giant collapses.
 static void em2b_R1_Dm_Parasite2(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     w->Be_flg |= 0x4800;
     switch (em->r_no_2) {
@@ -3441,7 +3441,7 @@ static inline void em2bPlOnEmSetRev(cPlayer* pl, f32 x, f32 y, f32 z)
 // Player attacking the parasite: climbs the back, slashes it while the button is mashed, is thrown off.
 static void plem2b_AtkParasite(cPlayer* pl)
 {
-    Em2bWork* w = EM2B_WK(pPL->pEmCatch);
+    FREE_EM2B* w = EM2B_WK(pPL->pEmCatch);
 
     pl->subArc = pl->pEmCatch->subArc;
     pl->dmg.m_Timer = 2;
@@ -3654,7 +3654,7 @@ static void plem2b_AtkParasite(cPlayer* pl)
 // Camera of the parasite attack: a fixed offset in the player's frame, lifted to the head parts.
 void em2bParasiteAtkCamMove(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cParts* p;
     Vec pos;
     Vec at;
@@ -3684,7 +3684,7 @@ void em2bParasiteAtkCamMove(cEm2b* em)
 // Hit by the thrown-back rock.
 static void em2b_R1_Dm_Rock(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0: {
@@ -3704,7 +3704,7 @@ static void em2b_R1_Dm_Rock(cEm2b* em)
 }
 
 // Drops the held tree to the ground next to the foot (flash / bomb damage).
-static inline void em2bTreeDrop(cEm2b* em, Em2bWork* w)
+static inline void em2bTreeDrop(cEm2b* em, FREE_EM2B* w)
 {
     cEmTree* tree = w->pTree;
 
@@ -3727,7 +3727,7 @@ static inline void em2bTreeDrop(cEm2b* em, Em2bWork* w)
 // Flash grenade damage.
 static void em2b_R1_Dm_Flash(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     int rtn = em->r_no_2;
 
     w->Be_flg |= 0x400;
@@ -3752,7 +3752,7 @@ static void em2b_R1_Dm_Flash(cEm2b* em)
 // Explosion damage.
 static void em2b_R1_Dm_Bomb(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     int rtn = em->r_no_2;
 
     w->Be_flg |= 0x400;
@@ -3777,7 +3777,7 @@ static void em2b_R1_Dm_Bomb(cEm2b* em)
 // R0 == 3: death (Be_flg bit3), runs Em2b_R1_die_tbl[r_no_1].
 static void em2b_R0_Die(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     w->Be_flg |= 8;
     Em2b_R1_die_tbl[em->r_no_1](em);
@@ -3786,7 +3786,7 @@ static void em2b_R0_Die(cEm2b* em)
 // Normal death: falls forward; while falling the feet crush and the player can dash out from under.
 static void em2b_R1_Die_Normal(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -3825,7 +3825,7 @@ static void em2b_R1_Die_Normal(cEm2b* em)
 // Lost: sinks into the ground shrinking, then fades out with the rope / chain objects.
 static void em2b_R1_Die_Lost(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -3882,7 +3882,7 @@ static void em2b_R1_Die_Lost(cEm2b* em)
 // Event death (room 119): lies down at a fixed spot facing the player, the trees are lost.
 static void em2b_R1_Die_Event(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     int rtn = em->r_no_2;
 
     switch (rtn) {
@@ -3924,7 +3924,7 @@ static void em2b_R1_Die_Event(cEm2b* em)
 // Room 224: dropped from the cage into the lava.
 static void em2b_R1_Die_R224Drop(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cParts* p = em->getPartsPtr(0);
 
     switch (em->r_no_2) {
@@ -3954,7 +3954,7 @@ static void em2b_R1_Die_R224Drop(cEm2b* em)
 // behind), then the current target (dog target, goto point, friend, partner) and its angle / distance.
 void em2bRouteCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     Vec v;
     Vec a;
     Vec plPos;
@@ -4047,7 +4047,7 @@ void em2bRouteCk(cEm2b* em)
 // Turns the head towards the current target's head (damped) while a routine runs.
 void em2bNeckMove(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cParts* t;
     cParts* p;
     Vec v;
@@ -4080,7 +4080,7 @@ void em2bNeckMove(cEm2b* em)
 // weight |Blend|; Hokan / Frame give the hokan frames and start frame (the stamp aim).
 void em2bBlendMotSet(cEm2b* em, void* m0, void* m1, void* m2, int a, int b, int c, int d)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     MotionWork* bm;
     f32 val = fabsf(w->Blend);
     void* m;
@@ -4110,7 +4110,7 @@ void em2bBlendMotSet(cEm2b* em, void* m0, void* m1, void* m2, int a, int b, int 
 // Chain cloth of the type 1 giant (the chain on the arm).
 void em2bClothSet(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     if (em->type == 1) {
         int zero;
@@ -4182,7 +4182,7 @@ void em2bClothSet(cEm2b* em)
 // Per frame: the chained variant's (type 1) cloth simulation (PenClothMove3).
 void em2bClothMove(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     if (em->type == 1) {
         PenClothMove3(em, &w->Cloth);
@@ -4193,7 +4193,7 @@ void em2bClothMove(cEm2b* em)
 // callback, a hit shakes the camera and the pad.
 int em2bAtkCk(cEm2b* em, Vec* a, Vec* b, int no)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     EmAtkInfo* atk;
     int hit;
 
@@ -4384,7 +4384,7 @@ static void plem2bDashEscape(cPlayer* pl)
 // Event camera of the escape scenes: behind the player, pulled in to the scenario hit.
 void em2bEscapeCamMove(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     GLOBAL_WK* g = pG;
     Vec a;
     Vec b;
@@ -4423,7 +4423,7 @@ void em2bEscapeCamMove(cEm2b* em)
 // Foot landing of the walk: quake, step SE, dust; the chain giant rattles.
 void em2bFootSe(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     u32 no;
     cParts* p = 0;
     Vec* pos;
@@ -4469,7 +4469,7 @@ void em2bFootSe(cEm2b* em)
 // Motion key bit7: swap the model variant (the foot / hand side tables).
 void em2bFtChgCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     if (em->Motion.Seq_old.Free & 0x80) {
         switch (w->Ft_axis) {
@@ -4509,7 +4509,7 @@ void em2bQuakeSet(Vec* pos)
 // Type 0: the short rope hanging between the neck parts.
 void em2bShortRopeSet(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cObjChain* chain;
     Vec pos;
     Vec b;
@@ -4592,8 +4592,8 @@ void em2bShortRopeSet(cEm2b* em)
 // Type 3: the three chains on the arms.
 void em2bChainSet(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
-    PenCloth* c = &w->rope[1];
+    FREE_EM2B* w = EM2B_WK(em);
+    CLOTH_INFO* c = &w->rope[1];
     cObjChain* chain;
     Vec pos;
     Vec rot;
@@ -4716,7 +4716,7 @@ void em2bChainSet(cEm2b* em)
 // Room 119: is the player inside an intact house near enough to break?
 int em2bPlInHouseCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     EmiData* tbl;
     int i;
 
@@ -4751,7 +4751,7 @@ int em2bPlInHouseCk(cEm2b* em)
 // Looks for a tree to tear out in front of the giant; it becomes the target.
 int em2bSearchTree(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     u32 i;
 
     if (w->pTree || w->pTreeTarget || w->pRock || w->pGoto || w->pHouse || w->Rock_wait || (w->Be_flg & 0x80)) {
@@ -4797,7 +4797,7 @@ int em2bSearchTree(cEm2b* em)
 // Near enough to the target tree and facing it: go and get it.
 int em2bGetTreeCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cEm* t = w->pTreeTarget;
 
     if (t == 0) {
@@ -4819,7 +4819,7 @@ int em2bGetTreeCk(cEm2b* em)
 // Looks for a rock spot (EMI kind 4) in front of the giant; it becomes the goto target.
 int em2bSearchRockCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     int i;
 
     if (pG->pEmi == 0) {
@@ -4859,7 +4859,7 @@ int em2bSearchRockCk(cEm2b* em)
 // Near enough to the rock spot and facing it: tear out the rock.
 int em2bGetRockCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     EmiEntry* e = w->pGoto;
 
     if (e == 0) {
@@ -4881,7 +4881,7 @@ int em2bGetRockCk(cEm2b* em)
 // Tree swing hit check: the player within the swept sector in front of the tree gets blown away.
 int em2bTreeAtkCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cEmTree* tree = w->pTree;
     cParts* p;
     Vec a;
@@ -4941,7 +4941,7 @@ int em2bTreeAtkCk(cEm2b* em)
 // Tree swing against the scenery: the houses within the tree's reach in front of it break.
 int em2bTreeAtkScrCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     cEmTree* tree = w->pTree;
     Vec a;
     Vec b;
@@ -5087,7 +5087,7 @@ void em2bDashScrCk(cEm2b* em, Vec* pos, f32 rad)
 // Room 11E: a house in the way of the walk (ahead, towards the target, the giant stuck) breaks.
 void em2bR11eScrBrkCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     int i;
 
     if (pG->pEmi == 0) {
@@ -5271,7 +5271,7 @@ static void plem2bEscapeTree(cPlayer* pl)
 // Blown away by a swing / the tree: flies until a wall stops him, lands, gets up.
 static void plem2bDmBlow(cPlayer* pl)
 {
-    Em2bWork* w = EM2B_WK(pl->pEmCatch);
+    FREE_EM2B* w = EM2B_WK(pl->pEmCatch);
 
     pl->subArc = pl->pEmCatch->subArc;
     pl->dmg.set(0, 30);
@@ -5324,7 +5324,7 @@ static void plem2bDmBlow(cPlayer* pl)
 // Camera of the blow: the game camera position, the target pulled towards the player.
 void em2bBlowCamMove(cEm2b* em, f32 rate)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     GLOBAL_WK* g = pG;
 
     cParts* p;
@@ -5344,7 +5344,7 @@ void em2bBlowCamMove(cEm2b* em, f32 rate)
 // Camera of the stamp: pulled behind and above the player.
 void em2bStampCamMove(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     GLOBAL_WK* g = pG;
     Vec v;
     cParts* p;
@@ -5368,7 +5368,7 @@ void em2bStampCamMove(cEm2b* em)
 // Event placement: position / angle and the wait pose.
 void cEm2b::setPos(Vec* p, f32 ang)
 {
-    Em2bWork* w = EM2B_WK(this);
+    FREE_EM2B* w = EM2B_WK(this);
     cEm2b* em = this;
 
     if (p) {
@@ -5411,7 +5411,7 @@ void plBlendMotSet(cPlayer* pl, void* m0, void* m1, int a, int b)
 // Event death: the trees are lost, the die routine runs.
 void cEm2b::setEventDie()
 {
-    Em2bWork* w = EM2B_WK(this);
+    FREE_EM2B* w = EM2B_WK(this);
 
     if (w->pTree) {
         w->pTree->setLost();
@@ -5435,7 +5435,7 @@ int em2bStaggerCk(cEm2b* em, Vec* pos)
 // The first living dog becomes the friend the giant fights.
 int em2bSearchDog(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     u32 i;
 
     if (w->pFriend) {
@@ -5463,14 +5463,14 @@ int em2bSearchDog(cEm2b* em)
 }
 
 // Goes into the threat for half a second.
-static inline void em2bThreatSet(cEm2b* em, Em2bWork* w)
+static inline void em2bThreatSet(cEm2b* em, FREE_EM2B* w)
 {
     w->Dash_wait = 30;
     em->setRno(1, 0, 0, 0);
 }
 
 // The routine selecting rock throw / dash: coin flips guarded by the partner and the held rock.
-static inline void em2bRockOrKickSet(cEm2b* em, Em2bWork* w)
+static inline void em2bRockOrKickSet(cEm2b* em, FREE_EM2B* w)
 {
     if (((Rnd() & 7) || pSUB) && w->pRock == 0) {
         em->setRno(1, 0x11, 0, 0);
@@ -5486,7 +5486,7 @@ static inline void em2bRockOrKickSet(cEm2b* em, Em2bWork* w)
 // apart in the target (COMPILER-DIFF #6 mechanism, no tag needed).
 int em2bAtkRtnCk(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     if (StaFlagChk(pG, STA_PL_CATCHED) || pPL->dmg.isDamage() || (s16) pG->pl_life <= 0) {
         if (em->l_pl < 49000000.0f) {
@@ -5631,10 +5631,10 @@ int em2bAtkRtnCk(cEm2b* em)
     return 0;
 }
 
-// Debug page 7: the attack forced by Em2bWork::debugAtk when the target is in its range.
+// Debug page 7: the attack forced by FREE_EM2B::debugAtk when the target is in its range.
 int em2bAtkRtnCkDebug(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     switch (w->Debug_atk_rtn) {
     case 1:
@@ -5716,7 +5716,7 @@ int em2bAtkRtnCkDebug(cEm2b* em)
 // The routine after an attack: rock / tree pickup, an attack, else turn or walk.
 void em2bNextRtnSet(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
 
     em2bSearchRockCk(em);
     if (em2bGetRockCk(em)) {
@@ -5937,7 +5937,7 @@ void em2bCatchPosSet(cEm2b* em)
 // each a tenth of the motion further in.
 void em2bSetTentacle(cEm2b* em, int set)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     u16 step = (((MotionData*) ARC(EM2B_MOT_SET_TENTACLE))->maxFrame & 0x3FFF) / 10u;
     u32 i;
 
@@ -6235,7 +6235,7 @@ void em2bObaHitCk(cEm2b* em)
 // 1 while the parasite head object is out of the back (pParasite).
 int cEm2b::ckParasite()
 {
-    Em2bWork* w = EM2B_WK(this);
+    FREE_EM2B* w = EM2B_WK(this);
 
     if (w->pParasite) {
         return 1;
@@ -6246,7 +6246,7 @@ int cEm2b::ckParasite()
 // Die routine 1 (lost): squashes every parts by the y scale rate, keeping the world positions.
 void em2bScaleCompress(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     Mtx m;
     Vec s;
     cParts* p;
@@ -6343,7 +6343,7 @@ int cEm2b::ckR224Drop()
 // The tower (obj 0x39) within 8000 of the giant, for the base attack.
 void em2bYaguraSearch(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     u32 i;
 
     w->pYagura = 0;
@@ -6369,7 +6369,7 @@ void em2bYaguraSearch(cEm2b* em)
 // Room 224: the texture render manager of the hole attack's freeze effect.
 void em2bTexrenderInit(cEm2b* em)
 {
-    Em2bWork* w = EM2B_WK(em);
+    FREE_EM2B* w = EM2B_WK(em);
     u8* tbl = w->Tex_buf;
 
     if (pG->room_id != 0x224) {
@@ -6392,7 +6392,7 @@ void em2bTexrenderInit(cEm2b* em)
 // the player's climb-and-slash attack.
 int cEm2b::ckSit()
 {
-    Em2bWork* w = EM2B_WK(this);
+    FREE_EM2B* w = EM2B_WK(this);
 
     if (w->Be_flg & 0x4000) {
         return 1;

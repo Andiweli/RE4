@@ -6,7 +6,7 @@
 #include "math_sub.h"
 #include "esp.h"
 
-struct Esp07Work {
+typedef struct tagESP07_WK {
     Vec RefRate;    // 0x00 x: horizontal damping, y: vertical damping (gen->Vec0.x.. * 0.1)
     u8 GndEstOwner;      // 0x0C est on floor hit (gen->Work8[0])
     u8 GndEstNo;     // 0x0D (gen->Work8[1])
@@ -17,12 +17,12 @@ struct Esp07Work {
     u32 Flg;     // 0x18 bit0: stopped, bit1: floor height cached
     f32 GndHeight;    // 0x1C
     u8 SeType;     // 0x20 (gen->WorkSp8[2])
-};
+} ESP07_WK;
 
 // Bouncing particle: checks the floor (or walls) every frame, bounces / spawns an est / dies.
 class cEsp07 : public cEsp {
 public:
-    Esp07Work m_Free;  // 0xF8
+    ESP07_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -47,7 +47,7 @@ cEsp* Esp07_Create()
 // speed (x/z by RefRate.x, y by -RefRate.y) and freezes the particle when it is nearly at rest.
 void Esp07_ChkGnd(cEsp07* pEsp, f32 height)
 {
-    Esp07Work* w = &pEsp->m_Free;
+    ESP07_WK* w = &pEsp->m_Free;
     f32 half;
 
     half = pEsp->m_Size_base_y * 0.5f * pEsp->m_Size_mul;
@@ -102,7 +102,7 @@ void Esp07_ChkGnd(cEsp07* pEsp, f32 height)
 // HitType 0: probes the floor height once (Flg bit1 caches it) and runs Esp07_ChkGnd.
 void Esp07_HitGndLight(cEsp07* pEsp)
 {
-    Esp07Work* w = &pEsp->m_Free;
+    ESP07_WK* w = &pEsp->m_Free;
     u32 attr;
 
     if (!(w->Flg & 2)) {
@@ -125,7 +125,7 @@ void Esp07_HitGnd(cEsp07* pEsp)
 // reflects the speed about the normal scaled by RefRate.y and reverses most of the spin.
 void Esp07_HitWall(cEsp07* pEsp)
 {
-    Esp07Work* w = &pEsp->m_Free;
+    ESP07_WK* w = &pEsp->m_Free;
     Vec refl;
     Vec hit;
     Vec n2;
@@ -176,7 +176,7 @@ void Esp07_HitWall(cEsp07* pEsp)
 // released when the animation ends.
 void cEsp07::move()
 {
-    Esp07Work* w = &m_Free;
+    ESP07_WK* w = &m_Free;
 
     if (CommonMove()) {
         if (!(w->Flg & 1)) {
@@ -206,7 +206,7 @@ void cEsp07::move()
 // WorkSp8[0..2] (range-checked, else fails); a zero life becomes 0x80 frames.
 int cEsp07::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp07Work* w = &m_Free;
+    ESP07_WK* w = &m_Free;
 
     w->RefRate = pSeq->Vec0;
     PSVECScale(&w->RefRate, &w->RefRate, 0.1f);

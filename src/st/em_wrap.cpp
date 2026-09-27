@@ -428,7 +428,7 @@ int cEmWrap::isActive()
 void cEmWrap::destroy()
 {
     if (isAlive() == 1) {
-        EmListData* d = GetListPtrFromEm(pEm);
+        EM_LIST* d = GetListPtrFromEm(pEm);
 
         if (d != 0) {
             d->be_flag &= ~1;

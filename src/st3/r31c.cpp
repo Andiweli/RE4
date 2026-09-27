@@ -1536,7 +1536,7 @@ static void r31cEventS01()
 // (Room_flg[0] 0x10000000 = the button was hit), area 0x1C = the tower cover, the room state.
 void r31cEventS01EndProc()
 {
-    EmListData* l;
+    EM_LIST* l;
     int i;
 
     l = &pG->Em_list[0x13];

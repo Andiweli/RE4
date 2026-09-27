@@ -13,7 +13,7 @@
 #include "view.h"
 
 // Scrolling-texture sprite (Esp08_Trans) and the heat-shimmer variant (Esp08_TransShimmer).
-struct Esp08Work {
+typedef struct tagESP08_WK {
     f32 Div_x;     // 0x00 texture repeat along s (>= 1)
     f32 Div_y;     // 0x04 texture repeat along t
     f32 Spd_x;      // 0x08 scroll speed
@@ -25,11 +25,11 @@ struct Esp08Work {
     f32 Base_alpha;     // 0x1C initial alpha (esp->colA)
     u8 Room_del_frame; // 0x20 frames the alpha fades in (0: none)
     u8 Room_del_cnt;    // 0x21
-};
+} ESP08_WK;
 
 class cEsp08 : public cEsp {
 public:
-    Esp08Work m_Free;  // 0xF8
+    ESP08_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -364,7 +364,7 @@ cEsp* Esp08_Create()
 // set and back when it clears.
 void cEsp08::move()
 {
-    Esp08Work* w = &m_Free;
+    ESP08_WK* w = &m_Free;
 
     if (w->Room_del_frame != 0) {
         m_Col_a = w->Base_alpha;
@@ -414,10 +414,10 @@ void cEsp08::move()
 // coordinates.
 void Esp08_Trans(cEsp08* esp)
 {
-    Esp08Work* w = &esp->m_Free;
+    ESP08_WK* w = &esp->m_Free;
     Mtx44 proj;
     Mtx inv;
-    EspAnmData* anm;
+    cAnm* anm;
     f32 y0;
     f32 sx;
     f32 sy;
@@ -546,10 +546,10 @@ void Esp08_TransShimmer(cEsp08* esp, int u_pow)
         {0.0f, 0.0029762f, -0.167f, 0.0f},
         {0.0f, 0.0f, 1.0f, 0.0f},
     };
-    Esp08Work* w = &esp->m_Free;
+    ESP08_WK* w = &esp->m_Free;
     Mtx44 proj;
     Mtx inv;
-    EspAnmData* anm;
+    cAnm* anm;
     GXColor fog;
     f32 y0;
     f32 sx;
@@ -772,7 +772,7 @@ void Esp08_TransShimmer(cEsp08* esp, int u_pow)
 // Work8[3], mask type Work8[2] (0/1, else fails); remembers the initial alpha.
 int cEsp08::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp08Work* w = &m_Free;
+    ESP08_WK* w = &m_Free;
     u32 type;
 
     w->Div_x = (f32) (int) pSeq->Work8[0] * 0.1f + 1.0f;

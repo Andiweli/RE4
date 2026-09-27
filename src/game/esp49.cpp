@@ -6,19 +6,19 @@
 #include "light.h"
 #include "esp.h"
 
-struct Esp49Work {
+typedef struct tagESP49_WK {
     f32 del_height;     // 0x00 depth below the water surface at which the effect dies
     f32 fade_height; // 0x04 depth over which the alpha fades
     f32 Base_alpha;     // 0x08 base alpha
     u8 EstOwner;      // 0x0C spawn an est when the effect dies underwater
     u8 EstNo;      // 0x0D
     u8 estPrm;     // 0x0E
-};
+} ESP49_WK;
 
 // Effect that fades out and dies when it sinks below the water surface.
 class cEsp49 : public cEsp {
 public:
-    Esp49Work m_Free;  // 0xF8
+    ESP49_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -35,7 +35,7 @@ cEsp* Esp49_Create()
 // optional EstSet), between del_height and fade_height scales m_Col_a linearly.
 void cEsp49::move()
 {
-    Esp49Work* w = &m_Free;
+    ESP49_WK* w = &m_Free;
     Vec wpos;
     Vec r;
     Vec ep;
@@ -73,7 +73,7 @@ void cEsp49::move()
 // est enable Work8[2] (0/1, else fails); remembers the initial alpha.
 int cEsp49::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp49Work* w = &m_Free;
+    ESP49_WK* w = &m_Free;
 
     w->del_height = pSeq->Vec0.x;
     w->fade_height = pSeq->Vec0.z;

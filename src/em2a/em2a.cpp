@@ -381,7 +381,7 @@ static void em2a_R1_Trap1Set(cEm2a* em)
 static void em2a_R1_Trap1Bite(cEm2a* em)
 {
     Em2aWork* w = EM2A_WK(em);
-    EmListData* l = &pG->Em_list[em->emset_no];
+    EM_LIST* l = &pG->Em_list[em->emset_no];
 
     switch (em->r_no_2) {
     case 0:
@@ -452,7 +452,7 @@ static void plem2a_Trap1Bite(cPlayer* pl)
 static void em2a_R1_Trap1BiteSub(cEm2a* em)
 {
     Em2aWork* w = EM2A_WK(em);
-    EmListData* l = &pG->Em_list[em->emset_no];
+    EM_LIST* l = &pG->Em_list[em->emset_no];
     int r;
 
     switch (em->r_no_2) {
@@ -648,7 +648,7 @@ void plem2aTrapCamMove(cModel* m)
 // goes inactive; the list entry is marked sprung.
 static void em2a_R1_Trap1Break(cEm2a* em)
 {
-    EmListData* l = &pG->Em_list[em->emset_no];
+    EM_LIST* l = &pG->Em_list[em->emset_no];
 
     switch (em->r_no_2) {
     case 0:

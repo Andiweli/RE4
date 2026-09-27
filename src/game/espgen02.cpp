@@ -9,19 +9,19 @@
 #include "rnd.h"
 #include "db_log.h"
 
-struct Espgen02Work;
+typedef struct tagESPGEN02_WK ESPGEN02_WK;
 
 extern "C" {
 void espgen02_UpdateMatrix(EspgenWork* w);
 void espgen02_Update(EspgenWork* w);
 static void espgen02_Move00(EspgenWork* w);
 void espgen02_Move01(EspgenWork* w);
-static f32 Calc_D256(Espgen02Work* p, u8 d, f32 rate);
+static f32 Calc_D256(ESPGEN02_WK* p, u8 d, f32 rate);
 }
 
 // Effect controller 02: like controller 00 but places every emitted esp on a path (path.cpp),
 // optionally oriented along it.
-struct Espgen02Work {
+typedef struct tagESPGEN02_WK {
     cEspSeqTbl* rec;   // 0x14
     cModel* pMod;     // 0x18
     u32 Guid_pMod;        // 0x1C model serial the controller was set up with
@@ -54,13 +54,13 @@ struct Espgen02Work {
     u8 PathRot_y;           // 0xA3
     Vec PathScale;         // 0xA4
     u8 mode;           // 0xB0 bit0: orient along the path, bit1: orient along the path (type 2)
-};
+} ESPGEN02_WK;
 
 // Rebuilds the emitter matrix from parts Null_parts_no of pMod (same rules as espgen00): 0xFE = free
 // position, invalid parts numbers kill the controller.
 void espgen02_UpdateMatrix(EspgenWork* pEspgen)
 {
-    Espgen02Work* p = (Espgen02Work*) pEspgen->work;
+    ESPGEN02_WK* p = (ESPGEN02_WK*) pEspgen->work;
     cModel* model = p->pMod;
 
     if ((p->Null_parts_no >= 0xF8 && p->Null_parts_no <= 0xFD) || p->Null_parts_no == 0xFF) {
@@ -101,7 +101,7 @@ void espgen02_UpdateMatrix(EspgenWork* pEspgen)
 }
 
 // Rate curve: d >= 0 fades 1 -> 1 - d/128 over the life, d < 0 grows 1 -> 1 + 10 * -d/128.
-static f32 Calc_D256(Espgen02Work* p, u8 d, f32 rate)
+static f32 Calc_D256(ESPGEN02_WK* p, u8 d, f32 rate)
 {
     s8 v = d;
     f32 t;
@@ -124,7 +124,7 @@ static f32 Calc_D256(Espgen02Work* p, u8 d, f32 rate)
 // without the pin colR loses to spdR in global-alloc (f23/f24 swapped).
 void espgen02_Update(EspgenWork* pEspgen)
 {
-    Espgen02Work* p = (Espgen02Work*) pEspgen->work;
+    ESPGEN02_WK* p = (ESPGEN02_WK*) pEspgen->work;
     f32 scaleR;
     f32 spdR = 0.0f;
     // COMPILER-DIFF: #17. colR pinned to f24 (global-alloc order of the three 0.0f copies); no
@@ -412,7 +412,7 @@ void Espgen02_Move(EspgenWork* pEspgen)
 int Espgen02_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag)
 {
-    Espgen02Work* p = (Espgen02Work*) w->work;
+    ESPGEN02_WK* p = (ESPGEN02_WK*) w->work;
 
     p->rec = rec;
     p->pMod = model;

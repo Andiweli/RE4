@@ -14,7 +14,7 @@ class cEm;
 class cCoord;
 
 // Spot block of a light (0x40 bytes, cLight+0x38 / cLightWork+0x2C). Only the direction is known.
-struct LightSpot {
+struct LIT_TYPE04_FREE {
     Vec Normal;        // 0x00 direction
     union {
         f32 A0;    // 0x0C  spot cutoff angle (GXInitLightSpot); custom: a0
@@ -60,7 +60,7 @@ public:
     u16 HitRadius;           // 0x24  hit adjust radius
     u16 Dummy82;       // 0x26  (PS2 cLightWork Dummy82)
     u32 Dummy9;        // 0x28  (PS2 cLightWork Dummy9)
-    LightSpot spot;    // 0x2C
+    LIT_TYPE04_FREE spot;    // 0x2C
     LightSub sub;      // 0x6C
     LightPath path;    // 0xEC
 
@@ -94,7 +94,7 @@ public:
     u32 Dummy9;        // 0x34  (PS2 cLight Dummy9)
     union {
         Vec normal;        // 0x38 direction
-        LightSpot spot;    // 0x38 .. 0x78
+        LIT_TYPE04_FREE spot;    // 0x38 .. 0x78
     };
     union {
         u8 work[0x40];     // 0x78 per-light-type work area
@@ -162,7 +162,7 @@ struct LightPathHeader {
 };
 
 // Fog block (cLightEnv+0x8, copied to `fogNew` by setEnv).
-struct LightFog {
+struct FOG {
     s32 Type;          // 0x00  GX fog type (0 = off)
     f32 Start;         // 0x04
     f32 End;           // 0x08
@@ -184,8 +184,8 @@ public:
 struct cLightEnv {
     GXColor AmbientScr;     // 0x00  model ambient (trans_lit LightSetModel / cloth / water; versionUp 0x23 copies it to AmbientEm / AmbientEsp)
     u32 nLight;      // 0x04
-    LightFog Fog;    // 0x08  Type: gx_sub: 0 = the background colour has no rgb (alpha only); Color: fog / background colour
-    LightFog MirrorFog;   // 0x18  mirror fog (db_light "MIRROR FOG")
+    FOG Fog;    // 0x08  Type: gx_sub: 0 = the background colour has no rgb (alpha only); Color: fog / background colour
+    FOG MirrorFog;   // 0x18  mirror fog (db_light "MIRROR FOG")
     s32 FocusZ;         // 0x28  focus depth (screen z, 0..65535)
     u8 FocusFlag;          // 0x2C
     u8 FocusLevel;          // 0x2D  focus level (0 = depth of field off)

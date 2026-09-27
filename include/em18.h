@@ -9,7 +9,7 @@
 class cModelInfo;
 
 // Work of the em18 enemy (em18 module, D:/Bio4/Prog/em18.cpp, the merchant), overlaid on cEm from 0x3E0.
-struct Em18Work {
+struct FREE_EM18 {
     u32 Be_flg;            // 0x000 (0x3E0)  bit3: damage / die routine, bit4: neck follows the player, bit5: trade started (em18TradeAction)
     u8 pad_4[8];
     YARARE_INFO hit[9];     // 0x00C (0x3EC)  extra hit boxes (YarareAdd)
@@ -24,7 +24,7 @@ struct Em18Work {
     u32 Seid_voice;            // 0x2D0 (0x6B0)  SndCall handle of the current voice
 };
 
-#define EM18_WK(em) ((Em18Work*) (((cEm18*) (em))->free))
+#define EM18_WK(em) ((FREE_EM18*) (((cEm18*) (em))->free))
 
 class cEm18 : public cEm {
 public:

@@ -31,7 +31,7 @@ class cEmRock;
 
 // Work of the em2b enemy (em2b module, D:/Bio4/Prog/em2b.cpp): the giant, overlaid on cEm from
 // 0x3E0. Field names are work-relative offsets; the comment gives the cEm offset.
-struct Em2bWork {
+struct FREE_EM2B {
     u32 Be_flg;            // 0x000 (0x3E0)  bit0: route found, bit2: targets the partner, bit3: damage / die routine, bit4: routine running,
                           //                bit7: targets the friend (0x26C), bit9: parasite out, bit13: parasite hit
     int Timer;            // 0x004 (0x3E4)
@@ -69,8 +69,8 @@ struct Em2bWork {
     int blendC;           // 0x398 (0x778)
     int blendD;           // 0x39C (0x77C)
     f32 Neck_dir_y;          // 0x3A0 (0x780)
-    PenCloth Cloth;       // 0x3A4 (0x784)  chain cloth (em2bClothSet, type 1)
-    PenCloth rope[2];     // 0x404 (0x7E4)  short rope / chain pendulums (em2bShortRopeSet, em2bChainSet)
+    CLOTH_INFO Cloth;       // 0x3A4 (0x784)  chain cloth (em2bClothSet, type 1)
+    CLOTH_INFO rope[2];     // 0x404 (0x7E4)  short rope / chain pendulums (em2bShortRopeSet, em2bChainSet)
     cObj* pChain;        // 0x4C4 (0x8A4)  chain object (PS2 pChain before pChain2/pChain3)
     cObj* pChain2;        // 0x4C8 (0x8A8)
     cObj* pChain3;        // 0x4CC (0x8AC)
@@ -107,7 +107,7 @@ struct Em2bWork {
 };
 
 
-#define EM2B_WK(em) ((Em2bWork*) (((cEm2b*) (em))->free))
+#define EM2B_WK(em) ((FREE_EM2B*) (((cEm2b*) (em))->free))
 #define EM2B_BLEND_MOT(w) ((MotionWork*) &(w)->Sub_mot)
 
 class cEm2b : public cEm {

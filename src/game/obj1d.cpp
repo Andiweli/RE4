@@ -21,7 +21,7 @@ static void (*Obj1d_R1_move_tbl[4])(cObjChain*) = { obj1d_R1_Set, obj1d_R1_LostW
 cObjChain* SetChain(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cObjChain* obj;
-    ChainWork* w;
+    FREE_OBJ1D* w;
 
     obj = (cObjChain*) ObjMgr.createBack(cObjMgr::ID_CHAIN);
     if (obj == 0) {
@@ -56,7 +56,7 @@ cObjChain* SetChain(void* bin, void* tpl, Vec* pos, Vec* rot)
 // Per-frame: dies with the parent, motion, R1 routine, pendulum step.
 void cObjChain::move()
 {
-    ChainWork* w = CHAIN_WK(this);
+    FREE_OBJ1D* w = CHAIN_WK(this);
 
     if (w->pEm_oya) {
         if (!w->pEm_oya->isAlive()) {
@@ -90,7 +90,7 @@ void obj1d_R1_Set(cObjChain* pObj)
 // Rno1 == 1: waits 90 frames then fades out (or vanishes off screen) -> Lost.
 void obj1d_R1_LostWait(cObjChain* pObj)
 {
-    ChainWork* w = CHAIN_WK(pObj);
+    FREE_OBJ1D* w = CHAIN_WK(pObj);
 
     switch (pObj->r_no_2) {
     case 0:
@@ -147,7 +147,7 @@ void obj1d_R1_Lost(cObjChain* pObj)
 // matrices (axes normalised unless flags bit 1), position = midpoint of the two offsets.
 void obj1d_R1_Parent(cObjChain* pObj)
 {
-    ChainWork* w = CHAIN_WK(pObj);
+    FREE_OBJ1D* w = CHAIN_WK(pObj);
     Mtx ma;
     Mtx mb;
     Vec v0;
@@ -260,7 +260,7 @@ void obj1d_R1_Parent(cObjChain* pObj)
 // Hangs the link on one parts (both ends the same); flag = keep the parts scale.
 void cObjChain::setParent(cModel* parent, int parts, Vec* ofs, int flag)
 {
-    ChainWork* w = CHAIN_WK(this);
+    FREE_OBJ1D* w = CHAIN_WK(this);
 
     w->pEm_oya = parent;
     w->Parts1 = parts;
@@ -281,7 +281,7 @@ void cObjChain::setParent(cModel* parent, int parts, Vec* ofs, int flag)
 // Hangs the link between two parts with their offsets.
 void cObjChain::setParent2(cModel* pEm, int parts1, Vec* pPos1, int parts2, Vec* pPos2, int mode)
 {
-    ChainWork* w = CHAIN_WK(this);
+    FREE_OBJ1D* w = CHAIN_WK(this);
 
     w->pEm_oya = pEm;
     w->Parts1 = parts1;
@@ -300,7 +300,7 @@ void cObjChain::setParent2(cModel* pEm, int parts1, Vec* pPos1, int parts2, Vec*
 }
 
 // Attaches a pendulum cloth to the link.
-void cObjChain::setChain(PenCloth* pCloth)
+void cObjChain::setChain(CLOTH_INFO* pCloth)
 {
     CHAIN_WK(this)->pCloth = pCloth;
     if (pCloth) {

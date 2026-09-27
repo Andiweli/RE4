@@ -44,7 +44,7 @@ struct TBlockHeader {
 // The tool's view of BlockArea: the area number is unsigned here.
 struct TBlockArea {
     u32 tag;          // 0x00
-    AreaData area;    // 0x04
+    AREA_HIT_DATA area;    // 0x04
     u8 flags;         // 0x34  bit0: active, bit1: initialised
     u8 slot;          // 0x35  slot of the area in the tool's table (written with pW->areaNo, indexes pW->area)
     u8 areaNo;        // 0x36
@@ -1116,7 +1116,7 @@ void tBlockArea_dispBlockModel(int on)
 void tBlockArea_dispBlockArea(u8 no, u32 col)
 {
     TBlockArea* a = &pW->area[no];
-    AreaData* area = &a->area;
+    AREA_HIT_DATA* area = &a->area;
     Vec c;
 
     AreaDataDisp(area, col | 0x40000000, 1, NULL);

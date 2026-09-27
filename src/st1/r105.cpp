@@ -775,7 +775,7 @@ extern "C" void Evt_R105S10_Func(Event* e)
         if (e->GetNowCut() == 0xE || e->GetNowCut() == 0x13) {
             if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod)->ObjChainFlagCommon |= 0x04000000;
@@ -786,7 +786,7 @@ extern "C" void Evt_R105S10_Func(Event* e)
         } else {
             if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
-                    Obj18Work* w = OBJ18_WK((cObj18*) mod);
+                    FREE_OBJ18* w = OBJ18_WK((cObj18*) mod);
 
                     if (w && w->pObjChain) {
                         OBJ18_WK((cObj18*) mod)->ObjChainFlagCommon &= ~0x04000000;

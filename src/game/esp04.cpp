@@ -7,20 +7,20 @@
 #include "rnd.h"
 #include "esp.h"
 
-struct Esp04Work {
+typedef struct tagESP04_WK {
     Vec base_pos;      // 0x00 initial position
     u8 flag;   // 0x0C bit0: repeat horizontally, bit1: repeat vertically (gen->Work8[0])
     s8 rand_x;      // 0x0D random jitter in x (gen->Work8[1])
     s8 rand_y;      // 0x0E random jitter in y (gen->Work8[2])
     s8 a_rate;   // 0x0F alpha change per frame (gen->prm byte 0xCF)
     u8 a_wait;  // 0x10 frames before the alpha starts changing (gen->Work8[3])
-};
+} ESP04_WK;
 
 // Screen-space tiled texture (rain / dust overlay): a 2D quad grid drawn in an orthographic
 // projection; scrolls with pos and wraps around the 512x448 screen.
 class cEsp04 : public cEsp {
 public:
-    Esp04Work m_Free;  // 0xF8
+    ESP04_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -64,7 +64,7 @@ void move00(cEsp04* pEsp)
 // animation (released when it ends).
 void move10(cEsp04* esp)
 {
-    Esp04Work* w = &esp->m_Free;
+    ESP04_WK* w = &esp->m_Free;
     f32 v;
     f32 x;
     f32 y;
@@ -161,8 +161,8 @@ void move10(cEsp04* esp)
 // 448 / sy + 2 rows when repeating, starting one tile off screen) with the whole texture per tile.
 extern "C" void Esp04_Trans(cEsp04* esp)
 {
-    Esp04Work* w = &esp->m_Free;
-    EspAnmData* anm;
+    ESP04_WK* w = &esp->m_Free;
+    cAnm* anm;
     Mtx44 proj;
     int sx;
     int sy;
@@ -247,7 +247,7 @@ extern "C" void Esp04_Trans(cEsp04* esp)
 // at least 0.1. Warns when the parent is not a screen layer.
 int cEsp04::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp04Work* w = &m_Free;
+    ESP04_WK* w = &m_Free;
 
     w->flag = pSeq->Work8[0];
     w->rand_x = pSeq->Work8[1];

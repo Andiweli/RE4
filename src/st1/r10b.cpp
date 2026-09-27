@@ -836,7 +836,7 @@ extern "C" void Evt_R10BSXX_Func_Em2f(Event* e)
 // The five fish (enemy 0x27) of the lake.
 static void r10b_setEm()
 {
-    EmListData d;
+    EM_LIST d;
 
     d.rot[0] = 0;
     d.rot[2] = 0;

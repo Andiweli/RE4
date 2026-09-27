@@ -54,7 +54,7 @@ extern "C" void Esp0f_Trans(cEsp0f* esp)
     Esp0fWork* w = &esp->m_Free;
     Mtx44 proj;
     Mtx inv;
-    EspAnmData* anm;
+    cAnm* anm;
     GXColor fog;
     void* buf;
     f32 sx;

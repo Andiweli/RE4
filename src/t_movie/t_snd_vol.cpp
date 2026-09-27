@@ -57,7 +57,7 @@ struct SndVolWork {
     s8 menuCur;      // 0x28
     s8 setCur;       // 0x29  selected output set (0 stereo, 1 DPL2): efx / efxCur / CombSel column
     s8 efxCur[2];    // 0x2A  cursor per set
-    SndEfxParam efx[2];     // 0x2C
+    REVERB_INFO efx[2];     // 0x2C
     CombSel sel[32];        // 0x6C
     CombSel selBackup;      // 0x16C
     EditTbl* curTbl;        // 0x174
@@ -1169,18 +1169,18 @@ static void edit_reverb_param()
         work->efxCur[work->setCur]++;
     } else if (Joy[0].rep & 0x10001) {
         if (work->setCur == 0) {
-            register SndEfxParam* p asm("r10") = &work->efx[0]; // COMPILER-DIFF: pin (global-alloc order: the target allocates work before p: work r11, p r10, Joy r10)
+            register REVERB_INFO* p asm("r10") = &work->efx[0]; // COMPILER-DIFF: pin (global-alloc order: the target allocates work before p: work r11, p r10, Joy r10)
             EFX_PARAM_MOVE(EFX_SW_DPL2, 0, -=)
         } else {
-            register SndEfxParam* p asm("r10") = &work->efx[1]; // COMPILER-DIFF: pin
+            register REVERB_INFO* p asm("r10") = &work->efx[1]; // COMPILER-DIFF: pin
             EFX_PARAM_MOVE(EFX_SW_ST, 1, -=)
         }
     } else if (Joy[0].rep & 0x20002) {
         if (work->setCur == 0) {
-            register SndEfxParam* p asm("r10") = &work->efx[0]; // COMPILER-DIFF: pin
+            register REVERB_INFO* p asm("r10") = &work->efx[0]; // COMPILER-DIFF: pin
             EFX_PARAM_MOVE(EFX_SW_DPL2, 0, +=)
         } else {
-            register SndEfxParam* p asm("r10") = &work->efx[1]; // COMPILER-DIFF: pin
+            register REVERB_INFO* p asm("r10") = &work->efx[1]; // COMPILER-DIFF: pin
             EFX_PARAM_MOVE(EFX_SW_ST, 1, +=)
         }
     }
@@ -1190,14 +1190,14 @@ static void edit_reverb_param()
         work->efxCur[1] = work->efxCur[1] < 0 ? 0 : work->efxCur[1] > 9 ? 9 : work->efxCur[1];
     }
     {
-        SndEfxParam* p = &work->efx[0];
+        REVERB_INFO* p = &work->efx[0];
 
         EFX_CLAMP_COMMON(p);
         p->Mix = p->Mix < 0.0f ? 0.0f : p->Mix > 1.0f ? 1.0f : p->Mix;
         EFX_CLAMP_AUX(p);
     }
     {
-        SndEfxParam* p = &work->efx[1];
+        REVERB_INFO* p = &work->efx[1];
 
         EFX_CLAMP_COMMON(p);
         p->Crosstalk = p->Crosstalk < 0.0f ? 0.0f : p->Crosstalk > 1.0f ? 1.0f : p->Crosstalk;

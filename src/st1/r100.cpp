@@ -162,7 +162,7 @@ void R100Init()
     setTexRender();
     SceAtSetEnable(1, 0);
     if (RsfCheck(G_ROOM_ID, 10) == 0) {
-        EmListData d;
+        EM_LIST d;
         cEm* em;
 
         d.id = 0x12;
@@ -892,7 +892,7 @@ static void r100_Sce_zombi_dead(cEm* em)
     Vec at[4];
     void* evt;
     Event* ev;
-    EmListData* l;
+    EM_LIST* l;
     int zero;
 
     if (em == 0 || em == errEm) {

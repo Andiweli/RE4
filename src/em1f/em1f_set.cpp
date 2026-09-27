@@ -48,7 +48,7 @@ void Em1fInit(cEm* em)
 // and calls Em1fWeaponSet.
 void Em1fSet(cEm10* em)
 {
-    Em10Work* w = EM10_WK(em);
+    FREE_EM10* w = EM10_WK(em);
 
     switch (em->type) {
     case 14:
@@ -240,7 +240,7 @@ void Em1fSet(cEm10* em)
 // stun rod, torch, bowgun and arrow, pitchfork); 0 = the weapon does not exist in this island module.
 void Em1fWeaponSet(cEm10* em)
 {
-    Em10Work* w = EM10_WK(em);
+    FREE_EM10* w = EM10_WK(em);
 
     w->mot[41] = 0;
     w->mot[42] = 0;

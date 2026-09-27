@@ -8,16 +8,16 @@
 #include "math_sub.h"
 #include "esp.h"
 
-struct Esp12Work {
+typedef struct tagESP12_WK {
     u32 Num;         // 0x00 number of trail points
     cEsp3f* pBuf;   // 0x04 vector buffer (esp3f)
-};
+} ESP12_WK;
 
 // Ribbon trail: keeps the last n positions in an esp3f buffer and draws a textured strip
 // through them.
 class cEsp12 : public cEsp {
 public:
-    Esp12Work m_Free;  // 0xF8
+    ESP12_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -34,7 +34,7 @@ cEsp* Esp12_Create()
 // position at index 0. Never Z-culled (huge m_Radius).
 void cEsp12::move()
 {
-    Esp12Work* w = &m_Free;
+    ESP12_WK* w = &m_Free;
     Vec wpos;
     Vec* dst;
     Vec* src;
@@ -65,8 +65,8 @@ void cEsp12::move()
 // in view space rotated by m_Ang.
 extern "C" void Esp12_Trans(cEsp12* esp)
 {
-    Esp12Work* w = &esp->m_Free;
-    EspAnmData* anm;
+    ESP12_WK* w = &esp->m_Free;
+    cAnm* anm;
     Mtx inv;
     Vec camPos;
     Vec v0;
@@ -184,7 +184,7 @@ void cEsp12::Destruct()
 // current world position; never Z-culled (m_Flg bit1). Fails when the buffer cannot be pulled.
 int cEsp12::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp12Work* w = &m_Free;
+    ESP12_WK* w = &m_Free;
     Vec wpos;
     int i;
 

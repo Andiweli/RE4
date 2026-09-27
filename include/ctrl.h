@@ -43,11 +43,11 @@ class cCtrl01 : public cCtrl {};
 class cCtrl10 : public cCtrl {};
 
 // ctrl11: sound effect handles kept per object (GetCtrlCtrl11 / Ctrl11SetSe*).
-struct Ctrl11Work {
+typedef struct tagCTRL11_WK {
     s16 Se_wait[16];   // 0x00  frames until the slot may play again
     u32 Se_id[15];  // 0x20  SndCall ids
     u32 Se_id_em38;    // 0x5C  em38 voice
-};
+} CTRL11_WK;
 
 class cCtrl11 : public cCtrl {
 public:

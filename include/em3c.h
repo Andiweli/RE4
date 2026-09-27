@@ -11,7 +11,7 @@ class cObj16;
 // Work of the em3c enemy (em3c module, D:/Bio4/Prog/em3c.cpp), overlaid on cEm from 0x3E0. The four
 // cModel::type variants share the routines: types 1 / 3 use the second motion set (Wep_type), types
 // 2 / 3 carry the parasite head that attacks on its own (em3c_R1_CoreAtk).
-struct Em3cWork {
+struct FREE_EM3C {
     u32 Be_flg;            // 0x000 (0x3E0)  bit0: route to the player found, bit2, bit4: head bomb done, bit6: bomb SE played, bit7: player found,
                           //                bit8: damage routine, bit9: head damage routine, bit10: start / attack wait, bit11: parasite set
     int Timer;            // 0x004 (0x3E4)
@@ -56,7 +56,7 @@ struct Em3cWork {
     u8 Armor_type;            // 0x3DD (0x7BD)  type 2 / 3
 };
 
-#define EM3C_WK(em) ((Em3cWork*) (((cEm3c*) (em))->free))
+#define EM3C_WK(em) ((FREE_EM3C*) (((cEm3c*) (em))->free))
 
 class cEm3c : public cEm {
 public:

@@ -14,9 +14,9 @@
 
 // cItem::x6 tune levels (the exclusive nibble is read as a byte)
 
-MerchantInfo merchant_info_A = {0, -10, -10, -10, -10, 10000, 5, 10, 10, 10, 20, 30, 70, 30, 10};
+MERCHANT_INFO merchant_info_A = {0, -10, -10, -10, -10, 10000, 5, 10, 10, 10, 20, 30, 70, 30, 10};
 
-LevelPrice level_price[] = {
+LEVEL_PRICE level_price[] = {
     {0x23, {700, 1000, 1500, 2000, 3000, 4000, 0}, {500, 1200, 0}, {400, 1000, 0}, {400, 600, 1000, 1500, 2000, 0, 0}},
     {0x25, {1500, 2000, 2400, 2800, 4500, 8000, 0}, {1000, 1500, 0}, {600, 1000, 0}, {600, 800, 1200, 1600, 2200, 0, 0}},
     {0x03, {1500, 1700, 2000, 2500, 3500, 0, 0}, {0, 0, 0}, {600, 1500, 0}, {700, 1000, 1200, 1600, 2000, 3500, 0}},
@@ -219,7 +219,7 @@ LevelEntry level_ext_tompson[] = {
     {0xFFFF},
 };
 
-PriceEntry exer_price_1st[] = {
+PRICE_INFO exer_price_1st[] = {
     {0x01, 400, 1}, {0x02, 200, 1}, {0x04, 10, 1}, {0x05, 1000, 1},
     {0x06, 100, 1}, {0x95, 60, 1}, {0x97, 240, 1}, {0x07, 30, 1},
     {0x08, 60, 1}, {0x09, 120, 1}, {0x0A, 600, 1}, {0x0E, 100, 1},
@@ -239,21 +239,21 @@ PriceEntry exer_price_1st[] = {
     {0xFFFF},
 };
 
-PriceEntry sell_price_r104[] = {
+PRICE_INFO sell_price_r104[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x2C, 1820, 1},
     {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1}, {0x44, 700, 1},
     {0x7D, 3000, 1}, {0xA9, 1000, 1},
     {0xFFFF},
 };
 
-PriceEntry sell_price_r102_r10d_r10e[] = {
+PRICE_INFO sell_price_r102_r10d_r10e[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x2C, 1820, 1},
     {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1}, {0x43, 400, 1},
     {0x44, 700, 1}, {0x7D, 3000, 1}, {0xA9, 1000, 1},
     {0xFFFF},
 };
 
-PriceEntry sell_price_r112[] = {
+PRICE_INFO sell_price_r112[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x25, 1320, 1},
     {0x2C, 1820, 1}, {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1},
     {0x42, 400, 1}, {0x43, 400, 1}, {0x44, 700, 1}, {0x7D, 3000, 1},
@@ -261,7 +261,7 @@ PriceEntry sell_price_r112[] = {
     {0xFFFF},
 };
 
-PriceEntry sell_price_r11c[] = {
+PRICE_INFO sell_price_r11c[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x25, 1320, 1},
     {0x2C, 1820, 1}, {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1},
     {0x42, 400, 1}, {0x43, 400, 1}, {0x44, 700, 1}, {0x7D, 3000, 1},
@@ -269,7 +269,7 @@ PriceEntry sell_price_r11c[] = {
     {0xFFFF},
 };
 
-PriceEntry sell_price_r10f[] = {
+PRICE_INFO sell_price_r10f[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x25, 1320, 1},
     {0x2C, 1820, 1}, {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1},
     {0x42, 400, 1}, {0x43, 400, 1}, {0x44, 700, 1}, {0x7D, 3000, 1},
@@ -338,7 +338,7 @@ StockEntry stock_1st_mission[] = {
     {0xFFFF},
 };
 
-PriceEntry exer_price_2st[] = {
+PRICE_INFO exer_price_2st[] = {
     {0x01, 400, 1}, {0x02, 200, 1}, {0x04, 10, 1}, {0x05, 1000, 1},
     {0x06, 100, 1}, {0x95, 60, 1}, {0x97, 240, 1}, {0x07, 30, 1},
     {0x08, 60, 1}, {0x09, 120, 1}, {0x0A, 600, 1}, {0x0E, 100, 1},
@@ -367,7 +367,7 @@ PriceEntry exer_price_2st[] = {
     {0xFFFF},
 };
 
-static PriceEntry sell_price_2st_first[] = {
+static PRICE_INFO sell_price_2st_first[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x25, 1320, 1},
     {0x2C, 1820, 1}, {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1},
     {0x42, 400, 1}, {0x43, 400, 1}, {0x44, 700, 1}, {0x7D, 3000, 1},
@@ -377,7 +377,7 @@ static PriceEntry sell_price_2st_first[] = {
     {0xFFFF},
 };
 
-PriceEntry sell_price_r20f[] = {
+PRICE_INFO sell_price_r20f[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x25, 1320, 1},
     {0x2C, 1820, 1}, {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1},
     {0x42, 400, 1}, {0x43, 400, 1}, {0x44, 700, 1}, {0x7D, 3000, 1},
@@ -387,7 +387,7 @@ PriceEntry sell_price_r20f[] = {
     {0xFFFF},
 };
 
-static PriceEntry sell_price_r229[] = {
+static PRICE_INFO sell_price_r229[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x25, 1320, 1},
     {0x2C, 1820, 1}, {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1},
     {0x42, 400, 1}, {0x43, 400, 1}, {0x44, 700, 1}, {0x7D, 3000, 1},
@@ -435,7 +435,7 @@ static StockEntry stock_r229[] = {
     {0xFFFF},
 };
 
-static PriceEntry exer_price_3st[] = {
+static PRICE_INFO exer_price_3st[] = {
     {0x01, 400, 1}, {0x02, 200, 1}, {0x04, 10, 1}, {0x05, 1000, 1},
     {0x06, 100, 1}, {0x95, 60, 1}, {0x97, 240, 1}, {0x07, 30, 1},
     {0x08, 60, 1}, {0x09, 120, 1}, {0x0A, 600, 1}, {0x0E, 100, 1},
@@ -468,7 +468,7 @@ static PriceEntry exer_price_3st[] = {
     {0xFFFF},
 };
 
-static PriceEntry sell_price_r301[] = {
+static PRICE_INFO sell_price_r301[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x25, 1320, 1},
     {0x2C, 1820, 1}, {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1},
     {0x42, 400, 1}, {0x43, 400, 1}, {0x44, 700, 1}, {0x7D, 3000, 1},
@@ -478,7 +478,7 @@ static PriceEntry sell_price_r301[] = {
     {0xFFFF},
 };
 
-PriceEntry sell_price_r305[] = {
+PRICE_INFO sell_price_r305[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x25, 1320, 1},
     {0x2C, 1820, 1}, {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1},
     {0x42, 400, 1}, {0x43, 400, 1}, {0x44, 700, 1}, {0x7D, 3000, 1},
@@ -525,7 +525,7 @@ StockEntry stock_r305[] = {
     {0xFFFF},
 };
 
-static PriceEntry exer_price_ext[] = {
+static PRICE_INFO exer_price_ext[] = {
     {0x01, 400, 1}, {0x02, 200, 1}, {0x04, 10, 1}, {0x05, 1000, 1},
     {0x06, 100, 1}, {0x95, 60, 1}, {0x97, 240, 1}, {0x07, 30, 1},
     {0x08, 60, 1}, {0x09, 120, 1}, {0x0A, 600, 1}, {0x0E, 100, 1},
@@ -559,7 +559,7 @@ static PriceEntry exer_price_ext[] = {
     {0xFFFF},
 };
 
-PriceEntry sell_price_ext[] = {
+PRICE_INFO sell_price_ext[] = {
     {0x05, 1000, 1}, {0x21, 1900, 1}, {0x23, 700, 1}, {0x25, 1320, 1},
     {0x2C, 1820, 1}, {0x2E, 1050, 1}, {0x30, 1320, 1}, {0x35, 3000, 1},
     {0x42, 400, 1}, {0x43, 400, 1}, {0x44, 700, 1}, {0x7D, 3000, 1},
@@ -587,7 +587,7 @@ StockEntry stock_ext_tompson[] = {
     {0xFFFF},
 };
 
-PriceEntry g_item_price_tbl[] = {
+PRICE_INFO g_item_price_tbl[] = {
     {0x7F, 6000, 1}, {0x7E, 4000, 1}, {0x7D, 3000, 1}, {0xFE, 6000, 1},
     {0xA9, 1000, 1}, {0x54, 1000, 1}, {0x55, 1000, 1}, {0x04, 10, 1},
     {0x18, 30, 1}, {0x00, 100, 1}, {0x07, 30, 1}, {0x20, 6, 1},
@@ -627,7 +627,7 @@ PriceEntry g_item_price_tbl[] = {
 static int g_item_price_tbl_num = sizeof(g_item_price_tbl) / sizeof(g_item_price_tbl[0]);
 
 MerchantCharacter merchantChar;
-MerchantData merchantData[MERCHANT_NUM];
+MERCHANT_DATA merchantData[MERCHANT_NUM];
 
 // Debug_flg[3] bit test.
 // the tests below are kept apart (fold would merge two masks of one lvalue into a single andis.)
@@ -698,7 +698,7 @@ void MerchantGameInit()
     int i;
 
     for (i = 0; i < MERCHANT_NUM; i++) {
-        MerchantData* d = &merchantData[i];
+        MERCHANT_DATA* d = &merchantData[i];
         d->friendship = 50;
         d->study_num = 0;
         d->reduction_ratio = 0;
@@ -938,13 +938,13 @@ void MerchantRoomInit()
 // Size of the merchant save block.
 int MerchantDataSize()
 {
-    return sizeof(MerchantData) * MERCHANT_NUM;
+    return sizeof(MERCHANT_DATA) * MERCHANT_NUM;
 }
 
 // Copies the merchant data (stock, tunes, favor, discount) into the save block.
 void MerchantDataSave(void* dst)
 {
-    MerchantData* p = (MerchantData*) dst;
+    MERCHANT_DATA* p = (MERCHANT_DATA*) dst;
     int i;
 
     for (i = 0; i < MERCHANT_NUM; i++) {
@@ -955,7 +955,7 @@ void MerchantDataSave(void* dst)
 // Restores the merchant data from the save block.
 void MerchantDataLoad(void* src)
 {
-    MerchantData* p = (MerchantData*) src;
+    MERCHANT_DATA* p = (MERCHANT_DATA*) src;
     int i;
 
     for (i = 0; i < MERCHANT_NUM; i++) {
@@ -964,7 +964,7 @@ void MerchantDataLoad(void* src)
 }
 
 // Empties the stock table (all ids 0xFFFF).
-void stockDataInit(MerchantData* p_data)
+void stockDataInit(MERCHANT_DATA* p_data)
 {
     StockEntry* s = p_data->stock.e;
     int i;
@@ -999,7 +999,7 @@ void add_stock(StockEntry* dst, StockEntry* src)
 
 // Merges a stock table into the merchant's stock: clears the "new" marks, then adds to existing
 // slots or appends new ones (marked new). Logs when the 64-slot table is full.
-void stockDataAdd(MerchantData* d, StockEntry* tbl)
+void stockDataAdd(MERCHANT_DATA* d, StockEntry* tbl)
 {
     StockEntry* s;
     int i;
@@ -1046,7 +1046,7 @@ void stockDataAdd(MerchantData* d, StockEntry* tbl)
 }
 
 // Empties the tune (level) table.
-void levelDataInit(MerchantData* p_data)
+void levelDataInit(MERCHANT_DATA* p_data)
 {
     LevelEntry* l = p_data->level.e;
     int i;
@@ -1059,7 +1059,7 @@ void levelDataInit(MerchantData* p_data)
 
 // Merges a tune table: raises the max level per type of existing weapons (marking them new when
 // something rose) or appends new weapons. Logs when the 32-slot table is full.
-void levelDataAdd(MerchantData* d, LevelEntry* tbl)
+void levelDataAdd(MERCHANT_DATA* d, LevelEntry* tbl)
 {
     LevelEntry* l;
     int j;
@@ -1115,7 +1115,7 @@ void levelDataAdd(MerchantData* d, LevelEntry* tbl)
 
 // Binds the merchant personality, data block, selling and buying (exercise) price tables and the
 // tune price table.
-void MerchantCharacter::setChar(MerchantInfo* info, MerchantData* data, PriceEntry* sell, PriceEntry* exer, LevelPrice* lvup)
+void MerchantCharacter::setChar(MERCHANT_INFO* info, MERCHANT_DATA* data, PRICE_INFO* sell, PRICE_INFO* exer, LEVEL_PRICE* lvup)
 {
     m_p_info = info;
     m_p_data = data;
@@ -1137,7 +1137,7 @@ Merchant::Merchant(MerchantCharacter* c)
 }
 
 // Writes the session's stock/tune/favor/discount back into the merchant data.
-void Merchant::save(MerchantData* p_data)
+void Merchant::save(MERCHANT_DATA* p_data)
 {
     p_data->stock = m_stock;
     p_data->level = level;
@@ -1148,7 +1148,7 @@ void Merchant::save(MerchantData* p_data)
 }
 
 // Loads the session from the merchant data.
-void Merchant::load(MerchantData* p_data)
+void Merchant::load(MERCHANT_DATA* p_data)
 {
     if (p_data == 0) {
         pLog->err(0, 0, "Merchant::load() Data is empty.");
@@ -1414,7 +1414,7 @@ int checkSellingItem(ITEM_ID id)
 // Fills sellingList with the indices of price table entries that are stocked and allowed.
 int Merchant::makeSellingList()
 {
-    PriceEntry* p = m_p_sell;
+    PRICE_INFO* p = m_p_sell;
     int n;
     int i;
 
@@ -1438,15 +1438,15 @@ u8 Merchant::sellingItemNum()
 }
 
 // Price entry of Buy list row `no`.
-PriceEntry* Merchant::sellingItemNo(int no)
+PRICE_INFO* Merchant::sellingItemNo(int no)
 {
     return &m_p_sell[sellingList[no]];
 }
 
 // Selling price entry of item `id`.
-PriceEntry* Merchant::sellingItemId(u16 id)
+PRICE_INFO* Merchant::sellingItemId(u16 id)
 {
-    PriceEntry* p = m_p_sell;
+    PRICE_INFO* p = m_p_sell;
 
     if (p->id != 0xFFFF) {
         do {
@@ -1482,7 +1482,7 @@ int checkExerciseItem(ITEM_ID id)
 // per slot by descending count); returns the count.
 int Merchant::makeExerciseList()
 {
-    PriceEntry* p = m_p_exer;
+    PRICE_INFO* p = m_p_exer;
     int n;
     int j;
 
@@ -1528,15 +1528,15 @@ cItem* Merchant::exerciseItemPtr(int no)
 }
 
 // Buying price entry of Sell list row `no`.
-PriceEntry* Merchant::exerciseItemNo(int no)
+PRICE_INFO* Merchant::exerciseItemNo(int no)
 {
     return exerciseItemId(ItemMgr.at(exerciseList[no])->id);
 }
 
 // Buying price entry of item `id`.
-PriceEntry* Merchant::exerciseItemId(u16 id)
+PRICE_INFO* Merchant::exerciseItemId(u16 id)
 {
-    PriceEntry* p = m_p_exer;
+    PRICE_INFO* p = m_p_exer;
 
     if (p->id != 0xFFFF) {
         do {
@@ -1553,7 +1553,7 @@ PriceEntry* Merchant::exerciseItemId(u16 id)
 // weapons/ammo/grenades/the case, 90% otherwise.
 int Merchant::buyupPrice(u16 id, int num)
 {
-    PriceEntry* p;
+    PRICE_INFO* p;
     int price;
     int n;
     int type;
@@ -1651,7 +1651,7 @@ int Merchant::buyup(cItem* p_item, int num, int* pocket)
 // includes one magazine of ammo; 0x40/0x37 cost 1,000,000.
 int Merchant::sellPrice(u16 id, int num)
 {
-    PriceEntry* p = sellingItemId(id);
+    PRICE_INFO* p = sellingItemId(id);
     f32 rate = 1.0f - (f32) m_reduction_ratio / 100.0f;
     int price;
     int n;
@@ -1685,7 +1685,7 @@ int Merchant::sellPrice(u16 id, int num)
 // Pieces per purchase of `id`.
 int Merchant::sellUnit(u16 id)
 {
-    PriceEntry* p = sellingItemId(id);
+    PRICE_INFO* p = sellingItemId(id);
 
     if (p == 0) {
         pLog->err(0, 0, "sellUnit() : 0x%02x not found", id);
@@ -1819,9 +1819,9 @@ cItem* Merchant::levelupItemPtr(int no)
 }
 
 // Tune price table entry of weapon `id`.
-LevelPrice* Merchant::levelupItemPrice(u16 id)
+LEVEL_PRICE* Merchant::levelupItemPrice(u16 id)
 {
-    LevelPrice* p = m_p_lvup;
+    LEVEL_PRICE* p = m_p_lvup;
 
     if (p->id != 0xFFFF) {
         do {
@@ -1838,7 +1838,7 @@ LevelPrice* Merchant::levelupItemPrice(u16 id)
 int Merchant::levelupPrice(u16 id, int type, int lv)
 {
     LevelEntry* l = levelPtr(id);
-    LevelPrice* p = levelupItemPrice(id);
+    LEVEL_PRICE* p = levelupItemPrice(id);
     int price = 0;
 
     if (l && lv <= l->lv[type] && p) {

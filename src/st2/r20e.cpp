@@ -1085,11 +1085,11 @@ static void r20d_checkPuzzle()
         // structure; ours has 624 and hoists `lis r23,Key@ha` to the preheader). (2) The second
         // set's two insns move gcse's expression table from 331 to 333 buckets so the reaching regs
         // of `high(pG)` and `high(RoomData)` keep the target's allocation order (r25/r24).
-        KeyWork* key = 0;
+        KEY* key = 0;
         int result;
 
         result = r20e_puzzleMove(p);
-        key = (KeyWork*) (p + result);
+        key = (KEY*) (p + result);
         if (result == 1) {
             int frame;
             int i;

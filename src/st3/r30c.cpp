@@ -354,7 +354,7 @@ static void r30c_PlaneMove()
     obj = SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x21), ROOM_ARC_PTR(pG->pRoom, 0x22), &pos, &pos, 0x10, 1);
     obj->setNoSuspend(1);
 #line 494 "D:/Bio4/Prog/r30c.cpp"
-    (obj->Motion.pAttachCam = (AttachCamera*) MEM_ALLOC(0x98, 1, 0xd));
+    (obj->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xd));
     obj->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x23), 0, 0, 0x201, 0);
     SndStrReq(r30c_work->strId, 2, 0, 0);
     pG->Room_flg[0] &= 0x7FFFFFFF;

@@ -48,7 +48,7 @@ static cObj* pObj_ck;
 // Apply `force` at world point `point`: the force and the torque about the centre accumulate.
 void AddForce(cObj* pObj, Vec* pos, Vec* f)
 {
-    Efm09Work* w = EFM09_WK((cObj09*) pObj);
+    OBJ09_FREE* w = EFM09_WK((cObj09*) pObj);
     Vec t;
     Vec r;
 
@@ -73,7 +73,7 @@ void dwdt(Vec* w, Vec* tq, Vec* I, Vec* pRet)
 // Integrate the linear and angular velocities over `dt` and clear the accumulators.
 static void CalcVel(cObj* pObj, f32 dt)
 {
-    Efm09Work* w = EFM09_WK((cObj09*) pObj);
+    OBJ09_FREE* w = EFM09_WK((cObj09*) pObj);
     Vec a;
     Vec lt;
     Mtx inv;
@@ -106,7 +106,7 @@ static void CalcVel(cObj* pObj, f32 dt)
 // is re-orthonormalised from its z axis.
 void Calc(cObj* pObj, f32 dt)
 {
-    Efm09Work* w = EFM09_WK((cObj09*) pObj);
+    OBJ09_FREE* w = EFM09_WK((cObj09*) pObj);
     Vec v;
     Vec av;
     Mtx n;
@@ -198,8 +198,8 @@ void Calc(cObj* pObj, f32 dt)
 static void Obj09HitCheck(cObj* pObj)
 {
     cObj* ck;
-    Efm09Work* w1;
-    Efm09Work* w2;
+    OBJ09_FREE* w1;
+    OBJ09_FREE* w2;
     Mtx m1;
     Mtx inv;
     Mtx m2;
@@ -470,7 +470,7 @@ f32 LinerEquation3(f32 a[][3], f32* b, f32* x)
 
 // A corner (`lp` in body space, `wp` in the world) hit the scenario at `hit` with normal `nrm`:
 // push the body out, add the spring / damper force and the friction impulse.
-static void calcPointHit(cObj* pObj, Efm09Work* pFree, Vec* pos1, Vec* pos2, Vec* pos_wld, Vec* cross, Vec* pNorm)
+static void calcPointHit(cObj* pObj, OBJ09_FREE* pFree, Vec* pos1, Vec* pos2, Vec* pos_wld, Vec* cross, Vec* pNorm)
 {
     static f32 frc_ratio = -1.0f;
     Vec d;
@@ -568,7 +568,7 @@ void cObj09::move()
     static f32 pl_spd_dist = 1500.0f;
     static f32 pl_spd_mul = -0.015f;
     static f32 pl_spd_mul2 = -0.25f;
-    Efm09Work* w = EFM09_WK(this);
+    OBJ09_FREE* w = EFM09_WK(this);
     f32 dt = 1.0f / 30.0f;
     Vec old;
     Vec lp;

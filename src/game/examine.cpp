@@ -437,7 +437,7 @@ void ItemExamine::setup()
 void ItemExamine::idSet()
 {
     SubScreenWork* wk = &SubScreenWk;
-    ItemInfo inf;
+    ITEM_INFO inf;
     int d[3];
     int kind;
     int j;

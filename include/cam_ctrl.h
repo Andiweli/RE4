@@ -77,7 +77,7 @@ struct CameraDataHeader {
 };
 
 // Per-attach-camera record registered by other units (only the frame count is used here).
-struct AttachCamera {
+struct ATTACH_CAMERA {
     u8 parts[5];    // 0x00  motion parts index feeding each channel (0xFF = none): 0/1 pos, 2/3 rot, 4 misc
     u8 type;        // 0x05  0 = off, 1 = follows the model matrix, 2 = own matrix copy (MotionSetCore)
     u8 frame;       // 0x06  (u8)(out[4].y / 100)
@@ -145,7 +145,7 @@ private:
 public:
     u8 x3;                        // 0x03
 private:
-    AttachCamera* m_p_attach[3];  // 0x04
+    ATTACH_CAMERA* m_p_attach[3];  // 0x04
     cModel* m_p_model[3];      // 0x10
     cModel* m_p_attach_model_old;           // 0x1C
     f32 m_scope_zoom;             // 0x20
@@ -256,11 +256,11 @@ public:
     void setMotionBaseMatPtr(Mtx* p_mat);
     struct MOTION_INFO* getMotionInfoPtr();
     void clearAttachCamera();
-    void registAttachCamera(AttachCamera* p_attach, cModel* p_model);
-    void deleteAttachCamera(AttachCamera* p_attach, cModel* p_model);
+    void registAttachCamera(ATTACH_CAMERA* p_attach, cModel* p_model);
+    void deleteAttachCamera(ATTACH_CAMERA* p_attach, cModel* p_model);
     int getAttachCameraNum() { return m_attach_num; }
     cModel* getAttachModel(cModel* p_model);
-    AttachCamera* getAttachCamera(cModel* p_model);
+    ATTACH_CAMERA* getAttachCamera(cModel* p_model);
     void checkAttachCamera();
 
     // Empty ctor/dtor: cam_ctrl's `__static_initialization_and_destruction_0` and the

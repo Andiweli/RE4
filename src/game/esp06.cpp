@@ -7,7 +7,7 @@
 #include "rnd.h"
 #include "esp.h"
 
-struct Esp06Work {
+typedef struct tagESP06_WK {
     u8 PathId;    // 0x00 (gen->Work8[1])
     u8 Flg;     // 0x01 bit0: loop, bit1: stop at the end, bit2: stopped, bit7: has matrix (gen->Work8[2])
     u16 pathId;   // 0x02 (gen->Work8[0])
@@ -22,12 +22,12 @@ struct Esp06Work {
     u8 StopFrame;  // 0x54 frames to wait at a loop restart (gen->WorkSp8[0])
     u8 StopFrameRnd;   // 0x55 random addition to waitBase (gen->WorkSp8[1])
     u8 wait;      // 0x56
-};
+} ESP06_WK;
 
 // Path follower: moves the sprite along an effect path (loops / stops / dies at the end).
 class cEsp06 : public cEsp {
 public:
-    Esp06Work m_Free;  // 0xF8
+    ESP06_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -52,7 +52,7 @@ cEsp* Esp06_Create()
 // Returns 0 when Dist is past either end.
 int Esp06GetPathPos(cEsp06* pEsp)
 {
-    Esp06Work* w = &pEsp->m_Free;
+    ESP06_WK* w = &pEsp->m_Free;
     int ret;
 
     if (PathHasWeight(w->pPath)) {
@@ -73,7 +73,7 @@ int Esp06GetPathPos(cEsp06* pEsp)
 // (loop / stop / die) and sets m_Pos = PathMat * path point + LocalPos.
 void esp06_CommonMove(cEsp06* pEsp)
 {
-    Esp06Work* w = &pEsp->m_Free;
+    ESP06_WK* w = &pEsp->m_Free;
     Mtx m;
 
     if (pEsp->parent != pEffParentWorld && pEsp->m_Release_time != 0xFF && pEsp->m_Release_time <= pEsp->m_Life_time) {
@@ -178,7 +178,7 @@ void cEsp06::move()
 // speed.
 int cEsp06::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp06Work* w = &m_Free;
+    ESP06_WK* w = &m_Free;
     f32 t;
 
     w->pathId = pSeq->Work8[0];

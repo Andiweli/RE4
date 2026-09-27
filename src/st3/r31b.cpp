@@ -1593,7 +1593,7 @@ static void R31bExecGondolaMain(int dir)
     int faded;
     int frame;
     int i;
-    FadeWork* fade;
+    FADE_WORK* fade;
 
     obj = SmdGetObjPtr(0xA3);
     if (obj == 0) {

@@ -94,7 +94,7 @@ PieceInfo piece_info[] = {
 };
 
 // Shape record of item `id` in the piece table (ends with id 0xFFFF); 0 when the item has none.
-PieceData* searchItemPieceData(int item_id, PieceInfo* p_info)
+pieceData* searchItemPieceData(int item_id, PieceInfo* p_info)
 {
     int i;
 
@@ -262,7 +262,7 @@ void pzlPiece::mirror(int dir)
 }
 
 // Takes the piece into use with shape `p_data`, orientation 0, not on a board.
-void pzlPiece::init(PieceData* p_data)
+void pzlPiece::init(pieceData* p_data)
 {
     m_p_data = p_data;
     be_flag |= 1;
@@ -891,7 +891,7 @@ int pzlPlayer::init(int size)
             cItem* item = ItemMgr.at(i);
             if (item->isAlive(extraGame)) {
                 p = &m_piece[k];
-                PieceData* d = searchItemPieceData(item->id, piece_info);
+                pieceData* d = searchItemPieceData(item->id, piece_info);
                 if (d) {
                     k++;
                     p->init(d);
@@ -1015,7 +1015,7 @@ void pzlPlayer::save()
 int pzlPlayer::appendExtraPiece(cItem* pItem)
 {
     pzlPiece* p = 0;
-    PieceData* d;
+    pieceData* d;
     int i;
 
     if (pItem == 0) {
@@ -1629,7 +1629,7 @@ void pzlPlayer::salvCursor()
 int PutInCase(ITEM_ID item_id, u16 item_num, int size)
 {
     cItem item;
-    ItemInfo info;
+    ITEM_INFO info;
     pzlPlayer* pl;
     u16 max;
     int total;

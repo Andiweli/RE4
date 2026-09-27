@@ -9,7 +9,7 @@ struct CameraAreaRec;
 
 // Shoulder camera offsets in player space (0x2C bytes), one per [left/right][up/mid/down] site.
 // g_readyOfs[16]/g_transOfs[7] are the per-area tables (game/cam_qfps.cpp); db_cam edits a copy.
-struct QfpsOfs {
+struct CAMERA_POINT {
     Vec Campos;    // 0x00
     Vec campos2;   // 0x0C  close point
     Vec Target;    // 0x18
@@ -42,21 +42,21 @@ enum TRANS_DATA {
     TRANS_DATA_NUM = 7
 };
 
-extern QfpsOfs g_readyOfs[16][2][3];
-extern QfpsOfs g_transOfs[TRANS_DATA_NUM][2][3];
+extern CAMERA_POINT g_readyOfs[16][2][3];
+extern CAMERA_POINT g_transOfs[TRANS_DATA_NUM][2][3];
 
 // Over-the-shoulder ("quasi FPS") camera, game/cam_qfps.cpp. 0x214 bytes.
 class CameraQuasiFPS {
 public:
     CAMERA cam;                   // 0x000 (cam.param at 0xA4 is what CameraControl::Move copies)
-    QfpsOfs (*ready_tbl[14])[3];  // 0x0F8  ready table per camera type (checkCameraType 0..0xC), [13] = area copy
-    QfpsOfs (*trans_tbl[TRANS_CAM_NUM])[3];   // 0x130  transition table per TRANS_CAM type
+    CAMERA_POINT (*ready_tbl[14])[3];  // 0x0F8  ready table per camera type (checkCameraType 0..0xC), [13] = area copy
+    CAMERA_POINT (*trans_tbl[TRANS_CAM_NUM])[3];   // 0x130  transition table per TRANS_CAM type
 private:
-    QfpsOfs (*m_p_ready_array)[3]; // 0x148  current ready table
-    QfpsOfs (*m_p_trans_array)[3]; // 0x14C  current transition table
+    CAMERA_POINT (*m_p_ready_array)[3]; // 0x148  current ready table
+    CAMERA_POINT (*m_p_trans_array)[3]; // 0x14C  current transition table
 public:
-    QfpsOfs* cur;                 // 0x150  offsets of the current site
-    QfpsOfs* old;                 // 0x154  offsets blended from (g_readyOfs[15] / g_transOfs[6] copies)
+    CAMERA_POINT* cur;                 // 0x150  offsets of the current site
+    CAMERA_POINT* old;                 // 0x154  offsets blended from (g_readyOfs[15] / g_transOfs[6] copies)
 private:
     void* m_LR_info;                // 0x158
     Vec m_pl_ofs;                  // 0x15C  one-shot translation applied to the base matrix
@@ -102,13 +102,13 @@ public:
 private:
     void checkCameraType();
 public:
-    void calcOffset(QfpsOfs* p_offset);
-    void hitCheck(Mtx m, QfpsOfs* ofs, CameraParam* out);
-    QfpsOfs (*readyArrayPtr())[3] { return m_p_ready_array; }
-    QfpsOfs (*transArrayPtr())[3] { return m_p_trans_array; }
+    void calcOffset(CAMERA_POINT* p_offset);
+    void hitCheck(Mtx m, CAMERA_POINT* ofs, CameraParam* out);
+    CAMERA_POINT (*readyArrayPtr())[3] { return m_p_ready_array; }
+    CAMERA_POINT (*transArrayPtr())[3] { return m_p_trans_array; }
     void setBlendData(void* src, void* dst);
-    void getAreaData(QfpsOfs (*ready)[3], QfpsOfs (*trans)[3]);
-    void setAreaData(QfpsOfs (*ready)[3], QfpsOfs (*trans)[3]);
+    void getAreaData(CAMERA_POINT (*ready)[3], CAMERA_POINT (*trans)[3]);
+    void setAreaData(CAMERA_POINT (*ready)[3], CAMERA_POINT (*trans)[3]);
     void setAreaData(struct CameraCut* pCdat);
     void offsetCorrection();
     void bindDefaultCamera();

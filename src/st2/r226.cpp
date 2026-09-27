@@ -526,7 +526,7 @@ static void R226EventRoboStartMainSub(int id)
 static void R226EventRoboStartEnd()
 {
     cObjRobo* robo = r226_work->robo;
-    RoboWork* rw = ROBO_WK(robo);
+    FREE_ROBO* rw = ROBO_WK(robo);
     cObj* o;
 
     if (r226_work->str) {
@@ -760,7 +760,7 @@ static void R226EventPassageSwitchEnd(int side)
 static void R226EventRoboWalkPassageStart()
 {
     cObjRobo* robo = r226_work->robo;
-    RoboWork* rw = ROBO_WK(robo);
+    FREE_ROBO* rw = ROBO_WK(robo);
     int i;
 
     if (RsfCheck(G_ROOM_ID, 7) == 0) {
@@ -810,7 +810,7 @@ static void R226EventRoboWalkPassageStart()
 static void R226EventRoboWalkPassageGoal()
 {
     cObjRobo* robo = r226_work->robo;
-    RoboWork* rw = ROBO_WK(robo);
+    FREE_ROBO* rw = ROBO_WK(robo);
 
     if (RsfCheck(G_ROOM_ID, 3)) {
         return;
@@ -906,7 +906,7 @@ static void R226EventRoboWalkDoorDie()
 static void R226EventRoboWalkBridgeStart()
 {
     cObjRobo* robo = r226_work->robo;
-    RoboWork* rw = ROBO_WK(robo);
+    FREE_ROBO* rw = ROBO_WK(robo);
     int i;
 
     if (RsfCheck(G_ROOM_ID, 5)) {
@@ -1077,7 +1077,7 @@ static void SceBgmCheck()
 static void playerRunMovePassage(cPlayer* pl)
 {
     cObjRobo* robo = (cObjRobo*) pl->pEmCatch;
-    RoboWork* rw = ROBO_WK(robo);
+    FREE_ROBO* rw = ROBO_WK(robo);
     void* data = ROOM_ARC_PTR(pG->pRoom, 0x2C);
     void* mot[8] = {ROOM_ARC_PTR(pG->pRoom, 0x2D), ROOM_ARC_PTR(pG->pRoom, 0x2E), ROOM_ARC_PTR(pG->pRoom, 0x2F), ROOM_ARC_PTR(pG->pRoom, 0x30),
                     ROOM_ARC_PTR(pG->pRoom, 0x31), ROOM_ARC_PTR(pG->pRoom, 0x32), ROOM_ARC_PTR(pG->pRoom, 0x33), ROOM_ARC_PTR(pG->pRoom, 0x34)};
@@ -1442,7 +1442,7 @@ void playerRunCamDiePassage(cPlayer* pl)
 // Starts the pillar `smdNo` falling once the player passed it by `dist`.
 extern "C" void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, u32 flagNo, f32 dist, int idx)
 {
-    RoboWork* rw = ROBO_WK(robo);
+    FREE_ROBO* rw = ROBO_WK(robo);
 
     if (!FlagChkVar(&pG->Room_flg, (u32) flagNo)) {
         cObj* o = SmdGetObjPtr(smdNo);

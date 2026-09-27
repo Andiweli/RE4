@@ -31,10 +31,10 @@ void* GetDataExt(void* arc, const char* tag, int no);
 #define SND_DATA_TOP 0x80370000
 #define LOOP_IDX(x, max) ((x) < 0 ? (max) : ((x) > (max) ? 0 : (x)))
 
-SndWork Snd;
+SND_WORK Snd;
 SndMemWork SndMem;
 u32 UseAramSize[14];
-SndHistory History;
+SE_HISTORY History;
 SndRoomHdr DefEffTbl;
 static u32 callErr[14][32];
 u32 aram_buf[3];
@@ -42,7 +42,7 @@ u32 aram_buf[3];
 u16 StrFileTbl[2] = { 1, 0x5F };
 int str_flag = 1;
 u32 ARAM_FREE_BASE;
-SndWork* pSnd;
+SND_WORK* pSnd;
 u32 SndStrAramAddr[4] = { 0x700000, 0x740000, 0x780000, 0x7C0000 };
 
 
@@ -86,7 +86,7 @@ void SndInit()
     ARInit(aram_buf, 3);
     ARAlloc(0x6FC000);
     ARQInit();
-    memclr_asm(pSnd, sizeof(SndWork));
+    memclr_asm(pSnd, sizeof(SND_WORK));
 
 #line 120 SND_FILE
     r = DvdRead(0, (void*) SND_DATA_TOP, 0, 0, 0, 0x11, __FILE__, __LINE__);
@@ -141,7 +141,7 @@ void SndInit2()
 {
     int i;
 
-    memclr_asm(pSnd, sizeof(SndWork));
+    memclr_asm(pSnd, sizeof(SND_WORK));
     pSnd->mram_top = SndMem.mram_end;
     pSnd->aram_base_addr = 0x1F4100;
     for (i = 0; i < 6; i++) {
@@ -862,7 +862,7 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
     if (sit->aux_a == -1) {
         c->ovr_flag |= 0x20;
         if (pSnd->hdr != NULL) {
-            SndEfxParam* p = &pSnd->hdr->efx[0];
+            REVERB_INFO* p = &pSnd->hdr->efx[0];
             if (pSys->SndMode != 2) {
                 p = &pSnd->hdr->efx[1];
             }
@@ -1543,7 +1543,7 @@ void SndNextRoomInit()
     nextRoomBgmCheck();
     SndSeAbsFadeOutAll_5msec(100);
     Snd_seq_fade_out_type(2, 100);
-    memclr_asm(&pSnd->room_ok, sizeof(SndWork) - 0x90);
+    memclr_asm(&pSnd->room_ok, sizeof(SND_WORK) - 0x90);
     SND_BIT_CLR(pSnd->blk_flag, 6);
     SND_BIT_CLR(pSnd->blk_flag, 5);
     memclr_asm(&Snd_iss_blk[6], sizeof(SND_ISS_BLK));
@@ -1583,7 +1583,7 @@ int SndRoomStartInit()
 {
     u32 i;
     SndRoomSave* rs;
-    SndEfxParam* e;
+    REVERB_INFO* e;
 
     pSnd->hdr = (SndRoomHdr*) GetDataExt(pG->pRoom, "STB", 0);
     memclr_asm(&DefEffTbl, sizeof(SndRoomHdr));
@@ -1646,7 +1646,7 @@ int SndRoomStartInit()
             pSnd->room_str_tbl[i] = rs->str[i];
         }
     }
-    memclr_asm(&History, sizeof(SndHistory));
+    memclr_asm(&History, sizeof(SE_HISTORY));
     History.idx = -1;
     pSnd->flrat_last_hit[0] = -1;
     pSnd->flrat_last_hit[1] = -1;
@@ -2541,7 +2541,7 @@ int SndBgmDataReadCheck(int bgm_no)
 void SndSetReverb()
 {
     SND_EFX_WORK* w = &Snd_efx_work[0];
-    SndEfxParam* p;
+    REVERB_INFO* p;
 
     if (pSys->SndMode == 2) {
         p = &pSnd->hdr->efx[0];

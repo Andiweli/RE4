@@ -1444,7 +1444,7 @@ void deleteAllMark()
 static void r22cSetWepMan()
 {
     if (isWepmanAlive() != 0) {
-        EmListData d;
+        EM_LIST d;
         cEm* em;
 
         memclr_asm(&d, sizeof(d));

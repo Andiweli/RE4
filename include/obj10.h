@@ -5,9 +5,9 @@
 #include "vec.h"
 #include "obj.h"
 
-// Thrown weapon item work (game/obj10.cpp `cWepItem`): the grenade layout (Obj01Work) with the
+// Thrown weapon item work (game/obj10.cpp `cWepItem`): the grenade layout (FREE_OBJ01) with the
 // landing SE counters split out.
-struct WepItemWork {
+struct FREE_WEP_ITEM {
     u32 be_flag;            // 0x00  bit0 start motion, bit1 motion running, bit2 water / bounce check, bit3 rotate parts 0
     void* pMot;           // 0x04
     u8 pad_8[2];
@@ -41,7 +41,7 @@ struct WepItemWork {
 // landing sounds, a player hit check on the explosion and no flash / underwater variants.
 class cWepItem : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  WepItemWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_WEP_ITEM
 
     virtual void move();
     virtual void beginEvent(u32 mode);
@@ -52,6 +52,6 @@ public:
     void hitCkPl();
 };
 
-#define WEPITEM_WK(o) ((WepItemWork*) (o)->free)
+#define WEPITEM_WK(o) ((FREE_WEP_ITEM*) (o)->free)
 
 #endif

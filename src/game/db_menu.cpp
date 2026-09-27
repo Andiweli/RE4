@@ -19,12 +19,12 @@
 #include "main_sub.h"
 
 // One debug menu line (0x10 bytes)
-struct DB_MENU {
+typedef struct tagMENU {
     const char* name;  // 0x00
     const char* rel_name;   // 0x04  tool module to load (NULL = built-in tool)
     void (*func)();    // 0x08  built-in tool entry
     int id;            // 0x0C  DebugMenuSelected
-};
+} MENU;
 
 // Debug menu task work (0x34 bytes)
 struct test {
@@ -54,7 +54,7 @@ void ToolBugcheck();
 
 #define MENU_NUM 34
 
-DB_MENU menu[MENU_NUM] = {
+MENU menu[MENU_NUM] = {
     {"AREA JUMP", NULL, RoomJump, 0},
     {"FLAG EDIT", NULL, FlagEdit, 1},
     {"DEBUG PAGE", NULL, ToolDebugPage, 2},

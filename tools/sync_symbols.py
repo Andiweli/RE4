@@ -7,6 +7,11 @@ linker match symbols by name, so once a unit is compiled we read its ELF symbol 
 each GNU v2 (gcc 2.95) name back to `Class::Method` and rename the placeholder at the matching
 address.
 
+The resulting mangled name (parameter types included) is therefore derived from whatever this
+project's own source currently declares at that address, not read from Bio4.sym or the retail
+game itself; it is not independent evidence of the original signature, only of what this codebase
+already thinks it is.
+
 usage: sync_symbols.py <compiled .o> [more .o ...]       (paths under build/<ver>/src/)
 """
 import os, re, subprocess, sys

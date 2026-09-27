@@ -344,7 +344,7 @@ void SceElevator2Main(SceElevator2Data* d)
     int i;
     int j;
     u32* hSnd;
-    FadeWork* fade;
+    FADE_WORK* fade;
 
     obj = SmdGetObjPtr(d->objId);
     gear1 = SmdGetObjPtr(d->objId2);

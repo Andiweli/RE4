@@ -30,7 +30,7 @@ f32 focus_frame = 5.0f;
 u8 alpha_max = 0xDC;
 
 // ---------------------------------------------------------------------------
-// CameraAttachedToMotion: follows the AttachCamera channels of a model's motion.
+// CameraAttachedToMotion: follows the ATTACH_CAMERA channels of a model's motion.
 // ---------------------------------------------------------------------------
 
 CameraAttachedToMotion::CameraAttachedToMotion(cModel* m)
@@ -49,7 +49,7 @@ CameraAttachedToMotion::~CameraAttachedToMotion()
 // from the model's frame into the world; rebuilds the orientation with roll.
 void CameraAttachedToMotion::move()
 {
-    AttachCamera* ac = MOTION(m_pModel)->pAttachCam;
+    ATTACH_CAMERA* ac = MOTION(m_pModel)->pAttachCam;
     Vec hit;
     Vec nrm;
     Vec pos;

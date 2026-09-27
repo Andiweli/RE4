@@ -14,7 +14,7 @@ class cObj12;
 // Work of the em39 enemy (em39 module, D:/Bio4/Prog/em39.cpp; cModel::type 0/1 = knife fight,
 // 2 = the second battle), overlaid on cEm from 0x3E0. Field names are the work-relative offsets;
 // the comment gives the cEm offset.
-struct Em39Work {
+struct FREE_EM39 {
     u32 Be_flg;            // 0x000 (0x3E0)
     int Timer;               // 0x004 (0x3E4)  routine timer
     int Timer2;               // 0x008 (0x3E8)
@@ -106,7 +106,7 @@ struct Em39Work {
     u8 EffKindIdArrow;          // 0x8C7 (0xCA7)
 };
 
-#define EM39_WK(em) ((Em39Work*) (((cEm39*) (em))->free))
+#define EM39_WK(em) ((FREE_EM39*) (((cEm39*) (em))->free))
 
 class cEm39 : public cEm {
 public:

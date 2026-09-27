@@ -7,14 +7,14 @@
 #include "main_mem.h"
 #include "fade.h"
 
-FadeWork Fade[4];
+FADE_WORK Fade[4];
 
 // Starts fade slot (no & 0x7FFFFFFF) from *start to *end over `time` frames at depth z; a negative
 // `no` means "one shot" (stop drawing when done), otherwise the end colour stays on screen until
 // FadeKill. late != 0 puts the fade in the late draw group.
 void FadeSet(int no, GXColor* start, GXColor* end, u32 time, u32 z, int late)
 {
-    FadeWork* f = &Fade[no & 0x7FFFFFFF];
+    FADE_WORK* f = &Fade[no & 0x7FFFFFFF];
     GXColor s = *start;
     GXColor e = *end;
 
@@ -55,7 +55,7 @@ void FadeKill(int no)
 void FadeInit()
 {
     int i;
-    FadeWork* f = Fade;
+    FADE_WORK* f = Fade;
 
     memclr_asm(f, sizeof(Fade));
     for (i = 0; i < 4; i++, f++) {
@@ -69,7 +69,7 @@ void FadeInit()
 void FadeControl(int flag)
 {
     int i;
-    FadeWork* f;
+    FADE_WORK* f;
 
     for (i = 0; i < 4; i++) {
         f = &Fade[i];
@@ -108,7 +108,7 @@ void FadeControl(int flag)
 
 // Draws the fade quad (screen-wide, between y 56 and height-56) in the slot's current colour at its
 // z with alpha blending.
-void fadeDraw(FadeWork* pF)
+void fadeDraw(FADE_WORK* pF)
 {
     GXRenderModeObj* rmode = &Rmode;
     Mtx44 proj;

@@ -154,7 +154,7 @@ void Pl0fInit(cEm* em)
 // the boss holds it. A boss lunge rocks the hull and shoves both nodes away from it.
 void cPl0f::move()
 {
-    Pl0fWork* w = PL0F_WK(this);
+    FREE_PL0F* w = PL0F_WK(this);
 
     w->Be_flg &= ~0xC;
     Pl0f_R0_move_tbl[r_no_0](this);
@@ -211,7 +211,7 @@ void cPl0f::move()
 // left, bit3 right; consumed by pl0fBoatSpdControl.
 void cPl0f::setTiller()
 {
-    Pl0fWork* w = PL0F_WK(this);
+    FREE_PL0F* w = PL0F_WK(this);
 
     if (Key.on & 1) {
         w->Tiller |= 1;
@@ -230,7 +230,7 @@ void cPl0f::setTiller()
 // Room script: full ahead this frame.
 void cPl0f::setTillerFront()
 {
-    Pl0fWork* w = PL0F_WK(this);
+    FREE_PL0F* w = PL0F_WK(this);
 
     w->Tiller |= 1;
 }
@@ -239,7 +239,7 @@ void cPl0f::setTillerFront()
 // matrices and kills the wake effects (group 0x35) of the old position.
 void cPl0f::setPos(Vec* p, f32 ang)
 {
-    Pl0fWork* w = PL0F_WK(this);
+    FREE_PL0F* w = PL0F_WK(this);
     u32 i;
 
     for (i = 0; i < 2; i++) {
@@ -267,7 +267,7 @@ void cPl0f::setPos(Vec* p, f32 ang)
 // state from type / set and runs it this frame.
 static void pl0f_R0_Init(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     u32 i;
     u32 j;
 
@@ -376,7 +376,7 @@ static void pl0f_R0_Init(cPl0f* em)
 // state and records the boss position into the 10-entry history ring.
 static void pl0f_R0_Move(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     if (w->Boat_spd > 30.0f) {
         cParts* p = em->getPartsPtr(2);
@@ -395,7 +395,7 @@ static void pl0f_R0_Move(cPl0f* em)
 }
 
 // Engine stop SE: the long one after a minute of running.
-static inline void pl0fEngineStop(Pl0fWork* w, Vec* pos)
+static inline void pl0fEngineStop(FREE_PL0F* w, Vec* pos)
 {
     w->Be_flg &= ~2;
     if (w->Sailing_timer > 60) {
@@ -409,7 +409,7 @@ static inline void pl0fEngineStop(Pl0fWork* w, Vec* pos)
 // boarding action button check.
 static void pl0f_R1_Wait(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     if (w->Be_flg & 2) {
         w->Be_flg &= ~2;
@@ -436,7 +436,7 @@ static void pl0f_R1_Wait(cPl0f* em)
 // a crash into the boss / an island -> guard 3.
 static void pl0f_R1_RideMove(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     w->Boss_chase = 0;
     pl0fBoatSpdControl(em);
@@ -458,7 +458,7 @@ static void pl0f_R1_RideMove(cPl0f* em)
 // partner into subBoatRide step 2 (already seated), then -> ride (1).
 static void pl0f_R1_RideStart(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     cPlayer* pl = pPL;
 
     pl->Body->initWepHand((u32) ARC(PL0F_BIN_008));
@@ -485,7 +485,7 @@ static void pl0f_R1_RideStart(cPl0f* em)
 // the normal ride.
 static void pl0f_R1_BossMove(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     w->Boss_chase = 1;
     pl0fBoatChaseBoss(em);
@@ -543,7 +543,7 @@ static void pl0f_R1_BossMove(cPl0f* em)
 // ride (1) at its end; the boss close / another crash re-trigger the guards.
 static void pl0f_R1_Guard(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -576,7 +576,7 @@ static void pl0f_R1_Guard(cPl0f* em)
 // boat's remaining hp); crash / drop checks are off (Be_flg bits 2/3); ends in wait (0).
 static void pl0f_R1_Drop(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     w->Be_flg |= 0xC;
     switch (em->r_no_2) {
@@ -633,7 +633,7 @@ static void pl0f_R1_Drop(cPl0f* em)
 // 0x22 with a splash effect and SE, crash checks off; then -> dragged by the boss (6).
 static void pl0f_R1_WaterRide(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     w->Be_flg |= 4;
     switch (em->r_no_2) {
@@ -738,7 +738,7 @@ static void pl0f_R1_BossGuard(cPl0f* em)
 // the boat waits.
 static void pl0f_R1_R10dIn(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     PL0F_ROOM_IN(0xD, subBoatR10dIn, 45, 75);
     PL0F_ROOM_IN_END(1.47f, -500.0f, -2280.0f, -16870.0f);
@@ -758,7 +758,7 @@ static void pl0f_R1_R10dOut(cPl0f* em)
 // the landing after 95.
 static void pl0f_R1_R10eIn(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     PL0F_ROOM_IN(0xF, subBoatR10eIn, 65, 95);
     PL0F_ROOM_IN_END(1.568879f, 38250.0f, -15000.0f, 52360.0f);
@@ -777,7 +777,7 @@ static void pl0f_R1_R10eOut(cPl0f* em)
 // r_no_1 == 12 (type 4): the second room 10E entrance (player state 0x11), the other landing.
 static void pl0f_R1_R10eIn2(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     PL0F_ROOM_IN(0x11, subBoatR10eIn2, 65, 95);
     PL0F_ROOM_IN_END(1.57f, -46610.0f, -15000.0f, 39280.0f);
@@ -816,7 +816,7 @@ static void pl0f_R1_R10eOut2(cPl0f* em)
 // bobbing, and the tiller following the rider's lean.
 void pl0fBoatControl(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     Mtx m;
     Vec d;
     u32 i;
@@ -900,7 +900,7 @@ void pl0fBoatControl(cPl0f* em)
 // Boat_rot = |Boat_dir|.
 void pl0fGetBoatDir(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     Vec d;
 
     PSVECSubtract(&em->pos, &em->pos_old, &d);
@@ -917,7 +917,7 @@ void pl0fGetBoatDir(cPl0f* em)
 // Wake and spray effects of the boat, on the lake only.
 void pl0fWaterEff(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     static u8 cnt = 0;
     static u8 turn = 0;
     static u8 hideCnt = 0;
@@ -982,7 +982,7 @@ void pl0fWaterEff(cPl0f* em)
 // (Bank_sin), and the decaying impact sway (swayAmp * sin(swayPhase), amplitude * 0.96 per frame).
 void pl0fBoatRoll(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     Mtx m;
     Vec sway;
     f32 t;
@@ -1029,7 +1029,7 @@ void pl0fBoatRoll(cPl0f* em)
 // Adds a world-space speed to node `no` (0 bow, 1 stern).
 void pl0fBoatAddSpd(cPl0f* em, u32 no, Vec* spd)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     if (no < 2) {
         PSVECAdd(&w->node[no].spd, spd, &w->node[no].spd);
@@ -1040,7 +1040,7 @@ void pl0fBoatAddSpd(cPl0f* em, u32 no, Vec* spd)
 // Sailing_timer. While the player hides the engine only stops. The Tiller bits are consumed.
 void pl0fBoatSpdControl(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     Mtx m;
     Vec spd;
     Vec p;
@@ -1256,7 +1256,7 @@ static Vec pl0f_boss_cam_at1 = { 0.0f, 1500.0f, 5000.0f };
 // Without the boss it is a fixed behind-the-boat camera.
 void pl0fBossCamMove(cPl0f* em, int hide)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     CAMERA* gcam = &pG->Camera;
     Mtx m;
     Vec bpos;
@@ -1536,7 +1536,7 @@ static f32 pl0f_getoff_ang[3] = { 1.466677f, 3.089821f, 0.0f };
 // landing position / heading go to Getoff_pos / Getoff_dir and action 0x24 (pl0fActGetOff) is offered.
 void pl0fGetoffActEvtCk(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     u32 i;
 
     if (!StaFlagChk(pG, STA_PL_BOAT)) {
@@ -1608,7 +1608,7 @@ static void pl0fActRideR10e2(cPl0f* em)
 // waits, the engine stops, the partner into subBoatGetoff.
 static void pl0fActGetOff(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     cPlayer* pl = pPL;
 
     pl->m_Fwork0 = w->Getoff_dir;
@@ -1628,7 +1628,7 @@ static void pl0fActGetOff(cPl0f* em)
 // player hides or the boss rams (flag bit2), else a shove off the hit point. Returns 1 on a hit.
 int pl0fCrashCk(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     Vec hit;
     u32 i;
     u32 n;
@@ -1683,7 +1683,7 @@ int pl0fCrashCk(cPl0f* em)
 // hit point `p` (horizontal; backwards when the boat sits on the point).
 void pl0fCrashAdjustSet(cPl0f* em, Vec* p, int away)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     Mtx m;
     Vec d;
     u32 i;
@@ -1719,7 +1719,7 @@ void pl0fCrashAdjustSet(cPl0f* em, Vec* p, int away)
 // types 1 / 2 (rails do it).
 void pl0fScrAdjust(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     Vec nrm;
     Vec p;
     Vec d;
@@ -1829,7 +1829,7 @@ static void PlBoatMove(cPlayer* pl)
 // slot; an inline's temp Vec takes a second slot).
 #define PLBOAT_ENGINE_START() \
 { \
-    Pl0fWork* w = PL0F_WK(boat); \
+    FREE_PL0F* w = PL0F_WK(boat); \
  \
     w->Be_flg |= 1; \
     v = boat->pos; \
@@ -1956,7 +1956,7 @@ static void plboat_R2_Move(cPlayer* pl)
     if (boat) {
         // The work pointer local keeps the then-arm two insns at jump1 time, so the `boss = 0` hoist
         // happens in jump2 (after sched2) and the `li` stays between the compare and the branch.
-        Pl0fWork* w = PL0F_WK(boat);
+        FREE_PL0F* w = PL0F_WK(boat);
         boss = w->pBoss;
     } else {
         boss = 0;
@@ -2094,7 +2094,7 @@ static void plboat_R2_SpearSet(cPlayer* pl)
     if (boat) {
         // The work pointer local keeps the then-arm two insns at jump1 time, so the `boss = 0` hoist
         // happens in jump2 (after sched2) and the `li` stays between the compare and the branch.
-        Pl0fWork* w = PL0F_WK(boat);
+        FREE_PL0F* w = PL0F_WK(boat);
         boss = w->pBoss;
     } else {
         boss = 0;
@@ -2222,7 +2222,7 @@ static void plboat_R2_SpearSet2(cPlayer* pl)
     if (boat) {
         // The work pointer local keeps the then-arm two insns at jump1 time, so the `boss = 0` hoist
         // happens in jump2 (after sched2) and the `li` stays between the compare and the branch.
-        Pl0fWork* w = PL0F_WK(boat);
+        FREE_PL0F* w = PL0F_WK(boat);
         boss = w->pBoss;
     } else {
         boss = 0;
@@ -2480,7 +2480,7 @@ static void plboat_R2_Swim(cPlayer* pl)
     f32 h;
 
     if (boat) {
-        Pl0fWork* w = PL0F_WK(boat);
+        FREE_PL0F* w = PL0F_WK(boat);
 
         if (w->First_camck == 0) {
             w->First_camck = 1;
@@ -2713,7 +2713,7 @@ static void plboat_R2_Die(cPlayer* pl)
     if (boat) {
         // The work pointer local keeps the then-arm two insns at jump1 time, so the `boss = 0` hoist
         // happens in jump2 (after sched2) and the `li` stays between the compare and the branch.
-        Pl0fWork* w = PL0F_WK(boat);
+        FREE_PL0F* w = PL0F_WK(boat);
         boss = w->pBoss;
     } else {
         boss = 0;
@@ -2980,7 +2980,7 @@ void pl00SwimCamMove(cPlayer* pl)
         cEm* boss;
 
         if (pl->m_pBoat) {
-            Pl0fWork* w = PL0F_WK(pl->m_pBoat);   // two insns at jump1: the `boss = 0` arm is not hoisted
+            FREE_PL0F* w = PL0F_WK(pl->m_pBoat);   // two insns at jump1: the `boss = 0` arm is not hoisted
             boss = w->pBoss;
         } else {
             boss = 0;
@@ -3272,7 +3272,7 @@ void plOnBoat(cPlayer* pl)
 // filled with the boss position and the bow leash is at least 25 m. Returns 1 when found.
 int testSearchEm2f(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     u32 n;
 
     w->pBoss = 0;
@@ -3294,7 +3294,7 @@ int testSearchEm2f(cPl0f* em)
             {
                 // A second work pointer: cse turns it into a copy of `w` that loop.c hoists (`mr r12, r6`
                 // before the loop) and the pSelf store goes through the copy.
-                Pl0fWork* w2 = PL0F_WK(em);
+                FREE_PL0F* w2 = PL0F_WK(em);
 
                 w2->pSelf = em;
             }
@@ -3388,7 +3388,7 @@ static u8 pl0f_rope_down[30] = {
 // the boat; its end is pinned to the anchor every frame in cPl0f::move.
 void pl0fLongRopeSet(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     Vec pos;
     Vec rot;
 
@@ -3538,7 +3538,7 @@ void pl0fBossDiePosSet(cPlayer* pl)
 // The anchor object hung on the boat (room 10B only).
 void pl0fSetAnchor(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
     Vec pos;
     Vec rot;
 
@@ -3557,7 +3557,7 @@ void pl0fSetAnchor(cPl0f* em)
 // Moves the anchor onto the boss (parts 0x1A) once it is hooked.
 void pl0fSetAnchorEm2f(cPl0f* em)
 {
-    Pl0fWork* w = PL0F_WK(em);
+    FREE_PL0F* w = PL0F_WK(em);
 
     if (w->pBoss && w->pAnchor) {
         w->pAnchor->pos.x = 0.0f;
@@ -3576,7 +3576,7 @@ void pl0fSetAnchorEm2f(cPl0f* em)
 // anchorEff reset; otherwise the side is picked from the angle to the boss.
 void pl0fSetAnchorEm2f(cPlayer* pl)
 {
-    Pl0fWork* w;
+    FREE_PL0F* w;
     cEm* boss;
     f32 ang;
 
@@ -3667,7 +3667,7 @@ static void subBoatRide()
 {
     cSubChar* sub = SUB_CHAR();
     cPl0f* boat = (cPl0f*)sub->pEmCatch;
-    Pl0fWork* w = PL0F_WK(boat);
+    FREE_PL0F* w = PL0F_WK(boat);
     Vec v;
 
     sub->subArc = boat->subArc;
@@ -3759,7 +3759,7 @@ static void subBoatGetoff()
 { \
     cSubChar* sub = SUB_CHAR(); \
     cPl0f* boat = (cPl0f*)sub->pEmCatch; \
-    Pl0fWork* w = PL0F_WK(boat); \
+    FREE_PL0F* w = PL0F_WK(boat); \
  \
     sub->subArc = boat->subArc; \
     sub->dmg.m_Timer = 0x1E; \

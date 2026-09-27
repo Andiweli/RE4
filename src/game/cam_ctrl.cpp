@@ -2427,7 +2427,7 @@ void CameraControl::clearAttachCamera()
 }
 
 // Registers (or replaces) the attach camera of `model` (up to 3).
-void CameraControl::registAttachCamera(AttachCamera* p_attach, cModel* p_model)
+void CameraControl::registAttachCamera(ATTACH_CAMERA* p_attach, cModel* p_model)
 {
     int i;
 
@@ -2449,7 +2449,7 @@ void CameraControl::registAttachCamera(AttachCamera* p_attach, cModel* p_model)
 }
 
 // Unregisters the attach camera of `model`.
-void CameraControl::deleteAttachCamera(AttachCamera* p_attach, cModel* p_model)
+void CameraControl::deleteAttachCamera(ATTACH_CAMERA* p_attach, cModel* p_model)
 {
     int i;
 
@@ -2485,7 +2485,7 @@ cModel* CameraControl::getAttachModel(cModel* p_model)
 }
 
 // The active attach camera (any when `model` is NULL, else that model's).
-AttachCamera* CameraControl::getAttachCamera(cModel* p_model)
+ATTACH_CAMERA* CameraControl::getAttachCamera(cModel* p_model)
 {
     int i;
 
@@ -2513,7 +2513,7 @@ void CameraControl::checkAttachCamera()
     static int inter_frame;
     cModel* em[3] = {NULL, NULL, NULL};
     cModel* model = NULL;
-    AttachCamera* ac;
+    ATTACH_CAMERA* ac;
     int i;
 
     if (StaFlagChk(pG, STA_SCOPE_CAMERA)) {

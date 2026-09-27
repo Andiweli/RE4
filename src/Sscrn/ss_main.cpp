@@ -460,7 +460,7 @@ void SsItemExamine::init(SUB_SCREEN* wk)
 // `&local` arguments through an inlined helper are recomputed at every call (`addi r4, r1, 0x208`)
 // instead of being kept in a callee-saved register (integrate.c substitutes the frame address into
 // the hard-register argument set).
-static inline void ssItemInfo(u16 id, ItemInfo* info)
+static inline void ssItemInfo(u16 id, ITEM_INFO* info)
 {
     itemInfo(id, info);
 }
@@ -473,7 +473,7 @@ void SsItemExamine::move(SUB_SCREEN* wk)
     static u16 exam_id;
     char name[0x100];
     char name2[0x100];
-    ItemInfo info;
+    ITEM_INFO info;
     int size;
 
     switch (_rno) {

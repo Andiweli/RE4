@@ -7,15 +7,15 @@
 #include "rnd.h"
 #include "esp.h"
 
-struct Esp1aWork {
+typedef struct tagESP1A_WK {
     Vec Move_vec;  // 0x00 camera-relative jitter applied this frame
     Vec Dist;  // 0x0C x: sideways jitter, y: vertical jitter, z: distance toward the camera
-};
+} ESP1A_WK;
 
 // Jittering sprite spawned in a random cone around a model part (esp0b-style camera jitter).
 class cEsp1a : public cEsp {
 public:
-    Esp1aWork m_Free;  // 0xF8
+    ESP1A_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -33,7 +33,7 @@ cEsp* Esp1a_Create()
 // Dist.x sideways / Dist.y up in the camera plane and Dist.z toward the camera.
 void cEsp1a::move()
 {
-    Esp1aWork* w = &m_Free;
+    ESP1A_WK* w = &m_Free;
     Vec look;
     Vec up;
     Vec side;
@@ -97,7 +97,7 @@ void get_angle(Vec* vec, f32* ang_x, f32* ang_y)
 // model's angles, then detaches into world space. Fails without a parent or a bad parts number.
 int cEsp1a::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp1aWork* w = &m_Free;
+    ESP1A_WK* w = &m_Free;
 
     if (parent != pEffParentWorld && (m_Release_time == 0xFF || m_Release_time <= m_Life_time)) {
         cParts* parts;

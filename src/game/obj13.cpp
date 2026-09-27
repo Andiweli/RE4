@@ -57,7 +57,7 @@ void (*ObjLadder_R1_move_tbl[4])(cObjLadder*) = {
 cObj* SetLadder(void* bin, void* tpl, Vec* pos, Vec* rot, int no)
 {
     cObj* obj;
-    LadderWork* w;
+    FREE_OBJ13* w;
     cParts* parts;
     u16* flg;
 
@@ -116,7 +116,7 @@ cObj* SetLadder(void* bin, void* tpl, Vec* pos, Vec* rot, int no)
 // and collision update.
 void cObjLadder::move()
 {
-    LadderWork* w = LADDER_WK(this);
+    FREE_OBJ13* w = LADDER_WK(this);
 
     if (w->Climb_wait) {
         w->Climb_wait--;
@@ -140,7 +140,7 @@ void cObjLadder::move()
 // climb and kick-down action buttons.
 void objLadder_R1_Set(cObjLadder* pObj)
 {
-    LadderWork* w = LADDER_WK(pObj);
+    FREE_OBJ13* w = LADDER_WK(pObj);
     cParts* parts;
 
     pObj->pos = w->St_pos;
@@ -166,7 +166,7 @@ void objLadder_R1_Set(cObjLadder* pObj)
 // its end status 1 and two damage areas (kind 3) along the fallen ladder, then Rno1 = 2.
 void objLadder_R1_Fall(cObjLadder* pObj)
 {
-    LadderWork* w = LADDER_WK(pObj);
+    FREE_OBJ13* w = LADDER_WK(pObj);
     Vec v;
 
     w->Status = 4;
@@ -216,7 +216,7 @@ void objLadder_R1_Fall(cObjLadder* pObj)
 // Rno1 == 2: lying down: offers the reset action button; collision off.
 void objLadder_R1_Down(cObjLadder* pObj)
 {
-    LadderWork* w = LADDER_WK(pObj);
+    FREE_OBJ13* w = LADDER_WK(pObj);
 
     w->Status = 1;
     pObj->matUpdate();
@@ -232,7 +232,7 @@ void objLadder_R1_Down(cObjLadder* pObj)
 // standing (Rno1 = 0).
 void objLadder_R1_Reset(cObjLadder* pObj)
 {
-    LadderWork* w = LADDER_WK(pObj);
+    FREE_OBJ13* w = LADDER_WK(pObj);
 
     w->Status = 4;
     switch (pObj->r_no_2) {
@@ -262,7 +262,7 @@ void objLadder_R1_Reset(cObjLadder* pObj)
     }
 }
 
-// LadderWork status (0 standing, 1 down, 2/3 falling, 4 moving).
+// FREE_OBJ13 status (0 standing, 1 down, 2/3 falling, 4 moving).
 int cObjLadder::getStatus()
 {
     return LADDER_WK(this)->Status;
@@ -277,7 +277,7 @@ int cObjLadder::getType()
 // 1 when the ladder can be climbed now (standing, not hidden, climbTimer expired).
 int cObjLadder::ckClimb()
 {
-    LadderWork* w = LADDER_WK(this);
+    FREE_OBJ13* w = LADDER_WK(this);
 
     if (w->Status != 0) {
         return 0;
@@ -321,7 +321,7 @@ void cObjLadder::setStand()
 // Puts the ladder down instantly (room load state).
 void cObjLadder::setDowned()
 {
-    LadderWork* w = LADDER_WK(this);
+    FREE_OBJ13* w = LADDER_WK(this);
     cParts* parts;
 
     w->Status = 1;
@@ -342,7 +342,7 @@ void cObjLadder::setDowned()
 // Starts the kick-down fall with motion `mot` after 17 frames.
 void cObjLadder::setDown(void* mot, void* seq)
 {
-    LadderWork* w = LADDER_WK(this);
+    FREE_OBJ13* w = LADDER_WK(this);
 
     w->Status = 2;
     w->Down_wait = 17;
@@ -361,7 +361,7 @@ void cObjLadder::setDown(void* mot, void* seq)
 // (enemy kicked it while the player climbs).
 void cObjLadder::setDown2()
 {
-    LadderWork* w = LADDER_WK(this);
+    FREE_OBJ13* w = LADDER_WK(this);
     void* mot = w->mot_tbl[10];
     void* a = w->mot_tbl[15];
     cParts* parts;
@@ -409,7 +409,7 @@ void cObjLadder::setDown2()
 // 1 when the ladder is down and the reset reserve timer expired.
 int cObjLadder::ckReset()
 {
-    LadderWork* w = LADDER_WK(this);
+    FREE_OBJ13* w = LADDER_WK(this);
 
     if (w->Status != 1) {
         return 0;
@@ -420,7 +420,7 @@ int cObjLadder::ckReset()
 // Starts the reset motion (t 0/1 = the two variants mot[6]/mot[8]).
 void cObjLadder::setReset(int mode)
 {
-    LadderWork* w = LADDER_WK(this);
+    FREE_OBJ13* w = LADDER_WK(this);
 
     w->Status = 4;
     switch (mode) {
@@ -481,7 +481,7 @@ void cObjLadder::setResetReserve()
 // Collision flag 0x200 (blocking) on the ladder and its pair only while it is not standing.
 void objLadderSatSet(cObjLadder* pObj)
 {
-    LadderWork* w = LADDER_WK(pObj);
+    FREE_OBJ13* w = LADDER_WK(pObj);
 
     pObj->atari.offOba();
     if (w->pHosei) {
@@ -500,7 +500,7 @@ void objLadderSatSet(cObjLadder* pObj)
 // (within the local box -500..1000 z, +-800 x, +-500 y) facing it.
 void objLadderClimbActEvtCk(cObjLadder* pObj)
 {
-    LadderWork* w = LADDER_WK(pObj);
+    FREE_OBJ13* w = LADDER_WK(pObj);
     Mtx m;
     Vec v;
 
@@ -555,7 +555,7 @@ void plobjLadderClimb(cPlayer* pEm)
 {
     cEm* em = (cEm*) pEm;
     cObjLadder* obj = (cObjLadder*) em->pEmCatch;
-    LadderWork* w = LADDER_WK(obj);
+    FREE_OBJ13* w = LADDER_WK(obj);
     Mtx m;
     Vec v;
     f32 fl;
@@ -743,7 +743,7 @@ void subobjLadderClimb(cEm* pl)
 {
     cEm* em = pSUB;
     cObjLadder* obj = (cObjLadder*) em->pEmCatch;
-    LadderWork* w = LADDER_WK(obj);
+    FREE_OBJ13* w = LADDER_WK(obj);
     Mtx m;
     Vec p;
     Vec rot;
@@ -908,7 +908,7 @@ void objLadderClimbCamMove(cEm* pEm)
 // (hatch type: flag 0x20 variant).
 void objLadderDownActEvtCk(cObjLadder* pObj)
 {
-    LadderWork* w = LADDER_WK(pObj);
+    FREE_OBJ13* w = LADDER_WK(pObj);
     Mtx m;
     Vec v;
     f32 n;
@@ -963,7 +963,7 @@ void objLadderDownActEvtCk(cObjLadder* pObj)
 // Action button 0xA: puts the player into plobjLadderDown.
 void objLadderActDown(cObjLadder* ptr)
 {
-    LadderWork* w = LADDER_WK(ptr);
+    FREE_OBJ13* w = LADDER_WK(ptr);
 
     if (!(w->be_flag & 4)) {
         SetPlDamage((cEm*) ptr, plobjLadderDown);
@@ -977,7 +977,7 @@ void plobjLadderDown(cPlayer* pEm)
 {
     cEm* em = (cEm*) pEm;
     cObjLadder* obj = (cObjLadder*) em->pEmCatch;
-    LadderWork* w = LADDER_WK(obj);
+    FREE_OBJ13* w = LADDER_WK(obj);
     Mtx m;
     Vec v;
 
@@ -1059,7 +1059,7 @@ void objLadderDownCamMove(cEm* pEm)
 // Offers the reset action button (0xB) when the player stands at the foot of the fallen ladder.
 void objLadderResetActEvtCk(cObjLadder* pObj)
 {
-    LadderWork* w = LADDER_WK(pObj);
+    FREE_OBJ13* w = LADDER_WK(pObj);
 
     if (!(w->be_flag & 1)) {
         return;
@@ -1091,7 +1091,7 @@ void plobjLadderReset(cPlayer* pEm)
 {
     cEm* em = (cEm*) pEm;
     cObjLadder* obj = (cObjLadder*) em->pEmCatch;
-    LadderWork* w = LADDER_WK(obj);
+    FREE_OBJ13* w = LADDER_WK(obj);
     Mtx m;
     Vec v;
     int motA;
@@ -1164,7 +1164,7 @@ void objLadderResetCamMove(cEm* pEm)
 // Installs the 20 motion pointers (player/partner/ladder motions) from the room's table.
 void cObjLadder::setMotion(void** pMot)
 {
-    LadderWork* w = LADDER_WK(this);
+    FREE_OBJ13* w = LADDER_WK(this);
 
     w->mot_tbl[0] = *pMot++;
     w->mot_tbl[1] = *pMot++;
@@ -1198,7 +1198,7 @@ int LadderNearCk(Vec* pPos)
 
     for (i = 0; i < ObjMgr.getArrayNum(); i++) {
         cObjLadder* obj = (cObjLadder*) ObjMgr.fastAt(i);
-        LadderWork* w = LADDER_WK(obj);
+        FREE_OBJ13* w = LADDER_WK(obj);
 
         if (obj->isAlive() && obj->id == 0x13 && w->Status == 0 && !(LADDER_WK(obj)->be_flag & 2)) {
             PSMTXRotRad(m, 'y', obj->ang.y);
@@ -1240,7 +1240,7 @@ void LadderEventTrans(int flag)
 // Breaks the windows (em 0x46) within 2000 of the ladder's top.
 void cObjLadder::breakWindow()
 {
-    LadderWork* w = LADDER_WK(this);
+    FREE_OBJ13* w = LADDER_WK(this);
     Mtx m;
     Vec v;
     f32 n;

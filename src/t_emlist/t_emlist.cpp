@@ -463,21 +463,21 @@ extern cEm* pPLem asm("pPL");
 // The list index is stored through a reference in emlist_r0_target: the store then keeps the
 // following `pG` loads in the search loops (a plain member store lets them hoist).
 
-// The editor's view of a list entry (em_set.h EmListData with signed hp / Guard_r: the tool prints them
+// The editor's view of a list entry (em_set.h EM_LIST with signed hp / Guard_r: the tool prints them
 // with lha).
 struct EmListEnt {
     u8 flags;       // 0x00
     u8 id;          // 0x01
     u8 type;        // 0x02
-    u8 set;         // 0x03  (PS2 EM_LIST.set)
+    u8 set;         // 0x03
     u32 flags4;     // 0x04
     s16 hp;         // 0x08
-    u8 emset_no;    // 0x0A  ("EmSet"; PS2 EM_LIST.emset_no)
-    u8 Character;   // 0x0B  (PS2 EM_LIST.Character)
+    u8 emset_no;    // 0x0A  ("EmSet")
+    u8 Character;   // 0x0B
     u16 pos[3];     // 0x0C  (the editor steps them as unsigned halves)
     u16 rot[3];     // 0x12
     u16 room;       // 0x18  stage << 8 | room
-    s16 Guard_r;    // 0x1A  * 1000 (PS2 EM_LIST.Guard_r)
+    s16 Guard_r;    // 0x1A  * 1000
     u8 pad_1C[4];
 };
 

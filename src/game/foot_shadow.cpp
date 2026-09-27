@@ -169,7 +169,7 @@ void DrawFootShadow(cModel* pMod)
             prevOn = 0;
             prevCnt = 0;
             for (i = 0; i < tbl->nTbl; i++) {
-                FootShadowDat* dat = &tbl->dat[i];
+                FOOTSHADOW_DATA* dat = &tbl->dat[i];
                 cParts* p = pMod->getPartsPtr(dat->joint);
                 ShadowInfo mid;
                 Vec ofs;

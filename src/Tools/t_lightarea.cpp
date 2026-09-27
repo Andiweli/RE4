@@ -42,7 +42,7 @@ struct LIGHT_AREA {
     u8 be_flag;        // 0x01  bit 0: in use
     u8 pl_light_no;    // 0x02  light no for the player (0xFF: none)
     u8 em_light_no;    // 0x03  light no for the other characters
-    AreaData area;   // 0x04
+    AREA_HIT_DATA area;   // 0x04
     u8 x34[4];
     s8 power;        // 0x38  scale in percent (0..100)
     u8 sub_light_no;   // 0x39  light no for the sub character
@@ -98,7 +98,7 @@ void InitWork(LIGHT_AREA* w, int no)
 // Position column pressed: the shared AreaDataEdit editor on the slot's area; 0 on B.
 int PosExec_callback(int no, LIGHT_AREA* w, cDbgButtonTemplate<LIGHT_AREA>* b)
 {
-    AreaData* a = &w->area;
+    AREA_HIT_DATA* a = &w->area;
 
     AreaDataEdit(a, 0xA0FF8080, 1, 0, 2.3f);
     AreaDataInfoDisp(a, 0x28, 0x18);
@@ -119,7 +119,7 @@ void PosUpdate_callback(int no, LIGHT_AREA* w, cDbgButtonTemplate<LIGHT_AREA>* b
     if (IsWorkAlive(w)) {
         AreaGetCenterPos(&pos, &w->area);
         PSVECScale(&pos, &pos, 0.001f);
-        h = w->area.u.xz4.height / 1000.0f;
+        h = w->area.xz4.height / 1000.0f;
     }
     sprintf(buf, "%6.1f %6.1f %6.1f %6.1f", pos.x, pos.y, pos.z, h);
     b->SetString(buf);
@@ -448,7 +448,7 @@ void ToolLightAreaMain()
             for (i = 0; i < LIGHT_AREA_MAX; i++, w++) {
                     if (IsWorkAlive(w)) {
                     AreaGetCenterPos(&pos, &w->area);
-                    pos.y = (pos.y + w->area.u.xz4.height) * 0.5f;
+                    pos.y = (pos.y + w->area.xz4.height) * 0.5f;
                     Vec posCopy = pos;
                     if (GetScreenPos(&posCopy, &scr) == 1) {
                         if (i == tool.GetEdit()->GetCurrentNo()) {

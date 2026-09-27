@@ -156,7 +156,7 @@ static int em34_atk_pad = 0;
 // cloth chains.
 void cEm34::move()
 {
-    Em34Work* w = EM34_WK(this);
+    FREE_EM34* w = EM34_WK(this);
 
     if (r_no_0) {
         em34DmCk(this);
@@ -197,7 +197,7 @@ void cEm34::move()
 // hit[0..2]), lock-on on parts 2, effects (archive 0x10 as group 0x2B), the idle motion; then wait (1/0).
 static void em34_R0_Init(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
     cModelInfo* info;
     int one;
 
@@ -335,7 +335,7 @@ static void em34_R0_Move(cEm34* em)
 // death (dmg upper bits) -> walk (1).
 static void em34_R1_Wait(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -367,7 +367,7 @@ static void em34_R1_Wait(cEm34* em)
 // below 500 hp bites (2) within 1 m, the others go back to wait within 2 m of the player.
 static void em34_R1_Walk(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -408,7 +408,7 @@ static void em34_R1_Walk(cEm34* em)
 // jaw (parts 10) hits (em34AtkCk); back to wait at the end.
 static void em34_R1_Atk(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -443,7 +443,7 @@ static void em34_R1_Atk(cEm34* em)
 // r_no_0 == 2: the damage routine (Be_flg bit3), r_no_1 state table.
 static void em34_R0_Damage(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
 
     w->Be_flg |= 8;
     Em34_R2_move_tbl[em->r_no_1](em);
@@ -452,7 +452,7 @@ static void em34_R0_Damage(cEm34* em)
 // Damage state 0: the flinch (the type's idle motion), then back to walk with r_no_3 = 10.
 static void em34_R1_Dm_Normal(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
 
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
@@ -482,7 +482,7 @@ static void em34_R1_Dm_Normal(cEm34* em)
 // r_no_0 == 3: the die routine (Be_flg bit3), r_no_1 state table.
 static void em34_R0_Die(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
 
     w->Be_flg |= 8;
     Em34_R3_move_tbl[em->r_no_1](em);
@@ -493,7 +493,7 @@ static void em34_R0_Die(cEm34* em)
 // -0.02 per frame) and is hidden.
 static void em34_R1_Die_Normal(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
 
     switch (em->r_no_2) {
     case 0:
@@ -542,7 +542,7 @@ static void em34_R1_Die_Normal(cEm34* em)
 // player is unreachable or farther away.
 void em34RouteCk(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
 
     if (em->hp <= 0) {
         return;
@@ -579,7 +579,7 @@ void em34RouteCk(cEm34* em)
 // degrees, else back to 0; applied as the additional rotation of parts 3.
 void em34NeckMove(cEm34* em)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
     cParts* p;
     Vec v;
 
@@ -609,7 +609,7 @@ void em34NeckMove(cEm34* em)
 // blood on the victim, a quake and pad vibration. Returns 1 on a hit.
 int em34AtkCk(cEm34* em, int no, int parts)
 {
-    Em34Work* w = EM34_WK(em);
+    FREE_EM34* w = EM34_WK(em);
 
     if (w->Atk_ck) {
         return 0;

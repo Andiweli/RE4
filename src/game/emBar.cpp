@@ -46,7 +46,7 @@ static EmBarFunc EmBar_R1_move_tbl[2] = {
 cEmBar* SetBar(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo)
 {
     cEmBar* em;
-    EmBarWork* w;
+    FREE_EMBAR* w;
     u16* flg;
 
     em = (cEmBar*) EmMgr.create(0x51);
@@ -212,7 +212,7 @@ void emBarDmCk(cEmBar* em)
 // with a different SE), hides the model and moves to Rno1 1 Break.
 void emBarSetBreak(cEmBar* pEm, u32 type)
 {
-    EmBarWork* w = EMBAR_WK(pEm);
+    FREE_EMBAR* w = EMBAR_WK(pEm);
     u8 eff = w->Eff_id;
 
     pEm->hp = 0;
@@ -268,7 +268,7 @@ void emBar_R0_Move(cEmBar* pEm)
 // used it yet (Act_ck), and runs the melee / explosion hit check.
 void emBar_R1_Set(cEmBar* pEm)
 {
-    EmBarWork* w = EMBAR_WK(pEm);
+    FREE_EMBAR* w = EMBAR_WK(pEm);
     u8 step = pEm->r_no_2;
 
     if (step == 0) {
@@ -308,7 +308,7 @@ void plemEscape(cPlayer* pEm)
 {
     cEm* em = (cEm*) pEm;
     cEmBar* bar = (cEmBar*) em->pEmCatch;
-    EmBarWork* w = EMBAR_WK(bar);
+    FREE_EMBAR* w = EMBAR_WK(bar);
 
     em->subArc = pPL->pEmCatch->subArc;
     em->dmg.set(0, 0xF);
@@ -329,7 +329,7 @@ void plemEscape(cPlayer* pEm)
 // model; then hit-box-only.
 void emBar_R1_Break(cEmBar* pEm)
 {
-    EmBarWork* w = EMBAR_WK(pEm);
+    FREE_EMBAR* w = EMBAR_WK(pEm);
     u8 step = pEm->r_no_2;
 
     if (step == 0) {
@@ -348,7 +348,7 @@ void emBar_R1_Break(cEmBar* pEm)
 // Hit box: a cube of the bar's size centred half its height below the origin.
 void emBarYarareInit(cEmBar* pEm)
 {
-    EmBarWork* w = EMBAR_WK(pEm);
+    FREE_EMBAR* w = EMBAR_WK(pEm);
 
     YarareInitCube((cEmHit*) pEm, 0.0f, -w->size.y * 0.5f, 0.0f, w->size.x * 0.5f + 50.0f, w->size.y, w->size.z * 0.5f + 50.0f, 0, YAT_FLAG_ON);
 }

@@ -7,7 +7,7 @@
 
 // Rigid body effect model work (game/obj09.cpp, set up by esp_efm EfmSetObj09): a box of
 // `size` with mass / moments of inertia, pushed by `V` (momentum). Extends to cObj+0x3D8.
-struct Efm09Work {
+struct OBJ09_FREE {
     EfmCore Eff_core;    // 0x00
     f32 m;               // 0x0C  size.x * size.y * size.z / 1e9 * mass_mul
     Vec Ig;              // 0x10  moments of inertia: moment_mul * m * (size.y^2 + size.z^2) / 12, ... (obj09 dwdt)
@@ -29,11 +29,11 @@ struct Efm09Work {
 // the player.
 class cObj09 : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  Efm09Work
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  OBJ09_FREE
 
     virtual void move();
 };
 
-#define EFM09_WK(o) ((Efm09Work*) (o)->free)
+#define EFM09_WK(o) ((OBJ09_FREE*) (o)->free)
 
 #endif

@@ -9,21 +9,21 @@
 
 // Face shape motion data built by cPlBody::makeSpaeData (PS2 PL_SHAPE_DATA, 0x58 bytes): a header,
 // two key tables and four keys.
-struct SHAPE_MOT_HEADER {
+typedef struct tagSHAPE_MOT_HEADER {
     u32 max_frame;  // 0x00  0x101
     u32 tbl_num;    // 0x04  2
-};
-struct SHAPE_MOT_TBL {
+} SHAPE_MOT_HEADER;
+typedef struct tagSHAPE_MOT_TBL {
     u32 offset;     // 0x00  byte offset of the table's keys (0x18 / 0x38)
     u16 shape_id;   // 0x04
     u16 key_num;    // 0x06  2
-};
-struct SHAPE_MOT {
+} SHAPE_MOT_TBL;
+typedef struct tagSHAPE_MOT {
     s32 frame;      // 0x00  0 / 0x100
     f32 value;      // 0x04
     f32 r_value;    // 0x08
     f32 l_value;    // 0x0C
-};
+} SHAPE_MOT;
 struct SpaeData {
     SHAPE_MOT_HEADER head;  // 0x00
     SHAPE_MOT_TBL tbl[2];   // 0x08

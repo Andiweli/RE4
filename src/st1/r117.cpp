@@ -87,7 +87,7 @@ static inline int r117_espEnd(cEsp* esp)
     return on;
 }
 
-static inline FadeWork* r117_fadeWork(int no) { return &Fade[no]; }
+static inline FADE_WORK* r117_fadeWork(int no) { return &Fade[no]; }
 
 // White fade (start -> end colour words); the colour pair is a local of the inline (fade.h).
 static inline void r117_fadeWhite(int no, u32 start, u32 end)

@@ -6,7 +6,7 @@
 #include "gx.h"
 
 // One foot shadow entry of a character (game/foot_shadow_tbl.cpp), 8 bytes.
-struct FootShadowDat {
+struct FOOTSHADOW_DATA {
     u8 joint;   // 0x00  parts the shadow is drawn under
     u8 div;     // 0x01  shadows interpolated between this and the previous linked entry
     u8 flag;    // 0x02  bit0: link the next entry to this one
@@ -17,7 +17,7 @@ struct FootShadowDat {
 // Foot shadow table (cEm::pFsdTbl): entry count and the entries.
 struct FootShadowTbl {
     u32 nTbl;
-    FootShadowDat* dat;
+    FOOTSHADOW_DATA* dat;
 };
 
 extern "C" {

@@ -21,7 +21,7 @@ struct ESP_AREA {
     u8 be_flag;       // 0x01  bit 0: in use
     u8 area_no;      // 0x02
     u8 x3;
-    AreaData area;  // 0x04
+    AREA_HIT_DATA area;  // 0x04
     u32 flags34;    // 0x34  bit 0: in room
     u32 x38[0x18];
 };
@@ -73,7 +73,7 @@ void InitWork(ESP_AREA* w, int no)
 // panels); returns 0 on B (column done).
 int PosExec_callback(int no, ESP_AREA* w, cDbgButtonTemplate<ESP_AREA>* b)
 {
-    AreaData* a = &w->area;
+    AREA_HIT_DATA* a = &w->area;
 
     AreaDataEdit(a, 0xA0FF8080, 1, 0, 2.3f);
     AreaDataInfoDisp(a, 0x28, 0x18);
@@ -94,7 +94,7 @@ void PosUpdate_callback(int no, ESP_AREA* w, cDbgButtonTemplate<ESP_AREA>* b)
     if (IsWorkAlive(w)) {
         AreaGetCenterPos(&pos, &w->area);
         PSVECScale(&pos, &pos, 0.001f);
-        h = w->area.u.xz4.height / 1000.0f;
+        h = w->area.xz4.height / 1000.0f;
     }
     sprintf(buf, "%6.1f %6.1f %6.1f %6.1f", pos.x, pos.y, pos.z, h);
     b->SetString(buf);
@@ -276,7 +276,7 @@ void ToolEspArea()
         for (i = 0; i < ESP_AREA_MAX; i++, w++) {
             if (IsWorkAlive(w)) {
                 AreaGetCenterPos(&pos, &w->area);
-                pos.y = (pos.y + w->area.u.xz4.height) * 0.5f;
+                pos.y = (pos.y + w->area.xz4.height) * 0.5f;
                 Vec posCopy = pos;
                 if (GetScreenPos(&posCopy, &scr) == 1) {
                     u32 col1;

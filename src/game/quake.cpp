@@ -24,7 +24,7 @@ void QuakeMove()
 void QuakeInit()
 {
     int i;
-    QuakeEntry* e = Quake.ent;
+    QUAKE_TASK* e = Quake.ent;
 
     for (i = 0; i < 16; i++, e++) {
         e->Be_flg = 0;
@@ -43,7 +43,7 @@ void QuakeInit()
 void QuakeExec(u8 id, u16 delay, s16 time, f32 power, u8 axis)
 {
     int i;
-    QuakeEntry* e = Quake.ent;
+    QUAKE_TASK* e = Quake.ent;
 
     for (i = 0; i < 16; i++, e++) {
         if (!(e->Be_flg & 1)) {
@@ -62,7 +62,7 @@ void QuakeExec(u8 id, u16 delay, s16 time, f32 power, u8 axis)
 static void QuakeKill(u8 id)
 {
     int i;
-    QuakeEntry* e = Quake.ent;
+    QUAKE_TASK* e = Quake.ent;
 
     for (i = 0; i < 16; i++, e++) {
         if ((e->Be_flg & 1) && e->No == id) {
@@ -81,7 +81,7 @@ static void QuakeKill(u8 id)
 void QuakeScheduler()
 {
     int i;
-    QuakeEntry* e;
+    QUAKE_TASK* e;
 
     Quake.active = 0;
     Quake.axis = 0;

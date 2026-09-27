@@ -17,7 +17,7 @@
 // Effect controller 43: sand surface. A (nx+1) x (ny+1) height grid drawn as triangle strips
 // through a prebuilt display list; AddSandPower pushes the grid down around a world position
 // and GetSandHeight samples it (obj09).
-struct Espgen43Work {
+typedef struct tagESPGEN43_WK {
     Mtx Wld_mat;           // 0x14 grid -> world
     Mtx Inv_mat;           // 0x44 world -> grid
     u16 Width;            // 0x74 grid cells along x
@@ -32,7 +32,7 @@ struct Espgen43Work {
     GXColor Amb;    // 0x94
     u8 TexNo;          // 0x98
     u8 texRep;         // 0x99 texture repeats across the grid
-};
+} ESPGEN43_WK;
 
 extern "C" {
 // game/trans_lit.cpp defines it with Vec* pos; this unit was built with the by-value prototype, so trans_lit.h is not included.
@@ -56,7 +56,7 @@ static int Height_find;
 // radius 3 / 2 / 1 around it by 2% / 10% / 30% of the power, then smooths the grid.
 void AddSandPowerSub(EspgenWork* pGen)
 {
-    Espgen43Work* p;
+    ESPGEN43_WK* p;
     Vec v;
     u32 x;
     u32 z;
@@ -70,7 +70,7 @@ void AddSandPowerSub(EspgenWork* pGen)
     if (pGen->id != 0x43) {
         return;
     }
-    p = (Espgen43Work*) pGen->work;
+    p = (ESPGEN43_WK*) pGen->work;
     v = Chk_pos;
     PSMTXMultVec(p->Inv_mat, &v, &v);
     if (v.x < (f32) (-p->Width / 2)) {
@@ -143,13 +143,13 @@ void AddSandPower(Vec& pos, f32 power)
 // grid is treated as flat) is stored in Height_ret.
 void GetSandHeightSub(EspgenWork* pGen)
 {
-    Espgen43Work* p;
+    ESPGEN43_WK* p;
     Vec v;
 
     if (pGen->id != 0x43) {
         return;
     }
-    p = (Espgen43Work*) pGen->work;
+    p = (ESPGEN43_WK*) pGen->work;
     v = Chk_pos;
     PSMTXMultVec(p->Inv_mat, &v, &v);
     if (v.x < (f32) (-p->Width / 2)) {
@@ -191,7 +191,7 @@ int GetSandHeight(Vec* pos, f32* Ret)
 #line 246 "D:/Bio4/Prog/Espgen43.cpp"
 void Espgen43_Move00(EspgenWork* pGen)
 {
-    Espgen43Work* p = (Espgen43Work*) pGen->work;
+    ESPGEN43_WK* p = (ESPGEN43_WK*) pGen->work;
     Vec v;
     int i;
     int j;
@@ -237,7 +237,7 @@ void Espgen43_Trans(EspgenWork* pGen)
 void Espgen43_TransSub(EspgenWork* pGen)
 {
     GxStageWork* st;
-    Espgen43Work* p;
+    ESPGEN43_WK* p;
     GXTexObj* tex;
     GXTlutObj* tlut;
     f32 r;
@@ -249,7 +249,7 @@ void Espgen43_TransSub(EspgenWork* pGen)
         return;
     }
     st = &pG->gxStage;
-    p = (Espgen43Work*) pGen->work;
+    p = (ESPGEN43_WK*) pGen->work;
     st->tevStage = 0;
     st->texMap = 0;
     st->texCoord = 0;
@@ -343,7 +343,7 @@ static int SetSand(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny)
 // grid). Returns NULL (and releases the generator) on memory failure.
 EspgenWork* SetSandWork(EspgenWork* w, Vec* pos, Vec* rot, f32 size, f32 sizeRate, u32 nx, u32 ny)
 {
-    Espgen43Work* p = (Espgen43Work*) w->work;
+    ESPGEN43_WK* p = (ESPGEN43_WK*) w->work;
     Mtx m;
     u32 n;
     u8* d;
@@ -523,7 +523,7 @@ EspgenWork* SetSandWork(EspgenWork* w, Vec* pos, Vec* rot, f32 size, f32 sizeRat
 // Frees the height, normal and display list buffers.
 void Espgen43_Destruct(EspgenWork* pGen)
 {
-    Espgen43Work* p = (Espgen43Work*) pGen->work;
+    ESPGEN43_WK* p = (ESPGEN43_WK*) pGen->work;
 
     if (p->pHeightBuf != NULL) {
         Mem_free(p->pHeightBuf);
@@ -545,7 +545,7 @@ void Espgen43_Destruct(EspgenWork* pGen)
 int Espgen43_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
                          Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct)
 {
-    Espgen43Work* p = (Espgen43Work*) pGen->work;
+    ESPGEN43_WK* p = (ESPGEN43_WK*) pGen->work;
     Vec r;
     u32 nx = 0x40;
     u32 ny = 0x40;

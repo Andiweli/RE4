@@ -12,7 +12,7 @@
 // Per-frame: counts every slot's cooldown down.
 void cCtrl11::move()
 {
-    Ctrl11Work* w = (Ctrl11Work*) work;
+    CTRL11_WK* w = (CTRL11_WK*) work;
     int i;
 
     for (i = 0; i < 15; i++) {
@@ -47,7 +47,7 @@ cCtrl* GetCtrlCtrl11()
 // sets the cooldown to `time` frames. Returns the SndCall handle (0 = not played).
 u32 Ctrl11SetSe(cCtrl* pCtrl, cModel* m, s16 time, u16 no, int idx)
 {
-    Ctrl11Work* w;
+    CTRL11_WK* w;
 
     if (pCtrl == 0) {
         return 0;
@@ -55,7 +55,7 @@ u32 Ctrl11SetSe(cCtrl* pCtrl, cModel* m, s16 time, u16 no, int idx)
     if (pCtrl->Id != 0x11) {
         return 0;
     }
-    w = (Ctrl11Work*) pCtrl->work;
+    w = (CTRL11_WK*) pCtrl->work;
     if (w->Se_wait[idx] != 0) {
         return 0;
     }
@@ -67,7 +67,7 @@ u32 Ctrl11SetSe(cCtrl* pCtrl, cModel* m, s16 time, u16 no, int idx)
 // Same at the model's parts 0 with an explicit SE block, without the cooldown test.
 u32 Ctrl11SetSe2(cCtrl* pCtrl, cModel* m, s16 time, u16 no, int idx, u16 blk)
 {
-    Ctrl11Work* w;
+    CTRL11_WK* w;
 
     if (pCtrl == 0) {
         return 0;
@@ -75,7 +75,7 @@ u32 Ctrl11SetSe2(cCtrl* pCtrl, cModel* m, s16 time, u16 no, int idx, u16 blk)
     if (pCtrl->Id != 0x11) {
         return 0;
     }
-    w = (Ctrl11Work*) pCtrl->work;
+    w = (CTRL11_WK*) pCtrl->work;
     w->Se_id[idx] = SndCall(blk, no, &m->getPartsPtr(0)->world, m->id, 0, m);
     w->Se_wait[idx] = time;
     return w->Se_id[idx];
@@ -84,7 +84,7 @@ u32 Ctrl11SetSe2(cCtrl* pCtrl, cModel* m, s16 time, u16 no, int idx, u16 blk)
 // Stops the slot's current sound and plays `no` (block 8) at parts 0, cooldown `time`.
 u32 Ctrl11StopAndSetSe(cCtrl* pCtrl, cModel* m, s16 time, u16 no, int idx)
 {
-    Ctrl11Work* w;
+    CTRL11_WK* w;
 
     if (pCtrl == 0) {
         return 0;
@@ -92,7 +92,7 @@ u32 Ctrl11StopAndSetSe(cCtrl* pCtrl, cModel* m, s16 time, u16 no, int idx)
     if (pCtrl->Id != 0x11) {
         return 0;
     }
-    w = (Ctrl11Work*) pCtrl->work;
+    w = (CTRL11_WK*) pCtrl->work;
     SndStop(w->Se_id[idx], 0);
     w->Se_id[idx] = SndCall(8, no, &m->getPartsPtr(0)->world, m->id, 0, m);
     w->Se_wait[idx] = time;
@@ -102,7 +102,7 @@ u32 Ctrl11StopAndSetSe(cCtrl* pCtrl, cModel* m, s16 time, u16 no, int idx)
 // The em38 voice slot: stops the previous voice and plays `no` at parts 0.
 u32 Ctrl11SetSeEm38(cCtrl* pCtrl, cModel* pEm, u16 se)
 {
-    Ctrl11Work* w;
+    CTRL11_WK* w;
 
     if (pCtrl == 0) {
         return 0;
@@ -110,7 +110,7 @@ u32 Ctrl11SetSeEm38(cCtrl* pCtrl, cModel* pEm, u16 se)
     if (pCtrl->Id != 0x11) {
         return 0;
     }
-    w = (Ctrl11Work*) pCtrl->work;
+    w = (CTRL11_WK*) pCtrl->work;
     SndStop(w->Se_id_em38, 0);
     w->Se_id_em38 = SndCall(8, se, &pEm->getPartsPtr(0)->world, pEm->id, 0, pEm);
     return w->Se_id_em38;

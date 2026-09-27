@@ -63,7 +63,7 @@ static inline void PSetTex(TexRenderMng*& d, TexRenderMng* v) { d = v; }
 static u8 r213_texTbl[0x20];
 static R213Work* r213_work;
 static R213SuYarare* r213_suYarare;
-PenCloth r213_cloth;
+CLOTH_INFO r213_cloth;
 
 static Vec r213_satPos = {-14500.0f, 0.0f, -53000.0f};
 static Vec r213_satRot = {0.0f, 0.0f, 0.0f};

@@ -13,13 +13,13 @@
 #include "espgen.h"
 
 // laser line: cEsp19 (game/esp19.cpp) work
-struct Esp19Work {
+typedef struct tagESP19_WK {
     Vec Vec0;  // 0x00 end point of the line
     f32 max_laser_dist;     // 0x0C maximum length
-};
+} ESP19_WK;
 class cEsp19 : public cEsp {
 public:
-    Esp19Work m_Free;  // 0xF8
+    ESP19_WK m_Free;  // 0xF8
 };
 
 class cEsp46;
@@ -448,7 +448,7 @@ void EspDrawLaserLine(Vec lpos, Vec lcross, f32 rate)
 {
     cEsp* esp;
     cEsp19* e;
-    Esp19Work* w;
+    ESP19_WK* w;
 
     if (DbgFlagChk(pG, DBG_NO_LASER_LINE)) {
         return;

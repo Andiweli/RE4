@@ -11,7 +11,7 @@ cObj* SetGondola(void* bin, void* tpl, Vec* pos, Vec* rot);
 
 // Gondola work (game/objGondola.cpp `cObjGondola`): a cable car the player / partner / up to
 // five enemies ride; five scenario collision quads follow it.
-struct GondolaWork {
+struct FREE_GONDOLA {
     u32 Be_flg;              // 0x00
     int Timer;            // 0x04  break: frames before the sub motion starts
     u8 Ride_pl;            // 0x08  player is on board (ckRide)
@@ -31,7 +31,7 @@ struct GondolaWork {
 // with five collision quads following the car; the break routine hands the camera over.
 class cObjGondola : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  GondolaWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_GONDOLA
 
     virtual void move();
     virtual ~cObjGondola() {}
@@ -47,6 +47,6 @@ public:
     void setVib();
 };
 
-#define GONDOLA_WK(o) ((GondolaWork*) (o)->free)
+#define GONDOLA_WK(o) ((FREE_GONDOLA*) (o)->free)
 
 #endif

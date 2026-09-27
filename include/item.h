@@ -44,15 +44,15 @@ struct cItem {
 };
 
 // cItemMgr::ordering() output (cItemMgr::pOrder[], 8 bytes): the in-use slots holding one item id.
-struct ItemOrder {
+struct ITEM_ORDER {
     cItem* p_item;  // 0x00
     u16 num;         // 0x04  copy of item->num
     u8 pad_6[2];
 };
 
 // itemInfo() result (game/item.cpp).
-struct ItemInfo {
-    u16 id;        // 0x00  item id (PS2 ITEM_INFO id)
+struct ITEM_INFO {
+    u16 id;        // 0x00  item id
     u8 type;       // 0x02  1 weapon, 2 ammo, 3 = weapon with a magazine (sscrn: empty check), 5/0xC treasure, 9 weapon part, 0xA file ...
     u8 defNum;         // 0x03  default count when get(id, 0)
     u16 maxNum;        // 0x04  max count per slot
@@ -70,7 +70,7 @@ struct ItemSaveWork {
     u8 board;      // 0x0B
 };
 
-struct ItemSaveData {
+struct _ITEM_SAVE_DATA {
     u16 wep_id;               // 0x00
     u16 arm_no;              // 0x02  slot index of the equipped weapon, 0xFFFF = none
     ItemSaveWork item_list[0x180];// 0x04
@@ -91,7 +91,7 @@ public:
     cItem* m_pItem;           // 0x14
     cItem* m_pNew;            // 0x18  slot the last get() filled (puzzle PutInCase copies the piece position into it)
     s32 m_array_num;                 // 0x1C
-    ItemOrder* m_p_order_tbl;          // 0x20  ordering() result (merchant: sorted slots of one item id)
+    ITEM_ORDER* m_p_order_tbl;          // 0x20  ordering() result (merchant: sorted slots of one item id)
     s32 m_order_tbl_num;                 // 0x24  entries in pOrder
     u32 m_bonus_time;                    // 0x28  (sce_at: number shown with item 0x73; get(0x73, n): mercenaries add time)
     u32 m_bonus_point;                    // 0x2C  (sce_at: number shown with item 0x75; get(0x75, n): mercenaries bonus time)
@@ -172,7 +172,7 @@ extern "C" {
 // item id -> weapon number / type (0xFF when unknown), item attributes
 u8 WeaponId2WeaponNo(ITEM_ID id);
 u8 WeaponId2WeaponType(ITEM_ID id);
-void itemInfo(ITEM_ID id, ItemInfo* info);
+void itemInfo(ITEM_ID id, ITEM_INFO* info);
 // weapon item id -> its bullet item id (attr: cItem::x8 >> 13), charge count, max tune level per type
 u16 WeaponId2BulletId(ITEM_ID id, int bllt_type);
 u16 WeaponId2ChargeNum(ITEM_ID id, int level);
@@ -194,26 +194,26 @@ int gld_cmp(const void* a, const void* b);
 int order_cmp(const void* a, const void* b);
 }
 
-// Each reads one field of the ItemInfo that itemInfo() fills (type, defNum, maxNum: offsets 2, 3 and 4),
-// as the three free inlines of the original (an ItemInfo temp at every call site). Free inlines carry no
+// Each reads one field of the ITEM_INFO that itemInfo() fills (type, defNum, maxNum: offsets 2, 3 and 4),
+// as the three free inlines of the original (an ITEM_INFO temp at every call site). Free inlines carry no
 // symbol, so these three identifiers are not recovered from the original.
 inline u8 itemType(ITEM_ID id)
 {
-    ItemInfo info;
+    ITEM_INFO info;
     itemInfo(id, &info);
     return info.type;
 }
 
 inline u8 itemDefNum(ITEM_ID id)
 {
-    ItemInfo info;
+    ITEM_INFO info;
     itemInfo(id, &info);
     return info.defNum;
 }
 
 inline u16 itemMaxNum(ITEM_ID id)
 {
-    ItemInfo info;
+    ITEM_INFO info;
     itemInfo(id, &info);
     return info.maxNum;
 }

@@ -55,7 +55,7 @@ static void IdSetColLoop(IDSystem* id, int no, u8 type, int on);
 
 // 1 while a fade slot is still fading.
 // Through a pointer parameter: `&Fade[2]` stays a loop-invariant pseudo (`addi rX, Fade+0x48@l`).
-static inline int fadeIsOn(FadeWork* f)
+static inline int fadeIsOn(FADE_WORK* f)
 {
     return f->flags & 1;
 }
@@ -206,7 +206,7 @@ int MercSysInitRoom(MercInit* pMInit)
         smd->setMove(1);
         if (smd->Motion.pAttachCam == NULL) {
 #line 274 "D:/Bio4/Prog/mercenaries.cpp"
-            smd->Motion.pAttachCam = (AttachCamera*) MEM_CALLOC(0x98, 1, 13);
+            smd->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_CALLOC(0x98, 1, 13);
         }
     }
     pPL->setPos(&pMInit->pos);

@@ -31,7 +31,7 @@ void cEsp4b::move()
 // texture id has no animation data or the pattern is out of range.
 int cEsp4b::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    EspAnmData* anm;
+    cAnm* anm;
     u32 ptn;
 
     if (!EspGetAnmAddr(m_Tex_id, &anm)) {

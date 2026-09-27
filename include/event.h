@@ -31,7 +31,7 @@ class cModel;
 class cLit;
 
 // Named data slot table (game/event.cpp `cDatTbl`, demangled `DatTbl`): `num` entries of 0x3C.
-struct DatTblEntry {
+struct DatTblWork {
     char Name[0x30];   // 0x00
     u8 FlagBe8;           // 0x30  bit0: in use, bit1: `dat2` is a debug-heap block freed with the entry
     u8 Etc;           // 0x31
@@ -43,7 +43,7 @@ struct DatTblEntry {
 class DatTbl {
 private:
     int NumDatTbl;               // 0x00
-    public: DatTblEntry* pWork;    // 0x04
+    public: DatTblWork* pWork;    // 0x04
 
     DatTbl();
     ~DatTbl();

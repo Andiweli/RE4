@@ -19,7 +19,7 @@ struct CLOTH_AT_SET {
 };
 
 // Cloth / pendulum chain work of one accessory (game/pl_cloth.cpp, game/pendulum.cpp), 0x60 bytes.
-// pendulum.h's PenCloth is the same object with the obj units' field names.
+// pendulum.h's CLOTH_INFO is the same object with the obj units' field names.
 struct PlCloth {
     int Num;             // 0x00  number of chain links
     u8* pCloth;          // 0x04  model parts index per link

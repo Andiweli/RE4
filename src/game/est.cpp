@@ -34,7 +34,7 @@ void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void
 void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, void* h)
 {
     EspgenWork* w;
-    Espgen10Work* p;
+    ESPGEN10_WK* p;
 
     if (DbgFlagChk(pG, DBG_NO_EST_CALL)) {
         return;
@@ -57,7 +57,7 @@ void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e,
     }
     EspgenIncCallNo();
     w->id = 0x10;
-    p = (Espgen10Work*) w->work;
+    p = (ESPGEN10_WK*) w->work;
     p->head = head;
     p->pMod = model;
     if (model != NULL) {

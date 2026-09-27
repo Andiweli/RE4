@@ -10,7 +10,7 @@ class cObj12;
 class cEmDoor;
 
 // Work of the door enemy (game/emdoor.cpp), overlaid on cEm from 0x3E0.
-struct EmDoorWork {
+struct FREE_EMDOOR {
     u32 Be_flg;            // 0x000 (0x3E0)  bit0: locked (setOpenLock / setCloseLock, setNormal clears), bit1: setLock strong mode (lock hp drops by 4 per hit)
     int Timer;            // 0x004 (0x3E4)  shake frames (R1_Open / Close / Shock / OpenLock)
     int Timer2;          // 0x008 (0x3E8)  R1_Open / Down: enemies still to be hit by the opening door
@@ -47,7 +47,7 @@ struct EmDoorWork {
     u8 Etc_no;            // 0x43F (0x81F)  etc flag number (bit0 broken, bit1 right lock broken, bit2 left lock broken, bit3..5 chains broken, bit6/7 fallen direction)
 };
 
-#define EMDOOR_WK(em) ((EmDoorWork*) (((cEmDoor*) (em))->free))
+#define EMDOOR_WK(em) ((FREE_EMDOOR*) (((cEmDoor*) (em))->free))
 
 // Door enemy (game/emdoor.cpp): the room doors the player opens or kicks, with locks, chains and
 // breakable panes.

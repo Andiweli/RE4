@@ -7,10 +7,10 @@
 #include "esp.h"
 
 
-struct Esp0aWork {
+typedef struct tagESP0A_WK {
     u8 Type;   // 0x00 0: spawner (copies itself 50 times), 1: rim-lit sprite
     u8 Base_alpha;  // 0x01 base alpha
-};
+} ESP0A_WK;
 
 static f32 RIMIT1 = 0.9f;
 static f32 RIMIT2 = 0.6f;
@@ -21,7 +21,7 @@ static f32 RIMIT4 = 0.6f;
 // or away from the camera while the sprite is in front of it.
 class cEsp0a : public cEsp {
 public:
-    Esp0aWork m_Free;  // 0xF8
+    ESP0A_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -50,7 +50,7 @@ cEsp* Esp0a_Create()
 // axis (vpos.z < -0.9) and moving along it (|dot| beyond 0.6).
 void cEsp0a::move()
 {
-    Esp0aWork* w = &m_Free;
+    ESP0A_WK* w = &m_Free;
     Vec dir;
     Vec vpos;
     Mtx m;
@@ -89,7 +89,7 @@ void cEsp0a::move()
 // one-frame id-0 ghost sprite (Esp0a_Trans2) at each position, Z-sorted by world position.
 void Esp0a_Trans(cEsp0a* pEsp)
 {
-    Esp0aWork* w = &pEsp->m_Free;
+    ESP0A_WK* w = &pEsp->m_Free;
 
     switch (w->Type) {
     case 0:
@@ -149,7 +149,7 @@ void Esp0a_Trans2(cEsp* esp)
 // its simulated path. Type 1: Tool_flg 0x400 (pre-world layer) and m_Flg bit1. Work8[1] must be 0.
 int cEsp0a::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp0aWork* w = &m_Free;
+    ESP0A_WK* w = &m_Free;
 
     if (pSeq->Work8[1] != 0) {
         pLog->err(0, 0, "ESP0a : WK1 not 0!!");

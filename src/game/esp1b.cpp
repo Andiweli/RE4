@@ -7,19 +7,19 @@
 #include <string.h>
 
 
-struct Esp1bWork {
+typedef struct tagESP1B_WK {
     int div;   // 0x00 number of points
     Vec Vec0;  // 0x04
     Vec Vec1;  // 0x10
     Vec Vec2;  // 0x1C
-};
+} ESP1B_WK;
 
 static f32 esp1b_scale = 0.005f;
 
 // Spline sprite (drawn by Esp1b_SpTrans in esp_sub.cpp).
 class cEsp1b : public cEsp {
 public:
-    Esp1bWork m_Free;  // 0xF8
+    ESP1B_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -45,7 +45,7 @@ void cEsp1b::move()
 // Vec0..Vec2 x esp1b_scale; sets m_Flg 0x10 (spline sprite) for the trans function.
 int cEsp1b::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp1bWork* w = &m_Free;
+    ESP1B_WK* w = &m_Free;
     int n;
 
     n = (s8)pSeq->Work8[0] + 4;

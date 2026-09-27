@@ -254,7 +254,7 @@ static inline void r300_setEmAngR(cEmWrap* em, f32 ry)
 }
 
 // An ESL entry's position (1/10 units -> world) and yaw (rot[1] in 1/32768 turns -> degrees).
-static inline void r300_getListPos(EmListData* l, Vec* pos, f32& ry)
+static inline void r300_getListPos(EM_LIST* l, Vec* pos, f32& ry)
 {
     pos->x = (f32) l->pos[0] * 10.0f;
     pos->y = (f32) l->pos[1] * 10.0f;
@@ -326,7 +326,7 @@ void R300Init()
             r300_work->rock->setNoSuspend(1);
         }
         {
-            EmListData d;
+            EM_LIST d;
 
             d.id = 0x1D;
             d.type = 0xE;
@@ -440,7 +440,7 @@ void R300Init()
         em[0].setEm(3, -1, 1, 1, 1);
         em[1].setEm(4, -1, 1, 1, 1);
         if (pG->room_id_prev == 0x301) {
-            EmListData* l;
+            EM_LIST* l;
             f32 ry;
 
             Vec pos;

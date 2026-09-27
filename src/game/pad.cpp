@@ -197,7 +197,7 @@ void PadRead()
     {
         // Reference store through a `&Key` pointer: `stw 16(r11)` with r11 = &Key, and the following
         // `pSys` load depends on it, so the stores are issued before the `li r0,64; mtctr` pair.
-        KeyWork* k = &Key;
+        KEY* k = &Key;
         k->on = 0;
     }
     for (i = 0, bit = 1; i < 64; bit <<= 1, i++) {

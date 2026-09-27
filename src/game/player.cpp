@@ -272,7 +272,7 @@ void cPlayer::init1()
     if (pG->pl_type == 0) {
         Body->makeSpaeData();
     }
-    Motion.pAttachCam = (AttachCamera*) PL_MEM_ALLOC(0x98, 510);
+    Motion.pAttachCam = (ATTACH_CAMERA*) PL_MEM_ALLOC(0x98, 510);
 }
 
 // Place the player at the room start position and run the first frames of its motion.

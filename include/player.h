@@ -352,16 +352,16 @@ private:
 void pl01weaponSet(cPlayer* pEm);  // game/pl_ashley.cpp: fills m_MotTbl from the player archive
 
 // Debug cheat ("maho") command table (game/pl_debug.cpp), 0x16C bytes, `new`ed by cPlayer::debugInit.
-struct PlMahoEntry {
-    u8 rno;               // 0x00  (PS2 cPlMahoWork::rno)
-    u8 timer;               // 0x01  (PS2 cPlMahoWork::timer)
+struct cPlMahoWork {
+    u8 rno;               // 0x00
+    u8 timer;               // 0x01
     void (*pFunc)();     // 0x04
     const char* pSpell;    // 0x08  button sequence string  button sequence string (PS2 pSpell)
 };
 
 class cPlMaho {
 private:
-    PlMahoEntry work[30]; // 0x000
+    cPlMahoWork work[30]; // 0x000
     u32 nWork;             // 0x168
 
 public:

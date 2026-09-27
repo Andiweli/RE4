@@ -966,7 +966,7 @@ void getPieceVertex(pzlPiece* p, Vec* out, int corner)
 // The &info argument as an inlined helper parameter: integrate substitutes the frame address into the
 // argument register set, so each call recomputes `addi r4, r1, ofs` instead of gcse PRE hoisting one
 // pseudo (COMPILER-DIFF: 3).
-static inline void pzzlItemInfo(int id, ItemInfo* info)
+static inline void pzzlItemInfo(int id, ITEM_INFO* info)
 {
     itemInfo(id, info);
 }
@@ -989,7 +989,7 @@ void pieceModelDisp(SUB_SCREEN* wk)
         cModel* m = p->model;
         Vec pos;
         Vec scr;
-        ItemInfo info;
+        ITEM_INFO info;
         cItem* item;
         int id;
 
@@ -1753,7 +1753,7 @@ void PzzlThinking::move(SUB_SCREEN* wk)
             pzlPiece* p = wk->puzzlePlayer->cmbPiece(wk->puzzlePlayer->m_p_active_board);
 
             if (p) {
-                ItemInfo info;
+                ITEM_INFO info;
 
                 pieceModelSet(p);
                 pieceModelOrientation(wk, p);
@@ -2128,7 +2128,7 @@ void PieceCombine::move(SUB_SCREEN* wk)
                 idB = sel->item->id;
                 if (p != sel) {
                     if (ItemMgr.combine(p->item, sel->item, 0)) {
-                        ItemInfo info;
+                        ITEM_INFO info;
 
                         if (extra == 1) {
                             wk->puzzlePlayer->giveupExtraPiece();

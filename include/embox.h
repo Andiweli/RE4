@@ -8,7 +8,7 @@
 class cSat;
 
 // Work of the box enemy (game/embox.cpp), overlaid on cEm from 0x3E0.
-struct EmBoxWork {
+struct FREE_EMBOX {
     u32 Be_flg;            // 0x000 (0x3E0)
     u8 pad_4[8];
     YARARE_INFO hit;        // 0x00C (0x3EC)  second yarare cube (YarareAddCube)
@@ -28,7 +28,7 @@ struct EmBoxWork {
     u8 Etc_no;             // 0x245 (0x625)  etc flag index (broken flag)
 };
 
-#define EMBOX_WK(em) ((EmBoxWork*) (((cEmBox*) (em))->free))
+#define EMBOX_WK(em) ((FREE_EMBOX*) (((cEmBox*) (em))->free))
 
 // Box enemy: breakable boxes, barrels, vases and cabinets (types 0..7) that drop an item.
 class cEmBox : public cEm {

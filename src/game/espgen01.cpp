@@ -13,7 +13,7 @@
 
 // Effect controller 01: lens flare. Projects the light position to the screen and lays the
 // est table sprites along the line to the screen centre; HideCheck samples the Z buffer.
-struct Espgen01Work {
+typedef struct tagESPGEN01_WK {
     Vec offset;           // 0x14 light offset (from the parts)
     Vec pos;           // 0x20 world position
     Vec dir_vec;           // 0x2C light direction
@@ -36,7 +36,7 @@ struct Espgen01Work {
     u8 est_id;          // 0x69
     u16 delay_cnt;        // 0x6A frames to hide after a camera change
     u32 Rand_seed;          // 0x6C
-};
+} ESPGEN01_WK;
 
 extern "C" {
 void espgen01_Move00(EspgenWork* w);
@@ -83,7 +83,7 @@ void Espgen01_Trans(EspgenWork* pEspgen)
 // one-frame sprite along the line to the screen centre, faded by the combined alpha.
 void SetEsp(EspgenWork* pGen)
 {
-    Espgen01Work* p = (Espgen01Work*) pGen->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) pGen->work;
     Vec v;
     Vec scr;
     Vec d;
@@ -204,7 +204,7 @@ u32 GetEstTblnum(cEspSeqHead* head)
 // when the pool is full).
 cEsp* SetEstTbl(EspgenWork* w, cEspSeqHead* head, int no)
 {
-    Espgen01Work* p = (Espgen01Work*) w->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
     cEspSeqTbl* rec = head->SeqTbl;
     Mtx m;
     cEsp* esp;
@@ -218,7 +218,7 @@ cEsp* SetEstTbl(EspgenWork* w, cEspSeqHead* head, int no)
 // Alpha factor from the camera distance: 1 at the light fading to 0 at `dist` (1 when dist == 0).
 static f32 GetDistAlpha(EspgenWork* w)
 {
-    Espgen01Work* p = (Espgen01Work*) w->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
     CAMERA* cam;
     Vec d;
     f32 a;
@@ -244,7 +244,7 @@ static f32 GetDistAlpha(EspgenWork* w)
 // of half-angle dir_ang (radians), linear in the cosine in between.
 static f32 GetDirAlpha(EspgenWork* w, Vec* dir)
 {
-    Espgen01Work* p = (Espgen01Work*) w->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
     CAMERA* cam;
     Vec d;
     f32 ang;
@@ -281,7 +281,7 @@ void HideCheck(cEsp* pDat)
     static f32 hide_x_tbl[12] = {0.0f, 0.5f, 0.86f, 1.0f, 0.86f, 0.5f, 0.0f, -0.5f, -0.86f, -1.0f, -0.86f, -0.5f};
     static f32 hide_y_tbl[12] = {1.0f, 0.86f, 0.5f, 0.0f, -0.5f, -0.86f, -1.0f, -0.86f, -0.5f, 0.0f, 0.5f, 0.86f};
     EspgenWork* w = (EspgenWork*) pDat;
-    Espgen01Work* p = (Espgen01Work*) w->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
     Vec v;
     Vec s;
     u32 z;
@@ -353,7 +353,7 @@ void HideCheck(cEsp* pDat)
 int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag)
 {
-    Espgen01Work* p = (Espgen01Work*) w->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
     Mtx m1;
     Mtx m2;
     f32 rx;
