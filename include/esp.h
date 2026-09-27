@@ -673,7 +673,8 @@ void AddSandPower(Vec& pos, f32 power);
 int EspChkTexId(int no);   // 1 when texture `no` has an object
 GXTexObj* EspGetTexObj(int no, int ptn_no);
 GXTlutObj* EspGetTlutObj(int no);
-struct EspTexWk* EspGetTexWk(int id, int quiet);   // NULL (and an error unless quiet) when the id has no texture
+typedef struct tagESP_TEX_WK ESP_TEX_WK;
+ESP_TEX_WK* EspGetTexWk(int id, int quiet);   // NULL (and an error unless quiet) when the id has no texture
 int EspGetTexOwner(int id, u32* pOwner);
 int EspGetEfmAddr(int id, void** ppBin, void** ppTpl);
 int EspGetEfmMotAddr(int id, u32 no, void** ppMot);

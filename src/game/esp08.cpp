@@ -299,7 +299,7 @@ void Esp08_TransShimmer(cEsp08* esp, int type);
 // (maskType 1 stretches it over the sprite through the tile coordinates: ind).
 #define ESP08_MASK_SET(coord, mapId, texDecl, tlutDecl)                                           \
     if (esp->m_Tool_flg & 0x4000) {                                                                    \
-        EspTexWk* tw;                                                                             \
+        ESP_TEX_WK* tw;                                                                             \
         if (w->Mask_type == 1) {                                                                   \
             ind = 1;                                                                              \
         }                                                                                         \

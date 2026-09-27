@@ -227,12 +227,12 @@ extern void* g_pIdBuff;
 extern int IdBuffType;
 
 // game/id_tex.cpp
-struct TexWk;
+typedef struct tagTEX_WK TEX_WK;
 struct TexAnm;
 void IdTexSet(u8 id, u8 no);
 int IdGetAnmAddr(u8 id, TexAnm** ppAnm);
 void IdChannelSet(IdUnit* pIdUnit);
-TexWk* IdGetTexWk(u8 id, int bNoDispErrMsg);
+TEX_WK* IdGetTexWk(u8 id, int bNoDispErrMsg);
 
 extern "C" {
 void idSysMove00(IdUnit* u);

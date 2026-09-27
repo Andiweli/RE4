@@ -625,7 +625,7 @@ void Espgen45_TransSub(cEspgen* w)
         st->texCoord++;
         if ((g_bSetParam == 1 && (g_Free.flag & 2)) || (g_bSetParam == 0 && (p->flag & 2))) {
             u8 texId;
-            EspTexWk* tw;
+            ESP_TEX_WK* tw;
             if (g_bSetParam == 1) {
                 texId = g_Free.Mask_Tex;
             } else {

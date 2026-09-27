@@ -1122,13 +1122,13 @@ void IdCommonTrans(IdUnit* u)
     GXSetAlphaCompare(4, 1, 1, 4, 1);
     GXSetBlendMode(blend[u->blend_type][0], blend[u->blend_type][1], blend[u->blend_type][2], blend[u->blend_type][3]);
     if (u->tex_flag & 0x1) {
-        TexWk* wk = IdGetTexWk(u->maskId, 1);
+        TEX_WK* wk = IdGetTexWk(u->maskId, 1);
         if (wk != 0) {
             GXTexObj obj;
             GXTlutObj tlut;
             GXTlutObj* pTlut = &tlut; // see IdShimmerTrans
             Mtx tm;
-            TEXDescriptor* td = TEXGet(wk->pTpl, u->maskNo);
+            TEXDescriptor* td = TEXGet(wk->Tpl_addr, u->maskNo);
             TEXHeader* th = td->textureHeader;
             if (th->format == 8 || th->format == 9) {
                 GXInitTexObjCI(&obj, th->data, th->width, th->height, th->format, 0, 0, 0, 1);
@@ -1381,9 +1381,9 @@ void IdShimmerTrans(IdUnit* u, int u_pow, int Refract_type)
     GXSetTevAlphaIn(0, 7, 7, 7, 5);
     GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
     if (u->tex_flag & 0x1) {
-        TexWk* wk = IdGetTexWk(u->maskId, 1);
+        TEX_WK* wk = IdGetTexWk(u->maskId, 1);
         if (wk != 0) {
-            TEXDescriptor* td = TEXGet(wk->pTpl, u->maskNo);
+            TEXDescriptor* td = TEXGet(wk->Tpl_addr, u->maskNo);
             {
                 GXTexObj mobj;
                 GXTlutObj tlut;

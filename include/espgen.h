@@ -70,7 +70,7 @@ struct SstArea {   // (PS2 ESP_AREA_HEADER)
 };
 
 // One registered effect texture set (eff_sys espTexRegist), 0x54 bytes; owner 0xD2 = free.
-struct EspTexWk {
+typedef struct tagESP_TEX_WK {
     GXTexObj* pTex_obj_start;   // 0x00 first of nTex objects pulled from cEspSystem::texObj
     u16 nTexObj;            // 0x04
     u8 pad_6[2];
@@ -80,7 +80,7 @@ struct EspTexWk {
     TEXPalette* Tpl_addr;    // 0x48
     cAnm* Anm_addr;    // 0x4C
     u32 Owner;           // 0x50
-};
+} ESP_TEX_WK;
 
 // Effect model (efm) registration (eff_sys efmRegist), 0x14 bytes.
 struct EspEfmMotTbl {
@@ -97,7 +97,7 @@ struct EspEfmWk {
 
 // Effect system work (game/eff_sys.cpp, g_pEspSys, sizeof 0xC5E8).
 struct cEspSystem {
-    EspTexWk Esp_tex_tbl[0x100];       // 0x0000 by texture id
+    ESP_TEX_WK Esp_tex_tbl[0x100];       // 0x0000 by texture id
     EspEfmWk efmWk[0x100];       // 0x5400 by effect model id
     SstTbl estTbl[EFF_MAX];         // 0x6800 effect set tables by owner id
     SstTbl sstTbl[EFF_MAX];         // 0x71E4 room effect tables by owner id

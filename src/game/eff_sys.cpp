@@ -60,7 +60,7 @@ GXTexObj* EspPullTexObj(u32 num);
 int EspDataLoad(u32 addr, u32 owner, int flag);
 int EffAreaDataLoad(SstArea* area);
 int EspDataRelease(u32 owner, int flag, int warn);
-EspTexWk* EspGetTexWk(int id, int quiet);
+ESP_TEX_WK* EspGetTexWk(int id, int quiet);
 int EspGetTexOwner(int id, u32* out);
 int espTexRegist(TEXPalette* tpl, cAnm* anm, u8 id, u32 owner);
 int estRegist(void* data, void* list, u32 owner);
@@ -230,7 +230,7 @@ void EspRoomInit()
 {
     cEspSystem* p;
     cEspSystem* sys;
-    EspTexWk* tw;
+    ESP_TEX_WK* tw;
     EspEfmWk* ew;
     SstTbl* et;
     SstTbl* st;
@@ -438,9 +438,9 @@ int EspDataRelease(u32 owner, int bCountCheck, int warn)
 }
 
 // Texture work of effect texture `id`; NULL (error unless quiet) when the id is not registered.
-EspTexWk* EspGetTexWk(int id, int bNoDispErrMsg)
+ESP_TEX_WK* EspGetTexWk(int id, int bNoDispErrMsg)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         if (bNoDispErrMsg == 0) {
@@ -455,7 +455,7 @@ EspTexWk* EspGetTexWk(int id, int bNoDispErrMsg)
 // loads the texture's matrix as texmtx 0x1E; the standard sprite texture setup.
 void EspTexSet(int id, int ptn)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         pLog->err(0, 0, "ESP : TexId[%x] no data", id);
@@ -471,7 +471,7 @@ void EspTexSet(int id, int ptn)
 // GXTexObj of pattern `ptn` of texture `id`; NULL with an error when unregistered.
 GXTexObj* EspGetTexObj(int id, int ptn_no)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         pLog->err(0, 0, "ESP : TEX_ID[%x] no data", id);
@@ -483,7 +483,7 @@ GXTexObj* EspGetTexObj(int id, int ptn_no)
 // TLUT of texture `id` for CI4 / CI8 textures; NULL otherwise (error when unregistered).
 GXTlutObj* EspGetTlutObj(int id)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         pLog->err(0, 0, "ESP : TEX_ID[%x] no data", id);
@@ -498,7 +498,7 @@ GXTlutObj* EspGetTlutObj(int id)
 // TPL of texture `id` in *out; 0 when unregistered.
 int EspGetTplAddr(int id, void** pTpl_addr)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         return 0;
@@ -510,7 +510,7 @@ int EspGetTplAddr(int id, void** pTpl_addr)
 // Owner id of texture `id` in *out; 0 when unregistered (owner 0xD2).
 int EspGetTexOwner(int id, u32* pOwner)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     *pOwner = w->Owner;
     if (w->Owner == EFF_NONE) {
@@ -523,7 +523,7 @@ int EspGetTexOwner(int id, u32* pOwner)
 // unregistered.
 int EspGetAnmAddr(int id, cAnm** ppAnm)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         return 0;
@@ -535,7 +535,7 @@ int EspGetAnmAddr(int id, cAnm** ppAnm)
 // 1 when effect texture `id` is registered.
 int EspChkTexId(int id)
 {
-    EspTexWk* w = &g_pEspSys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &g_pEspSys->Esp_tex_tbl[id];
 
     if (w->Owner == EFF_NONE) {
         return 0;
@@ -574,7 +574,7 @@ static void EspCalcTplAddr(TEXPalette* tpl)
 int espTexRegist(TEXPalette* tpl, cAnm* anm, u8 id, u32 owner)
 {
     cEspSystem* sys = g_pEspSys;
-    EspTexWk* w = &sys->Esp_tex_tbl[id];
+    ESP_TEX_WK* w = &sys->Esp_tex_tbl[id];
     TEXDescriptor* desc;
     TEXHeader* hdr;
     GXTexObj* obj;
@@ -799,7 +799,7 @@ int efmRegist(void* model, void* tpl, void* mot, void* x, u8 id, u32 owner)
 int espTexRelease(u32 owner)
 {
     cEspSystem* sys = g_pEspSys;
-    EspTexWk* w = sys->Esp_tex_tbl;
+    ESP_TEX_WK* w = sys->Esp_tex_tbl;
     u32 i;
     u32 j;
     u32 start;

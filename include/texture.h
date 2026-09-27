@@ -37,22 +37,22 @@ struct TexOfsTbl {
 };
 
 // One registered texture set (0x54 bytes).
-struct TexWk {
+typedef struct tagTEX_WK {
     GXTexObj* pTex_obj_start;   // 0x00  first of nTex objects pulled from cTexSys::pTexObj
     u16 nTexObj;            // 0x04
     u8 pad_6[2];
     GXTlutObj tlut;      // 0x08
     TEXHeader* texHdr;   // 0x14  header of texture 0
     Mtx _Mtx;             // 0x18
-    TEXPalette* pTpl;    // 0x48
-    TexAnm* pAnm;        // 0x4C
+    TEXPalette* Tpl_addr;    // 0x48
+    TexAnm* Anm_addr;        // 0x4C
     u32 Owner;           // 0x50  0 = free
-};
+} TEX_WK;
 
 // game/texture.cpp
 class cTexSys {
 private:
-    TexWk m_texw_array[256];       // 0x0000
+    TEX_WK m_texw_array[256];       // 0x0000
 public:
     GXTexObj* pTexObj;   // 0x5400  nTexObj objects
     u8* pFlag;           // 0x5404  in-use bits
@@ -74,7 +74,7 @@ public:
     int GetTexObj(u32 id, u32 no, GXTexObj** texobj);
     int GetAnmAddr(u32 id, TexAnm** anm);
     int GetTlutObj(u32 id, GXTlutObj** out);
-    TexWk* GetTexWk(u32 id, int bNoDispErrMsg);
+    TEX_WK* GetTexWk(u32 id, int bNoDispErrMsg);
     int TexRelease(u32 owner);
 };
 

@@ -336,7 +336,7 @@ void Esp18_Trans(cEsp18* esp)
         stages++;
         {
             int no = esp->m_Tex_id;
-            EspTexWk* tw = EspGetTexWk(no, 1);
+            ESP_TEX_WK* tw = EspGetTexWk(no, 1);
             if (tw->Owner == EFF_NONE) {
                 pLog->err(0, 0, "ESP : TexId[%x] no data", no);
             } else {

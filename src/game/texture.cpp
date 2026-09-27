@@ -43,7 +43,7 @@ void cTexSys::Init(const char* name, u32 max)
 void cTexSys::Clear()
 {
     u32 i;
-    TexWk* w = m_texw_array;
+    TEX_WK* w = m_texw_array;
 
     for (i = 0; i < 256; i++, w++) {
         w->Owner = 0;
@@ -179,7 +179,7 @@ void cTexSys::CalcTplAddr(TEXPalette* tpl)
 // optional LOD setup. 0 when the id is taken (error when `check`) or the pool is full.
 int cTexSys::TexRegist(TEXPalette* tpl, TexAnm* anm, u8 id, u32 owner, int clamp, int check)
 {
-    TexWk* w = &m_texw_array[id];
+    TEX_WK* w = &m_texw_array[id];
     TEXDescriptor* desc;
     TEXHeader* hdr;
     GXTexObj* obj;
@@ -200,9 +200,9 @@ int cTexSys::TexRegist(TEXPalette* tpl, TexAnm* anm, u8 id, u32 owner, int clamp
         return 0;
     }
     w->texHdr = desc->textureHeader;
-    w->pAnm = anm;
+    w->Anm_addr = anm;
     w->Owner = owner;
-    w->pTpl = tpl;
+    w->Tpl_addr = tpl;
     for (i = 0; i < w->nTexObj; i++) {
         obj = &w->pTex_obj_start[i];
         desc = TEXGet(tpl, i);
@@ -236,19 +236,19 @@ int cTexSys::TexRegist(TEXPalette* tpl, TexAnm* anm, u8 id, u32 owner, int clamp
 // TPL of texture `id`; 0 when unregistered.
 int cTexSys::GetTplAddr(u32 id, TEXPalette** tpl_addr)
 {
-    TexWk* w = &m_texw_array[id];
+    TEX_WK* w = &m_texw_array[id];
 
     if (w->Owner == 0) {
         return 0;
     }
-    *tpl_addr = w->pTpl;
+    *tpl_addr = w->Tpl_addr;
     return 1;
 }
 
 // GX texture object `no` (animation frame) of texture `id`; 0 when unregistered.
 int cTexSys::GetTexObj(u32 id, u32 no, GXTexObj** texobj)
 {
-    TexWk* w = &m_texw_array[id];
+    TEX_WK* w = &m_texw_array[id];
 
     if (w->Owner == 0) {
         return 0;
@@ -260,19 +260,19 @@ int cTexSys::GetTexObj(u32 id, u32 no, GXTexObj** texobj)
 // Animation table of texture `id`; 0 when unregistered.
 int cTexSys::GetAnmAddr(u32 id, TexAnm** anm)
 {
-    TexWk* w = &m_texw_array[id];
+    TEX_WK* w = &m_texw_array[id];
 
     if (w->Owner == 0) {
         return 0;
     }
-    *anm = w->pAnm;
+    *anm = w->Anm_addr;
     return 1;
 }
 
 // Palette object of a CI texture `id`; 0 when unregistered or not paletted.
 int cTexSys::GetTlutObj(u32 id, GXTlutObj** out)
 {
-    TexWk* w = &m_texw_array[id];
+    TEX_WK* w = &m_texw_array[id];
 
     if (w->Owner == 0) {
         return 0;
@@ -286,9 +286,9 @@ int cTexSys::GetTlutObj(u32 id, GXTlutObj** out)
 }
 
 // The registry slot of texture `id`, NULL (error unless `quiet`) when unregistered.
-TexWk* cTexSys::GetTexWk(u32 id, int bNoDispErrMsg)
+TEX_WK* cTexSys::GetTexWk(u32 id, int bNoDispErrMsg)
 {
-    TexWk* w = &m_texw_array[id];
+    TEX_WK* w = &m_texw_array[id];
 
     if (w->Owner != 0) {
         return w;
@@ -302,7 +302,7 @@ TexWk* cTexSys::GetTexWk(u32 id, int bNoDispErrMsg)
 // Unregisters every texture of `owner` and frees its pool objects. Returns the count released.
 int cTexSys::TexRelease(u32 owner)
 {
-    TexWk* w;
+    TEX_WK* w;
     u32 i;
     u32 j;
     u32 base;
