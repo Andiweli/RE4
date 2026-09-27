@@ -6,11 +6,12 @@
 #include "obj.h"
 
 class cSubWep : public cObj {
-public:
+protected:
     u32 effType;          // 0x328  landing effect (AtEffInfo pair by type; 0xD2 = none)
     u8 effId;             // 0x32C  (PS2 EST_ID effId)
     u8 pad_32D[3];
     s32 effFlag;          // 0x330  AtEffInfo::flags of the hit (bit31 set when known, bit0: solid ground)
+public:
     u32* pMot;            // 0x334
     u32 mot_attr;         // 0x338
     Vec rot_spd;          // 0x33C

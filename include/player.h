@@ -40,14 +40,20 @@ public:
 
 // Waist control (game/pl_class.cpp), 0xC bytes at cEm::pWaist.
 class cPlWaist {
-public:
+private:
     Vec m_Ang;                   // 0x00  waist twist angles; only .y (the current angle) is used (PS2 m_Ang)
 
+public:
     cPlWaist();
     // cur = cur * (1 - rate) + target * rate; returns the delta applied
     f32 set(f32 dir, f32 rate);
     void reset() { m_Ang.y = 0.0f; }
     operator f32() { return m_Ang.y; }
+    cPlWaist& operator=(f32 ang)
+    {
+        m_Ang.y = ang;
+        return *this;
+    }
 
     static const f32 ROT_LIMIT;   // pl_class.cpp (.sdata2), unused there
 };
