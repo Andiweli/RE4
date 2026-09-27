@@ -44,7 +44,7 @@ EmBarredFunc EmBarred_R1_move_tbl[4] = {
 cEmBarred* SetEmBarred(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo, int type)
 {
     cEmBarred* em;
-    EmBarredWork* w;
+    FREE_EMBARRED* w;
     u16* flg;
     cParts* parts;
     u32 i;
@@ -252,7 +252,7 @@ cEmBarred* SetEmBarred(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo, int
 // spark est (1 near / 0 far) by weapon class.
 void emBarredDmCk(cEmBarred* pEm)
 {
-    EmBarredWork* w = EMBARRED_WK(pEm);
+    FREE_EMBARRED* w = EMBARRED_WK(pEm);
     YARARE_INFO* part;
     cParts* parts;
     u16* flg;
@@ -382,7 +382,7 @@ void cEmBarred::move()
 // (Rno3) 1 = silent (the paired gate of setDouble).
 void cEmBarred::setOpen(int mode)
 {
-    EmBarredWork* w = EMBARRED_WK(this);
+    FREE_EMBARRED* w = EMBARRED_WK(this);
 
     if (w->Status == 1) {
         return;
@@ -404,7 +404,7 @@ void cEmBarred::setOpen(int mode)
 // Script entry: starts lowering the gate (Rno1 2) unless already closed / closing / broken.
 void cEmBarred::setClose(int mode)
 {
-    EmBarredWork* w = EMBARRED_WK(this);
+    FREE_EMBARRED* w = EMBARRED_WK(this);
 
     if (w->Status == 2) {
         return;
@@ -426,7 +426,7 @@ void cEmBarred::setClose(int mode)
 // Script entry: snaps the gate to fully open (2500 above pos0) without animation.
 void cEmBarred::setOpened()
 {
-    EmBarredWork* w = EMBARRED_WK(this);
+    FREE_EMBARRED* w = EMBARRED_WK(this);
 
     if (r_no_1 != 3) {
         w->Status = 1;
@@ -443,7 +443,7 @@ void cEmBarred::setOpened()
 // Script entry: snaps the gate shut at pos0.
 void cEmBarred::setClosed()
 {
-    EmBarredWork* w = EMBARRED_WK(this);
+    FREE_EMBARRED* w = EMBARRED_WK(this);
 
     if (r_no_1 != 3) {
         w->Status = 2;
@@ -483,7 +483,7 @@ int cEmBarred::ckOpen()
 // locked or setNoClose; a setDouble partner is driven along.
 void emBarred_R1_Set(cEmBarred* pEm)
 {
-    EmBarredWork* w = EMBARRED_WK(pEm);
+    FREE_EMBARRED* w = EMBARRED_WK(pEm);
 
     pEm->matUpdate();
     if (pEm->r_no_2 == 0) {
@@ -525,7 +525,7 @@ void emBarred_R1_Set(cEmBarred* pEm)
 // type 4; types 5 / 6 slide sideways instead) to pos0.y + Height, a 5 frame rattle, then Status 1.
 void emBarred_R1_Open(cEmBarred* pEm)
 {
-    EmBarredWork* w = EMBARRED_WK(pEm);
+    FREE_EMBARRED* w = EMBARRED_WK(pEm);
     Vec v;
     f32 d;
 
@@ -641,7 +641,7 @@ void emBarred_R1_Open(cEmBarred* pEm)
 // (emBarredUnderCk) is hit; slam SE, a short rattle, then Status 2.
 void emBarred_R1_Close(cEmBarred* pEm)
 {
-    EmBarredWork* w = EMBARRED_WK(pEm);
+    FREE_EMBARRED* w = EMBARRED_WK(pEm);
     Vec d;
 
     w->Status = 0;
@@ -779,7 +779,7 @@ void emBarred_R1_Close(cEmBarred* pEm)
 // bit0 of the etc flag.
 void emBarred_R1_Break(cEmBarred* pEm)
 {
-    EmBarredWork* w = EMBARRED_WK(pEm);
+    FREE_EMBARRED* w = EMBARRED_WK(pEm);
     u16* flg;
 
     if (pEm->r_no_2 == 0) {
@@ -800,7 +800,7 @@ void emBarred_R1_Break(cEmBarred* pEm)
 // gate only deactivates them and lets the player through.
 void emBarredEatSet(cEmBarred* pEm)
 {
-    EmBarredWork* w = EMBARRED_WK(pEm);
+    FREE_EMBARRED* w = EMBARRED_WK(pEm);
     Vec poly[4];
     u16* flg;
     f32 hx;
@@ -989,7 +989,7 @@ void emBarredEatSet(cEmBarred* pEm)
 // within 2500 units of pos0 (3500 while open, hysteresis); 0 for other types or when locked.
 int emBarredNearCk(cEmBarred* pEm)
 {
-    EmBarredWork* w = EMBARRED_WK(pEm);
+    FREE_EMBARRED* w = EMBARRED_WK(pEm);
     f32 r2;
     f32 d;
     u32 i;
@@ -1047,7 +1047,7 @@ void cEmBarred::setEff(u8 eff_id)
 // Script / explosion entry: blows the gate out toward `target` (est 3 of Eff_id) and goes to Break.
 void cEmBarred::setBreak(Vec* pPos)
 {
-    EmBarredWork* w = EMBARRED_WK(this);
+    FREE_EMBARRED* w = EMBARRED_WK(this);
     Vec v;
     f32 ang;
 
@@ -1080,7 +1080,7 @@ void cEmBarred::setNoClose()
 // Pairs two gates so the proximity logic of one opens / closes the other.
 void cEmBarred::setDouble(cEmBarred* other)
 {
-    EmBarredWork* w = EMBARRED_WK(this);
+    FREE_EMBARRED* w = EMBARRED_WK(this);
 
     if (other) {
         w->pBarred = other;
@@ -1099,7 +1099,7 @@ void cEmBarred::setUnderCk()
 // and not for the proximity types.
 int emBarredUnderCk(cEmBarred* pEm)
 {
-    EmBarredWork* w = EMBARRED_WK(pEm);
+    FREE_EMBARRED* w = EMBARRED_WK(pEm);
     Mtx m;
     Vec v;
     u32 i;

@@ -5,7 +5,7 @@
 #include "vec.h"
 #include "area.h"
 
-// Per-type payload of a floor attribute record (FlrAt + 0x44), one view per FlrAt::id. Names and
+// Per-type payload of a floor attribute record (FLR_AT_DATA + 0x44), one view per FLR_AT_DATA::id. Names and
 // layouts are the PS2 FLR_AT_SE_TYPE / FLR_AT_SE_VOLCTRL / FLR_AT_BGM_VOL / FLR_AT_THUNDER_VOL.
 struct FLR_AT_SE_TYPE {         // id 0 (foot SE)
     u8 se_type;                 // 0x00  foot SE variation (snd.cpp: SE number += se_type * 30)
@@ -34,7 +34,7 @@ struct FLR_AT_THUNDER_VOL {     // id 3 (thunder volume)
 };
 
 // Floor attribute record returned by FlrAtCheck (game/flr_at.cpp), 0x84 bytes (PS2 FLR_AT_DATA).
-struct FlrAt {
+struct FLR_AT_DATA {
     u8 flag;         // 0x00  bit0: active (FlrAtOn / FlrAtOff)  (PS2 be_flg)
     u8 type;         // 0x01  attribute type asked for in FlrAtCheck  (PS2 id)
     u8 no;           // 0x02  record index; (type 2) the BGM control id snd.cpp remembers  (PS2 no)
@@ -51,7 +51,7 @@ struct FlrAt {
     };
 };
 
-// "FSE" room file header (pG->pRoomArc), followed by the FlrAt records at 0x10 (PS2 FLR_AT_HEADER).
+// "FSE" room file header (pG->pRoomArc), followed by the FLR_AT_DATA records at 0x10 (PS2 FLR_AT_HEADER).
 struct FlrAtHead {
     char magic[4];   // 0x00  "FSE"
     u16 version;     // 0x04  0x103
@@ -65,7 +65,7 @@ struct FlrAtHead {
 // Floor system work (`pFlrSys` -> FlrAt_sys, 0x8C bytes).
 struct FlrSys {
     void* pData;         // 0x00  room floor attribute data (NULL when the room has none)
-    FlrAt* pList;        // 0x04  its records
+    FLR_AT_DATA* pList;        // 0x04  its records
     u8 group;            // 0x08  current group (0xFF = any)
     u8 foot_se[0x41];    // 0x09  foot SE variation per material (FlrAtSetDefVal a)
     u8 foot_esp[0x42];   // 0x4A  foot effect per material (FlrAtSetDefVal b)
@@ -73,7 +73,7 @@ struct FlrSys {
 
 extern FlrSys* pFlrSys;
 
-FlrAt* FlrAtCheck(int id, Vec* pos, int flag);
+FLR_AT_DATA* FlrAtCheck(int id, Vec* pos, int flag);
 
 extern "C" {
 void FlrAtInit();

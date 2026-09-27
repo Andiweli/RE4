@@ -34,16 +34,16 @@ void FlrAtInit()
         return;
     }
     pFlrSys->pData = p;
-    pFlrSys->pList = (FlrAt*) (p + 1);
+    pFlrSys->pList = (FLR_AT_DATA*) (p + 1);
 }
 
 // Returns the enabled floor attribute of `type` whose area contains pos (+300 y) and whose group
 // matches the current group (0xFF = any); NULL outside the main game step (Rno0 != 3), during
 // Status_flg[0] 0x10000000, or when none hits.
-FlrAt* FlrAtCheck(int id, Vec* pos, int flag)
+FLR_AT_DATA* FlrAtCheck(int id, Vec* pos, int flag)
 {
     Vec p;
-    FlrAt* at;
+    FLR_AT_DATA* at;
     u32 i;
     int hit = 0;
 

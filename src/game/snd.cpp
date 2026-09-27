@@ -438,10 +438,10 @@ int sndWallCheckSub(Vec* pos)
 }
 
 // SEs flagged se_flag 0x20 drop to volume 1 when the player stands in a volume-control floor area
-// (FlrAt kind 1) that does not contain the source.
+// (FLR_AT_DATA kind 1) that does not contain the source.
 void sndVolCtrlAtCheck(SND_SIT* pSit, u8* vol, u8* svol, Vec* pos)
 {
-    FlrAt* at;
+    FLR_AT_DATA* at;
 
     if (pos == NULL) {
         return;
@@ -464,7 +464,7 @@ void sndVolCtrlAtCheck(SND_SIT* pSit, u8* vol, u8* svol, Vec* pos)
     }
 }
 
-// While the player is in an "inner" floor area (FlrAt kind 3), SEs with inner_vol are scaled by
+// While the player is in an "inner" floor area (FLR_AT_DATA kind 3), SEs with inner_vol are scaled by
 // that percent. Returns 1 when applied.
 int sndInnerVolCheck(SND_SIT* pSit, u8* vol, u8* svol)
 {
@@ -495,7 +495,7 @@ void seRandomCheck(int blk, u16* no);
 // effect for 0..3, else the floor system default); then the random table and existence check.
 int footSeCheck(u16* call_no, Vec* pos)
 {
-    FlrAt* at;
+    FLR_AT_DATA* at;
     int ret;
 
     if (pos != NULL) {
@@ -615,7 +615,7 @@ int wepSeCheck(u16* call_no, Vec* pos)
     int ret;
 
     if (pos != NULL && *call_no == 0xF) {
-        FlrAt* at = FlrAtCheck(0, pos, 4);
+        FLR_AT_DATA* at = FlrAtCheck(0, pos, 4);
         if (at != NULL) {
             *call_no += at->se.cartridge_type;
         } else if (pFlrSys->pData != NULL) {
@@ -1345,7 +1345,7 @@ void debugDisp();
 void SndWatcher()
 {
     u32 i;
-    FlrAt* at;
+    FLR_AT_DATA* at;
     FLR_AT_BGM_VOL* b;
 
     if (StaFlagChk(pG, STA_MOVIE_ON)) {

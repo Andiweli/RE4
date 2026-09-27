@@ -337,11 +337,11 @@ static inline void EspEatEffectMessage(int type)
     }
 }
 
-// 1 when the hit point lies on a near-horizontal floor whose FlrAt entry is marked as a puddle (se.eff_type 1).
+// 1 when the hit point lies on a near-horizontal floor whose FLR_AT_DATA entry is marked as a puddle (se.eff_type 1).
 int EspChkInPuddle(Vec* pos, Vec* nor)
 {
     if (nor->y > 0.9f) {
-        FlrAt* at = FlrAtCheck(0, pos, 1);
+        FLR_AT_DATA* at = FlrAtCheck(0, pos, 1);
 
         if (at != NULL && at->se.eff_type == 1) {
             return 1;

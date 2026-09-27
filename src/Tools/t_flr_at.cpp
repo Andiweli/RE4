@@ -22,7 +22,7 @@
 
 int SetToolLight(int no);  // db_light_tools.cpp
 
-// Tool-side view of the FlrAt record (flr_at.h), 0x84 bytes.
+// Tool-side view of the FLR_AT_DATA record (flr_at.h), 0x84 bytes.
 struct TFlrAt {
     u8 be_flg;        // 0x00  bit 0 enabled, bit 1 created
     u8 id;         // 0x01  0 foot SE, 1 SE volume, 2 BGM volume, 3 thunder volume
@@ -126,7 +126,7 @@ static void preview_main();
 static void preview_exit();
 
 // Tool start: default tool flags (pause, debug displays, tool light 1), the work allocated, the
-// room's FlrAt system pointer saved (the tool installs its own records), start with DATA LOAD.
+// room's FLR_AT_DATA system pointer saved (the tool installs its own records), start with DATA LOAD.
 void flrAtInit()
 {
     int zero = 0;
@@ -165,7 +165,7 @@ void flrAtInit()
     pW->editType = -1;
 }
 
-// EXIT: restores the FlrAt system pointer, the tool light and flags, frees the work, ends the task.
+// EXIT: restores the FLR_AT_DATA system pointer, the tool light and flags, frees the work, ends the task.
 static void flrAtExit()
 {
     pG->Disp_flg = pW->saveDisp;
@@ -922,7 +922,7 @@ static inline u8 flrAtColU8(int c)
 
 // DATA LOAD: picks server (d:) / local (x:), stage and room with the d-pad, "DATA LOAD OK?" YES/NO;
 // reads r<room>.fse into the records (all, or only the edit type's) and installs them as the room's
-// FlrAt data.
+// FLR_AT_DATA data.
 static void flrAtDataLoad()
 {
     const char* title[3] = {"[ALL DATA LOAD]", "[SE DATA LOAD]", "[BGM DATA LOAD]"};
@@ -1268,7 +1268,7 @@ static void preview_init()
     DbgFlagOff(pG, DBG_DBG_CAM);
     pFlrSys = &pW->flrSys;
     pFlrSys->pData = &pW->head;
-    pFlrSys->pList = (FlrAt*) pW->area;
+    pFlrSys->pList = (FLR_AT_DATA*) pW->area;
     pFlrSys->group = 0xFF;
     pW->sub = 1;
     pW->step = 0;
