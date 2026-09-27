@@ -1101,9 +1101,9 @@ void cEsp::Destruct()
 // Core_flg bit 0 (kept through pauses). Returns 1 with *out = the esp, 0 (with the dummy) on error.
 int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend)
 {
-    EspSeqData* head;
+    cEspSeqHead* head;
     cEspSeqTbl* rec;
-    EspInfo info;
+    cEffectCore info;
     Mtx m;
     u8 type;
 
@@ -1117,7 +1117,7 @@ int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend)
         return 0;
     }
     u32 seed = 0x12345678;
-    rec = &head->rec[no];
+    rec = &head->SeqTbl[no];
     type = rec->Kind;
     if (type != 0) {
         if (type == 1) {
@@ -1138,8 +1138,8 @@ int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend)
 // Creates one esp from an effect record (Id 0xFC..0xFF are effect models, made by EfmSeqSet): copies
 // the record, resolves the parent, runs the id's SetFreeWork and applies the EspSeqOpt overrides.
 // Returns 1 with the new esp, or 0 with the dummy esp on failure.
-int EspSeqSet(cEspSeqTbl* pSeq, EspInfo* pCore, u32* pRand_seed, cModel* pMod, Mtx* pMat, int flg, f32 f, cEsp** ppEsp,
-              EspSeqOpt* pSct, Vec* pOffset)
+int EspSeqSet(cEspSeqTbl* pSeq, cEffectCore* pCore, u32* pRand_seed, cModel* pMod, Mtx* pMat, int flg, f32 f, cEsp** ppEsp,
+              ESPSEQ_CONTROL* pSct, Vec* pOffset)
 {
     static int bl[6][4] = {
         {1, 4, 5, 0}, {1, 4, 1, 0}, {1, 1, 1, 0}, {1, 2, 1, 0}, {1, 2, 0, 0}, {1, 4, 3, 0},

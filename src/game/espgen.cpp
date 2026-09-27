@@ -33,10 +33,10 @@ void EspgenIncCallNo();
 int EspgenApplyFunc(void (*func)(EspgenWork* w));
 
 // generator entry points (game/espgen0*.cpp, Espgen4*.cpp)
-int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag);
-int Espgen02_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag);
+int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
+int Espgen02_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
 }
 // game/espgen40.cpp (declared with the record type in the original)
 void Espgen40_Move(cEspSeqTbl* gen);
@@ -508,7 +508,7 @@ int EspgenDispInfo()
     return 1;
 }
 
-// Current effect call number (g_Call_no, stamped into EspInfo::Call_no by est.cpp).
+// Current effect call number (g_Call_no, stamped into cEffectCore::Call_no by est.cpp).
 int EspgenGetCallNo()
 {
     return g_Call_no;
@@ -536,8 +536,8 @@ int EspgenApplyFunc(void (*func)(EspgenWork* w))
 
 // Runs the id's SetFreeWork entry (generic table with `flag`, application table without) to fill a
 // freshly pulled controller from its record; returns its result (1 when the id has no entry).
-int EspgenSetFreeWork(EspgenWork* pEspgen, cEspSeqTbl* pSeq, EspSeqData* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
-                      Vec* pOffset, Vec* pAng, EspSeqOpt* pSct, int bUseOffset)
+int EspgenSetFreeWork(EspgenWork* pEspgen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
+                      Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct, int bUseOffset)
 {
     int ret = 1;
     u32 max = GetEspgenIdMax();
@@ -560,10 +560,10 @@ int EspgenSetFreeWork(EspgenWork* pEspgen, cEspSeqTbl* pSeq, EspSeqData* pSeqHed
 // type (0xFF is the special "set generator loop count" record, EspGenSetMoveLoop), the owner info is
 // copied from `info`, then SetFreeWork fills it. Returns 0 (controller released) on a bad id, a full
 // pool or a SetFreeWork failure.
-int EspgenSeqSet(EspSeqData* pSeqHed, int seq_ptr, EspInfo* pCore, cModel* pMod, u16 Null_parts_no, Mtx* pMat, Vec* pOffset, Vec* pAng,
-                 EspSeqOpt* pSct, int bUseOffset)
+int EspgenSeqSet(cEspSeqHead* pSeqHed, int seq_ptr, cEffectCore* pCore, cModel* pMod, u16 Null_parts_no, Mtx* pMat, Vec* pOffset, Vec* pAng,
+                 ESPSEQ_CONTROL* pSct, int bUseOffset)
 {
-    cEspSeqTbl* rec = &pSeqHed->rec[seq_ptr];
+    cEspSeqTbl* rec = &pSeqHed->SeqTbl[seq_ptr];
     EspgenWork* w;
     u32 max = GetEspgenIdMax();
 

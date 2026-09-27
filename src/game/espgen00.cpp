@@ -42,8 +42,8 @@ struct Espgen00Work {
     u8 spdD;           // 0x79
     u8 colD;           // 0x7A
     u8 waitD;          // 0x7B
-    EspSeqOpt opt;     // 0x7C
-    EspSeqOpt* pOpt;   // 0x98
+    ESPSEQ_CONTROL opt;     // 0x7C
+    ESPSEQ_CONTROL* pOpt;   // 0x98
 };
 
 // Rebuilds the emitter matrix from parts `parts` of pMod (parts rotation + Offset/Ang), once when
@@ -256,9 +256,9 @@ void Espgen00_Move(EspgenWork* pEspgen)
 // Fills the emitter from the controller record: life (Espgen_work16[0]), wait (x10C), num (x10D),
 // the D curves (Espgen_work8_2), Espgen_flg, random wait range; head flag bit 0 keeps following the
 // parts, `flag` == 1 passes the position on to the children; fixed seed 0x12345678+x10E when Flg
-// bit 1. Copies the optional EspSeqOpt. Always returns 1.
-int Espgen00_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag)
+// bit 1. Copies the optional ESPSEQ_CONTROL. Always returns 1.
+int Espgen00_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag)
 {
     Espgen00Work* p = (Espgen00Work*) w->work;
 

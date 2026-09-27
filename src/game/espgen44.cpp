@@ -42,8 +42,8 @@ void Espgen44_Destruct(EspgenWork* pGen)
 // Programs the filter from the record: level = Work8[0]*100+100, colour Col_start_rgba, Col_d_a,
 // scale = Size_base_x*0.005; Filter05 (Id 0) takes Blend_type and kind Tex_id, Filter06 takes
 // Speed/R_speed as vectors and kind Work8[1].
-int Espgen44_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, EspSeqData* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
-                         Vec* pOffset, Vec* pAng, EspSeqOpt* pSct)
+int Espgen44_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
+                         Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct)
 {
     Espgen44Work* p = (Espgen44Work*) pGen->work;
     if (pSeq->Id == 0) {

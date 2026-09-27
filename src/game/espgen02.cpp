@@ -43,8 +43,8 @@ struct Espgen02Work {
     u8 D_speed;           // 0x79
     u8 D_alpha;           // 0x7A
     u8 D_inter;          // 0x7B
-    EspSeqOpt opt;     // 0x7C
-    EspSeqOpt* pOpt;   // 0x98
+    ESPSEQ_CONTROL opt;     // 0x7C
+    ESPSEQ_CONTROL* pOpt;   // 0x98
     u8 PathOwner;         // 0x9C
     u8 PathId;         // 0x9D
     u8 Start_ratio;        // 0x9E position along the path in 1/100
@@ -409,8 +409,8 @@ void Espgen02_Move(EspgenWork* pEspgen)
 // Fills the path emitter from the record: the espgen00 fields plus path group/id
 // (Espgen_work8_4[0..1]), Start_ratio/Rnd_ratio (percent), PathRot_x/y and mode (Espgen_work8_3[1..3]),
 // and PathScale = 1 + Espgen_vec0/10 when non-zero. Always returns 1.
-int Espgen02_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag)
+int Espgen02_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag)
 {
     Espgen02Work* p = (Espgen02Work*) w->work;
 

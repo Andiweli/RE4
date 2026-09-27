@@ -640,7 +640,7 @@ int estRegist(void* data, void* list, u32 owner)
 // The est record block of est `id` of `owner` (EstSet's data): looks the id up in the owner's
 // list and returns the data at its offset; NULL (error unless quiet) for a bad owner, an owner
 // without data or an unknown id. Debug_flg[2] 0x80 logs every est call except core est 6.
-EspSeqData* EspGetEstAddr(u32 owner, int id, int NoErrDisp)
+cEspSeqHead* EspGetEstAddr(u32 owner, int id, int NoErrDisp)
 {
     cEspSystem* sys = g_pEspSys;
     SstTbl* t;
@@ -682,7 +682,7 @@ EspSeqData* EspGetEstAddr(u32 owner, int id, int NoErrDisp)
         }
     }
     ofs = t->data->ofs;
-    return (EspSeqData*) ((u8*) t->data + ofs[no]);
+    return (cEspSeqHead*) ((u8*) t->data + ofs[no]);
 }
 
 // The effect path data of path `id` of `owner` (esp06 / espgen02 movement paths); NULL with an

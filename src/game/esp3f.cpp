@@ -59,7 +59,7 @@ void cEsp3f::Destruct()
 // Allocates a buffer of `num` elements of `size` bytes: `per` elements fit one child (0x58 bytes),
 // so num / per + 1 children are pulled (max 0x12, else an error). Returns 1 and the parent in
 // *out; on any pool failure everything pulled so far is released and 0 returned.
-int Esp3f_Alloc(u32 WorkSize, u32 Num, cEsp3f** ppEsp, EspInfo* pEff_core)
+int Esp3f_Alloc(u32 WorkSize, u32 Num, cEsp3f** ppEsp, cEffectCore* pEff_core)
 {
     cEsp* dmy = EspGetDmyPtr();
     u32 per = 0x58 / WorkSize;

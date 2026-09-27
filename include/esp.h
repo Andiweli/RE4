@@ -28,7 +28,7 @@ union EspGenPrm {
 };
 
 // Effect generator record (game/eff_sys.cpp, game/espgen*.cpp): one 0x12C byte entry of an
-// EspSeqData. GC types kept where the PS2 byte is signed.
+// cEspSeqHead. GC types kept where the PS2 byte is signed.
 struct cEspSeqTbl {
     u8 Be_flg;         // 0x00 (PS2 Be_flg)
     u8 Id;             // 0x01 esp id / generator sub type (PS2 Id)
@@ -86,7 +86,7 @@ struct cEspSeqTbl {
     Vec Vec1;          // 0xE4 (esp_efm: bounce) (PS2 Vec1)
     Vec Vec2;          // 0xF0 (esp_efm: burst centre random range; esp0e .z: visible cone angle in degrees) (PS2 Vec2)
     u8 WorkSp8[4];     // 0xFC ([3]: esp_efm obj04 motion type) (PS2 WorkSp8[4])
-    // 0x100..0x12C: sequence record tail (records of an EspSeqData are 0x12C bytes)
+    // 0x100..0x12C: sequence record tail (records of an cEspSeqHead are 0x12C bytes)
     u8 pad_100[0x104 - 0x100];
     u8 Espgen_work8_4[4]; // 0x104 (espgen02: path id, path number, path position offset, its random range) (PS2 Espgen_work8_4)
     u8 Kind;           // 0x108 0 = esp, 1 = espgen (PS2 Kind)
@@ -102,7 +102,7 @@ struct cEspSeqTbl {
 
 // Effect sequence data block: 0x30 byte header followed by 0x12C byte records (PS2 cEspSeqHead:
 // data_num[4], Flg, Null_parts_no, Offset, Ang, Ver_no, Core_flg, SeqTbl[]).
-struct EspSeqData {
+struct cEspSeqHead {
     u16 num;           // 0x00 number of records
     u8 pad_2[6];
     u16 flags;         // 0x08
@@ -114,7 +114,7 @@ struct EspSeqData {
     u8 pad0;           // 0x25 (PS2 pad0)
     u16 Core_flg;      // 0x26 (PS2 Core_flg)
     u32 pad1[2];       // 0x28 (PS2 pad1)
-    cEspSeqTbl rec[1]; // 0x30
+    cEspSeqTbl SeqTbl[1]; // 0x30
 };
 
 // Texture animation data returned by EspGetAnmAddr (eff_sys.cpp). Partial layout.
@@ -137,7 +137,7 @@ struct EspAnmData {
     u8 Frame_cnt[1];   // 0x10 pattern table: Frames entries, then the per-pattern display times (PS2 cAnm::Frame_cnt)
 };
 
-// Effect data owner: EspDataLoad/EspDataRelease/EspGetEstAddr/SstSet `owner`, EspInfo::owner. The names are
+// Effect data owner: EspDataLoad/EspDataRelease/EspGetEstAddr/SstSet `owner`, cEffectCore::owner. The names are
 // the PS2 ESP_OWNER enumerators; the values are the GC ones, i.e. the index of the same name in eff_sys.cpp
 // owner_name_tbl (the GC table has no EM3F/EM4E/EM4B/WEP51, so everything from WEP00 on sits 3 or 4 below
 // the PS2 value). SST/ITM/NONE/MAX follow from est.cpp (EstSet owner 0xD0, 0xD2 = free, tables of 0xD3).
@@ -364,7 +364,7 @@ enum ESP_OWNER {
     EFF_ET_IDEND = 195
 };
 
-// Effect core kind (PS2 ESP_CORE_KIND): EspInfo::Core_kind, SstSet/SetEspCore/PullEspEspgen `kind`.
+// Effect core kind (PS2 ESP_CORE_KIND): cEffectCore::Core_kind, SstSet/SetEspCore/PullEspEspgen `kind`.
 enum ESP_CORE_KIND {
     ESP_CORE_KIND_NONE = 0,
     ESP_CORE_KIND_SST = 1,
@@ -466,7 +466,7 @@ enum ESP_CORE_KIND {
 };
 
 // Effect owner info at the head of every cEsp (copied as a block by esp3f).
-struct EspInfo {
+struct cEffectCore {
     u16 Core_flg;            // 0x00
     u8 Core_kind;             // 0x02 ESP_CORE_KIND
     u8 owner;             // 0x03 ESP_OWNER
@@ -501,7 +501,7 @@ enum ESP_PARTS_NO {
 // One effect sprite (game/esp.cpp, game/esp_sub.cpp). sizeof 0xF8; the vptr sits at 0xF4.
 class cEsp {
 public:
-    EspInfo info;      // 0x00
+    cEffectCore info;      // 0x00
     u8 m_Be_flg;           // 0x0C bit0: in use
     u8 m_Id;             // 0x0D effect id
     u8 m_Tex_id;       // 0x0E texture animation id (EspGetAnmAddr; cEspSeqTbl Tex_id) (PS2 m_Tex_id)
@@ -589,7 +589,7 @@ public:
 
 // game/esp3f.cpp: vector buffer owned by an effect (see esp3f.cpp for the class)
 class cEsp3f;
-int Esp3f_Alloc(u32 WorkSize, u32 Num, cEsp3f** ppEsp, EspInfo* pEff_core);
+int Esp3f_Alloc(u32 WorkSize, u32 Num, cEsp3f** ppEsp, cEffectCore* pEff_core);
 Vec* Esp3f_GetVecPtr(cEsp3f* pEsp, u32 idx);
 
 // game/esp.cpp
@@ -631,7 +631,7 @@ void EspDrawLaserLine(Vec lpos, Vec lcross, f32 rate);
 int EspGetAnmAddr(int no, EspAnmData** ppAnm);
 void EspTexSet(int anmNo, int ptn);
 void* EspGetPathAddr(u32 owner, int id);
-struct EspSeqData* EspGetEstAddr(u32 owner, int id, int quiet);
+struct cEspSeqHead* EspGetEstAddr(u32 owner, int id, int quiet);
 void EspGenSetMoveLoop(int loop);
 void EspGenLoopMove();
 // game/path.cpp
@@ -646,7 +646,7 @@ int EspGetTplAddr(int no, void** pTpl_addr);
 void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void* g, void* h);
 }
 // game/est.cpp: the C++ overload the plain EstSet forwards to, with the est data block resolved.
-void EstSet(cModel* model, int no, Vec* pos, Vec* rot, EspSeqData* head, u16 e, u8 f, void* g, u32 owner, void* h);
+void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, void* h);
 // game/eff_sys.cpp
 int EspGenGetMoveLoop();
 extern cCoord* pEffParentWorld;

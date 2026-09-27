@@ -11,7 +11,7 @@
 
 // Optional 0x1C byte parameter block handed down the sequence calls (copied into the generator work)
 // (PS2 ESPSEQ_CONTROL, packed on GC).
-struct EspSeqOpt {
+struct ESPSEQ_CONTROL {
     u8 OverWrite_flg;  // 0x00 bit0: speed, bit1: size, bit2: colour replace the record's (esp_sub EspSeqSet)
     u8 Mul_flg;        // 0x01 same bits: multiply
     u8 Add_flg;        // 0x02 same bits: add
@@ -26,7 +26,7 @@ struct EspSeqOpt {
 };
 
 // Effect system work (game/eff_sys.cpp cEspSystem, g_pEspSys). Partial layout.
-// Room effect (sst) table entry: an effect list and the offsets of its EspSeqData blocks (game/est.cpp SstSet).
+// Room effect (sst) table entry: an effect list and the offsets of its cEspSeqHead blocks (game/est.cpp SstSet).
 struct SstList {
     u32 num;           // 0x00
     struct {
@@ -43,7 +43,7 @@ struct SstList {
 };
 struct SstData {
     u32 Num;            // 0x00  (PS2 ESP_COMMON_HEADER.Num)
-    u32 ofs[1];        // 0x04 byte offsets of the EspSeqData blocks from this header
+    u32 ofs[1];        // 0x04 byte offsets of the cEspSeqHead blocks from this header
 };
 struct SstTbl {
     SstData* data;     // 0x00
@@ -136,7 +136,7 @@ extern cEspSystem* g_pEspSys;
 // One effect generator instance (game/espgen.cpp array, stride 0xC8). Bytes 0x14.. are the
 // per-generator work (Espgen00Work, Espgen10Work, Espgen44Work, ...).
 struct EspgenWork {
-    EspInfo info;      // 0x00 owner info (copied from the parent by SetEspCore)
+    cEffectCore info;      // 0x00 owner info (copied from the parent by SetEspCore)
     u8 flag;           // 0x0C bit0: in use, bit1: delete requested
     u8 id;             // 0x0D generator id (index into the Espgen*Tbl tables)
     u8 Type;             // 0x0E  (PS2 cEspgen::Type; cEspSeqTbl Espgen_type)
@@ -146,10 +146,10 @@ struct EspgenWork {
     u8 work[0xC8 - 0x14];  // 0x14
 };
 
-// Effect controller 10 work (game/espgen10.cpp): plays an effect sequence (EspSeqData) record by
+// Effect controller 10 work (game/espgen10.cpp): plays an effect sequence (cEspSeqHead) record by
 // record. est.cpp EstSet fills it directly.
 struct Espgen10Work {
-    EspSeqData* head;  // 0x14
+    cEspSeqHead* head;  // 0x14
     cModel* pMod;     // 0x18
     u32 Guid_pMod;        // 0x1C model serial the controller was set up with
     u16 Time_cnt;           // 0x20 frame counter
@@ -161,8 +161,8 @@ struct Espgen10Work {
     Mtx Mat;           // 0x2C
     Vec Offset;           // 0x5C
     Vec Ang;           // 0x68
-    EspSeqOpt opt;     // 0x74 copy of the option block p8 points at
-    EspSeqOpt* p8;     // 0x90
+    ESPSEQ_CONTROL opt;     // 0x74 copy of the option block p8 points at
+    ESPSEQ_CONTROL* p8;     // 0x90
 };
 
 // Water surface work shared by generators 42 (room water, game/Espgen42.cpp) and 45 (weather water,
@@ -200,11 +200,11 @@ struct Espgen42Work {
 
 typedef void (*EspgenMoveFunc)(EspgenWork* w);
 typedef void (*EspgenTransFunc)(EspgenWork* w);
-typedef int (*EspgenSetFreeWorkFunc)(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts,
-                                     Mtx* mtx, Vec* pos, Vec* rot, EspSeqOpt* p8, int flag);
+typedef int (*EspgenSetFreeWorkFunc)(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts,
+                                     Mtx* mtx, Vec* pos, Vec* rot, ESPSEQ_CONTROL* p8, int flag);
 // the application generators (Espgen4x) take no flag argument
-typedef int (*EspgenSetFreeWorkAppFunc)(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model,
-                                        u16 parts, Mtx* mtx, Vec* pos, Vec* rot, EspSeqOpt* p8);
+typedef int (*EspgenSetFreeWorkAppFunc)(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model,
+                                        u16 parts, Mtx* mtx, Vec* pos, Vec* rot, ESPSEQ_CONTROL* p8);
 typedef void (*EspgenDestructFunc)(EspgenWork* w);
 
 extern "C" {
@@ -213,10 +213,10 @@ u32 GetEspgenIdMax();
 int PullEspgen(EspgenWork** ppEspgen);
 int PullEspgenFront(EspgenWork** ppEspgen);
 void PushEspgen(EspgenWork* pEspgen);
-int EspgenSetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                      Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag);
-int EspgenSeqSet(EspSeqData* head, int no, EspInfo* info, cModel* model, u16 parts, Mtx* mtx, Vec* pos, Vec* rot,
-                 EspSeqOpt* pSct, int flag);
+int EspgenSetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                      Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
+int EspgenSeqSet(cEspSeqHead* pSeqHed, int seq_ptr, cEffectCore* pCore, cModel* pMod, u16 Null_parts_no, Mtx* pMat, Vec* pOffset, Vec* pAng,
+                 ESPSEQ_CONTROL* pSct, int flag);
 void EspgenArrayClear();
 void EspgenDelete(int a, int b, void* c);
 void EspgenDeleteEvent();
@@ -224,8 +224,8 @@ int EspgenGetCallNo();
 void EspgenIncCallNo();
 
 // game/esp_sub.cpp
-int EspSeqSet(cEspSeqTbl* rec, EspInfo* info, u32* seed, cModel* model, Mtx* mtx, int flg, f32 f, cEsp** out,
-              EspSeqOpt* pSct, Vec* pos);
+int EspSeqSet(cEspSeqTbl* rec, cEffectCore* info, u32* seed, cModel* model, Mtx* mtx, int flg, f32 f, cEsp** out,
+              ESPSEQ_CONTROL* pSct, Vec* pos);
 
 // game/est.cpp: event model number -> model (Event::EspSetModelPtr fills it, effect records with Core_flg 0x1000 read it)
 class cEspEventModelList {
@@ -261,48 +261,48 @@ public:
 extern cEspEventModelList EspEvModList;
 
 // game/espgen10.cpp
-int EspgenDataSet(EspSeqData* head, int no, EspInfo* info, u32* seed, cModel* model, u16 parts, Mtx* mtx, Vec* pos,
-                  Vec* rot, EspSeqOpt* pSct, int flag);
+BOOL EspgenDataSet(cEspSeqHead* pSeqHed, u32 seq_ptr, cEffectCore* pCore, u32* pRand_seed, cModel* pMod, u16 Null_Parts_no, Mtx* pMat,
+                   Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct, BOOL bUseOffset);
 void SetEspCore(EspgenWork* pCore, int Core_flg, u32 Call_no, u8 Core_kind, void* Core_pEm, int owner);
 int PullEspEspgen(EspgenWork** ppEspgen, int Core_flg, int Core_kind, u32 Call_no, void* Core_pEm, int owner, int type);
 void Espgen10_Move(EspgenWork* pEspgen);
 
 // game/espgen00.cpp
 void Espgen00_Move(EspgenWork* pEspgen);
-int Espgen00_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag);
+int Espgen00_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
 
 // game/espgen01.cpp
 void Espgen01_Move(EspgenWork* pEspgen);
 void Espgen01_Trans(EspgenWork* pEspgen);
-int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag);
+int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
 
 // game/espgen02.cpp
 void Espgen02_Move(EspgenWork* pEspgen);
-int Espgen02_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag);
+int Espgen02_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
 
 // game/espgen44.cpp
 void Espgen44_Move(EspgenWork* pGen);
 void Espgen44_Trans(EspgenWork* pGen);
 void Espgen44_Destruct(EspgenWork* pGen);
-int Espgen44_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct);
+int Espgen44_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct);
 
 // game/Espgen42.cpp
 void Espgen42_Move(EspgenWork* pGen);
 void Espgen42_Trans(EspgenWork* pGen);
 void Espgen42_Destruct(EspgenWork* pGen);
-int Espgen42_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct);
+int Espgen42_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct);
 
 // game/Espgen43.cpp
 void Espgen43_Move(EspgenWork* pGen);
 void Espgen43_Trans(EspgenWork* pGen);
 void Espgen43_Destruct(EspgenWork* pGen);
-int Espgen43_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct);
+int Espgen43_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct);
 
 // game/espgen45.cpp
 void Espgen45_static_init();
@@ -321,8 +321,8 @@ void Estgen45SetParam(Esp4cWork* pFree);
 void Espgen45_Move(EspgenWork* pGen);
 void Espgen45_Trans(EspgenWork* pGen);
 void Espgen45_Destruct(EspgenWork* pGen);
-int Espgen45_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct);
+int Espgen45_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct);
 }
 
 // Debug tools (tools.cpp ToolArrayPush/ToolWorkPop): swap the espgen pool like EspArrayPush.

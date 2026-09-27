@@ -1136,8 +1136,8 @@ void Espgen42_Destruct(EspgenWork* pGen)
 
 // Espgen SetFreeWork for id 0x42: sets up the room water from the room's effect data. It needs
 // the noise texture 0xFE and runs one move step at once.
-int Espgen42_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, EspSeqData* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
-                         Vec* pOffset, Vec* pAng, EspSeqOpt* pSct)
+int Espgen42_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
+                         Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct)
 {
     Espgen42Work* p = (Espgen42Work*) pGen->work;
     Vec r;

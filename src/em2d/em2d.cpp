@@ -430,7 +430,7 @@ void em2dDmCk(cEm2d* em)
             EmDmBloodSet2(em, 0x25, 0x28, 0, 0, 0);
         }
         if (EmGetDmPos(em, &pos, &dir)) {
-            EspSeqData* seq = EspGetEstAddr(EFF_EM2D, 0x24, 1);
+            cEspSeqHead* seq = EspGetEstAddr(EFF_EM2D, 0x24, 1);
             if (seq) {
                 for (i = 0; i < seq->num; i++) {
                     if (EspEstSetSelect(EFF_EM2D, 0x24, i, &esp, 0)) {
@@ -462,7 +462,7 @@ void em2dDmCk(cEm2d* em)
             EmDmBloodSet2(em, 0x25, 0x22, 0, 0, 0);
         }
         if (EmGetDmPos(em, &pos, &dir)) {
-            EspSeqData* seq = EspGetEstAddr(EFF_EM2D, 0x25, 1);
+            cEspSeqHead* seq = EspGetEstAddr(EFF_EM2D, 0x25, 1);
             if (seq) {
                 for (i = 0; i < seq->num; i++) {
                     if (EspEstSetSelect(EFF_EM2D, 0x25, i, &esp2, 0)) {

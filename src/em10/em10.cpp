@@ -2118,7 +2118,7 @@ void em10BloodSet(cEm10* em, int near)
         case 0x28:
             EmDmBloodSet2(em, 0x10, 0x87, 0, 0, 0);
             if (EmGetDmPos(em, &pos, &dir2)) {
-                EspSeqData* est = EspGetEstAddr(EFF_EM10, 0x88, 1);
+                cEspSeqHead* est = EspGetEstAddr(EFF_EM10, 0x88, 1);
                 if (est) {
                     for (i = 0; i < est->num; i++) {
                         if (EspEstSetSelect(EFF_EM10, 0x88, i, &esp, 0)) {

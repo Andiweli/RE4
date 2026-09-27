@@ -4239,7 +4239,7 @@ address	size	section	unit	scope	name	demangled
 0x8012BCFC	0x34	.text	game/espgen45.cpp	global	Estgen45SetColor	Estgen45SetColor
 0x8012BD30	0x70	.text	game/espgen45.cpp	global	Estgen45SetParam	Estgen45SetParam
 0x8012BDA0	0x84	.text	game/est.cpp	global	EstSet	EstSet
-0x8012BE24	0x25C	.text	game/est.cpp	global	EstSet__FP6cModeliP3VecT2P10EspSeqDataUsUcPvUlT7	EstSet
+0x8012BE24	0x25C	.text	game/est.cpp	global	EstSet__FP6cModeliP3VecT2P11cEspSeqHeadUsUcPvUlT7	EstSet
 0x8012C080	0x108	.text	game/est.cpp	global	AreaSstSet	AreaSstSet
 0x8012C188	0x6C	.text	game/est.cpp	global	GetSstDispFlag	GetSstDispFlag
 0x8012C1F4	0xC4	.text	game/est.cpp	global	SetSstDispFlag	SetSstDispFlag
@@ -6329,7 +6329,7 @@ address	size	section	unit	scope	name	demangled
 0x801C4B10	0x44	.text	game/esp3f.cpp	global	Esp3f_Create__Fv	Esp3f_Create
 0x801C4B54	0x4	.text	game/esp3f.cpp	global	move__6cEsp3f	cEsp3f::move
 0x801C4B58	0x78	.text	game/esp3f.cpp	global	Destruct__6cEsp3f	cEsp3f::Destruct
-0x801C4BD0	0x18C	.text	game/esp3f.cpp	global	Esp3f_Alloc__FUlUlPP6cEsp3fP7EspInfo	Esp3f_Alloc
+0x801C4BD0	0x18C	.text	game/esp3f.cpp	global	Esp3f_Alloc__FUlUlPP6cEsp3fP11cEffectCore	Esp3f_Alloc
 0x801C4D5C	0x78	.text	game/esp3f.cpp	global	Esp3f_GetVecPtr__FP6cEsp3fUl	Esp3f_GetVecPtr
 0x801C4DD4	0x8	.text	game/esp3f.cpp	global	SetFreeWork__6cEsp3fP10cEspSeqTblPUl	cEsp3f::SetFreeWork
 0x801C4DDC	0x20	.text	game/esp3f.cpp	local	_._6cEsp3f	cEsp3f::~cEsp3f

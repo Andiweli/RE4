@@ -998,8 +998,8 @@ void Espgen45_Destruct(EspgenWork* pGen)
 
 // Builds the water from the effect record, registers g_pWater45 and runs the first move. Returns 0
 // when the noise texture 0xFE or memory is missing.
-int Espgen45_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, EspSeqData* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
-                         Vec* pOffset, Vec* pAng, EspSeqOpt* pSct)
+int Espgen45_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
+                         Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct)
 {
     Espgen42Work* p = (Espgen42Work*) pGen->work;
     Vec r;

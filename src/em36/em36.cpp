@@ -4183,7 +4183,7 @@ void em36SetHitMark(cEm36* em, int big)
     Vec lp2;
     Vec d;
     MtxPtr m;
-    EspSeqData* seq;
+    cEspSeqHead* seq;
     // The original zero-extends the u8 once (`clrlwi r30`) before both calls; a hard-register QImode variable
     // keeps the extension (combine drops it for a pseudo whose sets are the constants 3/4).
     register u8 kind asm("r30"); // COMPILER-DIFF: #2
@@ -4222,7 +4222,7 @@ void em36SetHitMark(cEm36* em, int big)
     seq = EspGetEstAddr(EFF_EM36, kind, 1);
     if (seq) {
         for (i = 0; i < seq->num; i++) {
-            cEspSeqTbl* r = &seq->rec[i];
+            cEspSeqTbl* r = &seq->SeqTbl[i];
 
             r->Pos = lp;
             r->Parts_no = part->parts_no - 1;

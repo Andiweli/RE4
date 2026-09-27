@@ -42,8 +42,8 @@ extern "C" {
 void espgen01_Move00(EspgenWork* w);
 void espgen01_Move01(EspgenWork* w);
 void SetEsp(EspgenWork* w);
-u32 GetEstTblnum(EspSeqData* head);
-cEsp* SetEstTbl(EspgenWork* w, EspSeqData* head, int no);
+u32 GetEstTblnum(cEspSeqHead* head);
+cEsp* SetEstTbl(EspgenWork* w, cEspSeqHead* head, int no);
 static f32 GetDistAlpha(EspgenWork* w);
 static f32 GetDirAlpha(EspgenWork* w, Vec* dir);
 void HideCheck(cEsp* esp);
@@ -89,7 +89,7 @@ void SetEsp(EspgenWork* pGen)
     Vec d;
     Vec dir;
     Mtx m;
-    EspSeqData* head;
+    cEspSeqHead* head;
     u32 num;
     u32 i;
     cEsp* esp;
@@ -195,17 +195,17 @@ void SetEsp(EspgenWork* pGen)
 }
 
 // Number of records in the flare's est table.
-u32 GetEstTblnum(EspSeqData* head)
+u32 GetEstTblnum(cEspSeqHead* head)
 {
     return head->num;
 }
 
 // Spawns record `no` of the est table with an identity matrix; returns the new esp (the dummy esp
 // when the pool is full).
-cEsp* SetEstTbl(EspgenWork* w, EspSeqData* head, int no)
+cEsp* SetEstTbl(EspgenWork* w, cEspSeqHead* head, int no)
 {
     Espgen01Work* p = (Espgen01Work*) w->work;
-    cEspSeqTbl* rec = head->rec;
+    cEspSeqTbl* rec = head->SeqTbl;
     Mtx m;
     cEsp* esp;
 
@@ -350,8 +350,8 @@ void HideCheck(cEsp* pDat)
 // Fills the flare from the record: offset = Pos, est owner/id = Work8[0..1], parts = Parts_no;
 // Vec2 = (rot x deg, rot y deg, cone fov deg) enables the direction test; Vec0 = (size %, scale %,
 // fade distance); Vec1.x != 0 is the hide-check radius in pixels.
-int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
-                         Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag)
+int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+                         Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag)
 {
     Espgen01Work* p = (Espgen01Work*) w->work;
     Mtx m1;
