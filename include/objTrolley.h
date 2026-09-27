@@ -9,7 +9,7 @@ cObj* SetTrolley(void* bin, void* tpl, Vec* pos, Vec* rot);
 
 // Mine trolley work (game/objTrolley.cpp `cObjTrolley`): three cars (parts 0 / 4 / 8) with a
 // scenario and an effect collision piece each.
-struct TrolleyWork {
+struct FREE_TROLLEY {
     u32 Be_flg;            // 0x00  bit0: start (setStart), bit1: 2nd start, bit2: stopped (ckStop)
     int Timer;            // 0x04
     void* Mot_tbl[9];         // 0x08  setMotion table: 0 run, 1 2nd run, 2/3 break (xFF), 4..8 player escape / die
@@ -23,7 +23,7 @@ struct TrolleyWork {
 // car are carried along, the break routine throws them off.
 class cObjTrolley : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  TrolleyWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_TROLLEY
 
     virtual void move();
     virtual ~cObjTrolley() {}
@@ -35,6 +35,6 @@ public:
     int ckStop();
 };
 
-#define TROLLEY_WK(o) ((TrolleyWork*) (o)->free)
+#define TROLLEY_WK(o) ((FREE_TROLLEY*) (o)->free)
 
 #endif

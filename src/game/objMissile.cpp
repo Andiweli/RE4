@@ -34,7 +34,7 @@ void (*ObjMissile_R0_move_tbl[5])(cObjMissile*) = {
 cObjMissile* SetHeliMissile(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
 {
     cObjMissile* obj;
-    MissileWork* w;
+    FREE_MISSILE* w;
 
     obj = (cObjMissile*) ObjMgr.create(cObjMgr::ID_HELI_MISSILE);
     if (obj == 0) {
@@ -87,7 +87,7 @@ cObjMissile* SetHeliMissile(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
 // Per-frame: destroyed (with its hit box) when the launcher dies; runs the R0 routine.
 void cObjMissile::move()
 {
-    MissileWork* w = MISSILE_WK(this);
+    FREE_MISSILE* w = MISSILE_WK(this);
 
     if (w->pEm_oya) {
         if (!w->pEm_oya->isAlive() || ((cEm*) w->pEm_oya)->hp <= 0) {
@@ -111,7 +111,7 @@ void objMissile_R0_Set(cObjMissile* pObj)
 // Rno0 == 1: mounted on parts oya_parts of the launcher (axes normalised unless scale_mode).
 void objMissile_R0_Parent(cObjMissile* pObj)
 {
-    MissileWork* w = MISSILE_WK(pObj);
+    FREE_MISSILE* w = MISSILE_WK(pObj);
     Mtx m;
     Vec v0;
     Vec v1;
@@ -173,7 +173,7 @@ void objMissile_R0_Parent(cObjMissile* pObj)
 // then Fire.
 void objMissile_R0_FireWait(cObjMissile* pObj)
 {
-    MissileWork* w = MISSILE_WK(pObj);
+    FREE_MISSILE* w = MISSILE_WK(pObj);
     Mtx m;
     Vec v0;
     Vec v1;
@@ -259,7 +259,7 @@ void objMissile_R0_FireWait(cObjMissile* pObj)
 // scenario 300 units back along the path, on a character (type 1), or when its hit box is shot.
 void objMissile_R0_Fire(cObjMissile* pObj)
 {
-    MissileWork* w = MISSILE_WK(pObj);
+    FREE_MISSILE* w = MISSILE_WK(pObj);
 
     if (pObj->r_no_2 == 0) {
         Vec d;
@@ -363,7 +363,7 @@ void objMissile_R0_Fire(cObjMissile* pObj)
 // Rno0 == 4: removes the missile and its hit box.
 void objMissile_R0_Lost(cObjMissile* pObj)
 {
-    MissileWork* w = MISSILE_WK(pObj);
+    FREE_MISSILE* w = MISSILE_WK(pObj);
 
     pObj->be_flag &= ~2;
     if (w->pHit) {
@@ -376,7 +376,7 @@ void objMissile_R0_Lost(cObjMissile* pObj)
 // Mounts the missile on parts oya_parts of `parent` -> Parent.
 void cObjMissile::setParent(cModel* parent, int partsNo, int noNormalize)
 {
-    MissileWork* w = MISSILE_WK(this);
+    FREE_MISSILE* w = MISSILE_WK(this);
 
     w->pEm_oya = parent;
     w->oya_parts = partsNo;
@@ -390,7 +390,7 @@ void cObjMissile::setParent(cModel* parent, int partsNo, int noNormalize)
 // Fires the missile at `target` (NULL = straight ahead) -> FireWait.
 void cObjMissile::setFire(Vec* pTarget)
 {
-    MissileWork* w = MISSILE_WK(this);
+    FREE_MISSILE* w = MISSILE_WK(this);
 
     w->Target_ok = 0;
     if (pTarget) {
@@ -408,7 +408,7 @@ void cObjMissile::setFire(Vec* pTarget)
 // r320 raises Room_flg[0] 0x80000000, -> Lost.
 void objMissileBomb(cObjMissile* pObj, Vec* pPos)
 {
-    MissileWork* w = MISSILE_WK(pObj);
+    FREE_MISSILE* w = MISSILE_WK(pObj);
 
     switch (pObj->type) {
     case 0:

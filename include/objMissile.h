@@ -7,7 +7,7 @@
 
 // Helicopter missile work (game/objMissile.cpp `cObjMissile`): hangs from a parts of the
 // helicopter (setParent), then flies toward `target` (setFire) and explodes (objMissileBomb).
-struct MissileWork {
+struct FREE_MISSILE {
     u32 Be_flg;              // 0x00
     int Timer;            // 0x04  fire wait / flight frames
     int Timer2;          // 0x08  frames before the hit checks start
@@ -25,7 +25,7 @@ struct MissileWork {
 // toward its target and explodes on the scenario / an enemy (R0_Fire, objMissileBomb).
 class cObjMissile : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  MissileWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_MISSILE
 
     virtual void move();
     virtual ~cObjMissile() {}
@@ -33,6 +33,6 @@ public:
     void setFire(Vec* target);
 };
 
-#define MISSILE_WK(o) ((MissileWork*) (o)->free)
+#define MISSILE_WK(o) ((FREE_MISSILE*) (o)->free)
 
 #endif
