@@ -278,7 +278,7 @@ void R209Init()
     }
     if (RsfCheck(G_ROOM_ID, 4) == 0) {
         r209_work->evd = DC.setData(EvtMgr.NameChange("evd/r209s00.evd"));
-        EmReadSearch(0x1A, 0, r209_work->evd->m_size);
+        EmReadSearch(0x1A, 0, r209_work->evd->getSize());
         r209_work->evd->setCommand(CMND_ARAM_LOAD, 0, 0);
         EvtMgr.SetFunc("evt_r209s00_func", (void*) Evt_R209S00_Func);
         getRoomEtcDoor(4, &r209_work->door4, 1);
@@ -1015,12 +1015,12 @@ static void r209_2ndBattle()
     SysFlagOn(pG, SYS_SCREEN_STOP);
     SubScreenWait(60);
     if (r209_work->evd->waitLoadOk() == 1) {
-        MemorySwap(m->pArc, (u32) r209_work->evd->m_addr, r209_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r209_work->evd->getAddr(), r209_work->evd->getSize());
         EvtMgr.SetEvt(m->pArc, (u32*) 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r209_work->evd->m_addr, r209_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r209_work->evd->getAddr(), r209_work->evd->getSize());
         r209_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     }
     SceAtSetEnable(0, 0);
@@ -1772,13 +1772,13 @@ static void Evt_R209S00_Func(Event* e)
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* o;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         r209_work->door4->setClose();
         r209_work->door4->setCloseLock();
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "evm4300", 0, 0) == 1) {
@@ -1789,9 +1789,9 @@ static void Evt_R209S00_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 o = SmdGetObjPtr(2);
                 if (o) {
                     e->SetMod("scr0000", o, 5, 0, 2, 0);
@@ -1813,7 +1813,7 @@ static void Evt_R209S00_Func(Event* e)
             }
             break;
         case 0xD:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdGetObjPtr(2)->be_flag |= 2;
                 SmdGetObjPtr(3)->be_flag |= 2;
             }

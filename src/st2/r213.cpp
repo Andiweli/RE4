@@ -1041,15 +1041,15 @@ extern "C" void Evt_R213S00_Func(Event* e)
 {
     f32 clip = 200.0f;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
         SetSstAddAreaFlag(0x800);
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
             SetSstAddAreaFlag(0);
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "em2d00", 0, 0) == 1) {
@@ -1068,7 +1068,7 @@ extern "C" void Evt_R213S00_Func(Event* e)
             SetNearClipDist(clip);
             break;
         case 1: {
-            int frame = e->NowFrame;
+            int frame = e->GetNowFrame();
 
             if (frame == 0) {
                 EffectEspDelete(0x4001, ESP_CORE_KIND_SST, 0, 0);

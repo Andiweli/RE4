@@ -431,8 +431,8 @@ extern "C" int readEvent(int no, int wait, void** out)
 
             EspEmDataSwapPush(0x12);
             m = SearchEmModule(0x12);
-            if (W->evt[no]->m_size > m->size) {
-                pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", W->evt[no]->m_size, m->size);
+            if (W->evt[no]->getSize() > m->size) {
+                pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", W->evt[no]->getSize(), m->size);
                 goto fail;
             }
             if (W->evt[no]->waitLoadOk() == 0) {
@@ -440,7 +440,7 @@ extern "C" int readEvent(int no, int wait, void** out)
                 pLog->err(0, 0, "r100::readEvent() : out of memory");
                 goto fail;
             }
-            MemorySwap(m->pArc, (u32) W->evt[no]->m_addr, W->evt[no]->m_size);
+            MemorySwap(m->pArc, (u32) W->evt[no]->getAddr(), W->evt[no]->getSize());
             {
                 void* arc = m->pArc;
 
@@ -453,11 +453,11 @@ extern "C" int readEvent(int no, int wait, void** out)
             if (W->evt[no]->waitUseOk() == 0) {
                 W->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);
                 pLog->err(0, 0, "readEvent() : out of memory.", no, r100_evtName[no]);
-                pLog->err(0, 0, "readEvent() : size(0x%x)[%d:%s]", W->evt[no]->m_size, no, r100_evtName[no]);
+                pLog->err(0, 0, "readEvent() : size(0x%x)[%d:%s]", W->evt[no]->getSize(), no, r100_evtName[no]);
                 return 0;
             }
             {
-                void* addr = W->evt[no]->m_addr;
+                void* addr = W->evt[no]->getAddr();
 
                 if (out != 0) {
                     *out = addr;
@@ -485,7 +485,7 @@ extern "C" void freeEvent(int no, int swap)
             ReadModule* m;
 
             m = SearchEmModule(0x12);
-            MemorySwap(m->pArc, (u32) W->evt[no]->m_addr, W->evt[no]->m_size);
+            MemorySwap(m->pArc, (u32) W->evt[no]->getAddr(), W->evt[no]->getSize());
             EspEmDataSwapPop(0x12);
         }
         W->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);
@@ -912,7 +912,7 @@ static void r100_Sce_zombi_dead(cEm* em)
     r100_em_set();
     if (readEvent(3, 1, &evt)) {
         EvtMgr.SetEvt(evt, (u32*) &ev);
-        ev->StatusFlag |= EvtStfBit(EvtStfPlPosNoSet);
+        ev->FlgOnStatus(EvtStfPlPosNoSet);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
@@ -1222,12 +1222,12 @@ extern "C" void setTexRender()
 // bit 0x10.
 extern "C" void Evt_R100S40_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
         StaFlagOn(pG, STA_CAMERA_IN_ROOM);
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             EventCarInit(e);
         }
         break;
@@ -1245,17 +1245,17 @@ extern "C" void Evt_R100S20_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType == 1) {
-        switch (e->NowCut) {
+    if (e->GetFuncType() == 1) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "obm2d00", 0, 0) == 1) {
                     ((cModel*) mod)->be_flag |= 0x10;
                 }
             }
             break;
         case 2:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (!DbgFlagChk(pG, DBG_EVENT_TOOL)) {
                     W->ems[1]->setNoSuspend(1);
                     W->ems[2]->setNoSuspend(1);
@@ -1272,8 +1272,8 @@ extern "C" void Evt_R100S03_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType == 1) {
-        switch (e->NowCut) {
+    if (e->GetFuncType() == 1) {
+        switch (e->GetNowCut()) {
         case 0:
         case 1:
         case 2:
@@ -1287,7 +1287,7 @@ extern "C" void Evt_R100S03_Func(Event* e)
         case 18:
         case 19:
         case 20:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "wep0200", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cModel*) mod)->be_flag |= 2;
@@ -1295,7 +1295,7 @@ extern "C" void Evt_R100S03_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "wep0200", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cModel*) mod)->be_flag &= ~2;

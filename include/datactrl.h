@@ -26,7 +26,7 @@ enum DATA_CONDITION {
 
 // One streamed data file (game/datactrl.cpp, 0x50 bytes).
 class cDataUnit {
-public:
+private:
     s32 m_condition;   // 0x00  DATA_CONDITION
     s32 m_command;     // 0x04  0 none, 1 load to MRAM, 2 load to ARAM, 3 clear, 4 delete
     s32 m_err;         // 0x08
@@ -44,6 +44,7 @@ public:
     char m_name[0x20]; // 0x2C
     int m_id;       // 0x4C  DVD / ARAM request number
 
+public:
     cDataUnit() {}
     ~cDataUnit() {}
 

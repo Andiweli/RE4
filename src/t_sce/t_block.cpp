@@ -327,7 +327,7 @@ static void tBlockExit()
             if (pW->link[i].flags & 1) {
                 cBlockUnit* u = Block.getUnitPtr(i);
 
-                total += u->pData->m_size;
+                total += u->pData->getSize();
                 u->setBlockDelete();
             }
         }

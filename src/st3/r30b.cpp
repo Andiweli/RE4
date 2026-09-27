@@ -914,12 +914,12 @@ static void R30bEventS00()
 // Event r30bs00: the fade at cut 5.
 void Evt_R30BS00_Func(Event* e)
 {
-    if (e->FuncType == 1) {
-        switch (e->NowCut) {
+    if (e->GetFuncType() == 1) {
+        switch (e->GetNowCut()) {
         case 0:
             break;
         case 5:
-            if (e->NowFrame == 25) {
+            if (e->GetNowFrame() == 25) {
                 FadeSetW(2, 40, 0, 0);
             }
             break;

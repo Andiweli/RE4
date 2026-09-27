@@ -274,7 +274,7 @@ extern "C" void r11c_eventInit()
     W->evd0 = DC.setData(EvtMgr.NameChange("evd/r11cs00.evd"));
     W->evd0->setCommand(CMND_ARAM_LOAD, 0, 0);
     W->evd1 = DC.setData(EvtMgr.NameChange("evd/r11cs10.evd"));
-    EmReadSearch(0x13, 0, W->evd0->m_size);
+    EmReadSearch(0x13, 0, W->evd0->getSize());
     EmReadSearch(3, 0, 0x120000);
     StaFlagOn(pG, STA_SUB_ASHLEY);
     SubCharInit(1, &pPL->pos, pPL->ang.y);
@@ -325,7 +325,7 @@ static void r11c_EventBesiegedStart()
             ang.z = 0.0f;
             pl->setAng(&ang);
         }
-    } else if (W->evd0->m_size > mod->size) {
+    } else if (W->evd0->getSize() > mod->size) {
         pLog->err(0, 0, "r11c_Event00 data size over");
         {
             Vec pos = {109264.0f, 4.0f, -50575.0f};
@@ -341,14 +341,14 @@ static void r11c_EventBesiegedStart()
             pl->setAng(&ang);
         }
     } else {
-        MemorySwap(mod->pArc, (u32) W->evd0->m_addr, W->evd0->m_size);
+        MemorySwap(mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
         EvtMgr.SetEvt(mod->pArc, (u32*) 0);
         SceSleep(2);
         SceSleep(2);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(mod->pArc, (u32) W->evd0->m_addr, W->evd0->m_size);
+        MemorySwap(mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
     }
     W->evd0->setCommand(CMND_DEL_DATA, 0, 0);
     SysFlagOn(pG, SYS_SCREEN_STOP);
@@ -557,17 +557,17 @@ static void r11c_EventBesiegedStart()
     InitModule(W->mod4);
     mod2 = SearchEmModule(0x13);
     if (err2 != 1) {
-        if (W->evd1->m_size > mod2->size) {
+        if (W->evd1->getSize() > mod2->size) {
             pLog->err(0, 0, "r11c_Event10 exec error");
         } else {
-            MemorySwap(mod2->pArc, (u32) W->evd1->m_addr, W->evd1->m_size);
+            MemorySwap(mod2->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
             if (EvtMgr.SetEvt(mod2->pArc, (u32*) &ev)) {
-                ev->StatusFlag |= EvtStfBit(EvtStfFadeOut);
+                ev->FlgOnStatus(EvtStfFadeOut);
             }
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
                 SceSleep(1);
             }
-            MemorySwap(mod2->pArc, (u32) W->evd1->m_addr, W->evd1->m_size);
+            MemorySwap(mod2->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
         }
     }
     W->evd1->setCommand(CMND_DEL_DATA, 0, 0);
@@ -1131,16 +1131,16 @@ extern "C" void Evt_R11CS00_Func(Event* e)
     void* mod;
     cObj* o;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         setRoomEtcDisp(0x16, 0, 1);
         setRoomEtcDisp(0xF, 0, 1);
         setRoomEtcDisp(0xA, 0, 1);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0: {
-            int frame = e->NowFrame;
+            int frame = e->GetNowFrame();
 
             if (frame == 0) {
                 EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
@@ -1193,7 +1193,7 @@ extern "C" void Evt_R11CS00_Func(Event* e)
 // Event r11cs10 handler: the ladders and the door.
 extern "C" void Evt_R11CS10_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0: {
         cObj* o;
 
@@ -1206,7 +1206,7 @@ extern "C" void Evt_R11CS10_Func(Event* e)
         break;
     }
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
             break;
         case 8:
@@ -1225,7 +1225,7 @@ extern "C" void Evt_R11CS10_Func(Event* e)
 // Per-cut effect of the s20 event on the render texture.
 static inline void r11c_evtEsp(Event* e, u8 no)
 {
-    if (e->NowFrame == 0) {
+    if (e->GetNowFrame() == 0) {
         EffectEspDelete(W->tex->GetCoreFlg() | 0x3001, ESP_CORE_KIND_NONE, 0, 0);
         EffectEspgenDelete(W->tex->GetCoreFlg() | 0x3001, ESP_CORE_KIND_NONE, 0);
         EffectEfmDelete(W->tex->GetCoreFlg() | 0x3001, ESP_CORE_KIND_NONE, 0);
@@ -1240,7 +1240,7 @@ extern "C" void Evt_R11CS20_Func(Event* e)
     // a second block-local `door` would get its own slot.
     cEmDoor* door;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         if (getRoomEtcDoor(0xA, &door, 1)) {
             door->setNoSuspend(1);
@@ -1248,9 +1248,9 @@ extern "C" void Evt_R11CS20_Func(Event* e)
         setRoomEtcDisp(0xA, 1, 1);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {

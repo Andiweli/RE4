@@ -4043,7 +4043,7 @@ static void load()
                 ev->GetNameFile(key);
                 ev->GetEventNo(evStr);
                 if (EvtMgr.GetEvt(key, &evt) == 1) {
-                    evtKey = ((Event*) evt)->NowCut;
+                    evtKey = ((Event*) evt)->GetNowCut();
                     if (evStr[0] == 's' || evStr[0] == 'S') {
                         evtAction = 0;
                     } else {
@@ -4319,7 +4319,7 @@ static void save()
                 ev->GetNameFile(key);
                 ev->GetEventNo(evStr);
                 if (EvtMgr.GetEvt(key, &evt) == 1) {
-                    evtKey = ((Event*) evt)->NowCut;
+                    evtKey = ((Event*) evt)->GetNowCut();
                     if (evStr[0] == 's' || evStr[0] == 'S') {
                         evtAction = 0;
                     } else {

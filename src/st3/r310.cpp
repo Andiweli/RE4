@@ -824,14 +824,11 @@ static void R310EventS00()
 // frame 50 fades again.
 static void Evt_R310S00_Func(Event* e)
 {
-    if (e->FuncType == 1 && e->NowCut == 0) {
-        if (e->NowFrame == 0) {
+    if (e->GetFuncType() == 1 && e->GetNowCut() == 0) {
+        if (e->GetNowFrame() == 0) {
             void* mod;
-            int skip = 1;
+            int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-            if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-                skip = 0;
-            }
             if (skip == 0) {
                 FadeSetW(2, 0, 0, 0);
             }
@@ -839,12 +836,9 @@ static void Evt_R310S00_Func(Event* e)
                 ((R310EvtModel*) mod)->flags |= 0x40;
             }
         }
-        if (e->NowFrame == 50) {
-            int skip = 1;
+        if (e->GetNowFrame() == 50) {
+            int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-            if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-                skip = 0;
-            }
             if (skip == 0) {
                 FadeSetW(0x80000002, 40, 0, 0);
             }

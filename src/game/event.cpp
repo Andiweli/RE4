@@ -1012,7 +1012,7 @@ int Event::ExePacket_SetEff(Event* pEvt)
     void* dat;
     EvtPacket* pac = pEvt->pPacket;
 
-    if (pEvt->GetNoWork() == -1 || pEvt->NoWork > 1) {
+    if (pEvt->GetNoWork() == -1 || pEvt->GetNoWork() > 1) {
         pLog->err(0, 0, "Event::ExePacket_SetEff : NoWork failed");
         return 1;
     }
@@ -1020,7 +1020,7 @@ int Event::ExePacket_SetEff(Event* pEvt)
         pLog->err(0, 0, "Event::ExePacket_SetEff : dat failed");
         return 1;
     }
-    if (EspDataLoad((u32) dat, pEvt->NoWork + 0xC4, 0) == 0) {
+    if (EspDataLoad((u32) dat, pEvt->GetNoWork() + 0xC4, 0) == 0) {
         pLog->err(0, 0, "Event::ExePacket_SetEff : failed");
         return 1;
     }
@@ -1363,7 +1363,7 @@ int Event::ExePacket_Str(Event* pEvt)
     int no;
     int blk;
 
-    strcpy(key, pEvt->Name);
+    pEvt->GetName(key);
     blk = pac->val.no;
     no = pac->val.arg;
     if (pEvt->GetChangeNoStr() != 0) {
@@ -1628,8 +1628,8 @@ int Event::ExeFunc(int mode, int param)
         return 1;
     }
     SetFuncType(mode);
-    strcpy(a, pData->room);
-    strcpy(b, pData->no);
+    GetRoomNo(a);
+    GetEventNo(b);
     strcpy(nm, "evt_");
     strcat(nm, a);
     strcat(nm, b);
@@ -2071,7 +2071,7 @@ int EventMgr::construct(Event* pEvt, u32 id)
     e = new (pEvt) Event(id);
     if (e) {
         no = getWorkNo(e);
-        e->NoWork = no;
+        e->SetNoWork(no);
         if (no == -1 || no > 1) {
             pLog->err(0, 0, "EventMgr::construct : getWorkNo failed");
             return 1;
@@ -2210,7 +2210,7 @@ int EventMgr::IsAliveEvt(const char* pName, Event** ppEvt, int aliveEvtType)
                 continue;
             }
         }
-        strcpy(p, e->Name);
+        e->GetName(p);
         if (strcmp(p, pName) != 0) {
             continue;
         }
@@ -2606,19 +2606,19 @@ int EventMgr::DelEvt(void* pEvt, int delEvtFlag)
     int fade = evt->FlgCkStatus(EvtStfEvtCancelOn);
     int zero;
 
-    switch (evt->EndRNo1) {
+    switch (evt->GetEndRNo1()) {
     case 0:
         evt->ExeEndEvt(evt, 0);
         if (delEvtFlag == 1) {
             SysFlagOn(pG, SYS_SCREEN_STOP);
-            evt->EndRNo2 = 0;
+            evt->SetEndRNo2(0);
             evt->AddEndRNo1(1);
             return 1;
         }
         break;
     case 1:
         evt->AddEndRNo2(1);
-        if (evt->EndRNo2 <= 0) {
+        if (evt->GetEndRNo2() <= 0) {
             return 1;
         }
         SysFlagOff(pG, SYS_SCREEN_STOP);
@@ -2627,7 +2627,7 @@ int EventMgr::DelEvt(void* pEvt, int delEvtFlag)
     SysFlagOff(pG, SYS_SCREEN_STOP);
     {
         char* p = nm;
-        strcpy(p, evt->Name);
+        evt->GetName(p);
         destroyNow(evt);
         DelEvd(p);
     }

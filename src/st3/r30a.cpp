@@ -258,17 +258,17 @@ static void R30aEventS00()
 // Events r30as00 / r30as98: the light follows the player model, the fades and the hidden enemy part.
 extern "C" void Evt_R30AS00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         setRoomEtcBreakDisp(0, 0, 1);
         StaFlagOn(pG, STA_CAMERA_SET_ROOM);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
         case 2:
         case 4:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
@@ -281,16 +281,13 @@ extern "C" void Evt_R30AS00_Func(Event* e)
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
-                int skip = 1;
+                int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-                if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-                    skip = 0;
-                }
                 if (skip == 0) {
                     FadeSetW(0x80000002, 60, 0, 0);
                 }
@@ -300,12 +297,9 @@ extern "C" void Evt_R30AS00_Func(Event* e)
             }
             break;
         case 7:
-            if (e->NowFrame == 50) {
-                int skip = 1;
+            if (e->GetNowFrame() == 50) {
+                int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-                if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-                    skip = 0;
-                }
                 if (skip == 0) {
                     FadeSetW(2, 30, 0, 0);
                 }

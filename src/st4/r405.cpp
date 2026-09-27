@@ -196,9 +196,9 @@ extern "C" void Evt_R405S00_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType == 1) {
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+    if (e->GetFuncType() == 1) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0c00", 0, 0) == 1) {
                     ((cModel*) mod)->LightInfo.EnableMask = 1;
                 }

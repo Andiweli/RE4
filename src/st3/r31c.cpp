@@ -1613,7 +1613,7 @@ static void r31cEventS02EndProc()
 // the end sets Room_flg[0] bit 31.
 static void Evt_R31CS00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SceAtItemModelPtr(0x80)->setNoSuspend(1);
         SceAtItemModelPtr(0x81)->setNoSuspend(1);
@@ -1644,7 +1644,7 @@ static int r31c_evtS01Flag = 0;
 static void Evt_R31CS01_Func(Event* e)
 {
     void* mod;
-    int mode = e->FuncType;
+    int mode = e->GetFuncType();
     int cut;
 
     // `mode` keeps the switch value live into case 1 (the `1` stores reuse it). `cut` is set before
@@ -1660,7 +1660,7 @@ static void Evt_R31CS01_Func(Event* e)
         e->SetEvtCancelCut(cut);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
             if (e->GetMod(&mod, "em3900c", 0, 0) == 1) {
                 ((cModel*) mod)->ot_type = 1;
@@ -1682,10 +1682,10 @@ static void Evt_R31CS01_Func(Event* e)
             SmdGetObjPtr(0x97)->be_flag &= ~2;
             break;
         case 7:
-            if (e->NowFrame > 0x3B) {
+            if (e->GetNowFrame() > 0x3B) {
                 if (e->GetMod(&mod, "em3900d", 0, 0) == 1) {
-                    int f = e->NowFrame - 60;
-                    int mf = e->MaxFrame - 60;
+                    int f = e->GetNowFrame() - 60;
+                    int mf = e->GetMaxFrame() - 60;
 
                     ((cModel*) mod)->invisible_factor = 1.0f - (f32) f / (f32) mf;
                 }
@@ -1693,10 +1693,10 @@ static void Evt_R31CS01_Func(Event* e)
             }
             break;
         case 0xB:
-            if (e->NowFrame == 0x66) {
+            if (e->GetNowFrame() == 0x66) {
                 r31c_evtS01Flag = 1;
             }
-            if (e->NowFrame == 0x78) {
+            if (e->GetNowFrame() == 0x78) {
                 r31c_evtS01Flag = 0;
             }
             break;
@@ -1726,7 +1726,7 @@ static void Evt_R31CS01_Func(Event* e)
 static void Evt_R31CS02_Func(Event* e)
 {
     // The empty arms keep their own compare-tree nodes: two of them return, one breaks.
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         return;
     case 1:

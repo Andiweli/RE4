@@ -227,7 +227,7 @@ extern "C" void Evt_R11FS00_Func(Event* e)
     void* mod;
     int skip;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         pG->Room_flg[0] &= ~0x80000000;
         r11f_actNo = (Rnd() & 1) ? 3 : 4;
@@ -241,8 +241,8 @@ extern "C" void Evt_R11FS00_Func(Event* e)
         SmdSetTrans(2, 0);
         break;
     case 1:
-        if (e->NowCut > 4) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() > 4) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evm7000", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cModel*) mod)->be_flag |= 2;
@@ -253,7 +253,7 @@ extern "C" void Evt_R11FS00_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evm7000", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cModel*) mod)->be_flag &= ~2;
@@ -264,9 +264,9 @@ extern "C" void Evt_R11FS00_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evm7000", 0, 0) == 1) {
                     ((cModel*) mod)->be_flag |= 0x10;
                 }
@@ -288,12 +288,12 @@ extern "C" void Evt_R11FS00_Func(Event* e)
             }
             break;
         case 0x11:
-            if (e->NowFrame == 20) {
+            if (e->GetNowFrame() == 20) {
                 r11f_actOn = 1;
             }
             break;
         case 3:
-            if (e->NowFrame == 160) {
+            if (e->GetNowFrame() == 160) {
                 skip = 1;
                 if (!(e->StatusFlag & EvtStfBit(EvtStfToolFrontExec))) {
                     skip = 0;
@@ -304,7 +304,7 @@ extern "C" void Evt_R11FS00_Func(Event* e)
             }
             break;
         case 4:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 skip = 1;
                 if (!(e->StatusFlag & EvtStfBit(EvtStfToolFrontExec))) {
                     skip = 0;
@@ -322,10 +322,7 @@ extern "C" void Evt_R11FS00_Func(Event* e)
         r11f_actOn = 0;
         break;
     case 3:
-        skip = 1;
-        if (!(e->StatusFlag & EvtStfBit(EvtStfEvtCancelSet))) {
-            skip = 0;
-        }
+        skip = e->FlgCkStatus(EvtStfEvtCancelSet);
         if (skip == 0) {
             EventMgr* em = &EvtMgr;
             em->EvtSndStrPlay(em->GetNowExeEvtNamePtr(), 1, 0x50, 1, 0.0f);
@@ -348,10 +345,10 @@ extern "C" void Evt_R11FS00_Func(Event* e)
 // 2/4/5, shows them otherwise.
 extern "C" void Evt_R11FS01_Func(Event* e)
 {
-    if (e->FuncType == 1) {
-        if (e->NowFrame == 0) {
-            if (e->NowCut <= 5) {
-                if (e->NowCut == 2 || e->NowCut == 4 || e->NowCut == 5) {
+    if (e->GetFuncType() == 1) {
+        if (e->GetNowFrame() == 0) {
+            if (e->GetNowCut() <= 5) {
+                if (e->GetNowCut() == 2 || e->GetNowCut() == 4 || e->GetNowCut() == 5) {
                     SmdSetTrans(0xE, 0);
                     SmdSetTrans(0xD, 0);
                     SmdSetTrans(0xD, 0);
@@ -373,17 +370,17 @@ extern "C" void Evt_R11FS02_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType == 1) {
-        switch (e->NowCut) {
+    if (e->GetFuncType() == 1) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "et1200", 0, 0) == 1) {
                     ((cModel*) mod)->be_flag |= 0x10;
                 }
             }
             break;
         case 0xB:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
                 EffectEspgenDelete(0x2001, ESP_CORE_KIND_ROOM01, 0);
                 EffectEfmDelete(0x2001, ESP_CORE_KIND_ROOM01, 0);
@@ -392,7 +389,7 @@ extern "C" void Evt_R11FS02_Func(Event* e)
             }
             break;
         case 7:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "wep0200", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cModel*) mod)->be_flag &= ~2;
@@ -400,7 +397,7 @@ extern "C" void Evt_R11FS02_Func(Event* e)
             }
             break;
         case 8:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "wep0200", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cModel*) mod)->be_flag |= 2;
@@ -416,9 +413,9 @@ extern "C" void Evt_R11FS10_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType == 1) {
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+    if (e->GetFuncType() == 1) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evm3500", 0, 0) == 1) {
                     ((cModel*) mod)->LightInfo.EnableMask = 2;
                 }
@@ -435,12 +432,12 @@ extern "C" void Evt_R11FS10_Func(Event* e)
 // restores.
 extern "C" void Evt_R11FS11_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
-        if (e->NowFrame == 0) {
-            if (e->NowCut == 2) {
+        if (e->GetNowFrame() == 0) {
+            if (e->GetNowCut() == 2) {
                 SmdSetTrans(0xE, 0);
                 SmdSetTrans(0xD, 0);
                 SmdSetTrans(0xD, 0);
@@ -455,8 +452,8 @@ extern "C" void Evt_R11FS11_Func(Event* e)
                 SmdSetTrans(0x12, 1);
             }
         }
-        if (e->NowCut == 2) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 2) {
+            if (e->GetNowFrame() == 0) {
                 EstSet(0, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_NONE, 0, 0);
             }
         }

@@ -183,7 +183,7 @@ void R101Init()
             SceAtDataSet_exec(0x13, SCE_LEVEL10, 0, (TaskFunc) r101_callGanadoVoice, 0, 1);
             r101_work->evt00 = DC.setData(EvtMgr.NameChange("evd/r101s00.evd"));
             r101_work->evt00->setCommand(CMND_ARAM_LOAD, 0, 0);
-            EmReadSearch(0x26, 0, r101_work->evt00->m_size);
+            EmReadSearch(0x26, 0, r101_work->evt00->getSize());
             SceAtDataSet_exec(7, SCE_LEVEL10, 0, (TaskFunc) r101_Event00, 0, 1);
         } else {
             SceExec(0x12, (TaskFunc) r101_checkEmNum, 0, 0, SCE_PRIO_DEF_2, 0);
@@ -194,10 +194,10 @@ void R101Init()
         if (RsfCheck(G_ROOM_ID, 8) == 0) {
             r101_work->evt21 = DC.setData(EvtMgr.NameChange("evd/r101s21.evd"));
             r101_work->evt21->setCommand(CMND_ARAM_LOAD, 0, 0);
-            if (r101_work->evt21->m_size > r101_work->evt30->m_size) {
-                EmReadSearch(0x15, 0, r101_work->evt21->m_size);
+            if (r101_work->evt21->getSize() > r101_work->evt30->getSize()) {
+                EmReadSearch(0x15, 0, r101_work->evt21->getSize());
             } else {
-                EmReadSearch(0x15, 0, r101_work->evt30->m_size);
+                EmReadSearch(0x15, 0, r101_work->evt30->getSize());
             }
             if (getRoomEtcWindow(0, &win, 1)) {
                 win->SetEnableDamage(0);
@@ -414,8 +414,8 @@ static void r101_Event30_TitleCall()
         SceSleep(1);
     } while (1);
     IdSys.dispSw(IDC_LIFE_METER, 0);
-    IdTexDataLoad(tex->m_addr, TEX_OWNER_ID_EVENT);
-    IdSys.set(id->m_addr, 0xFF, IDC_EVENT, 0x13, 6, 0);
+    IdTexDataLoad(tex->getAddr(), TEX_OWNER_ID_EVENT);
+    IdSys.set(id->getAddr(), 0xFF, IDC_EVENT, 0x13, 6, 0);
     while (1) {
         if (pG->Room_flg[0] & 0x20000000) {
             goto end;
@@ -450,7 +450,7 @@ static void r101_Event30()
     r101_work->evt30->setCommand(CMND_ARAM_LOAD, 0, 0);
     SceSleep(60);
     while (r101_work->evt30->isLoadOk() == 0) {
-        if (r101_work->evt30->m_err != 0) {
+        if (r101_work->evt30->getErr() != 0) {
             fail = 1;
             break;
         }
@@ -466,7 +466,7 @@ static void r101_Event30()
     SceSleep(2);
     m = SearchEmModule(0x15);
     if (fail != 1) {
-        if (r101_work->evt30->m_size > m->size) {
+        if (r101_work->evt30->getSize() > m->size) {
             // COMPILER-DIFF: frame layout -- codeless use that keeps the 8-byte slot allocated
             // (an unreferenced aggregate gets no slot; the original's use is not in the bytes).
             asm("" : "=m"(unused));
@@ -476,7 +476,7 @@ static void r101_Event30()
             InitModule(m);
             r101_work->evt30->setCommand(CMND_MRAM_LOAD, 0, 1);
             SceExec(0x12, (TaskFunc) r101_Event30_TitleCall, 0, 2, SCE_PRIO_DEF_2, 0);
-            EvtMgr.SetEvt(r101_work->evt30->m_addr, 0);
+            EvtMgr.SetEvt(r101_work->evt30->getAddr(), 0);
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
                 SceSleep(1);
             }
@@ -633,10 +633,10 @@ static void r101_Event20()
     SceSleep(2);
     m = SearchEmModule(0x15);
     if (fail != 1) {
-        if (r101_work->evt21->m_size > m->size) {
+        if (r101_work->evt21->getSize() > m->size) {
             pLog->err(0, 0, "r101_Event20 exec error");
         } else {
-            MemorySwap(m->pArc, (u32) r101_work->evt21->m_addr, r101_work->evt21->m_size);
+            MemorySwap(m->pArc, (u32) r101_work->evt21->getAddr(), r101_work->evt21->getSize());
             EvtMgr.SetEvt(m->pArc, 0);
             SceSleep(3);
             for (;;) {
@@ -655,7 +655,7 @@ static void r101_Event20()
                 SceSleep(1);
             }
             SysFlagOff(pG, SYS_SCREEN_STOP);
-            MemorySwap(m->pArc, (u32) r101_work->evt21->m_addr, r101_work->evt21->m_size);
+            MemorySwap(m->pArc, (u32) r101_work->evt21->getAddr(), r101_work->evt21->getSize());
         }
     }
     r101_work->evt21->setCommand(CMND_DEL_DATA, 0, 0);
@@ -962,12 +962,12 @@ static void r101_Event00()
             SysFlagOn(pG, SYS_SCREEN_STOP);
             SceSleep(2);
             m = SearchEmModule(0x26);
-            MemorySwap(m->pArc, (u32) r101_work->evt00->m_addr, r101_work->evt00->m_size);
+            MemorySwap(m->pArc, (u32) r101_work->evt00->getAddr(), r101_work->evt00->getSize());
             EvtMgr.SetEvt(m->pArc, 0);
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
                 SceSleep(1);
             }
-            MemorySwap(m->pArc, (u32) r101_work->evt00->m_addr, r101_work->evt00->m_size);
+            MemorySwap(m->pArc, (u32) r101_work->evt00->getAddr(), r101_work->evt00->getSize());
         }
         r101_work->evt00->setCommand(CMND_DEL_DATA, 0, 0);
         r101_setEmSuspend(0);
@@ -1052,7 +1052,7 @@ extern "C" void Evt_R101S21_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType == 1 && e->NowCut == 0 && e->NowFrame == 0) {
+    if (e->GetFuncType() == 1 && e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
         e->GetMod(&mod, "et0800", 0, 0);
     }
 }
@@ -1066,12 +1066,12 @@ extern "C" void Evt_R101S30_Func(Event* e)
     cObj* obj;
     SmdWork* w;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         LadderEventTrans(0);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             if ((obj = SmdGetObjPtr(0x39)) != 0) {
                 e->SetMod("scr0000", obj, 5, 0, 2, 0);
                 obj->setPos(&pos);

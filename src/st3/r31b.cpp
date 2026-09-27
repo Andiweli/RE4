@@ -2049,7 +2049,7 @@ void R31bKanaamiRoom03Trans(int no, int on)
 // swapped; pl0010 (Leon) ot_type 2 and evma300's light mask on cut 0.
 void Evt_R31BS00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EffectDelete(0x2001, ESP_CORE_KIND_ROOM01);
         SmdSetTrans(0x82, 0);
@@ -2057,7 +2057,7 @@ void Evt_R31BS00_Func(Event* e)
         SmdSetTrans(0xF4, 0);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0010", 0, 0) == 1) {

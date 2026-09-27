@@ -192,7 +192,7 @@ void R201Init()
     if (!ScfFlagChk(pG, SCF_R201_EVENT00)) {
         r201_work->evd = DC.setData(EvtMgr.NameChange("evd/r201s00.evd"));
         r201_work->evd->setCommand(CMND_ARAM_LOAD, 0, 0);
-        EmReadSearch(0x1B, 0, r201_work->evd->m_size);
+        EmReadSearch(0x1B, 0, r201_work->evd->getSize());
         SceAtDataSet_exec(8, SCE_LEVEL10, 0, (TaskFunc) r201_execEvent00, 0, 1);
     } else {
         EmReadSearch(0x1B, 0, 0);
@@ -1092,13 +1092,13 @@ static void r201_execEvent00()
         SysFlagOn(pG, SYS_SCREEN_STOP);
         SceSleep(2);
         m = SearchEmModule(0x1B);
-        MemorySwap(m->pArc, (u32) r201_work->evd->m_addr, r201_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r201_work->evd->getAddr(), r201_work->evd->getSize());
         EvtMgr.SetEvt(m->pArc, &key);
-        ((Event*) key)->StatusFlag |= EvtStfBit(EvtStfPlPosNoSet);
+        ((Event*) key)->FlgOnStatus(EvtStfPlPosNoSet);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r201_work->evd->m_addr, r201_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r201_work->evd->getAddr(), r201_work->evd->getSize());
     }
     r201_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     SceEventEnd(0);

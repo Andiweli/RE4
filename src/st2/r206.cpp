@@ -289,29 +289,29 @@ static void Evt_R206S00_Func(Event* e)
     void* bin;
     void* bin2;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         setRoomEtcDisp(0x11, 0, 1);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0x13:
         case 0x15:
         case 0x17:
         case 0x18:
         case 0x1A:
         case 0x1E:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(8, 1);
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(8, 0);
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0xF:
         case 0x11:
             if (e->GetMod(&mod, "obm5500", 0, 0) == 1) {
@@ -324,8 +324,8 @@ static void Evt_R206S00_Func(Event* e)
             }
             break;
         }
-        if (e->NowCut <= 0xC) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() <= 0xC) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod2, "ev0401", 0, 0) == 1) {
                     if (EvtMgr.GetBin(&bin, "event/model/ev0400/ev0401.tpl", 0) == 1) {
                         ((cModelInfo*) mod2)->setTplAddr(bin);
@@ -333,7 +333,7 @@ static void Evt_R206S00_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod2, "ev0401", 0, 0) == 1) {
                     if (EvtMgr.GetBin(&bin2, "event/model/ev0400/ev0401_blood.tpl", 0) == 1) {
                         ((cModelInfo*) mod2)->setTplAddr(bin2);
@@ -341,14 +341,14 @@ static void Evt_R206S00_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 5:
         case 7:
         case 8:
         case 0xC:
         case 0xE:
         case 0xF:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evmc800", 0, 0) == 1) {
                     ((cModel*) mod)->ot_type = 1;
                     TexRenderModSet((cModel*) mod, 0, r206_work->texTbl, r206_work->tex, 0, 1, 1, 1, 1.0f);
@@ -360,7 +360,7 @@ static void Evt_R206S00_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evmc800", 0, 0) == 1) {
                     TexRenderModRes((cModel*) mod, 0);
                 }
@@ -381,7 +381,7 @@ static void Evt_R206S00_Func(Event* e)
 // Event r206s10 callback: hides scroll objects 0xC/0xD/0xE and etc model 0x11 for the event, restores them after.
 static void Evt_R206S10_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(0xC, 0);
         SmdSetTrans(0xD, 0);
@@ -399,11 +399,11 @@ static void Evt_R206S10_Func(Event* e)
 // Event r206s20 callback (the reunion): scroll object 0x12 hidden during the event.
 static void Evt_R206S20_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             SmdSetTrans(0x12, 0);
         }
         break;

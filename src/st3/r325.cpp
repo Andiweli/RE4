@@ -72,27 +72,27 @@ extern "C" void Evt_R325S00_Func(Event* e)
     void* info;
     void* bin;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         setRoomEtcDisp(0, 0, 1);
         pG->Room_flg[0] &= ~0x80000000;
         break;
     case 1:
-        if (e->NowCut == 7) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 7) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     OBJ18_WK((cObj18*) mod)->be_flag |= 0x40;
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     OBJ18_WK((cObj18*) mod)->be_flag &= ~0x40;
                 }
             }
         }
-        if (e->NowCut == 4) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 4) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     TexRenderModSet((cModel*) mod, 6, r325_work->texTbl0, r325_work->tex[0], 0, 0, 1, 1, 1.0f);
                 }
@@ -102,7 +102,7 @@ extern "C" void Evt_R325S00_Func(Event* e)
                 EstSet(0, -1, 0, 0, EFF_ROOM, 0, r325_work->tex[0]->GetCoreFlg() | 0x3001, ESP_CORE_KIND_NONE, 0, 0);
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     TexRenderModRes((cModel*) mod, 6);
                 }
@@ -112,14 +112,14 @@ extern "C" void Evt_R325S00_Func(Event* e)
             }
         }
         if (pG->game_costume == 1) {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod, 6, 0);
                 }
             }
         }
-        if (e->NowCut == 7) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 7) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     TexRenderModSet((cModel*) mod, 7, r325_work->texTbl1, r325_work->tex[1], 0, 0, 1, 1, 1.0f);
                 }
@@ -129,7 +129,7 @@ extern "C" void Evt_R325S00_Func(Event* e)
                 EstSet(0, -1, 0, 0, EFF_ROOM, 1, r325_work->tex[1]->GetCoreFlg() | 0x3001, ESP_CORE_KIND_NONE, 0, 0);
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
                     TexRenderModRes((cModel*) mod, 7);
                 }
@@ -138,9 +138,9 @@ extern "C" void Evt_R325S00_Func(Event* e)
                 EffectEfmDelete(r325_work->tex[1]->GetCoreFlg() | 0x3001, ESP_CORE_KIND_NONE, 0);
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&info, "ev0002", 0, 0) == 1) {
                     if (!(pG->Room_flg[0] & 0x80000000)) {
                         pG->Room_flg[0] |= 0x80000000;
@@ -150,7 +150,7 @@ extern "C" void Evt_R325S00_Func(Event* e)
             }
             break;
         case 7:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&info, "ev0002", 0, 0) == 1) {
                     if (EvtMgr.GetBin(&bin, "event/model/ev0000/ev0002_red_eye.tpl", 0) == 1) {
                         ((cModelInfo*) info)->setTplAddr(bin);
@@ -159,15 +159,15 @@ extern "C" void Evt_R325S00_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&info, "ev0002", 0, 0) == 1) {
                     ((cModelInfo*) info)->setTplAddr(r325_work->tpl);
                 }
             }
             break;
         }
-        if (e->NowCut == 8) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 8) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     Obj18Work* w = OBJ18_WK((cObj18*) mod);
 
@@ -178,7 +178,7 @@ extern "C" void Evt_R325S00_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     Obj18Work* w = OBJ18_WK((cObj18*) mod);
 

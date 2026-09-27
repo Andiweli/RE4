@@ -218,7 +218,7 @@ extern "C" void Evt_R330S00_Func(Event* e)
     cObj* obj;
     SmdWork* w;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(0x1C, 0);
         SmdSetTrans(0x1D, 0);
@@ -245,12 +245,12 @@ extern "C" void Evt_R330S00_Func(Event* e)
         }
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0x18:
         case 0x1A:
         case 0x1B:
         case 0x1D:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0100a", 0, 0) == 1) {
@@ -259,7 +259,7 @@ extern "C" void Evt_R330S00_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0100a", 0, 0) == 1) {
@@ -268,14 +268,14 @@ extern "C" void Evt_R330S00_Func(Event* e)
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 9:
         case 0x14:
         case 0x19:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 u32 no;
 
-                switch (e->NowCut) {
+                switch (e->GetNowCut()) {
                 default:
                 case 9:
                     no = 0;
@@ -295,7 +295,7 @@ extern "C" void Evt_R330S00_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (pG->Room_flg[0] & 0x80000000) {
                     pG->Room_flg[0] &= ~0x80000000;
                     IdR330.quit();
@@ -306,8 +306,8 @@ extern "C" void Evt_R330S00_Func(Event* e)
         {
             void* mod;
 
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evm9900", 0, 0) == 1) {
                     ((cModel*) mod)->ot_type = 1;
                 }
@@ -331,13 +331,13 @@ extern "C" void Evt_R330S00_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 6:
         case 8:
         case 0xB:
         case 0xF:
         case 0x17:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if ((mod = SmdGetObjPtr(0x22)) != 0) {
                     TexRenderModSet((cModel*) mod, 0, r330_work->texTbl0, r330_work->tex[0], 1, 1, 1, 1, 1.0f);
                 }
@@ -345,24 +345,24 @@ extern "C" void Evt_R330S00_Func(Event* e)
                     TexRenderModSet((cModel*) mod, 0, r330_work->texTbl1, r330_work->tex[1], 1, 1, 1, 1, 1.0f);
                 }
             }
-            if (e->NowCut == 6) {
+            if (e->GetNowCut() == 6) {
                 EvtTexRenderCamTrans(e, 6);
             }
-            if (e->NowCut == 8) {
+            if (e->GetNowCut() == 8) {
                 EvtTexRenderCamTrans(e, 8);
             }
-            if (e->NowCut == 0xB) {
+            if (e->GetNowCut() == 0xB) {
                 EvtTexRenderCamTrans(e, 0xB);
             }
-            if (e->NowCut == 0xF) {
+            if (e->GetNowCut() == 0xF) {
                 EvtTexRenderCamTrans(e, 0xF);
             }
-            if (e->NowCut == 0x17) {
+            if (e->GetNowCut() == 0x17) {
                 EvtTexRenderCamTrans(e, 0x17);
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if ((mod = SmdGetObjPtr(0x22)) != 0) {
                     TexRenderModRes((cModel*) mod, 0);
                     ModelInfoSetTrans((cModel*) mod, 0, 1);
@@ -407,11 +407,8 @@ void EvtTexRenderCamTrans(Event* e, int cut)
 {
     void* mod;
     void* bin;
-    int skip = 1;
+    int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-    if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-        skip = 0;
-    }
     if (skip == 0) {
         if (e->GetMod(&mod, "evm9900", 0, 0) == 1) {
             TexRenderModAddOt(0, (cModel*) mod);

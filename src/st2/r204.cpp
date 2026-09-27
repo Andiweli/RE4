@@ -986,11 +986,11 @@ void Evt_R204S00_Func(Event* e)
     void* mod3;
     cObj* obj;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             SmdSetTrans(0xC, 0);
             obj = SmdGetObjPtr(0xC);
             if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {
@@ -1023,22 +1023,22 @@ void Evt_R204S00_Func(Event* e)
                 ((cModel*) mod)->LightInfo.SelectMask = obj->LightInfo.SelectMask;
             }
         }
-        if (e->NowCut <= 2) {
-            if (e->NowCut >= 0) {
-                if (e->NowFrame == 0) {
+        if (e->GetNowCut() <= 2) {
+            if (e->GetNowCut() >= 0) {
+                if (e->GetNowFrame() == 0) {
                     if (e->GetMod(&mod2, "pl0100", 0, 0) == 1) {
                         ModelInfoSetTrans((cModel*) mod2, 6, 0);
                     }
                 }
             } else {
-                if (e->NowFrame == 0) {
+                if (e->GetNowFrame() == 0) {
                     if (e->GetMod(&mod3, "pl0100", 0, 0) == 1) {
                         ModelInfoSetTrans((cModel*) mod3, 6, 1);
                     }
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod3, "pl0100", 0, 0) == 1) {
                     ModelInfoSetTrans((cModel*) mod3, 6, 1);
                 }

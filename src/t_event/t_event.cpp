@@ -407,7 +407,7 @@ void ToolEvt::RunStop(ToolEvt* t, Event* ev)
 {
     int i;
 
-    ev->StatusFlag |= EvtStfBit(EvtStfToolStop);
+    ev->FlgOnStatus(EvtStfToolStop);
     EvtTaskSuspend(0);
     if ((t->pJoy1->on & 0x30000) || (t->pJoy1->trg & 0xC00)) {
         int flg;
@@ -549,7 +549,7 @@ void ToolEvt::MainPreview(ToolEvt* t)
         t->SubToolFogWkInit(t, ev);
         t->SubToolFocusWkInit(t, ev);
         t->StopTimer = 1;
-        ev->StatusFlag |= EvtStfBit(EvtStfStartWait);
+        ev->FlgOnStatus(EvtStfStartWait);
         t->r_no_1++;
         break;
     }
@@ -619,7 +619,7 @@ void ToolEvt::MainPreview(ToolEvt* t)
                     }
                 }
             }
-            if ((ev->NowCut >= ev->MaxCut && (t->EtcFlag & TefBit(TefCaptureRun))) || (t->pJoy1->trg & 0x200)) {
+            if ((ev->GetNowCut() >= ev->GetMaxCut() && (t->EtcFlag & TefBit(TefCaptureRun))) || (t->pJoy1->trg & 0x200)) {
                 if (!(t->EtcFlag & TefBit(TefCaptureEnd))) {
                     t->EtcFlag |= TefBit(TefCaptureEnd);
                     t->CaptureTimer = 0;
@@ -631,7 +631,7 @@ void ToolEvt::MainPreview(ToolEvt* t)
             if (--t->StopTimer <= 0) {
                 t->StopTimer = 0;
                 t->EtcFlag |= TefBit(TefStop);
-                ev->StatusFlag |= EvtStfBit(EvtStfToolExec);
+                ev->FlgOnStatus(EvtStfToolExec);
             }
         }
         if ((!(t->EtcFlag & TefBit(TefStop)) && ((t->pJoy1->on & 0x30000) || (t->pJoy1->trg & 0xE00))) ||
@@ -656,13 +656,13 @@ void ToolEvt::MainPreview(ToolEvt* t)
                 t->EvtTaskSignal(0);
                 if (!FlagBit(t->EtcFlag, TefBit(TefCaptureRun)) && !FlagBit(t->EtcFlag, TefBit(TefCaptureReq))) {
                     if (!ev->FlgCkStatus(EvtStfStartWait)) {
-                        ev->StatusFlag |= EvtStfBit(EvtStfStrTime);
+                        ev->FlgOnStatus(EvtStfStrTime);
                         EvtDebug.SetStfStrTimer(60);
                         SndAllStop();
                     }
                 }
             }
-            ev->StatusFlag &= ~EvtStfBit(EvtStfStartWait);
+            ev->FlgOffStatus(EvtStfStartWait);
         }
         {
             u32* sp = &ev->StatusFlag;
@@ -731,11 +731,11 @@ void ToolEvt::MainExit(ToolEvt* t)
 void ToolEvt::EventDel(Event* ev)
 {
     EvtTaskSignal(0);
-    ev->StatusFlag &= ~EvtStfBit(EvtStfToolExec);
-    ev->StatusFlag |= EvtStfBit(EvtStfNoFunc);
+    ev->FlgOffStatus(EvtStfToolExec);
+    ev->FlgOnStatus(EvtStfNoFunc);
     ev->RunEvtCancel();
     EvtMgr.DelEvt(ev, 0);
-    ev->StatusFlag &= ~EvtStfBit(EvtStfNoFunc);
+    ev->FlgOffStatus(EvtStfNoFunc);
 }
 
 static TOOL_MENU subMainMenu[8] = {
@@ -831,8 +831,8 @@ void ToolEvt::SubMenuFog(ToolEvt* t, Event* ev)
     char name[0x100];
 
     strcpy(dir, "x:/soft/room/event");
-    sprintf(path, "%s/%s/%s/etc/%s_%03d.fog", dir, t->roomNo, t->eventNo, t->eventNo, ev->NowCut);
-    sprintf(name, "[%s_%03d.fog]", t->eventNo, ev->NowCut);
+    sprintf(path, "%s/%s/%s/etc/%s_%03d.fog", dir, t->roomNo, t->eventNo, t->eventNo, ev->GetNowCut());
+    sprintf(name, "[%s_%03d.fog]", t->eventNo, ev->GetNowCut());
     ev->FogMove(ev, &t->DatFogWk);
     eprintf(0x38, 0x30, 5, 0, "FOG TOOL MENU");
     switch (ToolMenuDisp_cur(0x40, 0x40, 1, &t->CursolFog, fogMenu, sizeof(fogMenu), t->pJoy1)) {
@@ -894,8 +894,8 @@ void ToolEvt::SubMenuFocus(ToolEvt* t, Event* ev)
     char name[0x100];
 
     strcpy(dir, "x:/soft/room/event");
-    sprintf(path, "%s/%s/%s/etc/%s_%03d.fcs", dir, t->roomNo, t->eventNo, t->eventNo, ev->NowCut);
-    sprintf(name, "[%s_%03d.fcs]", t->eventNo, ev->NowCut);
+    sprintf(path, "%s/%s/%s/etc/%s_%03d.fcs", dir, t->roomNo, t->eventNo, t->eventNo, ev->GetNowCut());
+    sprintf(name, "[%s_%03d.fcs]", t->eventNo, ev->GetNowCut());
     ev->FocusMove(ev, &t->DatFocusWk);
     eprintf(0x38, 0x30, 5, 0, "FOCUS TOOL MENU");
     switch (ToolMenuDisp_cur(0x40, 0x40, 1, &t->CursolFocus, focusMenu, sizeof(focusMenu), t->pJoy1)) {
@@ -1069,7 +1069,7 @@ int ToolEvt::SubToolFogWkInit(ToolEvt* t, Event* ev)
     t->DatFogWk.start.key[0].v = LightMgr.getFogStart();
     t->DatFogWk.start.key[0].out = 0.0f;
     t->DatFogWk.start.key[0].in = 0.0f;
-    t->DatFogWk.start.key[1].t = (f32) ev->MaxFrame;
+    t->DatFogWk.start.key[1].t = (f32) ev->GetMaxFrame();
     t->DatFogWk.start.key[1].v = LightMgr.getFogStart();
     t->DatFogWk.start.key[1].out = 0.0f;
     t->DatFogWk.start.key[1].in = 0.0f;
@@ -1078,7 +1078,7 @@ int ToolEvt::SubToolFogWkInit(ToolEvt* t, Event* ev)
     t->DatFogWk.end.key[0].v = LightMgr.getFogEnd();
     t->DatFogWk.end.key[0].out = 0.0f;
     t->DatFogWk.end.key[0].in = 0.0f;
-    t->DatFogWk.end.key[1].t = (f32) ev->MaxFrame;
+    t->DatFogWk.end.key[1].t = (f32) ev->GetMaxFrame();
     t->DatFogWk.end.key[1].v = LightMgr.getFogEnd();
     t->DatFogWk.end.key[1].out = 0.0f;
     t->DatFogWk.end.key[1].in = 0.0f;
@@ -1091,13 +1091,13 @@ void ToolEvt::SubToolFogInit(ToolEvt* t, int sw, Event* ev, int which)
 {
     if (sw == 1) {
         EvtDebug.FlagOnEtc(FlagFogTool);
-        if (ev->NowCut > 99) {
+        if (ev->GetNowCut() > 99) {
             return;
         }
         if (which == 0) {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFogWk.start, (f32) ev->MaxFrame, 100000.0f);
+            t->SctrlToolInit(t, (Hermite1*) &t->DatFogWk.start, (f32) ev->GetMaxFrame(), 100000.0f);
         } else {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFogWk.end, (f32) ev->MaxFrame, 100000.0f);
+            t->SctrlToolInit(t, (Hermite1*) &t->DatFogWk.end, (f32) ev->GetMaxFrame(), 100000.0f);
         }
         t->CurveNo = which;
     } else {
@@ -1129,7 +1129,7 @@ void ToolEvt::SubToolFocusWkInit(ToolEvt* t, Event* ev)
     t->DatFocusWk.near_.key[0].v = 0.0f;
     t->DatFocusWk.near_.key[0].out = 0.0f;
     t->DatFocusWk.near_.key[0].in = 0.0f;
-    t->DatFocusWk.near_.key[1].t = (f32) ev->MaxFrame;
+    t->DatFocusWk.near_.key[1].t = (f32) ev->GetMaxFrame();
     t->DatFocusWk.near_.key[1].v = 0.0f;
     t->DatFocusWk.near_.key[1].out = 0.0f;
     t->DatFocusWk.near_.key[1].in = 0.0f;
@@ -1138,7 +1138,7 @@ void ToolEvt::SubToolFocusWkInit(ToolEvt* t, Event* ev)
     t->DatFocusWk.far_.key[0].v = 10000.0f;
     t->DatFocusWk.far_.key[0].out = 0.0f;
     t->DatFocusWk.far_.key[0].in = 0.0f;
-    t->DatFocusWk.far_.key[1].t = (f32) ev->MaxFrame;
+    t->DatFocusWk.far_.key[1].t = (f32) ev->GetMaxFrame();
     t->DatFocusWk.far_.key[1].v = 10000.0f;
     t->DatFocusWk.far_.key[1].out = 0.0f;
     t->DatFocusWk.far_.key[1].in = 0.0f;
@@ -1151,13 +1151,13 @@ void ToolEvt::SubToolFocusInit(ToolEvt* t, int sw, Event* ev, int which)
 {
     if (sw == 1) {
         EvtDebug.FlagOnEtc(FlagFocusTool);
-        if (ev->NowCut > 99) {
+        if (ev->GetNowCut() > 99) {
             return;
         }
         if (which == 0) {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFocusWk.near_, (f32) ev->MaxFrame, 10000.0f);
+            t->SctrlToolInit(t, (Hermite1*) &t->DatFocusWk.near_, (f32) ev->GetMaxFrame(), 10000.0f);
         } else {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFocusWk.far_, (f32) ev->MaxFrame, 10000.0f);
+            t->SctrlToolInit(t, (Hermite1*) &t->DatFocusWk.far_, (f32) ev->GetMaxFrame(), 10000.0f);
         }
         t->CurveNo = which;
     } else {
@@ -1307,13 +1307,13 @@ void ToolEvt::SubToolMessMove(ToolEvt* t, Event* ev)
         EventMessageData::MessElem* e;
         i = 0;
         eprintf(0x50, 0x90, 0, 0, "%3d", EvtDebug.NumGet(DebugNumNumber));
-        eprintf(0xA0, 0x90, 0, 0, "%3d", ev->NowCut);
-        eprintf(0xF0, 0x90, 0, 0, "%3d", ev->NowFrame);
+        eprintf(0xA0, 0x90, 0, 0, "%3d", ev->GetNowCut());
+        eprintf(0xF0, 0x90, 0, 0, "%3d", ev->GetNowFrame());
         eprintf(0x140, 0x90, 0, 0, "%3d", EvtDebug.NumGet(DebugNumNoMes));
         eprintf(0x190, 0x90, 0, 0, "%3d", EvtDebug.TimerGet(DebugTimerNoMes));
         e = t->PMesDat->elem;
         for (i = 0; i < XML_NODE_MAX; i++, e++) {
-            if (IsWorkAlive(e) && ev->NowCut == e->CutNo && ev->NowFrame == e->Frame) {
+            if (IsWorkAlive(e) && ev->GetNowCut() == e->CutNo && ev->GetNowFrame() == e->Frame) {
                 int mes;
 
                 ev->MesSet(e->MessNo, e->Timer, 100, EVT_MES_Y);

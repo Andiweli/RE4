@@ -298,6 +298,8 @@ public:
     int IsExePacket();
     int ExePacket();
     void GetNameFile(char* pName) { strcpy(pName, (char*) pData); }
+    void GetRoomNo(char* pName) { strcpy(pName, pData->room); }
+    void GetEventNo(char* pName) { strcpy(pName, pData->no); }
     static int ExePacket_BeginEvt(Event* pEvt);
     static int ExePacket_SetPl(Event* pEvt);
     static int ExePacket_SetEm(Event* pEvt);

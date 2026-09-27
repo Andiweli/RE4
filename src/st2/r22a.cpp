@@ -216,8 +216,8 @@ extern "C" void Evt_R22AS00_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType == 1) {
-        switch (e->NowCut) {
+    if (e->GetFuncType() == 1) {
+        switch (e->GetNowCut()) {
         case 0:
             if (e->GetMod(&mod, "wep0200", 0, 0) == 1) {
                 Obj18CmfOn((cObj*) mod, 5);

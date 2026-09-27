@@ -2180,7 +2180,7 @@ static void Evt_R320S00_Func(Event* e)
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(0x25, 1);
         SmdSetTrans(0x27, 1);
@@ -2191,11 +2191,11 @@ static void Evt_R320S00_Func(Event* e)
     case 1: {
         void* mod;
 
-        if (e->NowCut == 0 && e->NowFrame == 1) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 1) {
             EvtMgr.EvtReadAram("event/evd/r320s01.evd", 0, 0, 0, 0);
             RmfFlagOn(pG, RMF_EVTR320S01_READ);
         }
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             SmdSetTrans(0x27, 0);
             if (e->GetMod(&mod, "evm7900", 0, 0) == 1) {
                 ((cModel*) mod)->LightInfo.EnableMask = 1;
@@ -2220,7 +2220,7 @@ static void Evt_R320S00_Func(Event* e)
             }
             SmdSetTrans(0x28, 0);
         }
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             SmdSetTrans(3, 0);
             SmdSetTrans(0x15, 0);
             SmdSetTrans(0x16, 0);
@@ -2231,11 +2231,11 @@ static void Evt_R320S00_Func(Event* e)
             SmdSetTrans(0x17, 0);
             SmdSetTrans(0x18, 0);
         }
-        if (e->NowCut == 7 && e->NowFrame == 0x78) {
+        if (e->GetNowCut() == 7 && e->GetNowFrame() == 0x78) {
             int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
             if (skip == 0) {
-                FadeSetW(2, e->MaxFrame - 0x78, 0, 0);
+                FadeSetW(2, e->GetMaxFrame() - 0x78, 0, 0);
             }
         }
         break;
@@ -2281,7 +2281,7 @@ static void Evt_R320S01_Func(Event* e)
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(0x25, 1);
         SmdSetTrans(0x27, 1);
@@ -2292,7 +2292,7 @@ static void Evt_R320S01_Func(Event* e)
     case 1: {
         void* mod;
 
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             SmdSetTrans(0x27, 0);
             if (e->GetMod(&mod, "evm7900", 0, 0) == 1) {
                 ((cModel*) mod)->LightInfo.EnableMask = 1;
@@ -2323,34 +2323,34 @@ static void Evt_R320S01_Func(Event* e)
                 }
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 5:
         case 6:
         case 7:
         case 8:
         case 0xF:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x28, 0);
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x28, 1);
             }
             break;
         }
-        if (e->NowCut == 0xF) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0xF) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x34, 0);
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x34, 1);
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(3, 0);
                 SmdSetTrans(0x15, 0);
                 SmdSetTrans(0x16, 0);
@@ -2364,12 +2364,12 @@ static void Evt_R320S01_Func(Event* e)
             }
             break;
         case 0xF:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(1, 0);
                 SmdSetTrans(2, 0);
                 SmdSetTrans(0x25, 1);
             }
-            if (e->NowFrame > 5) {
+            if (e->GetNowFrame() > 5) {
                 if (e->GetMod(&mod, "evm7900", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cModel*) mod)->be_flag &= ~2;
@@ -2396,12 +2396,12 @@ static void Evt_R320S01_Func(Event* e)
                     ((cModel*) mod)->be_flag |= 2;
                 }
             }
-            if (e->NowFrame == 0x1E) {
+            if (e->GetNowFrame() == 0x1E) {
                 SmdSetTrans(0x25, 0);
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(1, 1);
                 SmdSetTrans(2, 1);
             }

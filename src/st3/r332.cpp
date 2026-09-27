@@ -1630,7 +1630,7 @@ void R332ScrTrans(int on)
 
 // Ashley's skirt / ribbon model (pl0200): hide (`on` 0) or show its cloth child (uses the caller's `mod`).
 #define R332_PL_CHILD_TRANS(e, on)                                    \
-    if ((e)->NowFrame == 0) {                                            \
+    if ((e)->GetNowFrame() == 0) {                                    \
         if ((e)->GetMod(&mod, "pl0200", 0, 0) == 1) {                 \
             Obj18Work* w = OBJ18_WK((cObj18*) mod);                       \
                                                                       \
@@ -1654,21 +1654,21 @@ void Evt_R332S00_Func(Event* e)
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(0xA, 0);
         break;
     case 1: {
         void* mod;
 
-        if (e->NowCut == 0xB) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0xB) {
+            if (e->GetNowFrame() == 0) {
                 SetShadowCamMoveSize(0.0f);
             }
-        } else if (e->NowFrame == 0) {
+        } else if (e->GetNowFrame() == 0) {
             ResetShadowCamMoveSize();
         }
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
             if (skip == 0) {
@@ -1687,7 +1687,7 @@ void Evt_R332S00_Func(Event* e)
                 ((cModel*) mod)->be_flag |= 0x80;
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 2:
         case 0xC:
         case 0x11:
@@ -1697,7 +1697,7 @@ void Evt_R332S00_Func(Event* e)
             R332_PL_CHILD_TRANS(e, 1)
             break;
         }
-        if (pG->game_costume == 1 && e->NowFrame == 0) {
+        if (pG->game_costume == 1 && e->GetNowFrame() == 0) {
             if (e->GetMod(&mod, "pl8200", 0, 0) == 1) {
                 Obj18CmfOn((cObj*) mod, 5);
                 ((cModel*) mod)->be_flag &= ~2;
@@ -1707,19 +1707,19 @@ void Evt_R332S00_Func(Event* e)
                 ((cModel*) mod)->be_flag &= ~2;
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0xB:
         case 0xC:
         case 0xD:
         case 0x15:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     OBJ18_WK((cObj18*) mod)->be_flag |= 0x40;
                 }
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                     OBJ18_WK((cObj18*) mod)->be_flag &= ~0x40;
                 }
@@ -1751,7 +1751,7 @@ void Evt_R332S00_Func(Event* e)
 // cut 0xD starts the escape count-down (0x1518 frames); the end sets it to 0x127D and restarts it.
 void Evt_R332S10_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         setRoomEtcDisp(1, 0, 1);
         if (r332_work->pillar[2]->isTrans() == 1) {
@@ -1760,9 +1760,9 @@ void Evt_R332S10_Func(Event* e)
         }
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0x11:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
                 cLight* light;
 
@@ -1782,7 +1782,7 @@ void Evt_R332S10_Func(Event* e)
             break;
         case 0x12:
         case 0x13:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
                 cLight* light;
 
@@ -1796,14 +1796,14 @@ void Evt_R332S10_Func(Event* e)
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R332ScrTrans(0);
             }
             break;
         case 1:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 R332ScrTrans(1);
             }
             break;
@@ -1811,9 +1811,9 @@ void Evt_R332S10_Func(Event* e)
         {
             void* mod;
 
-            switch (e->NowCut) {
+            switch (e->GetNowCut()) {
             case 0:
-                if (e->NowFrame == 0) {
+                if (e->GetNowFrame() == 0) {
                     if (e->GetMod(&mod, "evmb500", 0, 0) == 1) {
                         ((cModel*) mod)->LightInfo.EnableMask = 0x20;
                     }
@@ -1842,13 +1842,13 @@ void Evt_R332S10_Func(Event* e)
                 }
                 break;
             case 0xD:
-                if (e->NowFrame == 0x18 && DbgFlagChk(pG, DBG_EVENT_TOOL) == 0) {
+                if (e->GetNowFrame() == 0x18 && DbgFlagChk(pG, DBG_EVENT_TOOL) == 0) {
                     st3_setCountDownTimer(0x1518);
                     st3_startCountDown();
                 }
                 break;
             }
-            switch (e->NowCut) {
+            switch (e->GetNowCut()) {
             case 9:
             case 0xA:
             case 0xC:
@@ -1881,10 +1881,10 @@ void Evt_R332S20_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType != 1) {
+    if (e->GetFuncType() != 1) {
         return;
     }
-    if (e->NowCut == 0 && e->NowFrame == 0) {
+    if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
         if (e->GetMod(&mod, "evm8900", 0, 0) == 1) {
             ((cModel*) mod)->pModelInfo->color[0] = 0xA0;
             ((cModel*) mod)->pModelInfo->color[1] = 0xD0;
@@ -1900,12 +1900,12 @@ void Evt_R332S20_Func(Event* e)
             ((cModel*) mod)->be_flag |= 0x10;
         }
     }
-    if (e->NowCut == 1) {
+    if (e->GetNowCut() == 1) {
         R332_PL_CHILD_TRANS(e, 0)
     } else {
         R332_PL_CHILD_TRANS(e, 1)
     }
-    if (pG->game_costume == 1 && e->NowFrame == 0) {
+    if (pG->game_costume == 1 && e->GetNowFrame() == 0) {
         if (e->GetMod(&mod, "pl8200", 0, 0) == 1) {
             Obj18CmfOn((cObj*) mod, 5);
             ((cModel*) mod)->be_flag &= ~2;

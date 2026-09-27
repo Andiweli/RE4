@@ -279,28 +279,28 @@ static void R316EventSXX()
 // event models' flags per cut; the end restores the room.
 void Evt_R316S00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         break;
     case 1: {
         void* mod;
 
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x3D, 1);
                 SmdSetTrans(0x3E, 0);
             }
             break;
         case 5:
         case 0xB:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(0x3D, 0);
                 SmdSetTrans(0x3E, 1);
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
         case 1:
             if (e->GetMod(&mod, "obm5500", 0, 0) == 1) {
@@ -313,26 +313,26 @@ void Evt_R316S00_Func(Event* e)
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0xB:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(1, 0);
             }
             break;
         case 0xA:
         case 0xC:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(1, 1);
             }
             break;
         case 0x12:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(6, 0);
             }
             break;
         case 0x11:
         case 0x13:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 SmdSetTrans(6, 1);
             }
             break;

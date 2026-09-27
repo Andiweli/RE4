@@ -139,7 +139,7 @@ void R117Init()
         W->evd0 = DC.setData(EvtMgr.NameChange("evd/r117s00.evd"));
         W->evd0->setCommand(CMND_ARAM_LOAD, 0, 0);
         W->evd1 = DC.setData(EvtMgr.NameChange("evd/r117s10.evd"));
-        EmReadSearch(3, 0, W->evd1->m_size);
+        EmReadSearch(3, 0, W->evd1->getSize());
         SceAtDataSet_exec(7, SCE_LEVEL10, 0, (TaskFunc) r117_EventAshleyFind, 0, 1);
         SceAtDataSet_exec(4, SCE_LEVEL10, 0, (TaskFunc) r117_EventChandelier, 0, 1);
         EvtMgr.SetFunc("evt_r117s00_func", (void*) Evt_R117S00_Func);
@@ -362,13 +362,13 @@ static void r117_EventAshleyFind()
     ScfFlagOn(pG, SCF_R117_FIND_ASHLEY);
     ScfFlagOff(pG, SCF_90);
     if (W->evd0->waitLoadOk() == 1) {
-        MemorySwap(W->mod->pArc, (u32) W->evd0->m_addr, W->evd0->m_size);
+        MemorySwap(W->mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
         EvtMgr.SetEvt(W->mod->pArc, (u32*) 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
         SysFlagOn(pG, SYS_SCREEN_STOP);
-        MemorySwap(W->mod->pArc, (u32) W->evd0->m_addr, W->evd0->m_size);
+        MemorySwap(W->mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
         W->evd0->setCommand(CMND_DEL_DATA, 0, 0);
     }
     StaFlagOn(pG, STA_SUB_ASHLEY);
@@ -403,14 +403,14 @@ static void r117_EventSaddlerAppear()
     StaFlagOff(pG, STA_SUB_ASHLEY);
     SceSleep(3);
     if (W->evd1->waitLoadOk() == 1) {
-        MemorySwap(W->mod->pArc, (u32) W->evd1->m_addr, W->evd1->m_size);
+        MemorySwap(W->mod->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
         if (EvtMgr.SetEvt(W->mod->pArc, (u32*) &ev)) {
-            ev->StatusFlag |= EvtStfBit(EvtStfFadeOut);
+            ev->FlgOnStatus(EvtStfFadeOut);
         }
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(W->mod->pArc, (u32) W->evd1->m_addr, W->evd1->m_size);
+        MemorySwap(W->mod->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
         W->evd1->setCommand(CMND_DEL_DATA, 0, 0);
     }
     EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
@@ -829,7 +829,7 @@ static void r117_ThunderMove()
 // Event r117s00 handler: the etc models, the chandelier rope and the light sources.
 extern "C" void Evt_R117S00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         setRoomEtcDisp(0, 0, 1);
         setRoomEtcDisp(3, 0, 1);
@@ -840,13 +840,13 @@ extern "C" void Evt_R117S00_Func(Event* e)
         setRoomEtcDisp(0xA, 0, 1);
         break;
     case 1: {
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 4:
         case 6:
         case 7: {
             void* mod;
 
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {
                     OBJ18_WK((cObj18*) mod)->be_flag |= 0x40;
                 }
@@ -856,7 +856,7 @@ extern "C" void Evt_R117S00_Func(Event* e)
         default: {
             void* mod;
 
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {
                     OBJ18_WK((cObj18*) mod)->be_flag &= ~0x40;
                 }
@@ -865,9 +865,9 @@ extern "C" void Evt_R117S00_Func(Event* e)
         }
         }
         void* mod;
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {
                     ((cModel*) mod)->LightInfo.EnableMask = 0x40;
                 }
@@ -886,7 +886,7 @@ extern "C" void Evt_R117S00_Func(Event* e)
             break;
         case 6:
         case 7:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "wep0200", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cModel*) mod)->be_flag &= ~2;
@@ -894,7 +894,7 @@ extern "C" void Evt_R117S00_Func(Event* e)
             }
             break;
         default:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "wep0200", 0, 0) == 1) {
                     Obj18CmfOn((cObj*) mod, 5);
                     ((cModel*) mod)->be_flag |= 2;
@@ -923,14 +923,14 @@ extern "C" void Evt_R117S10_Func(Event* e)
     void* mod2;
     void* bin;
 
-    if (e->FuncType != 1) {
+    if (e->GetFuncType() != 1) {
         return;
     }
-    switch (e->NowCut) {
+    switch (e->GetNowCut()) {
     case 8:
     case 9:
     case 10:
-        if (e->NowFrame == 0) {
+        if (e->GetNowFrame() == 0) {
             if (e->GetMod(&mod, "evm4200", 0, 0) == 1) {
                 cLight* l = LightMgr.getKindLight(1);
 
@@ -941,11 +941,11 @@ extern "C" void Evt_R117S10_Func(Event* e)
         }
         break;
     }
-    switch (e->NowCut) {
+    switch (e->GetNowCut()) {
     case 0: {
         void* m;
 
-        if (e->NowFrame == 0) {
+        if (e->GetNowFrame() == 0) {
             if (e->GetMod(&m, "evm3100", 0, 0) == 1) {
                 ((cModel*) m)->LightInfo.EnableMask = 0x10;
             }
@@ -982,12 +982,9 @@ extern "C" void Evt_R117S10_Func(Event* e)
         break;
     }
     case 7:
-        if (e->NowFrame == 0x23) {
-            int skip = 1;
+        if (e->GetNowFrame() == 0x23) {
+            int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-            if (!(e->StatusFlag & EvtStfBit(EvtStfToolFrontExec))) {
-                skip = 0;
-            }
             if (skip == 0) {
                 SceExec(0x12, (TaskFunc) R117S0_WhiteFade, 0, 2, SCE_PRIO_DEF_2, 0);
             }
@@ -995,51 +992,45 @@ extern "C" void Evt_R117S10_Func(Event* e)
         break;
     case 8:
     case 9:
-        if (e->NowFrame == 0x19) {
-            int skip = 1;
+        if (e->GetNowFrame() == 0x19) {
+            int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-            if (!(e->StatusFlag & EvtStfBit(EvtStfToolFrontExec))) {
-                skip = 0;
-            }
             if (skip == 0) {
                 SceExec(0x12, (TaskFunc) R117S0_WhiteFade, 0, 2, SCE_PRIO_DEF_2, 0);
             }
         }
         break;
     case 10:
-        if (e->NowFrame == 0) {
+        if (e->GetNowFrame() == 0) {
             if (e->GetMod(&mod2, "ev0101", 0, 0) == 1) {
                 if (EvtMgr.GetBin(&bin, "event/model/ev0100/ev0100a.tpl", 0) == 1) {
                     ((cModelInfo*) mod2)->setTplAddr(bin);
                 }
             }
         }
-        if (e->NowFrame == 0x55) {
-            int skip = 1;
+        if (e->GetNowFrame() == 0x55) {
+            int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-            if (!(e->StatusFlag & EvtStfBit(EvtStfToolFrontExec))) {
-                skip = 0;
-            }
             if (skip == 0) {
                 SceExec(0x12, (TaskFunc) R117S0_WhiteFade, 0, 2, SCE_PRIO_DEF_2, 0);
             }
         }
         break;
     case 0xB:
-        if (e->NowFrame == 0) {
+        if (e->GetNowFrame() == 0) {
             if (e->GetMod(&mod2, "ev0101", 0, 0) == 1) {
                 ((cModelInfo*) mod2)->setTplAddr(W->evTpl);
             }
         }
         break;
     case 0x14:
-        if (e->NowFrame == 0) {
+        if (e->GetNowFrame() == 0) {
             SmdGetObjPtr(0x27)->be_flag &= ~2;
             SmdGetObjPtr(0x28)->be_flag &= ~2;
         }
         break;
     case 0x20:
-        if (e->NowFrame == 0) {
+        if (e->GetNowFrame() == 0) {
             SmdGetObjPtr(0x2E)->be_flag &= ~2;
         }
         break;

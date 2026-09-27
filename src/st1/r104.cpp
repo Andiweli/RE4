@@ -779,17 +779,17 @@ static void Evt_R104S00_Func(Event* e)
     void* mod2;
     int fadeOn;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         EvtFlgOnStatus(e, 3);
         e->SetEvtCancelCut(0x1E);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
         case 1:
         case 3:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 if (e->GetMod(&mod, "evm4200", 0, 0) == 1) {
                     cLight* l = LightMgr.getKindLight(1);
 
@@ -800,9 +800,9 @@ static void Evt_R104S00_Func(Event* e)
             }
             break;
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 fadeOn = 1;
                 if (!(e->StatusFlag & EvtStfBit(EvtStfToolFrontExec))) {
                     fadeOn = 0;
@@ -820,7 +820,7 @@ static void Evt_R104S00_Func(Event* e)
                     ((cModel*) mod2)->ot_type = 1;
                 }
             }
-            if (e->NowFrame == 120) {
+            if (e->GetNowFrame() == 120) {
                 fadeOn = 1;
                 if (!(e->StatusFlag & EvtStfBit(EvtStfToolFrontExec))) {
                     fadeOn = 0;
@@ -848,10 +848,7 @@ static void Evt_R104S00_Func(Event* e)
     case 2:
         break;
     case 3:
-        fadeOn = 1;
-        if (!(e->StatusFlag & EvtStfBit(EvtStfEvtCancelSet))) {
-            fadeOn = 0;
-        }
+        fadeOn = e->FlgCkStatus(EvtStfEvtCancelSet);
         if (fadeOn == 0) {
             EvtMgr.EvtSndStrPlay(EvtMgr.GetNowExeEvtNamePtr(), 1, 0x86, 1, 0.0f);
         }
@@ -864,7 +861,7 @@ static void Evt_R104S01_Func(Event* e)
 {
     void* mod;
 
-    if (e->FuncType == 1 && e->NowCut == 0 && e->NowFrame == 0) {
+    if (e->GetFuncType() == 1 && e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
         if (e->GetMod(&mod, "evm4500", 0, 0) == 1) {
             ((cModel*) mod)->be_flag |= 0x10;
         }

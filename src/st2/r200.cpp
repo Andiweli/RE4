@@ -361,7 +361,7 @@ static void r200_execTruckEvent()
 // ot_type and the gate / truck objects are set; the end restores the room.
 extern "C" void Evt_R200S00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdGetObjPtr(8)->setNoSuspend(0);
         SmdGetObjPtr(9)->setNoSuspend(0);
@@ -374,9 +374,9 @@ extern "C" void Evt_R200S00_Func(Event* e)
         setRoomEtcBreakDisp(6, 0, 1);
         break;
     case 1:
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -433,12 +433,12 @@ extern "C" void Evt_R200S00_Func(Event* e)
         case 0xA:
         case 0x10:
         case 0x13:
-            if (e->NowFrame == 0) {
-                EventCutEstSet(1, e->NowCut);
+            if (e->GetNowFrame() == 0) {
+                EventCutEstSet(1, e->GetNowCut());
             }
             break;
         case 0x14:
-            if (e->NowFrame == 2) {
+            if (e->GetNowFrame() == 2) {
                 SndRoomStrStop(3);
             }
             break;

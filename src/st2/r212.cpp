@@ -352,12 +352,12 @@ static void r212_EventTrap()
     RsfSet(G_ROOM_ID, 0);
     SceEventStart(0);
     if (r212_work->evd->waitLoadOk() == 1 && m != 0) {
-        MemorySwap(m->pArc, (u32) r212_work->evd->m_addr, r212_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r212_work->evd->getAddr(), r212_work->evd->getSize());
         EvtMgr.SetEvt(m->pArc, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r212_work->evd->m_addr, r212_work->evd->m_size);
+        MemorySwap(m->pArc, (u32) r212_work->evd->getAddr(), r212_work->evd->getSize());
         r212_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     }
     Vec* pa = &ang;
@@ -395,13 +395,13 @@ static void r212_EventTrap()
 // 0x40 on pl0100, then hidden again.
 void Evt_R212S00_Func(Event* e)
 {
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdGetObjPtr(0x1B)->be_flag &= ~2;
         SmdGetObjPtr(0xC)->be_flag &= ~2;
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             void* mod;
 
             if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {

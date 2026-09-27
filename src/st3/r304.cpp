@@ -153,12 +153,12 @@ extern "C" void Evt_R304S00_Func(Event* e)
     cObj* obj;
     SmdWork* w;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         StaFlagOn(pG, STA_CAMERA_SET_ROOM);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             obj = SmdGetObjPtr(0x10);
             if (obj) {
                 e->SetMod("scr0000", obj, 5, 0, 2, 0);
@@ -184,8 +184,8 @@ extern "C" void Evt_R304S00_Func(Event* e)
                 e->EspSetModelPtr(obj);
             }
         }
-        if (e->NowCut == 1) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 1) {
+            if (e->GetNowFrame() == 0) {
                 obj = SmdGetObjPtr(0xA);
                 if (obj) {
                     TexRenderModSet(obj, 0, r304_work->texTbl, r304_work->tex, 1, 1, 1, 1, 1.0f);
@@ -197,7 +197,7 @@ extern "C" void Evt_R304S00_Func(Event* e)
             }
             EvtTexRenderCamTrans(e, 1);
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 obj = SmdGetObjPtr(0xA);
                 if (obj) {
                     TexRenderModRes(obj, 0);
@@ -240,11 +240,8 @@ void EvtTexRenderCamTrans(Event* e, int cut)
 {
     void* mod;
     void* bin;
-    int skip = 1;
+    int skip = e->FlgCkStatus(EvtStfToolFrontExec);
 
-    if ((e->StatusFlag & EvtStfBit(EvtStfToolFrontExec)) == 0) {
-        skip = 0;
-    }
     if (skip == 0) {
         if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {
             TexRenderModAddOt(0, (cModel*) mod);

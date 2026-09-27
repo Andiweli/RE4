@@ -1008,19 +1008,19 @@ void Evt_R214S00_Func(Event* e)
 {
     void* mod;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         SmdSetTrans(0x18, 0);
         break;
     case 1:
-        if (e->NowCut == 0 && e->NowFrame == 0) {
+        if (e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
             if (e->GetMod(&mod, "evma900", 0, 0) == 1) {
                 ((cModel*) mod)->LightInfo.EnableMask = 8;
             }
         }
-        switch (e->NowCut) {
+        switch (e->GetNowCut()) {
         case 0:
-            if (e->NowFrame == 0 && (StaFlagChk(pG, STA_BINOCULAR))) {
+            if (e->GetNowFrame() == 0 && (StaFlagChk(pG, STA_BINOCULAR))) {
                 StaFlagOff(pG, STA_BINOCULAR);
                 r214_work->bino->quit(&pG->Camera);
                 r214_work->bino->~IdBinocular();
@@ -1030,11 +1030,11 @@ void Evt_R214S00_Func(Event* e)
         case 2:
         case 3:
         case 4:
-            if (e->NowFrame == 0 && !StaFlagChk(pG, STA_BINOCULAR)) {
+            if (e->GetNowFrame() == 0 && !StaFlagChk(pG, STA_BINOCULAR)) {
                 StaFlagOn(pG, STA_BINOCULAR);
                 r214_work->bino = new (&r214_work->binoObj) IdBinocular;
                 r214_work->bino->init(&pG->Camera, ROOM_ARC_PTR(pG->pRoom, 0x22), ROOM_ARC_PTR(pG->pRoom, 0x23));
-                if (e->NowCut != 1) {
+                if (e->GetNowCut() != 1) {
                     r214_work->bino->cutin(0);
                 }
                 r214_work->focus = &r214_work->focusObj;

@@ -156,7 +156,7 @@ extern "C" void Evt_R329S00_Func(Event* e)
     cObj* obj;
     SmdWork* w;
 
-    switch (e->FuncType) {
+    switch (e->GetFuncType()) {
     case 0:
         StaFlagOn(pG, STA_CAMERA_SET_ROOM);
         SmdSetTrans(0x30, 1);
@@ -167,8 +167,8 @@ extern "C" void Evt_R329S00_Func(Event* e)
         SmdSetTrans(0x32, 0);
         break;
     case 1:
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0000", 0, 0) == 1) {
@@ -232,8 +232,8 @@ extern "C" void Evt_R329S00_Func(Event* e)
                 }
             }
         }
-        if (e->NowCut == 0) {
-            if (e->NowFrame == 0) {
+        if (e->GetNowCut() == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {
@@ -241,7 +241,7 @@ extern "C" void Evt_R329S00_Func(Event* e)
                 }
             }
         } else {
-            if (e->NowFrame == 0) {
+            if (e->GetNowFrame() == 0) {
                 void* mod;
 
                 if (e->GetMod(&mod, "pl0100", 0, 0) == 1) {
@@ -252,27 +252,27 @@ extern "C" void Evt_R329S00_Func(Event* e)
         {
             void* mod;
 
-            if (e->NowCut <= 0x14) {
-                if (e->NowFrame == 0) {
+            if (e->GetNowCut() <= 0x14) {
+                if (e->GetNowFrame() == 0) {
                     if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                         OBJ18_WK((cObj18*) mod)->be_flag |= 0x40;
                     }
                 }
             } else {
-                if (e->NowFrame == 0) {
+                if (e->GetNowFrame() == 0) {
                     if (e->GetMod(&mod, "pl0200", 0, 0) == 1) {
                         OBJ18_WK((cObj18*) mod)->be_flag &= ~0x40;
                     }
                 }
             }
-            if (e->NowCut == 0x1A) {
-                if (e->NowFrame == 0) {
+            if (e->GetNowCut() == 0x1A) {
+                if (e->GetNowFrame() == 0) {
                     if (e->GetMod(&mod, "em3000a", 0, 0) == 1) {
                         OBJ18_WK((cObj18*) mod)->be_flag |= 0x40;
                     }
                 }
             } else {
-                if (e->NowFrame == 0) {
+                if (e->GetNowFrame() == 0) {
                     if (e->GetMod(&mod, "em3000a", 0, 0) == 1) {
                         OBJ18_WK((cObj18*) mod)->be_flag &= ~0x40;
                     }
