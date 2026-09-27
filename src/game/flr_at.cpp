@@ -73,7 +73,7 @@ FlrAt* FlrAtCheck(int id, Vec* pos, int flag)
         if (at->type != id) {
             continue;
         }
-        if (AreaHitCheck(at->area, &p) != 1) {
+        if (AreaHitCheck(&at->area, &p) != 1) {
             continue;
         }
         if (id != 0) {

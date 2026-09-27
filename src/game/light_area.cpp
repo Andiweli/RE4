@@ -14,7 +14,8 @@ struct LightAreaData {
     u8 x1;
     u8 lightNoPl;    // 0x02  light no for the player (0xFF: none)
     u8 lightNoEm;    // 0x03  light no for the other characters
-    u8 area[0x34];   // 0x04  AreaHitCheck data
+    AREA_HIT_DATA area;  // 0x04
+    u32 flag;        // 0x34  (PS2 LIGHT_AREA::flag; unused here)
     s8 power;        // 0x38  scale in percent
     u8 lightNoSub;   // 0x39  light no for the sub character
     u8 pad_3A[0xD8 - 0x3A];
@@ -136,7 +137,7 @@ void LightAreaUpdateSub(cEm* em, int type)
         if (type == 2 && d->lightNoSub == 0xFF) {
             continue;
         }
-        if (AreaHitCheck(d->area, &pos) != 1) {
+        if (AreaHitCheck(&d->area, &pos) != 1) {
             continue;
         }
         hit = 1;

@@ -2983,7 +2983,7 @@ address	size	section	unit	scope	name	demangled
 0x800C39AC	0x4	.text	game/act_btn.cpp	local	__static_initialization_and_destruction_0_800C39AC	__static_initialization_and_destruction_0
 0x800C39B0	0x2C	.text	game/act_btn.cpp	global	global_constructors_keyed_to_cActionButton_init	global constructors keyed to cActionButton::init
 0x800C39DC	0x2C	.text	game/act_btn.cpp	global	global_destructors_keyed_to_cActionButton_init	global destructors keyed to cActionButton::init
-0x800C3A08	0x90	.text	game/area.cpp	global	AreaHitCheck__FPvP3Vec	AreaHitCheck
+0x800C3A08	0x90	.text	game/area.cpp	global	AreaHitCheck__FP13AREA_HIT_DATAP3Vec	AreaHitCheck
 0x800C3A98	0xD8	.text	game/area.cpp	global	areaHitCheck_xz4	areaHitCheck_xz4
 0x800C3B70	0x94	.text	game/area.cpp	global	areaHitCheck_Cylinder	areaHitCheck_Cylinder
 0x800C3C04	0x12C	.text	game/area.cpp	global	AreaViewCheck	AreaViewCheck

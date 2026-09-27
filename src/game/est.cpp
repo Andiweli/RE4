@@ -112,7 +112,7 @@ void AreaSstSet(int id)
     flag = 0;
     ent = sys->Area_addr->ent;
     for (i = 0; i < sys->Area_addr->num; i++, ent++) {
-        if (AreaHitCheck(ent->area, &pos) == 1) {
+        if (AreaHitCheck(&ent->area, &pos) == 1) {
             flag |= 1 << ent->area_no;
         }
     }

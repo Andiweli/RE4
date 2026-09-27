@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "vec.h"
+#include "area.h"
 
 // Per-type payload of a floor attribute record (FlrAt + 0x44), one view per FlrAt::id. Names and
 // layouts are the PS2 FLR_AT_SE_TYPE / FLR_AT_SE_VOLCTRL / FLR_AT_BGM_VOL / FLR_AT_THUNDER_VOL.
@@ -40,7 +41,7 @@ struct FlrAt {
     u8 group;        // 0x03  group (FlrSys::group 0xFF = any)
     u8 priority;     // 0x04  save order in the tool (15 first)  (PS2 priority)
     u8 padd[15];     // 0x05  (PS2 padd)
-    u8 area[0x30];   // 0x14  area passed to AreaHitCheck
+    AREA_HIT_DATA area;  // 0x14
     union {          // 0x44  payload by `type`
         u8 dmy[64];
         FLR_AT_SE_TYPE se;

@@ -453,7 +453,7 @@ void sndVolCtrlAtCheck(SND_SIT* pSit, u8* vol, u8* svol, Vec* pos)
     if (at == NULL) {
         return;
     }
-    if (AreaHitCheck(at->area, pos) != 0) {
+    if (AreaHitCheck(&at->area, pos) != 0) {
         return;
     }
     if (*vol != 0) {

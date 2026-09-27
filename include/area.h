@@ -57,7 +57,7 @@ struct AREA_HIT_DATA {
 
 struct GEOM_CONE_REV;
 
-BOOL AreaHitCheck(void* pAre, Vec* pPos);
+BOOL AreaHitCheck(AREA_HIT_DATA* pAre, Vec* pPos);
 
 extern "C" {
 BOOL areaHitCheck_xz4(AREA_XZ4* pXz4, Vec* pPos);

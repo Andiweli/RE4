@@ -26,22 +26,21 @@
 
 // 1 when `pos` is inside area (quad or cylinder types; the eye type never hits). Unknown types
 // warn and return 0.
-BOOL AreaHitCheck(void* pAre, Vec* pPos)
+BOOL AreaHitCheck(AREA_HIT_DATA* pAre, Vec* pPos)
 {
-    AREA_HIT_DATA* a = (AREA_HIT_DATA*) pAre;
     int ret = 0;
 
-    switch (a->type) {
+    switch (pAre->type) {
     case AREA_TYPE_XZ4:
-        ret = areaHitCheck_xz4(&a->xz4, pPos);
+        ret = areaHitCheck_xz4(&pAre->xz4, pPos);
         break;
     case AREA_TYPE_CYLINDER:
-        ret = areaHitCheck_Cylinder(&a->cylinder, pPos);
+        ret = areaHitCheck_Cylinder(&pAre->cylinder, pPos);
         break;
     case AREA_TYPE_EYE:
         break;
     default:
-        pLog->warn(0, 0, AREA_TYPE_ERR, a->type);
+        pLog->warn(0, 0, AREA_TYPE_ERR, pAre->type);
         ret = 0;
         break;
     }

@@ -340,7 +340,7 @@ void EffAreaUpdate()
     flag = 0;
     ent = sys->Area_addr->ent;
     for (i = 0; i < sys->Area_addr->num; i++, ent++) {
-        if (AreaHitCheck(ent->area, &pos) == 1) {
+        if (AreaHitCheck(&ent->area, &pos) == 1) {
             flag |= 1 << ent->area_no;
             if (ent->flag & 1) {
                 StaFlagOn(pG, STA_CAMERA_IN_ROOM);
@@ -375,7 +375,7 @@ int EffAreaCheckInRoom(Vec* pos)
 
     ent = sys->Area_addr->ent;
     for (i = 0; i < sys->Area_addr->num; i++, ent++) {
-        if (AreaHitCheck(ent->area, pos) == 1) {
+        if (AreaHitCheck(&ent->area, pos) == 1) {
             if (ent->flag & 1) {
                 return 1;
             }
@@ -394,7 +394,7 @@ int EffAreaCheckNo(Vec* pos, u8 areaNo)
     ent = sys->Area_addr->ent;
     for (i = 0; i < sys->Area_addr->num; i++, ent++) {
         if (areaNo == ent->area_no) {
-            if (AreaHitCheck(ent->area, pos) == 1) {
+            if (AreaHitCheck(&ent->area, pos) == 1) {
                 return 1;
             }
         }

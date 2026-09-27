@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "vec.h"
+#include "area.h"
 #include "model.h"
 #include "light.h"
 #include "esp.h"
@@ -57,7 +58,7 @@ struct SstAreaEnt {
     u8 be_flag;//  (PS2 ESP_AREA.be_flag)
     u8 area_no;            // 0x02 display flag bit set while the player stands in the area  display flag bit set while the player stands in the area (PS2 ESP_AREA.area_no)
     u8 pad02;//  (PS2 ESP_AREA.pad02)
-    u8 area[0x30];     // 0x04 AreaHitCheck data (AREA_HIT_DATA)
+    AREA_HIT_DATA area;     // 0x04
     u32 flag;         // 0x34 bit0: the area counts as "in room" (esp_app EffAreaCheckInRoom)  (PS2 ESP_AREA.flag)
     u8 pad_38[0x98 - 0x38];
 };
