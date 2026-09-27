@@ -4,7 +4,7 @@
 #include "types.h"
 #include "vec.h"
 
-// game/main.cpp globals that are not part of GlobalWork.
+// game/main.cpp globals that are not part of GLOBAL_WK.
 
 // Persistent system settings (pRK), kept across a soft reset: systemResetCommon fills it and main.cpp
 // restores pSys and pG from it on the next boot.

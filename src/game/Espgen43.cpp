@@ -542,7 +542,7 @@ void Espgen43_Destruct(EspgenWork* pGen)
 // Espgen SetFreeWork for id 0x43: grid size prm 0xCC / 0xD0 (default 64, max 256), colours /
 // ambient from the record, texture Tex_id, repeat 2^Work8[0], height scale Size_plus + 1; runs
 // one move step at once.
-int Espgen43_SetFreeWork(EspgenWork* pGen, EspGenWork* pSeq, EspSeqData* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
+int Espgen43_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, EspSeqData* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
                          Vec* pOffset, Vec* pAng, EspSeqOpt* pSct)
 {
     Espgen43Work* p = (Espgen43Work*) pGen->work;

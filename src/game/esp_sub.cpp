@@ -894,7 +894,7 @@ int cEsp::ColorUpdate()
 }
 
 // Base per-id parameter set-up: nothing to read (returns 1); ids with their own work override it.
-int cEsp::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     return 1;
 }
@@ -1102,7 +1102,7 @@ void cEsp::Destruct()
 int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend)
 {
     EspSeqData* head;
-    EspGenWork* rec;
+    cEspSeqTbl* rec;
     EspInfo info;
     Mtx m;
     u8 type;
@@ -1138,7 +1138,7 @@ int EspEstSetSelect(int owner, int id, int no, cEsp** ppEsp, int bNoSuspend)
 // Creates one esp from an effect record (Id 0xFC..0xFF are effect models, made by EfmSeqSet): copies
 // the record, resolves the parent, runs the id's SetFreeWork and applies the EspSeqOpt overrides.
 // Returns 1 with the new esp, or 0 with the dummy esp on failure.
-int EspSeqSet(EspGenWork* pSeq, EspInfo* pCore, u32* pRand_seed, cModel* pMod, Mtx* pMat, int flg, f32 f, cEsp** ppEsp,
+int EspSeqSet(cEspSeqTbl* pSeq, EspInfo* pCore, u32* pRand_seed, cModel* pMod, Mtx* pMat, int flg, f32 f, cEsp** ppEsp,
               EspSeqOpt* pSct, Vec* pOffset)
 {
     static int bl[6][4] = {

@@ -34,7 +34,7 @@
 #define LOOP(x, lo, hi) (((x) < (lo)) ? (hi) : ((x) > (hi)) ? (lo) : (x))
 
 // The motion work of this build: model.h's MotionWork without the trailing blend/flip/blendTbl pointers
-// (0xD0 bytes; em.h MotionWorkSub is the same block).
+// (0xD0 bytes; em.h MOTION_INFO is the same block).
 struct DbMotWork {
     MotionData* data;     // 0x00
     u32* keyTbl;          // 0x04

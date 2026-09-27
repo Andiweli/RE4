@@ -30,7 +30,7 @@ static EmSwitchFunc EmSwitch_R1_move_tbl[3] = {
 // Damage_ck is on, toggles the lever (open <-> close) like the action button would.
 static void emSwitchDmCk(cEmSwitch* pEm)
 {
-    EmSwitchWork* w = EMSWITCH_WK(pEm);
+    FREE_EMSWITCH* w = EMSWITCH_WK(pEm);
     int near;
     u8 wep;
 
@@ -120,7 +120,7 @@ static void emSwitchDmCk(cEmSwitch* pEm)
 cEmSwitch* SetEmSwitch(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo)
 {
     cEmSwitch* em;
-    EmSwitchWork* w;
+    FREE_EMSWITCH* w;
     u16* flg;
 
     flg = GetEtcFlgPtr(flagNo, pG->room_id);
@@ -186,7 +186,7 @@ cEmSwitch* SetEmSwitch(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo)
 // model-vs-player atari.
 void cEmSwitch::move()
 {
-    EmSwitchWork* w = EMSWITCH_WK(this);
+    FREE_EMSWITCH* w = EMSWITCH_WK(this);
 
     if (w->Barrel_wait) {
         w->Barrel_wait--;
@@ -207,7 +207,7 @@ void emSwitch_R1_Set(cEmSwitch* pEm)
 // opens the linked gate(s) and settles in state 1 (Mode 2: immediately closes again).
 void emSwitch_R1_Open(cEmSwitch* pEm)
 {
-    EmSwitchWork* w = EMSWITCH_WK(pEm);
+    FREE_EMSWITCH* w = EMSWITCH_WK(pEm);
     cParts* p;
 
     switch (pEm->r_no_2) {
@@ -250,7 +250,7 @@ void emSwitch_R1_Open(cEmSwitch* pEm)
 // setAutoOpen: swings back open at once).
 void emSwitch_R1_Close(cEmSwitch* pEm)
 {
-    EmSwitchWork* w = EMSWITCH_WK(pEm);
+    FREE_EMSWITCH* w = EMSWITCH_WK(pEm);
     cParts* p;
 
     switch (pEm->r_no_2) {
@@ -319,7 +319,7 @@ int cEmSwitch::ckOpen()
 // Starts opening a closed lever (Rno1 1) and forwards to the connected switch.
 void cEmSwitch::setOpen()
 {
-    EmSwitchWork* w = EMSWITCH_WK(this);
+    FREE_EMSWITCH* w = EMSWITCH_WK(this);
 
     if (w->Status == 2) {
         w->Status = 0;
@@ -338,7 +338,7 @@ void cEmSwitch::setOpen()
 // switch.
 void cEmSwitch::setClose()
 {
-    EmSwitchWork* w = EMSWITCH_WK(this);
+    FREE_EMSWITCH* w = EMSWITCH_WK(this);
 
     if (w->Status == 1 && w->Mode != 1) {
         w->Status = 0;
@@ -356,7 +356,7 @@ void cEmSwitch::setClose()
 // Snaps the lever to the open position (no gate update).
 void cEmSwitch::setOpened()
 {
-    EmSwitchWork* w = EMSWITCH_WK(this);
+    FREE_EMSWITCH* w = EMSWITCH_WK(this);
 
     getPartsPtr(1)->ang.x = 0.0f;
     w->Status = 1;
@@ -366,7 +366,7 @@ void cEmSwitch::setOpened()
 // Snaps the lever to the closed position.
 void cEmSwitch::setClosed()
 {
-    EmSwitchWork* w = EMSWITCH_WK(this);
+    FREE_EMSWITCH* w = EMSWITCH_WK(this);
 
     getPartsPtr(1)->ang.x = 1.3613569f;
     w->Status = 2;
@@ -376,7 +376,7 @@ void cEmSwitch::setClosed()
 // Links the primary gate the lever drives and matches its current open / closed state.
 void cEmSwitch::setBarred(cEmBarred* b)
 {
-    EmSwitchWork* w = EMSWITCH_WK(this);
+    FREE_EMSWITCH* w = EMSWITCH_WK(this);
 
     w->pBarred = b;
     if (w->Status == 1) {
@@ -390,7 +390,7 @@ void cEmSwitch::setBarred(cEmBarred* b)
 // Links a second gate driven together with the first.
 void cEmSwitch::setBarred2nd(cEmBarred* pBarred)
 {
-    EmSwitchWork* w = EMSWITCH_WK(this);
+    FREE_EMSWITCH* w = EMSWITCH_WK(this);
 
     w->pBarred2 = pBarred;
     if (w->Status == 1) {
@@ -404,7 +404,7 @@ void cEmSwitch::setBarred2nd(cEmBarred* pBarred)
 // Links another lever that mirrors this one's operation.
 void cEmSwitch::setConnectSwitch(cEmSwitch* s)
 {
-    EmSwitchWork* w = EMSWITCH_WK(this);
+    FREE_EMSWITCH* w = EMSWITCH_WK(this);
 
     w->pSwitch = s;
     if (w->Status == 1) {
@@ -426,7 +426,7 @@ void cEmSwitch::setActButton(int flag)
 // lever, closes an open one unless Mode 1.
 void emSwitchOperationActEvtCk(cEmSwitch* pObj)
 {
-    EmSwitchWork* w = EMSWITCH_WK(pObj);
+    FREE_EMSWITCH* w = EMSWITCH_WK(pObj);
     f32 dz;
     f32 dx;
 

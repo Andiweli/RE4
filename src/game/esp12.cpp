@@ -20,7 +20,7 @@ public:
     Esp12Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
     virtual void Destruct();
 };
 
@@ -182,7 +182,7 @@ void cEsp12::Destruct()
 
 // Num = Work8[0] + 2 (Work8[0] <= 123), allocates the esp3f buffer and fills every slot with the
 // current world position; never Z-culled (m_Flg bit1). Fails when the buffer cannot be pulled.
-int cEsp12::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp12::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp12Work* w = &m_Free;
     Vec wpos;

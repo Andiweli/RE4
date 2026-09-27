@@ -22,7 +22,7 @@ public:
     Esp03Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" void Esp03_HitWall(cEsp03* esp);
@@ -161,7 +161,7 @@ extern "C" void Esp03_Trans(cEsp03* esp)
 }
 
 // Point count from Work8[0] (10 = quad mode), wall flag Work8[1] (0/1), never Z-culled.
-int cEsp03::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp03::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp03Work* w = &m_Free;
     int n;

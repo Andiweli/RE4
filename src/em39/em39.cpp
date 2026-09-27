@@ -7188,7 +7188,7 @@ void em39BloodSet(cEm39* em)
 void em39BlendMotSet(cEm39* em, void* m0, void* m1, void* m2, void* seq0, void* seq1, void* seq2, u16 attr)
 {
     Em39Work* w = EM39_WK(em);
-    MotionWorkSub* bm;
+    MOTION_INFO* bm;
     void* m;
     void* seq;
     void* ai;

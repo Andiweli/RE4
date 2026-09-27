@@ -24,7 +24,7 @@ public:
     Esp01Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -393,7 +393,7 @@ void EspStrip_draw_poly(cEsp* esp, int no, Vec* v, u8 texRepeat, int flag)
 
 // Segment count 15 - Work8[0] (2 when Work8[0] > 12, max 15), point interval Work8[1], and the
 // spawn position as pos0.
-int cEsp01::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp01::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp01Work* w = &m_Free;
 

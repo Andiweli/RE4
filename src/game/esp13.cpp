@@ -9,7 +9,7 @@ public:
     u32 xF8;
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x13] factory.
@@ -29,7 +29,7 @@ void cEsp13::move()
 }
 
 // Always fails ("Invalid ID 'ESP13'"), so EspSeqSet releases the effect straight away.
-int cEsp13::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp13::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     pLog->err(0, 0, "ESP : Invalid ID 'ESP13' ");
     return 0;

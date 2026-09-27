@@ -1147,7 +1147,7 @@ int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
     static int site_UMD = 0;
     static int yes_no = 0;
     static int near_far = 0;
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     CAMERA* cam = &g->Camera;
     CameraQuasiFPS* q = &CamCtrl.m_QuasiFPS;
     Mtx inv;

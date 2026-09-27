@@ -14,7 +14,7 @@ public:
     Esp4fWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // Create entry of the EffSetId function table for effect id 0x4F.
@@ -47,7 +47,7 @@ void cEsp4f::move()
 }
 
 // Work8[0] of the record is the effect area number the sprite is gated on.
-int cEsp4f::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp4f::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     m_Free.area_no = pSeq->Work8[0];
     return 1;

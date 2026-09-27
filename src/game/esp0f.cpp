@@ -22,7 +22,7 @@ public:
     Esp0fWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x0F] factory.
@@ -215,7 +215,7 @@ extern "C" void Esp0f_Trans(cEsp0f* esp)
 }
 
 // Brightness scale Pow from Work8[0] (0..2, else fails).
-int cEsp0f::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp0f::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     m_Free.Pow = pSeq->Work8[0];
     if (m_Free.Pow > 2) {

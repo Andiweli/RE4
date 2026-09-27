@@ -34,7 +34,7 @@ void roomJumpExec(test* w);
 void roomJumpExit(test* w);
 }
 
-// The original stores GlobalWork fields through references: GCC then reloads pG after every store.
+// The original stores GLOBAL_WK fields through references: GCC then reloads pG after every store.
 
 // Stage offset table right after the count; as an inline the base stays a pointer register (lwzx).
 static inline u32* ofsTbl(u32* tbl)

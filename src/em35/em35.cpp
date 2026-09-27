@@ -2241,7 +2241,7 @@ static void plem35DashEscape(cPlayer* pl)
 void em35EscapeCamMove(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec a;
     Vec b;
     Vec c;
@@ -2311,7 +2311,7 @@ static void plem35DmStamp(cPlayer* pl)
 void em35StampCamMove(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     CAMERA* cam = &w->cam;
     Vec a;
     cParts* p;
@@ -4964,7 +4964,7 @@ void em35BlendMotSet(cEm35* em, void* m0, void* m1, void* m2, void* m3, int a, i
 {
     Em35Work* w = EM35_WK(em);
     f32 rate = fabsf(w->blendRate);
-    MotionWorkSub* bm;
+    MOTION_INFO* bm;
     void* m;
     int seq;
 

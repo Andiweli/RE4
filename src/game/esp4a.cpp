@@ -21,7 +21,7 @@ public:
     Esp4aWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x4A] factory.
@@ -57,7 +57,7 @@ void Esp4a_Trans()
 }
 
 // Maps Work8[0] 0/1/2 to axis mask 2/1/3 (anything else fails), fade range from Vec0.z.
-int cEsp4a::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp4a::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp4aWork* w = &m_Free;
 

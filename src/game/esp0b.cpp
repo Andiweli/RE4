@@ -20,7 +20,7 @@ public:
     Esp0bWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x0B] factory.
@@ -127,7 +127,7 @@ extern "C" void Esp0b_Trans(cEsp0b* esp)
 }
 
 // Jitter amplitudes from Vec0; Work8[0..1] must be 0 (reported, not fatal).
-int cEsp0b::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp0b::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     m_Free.BasePos = pSeq->Vec0;
     if (pSeq->Work8[0] != 0) {

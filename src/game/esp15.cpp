@@ -23,7 +23,7 @@ public:
     Esp15Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x15] factory.
@@ -142,7 +142,7 @@ void cEsp15::move()
 // Delete distances from Work8[0..1] (x 10), fade ratio Work8[2] (%), indoor fade frames Work8[3],
 // box size R_pos.z (position randomised inside it), floor Vec0.x. Starts fully faded when the
 // player is already indoors.
-int cEsp15::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp15::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp15Work* w = &m_Free;
 

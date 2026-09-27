@@ -115,7 +115,7 @@ void QuakeScheduler()
 void QuakeMain()
 {
     static s8 rnd_tbl[16] = {0, -1, 1, 2, -1, 0, 1, -1, 1, -1, 0, 1, -1, -2, 0, 1};
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     CAMERA* cam = &g->Camera;
     Vec ofs = {0.0f, 0.0f, 0.0f};
 

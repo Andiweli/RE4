@@ -5467,7 +5467,7 @@ int em2dCamMove(cEm2d* em, int mode, f32 rate)
 void em2dDieCamMove(cEm2d* em)
 {
     Em2dWork* w = EM2D_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec pos;
     Vec at;
 

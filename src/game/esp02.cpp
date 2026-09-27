@@ -22,7 +22,7 @@ public:
     Esp02Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -191,7 +191,7 @@ void esp02Trans_sub(cEsp02* pEsp)
 }
 
 // Records the base position and an identity ParMat; screen-mode Parts_no is rejected.
-int cEsp02::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp02::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp02Work* w = &m_Free;
 

@@ -11,7 +11,7 @@ public:
     u32 xF8;
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x44] factory.
@@ -27,7 +27,7 @@ void cEsp44::move()
 
 // Plays room SE Work8[0] at m_Pos (skipped while the generator loop pre-runs so the sound is not
 // replayed) and returns 0 so the sprite is released immediately.
-int cEsp44::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp44::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     if (EspGenGetMoveLoop() == 0) {
         EffCallRoomSeFunc((s8)pSeq->Work8[0], &m_Pos);

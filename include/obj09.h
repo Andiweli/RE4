@@ -13,14 +13,14 @@ struct Efm09Work {
     Vec Ig;              // 0x10  moments of inertia: moment_mul * m * (size.y^2 + size.z^2) / 12, ... (obj09 dwdt)
     u8 pad_1C[4];
     Vec prev_X;          // 0x20  = X at set up
-    Vec X;               // 0x2C  EspGenWork x0C + random (y + 0.0001)
+    Vec X;               // 0x2C  cEspSeqTbl x0C + random (y + 0.0001)
     Mtx R;               // 0x38  identity at set up
-    Vec V;               // 0x68  EspGenWork x24 + random, * m * 100 (obj09: velocity)
+    Vec V;               // 0x68  cEspSeqTbl x24 + random, * m * 100 (obj09: velocity)
     Vec w;               // 0x74  0 at set up (obj09: world angular velocity, R * wg)
-    Vec size;            // 0x80  EspGenWork xD8..xE0 * 100 + 250
+    Vec size;            // 0x80  cEspSeqTbl xD8..xE0 * 100 + 250
     Vec F;               // 0x8C  force accumulated by AddForce, cleared every CalcVel
     Vec Tq;              // 0x98  torque accumulated by AddForce
-    Vec wg;              // 0xA4  EspGenWork x70 + random (overlaps cObj attr / callBack): local angular velocity
+    Vec wg;              // 0xA4  cEspSeqTbl x70 + random (overlaps cObj attr / callBack): local angular velocity
 };
 
 // Rigid body effect model (Efm09): a box with mass and moments of inertia, integrated with a

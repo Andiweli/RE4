@@ -18,7 +18,7 @@ public:
     Esp1aWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" void get_angle(Vec* v, f32* rx, f32* ry);
@@ -95,7 +95,7 @@ void get_angle(Vec* vec, f32* ang_x, f32* ang_y)
 // Requires a parent model: places m_Pos at gen->Pos + random disc offset (radius R_pos.z) +
 // a random fraction (R_pos.x..R_pos.y) of the parts' y axis, rotates speed / acceleration by the
 // model's angles, then detaches into world space. Fails without a parent or a bad parts number.
-int cEsp1a::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp1a::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp1aWork* w = &m_Free;
 

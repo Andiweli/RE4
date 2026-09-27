@@ -230,9 +230,9 @@ struct MotionData {
 
 struct AttachCamera;   // cam_ctrl.h
 
-// Per-model motion work (game/motion.cpp; PS2 MOTION_INFO), 0xD0 bytes: what cModel::cModel clears, what
+// Per-model motion work (game/motion.cpp), 0xD0 bytes: what cModel::cModel clears, what
 // a blend motion (MotionWork::blend, the enemy works' blendMot) is, and the prefix of cModel::Motion.
-struct MotionWorkSub {
+struct MOTION_INFO {
     MotionData* pMot;     // 0x00  NULL = no motion
     u32* pHermite_data;          // 0x04  per parts key data
     u16 Key_hist[2][2][3];    // 0x08  root key history [flip][rot/pos][axis]
@@ -274,8 +274,8 @@ struct MotionWorkSub {
 
 // cModel::Motion at cModel+0x1D8, 0xDC bytes: the motion work with the GC's three pointers after it
 // (the PS2 keeps them as cModel members pMotionB / pXFlip / pDblJnt).
-struct MotionWork : public MotionWorkSub {
-    MotionWorkSub* blend;    // 0xD0  second motion blended in by MotionMove (PS2 cModel pMotionB)
+struct MotionWork : public MOTION_INFO {
+    MOTION_INFO* blend;    // 0xD0  second motion blended in by MotionMove (PS2 cModel pMotionB)
     u16* flip;            // 0xD4  parts index remap for flipped motions
     u16* blendTbl;        // 0xD8  {count, (dst, a, b, percent)...} quaternion blended parts
 };
@@ -503,7 +503,7 @@ public:
     cModelInfo* pShadowModelInfo; // 0x160  (db_work "pShMdIfo")
     cLightInfo LightInfo;  // 0x164 .. 0x1D8
 
-    MotionWork Motion;     // 0x1D8 .. 0x2B4  motion work (motion.h MOTION(m), cMotBase `m->Motion`; PS2 MOTION_INFO Motion)
+    MotionWork Motion;     // 0x1D8 .. 0x2B4  motion work (motion.h MOTION(m), cMotBase `m->Motion`; PS2 Motion)
     cAtariInfo atari;          // 0x2B4 .. 0x300  (rect size at 0x2C0/0x2C4)
     Vec* inscreen_pos;                  // 0x300  (cModel::cModel clears it)
     u32 pPath;                  // 0x304  (cModel::cModel clears it)

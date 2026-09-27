@@ -695,7 +695,7 @@ static void em32_R0_Init(cEm32* em)
     EstSet(em, -1, 0, 0, EFF_EM32, 4, 0, w->espKind[0], em, (void*) zero);
     w->mode = zero;
 #line 1000 "D:/Bio4/Prog/em32.cpp"
-    w->pMot = (MotionWorkSub*) MEM_ALLOC(0xD0, 1, 0xD);
+    w->pMot = (MOTION_INFO*) MEM_ALLOC(0xD0, 1, 0xD);
     if (w->pMot) {
         memclr_asm(w->pMot, 0xD0);
     }

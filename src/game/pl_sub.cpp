@@ -24,7 +24,7 @@
 
 
 // Stores through references: scalar MEMs, so pG is reloaded after each of them (the original
-// reloads pG after every store to a GlobalWork field in this unit).
+// reloads pG after every store to a GLOBAL_WK field in this unit).
 
 // Routine bytes of the player set through one fresh load of pPL (the four byte stores share one
 // register in the original even right after a call, unlike direct `pPL->xFC = ..` stores).

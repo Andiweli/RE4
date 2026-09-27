@@ -32,7 +32,7 @@ public:
     Esp4eWork m_Free;       // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
     virtual void Destruct();
 };
 
@@ -152,7 +152,7 @@ void Esp4e_Trans()
 // by ny = size_y/200*24 (2..50), cell size from Vec0, Tool_flg bit 0 clears the cloth flag, and the
 // wave parameters from Work8[0..3] / prm xCC,xD0 / xD4 / WorkSp8[0..2]. Returns 0 (effect not
 // created) when the texture or a cloth slot is unavailable.
-int cEsp4e::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp4e::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp4eWork* wk = &m_Free;
     void* tpl;

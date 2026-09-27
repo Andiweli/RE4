@@ -74,13 +74,13 @@ struct Em39Work {
     f32 Blend;         // 0x6CC (0xAAC)  aim pitch, the blend rate of em39BlendMotSet (PS2 Blend, with Hokan / Frame / Sub_mot)
     int Hokan;             // 0x6D0 (0xAB0)
     int Frame;             // 0x6D4 (0xAB4)
-    MotionWorkSub Sub_mot;  // 0x6D8 (0xAB8)  em39BlendMotSet second motion
+    MOTION_INFO Sub_mot;  // 0x6D8 (0xAB8)  em39BlendMotSet second motion
     void* Mot_M;        // 0x7A8 (0xB88)  bow shot blend motions (em39BlendMotSet)
     void* Mot_L;        // 0x7AC (0xB8C)
     void* Mot_R;        // 0x7B0 (0xB90)
     void* Seq_M;        // 0x7B4 (0xB94)  sequence passed as em39BlendMotSet's 4th argument (PS2 u32 Seq_M)
     u8 pad_7B8[0xC];
-    MotionWorkSub Arm_mot;  // 0x7C4 (0xBA4)  tower form left arm motion (em39ArmControl)
+    MOTION_INFO Arm_mot;  // 0x7C4 (0xBA4)  tower form left arm motion (em39ArmControl)
     int HoseiCnt;         // 0x894 (0xC74)  frames the enemy moved less than half of the intended distance
     int Hide_timer;             // 0x898 (0xC78)
     int Back_atk_wait;             // 0x89C (0xC7C)

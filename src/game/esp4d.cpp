@@ -13,7 +13,7 @@ public:
     u8 type;  // 0xF8 0: push down, 1: pull up
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // Create entry of the EffSetId function table for effect id 0x4D.
@@ -67,7 +67,7 @@ void Esp4d_Trans()
 
 // Reads the effect-record parameter Work8[0] as the push (0) / pull (1) type; other values log an
 // error and fall back to 0. Always succeeds (returns 1).
-int cEsp4d::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp4d::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     type = pSeq->Work8[0];
     if (type > 1) {

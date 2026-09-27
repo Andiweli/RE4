@@ -16,7 +16,7 @@ struct Efm05Work {
     f32 Size_mul;           // 0x20  Size_mul += Size_plus, Size_plus *= D_size_plus
     f32 Size_plus;          // 0x24
     f32 D_size_plus;        // 0x28
-    u8 Col_start_r;         // 0x2C  start colour (EspGenWork x9C..x9F)
+    u8 Col_start_r;         // 0x2C  start colour (cEspSeqTbl x9C..x9F)
     u8 Col_start_g;         // 0x2D
     u8 Col_start_b;         // 0x2E
     u8 Col_start_a;         // 0x2F  alpha at the end of the fade-in
@@ -43,7 +43,7 @@ struct Efm05Work {
     f32 Kaboom_gravity;     // 0x70  added to the parts speed y
     f32 Kaboom_d_spd;       // 0x74  parts speed *= Kaboom_d_spd
     u32 Pt_hit_size;        // 0x78
-    Vec RefRate;            // 0x7C  x/z: horizontal, y: vertical rebound rate (EfmSetObj05: EspGenWork xE4 * 0.1; PS2 OBJ05_FREE RefRate)
+    Vec RefRate;            // 0x7C  x/z: horizontal, y: vertical rebound rate (EfmSetObj05: cEspSeqTbl xE4 * 0.1; PS2 OBJ05_FREE RefRate)
     u32 Rand_seed;          // 0x88  fRandSeed1_1 seed
 };
 

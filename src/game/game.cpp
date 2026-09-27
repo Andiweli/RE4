@@ -84,7 +84,7 @@ void DbMenuExec();
 void DbMenuRoomInit();
 
 // Stores through a scalar reference: not struct-member MEMs, so GCC 2.95 assumes they may alias
-// pG and reloads it afterwards, as the original does after every GlobalWork store.
+// pG and reloads it afterwards, as the original does after every GLOBAL_WK store.
 // One flag test per call: fold would merge `(f & A) || (f & B)` on one lvalue into a single mask.
 static inline u32 Flag54(u32 b) { return pG->System_flg & b; }
 
@@ -779,11 +779,11 @@ void GameContinue(int option_flag)
     pG->Rno3 = 0;
 }
 
-// GlobalWork 0x4FA4 .. 0x500C: the part of the save block that survives clearGlobalSaveData.
+// GLOBAL_WK 0x4FA4 .. 0x500C: the part of the save block that survives clearGlobalSaveData.
 struct GlobalKeep {
     u8 b[0x68];
 };
-// GlobalWork 0x8330 .. 0x8338: also kept.
+// GLOBAL_WK 0x8330 .. 0x8338: also kept.
 struct GlobalKeep2 {
     u32 x8330;
     u32 x8334;

@@ -32,7 +32,7 @@ public:
     Esp08Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -770,7 +770,7 @@ void Esp08_TransShimmer(cEsp08* esp, int u_pow)
 
 // Repeat counts from Work8[0..1] (min 1), scroll speeds from prm 0xCC / 0xD0, indoor fade frames
 // Work8[3], mask type Work8[2] (0/1, else fails); remembers the initial alpha.
-int cEsp08::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp08::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp08Work* w = &m_Free;
     u32 type;

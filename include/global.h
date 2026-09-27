@@ -119,7 +119,7 @@ struct EmiData;   // embarrel.h (PS2 EMINFO_DATA)
 
 // Global game work (`pG`, game/main.cpp). Offsets come from the cam_ctrl unit; extend the
 // pads as other units reveal more fields, never rewrite.
-struct GlobalWork {
+struct GLOBAL_WK {
     s32 IsDevConsole;          // 0x00  1 = development hardware (main: OSGetConsoleType & 0xF0000000)
     u8 shooting_mode;      // 0x04  shooting range mode (title: shoot_mode[] name table; em10/em39: 9999 damage, marker lines)
     u8 CardLastSelNo;            // 0x05  save file number last loaded/saved (card dataSelect)
@@ -268,11 +268,11 @@ struct GlobalWork {
     u8 pad_835C[0x8678 - 0x835C];
     s8 debug_mode;         // 0x8678  debug page number (t_page), 0xF = camera rail debug draw
     s8 debug_disp;         // 0x8679  debug page shown by the game (0 = off); t_page/t_sc_shot edit it
-    u8 pad_867A[0x8680 - 0x867A];  // sizeof == 0x8680 (main: memclr_asm(pG, sizeof(GlobalWork)))
+    u8 pad_867A[0x8680 - 0x867A];  // sizeof == 0x8680 (main: memclr_asm(pG, sizeof(GLOBAL_WK)))
 };
 
-extern GlobalWork* pG;
-extern GlobalWork Global;  // the instance pG points at (game/main.cpp); static initializers take its address
+extern GLOBAL_WK* pG;
+extern GLOBAL_WK Global;  // the instance pG points at (game/main.cpp); static initializers take its address
 
 // The first room flag word read through a helper: a plain scalar access, not a member chain.
 static inline u32* eventFlags() { return &pG->Room_flg[0]; }
@@ -1368,9 +1368,9 @@ static inline void U16Set(u16& d, u16 v) { d = v; }
         memcpy(copyDst_, &(src), sizeof(Vec)); \
     }
 
-// Offset of a GlobalWork member, written with the null-pointer idiom. Address arithmetic that adds it to pG
+// Offset of a GLOBAL_WK member, written with the null-pointer idiom. Address arithmetic that adds it to pG
 // keeps the offset as the last term (`pG->field` adds it first), which some callers need.
-#define PG_OFS(f) ((u32) &((GlobalWork*) 0)->f)
+#define PG_OFS(f) ((u32) &((GLOBAL_WK*) 0)->f)
 // Death words of enemy list `list` (Em_flg row: eight u32, one bit per entry). The scaled index is added to pG
 // first and the member offset last; written as `pG->Em_flg[list]` the address is built differently.
 #define EM_FLG_ROW(list) ((u32*) ((list) * 0x20 + (u32) pG + PG_OFS(Em_flg)))

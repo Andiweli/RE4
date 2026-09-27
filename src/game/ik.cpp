@@ -21,7 +21,7 @@ static void heel2toe(Mtx m, cParts* p, Vec* pos);
 
 // Called by MotionSetCore for a new motion: marks the IK chains of the motion's joint table and
 // stores their bend axis, bone lengths and options. A degenerate bend plane disables the chain.
-void IKInit(cModel* pEm, MotionWorkSub* pInfo)
+void IKInit(cModel* pEm, MOTION_INFO* pInfo)
 {
     Vec axis;
     Mtx mtx;
@@ -302,7 +302,7 @@ static void heel2toe(Mtx m, cParts* p, Vec* pos)
 void InverseKinematics(cModel* pEm, int arm_flag)
 {
     cEm* em = (cEm*) pEm;
-    MotionWorkSub* blend = MOTION(pEm)->blend;
+    MOTION_INFO* blend = MOTION(pEm)->blend;
     Mtx inv;
     Vec target;
     Vec a;

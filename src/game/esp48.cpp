@@ -23,7 +23,7 @@ public:
     Esp48Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x48] factory.
@@ -52,7 +52,7 @@ void cEsp48::move()
 }
 
 // Amplitudes (x 0.1) and frequencies per axis from Vec0..Vec2; the timer starts at a random phase.
-int cEsp48::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp48::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp48Work* w = &m_Free;
 

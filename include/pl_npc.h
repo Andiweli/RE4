@@ -61,7 +61,7 @@ public:
     u32 satAttr;              // 0x438  scenario attribute of the wall in front (anaSatInfo)
     Vec satCross;             // 0x43C  hit point of the action wall check (actionCheck)
     Vec satNorm;              // 0x448  its normal
-    MotionWorkSub subMot;     // 0x454 .. 0x524  look-back motion blended in (backCheckSet -> blendMot)
+    MOTION_INFO subMot;     // 0x454 .. 0x524  look-back motion blended in (backCheckSet -> blendMot)
     cModelInfo* m_pModRHand;  // 0x524  hand model infos (pl11 cSubAshley::setHand)
     cModelInfo* m_pModLHand;  // 0x528
     f32 fWork0;               // 0x52C  fence / window action direction

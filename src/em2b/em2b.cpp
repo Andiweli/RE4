@@ -4385,7 +4385,7 @@ static void plem2bDashEscape(cPlayer* pl)
 void em2bEscapeCamMove(cEm2b* em)
 {
     Em2bWork* w = EM2B_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec a;
     Vec b;
     Vec c;
@@ -5325,7 +5325,7 @@ static void plem2bDmBlow(cPlayer* pl)
 void em2bBlowCamMove(cEm2b* em, f32 rate)
 {
     Em2bWork* w = EM2B_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
 
     cParts* p;
 
@@ -5345,7 +5345,7 @@ void em2bBlowCamMove(cEm2b* em, f32 rate)
 void em2bStampCamMove(cEm2b* em)
 {
     Em2bWork* w = EM2B_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec v;
     cParts* p;
 

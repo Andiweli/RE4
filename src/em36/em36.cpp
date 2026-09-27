@@ -4222,7 +4222,7 @@ void em36SetHitMark(cEm36* em, int big)
     seq = EspGetEstAddr(EFF_EM36, kind, 1);
     if (seq) {
         for (i = 0; i < seq->num; i++) {
-            EspGenWork* r = &seq->rec[i];
+            cEspSeqTbl* r = &seq->rec[i];
 
             r->Pos = lp;
             r->Parts_no = part->parts_no - 1;

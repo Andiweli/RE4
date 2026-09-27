@@ -25,7 +25,7 @@ public:
     Esp07Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -204,7 +204,7 @@ void cEsp07::move()
 
 // Damping from Vec0 x 0.1, est owner/id pairs from Work8[0..3], HitType / EstCall / SeType from
 // WorkSp8[0..2] (range-checked, else fails); a zero life becomes 0x80 frames.
-int cEsp07::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp07::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp07Work* w = &m_Free;
 

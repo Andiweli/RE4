@@ -19,7 +19,7 @@ public:
     Esp0dWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x0D] factory.
@@ -63,7 +63,7 @@ void cEsp0d::move()
 
 // Range / strength from Work8[0..1], Type from WorkSp8[0] (only 0 is valid); the target is the
 // attached model's parts (Tool_flg 0x20) or the parent coordinate.
-int cEsp0d::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp0d::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp0dWork* w = &m_Free;
 

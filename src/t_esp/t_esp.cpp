@@ -59,7 +59,7 @@ enum {
     KEY_START = 12,
 };
 
-// The tool's view of one 0x12C sequence record (EspGenWork; PS2 cEspSeqTbl gives the vendor names).
+// The tool's view of one 0x12C sequence record (PS2 cEspSeqTbl gives the vendor names).
 struct TOOL_SEQ {
     u8 stat;        // 0x00 bit0: selected row of the edit table
     u8 id;          // 0x01

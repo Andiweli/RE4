@@ -1517,7 +1517,7 @@ static void plemEscape(cPlayer* pl)
 void em31EscapeCamMove(cEm31* em)
 {
     Em31Work* w = EM31_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec a;
     Vec b;
     Vec c;
@@ -3486,7 +3486,7 @@ static void plem31_dm_Stamp(cPlayer* pl)
 void em31StampCamMove(cEm31* em)
 {
     Em31Work* w = EM31_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     CAMERA* cam = &w->Cam;
     Vec a;
     cParts* p;

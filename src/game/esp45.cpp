@@ -37,7 +37,7 @@ public:
     Esp45Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -255,7 +255,7 @@ void Esp45_HideCheck(cEsp* esp0)
 
 // Spread type Work8[0], rate Blend_type, distance fade Vec0.z, visibility test radius Vec1.x
 // (enables flg bit1).
-int cEsp45::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp45::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp45Work* w = &m_Free;
 

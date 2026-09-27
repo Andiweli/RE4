@@ -20,7 +20,7 @@ public:
     Esp05Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x05] factory.
@@ -47,7 +47,7 @@ void cEsp05::move()
 }
 
 // Amplitude / speed from Vec0.x / Vec0.y (x 0.05), each randomised by Vec0.z x 10%, random phase.
-int cEsp05::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp05::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp05Work* w = &m_Free;
 

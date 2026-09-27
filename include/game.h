@@ -5,7 +5,7 @@
 
 // game/game.cpp: save data front end.
 
-// Copy of the GlobalWork tail (0x4F80 .. 0x8678) kept in the save data (cGameSave::save / load).
+// Copy of the GLOBAL_WK tail (0x4F80 .. 0x8678) kept in the save data (cGameSave::save / load).
 struct GameSaveBlock {
     u8 pad_0[4];              // 0x4F80
     s32 point;                // 0x4F84  pG->point (GamePointBossReset refreshes it)

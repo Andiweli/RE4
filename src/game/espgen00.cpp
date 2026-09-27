@@ -21,7 +21,7 @@ static f32 Calc_D256(Espgen00Work* p, u8 d, f32 rate);
 
 // Effect controller 00: emits one esp record repeatedly (num at a time, every wait frames).
 struct Espgen00Work {
-    EspGenWork* rec;   // 0x14
+    cEspSeqTbl* rec;   // 0x14
     cModel* pMod;     // 0x18
     u32 Guid_pMod;        // 0x1C model serial the controller was set up with
     u16 Time_cnt;           // 0x20 frame counter
@@ -153,7 +153,7 @@ void espgen00_Update(EspgenWork* pEspgen)
         }
     }
     if (p->waitCnt == 0) {
-        EspGenWork* rec = p->rec;
+        cEspSeqTbl* rec = p->rec;
         int n;
         int i;
 
@@ -257,7 +257,7 @@ void Espgen00_Move(EspgenWork* pEspgen)
 // the D curves (Espgen_work8_2), Espgen_flg, random wait range; head flag bit 0 keeps following the
 // parts, `flag` == 1 passes the position on to the children; fixed seed 0x12345678+x10E when Flg
 // bit 1. Copies the optional EspSeqOpt. Always returns 1.
-int Espgen00_SetFreeWork(EspgenWork* w, EspGenWork* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
+int Espgen00_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag)
 {
     Espgen00Work* p = (Espgen00Work*) w->work;

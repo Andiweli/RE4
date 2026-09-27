@@ -26,7 +26,7 @@ public:
     Esp18Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -52,7 +52,7 @@ void cEsp18::move()
 }
 
 // Remembers the spawn position and takes the blur strength from -Vec0.x.
-int cEsp18::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp18::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp18Work* w = &m_Free;
 

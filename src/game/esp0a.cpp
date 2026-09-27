@@ -24,7 +24,7 @@ public:
     Esp0aWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -147,7 +147,7 @@ void Esp0a_Trans2(cEsp* esp)
 
 // Type 0: pulls a scratch copy and lays down up to 50 frozen id-0 sprites (life Work8[0]) along
 // its simulated path. Type 1: Tool_flg 0x400 (pre-world layer) and m_Flg bit1. Work8[1] must be 0.
-int cEsp0a::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp0a::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp0aWork* w = &m_Free;
 

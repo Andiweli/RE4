@@ -21,7 +21,7 @@ public:
     Esp49Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x49] factory.
@@ -71,7 +71,7 @@ void cEsp49::move()
 
 // Depth thresholds from Vec0.x / Vec0.z (fade never below delete), est owner/id from Work8[0..1],
 // est enable Work8[2] (0/1, else fails); remembers the initial alpha.
-int cEsp49::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp49::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp49Work* w = &m_Free;
 

@@ -200,7 +200,7 @@ struct Em10Work {
     f32 Blend;        // 0x73C (0xB1C)  em10BlendMotSet
     int Hokan;             // 0x740 (0xB20)  em10BlendMotSet: hokan frames left (low byte passed)  em10BlendMotSet: hokan frames (PS2 Hokan)
     u32 Frame;             // 0x744 (0xB24)  em10BlendMotSet: start frame (low half passed)  em10BlendMotSet: start frame (PS2 Frame)
-    MotionWorkSub Sub_mot;  // 0x748 (0xB28)
+    MOTION_INFO Sub_mot;  // 0x748 (0xB28)
 };
 
 #define EM10_WK(em) ((Em10Work*) (((cEm10*) (em))->free))

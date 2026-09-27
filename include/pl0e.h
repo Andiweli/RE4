@@ -69,7 +69,7 @@ struct Pl0eWork {
     int hokan;            // 0x10C  blend motion hokan counter
     u32 frame;            // 0x110  blend motion frame
     u32 frameOld;         // 0x114
-    MotionWorkSub blendMot;   // 0x118 (0x4F8) .. 0x1E8  the blended lean motion
+    MOTION_INFO blendMot;   // 0x118 (0x4F8) .. 0x1E8  the blended lean motion
 };
 
 #define PL0E_WK(em) ((Pl0eWork*) (((cPl0e*) (em))->free))

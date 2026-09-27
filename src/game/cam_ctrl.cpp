@@ -2408,9 +2408,9 @@ void CameraControl::setMotionBaseMatPtr(Mtx* p_mat)
 }
 
 // The playing camera motion's work (frame / state).
-MotionWorkSub* CameraControl::getMotionInfoPtr()
+MOTION_INFO* CameraControl::getMotionInfoPtr()
 {
-    return (MotionWorkSub*) ((CameraMotion*) m_pProc)->getInfoPtr();
+    return (MOTION_INFO*) ((CameraMotion*) m_pProc)->getInfoPtr();
 }
 
 // Forgets all registered attach cameras (motion-driven cameras of models).

@@ -711,7 +711,7 @@ void getChapterSection(int no, int* chap, int* sect)
     }
 }
 
-// Reference setters: the original stores these GlobalWork fields through references (pG reloaded after each).
+// Reference setters: the original stores these GLOBAL_WK fields through references (pG reloaded after each).
 static inline void U16Zero(u16& d) { d = 0; }  // HImode zero (its own `li`), reference store
 
 // Chapter end task (SceSetChapterEnd): swaps the room data out to show the ChapterEnd screen with

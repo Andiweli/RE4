@@ -591,7 +591,7 @@ void EscapeCamMove()
     Vec hit;
     Vec d;
     f32 len;
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
 
     Cam.param.fovy = g->Camera.param.fovy;
     p0.x = -376.0f;

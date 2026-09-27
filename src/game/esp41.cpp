@@ -22,7 +22,7 @@ public:
     Esp41Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x41] factory.
@@ -72,7 +72,7 @@ void cEsp41::move()
 }
 
 // Range / strength from Work8[0..1], target offset from Vec0, Type from WorkSp8[0] (only 0 valid).
-int cEsp41::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp41::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp41Work* w = &m_Free;
 

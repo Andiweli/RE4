@@ -15,7 +15,7 @@ public:
     u32 xF8;
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x47] factory.
@@ -135,7 +135,7 @@ void Esp47_Trans(cEsp* pEsp)
 }
 
 // No extra parameters.
-int cEsp47::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp47::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     return 1;
 }

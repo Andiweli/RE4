@@ -140,15 +140,15 @@ extern "C" int Sp_char_ck(int c);
 extern "C" void font_draw(u8* c, f32 r, f32 g, f32 b, f32 a, s16 y, s16 x, s16 z, s16 w, s16 h);
 extern "C" void EprintfDrawing(char* s, f32 x, f32 y, f32 r, f32 g, f32 b, f32 a);
 extern "C" void DB_VecNullPartsPos(EspSeqData* head, Vec* in, Vec* out, Mtx* m);
-extern "C" void DB_VecMulEmPartsMat(u32 parts, Vec* in, Vec* out, Mtx* m, EspGenWork* gen);
-extern "C" void DB_GetCursorPos(EspSeqData* head, EspGenWork* gen, int flag, Vec* out, Mtx* m);
+extern "C" void DB_VecMulEmPartsMat(u32 parts, Vec* in, Vec* out, Mtx* m, cEspSeqTbl* gen);
+extern "C" void DB_GetCursorPos(EspSeqData* head, cEspSeqTbl* gen, int flag, Vec* out, Mtx* m);
 extern "C" void DB_DrawCross3D(Vec* pos, Mtx* m, f32 size);
 extern "C" void drawTexture2(GXTexObj* obj, s16 x, s16 y, s16 z, s16 w, s16 h);
 extern "C" int comment_check(char** pp);
 extern "C" char* space_skip(char* p);
 extern "C" int num_get(char** pp);
 extern "C" int symbol_check(char** pp, const char* sym);
-extern "C" void sp_PosRand_trans_1a(EspSeqData* head, EspGenWork* gen);
+extern "C" void sp_PosRand_trans_1a(EspSeqData* head, cEspSeqTbl* gen);
 // COMPILER-DIFF: #1 (the original moves the cModel* argument before the f32 one: `mr r4; fmr f1`)
 
 // the room id read through the struct view of pG (global.h pG) right after the "x:/soft/room/" template copy: the
@@ -158,7 +158,7 @@ extern "C" void sp_PosRand_trans_1a(EspSeqData* head, EspGenWork* gen);
 
 // The model an effect generator hangs on: the db_mod slot of its Parent_no, else the viewer's
 // model 0.
-extern "C" cModel* GetActiveModel(EspGenWork* gen)
+extern "C" cModel* GetActiveModel(cEspSeqTbl* gen)
 {
     cModel* m;
 
@@ -1227,7 +1227,7 @@ extern "C" void DB_DrawCursor2D(Vec* pos)
 
 // World position / matrix of a generator's origin: the parent parts (Parts_no; 0xFE = the null
 // parts position, 0xFF or flag = world) applied to gen->Pos.
-extern "C" void DB_GetCursorPos(EspSeqData* head, EspGenWork* gen, int flag, Vec* out, Mtx* m)
+extern "C" void DB_GetCursorPos(EspSeqData* head, cEspSeqTbl* gen, int flag, Vec* out, Mtx* m)
 {
     int parts = gen->Parts_no;
 
@@ -1245,7 +1245,7 @@ extern "C" void DB_GetCursorPos(EspSeqData* head, EspGenWork* gen, int flag, Vec
 }
 
 // Draws the 3D cross at a generator's origin.
-extern "C" void DB_DrawCursor3D(EspSeqData* head, EspGenWork* gen, int flag, f32 size)
+extern "C" void DB_DrawCursor3D(EspSeqData* head, cEspSeqTbl* gen, int flag, f32 size)
 {
     Vec pos;
     Mtx m;
@@ -1370,7 +1370,7 @@ extern "C" void DB_VecNullPartsPos(EspSeqData* head, Vec* in, Vec* out, Mtx* m)
 
 // Transforms `in` by parts `parts` of the generator's parent (a db_mod slot, or a scroll object
 // for Parent_no > 0); no-op for a dead model or bad parts.
-extern "C" void DB_VecMulEmPartsMat(u32 parts, Vec* in, Vec* out, Mtx* m, EspGenWork* gen)
+extern "C" void DB_VecMulEmPartsMat(u32 parts, Vec* in, Vec* out, Mtx* m, cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     Vec v;
@@ -1525,7 +1525,7 @@ extern "C" void DB_Sleep(int n)
 }
 
 // Debug draw of a ctrl01 generator: its origin (parent parts applied) and direction vector.
-extern "C" void sp_ctrl01_trans(EspGenWork* gen)
+extern "C" void sp_ctrl01_trans(cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     Mtx ry;
@@ -1599,7 +1599,7 @@ extern "C" void sp_ctrl01_trans(EspGenWork* gen)
 }
 
 // Debug draw of a generator's emission sphere (radius Vec0.z).
-extern "C" void sp_sphere(EspSeqData* head, EspGenWork* gen)
+extern "C" void sp_sphere(EspSeqData* head, cEspSeqTbl* gen)
 {
     Vec pos;
     Mtx m;
@@ -1609,7 +1609,7 @@ extern "C" void sp_sphere(EspSeqData* head, EspGenWork* gen)
 }
 
 // Debug draw of a generator's emission box (Vec0 half sizes) in green.
-extern "C" void sp_3dgrid_trans(EspSeqData* head, EspGenWork* gen)
+extern "C" void sp_3dgrid_trans(EspSeqData* head, cEspSeqTbl* gen)
 {
     Mtx m;
     Mtx rm;
@@ -1671,7 +1671,7 @@ extern "C" void sp_3dgrid_trans(EspSeqData* head, EspGenWork* gen)
 
 // Debug draw of an esp06 path effect: the path sampled along its length (on the parent model when
 // it has one).
-extern "C" void sp_path_trans(EspSeqData* head, EspGenWork* gen)
+extern "C" void sp_path_trans(EspSeqData* head, cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     cEsp* esp;
@@ -1723,7 +1723,7 @@ extern "C" void sp_path_trans(EspSeqData* head, EspGenWork* gen)
 }
 
 // Debug draw of an Espgen02 path generator: the path with the generator's rotation / scale.
-extern "C" void sp_path_trans2(EspSeqData* head, EspGenWork* gen)
+extern "C" void sp_path_trans2(EspSeqData* head, cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     Vec pos;
@@ -1789,7 +1789,7 @@ extern "C" void sp_path_trans2(EspSeqData* head, EspGenWork* gen)
 }
 
 // Debug draw of a generator's extension limit rectangle (Vec0 x/z).
-extern "C" void sp_nobigenkai_trans(EspSeqData* head, EspGenWork* gen)
+extern "C" void sp_nobigenkai_trans(EspSeqData* head, cEspSeqTbl* gen)
 {
     Vec c;
     Vec v0;
@@ -1820,7 +1820,7 @@ extern "C" void sp_nobigenkai_trans(EspSeqData* head, EspGenWork* gen)
 }
 
 // Debug draw of a position-random generator bound to a parts: a sphere at the parts.
-extern "C" void sp_PosRand_trans_1a(EspSeqData* head, EspGenWork* gen)
+extern "C" void sp_PosRand_trans_1a(EspSeqData* head, cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     cParts* p0;
@@ -1860,7 +1860,7 @@ extern "C" void sp_PosRand_trans_1a(EspSeqData* head, EspGenWork* gen)
 }
 
 // Debug draw of a position-random generator's box (yellow) in the parent's frame.
-extern "C" void sp_PosRand_trans(EspSeqData* head, EspGenWork* gen)
+extern "C" void sp_PosRand_trans(EspSeqData* head, cEspSeqTbl* gen)
 {
     f32 rx = gen->R_pos.x;
     f32 ry = gen->R_pos.y;

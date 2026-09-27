@@ -2638,7 +2638,7 @@ void cSubChar::backCheckSet(void* mot)
 // Fade the look-back blend in (sub404 == 2) or out (1).
 void cSubChar::backCheckMove()
 {
-    MotionWorkSub* w = pEm->Motion.blend;
+    MOTION_INFO* w = pEm->Motion.blend;
     const f32 d = 0.14f;
 
     if (w == 0) {

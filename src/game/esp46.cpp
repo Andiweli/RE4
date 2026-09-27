@@ -18,7 +18,7 @@ public:
     Esp46Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x46] factory.
@@ -47,7 +47,7 @@ void Esp46_Trans(cEsp46* pEsp)
 
 // Reads the filter type (Work8[0]), priority (Work8[1]) and special flag (Work8[2], 0/1) and puts
 // the effect on the screen-first layer (m_Parts_no 0xF8).
-int cEsp46::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp46::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp46Work* w = &m_Free;
 

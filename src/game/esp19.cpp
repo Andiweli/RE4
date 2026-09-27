@@ -20,7 +20,7 @@ public:
     Esp19Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x19] factory.
@@ -40,7 +40,7 @@ void cEsp19::move()
 }
 
 // End point from Vec0, maximum length from Vec1.x (0 -> 12000 units).
-int cEsp19::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp19::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp19Work* w = &m_Free;
 

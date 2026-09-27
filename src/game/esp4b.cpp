@@ -12,7 +12,7 @@ public:
     u32 xF8;
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x4B] factory.
@@ -29,7 +29,7 @@ void cEsp4b::move()
 
 // Sets m_Ptn_no from Work8[0] (0xFF: random pattern of the texture animation). Fails (0) when the
 // texture id has no animation data or the pattern is out of range.
-int cEsp4b::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp4b::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     EspAnmData* anm;
     u32 ptn;

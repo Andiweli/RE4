@@ -29,7 +29,7 @@ public:
     Esp16Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
     virtual void Destruct();
 };
 
@@ -271,7 +271,7 @@ void cEsp16::Destruct()
 
 // Reads the point count, optional tail parts, physics parameters, allocates both buffers (fails
 // when the pool is short) and starts every point at the effect's world position with zero speed.
-int cEsp16::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp16::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp16Work* w = &m_Free;
     Vec p;

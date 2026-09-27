@@ -1374,7 +1374,7 @@ void playerRunCamInitBridge()
 void playerRunCamMovePassage(cPlayer* pl, f32 t)
 {
     CAMERA* cam = &r226_cam;
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec pos;
     Vec at;
 
@@ -1395,7 +1395,7 @@ void playerRunCamMovePassage(cPlayer* pl, f32 t)
 void playerRunCamMoveBridge(cPlayer* pl, f32 t)
 {
     CAMERA* cam = &r226_cam;
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec pos;
     Vec at;
 
@@ -1424,7 +1424,7 @@ void playerRunCamMoveBridge(cPlayer* pl, f32 t)
 void playerRunCamDiePassage(cPlayer* pl)
 {
     CAMERA* cam = &r226_cam;
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     cParts* parts;
 
     cam->param.fovy = r226_fovyDie;

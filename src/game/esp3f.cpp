@@ -20,7 +20,7 @@ public:
     Esp3fWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
     virtual void Destruct();
 };
 
@@ -126,7 +126,7 @@ Vec* Esp3f_GetVecPtr(cEsp3f* pEsp, u32 idx)
 }
 
 // No generator parameters (buffers are only created through Esp3f_Alloc).
-int cEsp3f::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp3f::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     return 1;
 }

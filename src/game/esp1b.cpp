@@ -22,7 +22,7 @@ public:
     Esp1bWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x1B] factory.
@@ -43,7 +43,7 @@ void cEsp1b::move()
 
 // Point count = Work8[0] + 4 clamped to 2..0x40 (out of range is reported), control vectors from
 // Vec0..Vec2 x esp1b_scale; sets m_Flg 0x10 (spline sprite) for the trans function.
-int cEsp1b::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp1b::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp1bWork* w = &m_Free;
     int n;

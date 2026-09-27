@@ -20,7 +20,7 @@ public:
     Esp40Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x40] factory.
@@ -64,7 +64,7 @@ void cEsp40::move()
 
 // A parent with Release_time 0 is dropped to world space at once. Attached effects record Ofs_y,
 // Base_Pos and the y speeds; world-space effects are simply placed at water height + Pos.y.
-int cEsp40::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp40::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     f32 h;
 

@@ -205,7 +205,7 @@ u32 GetEstTblnum(EspSeqData* head)
 cEsp* SetEstTbl(EspgenWork* w, EspSeqData* head, int no)
 {
     Espgen01Work* p = (Espgen01Work*) w->work;
-    EspGenWork* rec = head->rec;
+    cEspSeqTbl* rec = head->rec;
     Mtx m;
     cEsp* esp;
 
@@ -350,7 +350,7 @@ void HideCheck(cEsp* pDat)
 // Fills the flare from the record: offset = Pos, est owner/id = Work8[0..1], parts = Parts_no;
 // Vec2 = (rot x deg, rot y deg, cone fov deg) enables the direction test; Vec0 = (size %, scale %,
 // fade distance); Vec1.x != 0 is the hide-check radius in pixels.
-int Espgen01_SetFreeWork(EspgenWork* w, EspGenWork* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
+int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag)
 {
     Espgen01Work* p = (Espgen01Work*) w->work;

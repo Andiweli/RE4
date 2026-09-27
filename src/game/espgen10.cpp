@@ -24,11 +24,11 @@ int EspgenDataSet(EspSeqData* head, int no, EspInfo* info, u32* seed, cModel* mo
     // (the rec offset, then the table address): no REG_EQUIV, global gives it r11, the high is
     // a plain local-alloc qty (r9) since the addi's destination is not a hard register.
     u32 list;
-    EspGenWork* rec;
+    cEspSeqTbl* rec;
     int ret = 1;
 
-    list = no * sizeof(EspGenWork) + 0x30;
-    rec = (EspGenWork*) ((u32) head + list);
+    list = no * sizeof(cEspSeqTbl) + 0x30;
+    rec = (cEspSeqTbl*) ((u32) head + list);
     if (info->Core_flg & 0x1000) {
         u32 no = rec->Parent_no;
         model = EspEvModList.GetModelPtr(no);
@@ -93,7 +93,7 @@ void espgen10_Update(EspgenWork* pEspgen)
 {
     Espgen10Work* p = (Espgen10Work*) pEspgen->work;
     EspSeqData* head = p->head;
-    EspGenWork* rec = &head->rec[p->Seq_ptr];
+    cEspSeqTbl* rec = &head->rec[p->Seq_ptr];
     cModel* model = p->pMod;
 
     if (model != NULL) {

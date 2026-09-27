@@ -32,7 +32,7 @@ public:
     Esp0cWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 
@@ -76,7 +76,7 @@ extern "C" void Esp0c_Trans(cEsp* esp)
 
 // Reads the est owner/id pairs, detaches from the parent into world space, applies the Work8[2]
 // floor / water snap (+65 units, + Vec0.y) and the Work8[3] in-room check; unknown modes fail.
-int cEsp0c::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp0c::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp0cWork* w = &m_Free;
     u32 attr;

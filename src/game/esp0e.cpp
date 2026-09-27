@@ -25,7 +25,7 @@ struct Esp0eWork {
     u16 flg;      // 0x4C bit0: direction test, bit1: visibility test
     u16 delay_cnt;    // 0x4E frames the visibility test is forced to 0
     u32 Rand_seed;       // 0x50 random seed for the screen jitter
-    EspGenWork* gen;  // 0x54
+    cEspSeqTbl* gen;  // 0x54
 };
 
 // Screen-space glow (lens flare style): the sprite is drawn in screen mode at the projected
@@ -35,7 +35,7 @@ public:
     Esp0eWork m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -329,7 +329,7 @@ void Esp0e_HideCheck(cEsp* esp0)
 // Builds dir_vec / dir_ang from Vec2 (enables the direction test), the centre and size ratios
 // from Vec0, the distance fade Vec0.z and the visibility radius Vec1.x; m_Flg bit3 marks the
 // screen-glow OT layer. Attached effects with Release_time 0 are kept attached forever.
-int cEsp0e::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp0e::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp0eWork* w = &m_Free;
 

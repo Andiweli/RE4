@@ -23,7 +23,7 @@ public:
     Esp04Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -245,7 +245,7 @@ extern "C" void Esp04_Trans(cEsp04* esp)
 
 // Repeat flags, jitter ranges, alpha delay and rate from the record; tile sizes are clamped to
 // at least 0.1. Warns when the parent is not a screen layer.
-int cEsp04::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp04::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp04Work* w = &m_Free;
 

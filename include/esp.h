@@ -28,8 +28,8 @@ union EspGenPrm {
 };
 
 // Effect generator record (game/eff_sys.cpp, game/espgen*.cpp): one 0x12C byte entry of an
-// EspSeqData (PS2 cEspSeqTbl, 1:1). GC types kept where the PS2 byte is signed.
-struct EspGenWork {
+// EspSeqData. GC types kept where the PS2 byte is signed.
+struct cEspSeqTbl {
     u8 Be_flg;         // 0x00 (PS2 Be_flg)
     u8 Id;             // 0x01 esp id / generator sub type (PS2 Id)
     u8 Tex_id;         // 0x02 (PS2 Tex_id)
@@ -114,7 +114,7 @@ struct EspSeqData {
     u8 pad0;           // 0x25 (PS2 pad0)
     u16 Core_flg;      // 0x26 (PS2 Core_flg)
     u32 pad1[2];       // 0x28 (PS2 pad1)
-    EspGenWork rec[1]; // 0x30
+    cEspSeqTbl rec[1]; // 0x30
 };
 
 // Texture animation data returned by EspGetAnmAddr (eff_sys.cpp). Partial layout.
@@ -504,13 +504,13 @@ public:
     EspInfo info;      // 0x00
     u8 m_Be_flg;           // 0x0C bit0: in use
     u8 m_Id;             // 0x0D effect id
-    u8 m_Tex_id;       // 0x0E texture animation id (EspGetAnmAddr; EspGenWork Tex_id) (PS2 m_Tex_id)
-    u8 m_Type;         // 0x0F EspGenWork Type (PS2 m_Type)
+    u8 m_Tex_id;       // 0x0E texture animation id (EspGetAnmAddr; cEspSeqTbl Tex_id) (PS2 m_Tex_id)
+    u8 m_Type;         // 0x0F cEspSeqTbl Type (PS2 m_Type)
     u8 m_Rno0;         // 0x10 routine numbers (PS2 m_Rno0..3)
     u8 m_Rno1;         // 0x11
     u8 m_Rno2;         // 0x12 (PS2 m_Rno2)
     u8 m_Rno3;         // 0x13 (PS2 m_Rno3)
-    u16 m_Del_near;    // 0x14 near delete distance (EspGenWork Del_near * 10) (PS2 m_Del_near)
+    u16 m_Del_near;    // 0x14 near delete distance (cEspSeqTbl Del_near * 10) (PS2 m_Del_near)
     u16 m_Del_far;           // 0x16
     u32 m_Tool_flg;         // 0x18 effect option bits
     cModel* m_pMod;    // 0x1C model the effect is attached to
@@ -560,12 +560,12 @@ public:
     union {
         u8 pad_EC[0xF4 - 0xEC];
         struct {
-            u8 m_Shimmer_type;        // 0xEC  (EspGenWork xC3; esp.cpp: 0 = plain EspCommonTrans)
-            u8 m_Shimmer_pow;        // 0xED  (EspGenWork xC4)
+            u8 m_Shimmer_type;        // 0xEC  (cEspSeqTbl xC3; esp.cpp: 0 = plain EspCommonTrans)
+            u8 m_Shimmer_pow;        // 0xED  (cEspSeqTbl xC4)
             u16 m_MaskAnm_cnt;   // 0xEE  mask texture animation counter
             u8 m_MaskPtn_no;    // 0xF0  mask texture animation pattern
-            u8 m_MaskTex_id;     // 0xF1  mask texture animation id (EspGenWork xC5)
-            u8 m_Blend_type;  // 0xF2  EspGenWork xC2 (3: colour bytes scaled by the fade)
+            u8 m_MaskTex_id;     // 0xF1  mask texture animation id (cEspSeqTbl xC5)
+            u8 m_Blend_type;  // 0xF2  cEspSeqTbl xC2 (3: colour bytes scaled by the fade)
             u8 xF3;
         };
     };
@@ -575,7 +575,7 @@ public:
     cEsp();
     virtual ~cEsp();
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* pSeq, u32* pRand_seed);
+    virtual int SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed);
     virtual void Destruct();
 
     int CommonMove();

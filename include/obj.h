@@ -165,11 +165,11 @@ public:
 
 extern cObjMgr ObjMgr;
 
-struct EspGenWork;
+struct cEspSeqTbl;
 extern "C" {
 // game/esp_efm.cpp: creates the obj04 / obj05 / obj09 effect model of a sequence record
 // (`info` is the caller's EspInfo, esp.h). esp_sub.cpp EspSeqSet is the only caller.
-cObj* EfmSeqSet(EspGenWork* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs);
+cObj* EfmSeqSet(cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs);
 // game/obj04.cpp / game/obj05.cpp: orient the model along `m`
 void Efm04RotMatrix(cObj* pObj, Mtx pMat);
 void Efm05RotMatrix(cObj* pObj, Mtx pMat);

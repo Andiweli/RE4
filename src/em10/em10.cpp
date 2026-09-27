@@ -13446,7 +13446,7 @@ static void subem10_TakeAway(cSubChar* sub)
 extern "C" void em10CamMoveTakeaway(cEm10* em)
 {
     Em10Work* w = EM10_WK(em);
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec a;
     Vec b;
 
@@ -25478,7 +25478,7 @@ void cEm10::setLost()
 extern "C" void em10BlendMotSet(cEm10* em, void* m0, void* m1, void* m2, int a, int b, int c, int d)
 {
     Em10Work* w = EM10_WK(em);
-    MotionWorkSub* bm;
+    MOTION_INFO* bm;
     void* m;
     int seq;
     f32 rate = fabsf(w->Blend);

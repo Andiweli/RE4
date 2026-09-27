@@ -73,7 +73,7 @@ public:
 private:
     int m_Mode;             // 0x14  set() 7th argument: 1 = the blend work gets flags2 bit31  set() 7th argument: 1 = the blend work gets flags2 bit31 (PS2 MODE m_Mode)
 public:
-    MotionWorkSub work;  // 0x18  the blended motion (em.h)
+    MOTION_INFO work;  // 0x18  the blended motion (em.h)
 
     cMot3();
     // set(model, motion0, motion1, motion2, MotionSetCore seq, u8 mode, int, u16, u16); the PS2 set(pEm, mot0, mot1, mot2, seq, hokan, mode, attr, frame) orders / types the tail differently
@@ -167,7 +167,7 @@ public:
     cFlag<u32, FLAG> stat;   // 0x420
     void** m_MotTbl;       // 0x424  motion data table ([0] walk, [2] turn, [0x5F..0x6C] set by setMotion)
     void** m_MotTbl2;    // 0x428  registered motion table (pl_sub PlRegistMotion fills [0..11])
-    MotionWorkSub m_SubMot;   // 0x42C .. 0x4FC  neck turn motion (pl_class cPlNeck::motSet), blended via blendMot
+    MOTION_INFO m_SubMot;   // 0x42C .. 0x4FC  neck turn motion (pl_class cPlNeck::motSet), blended via blendMot
     u8 m_Frame;              // 0x4FC  (pl_sub PlChangeData/PlMotionReset clear it)
     u8 m_Hokan;              // 0x4FD
     u8 m_BbtnCnt;         // 0x4FE  (PS2 cPlayer::m_BbtnCnt)

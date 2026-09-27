@@ -30,7 +30,7 @@ public:
     Esp06Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -176,7 +176,7 @@ void cEsp06::move()
 // the speed sign to match prm 0xCC, builds PathMat from Vec1 rotation and Vec0 scale, and picks
 // the start distance from Vec2 (percent + random percent, wrapped) or the far end for a negative
 // speed.
-int cEsp06::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp06::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp06Work* w = &m_Free;
     f32 t;

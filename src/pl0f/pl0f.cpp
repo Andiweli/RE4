@@ -3194,7 +3194,7 @@ void plboatSetSpear(cPlayer* pl)
 void plboatBlendMotSet(cPlayer* pl, void* m0, void* m1, void* m2, int a, int b, int c)
 {
     f32 rate = fabsf(pl->m_Blend);
-    MotionWorkSub* bm;
+    MOTION_INFO* bm;
     void* m;
     int f;
 
@@ -3223,7 +3223,7 @@ void plboatBlendMotSet(cPlayer* pl, void* m0, void* m1, void* m2, int a, int b, 
 void subBlendMotSet(cSubChar* sub, void* m0, void* m1, void* m2, int a, int b, int c)
 {
     f32 rate = fabsf(sub->m_Blend);
-    MotionWorkSub* bm;
+    MOTION_INFO* bm;
     void* m;
     int f;
 

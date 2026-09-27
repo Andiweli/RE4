@@ -610,7 +610,7 @@ void SsShopMain::quit(SUB_SCREEN* wk)
 // (1) or the plain greeting (0) plus the village hints 3/4; 0 when nothing is to be said.
 int getGreetMsg(int* num, int* tbl)
 {
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     SUB_SCREEN* wk = &SubScreenWk;
     int ret = 1;
 

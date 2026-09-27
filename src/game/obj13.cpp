@@ -879,7 +879,7 @@ static inline f32 LadderCamDist(Vec* a, Vec* b)
 void objLadderClimbCamMove(cEm* pEm)
 {
     static CAMERA objLadderClimbCam = { 0 };
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec camPos;
     Vec camAt;
     cParts* parts;
@@ -1033,7 +1033,7 @@ void plobjLadderDown(cPlayer* pEm)
 void objLadderDownCamMove(cEm* pEm)
 {
     static CAMERA objLadderDownCam = { 0 };
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec camPos;
     Vec camAt;
 
@@ -1138,7 +1138,7 @@ void plobjLadderReset(cPlayer* pEm)
 void objLadderResetCamMove(cEm* pEm)
 {
     static CAMERA objLadderResetCam = { 0 };
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     Vec camPos;
     Vec camAt;
 

@@ -22,7 +22,7 @@ static f32 Calc_D256(Espgen02Work* p, u8 d, f32 rate);
 // Effect controller 02: like controller 00 but places every emitted esp on a path (path.cpp),
 // optionally oriented along it.
 struct Espgen02Work {
-    EspGenWork* rec;   // 0x14
+    cEspSeqTbl* rec;   // 0x14
     cModel* pMod;     // 0x18
     u32 Guid_pMod;        // 0x1C model serial the controller was set up with
     u16 Time_cnt;           // 0x20 frame counter
@@ -168,7 +168,7 @@ void espgen02_Update(EspgenWork* pEspgen)
     }
     if (p->Next_cnt == 0) {
         Mtx mtx;
-        EspGenWork* rec;
+        cEspSeqTbl* rec;
         int n;
         int i;
 
@@ -409,7 +409,7 @@ void Espgen02_Move(EspgenWork* pEspgen)
 // Fills the path emitter from the record: the espgen00 fields plus path group/id
 // (Espgen_work8_4[0..1]), Start_ratio/Rnd_ratio (percent), PathRot_x/y and mode (Espgen_work8_3[1..3]),
 // and PathScale = 1 + Espgen_vec0/10 when non-zero. Always returns 1.
-int Espgen02_SetFreeWork(EspgenWork* w, EspGenWork* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
+int Espgen02_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, EspSeqData* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, EspSeqOpt* pSct, int flag)
 {
     Espgen02Work* p = (Espgen02Work*) w->work;

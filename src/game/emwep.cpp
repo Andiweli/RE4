@@ -1317,7 +1317,7 @@ void emWep_R1_BombThrow(cEmWep* pEm)
         w->Bomb_wait--;
     }
     if (w->Bomb_wait == 0) {
-        GlobalWork* g = pG;
+        GLOBAL_WK* g = pG;
         CAMERA* cam = &g->Camera;
         cParts* p;
         Vec r;
@@ -1753,7 +1753,7 @@ void plemFrontEscape(cPlayer* pEm)
 // Camera of the grenade escape: behind the player, pulled in front of the scenery.
 void emWepEscapeCamMove(cEmWep* pEm)
 {
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     EmWepWork* w = EMWEP_WK(pEm);
     Vec p0;
     Vec p1;

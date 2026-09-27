@@ -27,7 +27,7 @@ public:
     Esp09Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 extern "C" {
@@ -454,7 +454,7 @@ void Esp09_HideCheck(cEsp* esp0)
 }
 
 // Point count 4 - Work8[0] clamped to 2..6, flags from Work8[1].
-int cEsp09::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp09::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp09Work* w = &m_Free;
 

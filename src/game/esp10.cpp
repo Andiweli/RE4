@@ -12,7 +12,7 @@ public:
     u32 xF8;
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 
@@ -60,7 +60,7 @@ f32 getFloor_attr(Vec* pos, u32* attr, int x, f32 up, f32 down)
 
 // Moves the effect into world space, sets m_Pos.y to floor + 65 + Vec0.y (0 in the effect tool),
 // then applies the Work8[3] rule (0 none, 1 in-room check, 2 water clamp); other values fail.
-int cEsp10::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp10::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     u32 attr;
     f32 h;

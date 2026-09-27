@@ -184,7 +184,7 @@ int getEmListNum()
 // room heap and links the REL when the room needs another one, then reads the enemy list.
 void StageSet()
 {
-    GlobalWork* g = pG;
+    GLOBAL_WK* g = pG;
     u32 flags = g->System_flg;
     int reload = 0;
     int relink = 0;
@@ -233,7 +233,7 @@ void readEmList(int proc)
 
     no = checkEmListNo(G_ROOM_ID);
     if (no >= 0) {
-        GlobalWork* g = pG;
+        GLOBAL_WK* g = pG;
         if (no > g->em_list_no || (SysFlagChk(g, SYS_NEW_GAME)) || g->SaveKind == 3 ||
             (DbgFlagChk(g, DBG_ROOMJMP) && g->em_list_no != no)) {
             name = getEmListName(no);

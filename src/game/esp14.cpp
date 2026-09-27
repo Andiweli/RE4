@@ -20,7 +20,7 @@ public:
     Esp14Work m_Free;  // 0xF8
 
     virtual void move();
-    virtual int SetFreeWork(EspGenWork* gen, u32* seed);
+    virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
 // EspCreateTbl[0x14] factory.
@@ -114,7 +114,7 @@ void cEsp14::move()
 
 // Length factor from Work8[0], clip box from Vec0 (extents) and Vec1 (centre offset); fails when
 // the box is inconsistent or has a y component. Sets Tool_flg bit0.
-int cEsp14::SetFreeWork(EspGenWork* pSeq, u32* pRand_seed)
+int cEsp14::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     Esp14Work* w = &m_Free;
 
