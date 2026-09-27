@@ -37,13 +37,13 @@ struct Esp4cWork {
 };
 
 extern "C" {
-void Espgen45_Move00(EspgenWork* w);
-void Espgen45_TransSub(EspgenWork* w);
+void Espgen45_Move00(cEspgen* w);
+void Espgen45_TransSub(cEspgen* w);
 void SetIndMtx_801291F4(Espgen42Work* p);   // the DOL's local SetIndMtx (Espgen42 owns the global one); sym_map name
-EspgenWork* SetWaterWork45(EspgenWork* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate);
+cEspgen* SetWaterWork45(cEspgen* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate);
 }
 
-EspgenWork* g_pWater45;
+cEspgen* g_pWater45;
 static int g_bTargetCamera = 1;
 static int g_bTargetHeight = 1;
 static int g_bSizeOverWrite = 0;
@@ -105,11 +105,11 @@ void Espgen45_static_init()
 // Step 0 of Espgen45MoveTbl: recentres the surface on the camera target and simulates one frame of
 // waves, a damped wave equation or, in mode 1, a spring model. Debug: L trigger with Debug_flg[1]
 // 0x00800000 drops a wave in the middle.
-void Espgen45_Move00(EspgenWork* pGen)
+void Espgen45_Move00(cEspgen* pGen)
 {
     static f32 g45_wave_mul = 0.001f;
     static f32 wt_pow = 10.0f;
-    Espgen42Work* p = (Espgen42Work*) pGen->work;
+    Espgen42Work* p = (Espgen42Work*) pGen->Free.buff;
     Vec d0;
     Vec d1;
     Vec v;
@@ -383,21 +383,21 @@ void Espgen45_Move00(EspgenWork* pGen)
 }
 
 // EspgenMoveTbl entry for controller type 0x45; frozen while Stop_flg bit 0x40000 is set.
-void Espgen45_Move(EspgenWork* pGen)
+void Espgen45_Move(cEspgen* pGen)
 {
-    static void (*Espgen45MoveTbl[])(EspgenWork*) = {Espgen45_Move00};
+    static void (*Espgen45MoveTbl[])(cEspgen*) = {Espgen45_Move00};
 
     if (SpfFlagChk(pG, SPF_WATER)) {
         return;
     }
-    Espgen45MoveTbl[pGen->step](pGen);
+    Espgen45MoveTbl[pGen->Rno0](pGen);
 }
 
 // EspgenTransTbl entry: queues Espgen45_TransSub in OT layer 0x10 (drawn after the opaque scene) and
 // clears Status_flg[1] bit 0x20 (the "override parameters changed this frame" flag).
-void Espgen45_Trans(EspgenWork* pGen)
+void Espgen45_Trans(cEspgen* pGen)
 {
-    if ((pGen->flag & 1) && !(pGen->flag & 2)) {
+    if ((pGen->Be_flg & 1) && !(pGen->Be_flg & 2)) {
         AddOtDirect(0x10, pGen, (void (*)()) Espgen45_TransSub, 1, 0x80, NULL, 0.0f);
     }
     StaFlagOff(pG, STA_ESPGEN45_SET);
@@ -452,7 +452,7 @@ static inline void Vtx45(f32 nx, f32 ny, f32 nz, f32 x, f32 y, f32 z, f32 s, f32
 
 // Draws the water with a screen copy as the refraction texture, a bump indirect stage, the specular
 // and optional mask textures, the far border quads unless flag bit 0, then the grid display list.
-void Espgen45_TransSub(EspgenWork* w)
+void Espgen45_TransSub(cEspgen* w)
 {
     static f32 g45_mul = 15.0f;
     static f32 g45_mul2 = 1.0f;
@@ -461,11 +461,11 @@ void Espgen45_TransSub(EspgenWork* w)
     void* buf;
     s32 stage;
 
-    if (!(w->flag & 1) || (w->flag & 2)) {
+    if (!(w->Be_flg & 1) || (w->Be_flg & 2)) {
         return;
     }
     st = &pG->gxStage;
-    p = (Espgen42Work*) w->work;
+    p = (Espgen42Work*) w->Free.buff;
     st->tevStage = 0;
     st->texMap = 0;
     st->texCoord = 0;
@@ -751,9 +751,9 @@ void Espgen45_TransSub(EspgenWork* w)
 // Allocates a controller from the pool and builds a water surface on it (SetWaterWork45).
 // Dead-stripped from the DOL (string kept, no pool: STRIP_UNUSED): pulls a generator and sets the
 // surface up.
-static EspgenWork* SetWater(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate)
+static cEspgen* SetWater(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate)
 {
-    EspgenWork* w;
+    cEspgen* w;
 
     if (PullEspgen(&w) == 0) {
         pLog->err(0, 0, "Espgen45 : work pull failed");
@@ -766,9 +766,9 @@ static EspgenWork* SetWater(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 ra
 // override), allocates hA/hB/pos/nrm/bump and the strip display list (memory group 13), fills the
 // zig-zag triangle strip indices/UVs, the flat grid positions (random +-0.2 ripple), the sloped
 // normals and zero edge heights. Returns NULL (controller released) when an allocation fails.
-EspgenWork* SetWaterWork45(EspgenWork* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate)
+cEspgen* SetWaterWork45(cEspgen* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate)
 {
-    Espgen42Work* p = (Espgen42Work*) w->work;
+    Espgen42Work* p = (Espgen42Work*) w->Free.buff;
     Mtx m;
     u32 n;
     u8* d;
@@ -778,7 +778,7 @@ EspgenWork* SetWaterWork45(EspgenWork* w, Vec* pos, Vec* rot, f32 size, u32 nx, 
     f32 fx;
     f32 fy;
 
-    w->id = 0x45;
+    w->Id = 0x45;
     p->nx = nx;
     p->ny = ny;
     p->size = size;
@@ -965,9 +965,9 @@ EspgenWork* SetWaterWork45(EspgenWork* w, Vec* pos, Vec* rot, f32 size, u32 nx, 
 }
 
 // Frees the six grid buffers and clears g_pWater45.
-void Espgen45_Destruct(EspgenWork* pGen)
+void Espgen45_Destruct(cEspgen* pGen)
 {
-    Espgen42Work* p = (Espgen42Work*) pGen->work;
+    Espgen42Work* p = (Espgen42Work*) pGen->Free.buff;
 
     if (p->hA != NULL) {
         Mem_free(p->hA);
@@ -998,10 +998,10 @@ void Espgen45_Destruct(EspgenWork* pGen)
 
 // Builds the water from the effect record, registers g_pWater45 and runs the first move. Returns 0
 // when the noise texture 0xFE or memory is missing.
-int Espgen45_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
+int Espgen45_SetFreeWork(cEspgen* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
                          Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct)
 {
-    Espgen42Work* p = (Espgen42Work*) pGen->work;
+    Espgen42Work* p = (Espgen42Work*) pGen->Free.buff;
     Vec r;
     u32 nx = 0x40;
     u32 ny = 0x40;

@@ -63,7 +63,7 @@ struct DbPathEsp {
     DbPathWork w;     // 0xF8
 };
 
-// Espgen02 (path generator) work fields behind EspgenWork::work
+// Espgen02 (path generator) work fields behind cEspgen::work
 struct DbEspgen02 {
     u8 pad_0[0x19];
     u8 flags19;       // 0x19  bit2: scale
@@ -1728,20 +1728,20 @@ extern "C" void sp_path_trans2(cEspSeqHead* head, cEspSeqTbl* gen)
     cModel* em = GetActiveModel(gen);
     Vec pos;
     Vec old;
-    EspgenWork wk;
+    cEspgen wk;
     Mtx mtx;
     Mtx sm;
     Vec p158;
     Vec p168;
     u16 seg;
-    EspgenWork* pw = &wk;
-    DbEspgen02* w = (DbEspgen02*) wk.work;
+    cEspgen* pw = &wk;
+    DbEspgen02* w = (DbEspgen02*) wk.Free.buff;
     void* path;
     f32 len;
     f32 t;
     u32 i;
 
-    memclr_asm(pw, sizeof(EspgenWork));
+    memclr_asm(pw, sizeof(cEspgen));
     seg = 0;
     if (gen->Parent_no != 0) {
         em = SmdGetObjPtr(gen->Parent_no - 1);

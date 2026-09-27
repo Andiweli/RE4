@@ -8,9 +8,9 @@
 #include "db_log.h"
 
 extern "C" {
-void espgen10_Update(EspgenWork* w);
-void espgen10_Move00(EspgenWork* w);
-void espgen10_Move01(EspgenWork* w);
+void espgen10_Update(cEspgen* w);
+void espgen10_Move00(cEspgen* w);
+void espgen10_Move01(cEspgen* w);
 }
 
 // Spawns record `no` of the sequence: Kind 0 -> one esp via EspSeqSet (pos is passed only when
@@ -53,18 +53,18 @@ BOOL EspgenDataSet(cEspSeqHead* pSeqHed, u32 seq_ptr, cEffectCore* pCore, u32* p
 }
 // Fills the controller's cEffectCore owner block: Core_flg = a, Call_no = b, Core_kind = c, Core_pEm = d,
 // owner = e (the ids EfmDelete / EspDelete use to find effects by owner).
-void SetEspCore(EspgenWork* pCore, int Core_flg, u32 Call_no, u8 Core_kind, void* Core_pEm, int owner)
+void SetEspCore(cEspgen* pCore, int Core_flg, u32 Call_no, u8 Core_kind, void* Core_pEm, int owner)
 {
-    pCore->info.Core_flg = Core_flg;
-    pCore->info.Core_kind = Core_kind;
-    pCore->info.Call_no = Call_no;
-    pCore->info.Core_pEm = Core_pEm;
-    pCore->info.owner = owner;
+    pCore->Eff_core.Core_flg = Core_flg;
+    pCore->Eff_core.Core_kind = Core_kind;
+    pCore->Eff_core.Call_no = Call_no;
+    pCore->Eff_core.Core_pEm = Core_pEm;
+    pCore->Eff_core.owner = owner;
 }
 
 // Takes a free controller from the pool (front == 1: from the front, drawn first) and stamps the
 // owner info on it. Returns 0 when the pool is empty.
-int PullEspEspgen(EspgenWork** ppEspgen, int Core_flg, int Core_kind, u32 Call_no, void* Core_pEm, int owner, int type)
+int PullEspEspgen(cEspgen** ppEspgen, int Core_flg, int Core_kind, u32 Call_no, void* Core_pEm, int owner, int type)
 {
     int ret;
 
@@ -83,9 +83,9 @@ int PullEspEspgen(EspgenWork** ppEspgen, int Core_flg, int Core_kind, u32 Call_n
 // parts (or Offset/Ang for 0xFE) unless Flg bit 0 says it is fixed; then spawns every record whose
 // Set_time == Time_cnt (records must be sorted, otherwise "no SORT" error) and ends the controller
 // after the last record.
-void espgen10_Update(EspgenWork* pEspgen)
+void espgen10_Update(cEspgen* pEspgen)
 {
-    ESPGEN10_WK* p = (ESPGEN10_WK*) pEspgen->work;
+    ESPGEN10_WK* p = (ESPGEN10_WK*) pEspgen->Free.buff;
     cEspSeqHead* head = p->head;
     cEspSeqTbl* rec = &head->SeqTbl[p->Seq_ptr];
     cModel* model = p->pMod;
@@ -146,7 +146,7 @@ void espgen10_Update(EspgenWork* pEspgen)
         if (p->Flg & 2) {
             flag = 1;
         }
-        if (!EspgenDataSet(head, p->Seq_ptr, &pEspgen->info, &p->Rand_seed, p->pMod, p->Null_parts_no, &p->Mat, &p->Offset, &p->Ang, p->p8,
+        if (!EspgenDataSet(head, p->Seq_ptr, &pEspgen->Eff_core, &p->Rand_seed, p->pMod, p->Null_parts_no, &p->Mat, &p->Offset, &p->Ang, p->p8,
                            flag)) {
             return;
         }
@@ -161,22 +161,22 @@ void espgen10_Update(EspgenWork* pEspgen)
 }
 
 // Step 0 of Espgen10MoveTbl: first frame, then step 1.
-void espgen10_Move00(EspgenWork* pEspgen)
+void espgen10_Move00(cEspgen* pEspgen)
 {
     espgen10_Update(pEspgen);
-    pEspgen->step = 1;
+    pEspgen->Rno0 = 1;
 }
 
 // Step 1 of Espgen10MoveTbl: steady state.
-void espgen10_Move01(EspgenWork* pEspgen)
+void espgen10_Move01(cEspgen* pEspgen)
 {
     espgen10_Update(pEspgen);
 }
 
-// EspgenMoveTbl entry for controller type 0x10: dispatches on w->step.
-void Espgen10_Move(EspgenWork* pEspgen)
+// EspgenMoveTbl entry for controller type 0x10: dispatches on w->Rno0.
+void Espgen10_Move(cEspgen* pEspgen)
 {
-    static void (*Espgen10MoveTbl[])(EspgenWork*) = {espgen10_Move00, espgen10_Move01};
+    static void (*Espgen10MoveTbl[])(cEspgen*) = {espgen10_Move00, espgen10_Move01};
 
-    Espgen10MoveTbl[pEspgen->step](pEspgen);
+    Espgen10MoveTbl[pEspgen->Rno0](pEspgen);
 }

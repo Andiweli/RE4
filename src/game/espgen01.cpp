@@ -39,51 +39,51 @@ typedef struct tagESPGEN01_WK {
 } ESPGEN01_WK;
 
 extern "C" {
-void espgen01_Move00(EspgenWork* w);
-void espgen01_Move01(EspgenWork* w);
-void SetEsp(EspgenWork* w);
+void espgen01_Move00(cEspgen* w);
+void espgen01_Move01(cEspgen* w);
+void SetEsp(cEspgen* w);
 u32 GetEstTblnum(cEspSeqHead* head);
-cEsp* SetEstTbl(EspgenWork* w, cEspSeqHead* head, int no);
-static f32 GetDistAlpha(EspgenWork* w);
-static f32 GetDirAlpha(EspgenWork* w, Vec* dir);
+cEsp* SetEstTbl(cEspgen* w, cEspSeqHead* head, int no);
+static f32 GetDistAlpha(cEspgen* w);
+static f32 GetDirAlpha(cEspgen* w, Vec* dir);
 void HideCheck(cEsp* esp);
 }
 
 // Step 0 of Espgen01MoveTbl: first frame, then step 1.
-void espgen01_Move00(EspgenWork* w)
+void espgen01_Move00(cEspgen* w)
 {
     SetEsp(w);
-    w->step = 1;
+    w->Rno0 = 1;
 }
 
 // Step 1 of Espgen01MoveTbl: steady state.
-void espgen01_Move01(EspgenWork* w)
+void espgen01_Move01(cEspgen* w)
 {
     SetEsp(w);
 }
 
-// EspgenMoveTbl entry for controller type 1: dispatches on w->step.
-void Espgen01_Move(EspgenWork* pEspgen)
+// EspgenMoveTbl entry for controller type 1: dispatches on w->Rno0.
+void Espgen01_Move(cEspgen* pEspgen)
 {
-    static void (*Espgen01MoveTbl[])(EspgenWork*) = {espgen01_Move00, espgen01_Move01};
+    static void (*Espgen01MoveTbl[])(cEspgen*) = {espgen01_Move00, espgen01_Move01};
 
-    Espgen01MoveTbl[pEspgen->step](pEspgen);
+    Espgen01MoveTbl[pEspgen->Rno0](pEspgen);
 }
 
 // EspgenTransTbl entry: queues HideCheck to run after the scene render (needs the final Z buffer)
 // for a live controller.
-void Espgen01_Trans(EspgenWork* pEspgen)
+void Espgen01_Trans(cEspgen* pEspgen)
 {
-    if ((pEspgen->flag & 1) && !(pEspgen->flag & 2)) {
+    if ((pEspgen->Be_flg & 1) && !(pEspgen->Be_flg & 2)) {
         EspAddOtAfterRender((cEsp*) pEspgen, HideCheck);
     }
 }
 
 // Per-frame flare: while the light is in front of the camera, spawns every est table record as a
 // one-frame sprite along the line to the screen centre, faded by the combined alpha.
-void SetEsp(EspgenWork* pGen)
+void SetEsp(cEspgen* pGen)
 {
-    ESPGEN01_WK* p = (ESPGEN01_WK*) pGen->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) pGen->Free.buff;
     Vec v;
     Vec scr;
     Vec d;
@@ -202,23 +202,23 @@ u32 GetEstTblnum(cEspSeqHead* head)
 
 // Spawns record `no` of the est table with an identity matrix; returns the new esp (the dummy esp
 // when the pool is full).
-cEsp* SetEstTbl(EspgenWork* w, cEspSeqHead* head, int no)
+cEsp* SetEstTbl(cEspgen* w, cEspSeqHead* head, int no)
 {
-    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->Free.buff;
     cEspSeqTbl* rec = head->SeqTbl;
     Mtx m;
     cEsp* esp;
 
     rec = &rec[no];
     PSMTXIdentity(m);
-    EspSeqSet(rec, &w->info, &p->Rand_seed, p->pMod, &m, 0, 0.0f, &esp, NULL, NULL);
+    EspSeqSet(rec, &w->Eff_core, &p->Rand_seed, p->pMod, &m, 0, 0.0f, &esp, NULL, NULL);
     return esp;
 }
 
 // Alpha factor from the camera distance: 1 at the light fading to 0 at `dist` (1 when dist == 0).
-static f32 GetDistAlpha(EspgenWork* w)
+static f32 GetDistAlpha(cEspgen* w)
 {
-    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->Free.buff;
     CAMERA* cam;
     Vec d;
     f32 a;
@@ -242,9 +242,9 @@ static f32 GetDistAlpha(EspgenWork* w)
 
 // Alpha factor from the light direction: 1 when the camera is on the light axis, 0 outside the cone
 // of half-angle dir_ang (radians), linear in the cosine in between.
-static f32 GetDirAlpha(EspgenWork* w, Vec* dir)
+static f32 GetDirAlpha(cEspgen* w, Vec* dir)
 {
-    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->Free.buff;
     CAMERA* cam;
     Vec d;
     f32 ang;
@@ -280,8 +280,8 @@ void HideCheck(cEsp* pDat)
     static int Zs_bias = -5000;
     static f32 hide_x_tbl[12] = {0.0f, 0.5f, 0.86f, 1.0f, 0.86f, 0.5f, 0.0f, -0.5f, -0.86f, -1.0f, -0.86f, -0.5f};
     static f32 hide_y_tbl[12] = {1.0f, 0.86f, 0.5f, 0.0f, -0.5f, -0.86f, -1.0f, -0.86f, -0.5f, 0.0f, 0.5f, 0.86f};
-    EspgenWork* w = (EspgenWork*) pDat;
-    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
+    cEspgen* w = (cEspgen*) pDat;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->Free.buff;
     Vec v;
     Vec s;
     u32 z;
@@ -350,10 +350,10 @@ void HideCheck(cEsp* pDat)
 // Fills the flare from the record: offset = Pos, est owner/id = Work8[0..1], parts = Parts_no;
 // Vec2 = (rot x deg, rot y deg, cone fov deg) enables the direction test; Vec0 = (size %, scale %,
 // fade distance); Vec1.x != 0 is the hide-check radius in pixels.
-int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+int Espgen01_SetFreeWork(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag)
 {
-    ESPGEN01_WK* p = (ESPGEN01_WK*) w->work;
+    ESPGEN01_WK* p = (ESPGEN01_WK*) w->Free.buff;
     Mtx m1;
     Mtx m2;
     f32 rx;

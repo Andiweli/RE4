@@ -38,13 +38,13 @@ extern "C" {
 // game/trans_lit.cpp defines it with Vec* pos; this unit was built with the by-value prototype, so trans_lit.h is not included.
 void commonClothLightSet(cLight** list, int n, Vec pos, f32 radius);
 // game/espgen.cpp
-int EspgenApplyFunc(void (*func)(EspgenWork* w));
+int EspgenApplyFunc(void (*func)(cEspgen* w));
 
-void AddSandPowerSub(EspgenWork* w);
-void GetSandHeightSub(EspgenWork* w);
-void Espgen43_Move00(EspgenWork* w);
-void Espgen43_TransSub(EspgenWork* w);
-EspgenWork* SetSandWork(EspgenWork* w, Vec* pos, Vec* rot, f32 size, f32 sizeRate, u32 nx, u32 ny);
+void AddSandPowerSub(cEspgen* w);
+void GetSandHeightSub(cEspgen* w);
+void Espgen43_Move00(cEspgen* w);
+void Espgen43_TransSub(cEspgen* w);
+cEspgen* SetSandWork(cEspgen* w, Vec* pos, Vec* rot, f32 size, f32 sizeRate, u32 nx, u32 ny);
 }
 
 static Vec Chk_pos;
@@ -54,7 +54,7 @@ static int Height_find;
 
 // Applies Add_power at Chk_pos to sand generator `w`: raises the hit point and lowers rings of
 // radius 3 / 2 / 1 around it by 2% / 10% / 30% of the power, then smooths the grid.
-void AddSandPowerSub(EspgenWork* pGen)
+void AddSandPowerSub(cEspgen* pGen)
 {
     ESPGEN43_WK* p;
     Vec v;
@@ -67,10 +67,10 @@ void AddSandPowerSub(EspgenWork* pGen)
     int j;
     int k;
 
-    if (pGen->id != 0x43) {
+    if (pGen->Id != 0x43) {
         return;
     }
-    p = (ESPGEN43_WK*) pGen->work;
+    p = (ESPGEN43_WK*) pGen->Free.buff;
     v = Chk_pos;
     PSMTXMultVec(p->Inv_mat, &v, &v);
     if (v.x < (f32) (-p->Width / 2)) {
@@ -141,15 +141,15 @@ void AddSandPower(Vec& pos, f32 power)
 
 // Height test of Chk_pos on sand generator `w`: inside the grid, the surface plane height (the
 // grid is treated as flat) is stored in Height_ret.
-void GetSandHeightSub(EspgenWork* pGen)
+void GetSandHeightSub(cEspgen* pGen)
 {
     ESPGEN43_WK* p;
     Vec v;
 
-    if (pGen->id != 0x43) {
+    if (pGen->Id != 0x43) {
         return;
     }
-    p = (ESPGEN43_WK*) pGen->work;
+    p = (ESPGEN43_WK*) pGen->Free.buff;
     v = Chk_pos;
     PSMTXMultVec(p->Inv_mat, &v, &v);
     if (v.x < (f32) (-p->Width / 2)) {
@@ -189,9 +189,9 @@ int GetSandHeight(Vec* pos, f32* Ret)
 // Step 0, every frame: sets Status_flg[0] bit1 and recomputes the vertex normals from the
 // neighbouring heights, flushing both buffers for the GP.
 #line 246 "D:/Bio4/Prog/Espgen43.cpp"
-void Espgen43_Move00(EspgenWork* pGen)
+void Espgen43_Move00(cEspgen* pGen)
 {
-    ESPGEN43_WK* p = (ESPGEN43_WK*) pGen->work;
+    ESPGEN43_WK* p = (ESPGEN43_WK*) pGen->Free.buff;
     Vec v;
     int i;
     int j;
@@ -216,25 +216,25 @@ void Espgen43_Move00(EspgenWork* pGen)
     DCStoreRange(p->pNorBuf, n);
 }
 
-// Espgen move entry for id 0x43: dispatches on w->step.
-void Espgen43_Move(EspgenWork* pGen)
+// Espgen move entry for id 0x43: dispatches on w->Rno0.
+void Espgen43_Move(cEspgen* pGen)
 {
-    static void (*Espgen43MoveTbl[])(EspgenWork*) = {Espgen43_Move00};
+    static void (*Espgen43MoveTbl[])(cEspgen*) = {Espgen43_Move00};
 
-    Espgen43MoveTbl[pGen->step](pGen);
+    Espgen43MoveTbl[pGen->Rno0](pGen);
 }
 
 // Queues Espgen43_TransSub in the world OT (0x10, layer 1, priority 0x80) while live.
-void Espgen43_Trans(EspgenWork* pGen)
+void Espgen43_Trans(cEspgen* pGen)
 {
-    if ((pGen->flag & 1) && !(pGen->flag & 2)) {
+    if ((pGen->Be_flg & 1) && !(pGen->Be_flg & 2)) {
         AddOtDirect(0x10, pGen, (void (*)()) Espgen43_TransSub, 1, 0x80, NULL, 0.0f);
     }
 }
 
 // Draws the sand grid: lights from commonClothLightSet, material / ambient colours, texture
 // TexNo, then the pre-built display list of triangle strips.
-void Espgen43_TransSub(EspgenWork* pGen)
+void Espgen43_TransSub(cEspgen* pGen)
 {
     GxStageWork* st;
     ESPGEN43_WK* p;
@@ -242,14 +242,14 @@ void Espgen43_TransSub(EspgenWork* pGen)
     GXTlutObj* tlut;
     f32 r;
 
-    if (!(pGen->flag & 1)) {
+    if (!(pGen->Be_flg & 1)) {
         return;
     }
-    if (pGen->flag & 2) {
+    if (pGen->Be_flg & 2) {
         return;
     }
     st = &pG->gxStage;
-    p = (ESPGEN43_WK*) pGen->work;
+    p = (ESPGEN43_WK*) pGen->Free.buff;
     st->tevStage = 0;
     st->texMap = 0;
     st->texCoord = 0;
@@ -320,7 +320,7 @@ void Espgen43_TransSub(EspgenWork* pGen)
 // Dead-stripped from the DOL (pool and string kept): pulls a generator and sets the grid up.
 static int SetSand(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny)
 {
-    EspgenWork* w;
+    cEspgen* w;
 
     if (PullEspgen(&w) == 0) {
         pLog->err(0, 0, "Espgen43 : work pull failed");
@@ -341,9 +341,9 @@ static int SetSand(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny)
 // Builds the grid at pos / rot with cell `size` (height axis scaled by sizeRate): allocates the
 // height and normal buffers and the display list (texture repeated texRep times across the
 // grid). Returns NULL (and releases the generator) on memory failure.
-EspgenWork* SetSandWork(EspgenWork* w, Vec* pos, Vec* rot, f32 size, f32 sizeRate, u32 nx, u32 ny)
+cEspgen* SetSandWork(cEspgen* w, Vec* pos, Vec* rot, f32 size, f32 sizeRate, u32 nx, u32 ny)
 {
-    ESPGEN43_WK* p = (ESPGEN43_WK*) w->work;
+    ESPGEN43_WK* p = (ESPGEN43_WK*) w->Free.buff;
     Mtx m;
     u32 n;
     u8* d;
@@ -354,7 +354,7 @@ EspgenWork* SetSandWork(EspgenWork* w, Vec* pos, Vec* rot, f32 size, f32 sizeRat
     f32 fx;
     f32 fy;
 
-    w->id = 0x43;
+    w->Id = 0x43;
     p->Width = nx;
     p->Height = ny;
     p->Size = size;
@@ -521,9 +521,9 @@ EspgenWork* SetSandWork(EspgenWork* w, Vec* pos, Vec* rot, f32 size, f32 sizeRat
 }
 
 // Frees the height, normal and display list buffers.
-void Espgen43_Destruct(EspgenWork* pGen)
+void Espgen43_Destruct(cEspgen* pGen)
 {
-    ESPGEN43_WK* p = (ESPGEN43_WK*) pGen->work;
+    ESPGEN43_WK* p = (ESPGEN43_WK*) pGen->Free.buff;
 
     if (p->pHeightBuf != NULL) {
         Mem_free(p->pHeightBuf);
@@ -542,10 +542,10 @@ void Espgen43_Destruct(EspgenWork* pGen)
 // Espgen SetFreeWork for id 0x43: grid size prm 0xCC / 0xD0 (default 64, max 256), colours /
 // ambient from the record, texture Tex_id, repeat 2^Work8[0], height scale Size_plus + 1; runs
 // one move step at once.
-int Espgen43_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
+int Espgen43_SetFreeWork(cEspgen* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
                          Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct)
 {
-    ESPGEN43_WK* p = (ESPGEN43_WK*) pGen->work;
+    ESPGEN43_WK* p = (ESPGEN43_WK*) pGen->Free.buff;
     Vec r;
     u32 nx = 0x40;
     u32 ny = 0x40;

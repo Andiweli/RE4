@@ -12,20 +12,20 @@ struct Espgen44Work {
 };
 
 // EspgenMoveTbl entry for controller type 0x44: nothing per frame (the filter runs on its own).
-void Espgen44_Move(EspgenWork* pGen)
+void Espgen44_Move(cEspgen* pGen)
 {
 }
 
 // EspgenTransTbl entry: nothing to draw.
-void Espgen44_Trans(EspgenWork* pGen)
+void Espgen44_Trans(cEspgen* pGen)
 {
 }
 
 // Destruct entry: turns the filter the record programmed back off (Filter05SetParam / Filter06SetParam
 // with all-zero parameters).
-void Espgen44_Destruct(EspgenWork* pGen)
+void Espgen44_Destruct(cEspgen* pGen)
 {
-    Espgen44Work* p = (Espgen44Work*) pGen->work;
+    Espgen44Work* p = (Espgen44Work*) pGen->Free.buff;
 
     switch (p->type) {
     case 0:
@@ -42,10 +42,10 @@ void Espgen44_Destruct(EspgenWork* pGen)
 // Programs the filter from the record: level = Work8[0]*100+100, colour Col_start_rgba, Col_d_a,
 // scale = Size_base_x*0.005; Filter05 (Id 0) takes Blend_type and kind Tex_id, Filter06 takes
 // Speed/R_speed as vectors and kind Work8[1].
-int Espgen44_SetFreeWork(EspgenWork* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
+int Espgen44_SetFreeWork(cEspgen* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
                          Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct)
 {
-    Espgen44Work* p = (Espgen44Work*) pGen->work;
+    Espgen44Work* p = (Espgen44Work*) pGen->Free.buff;
     if (pSeq->Id == 0) {
         p->type = 0;
     } else {

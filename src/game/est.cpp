@@ -33,7 +33,7 @@ void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void
 // and a random seed. Debug_flg[1] 0x01000000 disables all effects.
 void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, void* h)
 {
-    EspgenWork* w;
+    cEspgen* w;
     ESPGEN10_WK* p;
 
     if (DbgFlagChk(pG, DBG_NO_EST_CALL)) {
@@ -56,8 +56,8 @@ void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e,
         return;
     }
     EspgenIncCallNo();
-    w->id = 0x10;
-    p = (ESPGEN10_WK*) w->work;
+    w->Id = 0x10;
+    p = (ESPGEN10_WK*) w->Free.buff;
     p->head = head;
     p->pMod = model;
     if (model != NULL) {

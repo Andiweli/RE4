@@ -1,5 +1,5 @@
 // game/espgen (D:/Bio4/Prog/espgen.cpp): the per-room pool of effect controllers ("ESP_CTRL"),
-// each an EspgenWork run every frame through id-indexed Move and Trans tables.
+// each an cEspgen run every frame through id-indexed Move and Trans tables.
 #include "atari.h"
 #include "light.h"
 #include "global.h"
@@ -13,7 +13,7 @@
 #define ESPGEN_APP_ID 0x40
 
 extern "C" {
-static void EspgenDummyMove(EspgenWork* w);
+static void EspgenDummyMove(cEspgen* w);
 void EspgenFreeSizeCheckApp();
 void EspgenFreeSizeCheck();
 int EspgenInit();
@@ -30,23 +30,23 @@ void EspgenDeleteEvent();
 int EspgenDispInfo();
 int EspgenGetCallNo();
 void EspgenIncCallNo();
-int EspgenApplyFunc(void (*func)(EspgenWork* w));
+int EspgenApplyFunc(void (*func)(cEspgen* w));
 
 // generator entry points (game/espgen0*.cpp, Espgen4*.cpp)
-int Espgen01_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+int Espgen01_SetFreeWork(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
-int Espgen02_SetFreeWork(EspgenWork* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
+int Espgen02_SetFreeWork(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
 }
 // game/espgen40.cpp (declared with the record type in the original)
 void Espgen40_Move(cEspSeqTbl* gen);
 
-EspgenWork* EspgenArray = NULL;
-EspgenWork* pEspgenArrayBack = NULL;
+cEspgen* EspgenArray = NULL;
+cEspgen* pEspgenArrayBack = NULL;
 u32 nEspgen = 0;
 u32 nEspgenBack = 0;
 int g_Call_no = 0;
-EspgenWork g_DmyEspgen;
+cEspgen g_DmyEspgen;
 
 EspgenMoveFunc EspgenMoveTblApp[6] = {
     (EspgenMoveFunc) Espgen40_Move, (EspgenMoveFunc) Espgen40_Move, Espgen42_Move, Espgen43_Move, Espgen44_Move,
@@ -87,11 +87,11 @@ EspgenDestructFunc EspgenDestructTbl[ESPGEN_APP_ID] = {
 
 // Active generators are moved when alive and not deleted; during an event only the ones flagged
 // as event effects.
-static inline int EspgenIsActive(EspgenWork* w)
+static inline int EspgenIsActive(cEspgen* w)
 {
     int on;
 
-    if (!(w->flag & 1) || (w->flag & 2)) {
+    if (!(w->Be_flg & 1) || (w->Be_flg & 2)) {
         on = 0;
     } else {
         // the flag load before `on = 1` keeps jump.c from hoisting `on = 0` above the first
@@ -99,14 +99,14 @@ static inline int EspgenIsActive(EspgenWork* w)
         u32 f = pG->Status_flg[1];
         on = 1;
         if (f & 0x10000000) {
-            on = w->info.Core_flg & 1;
+            on = w->Eff_core.Core_flg & 1;
         }
     }
     return on;
 }
 
-// Work size checks: the generator works must fit the 0xB4 bytes after the EspgenWork header.
-#define ESPGEN_WORK_SIZE (sizeof(EspgenWork) - 0x14)
+// Work size checks: the generator works must fit the 0xB4 bytes after the cEspgen header.
+#define ESPGEN_WORK_SIZE (sizeof(cEspgen) - 0x14)
 
 static inline void Espgen40_FreeSizeCheck(u32 size)
 {
@@ -150,7 +150,7 @@ static inline void Espgen45_FreeSizeCheck(u32 size)
     }
 }
 
-// Init-time check that the application controller works (40..45) fit the EspgenWork free area.
+// Init-time check that the application controller works (40..45) fit the cEspgen free area.
 void EspgenFreeSizeCheckApp()
 {
     Espgen40_FreeSizeCheck(0);
@@ -162,9 +162,9 @@ void EspgenFreeSizeCheckApp()
 }
 
 // Move entry of the unassigned controller ids: logs the invalid id.
-static void EspgenDummyMove(EspgenWork* pEspgen)
+static void EspgenDummyMove(cEspgen* pEspgen)
 {
-    pLog->err(0, 0, "ESP_CTRL : CTRL_ID[%d] invalid.", pEspgen->id);
+    pLog->err(0, 0, "ESP_CTRL : CTRL_ID[%d] invalid.", pEspgen->Id);
 }
 
 static inline void Espgen00_FreeSizeCheck(u32 size)
@@ -195,7 +195,7 @@ static inline void Espgen10_FreeSizeCheck(u32 size)
     }
 }
 
-// Init-time check that the generic controller works (00/01/02/10) fit the EspgenWork free area.
+// Init-time check that the generic controller works (00/01/02/10) fit the cEspgen free area.
 void EspgenFreeSizeCheck()
 {
     Espgen00_FreeSizeCheck(0);
@@ -240,9 +240,9 @@ int EspgenArrayAlloc(int workNum)
     if (workNum == 0) {
         return 0;
     }
-    size = workNum * sizeof(EspgenWork);
+    size = workNum * sizeof(cEspgen);
 #line 403 "D:/Bio4/Prog/espgen.cpp"
-    EspgenArray = (EspgenWork*) MEM_ALLOC(size, 1, 0xD);
+    EspgenArray = (cEspgen*) MEM_ALLOC(size, 1, 0xD);
     if (EspgenArray == NULL) {
         return 0;
     }
@@ -269,7 +269,7 @@ int EspgenArrayPush(int espgen_num)
         return 0;
     }
     pEspgenArrayBack = EspgenArray;
-    EspgenArray = (EspgenWork*) Debug_alloc(espgen_num * sizeof(EspgenWork), 1);
+    EspgenArray = (cEspgen*) Debug_alloc(espgen_num * sizeof(cEspgen), 1);
     nEspgenBack = nEspgen;
     nEspgen = espgen_num;
     return 1;
@@ -290,18 +290,18 @@ int EspgenArrayPop()
 
 // Takes a free controller searching from the BACK of the pool (moved/drawn last), clears it and
 // marks it in use. On failure *out is the dummy controller and 0 is returned.
-int PullEspgen(EspgenWork** ppEspgen)
+int PullEspgen(cEspgen** ppEspgen)
 {
-    EspgenWork* base = EspgenArray;
-    EspgenWork* w;
+    cEspgen* base = EspgenArray;
+    cEspgen* w;
     int ret = 0;
     u32 i;
 
     *ppEspgen = &g_DmyEspgen;
     for (i = 0, w = &base[nEspgen - 1]; i < nEspgen; i++, w--) {
-        if (!(w->flag & 1) || (w->flag & 2)) {
-            memclr_asm(w, sizeof(EspgenWork));
-            w->flag |= 1;
+        if (!(w->Be_flg & 1) || (w->Be_flg & 2)) {
+            memclr_asm(w, sizeof(cEspgen));
+            w->Be_flg |= 1;
             *ppEspgen = w;
             break;
         }
@@ -314,21 +314,21 @@ int PullEspgen(EspgenWork** ppEspgen)
 
 // Releases a controller: sets the delete-request bit (flag bit 1; the slot is reused after the next
 // EspgenMove) and runs the id's Destruct entry (frees water/sand buffers, resets filters).
-void PushEspgen(EspgenWork* pEspgen)
+void PushEspgen(cEspgen* pEspgen)
 {
-    if ((pEspgen->flag & 1) && !(pEspgen->flag & 2)) {
+    if ((pEspgen->Be_flg & 1) && !(pEspgen->Be_flg & 2)) {
         u32 max;
 
-        pEspgen->flag |= 2;
+        pEspgen->Be_flg |= 2;
         max = GetEspgenIdMax();
-        if (pEspgen->id < max) {
-            if (pEspgen->id < ESPGEN_APP_ID) {
-                if (EspgenDestructTbl[pEspgen->id] != NULL) {
-                    EspgenDestructTbl[pEspgen->id](pEspgen);
+        if (pEspgen->Id < max) {
+            if (pEspgen->Id < ESPGEN_APP_ID) {
+                if (EspgenDestructTbl[pEspgen->Id] != NULL) {
+                    EspgenDestructTbl[pEspgen->Id](pEspgen);
                 }
             } else {
-                if (EspgenDestructTblApp[pEspgen->id - ESPGEN_APP_ID] != NULL) {
-                    EspgenDestructTblApp[pEspgen->id - ESPGEN_APP_ID](pEspgen);
+                if (EspgenDestructTblApp[pEspgen->Id - ESPGEN_APP_ID] != NULL) {
+                    EspgenDestructTblApp[pEspgen->Id - ESPGEN_APP_ID](pEspgen);
                 }
             }
         }
@@ -336,18 +336,18 @@ void PushEspgen(EspgenWork* pEspgen)
 }
 
 // Like PullEspgen but searches from the FRONT of the pool (controllers that must move/draw first).
-int PullEspgenFront(EspgenWork** ppEspgen)
+int PullEspgenFront(cEspgen** ppEspgen)
 {
-    EspgenWork* base = EspgenArray;
-    EspgenWork* w;
+    cEspgen* base = EspgenArray;
+    cEspgen* w;
     int ret = 0;
     u32 i;
 
     *ppEspgen = &g_DmyEspgen;
     for (i = 0, w = base; i < nEspgen; i++, w++) {
-        if (!(w->flag & 1) || (w->flag & 2)) {
-            memclr_asm(w, sizeof(EspgenWork));
-            w->flag |= 1;
+        if (!(w->Be_flg & 1) || (w->Be_flg & 2)) {
+            memclr_asm(w, sizeof(cEspgen));
+            w->Be_flg |= 1;
             *ppEspgen = w;
             break;
         }
@@ -361,7 +361,7 @@ int PullEspgenFront(EspgenWork** ppEspgen)
 // Releases every controller (room change).
 void EspgenArrayClear()
 {
-    EspgenWork* w;
+    cEspgen* w;
     u32 i;
 
     for (i = 0, w = EspgenArray; i < nEspgen; i++, w++) {
@@ -374,8 +374,8 @@ void EspgenArrayClear()
 // bit 1 pauses the game only those with Core_flg 0x8000). Prints the active count at (472,216).
 int EspgenMove()
 {
-    EspgenWork* base = EspgenArray;
-    EspgenWork* w;
+    cEspgen* base = EspgenArray;
+    cEspgen* w;
     int pause = 0;
     u32 cnt;
     u32 i;
@@ -386,24 +386,24 @@ int EspgenMove()
     }
     cnt = 0;
     for (i = 0, w = base; i < nEspgen; i++, w++) {
-        if (w->flag & 2) {
-            w->flag &= ~3;
+        if (w->Be_flg & 2) {
+            w->Be_flg &= ~3;
         } else if (EspgenIsActive(w)) {
             max = GetEspgenIdMax();
-            if (w->id < max) {
-                if (pause && !(w->info.Core_flg & 0x8000)) {
+            if (w->Id < max) {
+                if (pause && !(w->Eff_core.Core_flg & 0x8000)) {
                     continue;
                 }
-                if (w->id < ESPGEN_APP_ID) {
-                    EspgenMoveTbl[w->id](w);
+                if (w->Id < ESPGEN_APP_ID) {
+                    EspgenMoveTbl[w->Id](w);
                 } else {
-                    EspgenMoveTblApp[w->id - ESPGEN_APP_ID](w);
+                    EspgenMoveTblApp[w->Id - ESPGEN_APP_ID](w);
                 }
-                if (!(w->flag & 2)) {
+                if (!(w->Be_flg & 2)) {
                     cnt++;
                 }
             } else {
-                pLog->err(0, 0, "ESP_CTRL : CTRL_ID[%x] is invalid.", w->id);
+                pLog->err(0, 0, "ESP_CTRL : CTRL_ID[%x] is invalid.", w->Id);
             }
         }
     }
@@ -418,7 +418,7 @@ int EspgenMove()
 // Per-frame draw pass: runs the id's Trans entry (when any) for every active controller.
 int EspgenTrans()
 {
-    EspgenWork* w;
+    cEspgen* w;
     u32 i;
     u32 max;
 
@@ -429,17 +429,17 @@ int EspgenTrans()
             continue;
         }
         max = GetEspgenIdMax();
-        if (w->id < max) {
-            if (w->id < ESPGEN_APP_ID) {
-                func = EspgenTransTbl[w->id];
+        if (w->Id < max) {
+            if (w->Id < ESPGEN_APP_ID) {
+                func = EspgenTransTbl[w->Id];
             } else {
-                func = EspgenTransTblApp[w->id - ESPGEN_APP_ID];
+                func = EspgenTransTblApp[w->Id - ESPGEN_APP_ID];
             }
             if (func != NULL) {
                 func(w);
             }
         } else {
-            pLog->err(0, 0, "ESP_CTRL : CTRL_ID[%x] is invalid.", w->id);
+            pLog->err(0, 0, "ESP_CTRL : CTRL_ID[%x] is invalid.", w->Id);
         }
     }
     return 1;
@@ -449,18 +449,18 @@ int EspgenTrans()
 // (each test skipped when 0): effects owned by a dying enemy/object.
 void EspgenDelete(int a, int b, void* c)
 {
-    EspgenWork* w;
+    cEspgen* w;
     u32 i;
 
     for (i = 0, w = EspgenArray; i < nEspgen; i++, w++) {
-        if ((w->flag & 1) && !(w->flag & 2)) {
-            if (a != 0 && w->info.Core_flg != a) {
+        if ((w->Be_flg & 1) && !(w->Be_flg & 2)) {
+            if (a != 0 && w->Eff_core.Core_flg != a) {
                 continue;
             }
-            if (b != 0 && w->info.Core_kind != b) {
+            if (b != 0 && w->Eff_core.Core_kind != b) {
                 continue;
             }
-            if (c != 0 && w->info.Core_pEm != c) {
+            if (c != 0 && w->Eff_core.Core_pEm != c) {
                 continue;
             }
             PushEspgen(w);
@@ -472,12 +472,12 @@ void EspgenDelete(int a, int b, void* c)
 // event end.
 void EspgenDeleteEvent()
 {
-    EspgenWork* w;
+    cEspgen* w;
     u32 i;
 
     for (i = 0, w = EspgenArray; i < nEspgen; i++, w++) {
-        if ((w->flag & 1) && !(w->flag & 2)) {
-            if (!(w->info.Core_flg & 1) && !(w->info.Core_flg & 0x800)) {
+        if ((w->Be_flg & 1) && !(w->Be_flg & 2)) {
+            if (!(w->Eff_core.Core_flg & 1) && !(w->Eff_core.Core_flg & 0x800)) {
                 PushEspgen(w);
             }
         }
@@ -488,7 +488,7 @@ void EspgenDeleteEvent()
 int EspgenDispInfo()
 {
     static int max = 0;
-    EspgenWork* w = EspgenArray;
+    cEspgen* w = EspgenArray;
     int cnt;
     u32 i;
 
@@ -497,7 +497,7 @@ int EspgenDispInfo()
     }
     cnt = 0;
     for (i = 0; i < nEspgen; i++, w++) {
-        if ((w->flag & 1) && !(w->flag & 2)) {
+        if ((w->Be_flg & 1) && !(w->Be_flg & 2)) {
             cnt++;
         }
     }
@@ -521,9 +521,9 @@ void EspgenIncCallNo()
 }
 
 // Calls func on every active controller (debug tools / bulk parameter updates).
-int EspgenApplyFunc(void (*func)(EspgenWork* w))
+int EspgenApplyFunc(void (*func)(cEspgen* w))
 {
-    EspgenWork* w;
+    cEspgen* w;
     u32 i;
 
     for (i = 0, w = EspgenArray; i < nEspgen; i++, w++) {
@@ -536,20 +536,20 @@ int EspgenApplyFunc(void (*func)(EspgenWork* w))
 
 // Runs the id's SetFreeWork entry (generic table with `flag`, application table without) to fill a
 // freshly pulled controller from its record; returns its result (1 when the id has no entry).
-int EspgenSetFreeWork(EspgenWork* pEspgen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
+int EspgenSetFreeWork(cEspgen* pEspgen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, cModel* pMod, u16 Null_parts_no, Mtx* pMat,
                       Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct, int bUseOffset)
 {
     int ret = 1;
     u32 max = GetEspgenIdMax();
 
-    if (pEspgen->id < max) {
-        if (pEspgen->id < ESPGEN_APP_ID) {
-            if (EspgenSetFreeWorkTbl[pEspgen->id] != NULL) {
-                ret = EspgenSetFreeWorkTbl[pEspgen->id](pEspgen, pSeq, pSeqHed, pMod, Null_parts_no, pMat, pOffset, pAng, pSct, bUseOffset);
+    if (pEspgen->Id < max) {
+        if (pEspgen->Id < ESPGEN_APP_ID) {
+            if (EspgenSetFreeWorkTbl[pEspgen->Id] != NULL) {
+                ret = EspgenSetFreeWorkTbl[pEspgen->Id](pEspgen, pSeq, pSeqHed, pMod, Null_parts_no, pMat, pOffset, pAng, pSct, bUseOffset);
             }
         } else {
-            if (EspgenSetFreeWorkTblApp[pEspgen->id - ESPGEN_APP_ID] != NULL) {
-                ret = EspgenSetFreeWorkTblApp[pEspgen->id - ESPGEN_APP_ID](pEspgen, pSeq, pSeqHed, pMod, Null_parts_no, pMat, pOffset, pAng, pSct);
+            if (EspgenSetFreeWorkTblApp[pEspgen->Id - ESPGEN_APP_ID] != NULL) {
+                ret = EspgenSetFreeWorkTblApp[pEspgen->Id - ESPGEN_APP_ID](pEspgen, pSeq, pSeqHed, pMod, Null_parts_no, pMat, pOffset, pAng, pSct);
             }
         }
     }
@@ -564,7 +564,7 @@ int EspgenSeqSet(cEspSeqHead* pSeqHed, int seq_ptr, cEffectCore* pCore, cModel* 
                  ESPSEQ_CONTROL* pSct, int bUseOffset)
 {
     cEspSeqTbl* rec = &pSeqHed->SeqTbl[seq_ptr];
-    EspgenWork* w;
+    cEspgen* w;
     u32 max = GetEspgenIdMax();
 
     if (rec->Espgen_id >= max && rec->Espgen_id != 0xFF) {
@@ -576,7 +576,7 @@ int EspgenSeqSet(cEspSeqHead* pSeqHed, int seq_ptr, cEffectCore* pCore, cModel* 
         return 1;
     }
     if (PullEspEspgen(&w, pCore->Core_flg, pCore->Core_kind, pCore->b.x7, pCore->Core_pEm, pCore->owner, 0)) {
-        w->id = rec->Espgen_id;
+        w->Id = rec->Espgen_id;
         w->Type = rec->Espgen_type;
         if (!EspgenSetFreeWork(w, rec, pSeqHed, pMod, Null_parts_no, pMat, pOffset, pAng, pSct, bUseOffset)) {
             PushEspgen(w);
