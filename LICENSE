@@ -1,3 +1,14 @@
+Scope
+
+This license covers only what was written for this project: the build scripts,
+the tools (tools/, configure.py), the configuration (config/) and the
+documentation (README.md, CONTRIBUTING.md, docs/).
+
+It does not cover the reconstructed game, SDK and middleware source in src/ and
+include/. That code is a reconstruction of software owned by Capcom, Nintendo
+and CRI Middleware, it stays their property, and it is published for research
+and preservation only.
+
 CC0 1.0 Universal
 
 Statement of Purpose
