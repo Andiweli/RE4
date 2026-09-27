@@ -117,7 +117,7 @@ int AreaNoExec_callback(int no, ESP_AREA* w, cDbgButtonTemplate<ESP_AREA>* b)
         eprintf(0xAA, 0xB0, 0, 0, "          OFF");
     }
     if (pG->Frame_cnt & 7) {
-        eprintf(0x9A, (cursor + 10) * 16, 0, 0, cDbgStr::cursor());
+        eprintf(0x9A, (cursor + 10) * 16, 0, 0, ">");
     }
     rep = Joy[0].rep;
     if (rep & 0x80008) {
@@ -192,7 +192,7 @@ void OptionExec()
         eprintf(0xAA, 0xA0, 0, 0, "       OFF");
     }
     if (pG->Frame_cnt & 7) {
-        eprintf(0x9A, (cursor + 10) * 16, 0, 0, cDbgStr::cursor());
+        eprintf(0x9A, (cursor + 10) * 16, 0, 0, ">");
     }
     rep = Joy[0].rep;
     if (rep & 0x80008) {

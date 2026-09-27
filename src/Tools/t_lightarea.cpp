@@ -156,7 +156,7 @@ int AreaNoExec_callback(int no, LIGHT_AREA* w, cDbgButtonTemplate<LIGHT_AREA>* b
     eprintf(0xAA, 0xD0, 4, 0, "POWER : ");
     eprintf(0xAA, 0xD0, 0, 0, "       %3d %", w->power);
     if (pG->Frame_cnt & 7) {
-        eprintf(0x9A, (cursor + 10) * 16, 0, 0, cDbgStr::cursor());
+        eprintf(0x9A, (cursor + 10) * 16, 0, 0, ">");
     }
     // one pad pointer for the four cases (the last one is past cse's jump-following path length), taken
     // here so that it does not live across the eprintf calls
@@ -325,7 +325,7 @@ void OptionExec()
         eprintf(0xAA, 0xA0, 0, 0, "       OFF");
     }
     if (pG->Frame_cnt & 7) {
-        eprintf(0x9A, (cursor + 10) * 16, 0, 0, cDbgStr::cursor());
+        eprintf(0x9A, (cursor + 10) * 16, 0, 0, ">");
     }
     rep = Joy[0].rep;
     if (rep & 0x80008) {

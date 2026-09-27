@@ -140,26 +140,14 @@ void cDbgWindow::LocalDisp()
         cDbgButton* b = m_pButList[i];
         int by = m_py + 1;
 
-        eprintf2(8, 12, (m_px + b->m_px) * 8, (by + b->m_py) * 14, 0x10, 0, b->m_pStr);
+        b->Disp(m_px, by);
     }
     cur = m_pCurrentBut;
     if (cur) {
         int bx = m_px;
         int by = m_py + 1;
 
-        if (pG->Frame_cnt & 4) {
-            eprintf2(8, 12, (bx + cur->m_px - 1) * 8, (by + cur->m_py) * 14, 0, 0, cDbgStr::cursor());
-        }
-        eprintf2(8, 12, (bx + cur->m_px) * 8, (by + cur->m_py) * 14, 0, 0, cur->m_pStr);
-        {
-            f32 fx = (f32) ((bx + cur->m_px) * 8);
-            f32 fh = 14.0f;
-            f32 mgn = 2.0f;
-            f32 zero = 0.0f;
-
-            DbgDrawBoxFill(fx - mgn, (f32) ((by + cur->m_py) * 14) - mgn, (f32) (cur->m_strlen * 8) + zero,
-                           fh + mgn, 0.7f, 0.7f, zero, 0.3f);
-        }
+        cur->DispCursor(bx, by);
     }
 }
 

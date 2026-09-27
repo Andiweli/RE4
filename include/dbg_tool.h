@@ -37,6 +37,30 @@ struct DbgToolFileHeader {
     u32 xC;
 };
 
+// The label at column bx + m_px, row by + m_py.
+inline void cDbgButtonBase::Disp(int bx, int by)
+{
+    eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0x10, 0, m_pStr);
+}
+
+// The current button: the blinking ">" before it, its label and the highlight box.
+inline void cDbgButtonBase::DispCursor(int bx, int by)
+{
+    if (pG->Frame_cnt & 4) {
+        eprintf2(8, 12, (bx + m_px - 1) * 8, (by + m_py) * 14, 0, 0, ">");
+    }
+    eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0, 0, m_pStr);
+    {
+        f32 fx = (f32) ((bx + m_px) * 8);
+        f32 fh = 14.0f;
+        f32 mgn = 2.0f;
+        f32 zero = 0.0f;
+
+        DbgDrawBoxFill(fx - mgn, (f32) ((by + m_py) * 14) - mgn, (f32) (m_strlen * 8) + zero, fh + mgn, 0.7f, 0.7f,
+                       zero, 0.3f);
+    }
+}
+
 // Decide / cancel flags of the window from the pad, then its own update.
 inline int cDbgWindowBase::Update()
 {
@@ -323,6 +347,33 @@ public:
 
     cDbgButtonTemplate(int x_, int y_, const char* name, int cx_, int cy_) { Init(x_, y_, name, cx_, cy_); }
     virtual ~cDbgButtonTemplate() {}
+    // The base versions with the label dimmed when the work is not alive.
+    void Disp(int bx, int by, int alive) {
+        if (alive) {
+            eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0x10, 0, m_pStr);
+        } else {
+            eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0x14, 0, m_pStr);
+        }
+    }
+    void DispCursor(int bx, int by, int alive) {
+        if (pG->Frame_cnt & 4) {
+            eprintf2(8, 12, (bx + m_px - 1) * 8, (by + m_py) * 14, 0, 0, ">");
+        }
+        if (alive) {
+            eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0, 0, m_pStr);
+        } else {
+            eprintf2(8, 12, (bx + m_px) * 8, (by + m_py) * 14, 0x14, 0, m_pStr);
+        }
+        {
+            f32 fx = (f32) ((bx + m_px) * 8);
+            f32 fh = 14.0f;
+            f32 mgn = 2.0f;
+            f32 zero = 0.0f;
+
+            DbgDrawBoxFill(fx - mgn, (f32) ((by + m_py) * 14) - mgn, (f32) (m_strlen * 8) + zero, fh + mgn, 0.7f,
+                           0.7f, zero, 0.3f);
+        }
+    }
 };
 
 // The work-list editor window: `rows` visible rows of an array of `numWork` works, scrolled by
@@ -780,11 +831,7 @@ template <class T> void cDbgEditWindow<T>::LocalDisp()
             cDbgButtonTemplate<T>* b = pButton[i];
             int bx = m_px;
 
-            if (alive) {
-                eprintf2(8, 12, (bx + b->m_px) * 8, (by + b->m_py) * 14, 0x10, 0, b->m_pStr);
-            } else {
-                eprintf2(8, 12, (bx + b->m_px) * 8, (by + b->m_py) * 14, 0x14, 0, b->m_pStr);
-            }
+            b->Disp(bx, by, alive);
         }
     }
     if (execMode == 0) {
@@ -794,23 +841,7 @@ template <class T> void cDbgEditWindow<T>::LocalDisp()
             int bx = m_px;
 
             cur = pCur;
-            if (pG->Frame_cnt & 4) {
-                eprintf2(8, 12, (bx + cur->m_px - 1) * 8, (by + cur->m_py) * 14, 0, 0, ">");
-            }
-            if (alive) {
-                eprintf2(8, 12, (bx + cur->m_px) * 8, (by + cur->m_py) * 14, 0, 0, cur->m_pStr);
-            } else {
-                eprintf2(8, 12, (bx + cur->m_px) * 8, (by + cur->m_py) * 14, 0x14, 0, cur->m_pStr);
-            }
-            {
-                f32 fx = (f32) ((bx + cur->m_px) * 8);
-                f32 fh = 14.0f;
-                f32 mgn = 2.0f;
-                f32 zero = 0.0f;
-
-                DbgDrawBoxFill(fx - mgn, (f32) ((by + cur->m_py) * 14) - mgn, (f32) (cur->m_strlen * 8) + zero,
-                               fh + mgn, 0.7f, 0.7f, zero, 0.3f);
-            }
+            cur->DispCursor(bx, by, alive);
         }
     }
 }

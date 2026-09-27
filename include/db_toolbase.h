@@ -17,7 +17,7 @@ void DbgDrawBox(f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a);
 void DbgDrawBoxFill(f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a);
 
 class cDbgButtonBase {
-public:
+protected:
     u32 m_px;          // 0x00  column inside the window
     u32 m_py;          // 0x04  row inside the window
     int m_cx;         // 0x08  cursor column
@@ -26,6 +26,7 @@ public:
     u32 m_strlen;    // 0x14  strlen + 1
     // 0x18 vptr
 
+public:
     virtual ~cDbgButtonBase() { delete m_pStr; }
 
     int Init(int x_, int y_, const char* name, int cx_, int cy_) {
@@ -60,14 +61,10 @@ public:
             strcpy(m_pStr, s);
         }
     }
-};
-
-// The cursor mark of cDbgWindow::LocalDisp (a header inline owns it: it opens the .rodata string
-// group of every unit including this header, right after the Init message). The other display
-// strings of the group come from the file-select / ok-cancel window inlines of dbg_tool.h, which
-// every user of this header (db_toolbase.cpp included) parses after it.
-struct cDbgStr {
-    static const char* cursor() { return ">"; }
+    // Label at column bx + m_px, row by + m_py; DispCursor draws the current button with the blinking ">"
+    // and the highlight box (defined in dbg_tool.h)
+    void Disp(int bx, int by);
+    void DispCursor(int bx, int by);
 };
 
 class cDbgWindowBase {
