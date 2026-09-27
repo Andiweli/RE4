@@ -36,7 +36,7 @@
 #include "em.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em30.h"
 
 typedef void (*Em30Func)(cEm30*);
 
@@ -203,36 +203,36 @@ static void em30_R0_Init(cEm30* em)
     Em30Work* w = EM30_WK(em);
     cModelInfo* info;
 
-    if (em->modelInit(ARC(4), ARC(5)) == 0) {
+    if (em->modelInit(ARC(EM30_BIN_004), ARC(EM30_TPL_005)) == 0) {
         pLog->err(0, 0, "em30() ModelInit failed.");
         em->r_no_0 = 0xFF;
         return;
     }
-    w->pInfo0 = ModInfoMgr.create(ARC(6), ARC(7));
+    w->pInfo0 = ModInfoMgr.create(ARC(EM30_BIN_006), ARC(EM30_TPL_007));
     if (w->pInfo0) {
         em->addModel(w->pInfo0);
     }
-    w->pInfo1 = ModInfoMgr.create(ARC(8), ARC(7));
+    w->pInfo1 = ModInfoMgr.create(ARC(EM30_BIN_008), ARC(EM30_TPL_007));
     if (w->pInfo1) {
         em->addModel(w->pInfo1);
     }
-    info = ModInfoMgr.create(ARC(9), ARC(5));
+    info = ModInfoMgr.create(ARC(EM30_BIN_009), ARC(EM30_TPL_005));
     if (info) {
         em->addModel(info);
     }
     if (em->type == 0) {
-        info = ModInfoMgr.create(ARC(0xA), ARC(5));
+        info = ModInfoMgr.create(ARC(EM30_BIN_00A), ARC(EM30_TPL_005));
     } else {
-        info = ModInfoMgr.create(ARC(0xB), ARC(5));
+        info = ModInfoMgr.create(ARC(EM30_BIN_00B), ARC(EM30_TPL_005));
     }
     if (info) {
         em->addModel(info);
     }
-    info = ModInfoMgr.create(ARC(0xC), ARC(5));
+    info = ModInfoMgr.create(ARC(EM30_BIN_00C), ARC(EM30_TPL_005));
     if (info) {
         em->addModel(info);
     }
-    info = ModInfoMgr.create(ARC(0xD), ARC(5));
+    info = ModInfoMgr.create(ARC(EM30_BIN_00D), ARC(EM30_TPL_005));
     if (info) {
         em->addModel(info);
     }
@@ -252,7 +252,7 @@ static void em30_R0_Init(cEm30* em)
     YarareAdd(em, &w->hit[1], 0.0f, -100.0f, 0.0f, 200.0f, 200.0f, 0x14, YAT_FLAG_ON);
     YarareAdd(em, &w->hit[2], 0.0f, -100.0f, 0.0f, 200.0f, 200.0f, 0x18, YAT_FLAG_ON);
     em->setTarget(2, 0.0f, 0.0f, 0.0f);
-    EspDataLoad((u32) ARC(0xE), EFF_EM30, 0);
+    EspDataLoad((u32) ARC(EM30_EFF_00E), EFF_EM30, 0);
     w->neckAng = 0.0f;
     w->flags = 0;
     if (em->flag & 0x80000000) {
@@ -270,7 +270,7 @@ static void em30_R0_Init(cEm30* em)
     em->r_no_1 = 0;
     em->r_no_2 = 0;
     em->r_no_3 = 0;
-    MotionSetCore(em, MOTION(em), ARC(0xF), 0, 0, 1, 0);
+    MotionSetCore(em, MOTION(em), ARC(EM30_MOT_00F), 0, 0, 1, 0);
     MotionMove(em, 0);
     em30_R0_Move(em);
 }
@@ -290,7 +290,7 @@ static void em30_R1_Wait(cEm30* em)
     w->flags |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0xF), 0, 30, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM30_MOT_00F), 0, 30, 5, 0);
         em->r_no_2++;
     case 1:
         MotionMove(em, 0);
@@ -310,7 +310,7 @@ static void em30_R1_Walk(cEm30* em)
     w->flags |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0x10), 0, 10, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM30_MOT_WALK), 0, 10, 5, 0);
         em->r_no_2++;
     case 1:
         em->ang.y += Muku(&em->pos, &w->targetPos, em->ang.y, PI / 64.0f);
@@ -340,7 +340,7 @@ static void em30_R1_Dm_Normal(cEm30* em)
     w->flags |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0xF), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM30_MOT_00F), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -368,7 +368,7 @@ static void em30_R1_Die_Normal(cEm30* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0xF), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM30_MOT_00F), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -475,18 +475,18 @@ void em30SetParasite(cEm30* em, int no)
     Vec pos;
     Vec rot;
     cObj* obj;
-    int frame = (((MotionData*) ARC(0x14))->maxFrame & 0x3FFF) / 4;
-    void* bin = ARC(0x15);
-    void* tpl = ARC(0x16);
-    void* m0 = ARC(0x17);
-    void* m1 = ARC(0x18);
-    void* m2 = ARC(0x1C);
-    void* m3 = ARC(0x1E);
-    void* m4 = ARC(0x1F);
-    void* m7 = ARC(0x19);
-    void* m8 = ARC(0x1D);
-    void* m9 = ARC(0x1A);
-    void* m10 = ARC(0x1B);
+    int frame = (((MotionData*) ARC(EM30_MOT_SET_PARASITE_014))->maxFrame & 0x3FFF) / 4;
+    void* bin = ARC(EM30_BIN_SET_PARASITE_015);
+    void* tpl = ARC(EM30_TPL_SET_PARASITE_016);
+    void* m0 = ARC(EM30_MOT_SET_PARASITE_017);
+    void* m1 = ARC(EM30_MOT_SET_PARASITE_018);
+    void* m2 = ARC(EM30_MOT_SET_PARASITE_01C);
+    void* m3 = ARC(EM30_MOT_SET_PARASITE_01E);
+    void* m4 = ARC(EM30_MOT_SET_PARASITE_01F);
+    void* m7 = ARC(EM30_MOT_SET_PARASITE_019);
+    void* m8 = ARC(EM30_MOT_SET_PARASITE_01D);
+    void* m9 = ARC(EM30_MOT_SET_PARASITE_01A);
+    void* m10 = ARC(EM30_MOT_SET_PARASITE_01B);
 
     switch ((u32) no) {
     case 0:
@@ -519,7 +519,7 @@ void em30SetParasite(cEm30* em, int no)
     if (w->pHead[no]) {
         ((cObj16*) w->pHead[no])->setMotData(m0, m1, m2, m3, m4, m4, m4, m7, m8, m9, m10);
         ((cObj16*) w->pHead[no])->setMotData(m0, m1, m2, m3, m4, m4, m4, m7, m8, m9, m10);
-        ((cObj16*) w->pHead[no])->setPlDmgMot(ARC(0x20), 0);
+        ((cObj16*) w->pHead[no])->setPlDmgMot(ARC(EM30_MOT_SET_PARASITE_020), 0);
     }
     pos.x = 0.0f;
     pos.y = 0.0f;
@@ -527,9 +527,9 @@ void em30SetParasite(cEm30* em, int no)
     rot.x = -0.6632251f;
     rot.y = 0.0f;
     rot.z = 0.0f;
-    obj = SetObj16(ARC(0x12), ARC(0x13), em, w->pHead[no], 0x16, 0xF, &pos, &rot);
+    obj = SetObj16(ARC(EM30_BIN_SET_PARASITE_012), ARC(EM30_TPL_SET_PARASITE_013), em, w->pHead[no], 0x16, 0xF, &pos, &rot);
     if (obj) {
-        MotSetObj16(obj, ARC(0x14), 4, 0);
+        MotSetObj16(obj, ARC(EM30_MOT_SET_PARASITE_014), 4, 0);
         w->para[no].p[0] = obj;
     }
     pos.x = 0.0f;
@@ -538,9 +538,9 @@ void em30SetParasite(cEm30* em, int no)
     rot.x = 0.0f;
     rot.y = 0.0f;
     rot.z = 0.61086524f;
-    obj = SetObj16(ARC(0x12), ARC(0x13), em, w->pHead[no], 0x17, 0xF, &pos, &rot);
+    obj = SetObj16(ARC(EM30_BIN_SET_PARASITE_012), ARC(EM30_TPL_SET_PARASITE_013), em, w->pHead[no], 0x17, 0xF, &pos, &rot);
     if (obj) {
-        MotSetObj16(obj, ARC(0x14), 4, frame);
+        MotSetObj16(obj, ARC(EM30_MOT_SET_PARASITE_014), 4, frame);
         w->para[no].p[1] = obj;
     }
     pos.x = 0.0f;
@@ -549,9 +549,9 @@ void em30SetParasite(cEm30* em, int no)
     rot.x = 0.0f;
     rot.y = 0.0f;
     rot.z = -0.5235988f;
-    obj = SetObj16(ARC(0x12), ARC(0x13), em, w->pHead[no], 0x18, 0xF, &pos, &rot);
+    obj = SetObj16(ARC(EM30_BIN_SET_PARASITE_012), ARC(EM30_TPL_SET_PARASITE_013), em, w->pHead[no], 0x18, 0xF, &pos, &rot);
     if (obj) {
-        MotSetObj16(obj, ARC(0x14), 4, frame * 2);
+        MotSetObj16(obj, ARC(EM30_MOT_SET_PARASITE_014), 4, frame * 2);
         w->para[no].p[2] = obj;
     }
     pos.x = 0.0f;
@@ -560,9 +560,9 @@ void em30SetParasite(cEm30* em, int no)
     rot.x = 0.0f;
     rot.y = 0.0f;
     rot.z = 0.0f;
-    obj = SetObj16(ARC(0x12), ARC(0x13), em, w->pHead[no], 0x19, 0xF, &pos, &rot);
+    obj = SetObj16(ARC(EM30_BIN_SET_PARASITE_012), ARC(EM30_TPL_SET_PARASITE_013), em, w->pHead[no], 0x19, 0xF, &pos, &rot);
     if (obj) {
-        MotSetObj16(obj, ARC(0x14), 4, frame * 3);
+        MotSetObj16(obj, ARC(EM30_MOT_SET_PARASITE_014), 4, frame * 3);
         w->para[no].p[3] = obj;
     }
 }

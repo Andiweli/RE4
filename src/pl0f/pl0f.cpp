@@ -52,7 +52,7 @@
 #include "act_btn.h"
 #include <dolphin/os.h>
 #include "pl_mod.h"
-
+#include "arc/pl0f.h"
 
 // The module's 0x30-byte COMMON block: uninitialised template statics of the original object,
 // appended to .bss by snmakerel.
@@ -295,7 +295,7 @@ static void pl0f_R0_Init(cPl0f* em)
     u32 i;
     u32 j;
 
-    em->modelInit(ARC(0x5), ARC(0x6));
+    em->modelInit(ARC(PL0F_BIN_005), ARC(PL0F_TPL_006));
     em->be_flag &= ~0x10;
     em->ot_type = 0;
     {
@@ -311,7 +311,7 @@ static void pl0f_R0_Init(cPl0f* em)
     em->atari.m_flag &= 0xFCFF;
     em->atari.setPriority(PRI_LV1);
     em->setStatus(EM_STATUS_LOCKOFF);
-    EspDataLoad((u32) ARC(0x4), EFF_PL0F, 0);
+    EspDataLoad((u32) ARC(PL0F_EFF_004), EFF_PL0F, 0);
     w->node[0].pos.x = 0.0f;
     w->node[0].pos.y = 0.0f;
     w->node[0].pos.z = 2500.0f;
@@ -485,7 +485,7 @@ static void pl0f_R1_RideStart(cPl0f* em)
     Pl0fWork* w = PL0F_WK(em);
     cPlayer* pl = pPL;
 
-    pl->Body->initWepHand((u32) ARC(0x8));
+    pl->Body->initWepHand((u32) ARC(PL0F_BIN_008));
     pl->setRightHand(1);
     pl->Wep->setTrans(0, 0);
     pl->m_pBoat = em;
@@ -573,7 +573,7 @@ static void pl0f_R1_Guard(cPl0f* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x1D), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(PL0F_MOT_01D), 0, 0, 5, 0);
         SndCall(8, 0x17, &em->pos, 0xF, 0, 0);
         VibSetData(VIB_TBL, 0xB, 1);
         em->r_no_2++;
@@ -607,7 +607,7 @@ static void pl0f_R1_Drop(cPl0f* em)
     w->Be_flg |= 0xC;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x1F), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(PL0F_MOT_DROP), 0, 0, 5, 0);
         EstSet(em, -1, 0, 0, 0xF, 0xB, 0, 0x35, em, 0);
         LifeDownSet2(em, 100, 0, 1);
         em->getPartsPtr(1)->ang.y = 0.0f;
@@ -664,7 +664,7 @@ static void pl0f_R1_WaterRide(cPl0f* em)
     w->Be_flg |= 4;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x22), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(PL0F_MOT_WATER_RIDE), 0, 0, 5, 0);
         EstSet(em, -1, 0, 0, 0xF, 0xC, 0, 0x35, em, 0);
         SndCall(8, 0x17, &em->pos, 0xF, 0, 0);
         w->Timer = 60;
@@ -686,7 +686,7 @@ static void pl0f_R1_BossGuard(cPl0f* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x1D), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(PL0F_MOT_01D), 0, 0, 5, 0);
         SndCall(8, 0x17, &em->pos, 0xF, 0, 0);
         em->r_no_2++;
     case 1:
@@ -1907,10 +1907,10 @@ static void plboat_R2_Ride(cPlayer* pl)
         pl->m_Work0 = 20;
         pl->ang.y = boat->ang.y - PI / 2;
         pl->ang.y = LIMIT_ANGLE(pl->ang.y);
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x29), 0, 0, 5, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_029), 0, 0, 5, 0);
         pl->m_BoatPlDir = 0.0f;
         pl->m_Blend = 0.0f;
-        pl->Body->initWepHand((u32) EM_ARC(pl, 0x8));
+        pl->Body->initWepHand((u32) EM_ARC(pl, PL0F_BIN_008));
         pl->setRightHand(1);
         pl->Wep->setTrans(0, 0);
         pl->r_no_3++;
@@ -1952,7 +1952,7 @@ static void plboat_R2_Getoff(cPlayer* pl)
 
     switch (pl->r_no_3) {
     case 0:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x2A), 0, 0, 5, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_GETOFF), 0, 0, 5, 0);
         pl->pos = pl->m_VecWork0;
         pl->ang.y = pl->m_Fwork0;
         boat->setPos(&pl->pos, pl->m_Fwork0);
@@ -2021,7 +2021,7 @@ static void plboat_R2_Move(cPlayer* pl)
         }
         pl->r_no_3++;
     case 1:
-        plboatBlendMotSet(pl, EM_ARC(pl, 0x9), EM_ARC(pl, 0xB), EM_ARC(pl, 0xA), 0, 0, 0);
+        plboatBlendMotSet(pl, EM_ARC(pl, PL0F_MOT_009), EM_ARC(pl, PL0F_MOT_00B), EM_ARC(pl, PL0F_MOT_00A), 0, 0, 0);
         if (Key.on & 0xC) {
             if (Key.on & 8) {
                 pl->m_Blend += 31.875f;
@@ -2155,7 +2155,7 @@ static void plboat_R2_SpearSet(cPlayer* pl)
     }
     switch (pl->r_no_3) {
     case 0:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0xC), 0, 0xA, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_SPEAR_SET), 0, 0xA, 1, 0);
         pl->m_Hokan = 0xA;
         pl->m_Frame = 0;
         pl->m_Blend = 0.0f;
@@ -2183,7 +2183,7 @@ static void plboat_R2_SpearSet(cPlayer* pl)
         plboatSetSpear(pl);
         pl->r_no_3++;
     case 3:
-        plboatBlendMotSet(pl, EM_ARC(pl, 0xE), EM_ARC(pl, 0xF), EM_ARC(pl, 0xD), 0, 0, 0);
+        plboatBlendMotSet(pl, EM_ARC(pl, PL0F_MOT_00E), EM_ARC(pl, PL0F_MOT_00F), EM_ARC(pl, PL0F_MOT_00D), 0, 0, 0);
         PLBOAT_AIM_CONTROL();
         plOnBoat(pl);
         MotionMove(pl, 0);
@@ -2195,7 +2195,7 @@ static void plboat_R2_SpearSet(cPlayer* pl)
         }
         break;
     case 4:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x13), 0, 0xA, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_013), 0, 0xA, 1, 0);
         pl->m_Work3 = 99999;
         pl->r_no_3++;
     case 5:
@@ -2236,7 +2236,7 @@ static void plboat_R2_SpearThrow(cPlayer* pl)
         pl->m_Work0 = 0;
         pl->r_no_3++;
     case 1:
-        plboatBlendMotSet(pl, EM_ARC(pl, 0x11), EM_ARC(pl, 0x12), EM_ARC(pl, 0x10), 0, 0, 0);
+        plboatBlendMotSet(pl, EM_ARC(pl, PL0F_MOT_011), EM_ARC(pl, PL0F_MOT_012), EM_ARC(pl, PL0F_MOT_010), 0, 0, 0);
         plOnBoat(pl);
         if (MotionMove(pl, 0)) {
             pPL->setRno(0, 0xF, 3, 2);
@@ -2286,7 +2286,7 @@ static void plboat_R2_SpearSet2(cPlayer* pl)
     switch (pl->r_no_3) {
     case 0:
         pl0fHidePosSet(pl);
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x27), 0, 0xA, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_SPEAR_SET2), 0, 0xA, 1, 0);
         pl->m_Blend = 0.0f;
         pl->m_Frame = 0;
         pl->m_Hokan = 0xA;
@@ -2309,7 +2309,7 @@ static void plboat_R2_SpearSet2(cPlayer* pl)
         pl->r_no_3++;
     case 3:
         ActBtn.set(ACT_SEARCH_ATTACK, 5, 0, 0, ACTCTR_NONE, DISP_A_NORMAL, ACT_FUNC_NORMAL, 0);
-        plboatBlendMotSet(pl, EM_ARC(pl, 0xE), EM_ARC(pl, 0xF), EM_ARC(pl, 0xD), 0, 0, 0);
+        plboatBlendMotSet(pl, EM_ARC(pl, PL0F_MOT_00E), EM_ARC(pl, PL0F_MOT_00F), EM_ARC(pl, PL0F_MOT_00D), 0, 0, 0);
         PLBOAT_AIM_CONTROL();
         plOnBoat(pl);
         MotionMove(pl, 0);
@@ -2321,7 +2321,7 @@ static void plboat_R2_SpearSet2(cPlayer* pl)
         }
         break;
     case 4:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x13), 0, 0xA, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_013), 0, 0xA, 1, 0);
         pl->m_Work3 = 99999;
         pl->r_no_3++;
     case 5:
@@ -2360,7 +2360,7 @@ static void plboat_R2_SpearThrow2(cPlayer* pl)
         pl->m_Work0 = 0;
         pl->r_no_3++;
     case 1:
-        plboatBlendMotSet(pl, EM_ARC(pl, 0x11), EM_ARC(pl, 0x12), EM_ARC(pl, 0x10), 0, 0, 0);
+        plboatBlendMotSet(pl, EM_ARC(pl, PL0F_MOT_011), EM_ARC(pl, PL0F_MOT_012), EM_ARC(pl, PL0F_MOT_010), 0, 0, 0);
         plOnBoat(pl);
         if (MotionMove(pl, 0)) {
             pPL->setRno(0, 0xF, 0xA, 2);
@@ -2387,7 +2387,7 @@ static void plboat_R2_BossDie(cPlayer* pl)
     case 0:
         pl0fBossDiePosSet(pl);
         plboatSetSpear(pl);
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0xE), 0, 0, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_00E), 0, 0, 1, 0);
         pl0fBossDieCamSet(pl);
         pl->m_Work0 = 300;
         pl->r_no_3++;
@@ -2401,7 +2401,7 @@ static void plboat_R2_BossDie(cPlayer* pl)
         }
         break;
     case 2:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x13), 0, 0xA, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_013), 0, 0xA, 1, 0);
         pl->m_Work3 = 99999;
         pl->r_no_3++;
     case 3:
@@ -2426,7 +2426,7 @@ static void plboat_R2_Guard(cPlayer* pl)
 {
     switch (pl->r_no_3) {
     case 0:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x1E), 0, 0xA, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_GUARD), 0, 0xA, 1, 0);
         pl->m_Hokan = 0xA;
         pl->m_Frame = 0;
         pl->m_Blend = 0.0f;
@@ -2458,7 +2458,7 @@ static void plboat_R2_FallWater(cPlayer* pl)
     StaFlagOn(pG, STA_PL_SWIM);
     switch (pl->r_no_3) {
     case 0:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x20), 0, 3, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_FALL_WATER), 0, 3, 1, 0);
         pl->ang.x = 0.0f;
         pl->ang.z = 0.0f;
         pl->m_Blend = 0.0f;
@@ -2575,7 +2575,7 @@ static void plboat_R2_Swim(cPlayer* pl)
             EstSet(0, -1, 0, 0, 0xF, 0xE, 0, 0x34, pl, (void*) first);
             StaFlagOn(pG, STA_WATER_CAMERA);
         }
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x14), EM_ARC(pl, 0x15), 5, 5, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_SWIM), EM_ARC(pl, PL0F_SEQ_PL_SWIM_015), 5, 5, 0);
         pl->m_VecWork0.x = 0.0f;
         pl->m_VecWork0.y = 0.0f;
         pl->m_VecWork0.z = 50.0f;
@@ -2599,35 +2599,35 @@ static void plboat_R2_Swim(cPlayer* pl)
             switch (n) {
             case 0:
             default:
-                m = EM_ARC(pl, 0x15);
+                m = EM_ARC(pl, PL0F_SEQ_PL_SWIM_015);
                 pl->m_VecWork0.z = 50.0f;
                 break;
             case 1:
-                m = EM_ARC(pl, 0x16);
+                m = EM_ARC(pl, PL0F_SEQ_PL_SWIM_016);
                 pl->m_VecWork0.z = 62.5f;
                 break;
             case 2:
-                m = EM_ARC(pl, 0x17);
+                m = EM_ARC(pl, PL0F_SEQ_PL_SWIM_017);
                 pl->m_VecWork0.z = 75.0f;
                 break;
             case 3:
-                m = EM_ARC(pl, 0x18);
+                m = EM_ARC(pl, PL0F_SEQ_PL_SWIM_018);
                 pl->m_VecWork0.z = 87.5f;
                 break;
             case 4:
-                m = EM_ARC(pl, 0x19);
+                m = EM_ARC(pl, PL0F_SEQ_PL_SWIM_019);
                 pl->m_VecWork0.z = 100.0f;
                 break;
             case 5:
-                m = EM_ARC(pl, 0x1A);
+                m = EM_ARC(pl, PL0F_SEQ_PL_SWIM_01A);
                 pl->m_VecWork0.z = 120.5f;
                 break;
             case 6:
-                m = EM_ARC(pl, 0x1B);
+                m = EM_ARC(pl, PL0F_SEQ_PL_SWIM_01B);
                 pl->m_VecWork0.z = 140.0f;
                 break;
             case 7:
-                m = EM_ARC(pl, 0x1C);
+                m = EM_ARC(pl, PL0F_SEQ_PL_SWIM_01C);
                 pl->m_VecWork0.z = 170.0f;
                 break;
             }
@@ -2637,7 +2637,7 @@ static void plboat_R2_Swim(cPlayer* pl)
             if (f >= cnt) {
                 f = 0;
             }
-            MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x14), m, pl->Motion.Hokan_cnt, 5, (u16) f);
+            MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_SWIM), m, pl->Motion.Hokan_cnt, 5, (u16) f);
         }
         if (pl->Motion.Seq_old.Free & 0x40) {
             EstSet(pl, -1, 0, 0, 0xF, 0x11, 0, 0x35, boat, 0);
@@ -2726,7 +2726,7 @@ static void plboat_R2_WaterRide(cPlayer* pl)
 
     switch (pl->r_no_3) {
     case 0:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x21), 0, 0xF, 5, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_WATER_RIDE), 0, 0xF, 5, 0);
         pl->m_BoatPlDir = 0.0f;
         pl->m_Blend = 0.0f;
         PSMTXRotRad(m, 'y', boat->ang.y);
@@ -2752,7 +2752,7 @@ static void plboat_R2_WaterRide(cPlayer* pl)
         pl->ang.y += Muku2(plboat_ride_ang, boat->ang.y, PI);
         plboat_ride_ang = boat->ang.y;
         if (MotionMove(pl, 0)) {
-            pl->Body->initWepHand((u32) EM_ARC(pl, 0x8));
+            pl->Body->initWepHand((u32) EM_ARC(pl, PL0F_BIN_008));
             pl->setRightHand(1);
             pl->Wep->setTrans(0, 0);
             pPL->setRno(0, 0xF, 2, 0);
@@ -2783,7 +2783,7 @@ static void plboat_R2_Die(cPlayer* pl)
     case 0: {
         int eaten = 0;
 
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x28), 0, 0, 5, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_DIE), 0, 0, 5, 0);
         if (boss && (boss->flag & 0x80) && (Rnd() & 1)) {
             eaten = 1;
         }
@@ -2845,7 +2845,7 @@ static void plboat_R2_Die(cPlayer* pl)
 { \
     switch (pl->r_no_3) { \
     case 0: \
-        pl->Body->initWepHand((u32) EM_ARC(pl, 0x8)); \
+        pl->Body->initWepHand((u32) EM_ARC(pl, PL0F_BIN_008)); \
         pl->setRightHand(1); \
         pl->Wep->setTrans(0, 0); \
         pl->m_Work7 = 1; \
@@ -2854,7 +2854,7 @@ static void plboat_R2_Die(cPlayer* pl)
         pl->m_Blend = 0.0f; \
         pl->r_no_3++; \
     case 1: \
-        plboatBlendMotSet(pl, EM_ARC(pl, 0x9), EM_ARC(pl, 0xB), EM_ARC(pl, 0xA), 0, 0, 0); \
+        plboatBlendMotSet(pl, EM_ARC(pl, PL0F_MOT_009), EM_ARC(pl, PL0F_MOT_00B), EM_ARC(pl, PL0F_MOT_00A), 0, 0, 0); \
         plOnBoat(pl); \
         MotionMove(pl, 0); \
         break; \
@@ -2896,10 +2896,10 @@ static void plboat_R2_R10dIn(cPlayer* pl)
         pl->m_Work0 = 20; \
         pl->ang.y = boat->ang.y - PI / 2; \
         pl->ang.y = LIMIT_ANGLE(pl->ang.y); \
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x29), 0, 0, 5, 0); \
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_029), 0, 0, 5, 0); \
         pl->m_BoatPlDir = 0.0f; \
         pl->m_Blend = 0.0f; \
-        pl->Body->initWepHand((u32) EM_ARC(pl, 0x8)); \
+        pl->Body->initWepHand((u32) EM_ARC(pl, PL0F_BIN_008)); \
         pl->setRightHand(1); \
         pl->Wep->setTrans(0, 0); \
         pl->r_no_3++; \
@@ -2957,7 +2957,7 @@ static void plboat_R2_R10dIn(cPlayer* pl)
         } \
         boat->setTillerFront(); \
         pl0fRideCamMove(boat, 1.0f); \
-        plboatBlendMotSet(pl, EM_ARC(pl, 0x9), EM_ARC(pl, 0xB), EM_ARC(pl, 0xA), 0, 0, 0); \
+        plboatBlendMotSet(pl, EM_ARC(pl, PL0F_MOT_009), EM_ARC(pl, PL0F_MOT_00B), EM_ARC(pl, PL0F_MOT_00A), 0, 0, 0); \
         plOnBoat(pl); \
         MotionMove(pl, 0); \
         break; \
@@ -3244,7 +3244,7 @@ void plboatSetSpear(cPlayer* pl)
         rot.x = 0.0f;
         rot.y = PI;
         rot.z = 0.0f;
-        pl->m_pSpear = (cObjSpear*) SetSpear(EM_ARC(pl, 0x7), EM_ARC(pl, 0x6), &pos, &rot);
+        pl->m_pSpear = (cObjSpear*) SetSpear(EM_ARC(pl, PL0F_BIN_PL_SET_SPEAR), EM_ARC(pl, PL0F_TPL_006), &pos, &rot);
         if (pl->m_pSpear) {
             pl->m_pSpear->setParent(pl, 0xA, 0);
         }
@@ -3461,7 +3461,7 @@ void pl0fLongRopeSet(cPl0f* em)
     rot.x = 0.0f;
     rot.y = 0.0f;
     rot.z = 0.0f;
-    w->pRope = SetChain(ARC(0x23), ARC(0x24), &pos, &rot);
+    w->pRope = SetChain(ARC(PL0F_BIN_LONG_ROPE_SET), ARC(PL0F_TPL_LONG_ROPE_SET), &pos, &rot);
     if (w->pRope) {
         w->Cloth.Num = 30;
         w->Cloth.pCloth = pl0f_rope_parts;
@@ -3612,7 +3612,7 @@ void pl0fSetAnchor(cPl0f* em)
         rot.x = 2.3f;
         rot.y = 3.14f;
         rot.z = 0.0f;
-        w->pAnchor = SetObj00(ARC(0x25), ARC(0x26), &pos, &rot);
+        w->pAnchor = SetObj00(ARC(PL0F_BIN_SET_ANCHOR), ARC(PL0F_TPL_SET_ANCHOR), &pos, &rot);
         OyaSetObj00(w->pAnchor, em, 0);
     }
 }
@@ -3707,7 +3707,7 @@ void pl0fSetAnchorEm2f(cPlayer* pl)
     if (sub->m_Work0) { \
         if (w->Boat_spd < lo) { \
             sub->m_Work0 = 0; \
-            MotionSetCore(sub, &sub->Motion, EM_ARC(sub, 0x2C), 0, 5, 5, 0); \
+            MotionSetCore(sub, &sub->Motion, EM_ARC(sub, PL0F_MOT_02C), 0, 5, 5, 0); \
         } \
     } else if (w->Boat_spd > hi) { \
         sub->m_Work0 = 1; \
@@ -3717,7 +3717,7 @@ void pl0fSetAnchorEm2f(cPlayer* pl)
     } \
     if (sub->m_Work0) { \
         sub->m_Blend = sub->m_Blend * 0.9f + pPL->m_Blend * 0.1f; \
-        subBlendMotSet(sub, EM_ARC(sub, 0x2E), EM_ARC(sub, 0x2F), EM_ARC(sub, 0x30), 0, 0, 0); \
+        subBlendMotSet(sub, EM_ARC(sub, PL0F_MOT_SET_ANCHOR_EM2F_02E), EM_ARC(sub, PL0F_MOT_SET_ANCHOR_EM2F_02F), EM_ARC(sub, PL0F_MOT_SET_ANCHOR_EM2F_030), 0, 0, 0); \
     } \
     subOnBoat(sub, boat); \
     MotionMove(sub, 0); \
@@ -3740,7 +3740,7 @@ static void subBoatRide()
     sub->Motion.Mot_flag &= ~0x40000000;
     switch (sub->r_no_2) {
     case 0:
-        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, 0x2B), 0, 5, 5, 0);
+        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, PL0F_MOT_SUB_RIDE), 0, 5, 5, 0);
         v.x = 984.32f;
         v.y = 500.0f;
         v.z = 731.88f;
@@ -3774,7 +3774,7 @@ static void subBoatRide()
         }
         break;
     case 2:
-        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, 0x2C), 0, 5, 5, 0);
+        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, PL0F_MOT_02C), 0, 5, 5, 0);
         sub->atari.m_flag &= 0xFCFF;
         sub->m_Work0 = 0;
         sub->r_no_2++;
@@ -3798,7 +3798,7 @@ static void subBoatGetoff()
     sub->Motion.Mot_flag &= ~0x40000000;
     switch (sub->r_no_2) {
     case 0:
-        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, 0x2D), 0, 5, 5, 0);
+        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, PL0F_MOT_SUB_GETOFF), 0, 5, 5, 0);
         sub->m_Work0 = 20;
         sub->fWork0 = 100.0f;
         sub->r_no_2++;
@@ -3831,7 +3831,7 @@ static void subBoatGetoff()
     sub->Motion.Mot_flag &= ~0x40000000; \
     switch (sub->r_no_2) { \
     case 0: \
-        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, 0x2C), 0, 0, 5, 0); \
+        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, PL0F_MOT_02C), 0, 0, 5, 0); \
         sub->atari.m_flag &= 0xFCFF; \
         sub->m_Work0 = 0; \
         sub->r_no_2++; \

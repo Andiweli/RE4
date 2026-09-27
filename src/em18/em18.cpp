@@ -29,7 +29,7 @@
 #include "db_log.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em18.h"
 // The module's 0x34-byte COMMON block (st_room.h): uninitialised template statics of the original
 // object, merged into .bss by the REL link.
 asm(".comm common_em18,52,4");
@@ -226,19 +226,19 @@ static void em18_R0_Init(cEm18* em)
     void* tplE;
     int one;
 
-    if (em->modelInit(ARC(5), ARC(6)) == 0) {
+    if (em->modelInit(ARC(EM18_BIN_005), ARC(EM18_TPL_006)) == 0) {
         pLog->err(0, 0, "em18() ModelInit failed.");
         em->r_no_0 = 0xFF;
         return;
     }
-    tpl = ARC(8);
-    tplE = ARC(0xF);
-    w->pRobe = ModInfoMgr.create(ARC(0xE), tplE);
+    tpl = ARC(EM18_TPL_008);
+    tplE = ARC(EM18_TPL_00F);
+    w->pRobe = ModInfoMgr.create(ARC(EM18_BIN_00E), tplE);
     if (w->pRobe) {
         em->addModel(w->pRobe);
         w->pRobe->be_flag |= 0x20;
     }
-    info = ModInfoMgr.create(ARC(7), tpl);
+    info = ModInfoMgr.create(ARC(EM18_BIN_007), tpl);
     if (info) {
         em->addModel(info);
     }
@@ -274,12 +274,12 @@ static void em18_R0_Init(cEm18* em)
     YarareAdd(em, &w->hit[7], -300.0f, 0.0f, 0.0f, 120.0f, 300.0f, 8, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
     YarareAdd(em, &w->hit[8], 0.0f, 0.0f, 0.0f, 120.0f, 300.0f, 0xE, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
     em->setTarget(0, 0.0f, 0.0f, 0.0f);
-    EspDataLoad((u32) ARC(4), EFF_EM18, 0);
+    EspDataLoad((u32) ARC(EM18_EFF_004), EFF_EM18, 0);
     Em18ClothSet(em, &w->Cloth, 0);
     w->Be_flg = 0;
     w->Neck_dir_y = 0.0f;
     em->setRno(one, 0, 0, 0);
-    MotionSetCore(em, MOTION(em), ARC(0x14), 0, 0, 1, 0);
+    MotionSetCore(em, MOTION(em), ARC(EM18_MOT_014), 0, 0, 1, 0);
     MotionMove(em, 0);
     em->clearStatus(EM_STATUS_ACTIVE);
     em18_R0_Move(em);
@@ -300,7 +300,7 @@ static void em18_R1_Wait(cEm18* em)
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0x14), 0, 30, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_014), 0, 30, 5, 0);
         em->r_no_2++;
     case 1:
         MotionMove(em, 0);
@@ -318,7 +318,7 @@ static void em18_R1_Trade(cEm18* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0x15), 0, 10, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_TRADE_015), 0, 10, 1, 0);
         w->Seid_voice = SndCall(8, 9, &em->pos, em->id, 0, 0);
         KeyStop(0xEFCF0000);
         em->r_no_2++;
@@ -343,7 +343,7 @@ static void em18_R1_Trade(cEm18* em)
         }
         break;
     case 3:
-        MotionSetCore(em, MOTION(em), ARC(0x17), 0, 10, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_TRADE_017), 0, 10, 1, 0);
         SndCall(8, 0xA, &em->pos, em->id, 0, 0);
         w->Seid_voice = SndCall(8, 7, &em->pos, em->id, 0, 0);
         pG->Stop_flg &= 0x7FFFFFFF;
@@ -447,7 +447,7 @@ static void em18_R1_Dm_Normal(cEm18* em)
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0x14), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_014), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -477,7 +477,7 @@ static void em18_R1_Die_Normal(cEm18* em)
     default:
         break;
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0x18), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_DIE_NORMAL), 0, 3, 1, 0);
         SndStop(w->Seid_voice, 0);
         SndCall(8, 8, &em->pos, em->id, 0, 0);
         em->r_no_2++;
@@ -531,17 +531,17 @@ void em18NeckMove(cEm18* em)
 void em18ClothPartsSet(cEm18* em, int on)
 {
     Em18Work* w = EM18_WK(em);
-    void* tpl = ARC(0xF);
+    void* tpl = ARC(EM18_TPL_00F);
     void* bin;
     cModelInfo* info;
 
     switch (on) {
     case 0:
     default:
-        bin = ARC(0xC);
+        bin = ARC(EM18_BIN_CLOTH_PARTS_SET_00C);
         break;
     case 1:
-        bin = ARC(0xB);
+        bin = ARC(EM18_BIN_CLOTH_PARTS_SET_00B);
         break;
     }
     info = ModInfoMgr.create(bin, tpl);
@@ -562,7 +562,7 @@ void em18GoodsPartsSet(cEm18* em, int on)
     Em18Work* w = EM18_WK(em);
 
     if (w->pGoods == 0) {
-        cModelInfo* info = ModInfoMgr.create(ARC(0xD), ARC(6));
+        cModelInfo* info = ModInfoMgr.create(ARC(EM18_BIN_GOODS_PARTS_SET), ARC(EM18_TPL_006));
 
         if (info) {
             em->addModel(info);
@@ -580,11 +580,11 @@ void em18GoodsPartsSet(cEm18* em, int on)
 void em18HandSet(cEm18* em)
 {
     Em18Work* w = EM18_WK(em);
-    void* binL = ARC(0x12);
-    void* binR = ARC(0x13);
+    void* binL = ARC(EM18_BIN_HAND_SET_012);
+    void* binR = ARC(EM18_BIN_HAND_SET_013);
     cModelInfo* info;
 
-    info = ModInfoMgr.create(binL, ARC(6));
+    info = ModInfoMgr.create(binL, ARC(EM18_TPL_006));
     if (info) {
         if (w->pRHand) {
             em->swapModelInfo(w->pRHand->model_addr, info);
@@ -593,7 +593,7 @@ void em18HandSet(cEm18* em)
         }
         w->pRHand = info;
     }
-    info = ModInfoMgr.create(binR, ARC(6));
+    info = ModInfoMgr.create(binR, ARC(EM18_TPL_006));
     if (info) {
         if (w->pLHand) {
             em->swapModelInfo(w->pLHand->model_addr, info);

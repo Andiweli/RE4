@@ -11,7 +11,7 @@
 #include "em10.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em1c.h"
 
 void Em1cInit(cEm* em);
 void Em1cSet(cEm10* em);
@@ -55,22 +55,22 @@ void Em1cSet(cEm10* em)
     case 7:
     default:
         em->type = 7;
-        w->mot[0] = ARC(0x1FD);
-        w->mot[1] = ARC(0x1FC);
-        w->mot[2] = ARC(0x1FE);
-        w->mot[3] = ARC(0x1FF);
-        w->mot[4] = ARC(0x200);
-        w->mot[5] = ARC(0x201);
-        w->mot[6] = ARC(0x204);
-        w->mot[7] = ARC(0x205);
-        w->mot[8] = ARC(0x206);
-        w->mot[9] = ARC(0x207);
-        w->mot[10] = ARC(0x207);
-        w->mot[11] = ARC(0x208);
-        w->mot[12] = ARC(0x209);
-        w->mot[13] = ARC(0x20A);
-        w->mot[14] = ARC(0x20B);
-        w->mot[15] = ARC(0x20C);
+        w->mot[0] = ARC(EM1C_TPL_1FD);
+        w->mot[1] = ARC(EM1C_BIN_1FC);
+        w->mot[2] = ARC(EM1C_BIN_1FE);
+        w->mot[3] = ARC(EM1C_BIN_1FF);
+        w->mot[4] = ARC(EM1C_BIN_200);
+        w->mot[5] = ARC(EM1C_TPL_201);
+        w->mot[6] = ARC(EM1C_BIN_204);
+        w->mot[7] = ARC(EM1C_BIN_205);
+        w->mot[8] = ARC(EM1C_BIN_206);
+        w->mot[9] = ARC(EM1C_BIN_207);
+        w->mot[10] = ARC(EM1C_BIN_207);
+        w->mot[11] = ARC(EM1C_BIN_208);
+        w->mot[12] = ARC(EM1C_BIN_209);
+        w->mot[13] = ARC(EM1C_BIN_20A);
+        w->mot[14] = ARC(EM1C_BIN_20B);
+        w->mot[15] = ARC(EM1C_BIN_20C);
         w->mot[16] = 0;
         w->mot[17] = 0;
         w->mot[18] = 0;
@@ -81,21 +81,21 @@ void Em1cSet(cEm10* em)
         w->mot[23] = 0;
         w->mot[24] = 0;
         w->mot[25] = 0;
-        w->mot[26] = ARC(0x202);
-        w->mot[27] = ARC(0x203);
-        w->mot[28] = ARC(0x20D);
-        w->mot[29] = ARC(0x20E);
-        w->mot[30] = ARC(0x20F);
-        w->mot[31] = ARC(0x210);
-        w->mot[32] = ARC(0x211);
-        w->mot[33] = ARC(0x212);
-        w->mot[34] = ARC(0x213);
-        w->mot[35] = ARC(0x214);
-        w->mot[36] = ARC(0x215);
-        w->mot[37] = ARC(0x216);
-        w->mot[38] = ARC(0x217);
-        w->mot[39] = ARC(0x218);
-        w->mot[40] = ARC(0x219);
+        w->mot[26] = ARC(EM1C_BIN_202);
+        w->mot[27] = ARC(EM1C_BIN_203);
+        w->mot[28] = ARC(EM1C_BIN_20D);
+        w->mot[29] = ARC(EM1C_TPL_20E);
+        w->mot[30] = ARC(EM1C_BIN_20F);
+        w->mot[31] = ARC(EM1C_TPL_210);
+        w->mot[32] = ARC(EM1C_BIN_211);
+        w->mot[33] = ARC(EM1C_TPL_212);
+        w->mot[34] = ARC(EM1C_BIN_213);
+        w->mot[35] = ARC(EM1C_TPL_214);
+        w->mot[36] = ARC(EM1C_BIN_215);
+        w->mot[37] = ARC(EM1C_TPL_216);
+        w->mot[38] = ARC(EM1C_BIN_217);
+        w->mot[39] = ARC(EM1C_TPL_218);
+        w->mot[40] = ARC(EM1C_TPL_219);
         if (em->emset_no & 1) {
             Em10SetSeTbl(em, 0);
         } else {
@@ -103,22 +103,22 @@ void Em1cSet(cEm10* em)
         }
         break;
     case 9:
-        w->mot[0] = ARC(0x21E);
-        w->mot[1] = ARC(0x21D);
-        w->mot[2] = ARC(0x21F);
-        w->mot[3] = ARC(0x1FF);
-        w->mot[4] = ARC(0x200);
-        w->mot[5] = ARC(0x201);
-        w->mot[6] = ARC(0x204);
-        w->mot[7] = ARC(0x205);
-        w->mot[8] = ARC(0x206);
-        w->mot[9] = ARC(0x207);
-        w->mot[10] = ARC(0x207);
-        w->mot[11] = ARC(0x208);
-        w->mot[12] = ARC(0x209);
-        w->mot[13] = ARC(0x20A);
-        w->mot[14] = ARC(0x20B);
-        w->mot[15] = ARC(0x20C);
+        w->mot[0] = ARC(EM1C_TPL_21E);
+        w->mot[1] = ARC(EM1C_BIN_21D);
+        w->mot[2] = ARC(EM1C_BIN_21F);
+        w->mot[3] = ARC(EM1C_BIN_1FF);
+        w->mot[4] = ARC(EM1C_BIN_200);
+        w->mot[5] = ARC(EM1C_TPL_201);
+        w->mot[6] = ARC(EM1C_BIN_204);
+        w->mot[7] = ARC(EM1C_BIN_205);
+        w->mot[8] = ARC(EM1C_BIN_206);
+        w->mot[9] = ARC(EM1C_BIN_207);
+        w->mot[10] = ARC(EM1C_BIN_207);
+        w->mot[11] = ARC(EM1C_BIN_208);
+        w->mot[12] = ARC(EM1C_BIN_209);
+        w->mot[13] = ARC(EM1C_BIN_20A);
+        w->mot[14] = ARC(EM1C_BIN_20B);
+        w->mot[15] = ARC(EM1C_BIN_20C);
         w->mot[16] = 0;
         w->mot[17] = 0;
         w->mot[18] = 0;
@@ -129,21 +129,21 @@ void Em1cSet(cEm10* em)
         w->mot[23] = 0;
         w->mot[24] = 0;
         w->mot[25] = 0;
-        w->mot[26] = ARC(0x202);
-        w->mot[27] = ARC(0x203);
-        w->mot[28] = ARC(0x20D);
-        w->mot[29] = ARC(0x20E);
-        w->mot[30] = ARC(0x20F);
-        w->mot[31] = ARC(0x210);
-        w->mot[32] = ARC(0x211);
-        w->mot[33] = ARC(0x212);
-        w->mot[34] = ARC(0x213);
-        w->mot[35] = ARC(0x214);
-        w->mot[36] = ARC(0x215);
-        w->mot[37] = ARC(0x216);
-        w->mot[38] = ARC(0x217);
-        w->mot[39] = ARC(0x218);
-        w->mot[40] = ARC(0x219);
+        w->mot[26] = ARC(EM1C_BIN_202);
+        w->mot[27] = ARC(EM1C_BIN_203);
+        w->mot[28] = ARC(EM1C_BIN_20D);
+        w->mot[29] = ARC(EM1C_TPL_20E);
+        w->mot[30] = ARC(EM1C_BIN_20F);
+        w->mot[31] = ARC(EM1C_TPL_210);
+        w->mot[32] = ARC(EM1C_BIN_211);
+        w->mot[33] = ARC(EM1C_TPL_212);
+        w->mot[34] = ARC(EM1C_BIN_213);
+        w->mot[35] = ARC(EM1C_TPL_214);
+        w->mot[36] = ARC(EM1C_BIN_215);
+        w->mot[37] = ARC(EM1C_TPL_216);
+        w->mot[38] = ARC(EM1C_BIN_217);
+        w->mot[39] = ARC(EM1C_TPL_218);
+        w->mot[40] = ARC(EM1C_TPL_219);
         if (em->emset_no & 1) {
             Em10SetSeTbl(em, 0);
         } else {
@@ -151,8 +151,8 @@ void Em1cSet(cEm10* em)
         }
         break;
     case 10:
-        w->mot[0] = ARC(0x222);
-        w->mot[1] = ARC(0x221);
+        w->mot[0] = ARC(EM1C_TPL_222);
+        w->mot[1] = ARC(EM1C_BIN_221);
         w->mot[2] = 0;
         w->mot[3] = 0;
         w->mot[4] = 0;
@@ -177,26 +177,26 @@ void Em1cSet(cEm10* em)
         w->mot[23] = 0;
         w->mot[24] = 0;
         w->mot[25] = 0;
-        w->mot[26] = ARC(0x202);
-        w->mot[27] = ARC(0x203);
-        w->mot[28] = ARC(0x20D);
-        w->mot[29] = ARC(0x20E);
-        w->mot[30] = ARC(0x20F);
-        w->mot[31] = ARC(0x210);
-        w->mot[32] = ARC(0x211);
-        w->mot[33] = ARC(0x212);
-        w->mot[34] = ARC(0x213);
-        w->mot[35] = ARC(0x214);
-        w->mot[36] = ARC(0x215);
-        w->mot[37] = ARC(0x216);
-        w->mot[38] = ARC(0x217);
-        w->mot[39] = ARC(0x218);
-        w->mot[40] = ARC(0x219);
+        w->mot[26] = ARC(EM1C_BIN_202);
+        w->mot[27] = ARC(EM1C_BIN_203);
+        w->mot[28] = ARC(EM1C_BIN_20D);
+        w->mot[29] = ARC(EM1C_TPL_20E);
+        w->mot[30] = ARC(EM1C_BIN_20F);
+        w->mot[31] = ARC(EM1C_TPL_210);
+        w->mot[32] = ARC(EM1C_BIN_211);
+        w->mot[33] = ARC(EM1C_TPL_212);
+        w->mot[34] = ARC(EM1C_BIN_213);
+        w->mot[35] = ARC(EM1C_TPL_214);
+        w->mot[36] = ARC(EM1C_BIN_215);
+        w->mot[37] = ARC(EM1C_TPL_216);
+        w->mot[38] = ARC(EM1C_BIN_217);
+        w->mot[39] = ARC(EM1C_TPL_218);
+        w->mot[40] = ARC(EM1C_TPL_219);
         Em10SetSeTbl(em, 1);
         break;
     case 13:
-        w->mot[0] = ARC(0x224);
-        w->mot[1] = ARC(0x223);
+        w->mot[0] = ARC(EM1C_TPL_224);
+        w->mot[1] = ARC(EM1C_BIN_223);
         w->mot[2] = 0;
         w->mot[3] = 0;
         w->mot[4] = 0;
@@ -220,21 +220,21 @@ void Em1cSet(cEm10* em)
         w->mot[23] = 0;
         w->mot[24] = 0;
         w->mot[25] = 0;
-        w->mot[26] = ARC(0x202);
-        w->mot[27] = ARC(0x203);
-        w->mot[28] = ARC(0x20D);
-        w->mot[29] = ARC(0x20E);
-        w->mot[30] = ARC(0x20F);
-        w->mot[31] = ARC(0x210);
-        w->mot[32] = ARC(0x211);
-        w->mot[33] = ARC(0x212);
-        w->mot[34] = ARC(0x213);
-        w->mot[35] = ARC(0x214);
-        w->mot[36] = ARC(0x215);
-        w->mot[37] = ARC(0x216);
-        w->mot[38] = ARC(0x217);
-        w->mot[39] = ARC(0x218);
-        w->mot[40] = ARC(0x219);
+        w->mot[26] = ARC(EM1C_BIN_202);
+        w->mot[27] = ARC(EM1C_BIN_203);
+        w->mot[28] = ARC(EM1C_BIN_20D);
+        w->mot[29] = ARC(EM1C_TPL_20E);
+        w->mot[30] = ARC(EM1C_BIN_20F);
+        w->mot[31] = ARC(EM1C_TPL_210);
+        w->mot[32] = ARC(EM1C_BIN_211);
+        w->mot[33] = ARC(EM1C_TPL_212);
+        w->mot[34] = ARC(EM1C_BIN_213);
+        w->mot[35] = ARC(EM1C_TPL_214);
+        w->mot[36] = ARC(EM1C_BIN_215);
+        w->mot[37] = ARC(EM1C_TPL_216);
+        w->mot[38] = ARC(EM1C_BIN_217);
+        w->mot[39] = ARC(EM1C_TPL_218);
+        w->mot[40] = ARC(EM1C_TPL_219);
         Em10SetSeTbl(em, 1);
         break;
     }
@@ -273,18 +273,18 @@ void Em1cWeaponSet(cEm10* em)
     w->mot[62] = 0;
     w->mot[63] = 0;
     w->mot[64] = 0;
-    w->mot[65] = ARC(0x276);
-    w->mot[66] = ARC(0x277);
+    w->mot[65] = ARC(EM1C_BIN_WEAPON_SET_276);
+    w->mot[66] = ARC(EM1C_TPL_WEAPON_SET_277);
     w->mot[67] = 0;
     w->mot[68] = 0;
-    w->mot[69] = ARC(0x26E);
-    w->mot[70] = ARC(0x26F);
-    w->mot[71] = ARC(0x270);
-    w->mot[72] = ARC(0x271);
-    w->mot[73] = ARC(0x272);
-    w->mot[74] = ARC(0x273);
-    w->mot[75] = ARC(0x274);
-    w->mot[76] = ARC(0x275);
+    w->mot[69] = ARC(EM1C_BIN_WEAPON_SET_26E);
+    w->mot[70] = ARC(EM1C_TPL_WEAPON_SET_26F);
+    w->mot[71] = ARC(EM1C_BIN_WEAPON_SET_270);
+    w->mot[72] = ARC(EM1C_TPL_WEAPON_SET_271);
+    w->mot[73] = ARC(EM1C_BIN_WEAPON_SET_272);
+    w->mot[74] = ARC(EM1C_TPL_WEAPON_SET_273);
+    w->mot[75] = ARC(EM1C_BIN_WEAPON_SET_274);
+    w->mot[76] = ARC(EM1C_TPL_WEAPON_SET_275);
     w->mot[77] = 0;
     w->mot[78] = 0;
 }

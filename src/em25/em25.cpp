@@ -36,7 +36,7 @@
 #include "quake.h"
 #include "em.h"
 #include "em_mod.h"
-
+#include "arc/em25.h"
 asm(".comm common_em25,52,4");
 
 
@@ -313,7 +313,7 @@ static void em25_R0_Init(cEm25* em)
     int zero;
     u32 i;
 
-    if (em->modelInit(ARC(4), ARC(5)) == 0) {
+    if (em->modelInit(ARC(EM25_BIN_004), ARC(EM25_TPL_005)) == 0) {
         pLog->err(0, 0, "em25() ModelInit failed.");
         em->r_no_0 = 0xFF;
         return;
@@ -321,7 +321,7 @@ static void em25_R0_Init(cEm25* em)
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     zero = 0;
     em->Motion.flip = em25_flip_tbl;
-    EspDataLoad((u32) ARC(7), EFF_EM25, 0);
+    EspDataLoad((u32) ARC(EM25_EFF_007), EFF_EM25, 0);
     {
         static const Vec ofs = {0.0f, 0.0f, 0.0f};
         static const Vec size = {2000.0f, 2000.0f, 2000.0f};
@@ -393,7 +393,7 @@ static void em25_R1_Hide(cEm25* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(8), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_008), 0, 0, 5, 0);
         MotionMove(em, 0);
         em->hp = 0;
         em->be_flag &= ~2;
@@ -441,7 +441,7 @@ static void em25_R1_Birth(cEm25* em)
         RotMatrix(em->mat, &em->ang);
         TransMatrix(em->mat, &em->pos);
         TransMatrix(em->mat, &em->scale);
-        MotionSetCore(em, &em->Motion, ARC(0x26), ARC(0x2E), 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_026), ARC(EM25_SEQ_02E), 0, 1, 0);
         for (p = em->pList; p; p = p->pList) {
             p->scale.x = 1.0f;
             p->scale.y = 1.0f;
@@ -472,7 +472,7 @@ static void em25_R1_Wait(cEm25* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x19), 0, 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_WAIT), 0, 5, 5, 0);
         if (w->Atk_wait <= 29) {
             w->Atk_wait = (u8) (Rnd() % 30) + 30;
         }
@@ -509,7 +509,7 @@ static void em25_R1_Walk(cEm25* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x1A), ARC(0x1B), 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_WALK), ARC(EM25_SEQ_WALK), 5, 5, 0);
         w->Timer = (u8) (Rnd() % 5) + 5;
         em->r_no_2++;
     case 1:
@@ -543,7 +543,7 @@ static void em25_R1_Run(cEm25* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x1C), ARC(0x1D), 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_RUN), ARC(EM25_SEQ_RUN), 5, 5, 0);
         w->Timer = (u8) (Rnd() % 3) + 2;
         em->r_no_2++;
     case 1:
@@ -579,9 +579,9 @@ static void em25_R1_Turn90(cEm25* em)
     switch (em->r_no_2) {
     case 0:
         if (Muku(&em->pos, &pPL->pos, em->ang.y, 3.14159274f) < 0.0f) {
-            MotionSetCore(em, &em->Motion, ARC(0x1E), ARC(0x1F), 5, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM25_MOT_TURN90), ARC(EM25_SEQ_TURN90), 5, 1, 0);
         } else {
-            MotionSetCore(em, &em->Motion, ARC(0x1E), ARC(0x1F), 5, 0x41, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM25_MOT_TURN90), ARC(EM25_SEQ_TURN90), 5, 0x41, 0);
         }
         em->r_no_2++;
     case 1:
@@ -623,7 +623,7 @@ static void em25_R1_JumpAtk(cEm25* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x26), ARC(0x2E), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_026), ARC(EM25_SEQ_02E), 5, 1, 0);
         w->Timer = 10;
         w->Atk_ck = 0;
         em->r_no_2++;
@@ -654,7 +654,7 @@ static void em25_R1_Bite(cEm25* em)
     fe = em->r_no_2;
     switch (fe) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x27), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_BITE_027), 0, 0, 1, 0);
         EstSet(em, -1, 0, 0, EFF_EM25, 3, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
         EmCatchPLSet(em, 0.0f, 2, -150.0f, 0.0f, 628.0f, plem25_Bite);
         PlGachaInit();
@@ -703,7 +703,7 @@ static void em25_R1_Bite(cEm25* em)
         }
         break;
     case 2:
-        MotionSetCore(em, &em->Motion, ARC(0x2B), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_BITE_02B), 0, 0, 1, 0);
         SndStop(w->TmpU32, 0);
         PlSetDamageSe(0xD);
         EmCatchPLSet(em, 0.0f, 2, 24.3600006f, 0.0f, 307.75f, plem25_Bite);
@@ -734,7 +734,7 @@ static void plem25_Bite(cPlayer* pl)
     pl->subArc = pPL->pEmCatch->subArc;
     switch (pl->r_no_2) {
     case 0:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x2F), 0, 0, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM25_MOT_PL_BITE_02F), 0, 0, 1, 0);
         PlSetFace(1);
         pl->atari.set(10, 480.000031f, 400.0f);
         pl->m_Work0 = 10;
@@ -752,7 +752,7 @@ static void plem25_Bite(cPlayer* pl)
         }
         break;
     case 2:
-        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, 0x30), 0, 0, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM25_MOT_PL_BITE_030), 0, 0, 1, 0);
         pl->atari.set(10, 480.000031f, 400.0f);
         pl->r_no_2++;
     case 3:
@@ -777,7 +777,7 @@ static void em25_R1_P_Appear(cEm25* em)
         em->scale.x = 0.0f;
         em->scale.y = 0.0f;
         em->scale.z = 0.0f;
-        MotionSetCore(em, &em->Motion, ARC(0xC), ARC(0xD), 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_P_APPEAR), ARC(EM25_SEQ_P_APPEAR), 0, 1, 0);
         w->Se_breath_wait = 0;
         em->setStatus(EM_STATUS_ACTIVE);
         EstSet(em, -1, 0, 0, EFF_EM25, 2, 0, w->EffKindId, em, (void*) fe);
@@ -842,7 +842,7 @@ static void em25_R1_P_Wait(cEm25* em)
     }
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(8), 0, 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_008), 0, 30, 5, 0);
         w->Timer = 10;
         em->r_no_2++;
     case 1:
@@ -869,7 +869,7 @@ static void em25_R1_P_Wait(cEm25* em)
         }
         break;
     case 2:
-        MotionSetCore(em, &em->Motion, ARC(9), 0, 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_P_WAIT_009), 0, 30, 5, 0);
         em->r_no_2++;
     case 3:
         em25OnParent(em);
@@ -883,7 +883,7 @@ static void em25_R1_P_Wait(cEm25* em)
         }
         break;
     case 4:
-        MotionSetCore(em, &em->Motion, ARC(0xA), 0, 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_P_WAIT_00A), 0, 30, 5, 0);
         em->r_no_2++;
     case 5:
         em25OnParent(em);
@@ -905,7 +905,7 @@ static void em25_R1_P_Atk(cEm25* em)
     fe = em->r_no_2;
     switch (fe) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x13), ARC(0x14), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_P_ATK), ARC(EM25_SEQ_P_ATK), 5, 1, 0);
         EstSet(em, -1, 0, 0, EFF_EM25, 0xC, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
         w->Atk_ck = 0;
         em->r_no_2++;
@@ -928,7 +928,7 @@ static void em25_R1_P_Poison(cEm25* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x15), ARC(0x16), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_P_POISON), ARC(EM25_SEQ_P_POISON), 5, 1, 0);
         w->Atk_ck = 0;
         em->r_no_2++;
     case 1:
@@ -957,9 +957,9 @@ static void em25_R1_Dm_P_Normal(cEm25* em)
     switch (em->r_no_2) {
     case 0:
         if (Rnd() & 1) {
-            MotionSetCore(em, &em->Motion, ARC(0xE), 0, 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM25_MOT_DM_P_NORMAL_00E), 0, 5, 5, 0);
         } else {
-            MotionSetCore(em, &em->Motion, ARC(0xF), 0, 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM25_MOT_DM_P_NORMAL_00F), 0, 5, 5, 0);
         }
         SndCall(8, 5, &em->pos, em->id, 0, em);
         w->Timer = 30;
@@ -1013,9 +1013,9 @@ static void em25_R1_Dm_P_GoOut(cEm25* em)
         w->Mode = 0;
         w->pEm_oya = 0;
         if (em->r_no_3) {
-            MotionSetCore(em, &em->Motion, ARC(0x24), ARC(0x25), 5, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM25_MOT_024), ARC(EM25_SEQ_025), 5, 1, 0);
         } else {
-            MotionSetCore(em, &em->Motion, ARC(0x26), ARC(0x2E), 5, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM25_MOT_026), ARC(EM25_SEQ_02E), 5, 1, 0);
         }
         w->Alive_timer = 900;
         em25SetParasite(em);
@@ -1041,7 +1041,7 @@ static void em25_R1_Dm_Small(cEm25* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x21), 0, 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_DM_SMALL), 0, 5, 1, 0);
         SndCall(8, 5, &em->pos, em->id, 0, em);
         SndCall(8, 0, &em->pos, em->id, 0, em);
         em->r_no_2++;
@@ -1059,7 +1059,7 @@ static void em25_R1_Dm_Big(cEm25* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x29), ARC(0x2A), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_029), ARC(EM25_SEQ_DM_BIG), 5, 1, 0);
         SndCall(8, 5, &em->pos, em->id, 0, em);
         em->r_no_2++;
     case 1:
@@ -1072,7 +1072,7 @@ static void em25_R1_Dm_Big(cEm25* em)
         }
         break;
     case 2:
-        MotionSetCore(em, &em->Motion, ARC(0x24), ARC(0x25), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_024), ARC(EM25_SEQ_025), 5, 1, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {
@@ -1090,7 +1090,7 @@ static void em25_R1_Dm_Frame(cEm25* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x29), 0, 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_029), 0, 5, 1, 0);
         LifeDownSet(em, 1000, 0);
         SndCall(8, 5, &em->pos, em->id, 0, em);
         em->r_no_2++;
@@ -1113,7 +1113,7 @@ static void em25_R1_Dm_Frame(cEm25* em)
         }
         break;
     case 2:
-        MotionSetCore(em, &em->Motion, ARC(0x24), ARC(0x25), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_024), ARC(EM25_SEQ_025), 5, 1, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {
@@ -1137,7 +1137,7 @@ static void em25_R1_Die_P_Normal(cEm25* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x10), 0, 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_DIE_P_NORMAL), 0, 5, 1, 0);
         w->Die_ck = 1;
         w->Timer = 15;
         em->hp = 0;
@@ -1177,7 +1177,7 @@ static void em25_R1_Die_Normal(cEm25* em)
     fe = em->r_no_2;
     switch (fe) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x20), 0, 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_DIE_NORMAL), 0, 5, 1, 0);
         em25ClearParasite(em);
         EstSet(em, -1, 0, 0, EFF_EM25, 4, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
         EffectEspDelete(0, w->EffKindId, em, 0);
@@ -1219,7 +1219,7 @@ static void em25_R1_Die_Big(cEm25* em)
     fe = em->r_no_2;
     switch (fe) {
     case 0:
-        MotionSetCore(em, &em->Motion, ARC(0x22), ARC(0x23), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM25_MOT_DIE_BIG), ARC(EM25_SEQ_DIE_BIG), 5, 1, 0);
         em->clearStatus(EM_STATUS_ACTIVE);
         em25ClearParasite(em);
         EstSet(em, -1, 0, 0, EFF_EM25, 4, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
@@ -1630,30 +1630,30 @@ void em25SetParasite(cEm25* em)
     u16 step;
 
     if (w->pParasite[0] == 0 && w->pParasite[1] == 0 && w->pParasite[2] == 0 && !(w->Be_flg & 0x10)) {
-        step = (*(u16*) ARC(0x33) & 0x3FFF) / 3;
+        step = (*(u16*) ARC(EM25_MOT_SET_PARASITE) & 0x3FFF) / 3;
         pos.x = 0.0f;
         pos.y = 0.0f;
         pos.z = 0.0f;
         rot.x = -0.185004905f;
         rot.y = -0.0663225129f;
         rot.z = 2.80474400f;
-        w->pParasite[0] = (cObj16*) SetObj16(ARC(0x31), ARC(0x32), em, em, 0x21, 7, &pos, &rot);
+        w->pParasite[0] = (cObj16*) SetObj16(ARC(EM25_BIN_SET_PARASITE), ARC(EM25_TPL_SET_PARASITE), em, em, 0x21, 7, &pos, &rot);
         if (w->pParasite[0]) {
-            MotSetObj16(w->pParasite[0], ARC(0x33), 4, 0);
+            MotSetObj16(w->pParasite[0], ARC(EM25_MOT_SET_PARASITE), 4, 0);
         }
         rot.x = 0.0f;
         rot.y = 0.0f;
         rot.z = 3.36673999f;
-        w->pParasite[1] = (cObj16*) SetObj16(ARC(0x31), ARC(0x32), em, em, 0x22, 7, &pos, &rot);
+        w->pParasite[1] = (cObj16*) SetObj16(ARC(EM25_BIN_SET_PARASITE), ARC(EM25_TPL_SET_PARASITE), em, em, 0x22, 7, &pos, &rot);
         if (w->pParasite[1]) {
-            MotSetObj16(w->pParasite[1], ARC(0x33), 4, step);
+            MotSetObj16(w->pParasite[1], ARC(EM25_MOT_SET_PARASITE), 4, step);
         }
         rot.x = 0.668461084f;
         rot.y = 0.0f;
         rot.z = 3.14159274f;
-        w->pParasite[2] = (cObj16*) SetObj16(ARC(0x31), ARC(0x32), em, em, 0x23, 7, &pos, &rot);
+        w->pParasite[2] = (cObj16*) SetObj16(ARC(EM25_BIN_SET_PARASITE), ARC(EM25_TPL_SET_PARASITE), em, em, 0x23, 7, &pos, &rot);
         if (w->pParasite[2]) {
-            MotSetObj16(w->pParasite[2], ARC(0x33), 4, step * 2);
+            MotSetObj16(w->pParasite[2], ARC(EM25_MOT_SET_PARASITE), 4, step * 2);
         }
         w->Be_flg |= 0x10;
     }

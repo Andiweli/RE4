@@ -41,7 +41,7 @@
 #include "db_log.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em3d.h"
 
 typedef void (*Em3dFunc)(cEm3d*);
 
@@ -280,7 +280,7 @@ static void em3d_R0_Init(cEm3d* em)
     u32 i;
     int zero;
 
-    if (em->modelInit(ARC(5), ARC(6)) == 0) {
+    if (em->modelInit(ARC(EM3D_BIN_005), ARC(EM3D_TPL_006)) == 0) {
         pLog->err(0, 0, "em3d() ModelInit failed.");
         em->r_no_0 = 0xFF;
         return;
@@ -301,7 +301,7 @@ static void em3d_R0_Init(cEm3d* em)
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     YarareInit(em, 0.0f, 750.0f, -3000.0f, 1500.0f, 6000.0f, 1, YAT_FLAG_ON | YAT_FLAG_Z_AXIS | YAT_FLAG_NO_MARK);
     em->cEm::setTarget(2, 0.0f, 0.0f, 0.0f);
-    EspDataLoad((u32) ARC(4), EFF_EM3D, 0);
+    EspDataLoad((u32) ARC(EM3D_EFF_004), EFF_EM3D, 0);
     w->Be_flg = zero;
     w->Fire_wait = zero;
     w->vibAng.x = fRand1_1() * PI;
@@ -327,7 +327,7 @@ static void em3d_R0_Init(cEm3d* em)
         rot.x = 0.0f;
         rot.y = 0.0f;
         rot.z = 0.0f;
-        w->pMissile[i] = SetHeliMissile(ARC(7), ARC(8), &pos, &rot, 0);
+        w->pMissile[i] = SetHeliMissile(ARC(EM3D_BIN_007), ARC(EM3D_TPL_008), &pos, &rot, 0);
         if (w->pMissile[i]) {
             w->pMissile[i]->setParent(em, em3d_missile_parts[i], 0);
         }
@@ -892,7 +892,7 @@ void em3dRocketFire(cEm3d* em)
             rot.x = 0.0f;
             rot.y = 0.0f;
             rot.z = 0.0f;
-            m = SetHeliMissile(ARC(7), ARC(8), &pos, &rot, 0);
+            m = SetHeliMissile(ARC(EM3D_BIN_007), ARC(EM3D_TPL_008), &pos, &rot, 0);
             if (m) {
                 m->setParent(em, em3d_missile_parts[no], 0);
                 m->setFire(&target);

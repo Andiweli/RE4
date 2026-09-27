@@ -75,8 +75,23 @@ def call_args(text, start):
     return split_args(text[start:i - 1]), i
 
 
+def arc_names():
+    """The archive entry names of include/arc/*.h (tools/arc_names.py): name -> index."""
+    out = {}
+    d = os.path.join(INCLUDE, 'arc')
+    for name in sorted(os.listdir(d)):
+        for m in re.finditer(r'^#define\s+(\w+)\s+(0x[0-9A-Fa-f]+)\s*$', open(os.path.join(d, name)).read(), re.M):
+            out[m.group(1)] = int(m.group(2), 16)
+    return out
+
+
+ARC_NAMES = arc_names()
+
+
 def const(s):
     s = s.strip()
+    if s in ARC_NAMES:
+        return ARC_NAMES[s]
     m = re.fullmatch(r'\(?\s*' + NUM + r'\s*(/\s*4)?\s*\)?', s)
     if not m:
         return None

@@ -36,7 +36,7 @@
 #include "em.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em34.h"
 
 typedef void (*Em34Func)(cEm34*);
 
@@ -212,57 +212,57 @@ static void em34_R0_Init(cEm34* em)
     switch (em->type) {
     case 0:
     default:
-        if (em->modelInit(ARC(4), ARC(8)) == 0) {
+        if (em->modelInit(ARC(EM34_BIN_004), ARC(EM34_TPL_008)) == 0) {
             pLog->err(0, 0, "em34() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
         }
-        info = ModInfoMgr.create(ARC(5), ARC(8));
+        info = ModInfoMgr.create(ARC(EM34_BIN_005), ARC(EM34_TPL_008));
         if (info) {
             em->addModel(info);
             w->pShoulder = info;
         }
-        info = ModInfoMgr.create(ARC(6), ARC(8));
+        info = ModInfoMgr.create(ARC(EM34_BIN_006), ARC(EM34_TPL_008));
         if (info) {
             em->addModel(info);
             w->pHead = info;
         }
-        info = ModInfoMgr.create(ARC(7), ARC(8));
+        info = ModInfoMgr.create(ARC(EM34_BIN_007), ARC(EM34_TPL_008));
         if (info) {
             em->addModel(info);
             w->pHand = info;
         }
         break;
     case 1:
-        if (em->modelInit(ARC(9), ARC(0xB)) == 0) {
+        if (em->modelInit(ARC(EM34_BIN_009), ARC(EM34_TPL_00B)) == 0) {
             pLog->err(0, 0, "em37() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
         }
-        info = ModInfoMgr.create(ARC(0xA), ARC(0xB));
+        info = ModInfoMgr.create(ARC(EM34_BIN_00A), ARC(EM34_TPL_00B));
         if (info) {
             em->addModel(info);
         }
         break;
     case 2:
-        if (em->modelInit(ARC(0xC), ARC(0xE)) == 0) {
+        if (em->modelInit(ARC(EM34_BIN_00C), ARC(EM34_TPL_00E)) == 0) {
             pLog->err(0, 0, "em33() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
         }
-        info = ModInfoMgr.create(ARC(0xD), ARC(0xE));
+        info = ModInfoMgr.create(ARC(EM34_BIN_00D), ARC(EM34_TPL_00E));
         if (info) {
             em->addModel(info);
         }
         em->be_flag |= 0x01000000;
         break;
     case 3:
-        if (em->modelInit(ARC(0xC), ARC(0xF)) == 0) {
+        if (em->modelInit(ARC(EM34_BIN_00C), ARC(EM34_TPL_00F)) == 0) {
             pLog->err(0, 0, "em33() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
         }
-        info = ModInfoMgr.create(ARC(0xD), ARC(0xF));
+        info = ModInfoMgr.create(ARC(EM34_BIN_00D), ARC(EM34_TPL_00F));
         if (info) {
             em->addModel(info);
         }
@@ -312,21 +312,21 @@ static void em34_R0_Init(cEm34* em)
     YarareAdd(em, &w->hit[1], 0.0f, -100.0f, 0.0f, 200.0f, 200.0f, 0x14, YAT_FLAG_ON);
     YarareAdd(em, &w->hit[2], 0.0f, -100.0f, 0.0f, 200.0f, 200.0f, 0x18, YAT_FLAG_ON);
     em->setTarget(2, 0.0f, 0.0f, 0.0f);
-    EspDataLoad((u32) ARC(0x10), EFF_EM34, 0);
+    EspDataLoad((u32) ARC(EM34_EFF_010), EFF_EM34, 0);
     w->Neck_dir_y = 0.0f;
     w->Be_flg = 0;
     em->setRno(one, 0, 0, 0);
     switch (em->type) {
     case 0:
     default:
-        MotionSetCore(em, MOTION(em), ARC(0x11), 0, 0, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 0, 5, 0);
         break;
     case 1:
-        MotionSetCore(em, MOTION(em), ARC(0x14), 0, 0, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM34_MOT_014), 0, 0, 5, 0);
         break;
     case 2:
     case 3:
-        MotionSetCore(em, MOTION(em), ARC(0x17), 0, 0, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 0, 5, 0);
         break;
     }
     MotionMove(em, 0);
@@ -351,14 +351,14 @@ static void em34_R1_Wait(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(0x11), 0, 30, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 30, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(0x14), 0, 30, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_014), 0, 30, 5, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(0x17), 0, 30, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 30, 5, 0);
             break;
         }
         em->r_no_2++;
@@ -383,14 +383,14 @@ static void em34_R1_Walk(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(0x12), 0, 10, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_WALK_012), 0, 10, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(0x13), 0, 10, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_WALK_013), 0, 10, 5, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(0x18), 0, 10, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_WALK_018), 0, 10, 5, 0);
             break;
         }
         em->r_no_2++;
@@ -424,14 +424,14 @@ static void em34_R1_Atk(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(0x11), 0, 10, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 10, 5, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(0x17), 0, 10, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 10, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(0x15), ARC(0x16), 10, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_ATK), ARC(EM34_SEQ_ATK), 10, 1, 0);
             break;
         }
         w->Atk_ck = 0;
@@ -468,14 +468,14 @@ static void em34_R1_Dm_Normal(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(0x11), 0, 3, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 3, 1, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(0x14), 0, 3, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_014), 0, 3, 1, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(0x17), 0, 0, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 0, 1, 0);
             break;
         }
         em->r_no_2++;
@@ -508,14 +508,14 @@ static void em34_R1_Die_Normal(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(0x11), 0, 3, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 3, 1, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(0x14), 0, 3, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_014), 0, 3, 1, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(0x17), 0, 0, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 0, 1, 0);
             break;
         }
         em->r_no_2++;

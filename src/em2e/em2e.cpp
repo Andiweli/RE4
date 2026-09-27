@@ -19,7 +19,7 @@
 #include "math_sub.h"
 #include "db_log.h"
 #include "em_mod.h"
-
+#include "arc/em2e.h"
 
 typedef void (*Em2eFunc)(cEm2e*);
 
@@ -149,14 +149,14 @@ static void em2e_R0_Init(cEm2e* em)
     switch (em->type) {
     case 0:
     default:
-        if (em->modelInit(ARC(4), ARC(5)) == 0) {
+        if (em->modelInit(ARC(EM2E_BIN_004), ARC(EM2E_TPL_005)) == 0) {
             pLog->err(0, 0, "em2e 00() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
         }
         break;
     case 1:
-        if (em->modelInit(ARC(4), ARC(6)) == 0) {
+        if (em->modelInit(ARC(EM2E_BIN_004), ARC(EM2E_TPL_006)) == 0) {
             pLog->err(0, 0, "em2e 01() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
@@ -168,7 +168,7 @@ static void em2e_R0_Init(cEm2e* em)
     at = &em->atari;
     em->be_flag &= ~0x01000000;
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
-    EspDataLoad((u32) ARC(7), EFF_EM2E, 0);
+    EspDataLoad((u32) ARC(EM2E_EFF_007), EFF_EM2E, 0);
     em->hp = 1;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };

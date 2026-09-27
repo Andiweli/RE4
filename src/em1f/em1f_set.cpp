@@ -13,7 +13,7 @@
 #include "esp.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em1f.h"
 
 void Em1fInit(cEm* em);
 void Em1fSet(cEm10* em);
@@ -56,23 +56,23 @@ void Em1fSet(cEm10* em)
     switch (em->type) {
     case 14:
     default:
-        w->mot[0] = ARC(0x230);
-        w->mot[1] = ARC(0x22F);
+        w->mot[0] = ARC(EM1F_TPL_230);
+        w->mot[1] = ARC(EM1F_BIN_22F);
         em->type = 14;
-        w->mot[2] = ARC(0x231);
-        w->mot[3] = ARC(0x233);
-        w->mot[4] = ARC(0x233);
-        w->mot[5] = ARC(0x232);
-        w->mot[6] = ARC(0x234);
-        w->mot[7] = ARC(0x235);
-        w->mot[8] = ARC(0x236);
-        w->mot[9] = ARC(0x237);
-        w->mot[10] = ARC(0x237);
-        w->mot[11] = ARC(0x238);
-        w->mot[12] = ARC(0x239);
-        w->mot[13] = ARC(0x23A);
-        w->mot[14] = ARC(0x23B);
-        w->mot[15] = ARC(0x23C);
+        w->mot[2] = ARC(EM1F_BIN_231);
+        w->mot[3] = ARC(EM1F_BIN_233);
+        w->mot[4] = ARC(EM1F_BIN_233);
+        w->mot[5] = ARC(EM1F_TPL_232);
+        w->mot[6] = ARC(EM1F_BIN_234);
+        w->mot[7] = ARC(EM1F_BIN_235);
+        w->mot[8] = ARC(EM1F_BIN_236);
+        w->mot[9] = ARC(EM1F_BIN_237);
+        w->mot[10] = ARC(EM1F_BIN_237);
+        w->mot[11] = ARC(EM1F_BIN_238);
+        w->mot[12] = ARC(EM1F_BIN_239);
+        w->mot[13] = ARC(EM1F_BIN_23A);
+        w->mot[14] = ARC(EM1F_BIN_23B);
+        w->mot[15] = ARC(EM1F_BIN_23C);
         w->mot[16] = 0;
         w->mot[17] = 0;
         w->mot[18] = 0;
@@ -101,22 +101,22 @@ void Em1fSet(cEm10* em)
         Em10SetSeTbl(em, 0);
         break;
     case 15:
-        w->mot[0] = ARC(0x230);
-        w->mot[1] = ARC(0x22F);
-        w->mot[2] = ARC(0x249);
-        w->mot[3] = ARC(0x233);
-        w->mot[4] = ARC(0x233);
-        w->mot[5] = ARC(0x24A);
-        w->mot[6] = ARC(0x234);
-        w->mot[7] = ARC(0x235);
-        w->mot[8] = ARC(0x236);
-        w->mot[9] = ARC(0x237);
-        w->mot[10] = ARC(0x237);
-        w->mot[11] = ARC(0x238);
-        w->mot[12] = ARC(0x239);
-        w->mot[13] = ARC(0x23A);
-        w->mot[14] = ARC(0x23B);
-        w->mot[15] = ARC(0x23C);
+        w->mot[0] = ARC(EM1F_TPL_230);
+        w->mot[1] = ARC(EM1F_BIN_22F);
+        w->mot[2] = ARC(EM1F_BIN_249);
+        w->mot[3] = ARC(EM1F_BIN_233);
+        w->mot[4] = ARC(EM1F_BIN_233);
+        w->mot[5] = ARC(EM1F_TPL_24A);
+        w->mot[6] = ARC(EM1F_BIN_234);
+        w->mot[7] = ARC(EM1F_BIN_235);
+        w->mot[8] = ARC(EM1F_BIN_236);
+        w->mot[9] = ARC(EM1F_BIN_237);
+        w->mot[10] = ARC(EM1F_BIN_237);
+        w->mot[11] = ARC(EM1F_BIN_238);
+        w->mot[12] = ARC(EM1F_BIN_239);
+        w->mot[13] = ARC(EM1F_BIN_23A);
+        w->mot[14] = ARC(EM1F_BIN_23B);
+        w->mot[15] = ARC(EM1F_BIN_23C);
         w->mot[16] = 0;
         w->mot[17] = 0;
         w->mot[18] = 0;
@@ -145,22 +145,22 @@ void Em1fSet(cEm10* em)
         Em10SetSeTbl(em, 2);
         break;
     case 16:
-        w->mot[0] = ARC(0x230);
-        w->mot[1] = ARC(0x22F);
-        w->mot[2] = ARC(0x24B);
-        w->mot[3] = ARC(0x233);
-        w->mot[4] = ARC(0x233);
-        w->mot[5] = ARC(0x24C);
-        w->mot[6] = ARC(0x234);
-        w->mot[7] = ARC(0x235);
-        w->mot[8] = ARC(0x236);
-        w->mot[9] = ARC(0x237);
-        w->mot[10] = ARC(0x237);
-        w->mot[11] = ARC(0x238);
-        w->mot[12] = ARC(0x239);
-        w->mot[13] = ARC(0x23A);
-        w->mot[14] = ARC(0x23B);
-        w->mot[15] = ARC(0x23C);
+        w->mot[0] = ARC(EM1F_TPL_230);
+        w->mot[1] = ARC(EM1F_BIN_22F);
+        w->mot[2] = ARC(EM1F_BIN_24B);
+        w->mot[3] = ARC(EM1F_BIN_233);
+        w->mot[4] = ARC(EM1F_BIN_233);
+        w->mot[5] = ARC(EM1F_TPL_24C);
+        w->mot[6] = ARC(EM1F_BIN_234);
+        w->mot[7] = ARC(EM1F_BIN_235);
+        w->mot[8] = ARC(EM1F_BIN_236);
+        w->mot[9] = ARC(EM1F_BIN_237);
+        w->mot[10] = ARC(EM1F_BIN_237);
+        w->mot[11] = ARC(EM1F_BIN_238);
+        w->mot[12] = ARC(EM1F_BIN_239);
+        w->mot[13] = ARC(EM1F_BIN_23A);
+        w->mot[14] = ARC(EM1F_BIN_23B);
+        w->mot[15] = ARC(EM1F_BIN_23C);
         w->mot[16] = 0;
         w->mot[17] = 0;
         w->mot[18] = 0;
@@ -189,22 +189,22 @@ void Em1fSet(cEm10* em)
         Em10SetSeTbl(em, 3);
         break;
     case 24:
-        w->mot[0] = ARC(0x248);
-        w->mot[1] = ARC(0x247);
-        w->mot[2] = ARC(0x24D);
-        w->mot[3] = ARC(0x233);
-        w->mot[4] = ARC(0x233);
-        w->mot[5] = ARC(0x24E);
-        w->mot[6] = ARC(0x234);
-        w->mot[7] = ARC(0x235);
-        w->mot[8] = ARC(0x236);
-        w->mot[9] = ARC(0x237);
-        w->mot[10] = ARC(0x237);
-        w->mot[11] = ARC(0x238);
-        w->mot[12] = ARC(0x239);
-        w->mot[13] = ARC(0x23A);
-        w->mot[14] = ARC(0x23B);
-        w->mot[15] = ARC(0x23C);
+        w->mot[0] = ARC(EM1F_TPL_248);
+        w->mot[1] = ARC(EM1F_BIN_247);
+        w->mot[2] = ARC(EM1F_BIN_24D);
+        w->mot[3] = ARC(EM1F_BIN_233);
+        w->mot[4] = ARC(EM1F_BIN_233);
+        w->mot[5] = ARC(EM1F_TPL_24E);
+        w->mot[6] = ARC(EM1F_BIN_234);
+        w->mot[7] = ARC(EM1F_BIN_235);
+        w->mot[8] = ARC(EM1F_BIN_236);
+        w->mot[9] = ARC(EM1F_BIN_237);
+        w->mot[10] = ARC(EM1F_BIN_237);
+        w->mot[11] = ARC(EM1F_BIN_238);
+        w->mot[12] = ARC(EM1F_BIN_239);
+        w->mot[13] = ARC(EM1F_BIN_23A);
+        w->mot[14] = ARC(EM1F_BIN_23B);
+        w->mot[15] = ARC(EM1F_BIN_23C);
         w->mot[16] = 0;
         w->mot[17] = 0;
         w->mot[18] = 0;
@@ -235,7 +235,7 @@ void Em1fSet(cEm10* em)
     }
     w->Ganado = 2;
     Em1fWeaponSet(em);
-    EspDataLoad((u32) ARC(0x278), EFF_OBM83, 0);
+    EspDataLoad((u32) ARC(EM1F_EFF_278), EFF_OBM83, 0);
 }
 
 // Weapon model table of the module: mot[41..78] = the bin / tpl pairs em10MakeWeapon uses (hoe, bucket
@@ -267,20 +267,20 @@ void Em1fWeaponSet(cEm10* em)
     w->mot[60] = 0;
     w->mot[61] = 0;
     w->mot[62] = 0;
-    w->mot[63] = ARC(0x26C);
-    w->mot[64] = ARC(0x26D);
-    w->mot[65] = ARC(0x276);
-    w->mot[66] = ARC(0x277);
+    w->mot[63] = ARC(EM1F_BIN_WEAPON_SET_26C);
+    w->mot[64] = ARC(EM1F_TPL_WEAPON_SET_26D);
+    w->mot[65] = ARC(EM1F_BIN_WEAPON_SET_276);
+    w->mot[66] = ARC(EM1F_TPL_WEAPON_SET_277);
     w->mot[67] = 0;
     w->mot[68] = 0;
-    w->mot[69] = ARC(0x26A);
-    w->mot[70] = ARC(0x26B);
-    w->mot[71] = ARC(0x270);
-    w->mot[72] = ARC(0x271);
-    w->mot[73] = ARC(0x272);
-    w->mot[74] = ARC(0x273);
-    w->mot[75] = ARC(0x274);
-    w->mot[76] = ARC(0x275);
+    w->mot[69] = ARC(EM1F_BIN_WEAPON_SET_26A);
+    w->mot[70] = ARC(EM1F_TPL_WEAPON_SET_26B);
+    w->mot[71] = ARC(EM1F_BIN_WEAPON_SET_270);
+    w->mot[72] = ARC(EM1F_TPL_WEAPON_SET_271);
+    w->mot[73] = ARC(EM1F_BIN_WEAPON_SET_272);
+    w->mot[74] = ARC(EM1F_TPL_WEAPON_SET_273);
+    w->mot[75] = ARC(EM1F_BIN_WEAPON_SET_274);
+    w->mot[76] = ARC(EM1F_TPL_WEAPON_SET_275);
     w->mot[77] = 0;
     w->mot[78] = 0;
 }

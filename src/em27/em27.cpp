@@ -24,7 +24,7 @@
 #include "em.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em27.h"
 
 
 typedef void (*Em27Func)(cEm27*);
@@ -296,7 +296,7 @@ static void em27_R0_Init(cEm27* em)
     int zero;
 
     em->ot_type = 0;
-    if (em->modelInit(ARC(4), ARC(5)) == 0) {
+    if (em->modelInit(ARC(EM27_BIN_004), ARC(EM27_TPL_005)) == 0) {
         pLog->err(0, 0, "em27() ModelInit failed.");
         em->r_no_0 = 0xFF;
         return;
@@ -325,7 +325,7 @@ static void em27_R0_Init(cEm27* em)
     em->atari.m_flag &= 0xFDFF;
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     YarareInit(em, 0.0f, 0.0f, -100.0f, 100.0f, 250.0f, 5, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    EspDataLoad((u32) ARC(6), EFF_EM27, 0);
+    EspDataLoad((u32) ARC(EM27_EFF_006), EFF_EM27, 0);
     w->Be_flg = zero;
     w->Dash_wait = Rnd() % 150 + 210;
     w->Esc_timer = zero;
@@ -352,7 +352,7 @@ static void em27_R0_Init(cEm27* em)
     at->offOba();
     em->setRno(1, zero, zero, zero);
     em->ang.y = fRand1_1() * PI;
-    MotionSetCore(em, MOTION(em), ARC(7), 0, 0, 1, 0);
+    MotionSetCore(em, MOTION(em), ARC(EM27_MOT_007), 0, 0, 1, 0);
     MotionMove(em, 0);
     em27_R0_Move(em);
 }
@@ -373,9 +373,9 @@ static void em27_R1_Wait(cEm27* em)
     switch (em->r_no_2) {
     case 0:
         if (Rnd() & 1) {
-            MotionSetCore(em, MOTION(em), ARC(7), 0, 0, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM27_MOT_007), 0, 0, 5, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(0xE), 0, 0, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM27_MOT_WAIT), 0, 0, 5, 0);
         }
         w->Timer = (Rnd() & 0x3C) + 60;
         w->Spd_t.x = 0.0f;
@@ -410,10 +410,10 @@ static void em27_R1_Walk(cEm27* em)
     switch (em->r_no_2) {
     case 0:
         if (Rnd() & 1) {
-            MotionSetCore(em, MOTION(em), ARC(8), 0, 5, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM27_MOT_WALK_008), 0, 5, 5, 0);
             w->Spd_t.z = fRand1_1() * 25.0f + 30.0f;
         } else {
-            MotionSetCore(em, MOTION(em), ARC(9), 0, 5, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM27_MOT_WALK_009), 0, 5, 5, 0);
             w->Spd_t.z = fRand1_1() * 25.0f + 60.0f;
         }
         w->Spd_t.x = 0.0f;
@@ -449,7 +449,7 @@ static void em27_R1_Dash(cEm27* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0xA), 0, 5, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DASH), 0, 5, 5, 0);
         w->Timer = Rnd() % 6 + 7;
         w->Dash_wait = Rnd() % 60 + 210;
         w->Spd_t.x = 0.0f;
@@ -480,7 +480,7 @@ static void em27_R1_Bank(cEm27* em)
     case 0: {
         Vec v;
 
-        MotionSetCore(em, MOTION(em), ARC(0xD), 0, 5, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM27_MOT_BANK), 0, 5, 5, 0);
         w->Spd_t.z = fRand1_1() * 25.0f + 100.0f;
         w->Spd_t.x = 0.0f;
         w->Spd_t.y = fRand1_1() * 10.0f;
@@ -512,9 +512,9 @@ static void em27_R1_Turn180(cEm27* em)
         int flag;
 
         if (Rnd() & 1) {
-            m = ARC(0xB);
+            m = ARC(EM27_MOT_TURN180_00B);
         } else {
-            m = ARC(0xC);
+            m = ARC(EM27_MOT_TURN180_00C);
         }
         if (Rnd() & 1) {
             flag = 1;
@@ -551,12 +551,12 @@ static void em27_R1_Jump(cEm27* em)
         switch (Rnd() & 1) {
         case 0:
         default:
-            m0 = ARC(0xF);
-            m1 = ARC(0x1D);
+            m0 = ARC(EM27_MOT_JUMP_00F);
+            m1 = ARC(EM27_SEQ_JUMP_01D);
             break;
         case 1:
-            m0 = ARC(0x10);
-            m1 = ARC(0x1E);
+            m0 = ARC(EM27_MOT_JUMP_010);
+            m1 = ARC(EM27_SEQ_JUMP_01E);
             break;
         }
         if (Rnd() & 1) {
@@ -604,7 +604,7 @@ static void em27_R1_Dm_Normal(cEm27* em)
             em->r_no_3 = 1;
             flag = 0x40;
         }
-        MotionSetCore(em, MOTION(em), ARC(0x11), ARC(0x1F), 3, flag, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DM_NORMAL), ARC(EM27_SEQ_DM_NORMAL), 3, flag, 0);
         em->r_no_2++;
     }
     case 1:
@@ -634,7 +634,7 @@ static void em27_R1_Dm_Big(cEm27* em)
         } else {
             flag = 0;
         }
-        MotionSetCore(em, MOTION(em), ARC(0x12), 0, 3, flag, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DM_BIG), 0, 3, flag, 0);
         em->r_no_2++;
     }
     case 1:
@@ -665,7 +665,7 @@ static void em27_R1_Dm_Air(cEm27* em)
         } else {
             flag = 1;
         }
-        MotionSetCore(em, MOTION(em), ARC(0x13), 0, 3, flag, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DM_AIR_013), 0, 3, flag, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -678,7 +678,7 @@ static void em27_R1_Dm_Air(cEm27* em)
         } else {
             flag = 1;
         }
-        MotionSetCore(em, MOTION(em), ARC(0x16), 0, 3, flag, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DM_AIR_016), 0, 3, flag, 0);
         w->Spd.x = 0.0f;
         w->Spd.y = -100.0f;
         w->Spd.z = 0.0f;
@@ -721,7 +721,7 @@ static void em27_R1_Dm_Air(cEm27* em)
         } else {
             flag = 1;
         }
-        MotionSetCore(em, MOTION(em), ARC(0x14), 0, 3, flag, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DM_AIR_014), 0, 3, flag, 0);
         em->r_no_2++;
     case 7:
         if (MotionMove(em, 0)) {
@@ -759,9 +759,9 @@ static void em27_R1_Die_Normal(cEm27* em)
         }
         w->Die_type = Rnd() & 1;
         if (w->Die_type) {
-            MotionSetCore(em, MOTION(em), ARC(0x15), 0, 10, flag, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DIE_NORMAL_015), 0, 10, flag, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(0x1C), 0, 15, flag, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DIE_NORMAL_01C), 0, 15, flag, 0);
         }
         Ctrl12CntAdd(w->pCtrlGroup, CTRL12_ID_CNT_EM27_DIE, 1);
         em->atari.m_flag &= 0xFCFF;
@@ -826,9 +826,9 @@ static void em27_R1_Die_Normal(cEm27* em)
                 flag = 0x41;
             }
             if (w->Die_type) {
-                MotionSetCore(em, MOTION(em), ARC(0x1B), 0, 10, flag, 0);
+                MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DIE_NORMAL_01B), 0, 10, flag, 0);
             } else {
-                MotionSetCore(em, MOTION(em), ARC(0x1C), 0, 10, flag, 0);
+                MotionSetCore(em, MOTION(em), ARC(EM27_MOT_DIE_NORMAL_01C), 0, 10, flag, 0);
             }
         }
         MotionMove(em, 0);

@@ -24,7 +24,7 @@
 #include "db_log.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em26.h"
 
 
 typedef void (*Em26Func)(cEm26*);
@@ -260,14 +260,14 @@ static void em26_R0_Init(cEm26* em)
     switch (em->type) {
     case 0:
     default:
-        if (em->modelInit(ARC(4), ARC(5)) == 0) {
+        if (em->modelInit(ARC(EM26_BIN_004), ARC(EM26_TPL_005)) == 0) {
             pLog->err(0, 0, "em26() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
         }
         break;
     case 1:
-        if (em->modelInit(ARC(4), ARC(6)) == 0) {
+        if (em->modelInit(ARC(EM26_BIN_004), ARC(EM26_TPL_006)) == 0) {
             pLog->err(0, 0, "em26() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
@@ -302,7 +302,7 @@ static void em26_R0_Init(cEm26* em)
     YarareInit(em, 0.0f, -150.0f, -150.0f, 500.0f, 1200.0f, 2, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[0], 0.0f, -50.0f, -100.0f, 300.0f, 350.0f, 5, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[1], 0.0f, 0.0f, -200.0f, 100.0f, 200.0f, 0x18, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    EspDataLoad((u32) ARC(7), EFF_EM26, 0);
+    EspDataLoad((u32) ARC(EM26_EFF_007), EFF_EM26, 0);
     w->flags = zero;
     w->sndId = zero;
     w->breathTimer = Rnd() % 60 + 30;
@@ -313,9 +313,9 @@ static void em26_R0_Init(cEm26* em)
     em->setStatus(EM_STATUS_ACTIVE);
     em->setRno(1, zero, zero, zero);
     if (w->flags & 0x10) {
-        MotionSetCore(em, MOTION(em), ARC(8), 0, 0, 0x41, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 0x41, 0);
     } else {
-        MotionSetCore(em, MOTION(em), ARC(8), 0, 0, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 1, 0);
     }
     MotionMove(em, 0);
     em26_R0_Move(em);
@@ -337,9 +337,9 @@ static void em26_R1_Wait(cEm26* em)
     switch (em->r_no_2) {
     case 0:
         if (w->flags & 0x10) {
-            MotionSetCore(em, MOTION(em), ARC(8), 0, 0, 0x45, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 0x45, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(8), 0, 0, 5, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 5, 0);
         }
         em->r_no_2++;
     case 1:
@@ -351,9 +351,9 @@ static void em26_R1_Wait(cEm26* em)
         break;
     case 2:
         if (w->flags & 0x10) {
-            MotionSetCore(em, MOTION(em), ARC(9), 0, 0, 0x41, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_WAIT), 0, 0, 0x41, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(9), 0, 0, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_WAIT), 0, 0, 1, 0);
         }
         SndStop(w->sndId, 0);
         w->sndId = SndCall(8, 4, &em->pos, em->id, 0, em);
@@ -396,9 +396,9 @@ static void em26_R1_Atk(cEm26* em)
             mode = 0x41;
         }
         if (ang < 0.0f) {
-            MotionSetCore(em, MOTION(em), ARC(0xE), ARC(0x16), 0, mode, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_ATK_00E), ARC(EM26_SEQ_ATK_016), 0, mode, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(0xF), ARC(0x17), 0, mode, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_ATK_00F), ARC(EM26_SEQ_ATK_017), 0, mode, 0);
         }
         w->atkHit = 0;
         em->r_no_2++;
@@ -453,17 +453,17 @@ static void em26_R1_Dm_Small(cEm26* em)
         switch ((u32) kind) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(0xA), 0, 0, mode, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_00A), 0, 0, mode, 0);
             break;
         case 1:
             if (Rnd() & 1) {
-                MotionSetCore(em, MOTION(em), ARC(0xB), 0, 0, mode, 0);
+                MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_00B), 0, 0, mode, 0);
             } else {
-                MotionSetCore(em, MOTION(em), ARC(0x10), 0, 0, mode, 0);
+                MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_010), 0, 0, mode, 0);
             }
             break;
         case 2:
-            MotionSetCore(em, MOTION(em), ARC(0xC), 0, 0, mode, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_00C), 0, 0, mode, 0);
             break;
         }
         em->r_no_2++;
@@ -503,26 +503,26 @@ static void em26_R1_Die_Normal(cEm26* em)
         switch (em->emset_no % 5) {
         case 0:
         default:
-            seq = ARC(0x11);
+            seq = ARC(EM26_SEQ_DIE_NORMAL_011);
             break;
         case 1:
-            seq = ARC(0x12);
+            seq = ARC(EM26_SEQ_DIE_NORMAL_012);
             break;
         case 2:
-            seq = ARC(0x13);
+            seq = ARC(EM26_SEQ_DIE_NORMAL_013);
             break;
         case 3:
-            seq = ARC(0x14);
+            seq = ARC(EM26_SEQ_DIE_NORMAL_014);
             break;
         case 4:
-            seq = ARC(0x15);
+            seq = ARC(EM26_SEQ_DIE_NORMAL_015);
             break;
         }
         mode = 1;
         if (w->flags & 0x10) {
             mode = 0x41;
         }
-        MotionSetCore(em, MOTION(em), ARC(0xD), seq, 0, mode, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DIE_NORMAL), seq, 0, mode, 0);
         em->atari.m_flag &= ~0x200;
         SndStop(w->sndId, 0);
         w->sndId = SndCall(8, 8, &em->pos, em->id, 0, em);

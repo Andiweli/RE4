@@ -27,7 +27,7 @@
 #include "db_log.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em3e.h"
 
 typedef void (*EmMarkFunc)(cEmMark*);
 
@@ -73,32 +73,32 @@ void cEmMark::init(u8 type, EmMarkInst* inst, f32 x, f32 y, f32 z)
     switch (this->type) {
     case 0:
     default:
-        bin = EM_ARC(this, 5);
-        tpl = EM_ARC(this, 6);
+        bin = EM_ARC(this, EM3E_BIN_005);
+        tpl = EM_ARC(this, EM3E_TPL_006);
         break;
     case 1:
-        bin = EM_ARC(this, 9);
-        tpl = EM_ARC(this, 0xA);
+        bin = EM_ARC(this, EM3E_BIN_009);
+        tpl = EM_ARC(this, EM3E_TPL_00A);
         break;
     case 2:
-        bin = EM_ARC(this, 0xD);
-        tpl = EM_ARC(this, 0xE);
+        bin = EM_ARC(this, EM3E_BIN_00D);
+        tpl = EM_ARC(this, EM3E_TPL_00E);
         break;
     case 3:
-        bin = EM_ARC(this, 0x15);
-        tpl = EM_ARC(this, 0x16);
+        bin = EM_ARC(this, EM3E_BIN_015);
+        tpl = EM_ARC(this, EM3E_TPL_016);
         break;
     case 4:
-        bin = EM_ARC(this, 5);
-        tpl = EM_ARC(this, 6);
+        bin = EM_ARC(this, EM3E_BIN_005);
+        tpl = EM_ARC(this, EM3E_TPL_006);
         break;
     case 5:
-        bin = EM_ARC(this, 5);
-        tpl = EM_ARC(this, 6);
+        bin = EM_ARC(this, EM3E_BIN_005);
+        tpl = EM_ARC(this, EM3E_TPL_006);
         break;
     case 6:
-        bin = EM_ARC(this, 0xF);
-        tpl = EM_ARC(this, 0x10);
+        bin = EM_ARC(this, EM3E_BIN_00F);
+        tpl = EM_ARC(this, EM3E_TPL_010);
         break;
     case 0xA:
         bin = SmdGetObjPtr(5)->pModelInfo->model_addr;
@@ -170,7 +170,7 @@ void cEmMark::init(u8 type, EmMarkInst* inst, f32 x, f32 y, f32 z)
         hp = 1000;
         break;
     }
-    EspDataLoad((u32) EM_ARC(this, 4), EFF_EM3E, 0);
+    EspDataLoad((u32) EM_ARC(this, EM3E_EFF_004), EFF_EM3E, 0);
     {
         const f32 depth = 150.0f;
 
@@ -500,7 +500,7 @@ int cEmMark::setEff(int a, int kind)
         EstSet(this, -1, &dmg.m_pDamageYarare->cross, 0, EFF_EM3E, k, 0, ESP_CORE_KIND_NONE, this, 0);
         SndCall(6, 1, &p, 0, 0, 0);
     } else if (kind == 2) {
-        modelInit(EM_ARC(this, 0x13), EM_ARC(this, 0x14));
+        modelInit(EM_ARC(this, EM3E_BIN_SET_EFF), EM_ARC(this, EM3E_TPL_SET_EFF));
         EstSet(this, -1, &pos, 0, EFF_EM3E, 6, 0, ESP_CORE_KIND_NONE, this, 0);
         SndCall(6, 1, &p, 0, 0, 0);
         PlWepHitCheck2(0, &pos, &pos, 0x13, 0, range);
@@ -604,34 +604,34 @@ void cEmMark::headBomb()
         case 0:
         default:
             kind = 2;
-            bin = EM_ARC(this, 7);
-            tpl = EM_ARC(this, 8);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_007);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_008);
             break;
         case 1:
             kind = 3;
-            bin = EM_ARC(this, 0xB);
-            tpl = EM_ARC(this, 0xC);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_00B);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_00C);
             break;
         case 2:
         case 3:
             kind = 8;
-            bin = EM_ARC(this, 7);
-            tpl = EM_ARC(this, 8);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_007);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_008);
             break;
         case 4:
             kind = 3;
-            bin = EM_ARC(this, 7);
-            tpl = EM_ARC(this, 8);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_007);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_008);
             break;
         case 5:
             kind = 3;
-            bin = EM_ARC(this, 7);
-            tpl = EM_ARC(this, 8);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_007);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_008);
             break;
         case 6:
             kind = 2;
-            bin = EM_ARC(this, 0x11);
-            tpl = EM_ARC(this, 0x12);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_011);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_012);
             break;
         }
         break;
@@ -641,34 +641,34 @@ void cEmMark::headBomb()
         case 0:
         default:
             kind = 4;
-            bin = EM_ARC(this, 7);
-            tpl = EM_ARC(this, 8);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_007);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_008);
             break;
         case 1:
             kind = 5;
-            bin = EM_ARC(this, 0xB);
-            tpl = EM_ARC(this, 0xC);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_00B);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_00C);
             break;
         case 2:
         case 3:
             kind = 9;
-            bin = EM_ARC(this, 7);
-            tpl = EM_ARC(this, 8);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_007);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_008);
             break;
         case 4:
             kind = 5;
-            bin = EM_ARC(this, 7);
-            tpl = EM_ARC(this, 8);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_007);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_008);
             break;
         case 5:
             kind = 5;
-            bin = EM_ARC(this, 7);
-            tpl = EM_ARC(this, 8);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_007);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_008);
             break;
         case 6:
             kind = 4;
-            bin = EM_ARC(this, 0x11);
-            tpl = EM_ARC(this, 0x12);
+            bin = EM_ARC(this, EM3E_BIN_HEAD_BOMB_011);
+            tpl = EM_ARC(this, EM3E_TPL_HEAD_BOMB_012);
             break;
         }
         break;

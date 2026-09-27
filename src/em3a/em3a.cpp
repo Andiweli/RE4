@@ -42,7 +42,7 @@
 #include "em.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em3a.h"
 
 
 typedef void (*Em3aFunc)(cEm3a*);
@@ -314,14 +314,14 @@ static void em3a_R0_Init(cEm3a* em)
     case 0:
     case 1:
     default:
-        if (em->modelInit(ARC(5), ARC(6)) == 0) {
+        if (em->modelInit(ARC(EM3A_BIN_005), ARC(EM3A_TPL_006)) == 0) {
             pLog->err(0, 0, "em3a() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
         }
         break;
     case 2:
-        if (em->modelInit(ARC(0xB), ARC(0xC)) == 0) {
+        if (em->modelInit(ARC(EM3A_BIN_00B), ARC(EM3A_TPL_00C)) == 0) {
             pLog->err(0, 0, "em3a() ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
@@ -366,7 +366,7 @@ static void em3a_R0_Init(cEm3a* em)
         rot.x = 0.0f;
         rot.y = 0.0f;
         rot.z = 0.0f;
-        w->pMissile = SetHeliMissile(ARC(9), ARC(0xA), &pos, &rot, 1);
+        w->pMissile = SetHeliMissile(ARC(EM3A_BIN_009), ARC(EM3A_TPL_00A), &pos, &rot, 1);
         if (w->pMissile) {
             w->pMissile->setParent(em, 9, 0);
         }
@@ -376,7 +376,7 @@ static void em3a_R0_Init(cEm3a* em)
         p->scale.z = 0.0f;
     }
     em->setTarget(2, 0.0f, 0.0f, 0.0f);
-    EspDataLoad((u32) ARC(4), EFF_EM3A, 0);
+    EspDataLoad((u32) ARC(EM3A_EFF_004), EFF_EM3A, 0);
     w->espKind = EspPullCoreKind();
     w->flags = 0;
     w->vibAng.x = fRand1_1() * PI;
@@ -435,11 +435,11 @@ static void em3a_R0_Init(cEm3a* em)
         case 5:
         default:
             em->setRno(1, 6, 0, 0);
-            MotionSetCore(em, MOTION(em), ARC(0x12), 0, 0, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_012), 0, 0, 1, 0);
             break;
         case 6:
             em->setRno(1, 9, 0, 0);
-            MotionSetCore(em, MOTION(em), ARC(0xD), 0, 0, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_00D), 0, 0, 1, 0);
             break;
         case 7:
             // Plain byte stores: the QImode zero keeps MotionSetCore's `li r9, 0` (em30_R0_Init).
@@ -447,7 +447,7 @@ static void em3a_R0_Init(cEm3a* em)
             em->r_no_1 = 6;
             em->r_no_2 = 0;
             em->r_no_3 = 1;
-            MotionSetCore(em, MOTION(em), ARC(0x12), 0, 0, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_012), 0, 0, 1, 0);
             break;
         }
         MotionMove(em, 0);
@@ -566,7 +566,7 @@ static void em3a_R1_Atk(cEm3a* em)
     fl = SatMgr.getFloor(&em->pos, 0, 600.0f, 100000.0f, 0);
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(7), 0, 0, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_007), 0, 0, 1, 0);
         em->r_no_2++;
     case 1:
         em3aHoverMove(em, w, fl);
@@ -654,7 +654,7 @@ static void em3a_R1_Atk(cEm3a* em)
         }
         break;
     case 8:
-        MotionSetCore(em, MOTION(em), ARC(8), 0, 0, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_008), 0, 0, 1, 0);
         w->flags &= ~2;
         em->r_no_2++;
     case 9:
@@ -802,7 +802,7 @@ static void em3a_R1_FixAtk(cEm3a* em)
     SatMgr.getFloor(&em->pos, 0, 600.0f, 100000.0f, 0);
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(7), 0, 0, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_007), 0, 0, 1, 0);
         em->r_no_2++;
     case 1:
         em3aFixMove(em, w);
@@ -892,7 +892,7 @@ static void em3a_R1_FixAtk(cEm3a* em)
         }
         break;
     case 8:
-        MotionSetCore(em, MOTION(em), ARC(8), 0, 0, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_008), 0, 0, 1, 0);
         w->flags &= ~2;
         em->r_no_2++;
     case 9:
@@ -949,7 +949,7 @@ static void em3a_R1_B_HideWait(cEm3a* em)
     switch (em->r_no_2) {
     case 0:
         em->atari.off();
-        MotionSetCore(em, MOTION(em), ARC(0x12), 0, 3, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_012), 0, 3, 5, 0);
         w->flags &= ~1;
         w->timer = 30;
         w->turnDir = 0;
@@ -1010,7 +1010,7 @@ static void em3a_R1_B_Hide(cEm3a* em)
     switch (em->r_no_2) {
     case 0:
         em->atari.off();
-        MotionSetCore(em, MOTION(em), ARC(0x11), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_B_HIDE), 0, 3, 1, 0);
         SndCall(8, 5, &em->getPartsPtr(0xA)->world, em->id, 0, em);
         EffectEspDelete(1, w->espKind, em, 0);
         EffectEspgenDelete(1, w->espKind, em);
@@ -1035,7 +1035,7 @@ static void em3a_R1_B_Appear(cEm3a* em)
     switch (em->r_no_2) {
     case 0:
         em->atari.on();
-        MotionSetCore(em, MOTION(em), ARC(0x13), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_B_APPEAR), 0, 3, 1, 0);
         SndCall(8, 5, &em->getPartsPtr(0xA)->world, em->id, 0, em);
         EstSet(em, -1, 0, 0, EFF_EM3A, 0xD, 0, ESP_CORE_KIND_NONE, em, 0);
         em->r_no_2++;
@@ -1057,7 +1057,7 @@ static void em3a_R1_B_Wait(cEm3a* em)
     switch (em->r_no_2) {
     case 0:
         em->atari.on();
-        MotionSetCore(em, MOTION(em), ARC(0xD), 0, 3, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_00D), 0, 3, 5, 0);
         w->flags &= ~1;
         w->turnDir = 0;
         em->r_no_2++;
@@ -1068,9 +1068,9 @@ static void em3a_R1_B_Wait(cEm3a* em)
         break;
     case 2:
         if (Rnd() % 10 > 4) {
-            MotionSetCore(em, MOTION(em), ARC(0x10), 0, 3, 0x41, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_010), 0, 3, 0x41, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(0x10), 0, 3, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_010), 0, 3, 1, 0);
         }
         w->timer = Rnd() % 3 + 2;
         em->r_no_2++;
@@ -1106,7 +1106,7 @@ static void em3a_R1_B_Move(cEm3a* em)
     w->routeAngAbs = fabsf(w->routeAng);
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0xE), ARC(0xF), 5, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_B_MOVE), ARC(EM3A_SEQ_B_MOVE), 5, 5, 0);
         w->timer = Rnd() % 3 + 2;
         em->r_no_2++;
     case 1:
@@ -1129,9 +1129,9 @@ static void em3a_R1_B_Move(cEm3a* em)
         break;
     case 2:
         if (w->routeAng < 0.0f) {
-            MotionSetCore(em, MOTION(em), ARC(0x10), 0, 5, 0x41, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_010), 0, 5, 0x41, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(0x10), 0, 5, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_010), 0, 5, 1, 0);
         }
         w->timer = Rnd() % 3 + 2;
         em->r_no_2++;
@@ -1145,7 +1145,7 @@ static void em3a_R1_B_Move(cEm3a* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(0xD), 0, 0xA, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_00D), 0, 0xA, 5, 0);
         w->timer = Rnd() % 60 + 60;
         em->r_no_2++;
     case 5:
@@ -1213,7 +1213,7 @@ static void em3a_R1_B_Die(cEm3a* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0x14), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_B_DIE), 0, 3, 1, 0);
         EstSet(em, -1, 0, 0, EFF_EM3A, 0xF, 0, ESP_CORE_KIND_NONE, em, 0);
         SndCall(8, 7, &em->getPartsPtr(0xA)->world, em->id, 0, em);
         em->hp = 0;
@@ -1240,7 +1240,7 @@ static void em3a_R1_B_AppearDie(cEm3a* em)
     case 0: {
         Vec* wp;
 
-        MotionSetCore(em, MOTION(em), ARC(0x15), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3A_MOT_B_APPEAR_DIE), 0, 3, 1, 0);
         EstSet(em, -1, 0, 0, EFF_EM3A, 0xE, 0, ESP_CORE_KIND_NONE, em, 0);
         wp = &em->getPartsPtr(0xA)->world;
         SndCall(8, 5, wp, em->id, 0, em);
@@ -1573,7 +1573,7 @@ void em3aRocketFire(cEm3a* em)
     rot.x = 0.0f;
     rot.y = 0.0f;
     rot.z = 0.0f;
-    m = SetHeliMissile(ARC(9), ARC(0xA), &pos, &rot, 1);
+    m = SetHeliMissile(ARC(EM3A_BIN_009), ARC(EM3A_TPL_00A), &pos, &rot, 1);
     if (m) {
         m->setParent(em, 9, 0);
         m->setFire(0);

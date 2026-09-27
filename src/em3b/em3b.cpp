@@ -36,7 +36,7 @@
 #include "em.h"
 #include <dolphin/os.h>
 #include "em_mod.h"
-
+#include "arc/em3b.h"
 
 
 typedef void (*Em3bFunc)(cEm3b*);
@@ -400,7 +400,7 @@ static void em3b_R0_Init(cEm3b* em)
     switch (em->type) {
     case 0:
     default:
-        if (em->modelInit(ARC(4), ARC(5)) == 0) {
+        if (em->modelInit(ARC(EM3B_BIN_004), ARC(EM3B_TPL_005)) == 0) {
             pLog->err(0, 0, "em3b() Turck:ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
@@ -408,7 +408,7 @@ static void em3b_R0_Init(cEm3b* em)
         break;
     case 1:
     case 2:
-        if (em->modelInit(ARC(0xB), ARC(0xC)) == 0) {
+        if (em->modelInit(ARC(EM3B_BIN_00B), ARC(EM3B_TPL_00C)) == 0) {
             pLog->err(0, 0, "em3b() Cart:ModelInit failed.");
             em->r_no_0 = 0xFF;
             return;
@@ -451,7 +451,7 @@ static void em3b_R0_Init(cEm3b* em)
     zero = 0;
     em->setTarget(zero, 0.0f, 0.0f, 0.0f);
     em->setStatus(EM_STATUS_ACTIVE);
-    EspDataLoad((u32) ARC(6), EFF_EM3B, 0);
+    EspDataLoad((u32) ARC(EM3B_EFF_006), EFF_EM3B, 0);
     w->espKind = EspPullCoreKind();
     w->flags = zero;
     w->sndId2 = zero;
@@ -497,14 +497,14 @@ static void em3b_R1_Truck_Wait(cEm3b* em)
     switch (st) {
     case 0:
         em3bPosReset(em);
-        MotionSetCore(em, MOTION(em), ARC(0xA), 0, 0, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00A), 0, 0, 1, 0);
         MotionMove(em, 0);
         w->timer = 10;
         em->r_no_2++;
         break;
     case 1:
         em3bPosReset(em);
-        MotionSetCore(em, MOTION(em), ARC(7), 0, 0, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_007), 0, 0, 1, 0);
         MotionMove(em, 0);
         if (w->timer) {
             w->timer--;
@@ -528,7 +528,7 @@ static void em3b_R1_Truck_Run(cEm3b* em)
     switch (em->r_no_2) {
     case 0:
         em3bPosReset(em);
-        MotionSetCore(em, MOTION(em), ARC(0xA), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00A), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -537,7 +537,7 @@ static void em3b_R1_Truck_Run(cEm3b* em)
         break;
     case 2:
         em3bPosReset(em);
-        MotionSetCore(em, MOTION(em), ARC(7), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_007), 0, 3, 1, 0);
         w->timer = 450;
         w->seTimer = 30;
         EstSet(em, -1, 0, 0, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, em, 0);
@@ -614,11 +614,11 @@ static void em3b_R1_Truck_RunInto(cEm3b* em)
         int dir = em->r_no_3;
 
         if (dir) {
-            MotionSetCore(em, MOTION(em), ARC(9), 0, 3, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_TRUCK_RUN_INTO_009), 0, 3, 1, 0);
             EstSet(em, -1, 0, 0, EFF_ROOM, 0x26, 0, ESP_CORE_KIND_NONE, em, 0);
             w->timer = 60;
         } else {
-            MotionSetCore(em, MOTION(em), ARC(8), 0, 3, 1, 0);
+            MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_TRUCK_RUN_INTO_008), 0, 3, 1, 0);
             EstSet(em, -1, 0, 0, EFF_ROOM, 0x25, 0, ESP_CORE_KIND_NONE, em, 0);
             w->timer = 120;
         }
@@ -674,7 +674,7 @@ static void em3b_R1_Truck_RunInto(cEm3b* em)
 // Cart r_no_1 == 3: waits at the first frame of the track motion 0xD (the room switches it to run).
 static void em3b_R1_Cart_Wait(cEm3b* em)
 {
-    MotionSetCore(em, MOTION(em), ARC(0xD), 0, 0, 0, 0);
+    MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00D), 0, 0, 0, 0);
     MotionMove(em, 0);
 }
 
@@ -688,7 +688,7 @@ static void em3b_R1_Cart_Run(cEm3b* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0xD), 0, 3, 5, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00D), 0, 3, 5, 0);
         w->timer = 80;
         em->r_no_2++;
     case 1:
@@ -728,7 +728,7 @@ static void em3b_R1_Cart_Damage(cEm3b* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(0xE), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00E), 0, 3, 1, 0);
         w->sndId2 = SndCall(6, 9, &em->pos, 0, 0, em);
         EmSetDie(em);
         em->clearStatus(EM_STATUS_ACTIVE);
@@ -753,7 +753,7 @@ static void em3b_R1_StopCart_Damage(cEm3b* em)
     case 0:
         EstSet(em, -1, 0, 0, EFF_OBM34, 3, 0, w->espKind, em, 0);
         w->dmgWait = 150;
-        MotionSetCore(em, MOTION(em), ARC(0xE), 0, 3, 1, 0);
+        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00E), 0, 3, 1, 0);
         w->timer = 1;
         EmSetDie(em);
         em->r_no_2++;
