@@ -935,7 +935,7 @@ def generate_build_ninja(
         n.rule(
             name="make_rel",
             command=f'$python {config.tools_dir / "make_rel.py"} --config $rel_json --dol-symbols $dol_symbols '
-            "--out $out $rel_links $in",
+            "--dol-elf $dol_elf --out $out $rel_links $in",
             description="REL $out",
         )
     else:
@@ -1239,16 +1239,18 @@ def generate_build_ninja(
                     order_only="post-compile",
                 )
                 link_elfs = [build_path / m / f"{m}.elf" for m in self.rel_links]
+                dol_elf = build_path / "main.elf"
                 n.build(
                     outputs=self.output(),
                     rule="make_rel",
                     inputs=elf_path,
-                    implicit=[self.rel_json, config.rel_dol_symbols, *link_elfs,
+                    implicit=[self.rel_json, config.rel_dol_symbols, dol_elf, *link_elfs,
                               config.tools_dir / "make_rel.py", config.tools_dir / "elffile.py",
                               config.tools_dir / "relfile.py"],
                     variables={
                         "rel_json": serialize_path(self.rel_json),
                         "dol_symbols": serialize_path(config.rel_dol_symbols),
+                        "dol_elf": serialize_path(dol_elf),
                         "rel_links": " ".join(f"--link {m}={serialize_path(p)}" for m, p in zip(self.rel_links, link_elfs)),
                     },
                     order_only="post-link",

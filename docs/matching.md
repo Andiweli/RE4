@@ -2464,6 +2464,35 @@ relocation fields masked; harness deleted). Findings that supersede parts of the
 - Regression fact for the sweep note: `-O4` (no `,p`) loses 75/261 Sofdec and 84/285 ADX functions,
   `-inline auto` vs `all` are identical on Sofdec and `all` loses 8 on ADX, `-proc 750` == `gekko`.
 
+## Moving code and data (relocation)
+
+A mod or a port changes the size of functions, so everything after them moves. Three things kept
+the build from following, all fixed without changing the matching output:
+
+- `config/G4BE08/ldscript.ld` placed every DOL section at its original address. Each section now
+  starts at the next 32-byte boundary after the one before, as in the original, and the small-data
+  bases, the stack and the arena start are computed from the sections. The matching build lands on
+  the original addresses; a longer `.text` pushes the rest along instead of overlapping `.ctors`.
+- `tools/make_rel.py` resolved the RELs' references to the DOL from `symbols.txt`, the original
+  addresses. It now takes each address from the linked `main.elf` (names and original section numbers
+  still come from `symbols.txt`, which the module-0 relocations need) and stops if a name is missing
+  or defined twice. The make_rel step depends on `main.elf`.
+- The asm-bodied units (`__start`, `ppcdown`, `fileserver`) still had 24 literal addresses: crt0's
+  `.bss`/`.sbss` clear bounds and the SN stub's data. They are symbol references now, the clear bounds
+  through `_bss_start`/`_bss_end`/`_sbss_start`/`_sbss_end` from the linker script.
+
+`tools/research/kit/reloc_test.py` puts a build's `main.dol` and RELs into an extracted disc 1 tree
+and boots it in Dolphin to the opening event. Results (2026-09-27, with a `. += 0x100` gap in the
+linker script or 64 `nop`s in a function):
+
+- All data moved (gap after `.text`: `.ctors` to `.sdata2`, the stack and the arena shift by 0x100,
+  every REL relinked): the game boots and the player animates, same as the original.
+- Code moved (gap before `.text`, or `nop`s in `CameraControl::HermiteExport` or in newlib's
+  `_write_r`): a machine check between `__OSCacheInit` and the end of `EXIInit` during `OSInit`,
+  before the title. Nothing in the compiled code, the DOL data or the RELs still points at an old
+  address (the stale-address scans behind this compare every data word and every `lis` pair of the
+  two builds), so the cause is something those scans do not see; it needs a debugger session.
+
 ## REL modules
 
 The game loads its rooms, enemies, weapons and debug tools as Nintendo REL overlays. `ninja` rebuilds the

@@ -2,17 +2,17 @@
 """Write a REL from a module ELF linked with `ngcld -r`, the way SN's snmakerel did for the original.
 
 usage: make_rel.py --config config/<ver>/modules/<mod>/rel.json --dol-symbols config/<ver>/symbols.txt
-                   --out build/<ver>/<mod>/<mod>.rel [--link <name>=<elf> ...] [--verify <orig.rel>]
-                   build/<ver>/<mod>/<mod>.elf
+                   --dol-elf build/<ver>/main.elf --out build/<ver>/<mod>/<mod>.rel
+                   [--link <name>=<elf> ...] [--verify <orig.rel>] build/<ver>/<mod>/<mod>.elf
 
 rel.json (tools/gen_rel_config.py) carries the header constants of the original REL: module id,
 section count of the original ELF, name offset/size (into makerel's string table), align, bss_align,
 the REL section indices and the size of ngcld's BSS_TAG object at the end of .bss.
 
 Relocations: every RELA entry of .text/.ctors/.dtors/.rodata/.data becomes a REL relocation.
-Undefined symbols resolve against the DOL's symbols.txt (module 0, section byte = the original DOL
-ELF's section index, addend = absolute address) or against the ELFs of the modules named in rel.json
-"links".
+Undefined symbols resolve against the DOL (module 0: section byte = the original DOL ELF's section
+index from symbols.txt, addend = the symbol's address in the linked main.elf) or against the ELFs of
+the modules named in rel.json "links".
 snmakerel's rules for what ends up in the file:
   * R_PPC_REL24 to a target in the same section is resolved and dropped from the table; a REL24 to
     another module or the DOL is patched to branch to _unresolved and kept,
@@ -38,19 +38,31 @@ import relfile  # noqa: E402
 # keyed by the DOL config's section names.
 DOL_SECTION_INDEX = {'.init': 1, '.text': 2, '.ctor': 3, '.dtor': 4, '.rodata': 5, '.data': 6, '.bss': 7,
                      '.sdata': 8, '.sbss': 9, '.sdata2': 10, '.sbss2': 11}
+STT_FILE = 4
 SYMBOL_RE = re.compile(r'^(\S+) = (\.\w+):0x([0-9A-Fa-f]+);')
 
 
 def read_dol_symbols(path):
-    """config/<ver>/symbols.txt -> name -> (section name, address). The split objects of the modules
-    reference DOL symbols by these names; main.elf's symbol table would only have the names the
-    compiled DOL units happen to use."""
+    """config/<ver>/symbols.txt -> name -> (section name, address). The section gives the original
+    DOL section index of a module-0 relocation."""
     out = {}
     for line in open(path):
         m = SYMBOL_RE.match(line)
         if m:
             out.setdefault(m.group(1), (m.group(2), int(m.group(3), 16)))
     return out
+
+
+def read_dol_addresses(path):
+    """name -> set of addresses of every symbol the linked main.elf defines, globals and the locals
+    the modules import by name (SceAtSys, fontTMtx, ...), so a module links against the DOL as it
+    was built, wherever its code moved."""
+    out = {}
+    for s in elffile.Elf(path).symbols:
+        if s.name and s.shndx != elffile.SHN_UNDEF and s.type not in (elffile.STT_SECTION, STT_FILE):
+            out.setdefault(s.name, set()).add(s.value)
+    return out
+
 KINDS = (relfile.R_PPC_ADDR32, relfile.R_PPC_ADDR16_LO, relfile.R_PPC_ADDR16_HA,
          relfile.R_PPC_REL24, relfile.R_PPC_REL14)
 
@@ -63,6 +75,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--config', required=True)
     ap.add_argument('--dol-symbols', required=True, metavar='SYMBOLS_TXT')
+    ap.add_argument('--dol-elf', required=True, metavar='MAIN_ELF')
     ap.add_argument('--out', required=True)
     ap.add_argument('--link', action='append', default=[], metavar='NAME=ELF')
     ap.add_argument('--verify', metavar='ORIG_REL')
@@ -77,6 +90,7 @@ def main():
 
     # --- external symbol tables ------------------------------------------------------------------
     dol_syms = read_dol_symbols(args.dol_symbols)
+    dol_addr = read_dol_addresses(args.dol_elf)
     links = {}
     for spec in args.link:
         name, path = spec.split('=', 1)
@@ -92,10 +106,13 @@ def main():
         # ascending module id (t_camera's __builtin_delete goes to the DOL although Tools and t_esp
         # have their own; st1_0's R102Init goes to st1_1 (73), not st1_3 (86)).
         if name in dol_syms:
-            secname, addr = dol_syms[name]
+            secname = dol_syms[name][0]
             if secname not in DOL_SECTION_INDEX:
                 die(f'{name}: DOL section {secname} has no known original section index')
-            return 0, DOL_SECTION_INDEX[secname], addr
+            addrs = dol_addr.get(name, set())
+            if len(addrs) != 1:
+                die(f'{name}: {len(addrs)} addresses in {args.dol_elf}, expected one')
+            return 0, DOL_SECTION_INDEX[secname], next(iter(addrs))
         for lname, (lcfg, lelf, lsyms) in sorted(links.items(), key=lambda kv: kv[1][0]['module_id']):
             if name in lsyms:
                 s = lsyms[name]
