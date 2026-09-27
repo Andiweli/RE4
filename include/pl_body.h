@@ -49,8 +49,10 @@ public:
     cModelInfo* m_pKnife;        // 0x2C  the knife model info (setKnife scales its matrix to 0 / 1)
     u32 nowLhandNo;                  // 0x30  current left hand item no
     u32 oldLhandNo;              // 0x34  previous one (setLeftHand(0x63) restores it)
+private:
     cModel* m_pMod;              // 0x38
     f32 m_WaistY;                   // 0x3C  waist twist angle (waistSet)
+public:
     SpaeData spae[2];            // 0x40
 
     cPlBody(cModel* model);

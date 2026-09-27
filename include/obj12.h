@@ -37,11 +37,15 @@ public:
     virtual void move();
     virtual ~cObj12() {}
     void setParent(cModel* oya, int partsNo, int noNormalize);
+private:
     void chainMove();
+public:
     void setFall(Vec* spd, u8 type);
     void setFallSe(u8 blk, u8 no, u8 id);
+private:
     void fallMove();
     void throwMove();
+public:
     void setBurn();
 };
 

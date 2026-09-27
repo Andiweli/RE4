@@ -34,8 +34,10 @@ private:
 public:
     PieceData* m_p_data;  // 0x04
     u32 x8;           // 0x08
+private:
     f32 m_center_x;           // 0x0C  rotated centre offset
     f32 m_center_y;           // 0x10
+public:
     f32 m_pos_x;            // 0x14  centre position on the board (cells)
     f32 m_pos_y;            // 0x18
     u32 x1C;
@@ -72,10 +74,11 @@ public:
 class pzlBoard {
 private:
     u8* m_cell;        // 0x00  w * h state bytes (bit0 occupied, bit1 inside, bit6 wall)
-public:
+private:
     // read directly by two float compares in pzlPlayer::movePiece: through size_y() the
     // conversion stores the sign-extended register instead of the loaded byte
     s8 m_size_x;             // 0x04
+public:
     s8 m_size_y;             // 0x05
 private:
     u8 m_piece_max;      // 0x06

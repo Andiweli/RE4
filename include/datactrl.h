@@ -54,8 +54,10 @@ public:
     int getCommand();
     void setCondition(int c);
     int getCondition();
+private:
     void checkMallocRelease();
     void setMallocInfo(int set, void* malloc_addr);
+public:
     void fixMramAddr(u32 a);
     int isUseOk();
     int waitUseOk();
@@ -122,17 +124,20 @@ public:
 
 // Room data unit controller (game/datactrl.cpp, `DC`, 0xAA4 bytes).
 class cDataCtrl {
-public:
+private:
     cDataUnit m_DataUnit[32];  // 0x000
     u32 m_aram_free;         // 0xA00  first free ARAM address above the loaded units
     s32 m_aram_sort_flag;        // 0xA04  1 = repack the ARAM units (checkAramSort)
     s32 m_data_ctrl_flag;  // 0xA08  0 while the sub screen owns the ARAM area (sscrn), 1 otherwise (PS2 m_data_ctrl_flag)
     s32 m_nblock_read_stop;  // 0xA0C  1 = commands are not executed immediately (PS2 m_nblock_read_stop)
+public:
     void* dispBuf;       // 0xA10  dispDebug tiles
+private:
     u32 m_heap_start;        // 0xA14
     u32 m_heap_end;         // 0xA18
     s32 m_UseDebugMemFlag;         // 0xA1C  1 = allocate from the debug heap
     s32 m_id_dummy[32];     // 0xA20  dummy.dat read requests (dev mode)
+public:
     void* m_DummyDataMem;      // 0xAA0
 
     void setNBlkStop(int flag) { m_nblock_read_stop = flag; }
@@ -149,7 +154,9 @@ public:
     cDataUnit* setData(char* name);
     cDataUnit* getNewUnit();
     void setAramSort(int flag);
+private:
     int checkAramSort();
+public:
     void dispDebug();
     void initDummyId();
     void setDummyId(int dummy_id);

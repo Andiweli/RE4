@@ -32,8 +32,10 @@ public:
     cPlNeck(cPlayer* pl);
     void init(void* motR, void* motL, int frame);   // range-checked pointers (motSet), frame passed on (PS2 parameter order: motR first)
     void move();
+private:
     void motSet(void* data, int frame);
     cEm* getTarget();
+public:
     void setMode(int mode);   // stores byte 0xE (pl_sub PlSetNeck)
     void clear() { m_MotR = 0; }
 };
@@ -61,19 +63,24 @@ public:
 // Three-way motion blend (game/pl_class.cpp), 0xE8 bytes; `mot3` in player.cpp: the model's own
 // motion (mot0) blended with mot1 (rate < 0) or mot2 (rate > 0) through MotionWork::blend.
 class cMot3 {
-public:
+private:
     cModel* m_pEm;       // 0x00
     f32 m_Rate;            // 0x04  last move() rate, clamped to -1..1
+public:
     void* mot0;          // 0x08
     void* mot1;          // 0x0C
     void* mot2;          // 0x10
+private:
     int m_Mode;             // 0x14  set() 7th argument: 1 = the blend work gets flags2 bit31  set() 7th argument: 1 = the blend work gets flags2 bit31 (PS2 MODE m_Mode)
+public:
     MotionWorkSub work;  // 0x18  the blended motion (em.h)
 
     cMot3();
     // set(model, motion0, motion1, motion2, MotionSetCore seq, u8 mode, int, u16, u16); the PS2 set(pEm, mot0, mot1, mot2, seq, hokan, mode, attr, frame) orders / types the tail differently
     void set(cModel* m, void* m0, void* m1, void* m2, void* seq, u8 b, int c, u16 d, u16 e);
+private:
     void set0(void* m, u8 a, int b);
+public:
     void move(f32 rate);
 };
 
@@ -338,6 +345,7 @@ public:
     virtual void moveMatCalcBefore();
     virtual void initCloth() { PlClothSetGirl(this, &girlHair, &girlSkirt, &girlSweater, 0); }
     virtual void moveCloth() { PlClothMoveGirl(this, &girlHair, &girlSkirt, &girlSweater); }
+private:
     void moveBust();
 };
 
@@ -352,10 +360,11 @@ struct PlMahoEntry {
 };
 
 class cPlMaho {
-public:
+private:
     PlMahoEntry work[30]; // 0x000
     u32 nWork;             // 0x168
 
+public:
     cPlMaho();
     void reset();
     void regist(const char* code, void (*func)());

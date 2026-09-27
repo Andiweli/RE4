@@ -41,13 +41,17 @@ public:
     virtual ~cSubWep() {}
     virtual void beginEvent(u32 mode);
     virtual void move();
+private:
     virtual void explode() = 0;
     virtual void waterExplode() = 0;
+public:
     void moveNormal();
     void moveWater();
     void scrAdjust();
     void dmgSet(int kind);
+private:
     void addSpeed();
+public:
     void bounce(Vec* nrm);
     int getEffectType();
     int init(Vec* rot, f32 power);
@@ -61,6 +65,7 @@ class cObjGrenade : public cSubWep {
 public:
     cObjGrenade();
     virtual ~cObjGrenade() {}
+private:
     virtual void explode();
     virtual void waterExplode();
 };
@@ -69,6 +74,7 @@ class cObjGreFire : public cSubWep {
 public:
     cObjGreFire();
     virtual ~cObjGreFire() {}
+private:
     virtual void explode();
     virtual void waterExplode();
 };
@@ -77,6 +83,7 @@ class cObjGreLight : public cSubWep {
 public:
     cObjGreLight();
     virtual ~cObjGreLight() {}
+private:
     virtual void explode();
     virtual void waterExplode();
 };
@@ -85,6 +92,7 @@ class cObjEgg : public cSubWep {
 public:
     cObjEgg();
     virtual ~cObjEgg() {}
+private:
     virtual void explode();
     virtual void waterExplode();
 };

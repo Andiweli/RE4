@@ -30,6 +30,7 @@ public:
     void setParent(cModel* parent, int parts, Vec* ofs, int flag);
     void setParent2(cModel* parent, int parts1, Vec* ofs1, int parts2, Vec* ofs2, int flag);
     void setChain(PenCloth* cloth);
+private:
     void chainMove();
 };
 

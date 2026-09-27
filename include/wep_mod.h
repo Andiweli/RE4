@@ -47,14 +47,16 @@ static inline void AtariFlagsAndV(cAtariInfo* at, u16 mask) { *(volatile u16*) &
 // Machine gun (wep11 = TMP, wep29; wep/objMachinegun.cpp shared object; wep12 Thompson, wep27
 // Klauser MG and wep39 carry their own copies of the class in the module object).
 class cObjMachinegun : public cObjWep {
-public:
+private:
     u8 ctr;               // 0x368  (PS2 ctr; unused by the GC machine gun)
 
     virtual void moveFire();
     virtual void moveReload();
+public:
     virtual void init(cModel* pMod);
     virtual void setMotion(cPlayer* pEm);
 
+private:
     void setCartridge();
 };
 // ObjMachinegun_init (wep/objMachinegun.cpp) is declared by wep11/wep29's entry: wep12/wep27/wep39 have
@@ -75,9 +77,10 @@ void ObjTompson_init(cObj* obj);   // wep12/objTompson.cpp
 // Semi-auto rifle (wep10 = own object wep10/objHkSniper.cpp; wep40 / wep47 carry a copy of the class
 // in the module object). Routines: wep/pl_rifle.cpp.
 class cObjHkSniper : public cObjWep {
-public:
+private:
     virtual void moveFire();
     virtual void moveReload();
+public:
     virtual void init(cModel* pMod);
     virtual void setMotion(cPlayer* pEm);
 };
@@ -94,8 +97,9 @@ public:
 // Krauser's bow (wep28; wep28/wep28.cpp): the arrow object (declared first: its vtable and destructor
 // follow the bow's) and the bow, whose routines (wep/pl_bow.cpp) show/hide the arrow model.
 class cObjAllow : public cObjWep {
-public:
+private:
     virtual void moveFire();
+public:
     virtual void init(cModel* pMod);
     virtual void setMotion(cPlayer* pEm);
 };
@@ -104,9 +108,11 @@ class cObjBow : public cObjWep {
 public:
     cObjWep* pAllow;      // 0x368  the arrow object shown on the bow (cObjAllow, ObjMgr id 0x10)
 
+private:
     virtual void moveReady();
     virtual void moveFire();
     virtual void moveDown();
+public:
     virtual void init(cModel* pMod);
     virtual void setMotion(cPlayer* pEm);
     virtual void interrupt();
@@ -119,32 +125,40 @@ public:
 class cObjRuger : public cObjWep {
 public:
     virtual ~cObjRuger() {}
+private:
     virtual void moveFire();
     virtual void moveReload();
+public:
     virtual void init(cModel* parent);
     virtual void setMotion(cPlayer* pl);
 
+private:
     void setCartridge();
 };
 
 class cObjShotgun : public cObjWep {
-public:
+private:
     virtual void moveFire();
     virtual void moveReload();
+public:
     virtual void init(cModel* parent);
     virtual void setMotion(cPlayer* pl);
 
+private:
     void setCartridge();
 };
 
 class cObjGovernment : public cObjWep {
 public:
     virtual ~cObjGovernment() {}
+private:
     virtual void moveFire();
     virtual void moveReload();
+public:
     virtual void init(cModel* parent);
     virtual void setMotion(cPlayer* pl);
 
+private:
     void setCartridge();
 };
 

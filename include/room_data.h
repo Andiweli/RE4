@@ -78,7 +78,9 @@ public:
     u8* getRoomSavePtr(u16 room_no);
     void execInitFunc(u16 room_no);
     void execMainFunc(u16 room_no);
+private:
     int checkRoomRange(u8 stage, u8 room);
+public:
     int checkRelRead(u16 room_no);
     void linkRelData(u16 room_no);
     void stopRelData();

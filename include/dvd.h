@@ -119,17 +119,20 @@ public:
     int EmptyCk() { return !CkFlag(1); }
     char* getName() { return m_Name; }
 
+private:
     void trans2mram(void* buf, u32 addr, u32 size);
     void trans2aram(void* buf, u32 addr, u32 size);
     void readInit();
     void readMain();
     void readCancelWait();
     void readExit();
+public:
     int Read();
     void Initialize();
     int LinkQueue();
     void PushQueue();
     void ErrMemFree();
+private:
     int fileOpen();
     int fileGetLength();
     int fileReadAsync(void* addr, u32 size, u32 offset);
@@ -160,7 +163,9 @@ public:
     cAramQueue AramQueue[16];   // 0x28
 
     int DmaTransReq(int type, u32 src, u32 dst, u32 len, int mode);
+private:
     cAramQueue* pullAramQueue(int* id);
+public:
     void DmaTrans(cAramQueue* req, int mode);
     int TransCheck(int id);
     int DmaCancel(int id);
@@ -176,33 +181,44 @@ public:
     cDvdQueue DvdQueue[16];  // 0x0C
     void* pSizeTbl;       // 0x310C
     s32 m_ErrCode;      // 0x3110
+private:
     u8 ReadID;             // 0x3114  next request number (never 0)
+public:
     u8 pad_3115[3];
     s32 discChanged;      // 0x3118
 
     void Init();
     void SizeTableRead();
     void ReadProc();
+private:
     void readProcMain(cDvdQueue* pQueue);
+public:
     void ReadNblk2Blk(int id);
     void FileTblExistCheck();
     int FileExistCheck(const char* name, u32* pLength);
     int ReadReq();
+private:
     void blockRead(cDvdQueue* pQueue);
+public:
     void Watcher();
     int ReadCancel(int id, int mode);
     void ReadCancelAll();
+private:
     cDvdQueue* pullReadQueue();
     // Polls request `req`. Returns 1 when done and then stores the result word, the size and
     // the destination address through the non-NULL pointers; < 0 on failure.
+public:
     int ReadCheck(int id, int* mram_size, int* aram_size, void** addr);
     // Same poll, filling the caller's DvdReadInfo (read.cpp).
     int ReadCheck(int id, DvdReadInfo* pInfo);
+private:
     int readCheckMain(int id, DvdReadInfo* pInfo);
     cDvdQueue* getQueuePtr(u8 id);
+public:
     int ErrCheck(int disc_new, int proc);
     int DiscChange(int disc_no);
     int GetDiscNo();
+private:
     void queueStatusDisp();
     void DiscReadInfo();
 };

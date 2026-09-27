@@ -92,19 +92,22 @@ public:
 
 // Shop session: a working copy of the merchant data plus the item lists shown in the shop.
 class Merchant {
-public:
+private:
     MerchantInfo* m_p_info;      // 0x000
     PriceEntry* m_p_sell;       // 0x004  selling price table
     PriceEntry* m_p_exer;       // 0x008  exercise (buy-up) price table
     LevelPrice* m_p_lvup;      // 0x00C  weapon tune price table
     STOCK_INFO m_stock;        // 0x010
+public:
     LEVEL_INFO level;        // 0x210
+private:
     s8 m_friendship;                // 0x310
     u8 m_study_num;
     s8 m_reduction_ratio;             // 0x312
     u8 m_bonus_flag;
     u8 m_exer_tbl_num;          // 0x314
     u8 m_sell_tbl_num;           // 0x315
+public:
     u8 exerciseList[0xFF];   // 0x316  cItemMgr slot indexes of the items the player can sell
     u8 sellingList[0xFF];    // 0x415  sellPrice indexes of the items for sale
 

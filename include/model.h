@@ -358,10 +358,12 @@ public:
 class cModInfoMgr : public cManager<cModelInfo> {
 public:
     cModInfoMgr();
+private:
     virtual void* memAlloc(u32 size) { return MemAlloc(size, 1); }
     virtual void memFree(void* p) { MemFree(p); }
     virtual void memClear(cModelInfo* p, u32 size) { memclr_asm(p, size); }
     virtual void log(const char* fmt, ...);
+public:
     virtual int construct(cModelInfo* pSat, u32 room_no);
 
     cModelInfo* create(void* bin, void* tpl);
@@ -439,10 +441,12 @@ public:
 class cPartsMgr : public cManager<cParts> {
 public:
     cPartsMgr();
+private:
     virtual void* memAlloc(u32 size) { return MemAlloc(size, 1); }
     virtual void memFree(void* p) { MemFree(p); }
     virtual void memClear(cParts* p, u32 size) { memclr_asm(p, size); }
     virtual void log(const char* fmt, ...);
+public:
     virtual int construct(cParts* pSat, u32 room_no);
 
     // `n` consecutive free works linked through pNext (the sequential parts list cModel::be_flag

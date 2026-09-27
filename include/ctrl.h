@@ -25,10 +25,10 @@ public:
 class cCtrlMgr : public cManager<cCtrl> {
 public:
     cCtrlMgr();
-    virtual void* memAlloc(u32 size) { return MEM_ALLOC(size, 1, 13); }
+    private: virtual void* memAlloc(u32 size) { return MEM_ALLOC(size, 1, 13); }
     virtual void memFree(void* p) { Mem_free(p); }
     virtual void memClear(cCtrl* p, u32 size) { memclr_asm(p, size); }
-    virtual int construct(cCtrl* pSat, u32 room_no);
+    public: virtual int construct(cCtrl* pSat, u32 room_no);
 
     void move();
     int trans();

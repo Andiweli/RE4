@@ -186,7 +186,7 @@ private:
 public:
     cCard();
     ~cCard();
-    void slotSelect();
+    private: void slotSelect();
     void inSlotCheck();
     void dataSelect();
     void loadMain();
@@ -203,14 +203,14 @@ public:
     int initSub();
     int workAlloc();
     u32 getUseMemSize();
-    int fileCreate(u8* sub, int blocks, CardSlot* s);
-    void makeCardStatus(CardSlot* s);
+    public: int fileCreate(u8* sub, int blocks, CardSlot* s);
+    private: void makeCardStatus(CardSlot* s);
     void firstCheck00();
     void firstCheck10();
     void firstCheck20();
     void firstCheck30();
-    void MainLoop(int arg);
-    int existCheck(int slot, CardSlot* s);
+    public: void MainLoop(int arg);
+    private: int existCheck(int slot, CardSlot* s);
     int mount(u8* Rno, CardSlot* s);
     int unmount(int slot);
     int verifyCheck(u8* Rno, CardSlot* s);
@@ -227,7 +227,7 @@ public:
     void cardMesSet(int mes_no, int wk_no, u32 attr);   // no: CARD_MES_NO
     void calcTplAddr(struct TEXPalette* tpl);
     void setMsgWindow(int a, int sw);
-    bool ckStatus(u32 bit)
+    public: bool ckStatus(u32 bit)
     {
         bool on = true;
 
@@ -241,8 +241,8 @@ public:
     CardSlot* getSlotInfo(int no) { return &m_Slot[no]; }
     u8* getSaveInfo(int no) { return m_pSaveInfo[no]; }
     u8 getRno0() { return m_Rno0; }
-    void setStatus(u32 bit) { m_Status |= bit; }
-    void resetStatus(u32 bit) { m_Status &= ~bit; }
+    private: void setStatus(u32 bit) { m_Status |= bit; }
+    public: void resetStatus(u32 bit) { m_Status &= ~bit; }
 
 #line 386 "D:/Bio4/Prog/card.h"
     void* operator new(unsigned int size) { return MEM_CALLOC(size, 1, 13); }

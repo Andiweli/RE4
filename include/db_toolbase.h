@@ -68,7 +68,7 @@ public:
 };
 
 class cDbgWindowBase {
-public:
+protected:
     u32 m_px;              // 0x00  window column (8 px units; unsigned: the frame conversions use the 2^52 trick without xoris)
     u32 m_py;              // 0x04  window row (14 px units)
     u32 m_wx;              // 0x08  width in columns

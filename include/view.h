@@ -23,6 +23,7 @@ struct ViewSphere {
 class VIEW {
 public:
     u8 pad_0[4];
+private:
     CAMERA* _p_camera;             // 0x04
     f32 _aspect;               // 0x08
     f32 _fovy;                 // 0x0C
@@ -30,6 +31,7 @@ public:
     f32 _znear;                // 0x14
     f32 _old_fovy;              // 0x18
     f32 _old_zfar;              // 0x1C
+public:
     u8 pad_20[0x54 - 0x20];
     ViewFrustum local;        // 0x054  half-width frustum, camera space
     ViewFrustum world;        // 0x114  half-width frustum, world space

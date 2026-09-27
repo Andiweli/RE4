@@ -66,6 +66,7 @@ public:
     cObjWep();
     virtual ~cObjWep() {}
     virtual void move();
+private:
     virtual void moveAll() {}
     virtual void moveStay() {}
     virtual void moveReady() {}
@@ -73,6 +74,7 @@ public:
     virtual void moveDown() {}
     virtual void moveReload() {}
     virtual void moveDrop() {}
+public:
     virtual void init(cModel* parent) { setAbility(5.73f, 2.86f, 0.2864f, 0.2864f); }
     virtual void setMotion(cPlayer* pl) {}    // pl_sub PlReloadBullet: the launcher fills the player's motion table
     virtual void interrupt();
@@ -110,6 +112,7 @@ public:
     int reloadable();
     void drawLaserSight(int draw, int noCalc);
     void getMarkerPos(Vec* lpos, Vec* lcross);
+private:
     void satCheck();
 };
 
@@ -157,16 +160,20 @@ public:
             pRocket->setNoSuspend(on);
         }
     }
+private:
     virtual void moveFire();
     virtual void moveDrop();
+public:
     virtual void init(cModel* pMod);
     virtual void setMotion(cPlayer* pEm);
     virtual void interrupt();
     virtual int keyKamae();
 
+private:
     void loadRocket();
     int ckBoss();
     void launch();
+public:
     void drop(int se);
     void grip(int onoff);
     void gripBack();

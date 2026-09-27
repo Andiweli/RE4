@@ -22,7 +22,7 @@ struct ExamInfo {
 };
 
 class ItemExamine {
-public:
+private:
     IDSystem* m_pIdSys;    // 0x00  IdSys (mode 0) / IdSub (mode 1, 2)
     u32 m_be_flag_bak;        // 0x04  model->be_flag at init
     Vec m_pos_bak;         // 0x08
@@ -30,10 +30,13 @@ public:
     u8 m_ot_type_bak;         // 0x20
     u8 m_scrn_flag;             // 0x21  0 in game, 1 sub screen, 2 puzzle
     s8 m_level[4];            // 0x22  weapon tune levels (power, speed, reload, bullet)
+public:
     u8 pad_26[2];
+private:
     cCoord* m_pList_pParent_bak;  // 0x28  model->pList->pParent at init
     Vec m_pList_pos_bak;    // 0x2C
     Vec m_pList_ang_bak;    // 0x38
+public:
     u16 m_item_id;              // 0x44  item id
     u8 pad_46[2];
     cModel* m_pModel;       // 0x48

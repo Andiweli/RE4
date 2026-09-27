@@ -5,9 +5,10 @@
 
 // game/cString.cpp: minimal heap string. `str` points at the shared "" literal when empty.
 class cString {
-public:
+private:
     char* m_str;  // 0x00
 
+public:
     cString();
     cString(const char* s);
     // declared only: a user copy constructor makes the class BLKmode, so a `cString("...")` temporary
@@ -19,6 +20,7 @@ public:
     cString& operator+=(const char* s);
     char* c_str();
     u32 size();
+private:
     void clear();
     void copy(const char* str);
 };

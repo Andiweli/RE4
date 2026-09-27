@@ -171,20 +171,25 @@ public:
 // Enemy manager (game/em.cpp). The construct id selects the class: 0 player, 1..0xE / others a
 // read-table enemy (EmInitFunc), 0x40.. the object enemies (cEmObj, cEmDoor, ...), 0xFF a plain cEm.
 class cEmMgr : public cManager<cEm> {
-public:
+private:
     u32 Guid;              // 0x34  next cModel::serial (construct)
 
+public:
     static const char* idName[96];   // debug names per construct id
 
     cEmMgr();
     // no user destructor: the synthesized one (and cManager<cEm>'s) land after the other inlines
+private:
     virtual void* memAlloc(u32 size) { return MemAlloc(size, 1); }
     virtual void memFree(void* p) { MemFree(p); }
     virtual void memClear(cEm* p, u32 size) { memclr_asm(p, size); }
     virtual void log(const char* fmt, ...);
+public:
     virtual void destroy(cEm* pEm);   // em.cpp overrides the cManager one (pl_sub SubCharCtrl / PlDataRelease)
+private:
     virtual int construct(cEm* pSat, u32 room_no);
 
+public:
     int arrayAlloc(u32 workNum);        // cManager<cEm>::arrayAlloc + pPL = pSUB = 0; returns 1
     void move();                  // dieCheck, RouteCk, emMove for every alive work (or only pSUB when stopped)
     // first alive enemy with model id `id`, searching from `start->next` (or the list head)

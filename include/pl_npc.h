@@ -39,9 +39,11 @@ public:
     };
 
     cSubChar* pEm;            // 0x3E0  the model the routines animate (itself)
+private:
     int m_NeckTimer;          // 0x3E4  neckSet() called this frame
     Vec m_NeckVec;            // 0x3E8  neck angles (y: current neck angle, parts 3)
     Vec m_NeckTgt;            // 0x3F4  position looked at
+public:
     cFlag<u16, FLAG> flg;     // 0x400
     cFlag<u16, STATUS> status;   // 0x402
     u8 m_BackRno;             // 0x404
@@ -146,7 +148,9 @@ public:
     void moveDijection();
     void movePos(Vec* toPos, f32 spd);
     void neckInit();
+private:
     void neckCtrl();
+public:
     void neckSet(Vec* pos);
     int actCheck();
     int cautionCheck();

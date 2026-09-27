@@ -145,10 +145,10 @@ inline void cDbgWindow::ButtonPushCheck()
 class cDbgFileSelectWindow : public cDbgWindow {
 public:
     int m_no;            // 0x238
-    const char* m_pPath;    // 0x23C  directory
+    private: const char* m_pPath;    // 0x23C  directory
     const char* m_pFname;    // 0x240  file stem
     const char* m_pExt;      // 0x244
-    char m_FnameBuf[0x100];  // 0x248  path1 + path2 + "%02d" + ext
+    public: char m_FnameBuf[0x100];  // 0x248  path1 + path2 + "%02d" + ext
 
     void Init(int wx, int wy, const char* name, const char* path1, const char* path2, const char* ext);
     virtual int LocalUpdate();

@@ -144,16 +144,22 @@ public:
         ID_NUM = 68
     };
 
+private:
     u32 Guid;
 
+public:
     cObjMgr();
+private:
     virtual void* memAlloc(u32 size) { return MemAlloc(size, 1); }
     virtual void memFree(void* p) { MemFree(p); }
     virtual void memClear(cObj* p, u32 size) { memclr_asm(p, size); }
     virtual void log(const char* fmt, ...);
+public:
     virtual void destroy(cObj* pEm);
+private:
     virtual int construct(cObj* pSat, u32 room_no);   // calls the int overload (obj.cpp)
     int construct(cObj* pSat, ID id);                 // placement-new of the per-id class, or ObjInitFunc[id]
+public:
     void move();                              // dieCheck, then objMove on every live object
 };
 

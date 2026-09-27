@@ -51,14 +51,17 @@ struct TexWk {
 
 // game/texture.cpp
 class cTexSys {
-public:
+private:
     TexWk m_texw_array[256];       // 0x0000
+public:
     GXTexObj* pTexObj;   // 0x5400  nTexObj objects
     u8* pFlag;           // 0x5404  in-use bits
     u32 x5408;           // 0x5408
     u32 nTexObj;         // 0x540C
+private:
     const char* m_name;    // 0x5410
 
+public:
     void Init(const char* name, u32 max);
     void Clear();
     int GetTexObjFlag(u32 no);

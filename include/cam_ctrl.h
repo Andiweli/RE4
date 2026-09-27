@@ -122,10 +122,11 @@ public:
 };
 
 class CameraSmooth : public CAMERA {
-public:
+private:
     u32 m_flag;         // 0xF8  bit 0 = reinit on next move
     f32 m_ratio;         // 0xFC
     CameraParam m_effect; // 0x100
+public:
     u8 pad_120[0x12C - 0x120];
 
     void init(CameraParam* p);

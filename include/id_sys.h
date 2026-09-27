@@ -190,12 +190,13 @@ enum ID_CLASS {
 };
 
 class IDSystem {
-public:
+private:
     s32 m_maxId;          // 0x00
     s32 m_nId;       // 0x04
     s32 m_levelMax;     // 0x08
     u32 m_set_flag[8];        // 0x0C  table types set
     u32 m_disp_off[8];      // 0x2C  table types hidden
+public:
     IdUnit* m_IdUnit;    // 0x4C
 
     static Mtx m_scrn_mat;

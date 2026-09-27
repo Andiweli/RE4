@@ -8,20 +8,25 @@
 
 // Debug camera tool (game/db_cam.cpp), instance `CamDbg` (0x20 bytes). Driven from CameraMove.
 class debugCamera {
-public:
+private:
     s8 m_menu_sw;           // 0x00  1 = menu open
     s8 m_sel0;            // 0x01  menu page (sel0_menu_tbl)
     s8 m_sel1;         // 0x02  cursor inside the page
     s8 m_sel2;             // 0x03  left/right counter (menuFlag)
     u8 m_timer;          // 0x04  frames until the Z trigger is checked again
     u8 m_draw_timer;     // 0x05  frames left to draw the target cross
+public:
     u8 pad_6[2];
+private:
     int m_printNo_bak;     // 0x08  pG->debug_mode saved while the tool is open
     s8 m_cam_no;         // 0x0C  camera cut to play (menuCamera)
     s8 m_cam_play;           // 0x0D  cut playback state
     s8 m_key_type;       // 0x0E  camera_type_tbl index
+public:
     s8 m_target_type;    // 0x0F  0 EM, 1 OBJ, 2 PL, 3 ORG, 4 OFF
+private:
     s8 m_target_save;    // 0x10  m_target_type saved while a tool forces its own (t_sce_at) (PS2 m_target_save)
+public:
     u8 pad_11[3];
     u32 pad_bits : 26; // 0x14
     u32 info_disp : 1; // 0x14  bit 0x20: print the camera in player space
@@ -33,13 +38,16 @@ public:
     f32 m_move_gain;          // 0x1C  stick gain (CameraRoomInit resets it)
 
     void move(CAMERA* pCam, JOY* pJoy, int attr);
+private:
     void camera_type_00(CAMERA* pCam, JOY* pJoy);
     void camera_type_01(CAMERA* pCam, JOY* pJoy);
+public:
     void menu(CAMERA* pCam, JOY* pJoy);
     void setTargetType(int type) { m_target_type = type; }
     void saveTargetType() { m_target_save = m_target_type; }
     void loadTargetType() { m_target_type = m_target_save; }
     void setKeyType(int type) { m_key_type = type; }
+private:
     int menuCamera(JOY* pJoy);
     int menuFlag(JOY* pJoy);
     int menuHitDisp(JOY* pJoy);

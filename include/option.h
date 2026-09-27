@@ -30,8 +30,9 @@ extern OptionScreen OptScrn;
 
 // Game result screen (id table type 0x28).
 class GameResult {
-public:
+private:
     void* _addr;       // 0x00  result id archive
+public:
     u8 _rno0;
     u8 _rno1;
     u8 _rno2;
@@ -46,9 +47,10 @@ public:
 
 // Chapter end screen (new'd by sce_com SceChapterEnd, 0xC bytes).
 class ChapterEnd {
-public:
+private:
     void* _addr;       // 0x00  chapter id archive
     s32 _chapter;      // 0x04
+public:
     u8 pad_8[4];
 
     void init(void* data, u8 chapter);

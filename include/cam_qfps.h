@@ -51,10 +51,13 @@ public:
     CAMERA cam;                   // 0x000 (cam.param at 0xA4 is what CameraControl::Move copies)
     QfpsOfs (*ready_tbl[14])[3];  // 0x0F8  ready table per camera type (checkCameraType 0..0xC), [13] = area copy
     QfpsOfs (*trans_tbl[TRANS_CAM_NUM])[3];   // 0x130  transition table per TRANS_CAM type
+private:
     QfpsOfs (*m_p_ready_array)[3]; // 0x148  current ready table
     QfpsOfs (*m_p_trans_array)[3]; // 0x14C  current transition table
+public:
     QfpsOfs* cur;                 // 0x150  offsets of the current site
     QfpsOfs* old;                 // 0x154  offsets blended from (g_readyOfs[15] / g_transOfs[6] copies)
+private:
     void* m_LR_info;                // 0x158
     Vec m_pl_ofs;                  // 0x15C  one-shot translation applied to the base matrix
     Vec m_pl_dir;                  // 0x168  one-shot look direction applied to the base matrix
@@ -65,10 +68,13 @@ public:
     u8 m_trans_type;                // 0x1B0  TRANS_CAM
     u8 m_ready_type;                // 0x1B1
     u8 m_init_flag;                     // 0x1B2  1 = first frame after init
+public:
     u8 pad_1B3[0x1E4 - 0x1B3];
+private:
     f32 m_blend_ratio;              // 0x1E4
     s32 m_blend_frame;              // 0x1E8
     s32 m_blend_count;              // 0x1EC
+public:
     Vec m_Aim;             // 0x1F0
     u8 m_site;                      // 0x1FC  0 right/up-mid-down, 1 left, 2 right far, 3 left far (db_cam)
     u8 pad_1FD[3];
@@ -80,16 +86,22 @@ public:
     u32 m_state;                    // 0x210  bit0 use pl_mat, bit2 blending, bit3 blend frozen
 
     void LRinfo(void* pInfo);
+private:
     int LRcheck();
     void calcDepressionRatio();
+public:
     void setPlayerLocation(Mtx mat, Vec* p_norm);
+private:
     void calcBaseMatrix(Mtx mat);
     int checkFBLR();
+public:
     void setBlendRatio(f32 ratio);
     void setBlendCount(int counter);
     f32 getFloorRatio();
     void setFloorRatio(f32 ratio);
+private:
     void checkCameraType();
+public:
     void calcOffset(QfpsOfs* p_offset);
     void hitCheck(Mtx m, QfpsOfs* ofs, CameraParam* out);
     QfpsOfs (*readyArrayPtr())[3] { return m_p_ready_array; }

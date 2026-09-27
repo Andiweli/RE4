@@ -36,9 +36,10 @@ static inline void ssWidgetDelete(Widget<SUB_SCREEN>* w)
 
 // ss_main.cpp
 class SsExitInit : public Widget<SUB_SCREEN> {
-public:
+private:
     int _rno;  // 0x10
 
+public:
     virtual void init(SUB_SCREEN* pWk);
     virtual void move(SUB_SCREEN* pWk);
 };
@@ -51,11 +52,14 @@ public:
 
 // Item examine screen (ss_main.cpp; ss_cap/ss_file/ss_item chain into it).
 class SsItemExamine : public Widget<SUB_SCREEN> {
-public:
+private:
     u8 _rno;          // 0x10
+public:
     u8 pad_11[3];
+private:
     ItemExamine _itemExam;  // 0x14
 
+public:
     virtual void init(SUB_SCREEN* pWk);
     virtual void move(SUB_SCREEN* pWk);
 };
@@ -301,10 +305,11 @@ public:
 // ss_term.cpp (the radio / codec call screen: Hunnigan and the partner models talk through the
 // op/opNN.das message sequences)
 class SsTermInit : public Widget<SUB_SCREEN> {
-public:
+private:
     int _counter;
     int _rno;  // 0x14  starts at 2
 
+public:
     virtual void init(SUB_SCREEN* pWk);
     virtual void move(SUB_SCREEN* pWk);
 };

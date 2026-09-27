@@ -149,7 +149,7 @@ private:
 public:
     cFlag<u8, STAT> status;  // 0x20
 
-private:
+public:
     void moveAttack(cAnalysis* an, cRoutine* rt);
     void moveGo2F(cAnalysis* an, cRoutine* rt);
     void moveAttackPl(cAnalysis* an, cRoutine* rt);
@@ -160,8 +160,6 @@ private:
     void move11cBegin(cAnalysis* an, cRoutine* rt);
     void moveEscRack(cAnalysis* an, cRoutine* rt);
     void moveChasePl(cAnalysis* an, cRoutine* rt);
-
-public:
     void init(cSubLuis* o);
     void move(cAnalysis* an, cRoutine* rt);
     void set(int mode);
@@ -211,26 +209,33 @@ public:
 
     cSubLuis();
     virtual ~cSubLuis();
+private:
     virtual void move();
+public:
     virtual void endDamage();
     void init();
     void modelSet();
+private:
     void think();
     int rackCheck();
     void seqSeCtrl();
     int damageCheck();
+public:
     void equipWeapon();
+private:
     void moveEye();
+public:
     void neckSet(f32 ang, f32 limit);
     void neckMove();
 };
 
 class cObjLuisItem : public cObj {
-public:
+private:
     int timer;            // 0x328
     Vec v;                // 0x32C  velocity
     Vec a;                // 0x338  acceleration
 
+public:
     virtual void move();
     void init(Vec* pos, f32 rotY);
 };

@@ -38,7 +38,9 @@ public:
 class BulletInfo {
 public:
     u8 pad_0[0x10];
+private:
     s32 m_mark_old;        // 0x10  bullet icon currently shown (type 0x32 id), -1 none
+public:
     u8 pad_14[0x2C - 0x14];
 
     void roomInit();
@@ -56,15 +58,18 @@ enum TIMER_STATE {
 };
 
 class CountDown {
-public:
+private:
     u32 m_state;         // 0x00  TIMER_STATE bits: ALIVE running, PAUSE by the game flags, ERASE hidden
     s8 m_minute;            // 0x04
     s8 m_second;            // 0x05
     s8 m_centisecond;             // 0x06  1/100 s
+public:
     u8 pad_7;
+private:
     u32 m_frame;         // 0x08  remaining time in frames
     u32 m_warn_frame;     // 0x0C  frame count below which the digits take unit 8's colour
     u32 m_counter;       // 0x10  1/100 digit jitter phase (0..5)
+public:
     u32 savedFlags;    // 0x14  saveDisp / loadDisp
 
     void roomInit();
