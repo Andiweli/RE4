@@ -387,11 +387,11 @@ ToolEvt::~ToolEvt()
     TaskExit();
 }
 
-static void (*runTbl[3])(ToolEvt*) = {ToolEvt::MainMenu, ToolEvt::MainPreview, ToolEvt::MainExit};
-
 // One frame: runTbl[r_no_0] (MainMenu / MainPreview / MainExit).
 void ToolEvt::Run()
 {
+    static void (*runTbl[3])(ToolEvt*) = {MainMenu, MainPreview, MainExit};
+
     while (!(EtcFlag & TefBit(TefExit))) {
         runTbl[r_no_0](this);
         TaskSleep(1);
@@ -473,12 +473,11 @@ static TOOL_MENU previewMenu[3] = {
     {1, "CONVERT AND LOAD", 0},
 };
 
-static void (*subRunTbl[3])(ToolEvt*, Event*) = {ToolEvt::SubMenuMain, ToolEvt::SubMenuFog, ToolEvt::SubMenuFocus};
-
 // r_no_0 1, the preview: picks an .evd from the host list, loads it ("DATA LOAD OK?"), then starts
 // and runs the event with the sub tools on the pads. CAPTURE writes screenshots to D:/bio4/Room/Sc_shot.
 void ToolEvt::MainPreview(ToolEvt* t)
 {
+    static void (*subRunTbl[3])(ToolEvt*, Event*) = {SubMenuMain, SubMenuFog, SubMenuFocus};
     char path[0x140];
 
     switch (t->r_no_1) {

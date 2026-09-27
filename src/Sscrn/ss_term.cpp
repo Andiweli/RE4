@@ -113,13 +113,13 @@ public:
     }
     virtual int GetCx() {
         if (m_pCurrentBut) {
-            return m_pCurrentBut->m_cx;
+            return m_pCurrentBut->GetCx();
         }
         return 0;
     }
     virtual int GetCy() {
         if (m_pCurrentBut) {
-            return m_pCurrentBut->m_cy;
+            return m_pCurrentBut->GetCy();
         }
         return 0;
     }
@@ -164,7 +164,7 @@ int cDbgWindow::FindButton(int cx, int cy, cDbgButton** out)
     *out = 0;
     for (i = 0; i < m_nBut; i++) {
         cDbgButton* b = m_pButList[i];
-        if (b->m_cx == cx && b->m_cy == cy) {
+        if (b->GetCx() == cx && b->GetCy() == cy) {
             *out = b;
             return 1;
         }

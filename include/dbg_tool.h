@@ -143,16 +143,20 @@ inline void cDbgWindow::ButtonPushCheck()
 
 // File selector: a 0..99 file number with the name preview, "[OK]" on the second cursor row.
 class cDbgFileSelectWindow : public cDbgWindow {
-public:
+private:
     int m_no;            // 0x238
-    private: const char* m_pPath;    // 0x23C  directory
+    const char* m_pPath;    // 0x23C  directory
     const char* m_pFname;    // 0x240  file stem
     const char* m_pExt;      // 0x244
-    public: char m_FnameBuf[0x100];  // 0x248  path1 + path2 + "%02d" + ext
+    char m_FnameBuf[0x100];  // 0x248  path1 + path2 + "%02d" + ext
 
+public:
     void Init(int wx, int wy, const char* name, const char* path1, const char* path2, const char* ext);
     virtual int LocalUpdate();
     virtual ~cDbgFileSelectWindow();
+    int GetFileNo() { return m_no; }
+    void SetFileNo(int no) { m_no = no; }
+    const char* GetFilename() { return m_FnameBuf; }
 };
 
 // Init wrapper defined before Init's body: the call stays out of line in the saved RTL of this inline
@@ -1194,7 +1198,7 @@ public:
             } else {
                 r = pLoad->Update();
                 if (r == 0) {
-                    pSave->m_no = pLoad->m_no;
+                    pSave->SetFileNo(pLoad->GetFileNo());
                     if (pLoad->GetCy() == 1) {
                         pLoadOk->SetCurrentBottomButton();
                         mode = 6;
@@ -1207,7 +1211,7 @@ public:
         case 6:
             if (pLoadOk->Update() == 0) {
                 if (pLoadOk->GetCx() == 0) {
-                    LoadData(pLoad->m_FnameBuf, pEdit->pWork, pEdit->numWork);
+                    LoadData(pLoad->GetFilename(), pEdit->pWork, pEdit->numWork);
                 }
                 mode = 0;
             }
@@ -1220,7 +1224,7 @@ public:
             } else {
                 r = pSave->Update();
                 if (r == 0) {
-                    pLoad->m_no = pSave->m_no;
+                    pLoad->SetFileNo(pSave->GetFileNo());
                     if (pSave->GetCy() == 1) {
                         pSaveOk->SetCurrentBottomButton();
                         mode = 7;
@@ -1233,7 +1237,7 @@ public:
         case 7:
             if (pSaveOk->Update() == 0) {
                 if (pSaveOk->GetCx() == 0) {
-                    SaveData(pSave->m_FnameBuf, pEdit->pWork, pEdit->numWork);
+                    SaveData(pSave->GetFilename(), pEdit->pWork, pEdit->numWork);
                 }
                 mode = 0;
             }
