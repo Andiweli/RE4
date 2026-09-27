@@ -201,8 +201,8 @@ declaration, an empty `asm("")` with operand constraints, a dead test, a stateme
 side effect on the allocator. None of them emits an instruction. `python3 tools/asmcheck.py --all`
 compiles every GCC unit with its asm templates marked and lists the instructions that came from a
 template; the only hits are the paired-single, GQR, cache and exception-handler kernels the vendor also
-wrote in assembly (231 instructions at 18 sites, unchanged since 2026-09-17). There are 542 tags and 103
-`register ... asm("rN")` pins (2026-09-22). Each tag number is a mechanism explained in
+wrote in assembly (231 instructions at 18 sites, unchanged since 2026-09-17). There are 526 tags and 101
+`register ... asm("rN")` pins (2026-09-27). Each tag number is a mechanism explained in
 `docs/matching.md` ("Known compiler-build differences", "Lever catalogue") and the pass-by-pass record
 in `docs/research/`; `docs/research/compiler.md`, section "Asm-removal pass", records how the earlier hand-placed instructions were
 replaced by C and which compiler pass each replacement relies on.

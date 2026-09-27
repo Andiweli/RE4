@@ -11,6 +11,9 @@ exact production command (taken from `ninja -t commands`) into `/tmp`, runs `too
 prints an objdiff side-by-side per differing function; `rtl.sh` does the same compile and keeps the GCC RTL dumps
 (`-dj -ds -dS -dR -dg -dl -dG -dL -fsched-verbose-9`). GCC and MWCC units, DOL and REL. Needs only what the
 normal build already fetched (`objdiff-cli`, `build/tools/dtk`, wibo and the compilers under `build/compilers/`).
+`sweep_cdiff.py` tries deleting every codeless asm and every register pin in the game sources through
+variant.py and keeps the ones the unit does not need (with their `COMPILER-DIFF` comment); rerun it after a
+compiler or header change (2026-09-27: 1 of 263 went, the rest are needed).
 
 **`sngdbg/`** — the debug build of the SN GCC `cc1plus`/`cc1`: `patches/dbg-hooks.patch` adds env-var-gated
 `fprintf(stderr)` hooks (`GDBG=1` global.c allocation order and priorities, `LADBG=1` local-alloc qty order,

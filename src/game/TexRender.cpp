@@ -121,10 +121,6 @@ void CopyTexRenderMgr(TexRenderMng* m)
         } else {
             ofs = (m->GetWSize() >> 2) + (m->GetWSize() >> 4);
         }
-        // The original reloads m->sx and m->sy here in both paths: a memory kill at the top of the
-        // join block makes neither load anticipatable, so gcse does not PRE the if-arm's m->sy
-        // load into the else arm (an empty asm keeps the two conversion paths' jumps on the join).
-        asm volatile("" : : : "memory");
         w = m->GetWSize() * 2;
         h = m->GetHSize() * 2;
         if (w > 0x280) {

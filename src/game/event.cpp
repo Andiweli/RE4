@@ -2024,7 +2024,6 @@ int Event::GetMod(void** mod, char* nm, u8* type, int* wkNo)
         {
             register int pin asm("r27"); // COMPILER-DIFF: #17
             asm volatile("" : "=r"(pin));
-            asm volatile("" : : "r"(pin));
         }
         pLog->err(0, 0, "Event::GetMod : mod failed[%s]", nm);
         return 0;
@@ -2035,7 +2034,6 @@ int Event::GetMod(void** mod, char* nm, u8* type, int* wkNo)
         // therefore took r27 while mod fell to r28. No code is emitted.
         register int pin asm("r27");
         asm volatile("" : "=r"(pin));
-        asm volatile("" : : "r"(pin));
     }
     if (type != 0) {
         *type = t;

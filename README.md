@@ -60,7 +60,7 @@ original, and `python3 tools/fdiff.py game/foo <symbol>` shows one function side
 Every unit compiles to the original bytes with the original compilers. In some places the compiler
 only picks the same registers or instruction order as the original if the code is written in a
 particular way, and no natural way of writing it was found. Those spots are marked with a
-`// COMPILER-DIFF:` comment, 527 of them at the moment. Most are a dead test, an empty `asm("")` or a
+`// COMPILER-DIFF:` comment, 526 of them at the moment. Most are a dead test, an empty `asm("")` or a
 `register T x asm("rN")` declaration. None of them puts an instruction into the output, and
 `python3 tools/asmcheck.py --all` checks that. `docs/matching.md` explains the reason behind each
 kind. Getting this number down is ongoing work.
