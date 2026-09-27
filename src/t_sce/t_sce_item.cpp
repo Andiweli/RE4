@@ -246,7 +246,7 @@ void ToolSceItem()
 // Flag setup: pause the game, debug displays on, tool light 1.
 void tSceItemInit_base()
 {
-    *((u8*) &pG->debug_mode) = 0x11;
+    pG->debug_mode = 0x11;
     DbgFlagOn(pG, DBG_BACK_CLIP);
     pG->Stop_flg |= 0x20000000;
     pG->Stop_flg |= 0x10000000;

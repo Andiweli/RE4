@@ -51,8 +51,6 @@ struct EvtDebugView {
 // cFlag-style bit numbering (from the MSB of flags) over the tool's flag word
 static inline u32 FlagBit(u32 f, u32 bit) { return f & bit; }
 
-#define CAM_MOTION_FLAGS(p) (*(u16*) ((u8*) (p) + 0x40))
-
 #define EVT_MES_Y (336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1)
 
 // One "Node" record of the message xml: the eleven text elements in file order.
@@ -1013,10 +1011,10 @@ int ToolEvt::SubToolCameraMove(ToolEvt* /*t*/)
                 eprintf2(0xE, 0x12, 0xAA, 0x18, 6, 0, "CAMERA MODE");
             }
             if (pJoy1->trg & 0x200) {
-                CAM_MOTION_FLAGS(CamCtrl.getMotionInfoPtr()) |= 8;
+                CamCtrl.getMotionInfoPtr()->Mot_attr |= 8;
                 SpfFlagOff(pG, SPF_CAMERA);
             } else {
-                CAM_MOTION_FLAGS(CamCtrl.getMotionInfoPtr()) &= ~8;
+                CamCtrl.getMotionInfoPtr()->Mot_attr &= ~8;
                 SpfFlagOn(pG, SPF_CAMERA);
             }
             CameraMove();

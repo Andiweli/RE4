@@ -301,7 +301,7 @@ void ToolSceAt()
 // areas (Disp_flg bits), Debug_flg bit 28 (tool running), tool light 1 on, flags_5010 bit 24.
 void tSceAtInit_base()
 {
-    *((u8*) &pG->debug_mode) = 0x11;
+    pG->debug_mode = 0x11;
     DbgFlagOn(pG, DBG_BACK_CLIP);
     pG->Stop_flg |= 0x20000000;
     pG->Stop_flg |= 0x10000000;
@@ -1105,7 +1105,7 @@ void tSceAtDataInput_door_PosSet()
         pG->Room_next = pCur->dstRoom;
         pG->Part_next = pCur->dstPart;
     }
-    *((u8*) &pG->debug_mode) = 7;
+    pG->debug_mode = 7;
     DbgFlagOn(pG, DBG_ROOMJMP);
     pG->Rno0 = 4;
     pG->Rno1 = 0;

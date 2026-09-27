@@ -242,7 +242,7 @@ public:
     int IsMotionSet();
     int IsMotionEnd();
     void setMotionBaseMatPtr(Mtx* p_mat);
-    void* getMotionInfoPtr();
+    struct MotionWorkSub* getMotionInfoPtr();
     void clearAttachCamera();
     void registAttachCamera(AttachCamera* p_attach, cModel* p_model);
     void deleteAttachCamera(AttachCamera* p_attach, cModel* p_model);
