@@ -137,9 +137,11 @@ public:
         FLAG_REQ_DROP = 0,  // fired: interrupt() drops the launcher
     };
 
+private:
     cFlag<u32, FLAG> flg; // 0x368
     Vec lpos;             // 0x36C  launch line (getMarkerPos) (PS2 lpos)
     Vec hpos;             // 0x378  (PS2 hpos)
+public:
     cObjRocket* pRocket;  // 0x384  loaded rocket (loadRocket)
 
     cObjLauncher();
@@ -168,6 +170,11 @@ public:
     void drop(int se);
     void grip(int onoff);
     void gripBack();
+    void setDirection(const Vec& from, const Vec& to)
+    {
+        lpos = from;
+        hpos = to;
+    }
 };
 
 // Player weapon control (game/pl_wep.cpp), 0x44 bytes at cEm::pWep.

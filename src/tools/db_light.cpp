@@ -2956,11 +2956,12 @@ f32 func_attn(cLight* l, f32 d)
 
 // Attenuation curve of a custom light: a gx x gy .. gw x gh graph, the player distance and 1000-unit marks.
 // (the static names decide the gcse hash order of their `high` pseudos and thus the r20/r21
-// assignment of the loop's gx/gy address registers: x0/y0 reproduce it, gx/gy do not)
+// assignment of the loop's gx/gy address registers; the numeric suffix of each name follows the
+// count of function bodies parsed so far, so these names hold for the current header contents)
 void draw_light_graph(cLight* l)
 {
-    static f32 x0 = 180.0f;
-    static f32 y0 = 250.0f;
+    static f32 gx = 180.0f;
+    static f32 gy = 250.0f;
     static f32 w0 = 300.0f;
     static f32 h0 = 200.0f;
     static f32 s0 = 100.0f;
@@ -2978,18 +2979,18 @@ void draw_light_graph(cLight* l)
     } else {
         scale = 10000000.0f / w0;
     }
-    a.x = x0;
-    a.y = y0;
+    a.x = gx;
+    a.y = gy;
     a.z = 0.0f;
-    b.x = x0 + w0;
-    b.y = y0;
+    b.x = gx + w0;
+    b.y = gy;
     b.z = 0.0f;
     Draw_line(&a, &b, 0xFFFFFFFF);
-    a.x = x0;
-    a.y = y0;
+    a.x = gx;
+    a.y = gy;
     a.z = 0.0f;
-    b.x = x0;
-    b.y = y0 - h0;
+    b.x = gx;
+    b.y = gy - h0;
     b.z = 0.0f;
     Draw_line(&a, &b, 0xFFFFFFFF);
     for (i = 1; i < (int) w0; i++) {
@@ -2997,15 +2998,15 @@ void draw_light_graph(cLight* l)
         if (v > h0) {
             v = h0;
         }
-        a.x = x0 + (f32) i;
-        a.y = y0 - v;
+        a.x = gx + (f32) i;
+        a.y = gy - v;
         a.z = 0.0f;
         v = func_attn(l, (f32) (i + 1) * scale) * s0;
         if (v > h0) {
             v = h0;
         }
-        b.x = x0 + (f32) (i + 1);
-        b.y = y0 - v;
+        b.x = gx + (f32) (i + 1);
+        b.y = gy - v;
         b.z = 0.0f;
         Draw_line(&a, &b, 0xE0E0E0E0);
     }
@@ -3014,34 +3015,34 @@ void draw_light_graph(cLight* l)
     x = GetDistance3(&l->Pos, &a);
     if (x < l->Radius || l->Radius == 0.0f) {
         t = x / scale;
-        a.x = x0 + t;
-        a.y = y0;
+        a.x = gx + t;
+        a.y = gy;
         a.z = 0.0f;
-        b.x = x0 + t;
-        b.y = y0 - h0;
+        b.x = gx + t;
+        b.y = gy - h0;
         b.z = 0.0f;
         lcol = 0xFFFF0000;
     } else {
-        a.x = x0 + w0;
-        a.y = y0;
+        a.x = gx + w0;
+        a.y = gy;
         a.z = 0.0f;
-        b.x = x0 + w0;
-        b.y = y0 - h0;
+        b.x = gx + w0;
+        b.y = gy - h0;
         b.z = 0.0f;
         lcol = 0xFF000080;
     }
     Draw_line(&a, &b, lcol);
-    eprintf((int) x0 + 0x78, (int) y0 + 8, 0, pTool->PageNo, "%3.6f", func_attn(l, x));
+    eprintf((int) gx + 0x78, (int) gy + 8, 0, pTool->PageNo, "%3.6f", func_attn(l, x));
     for (x = 1000.0f; x < l->Radius || l->Radius == 0.0f; x += 1000.0f) {
-        a.x = x0 + x / scale;
-        a.y = y0;
+        a.x = gx + x / scale;
+        a.y = gy;
         a.z = 0.0f;
-        b.x = x0 + x / scale;
-        b.y = y0 - h0;
+        b.x = gx + x / scale;
+        b.y = gy - h0;
         b.z = 0.0f;
         Draw_line(&a, &b, 0x80808080);
     }
-    eprintf((int) x0, (int) y0 + 8, 0, pTool->PageNo, "%1.6f", func_attn(l, 1.0f));
+    eprintf((int) gx, (int) gy + 8, 0, pTool->PageNo, "%1.6f", func_attn(l, 1.0f));
     v = func_attn(l, w0 * scale);
     {
         // COMPILER-DIFF: 2 + #17: the original's colour lives in r5 (a copy preference ours never gets)
@@ -3051,7 +3052,7 @@ void draw_light_graph(cLight* l)
         if (v > 0.04f) {
             col5 = 6;
         }
-        eprintf((int) x0 + 0xE6, (int) y0 + 8, (u8) col5, pTool->PageNo, "%3.6f", func_attn(l, w0 * scale));
+        eprintf((int) gx + 0xE6, (int) gy + 8, (u8) col5, pTool->PageNo, "%3.6f", func_attn(l, w0 * scale));
     }
 }
 // Parallel light: the direction is edited as two angles (static `ang`: x = pitch, y = yaw, z unused),

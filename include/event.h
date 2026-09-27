@@ -297,6 +297,7 @@ public:
     void DebugDispTool();
     int IsExePacket();
     int ExePacket();
+    void GetNameFile(char* pName) { strcpy(pName, (char*) pData); }
     static int ExePacket_BeginEvt(Event* pEvt);
     static int ExePacket_SetPl(Event* pEvt);
     static int ExePacket_SetEm(Event* pEvt);

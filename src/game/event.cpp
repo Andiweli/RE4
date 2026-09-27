@@ -300,7 +300,6 @@ int Event::EspToolSetDat()
     char nm[0x20];
     EvtPacket* pac;
     int no;
-    char* p;
 
     EvtDebug.SetNowCut(GetNowCut());
     RunTool(3, 0);
@@ -328,9 +327,8 @@ int Event::EspToolSetDat()
         }
         CalNextPacket();
     }
-    p = nm;
-    strcpy(p, (char*) pData);
-    strcmp(p, "event/evd/r120s00.evd");
+    GetNameFile(nm);
+    strcmp(nm, "event/evd/r120s00.evd");
     return 1;
 }
 

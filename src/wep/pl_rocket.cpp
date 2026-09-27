@@ -195,13 +195,6 @@ static void wep13_r3_ready30(cPlayer* pl)
     pl->motionMove();
 }
 
-// r2_set copies `to` with frame-relative loads. A plain `obj->hpos = to` lets cse reuse the call's
-// `&to` pseudo and gcse PRE hoist it into a callee-saved register, and this inline avoids that.
-static inline void VecCopy(Vec* d, const Vec* s)
-{
-    *d = *s;
-}
-
 // r_no_2 == 1: the set state = looking through the launcher's scope (no laser). Aim released ->
 // down (r_no_2 3, or crouch 0x11); fire held with a rocket loaded -> the scope trajectory is
 // stored in launcher.from/to, the scope camera ends and -> fire.
@@ -236,8 +229,7 @@ static void wep13_r2_set(cPlayer* pl)
         CameraMove();
         CamCtrl.getTrajectory(&from, &to);
         obj = LAUNCHER(pl);
-        obj->lpos = from;
-        VecCopy(&obj->hpos, &to);
+        obj->setDirection(from, to);
         pl->endCamera();
         pl->r_no_0 = 0;
         pl->r_no_1 = 6;
