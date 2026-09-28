@@ -130,7 +130,6 @@ struct AtPoly {
     };
 };
 
-extern "C" {
 extern int SEck;   // game/atari.cpp: scenario-effect check mode (skips the attribute filters)
 
 // Signed distance of `p` from the plane through `a` with normal `n`.
@@ -162,6 +161,5 @@ int Get_ang_dir(f32 ay);
 // out = a * t + b * (1 - t)
 void InterVectorXYZ(Vec* cross, Vec* p0, Vec* p1, f32 rate);
 int EatGetEffectType(u32 rgba);
-}
 
 #endif

@@ -46,7 +46,6 @@ struct DIEDEMO_WORK {
     int demo_type;   // 0x04  0 normal, 1 with the sub character alive, 2 (flags_54 bit31)
 };
 
-extern "C" {
 void GameTask();
 void primInit();
 void primFree();
@@ -78,7 +77,6 @@ void PrimDispWorkNum(int x, int y, int page);
 void DiedemoExec(int time, int type);
 void gameDiedemoCheck();
 void gameDiedemo(DIEDEMO_WORK* pDw);
-}
 void GameStopModeEnd();
 
 // game.cpp also owns the collision profile counters g_at2_cnt[20], g_at2_cyc[20], g_at2_total,

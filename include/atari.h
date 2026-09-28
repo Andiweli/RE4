@@ -190,9 +190,7 @@ private:
 
 extern cEatMgr EatMgr;
 
-extern "C" {
 // Effect type of a hitCheck attribute word (game/at_sub.cpp).
 int EatGetEffectType(u32 rgba);
-}
 
 #endif

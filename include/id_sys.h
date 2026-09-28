@@ -234,7 +234,6 @@ int IdGetAnmAddr(u8 id, TexAnm** ppAnm);
 void IdChannelSet(ID_UNIT* pIdUnit);
 TEX_WK* IdGetTexWk(u8 id, int bNoDispErrMsg);
 
-extern "C" {
 void idSysMove00(ID_UNIT* u);
 void IdCalcVertex(ID_UNIT* u);
 void idSysMove01(ID_UNIT* u);
@@ -271,6 +270,5 @@ enum TEX_OWNER {
 
 void IdTexRelease(int owner);
 int IdTexDataLoad(void* data, int id);
-}
 
 #endif

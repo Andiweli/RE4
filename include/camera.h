@@ -28,7 +28,6 @@ struct CAMERA {
     f32 Distance;           // 0xF4 |pos - at| (db_cam keeps it current for the debug camera)
 };
 
-extern "C" {
 // game/cam_sys.cpp
 void CameraSetOrientationUp(CAMERA* pCam);
 void CameraSetOrientationRoll(CAMERA* pCam);
@@ -51,7 +50,6 @@ void CameraGetUpVec(CAMERA* pCam, Vec* up);
 void CameraGetLookVec(CAMERA* pCam, Vec* look);
 void CameraGetLookVecInverse(CAMERA* pCam, Vec* look_inv);
 void CamPos2ScrnVec(f32 sX, f32 sY, Vec* vec);
-}
 // game/camera.cpp (C++ linkage): loads the current projection matrix into GX
 void CameraCurrentProjection();
 extern int ProjType;   // current projection type (db_cam.cpp toggles it)

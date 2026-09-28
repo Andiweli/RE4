@@ -52,6 +52,7 @@ BOOL PADReset(u32 mask);
 void PADRecalibrate(u32 mask);
 void PADControlMotor(int chan, u32 cmd);
 void PADSetAnalogMode(u32 mode);
+}
 
 // game/pad.cpp
 void PadInit();
@@ -68,6 +69,5 @@ int PadCheckStatus(JOY* joy);
 void Pad_test();
 
 extern u32 Key_type_tbl[2][64];
-}
 
 #endif
