@@ -12,20 +12,14 @@ class Event;
 class cLightTool;
 struct DbSctrlWork;
 
-// One Hermite curve of the fog / focus data (64 keys), as game/event.cpp has it.
-struct EvtCurve {
-    s32 num;
-    HermiteKey key[64];
-};
-
 struct EvtFogData {
-    EvtCurve start;    // 0x000
-    EvtCurve end;      // 0x404
+    HERMITE_1_FIX start;    // 0x000
+    HERMITE_1_FIX end;      // 0x404
 };
 
 struct EvtFocusData {
-    EvtCurve near_;    // 0x000
-    EvtCurve far_;     // 0x404
+    HERMITE_1_FIX near_;    // 0x000
+    HERMITE_1_FIX far_;     // 0x404
     f32 nearLevel;     // 0x808
     f32 farLevel;      // 0x80C
 };
@@ -157,7 +151,7 @@ private:
     void SubToolMessInit(ToolEvt* t, int sw);
     void SubToolMessMove(ToolEvt* t, Event* ev);
     void SubToolIn(ToolEvt* t, int sw, int bit);
-    void SctrlToolInit(ToolEvt* t, Hermite1* curve, f32 xMax, f32 yMax);
+    void SctrlToolInit(ToolEvt* t, HERMITE_1_PTR* curve, f32 xMax, f32 yMax);
 };
 
 void ToolEvent();

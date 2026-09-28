@@ -210,7 +210,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x000182C8	0x10A0	t_event/t_event.cpp	global	SubToolMessInit__7ToolEvtP7ToolEvti	ToolEvt::SubToolMessInit
 .text	0x00019368	0x1010	t_event/t_event.cpp	global	SubToolMessMove__7ToolEvtP7ToolEvtP5Event	ToolEvt::SubToolMessMove
 .text	0x0001A378	0x84	t_event/t_event.cpp	global	SubToolIn__7ToolEvtP7ToolEvtii	ToolEvt::SubToolIn
-.text	0x0001A3FC	0x104	t_event/t_event.cpp	global	SctrlToolInit__7ToolEvtP7ToolEvtP8Hermite1ff	ToolEvt::SctrlToolInit
+.text	0x0001A3FC	0x104	t_event/t_event.cpp	global	SctrlToolInit__7ToolEvtP7ToolEvtP13HERMITE_1_PTRff	ToolEvt::SctrlToolInit
 .text	0x0001A500	0x18	t_event/t_event.cpp	global	IsWorkAlive__FPQ216EventMessageData8MessElem	IsWorkAlive
 .text	0x0001A518	0x28	t_event/t_event.cpp	global	SetWorkAlive__FPQ216EventMessageData8MessElemi	SetWorkAlive
 .text	0x0001A540	0x8	t_event/t_event.cpp	global	GetWorkNo__FPQ216EventMessageData8MessElem	GetWorkNo

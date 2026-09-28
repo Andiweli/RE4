@@ -151,8 +151,8 @@ int PathGetMatEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Mtx pMat)
     Vec hvel;
     Vec d0;
     Vec d1;
-    HermiteKey key0;
-    HermiteKey key1;
+    HERMITE_1_POINT key0;
+    HERMITE_1_POINT key1;
     static int dbg_tangent_base = 1;
     static int inter_flag = 1;
 
@@ -213,12 +213,12 @@ int PathGetMatEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Mtx pMat)
 
     for (j = 0; j < 3; j++) {
         f32* ph = &(&hpos.x)[j];   // first &hpos use before &key0/&key1: PRE inserts its copy first
-        key0.t = 0.0f;
-        key0.v = (&v0->pos.x)[j];
-        key0.out = key0.in = (&d0.x)[j];
-        key1.t = 1.0f;
-        key1.v = (&v->pos.x)[j];
-        key1.out = key1.in = (&d1.x)[j];
+        key0.T = 0.0f;
+        key0.Q = (&v0->pos.x)[j];
+        key0.dQ[0] = key0.dQ[1] = (&d0.x)[j];
+        key1.T = 1.0f;
+        key1.Q = (&v->pos.x)[j];
+        key1.dQ[0] = key1.dQ[1] = (&d1.x)[j];
         Hermite_1(&key0, &key1, t, ph);
         Hermite_1_dt(&key0, &key1, t, &(&hvel.x)[j]);
     }

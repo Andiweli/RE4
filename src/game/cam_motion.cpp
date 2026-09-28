@@ -57,21 +57,21 @@ CameraMotion::~CameraMotion()
 // placed in the room), and sets `end` when the sequence finished.
 void CameraMotion::move()
 {
-    HermitePrm prm;
+    HERMITE_SET prm;
     Vec pos;
     Vec at;
     Vec roll = {0.0f, 0.0f, 0.0f};
     Vec fov;
-    HermitePrm* pp = &prm;
+    HERMITE_SET* pp = &prm;
     CameraMotionWork* w = &m_info;
     int i;
 
-    pp->frame = w->frame;
-    pp->maxFrame = w->maxFrame;
-    pp->flags = 2;
+    pp->Frame = w->frame;
+    pp->Frame_max = w->maxFrame;
+    pp->Attr = 2;
     for (i = 0; i < w->nParts; i++) {
-        pp->type = w->partsInfo[i] >> 12;
-        pp->key = (u8*) w->keyTbl[i];
+        pp->Data_fmt = w->partsInfo[i] >> 12;
+        pp->pData = (u8*) w->keyTbl[i];
         switch (w->partsNo[i]) {
         case 0:
             HermiteInterpolation(pp, &pos, w->hist[i]);

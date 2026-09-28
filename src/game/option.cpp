@@ -113,8 +113,8 @@ void OptionScreen::init(int type)
     IdSys.set((ID_FILE_HEADER*) OPT_PTR(0x24), 0xFF, IDC_OPTION_BG, 0x13, 4, 0);
     if (_type != 0) {
         ID_UNIT* u = IdSys.unitPtr(0, IDC_OPTION_BG);
-        Hermite1* h = u->curve[2];
-        IdSys.setTime(u, (s16) (int) h->key[h->num - 1].t);
+        HERMITE_1_PTR* h = u->curve[2];
+        IdSys.setTime(u, (s16) (int) h->Point[h->nPoint - 1].T);
     }
     IdSys.set((ID_FILE_HEADER*) OPT_PTR(0x28), 0xFF, IDC_OPTION, 0x13, 3, 0);
     _rno0 = 0;
@@ -468,8 +468,8 @@ int retry_load_menu(OptionScreen* pOpt)
             IdSys.set((ID_FILE_HEADER*) OPT_PTR(0x24), 0xFF, IDC_OPTION_BG, 0x13, 4, 0);
             {
                 ID_UNIT* bg = IdSys.unitPtr(0, IDC_OPTION_BG);
-                Hermite1* h = bg->curve[2];
-                IdSys.setTime(bg, (s16) (int) h->key[h->num - 1].t);
+                HERMITE_1_PTR* h = bg->curve[2];
+                IdSys.setTime(bg, (s16) (int) h->Point[h->nPoint - 1].T);
             }
             IdSys.kill(0xFF, IDC_OPTION);
             IdSys.set((ID_FILE_HEADER*) OPT_PTR(0x2C), 0xFF, IDC_OPTION, 0x13, 3, 0);

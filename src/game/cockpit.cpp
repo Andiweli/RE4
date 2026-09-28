@@ -404,8 +404,8 @@ void LifeMeter::fix(int flag)
         u->rev_flag |= 0xF;
         IdSys.setTime(u, 0);
     } else {
-        Hermite1* h = u->curve[0];
-        u8 t = (u8) h->key[h->num - 1].t;
+        HERMITE_1_PTR* h = u->curve[0];
+        u8 t = (u8) h->Point[h->nPoint - 1].T;
 
         u->rev_flag &= ~0xF;
         IdSys.setTime(u, t);

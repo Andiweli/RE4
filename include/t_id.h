@@ -22,12 +22,6 @@ struct IdPathData {
     Vec pos[ID_PATH_MAX];  // 0x08
 };
 
-// Hermite1 with room for ID_CURVE_MAX keys (0x404 bytes).
-struct IdCurve {
-    s32 num;                    // 0x00
-    HermiteKey key[ID_CURVE_MAX];  // 0x04
-};
-
 // One editable interface element (0x17D0 bytes, 0xC0 of them in idData[]). Derives from cCoord so
 // the tool can reuse its matrices; the cUnit be_flag doubles as the tool state word (0xFF = free).
 class ID_DATA : public cCoord {
@@ -69,10 +63,10 @@ public:
     u8 pad_1A1[7];
     IdPathData path0;    // 0x1A8
     IdPathData path1;    // 0x4B0
-    IdCurve curve0;      // 0x7B8
-    IdCurve curve1;      // 0xBBC
-    IdCurve curve2;      // 0xFC0
-    IdCurve curve3;      // 0x13C4
+    HERMITE_1_FIX curve0;      // 0x7B8
+    HERMITE_1_FIX curve1;      // 0xBBC
+    HERMITE_1_FIX curve2;      // 0xFC0
+    HERMITE_1_FIX curve3;      // 0x13C4
     u8 x17C8[8];         // 0x17C8
 
     virtual ~ID_DATA() {}

@@ -1344,14 +1344,14 @@ int idEditPos(IdTool* w, int x, int y)
                     break;
                 }
                 w->pSctrl = &idSctrl0;
-                idSctrl0.curve = (Hermite1*) &d->curve0;
+                idSctrl0.curve = (HERMITE_1_PTR*) &d->curve0;
                 SctrlSetAxisLabel(w->pSctrl, "Frame", "Param");
                 w->pSctrl->gridX = 15.0f;
                 w->pSctrl->gridY = 0.5f;
                 w->pSctrl->grid.x = 1.0f;
                 w->pSctrl->grid.y = 0.01f;
                 w->pSctrl->flags = 3;
-                if (w->pSctrl->curve->num <= 1) {
+                if (w->pSctrl->curve->nPoint <= 1) {
                     f32 xr = 90.0f;
                     f32 n = (f32) (w->pPath->path->n - 1);
 
@@ -1359,7 +1359,7 @@ int idEditPos(IdTool* w, int x, int y)
                     SctrlInitCursor(w->pSctrl, 0.0f, 0.0f);
                 } else {
                     SctrlAdjustAxisRange(w->pSctrl);
-                    SctrlInitCursor(w->pSctrl, w->pSctrl->curve->key[0].t, w->pSctrl->curve->key[0].v);
+                    SctrlInitCursor(w->pSctrl, w->pSctrl->curve->Point[0].T, w->pSctrl->curve->Point[0].Q);
                 }
                 w->subStep++;
                 break;
@@ -1622,14 +1622,14 @@ int idEditSize(IdTool* w, int x, int y)
             switch (w->subStep) {
             case 0:
                 w->pSctrl = &idSctrl1;
-                idSctrl1.curve = (Hermite1*) &d->curve1;
+                idSctrl1.curve = (HERMITE_1_PTR*) &d->curve1;
                 SctrlSetAxisLabel(w->pSctrl, "Frame", "Scale");
                 w->pSctrl->gridX = 15.0f;
                 w->pSctrl->gridY = 0.5f;
                 w->pSctrl->grid.x = 1.0f;
                 w->pSctrl->grid.y = 0.01f;
                 w->pSctrl->flags = 3;
-                if (w->pSctrl->curve->num <= 1) {
+                if (w->pSctrl->curve->nPoint <= 1) {
                     f32 xr = 90.0f;
                 f32 yr = 2.0f;
 
@@ -1637,7 +1637,7 @@ int idEditSize(IdTool* w, int x, int y)
                     SctrlInitCursor(w->pSctrl, 0.0f, 0.0f);
                 } else {
                     SctrlAdjustAxisRange(w->pSctrl);
-                    SctrlInitCursor(w->pSctrl, w->pSctrl->curve->key[0].t, w->pSctrl->curve->key[0].v);
+                    SctrlInitCursor(w->pSctrl, w->pSctrl->curve->Point[0].T, w->pSctrl->curve->Point[0].Q);
                 }
                 w->subStep++;
                 break;
@@ -1894,14 +1894,14 @@ int idEditColor(IdTool* w, int x, int y)
         switch (w->subStep) {
         case 0:
             w->pSctrl = &idSctrl2;
-            idSctrl2.curve = (Hermite1*) &d->curve2;
+            idSctrl2.curve = (HERMITE_1_PTR*) &d->curve2;
             SctrlSetAxisLabel(w->pSctrl, "Frame", "Color");
             w->pSctrl->gridX = 15.0f;
             w->pSctrl->gridY = 50.0f;
             w->pSctrl->grid.x = 1.0f;
             w->pSctrl->grid.y = 1.0f;
             w->pSctrl->flags = 3;
-            if (w->pSctrl->curve->num <= 1) {
+            if (w->pSctrl->curve->nPoint <= 1) {
                 f32 xr = 90.0f;
                 f32 yr = 256.0f;
 
@@ -1909,7 +1909,7 @@ int idEditColor(IdTool* w, int x, int y)
                 SctrlInitCursor(w->pSctrl, 0.0f, 0.0f);
             } else {
                 SctrlAdjustAxisRange(w->pSctrl);
-                SctrlInitCursor(w->pSctrl, w->pSctrl->curve->key[0].t, w->pSctrl->curve->key[0].v);
+                SctrlInitCursor(w->pSctrl, w->pSctrl->curve->Point[0].T, w->pSctrl->curve->Point[0].Q);
             }
             w->subStep++;
             break;
@@ -2100,14 +2100,14 @@ int idEditRot(IdTool* w, int x, int y)
         switch (w->subStep) {
         case 0:
             w->pSctrl = &idSctrl3;
-            idSctrl3.curve = (Hermite1*) &d->curve3;
+            idSctrl3.curve = (HERMITE_1_PTR*) &d->curve3;
             SctrlSetAxisLabel(w->pSctrl, "Frame", "Degree");
             w->pSctrl->gridX = 15.0f;
             w->pSctrl->gridY = 45.0f;
             w->pSctrl->grid.x = 1.0f;
             w->pSctrl->grid.y = 1.0f;
             w->pSctrl->flags = 3;
-            if (w->pSctrl->curve->num <= 1) {
+            if (w->pSctrl->curve->nPoint <= 1) {
                 f32 xr = 90.0f;
                 f32 yr = 360.0f;
 
@@ -2115,7 +2115,7 @@ int idEditRot(IdTool* w, int x, int y)
                 SctrlInitCursor(w->pSctrl, 0.0f, 0.0f);
             } else {
                 SctrlAdjustAxisRange(w->pSctrl);
-                SctrlInitCursor(w->pSctrl, w->pSctrl->curve->key[0].t, w->pSctrl->curve->key[0].v);
+                SctrlInitCursor(w->pSctrl, w->pSctrl->curve->Point[0].T, w->pSctrl->curve->Point[0].Q);
             }
             w->subStep++;
             break;
@@ -3208,51 +3208,51 @@ int toolIdDataEncode(void* buf, IdTool* w)
                 rec->ofs[0] = 0;
                 rec->ofs[1] = 0;
             }
-            if (d->curve0.num > 0) {
-                Hermite1* h = (Hermite1*) ext;
+            if (d->curve0.nPoint > 0) {
+                HERMITE_1_PTR* h = (HERMITE_1_PTR*) ext;
 
                 rec->ofs[2] = ext - base;
-                h->num = d->curve0.num;
-                for (k = 0; k < h->num; k++) {
-                    h->key[k] = d->curve0.key[k];
+                h->nPoint = d->curve0.nPoint;
+                for (k = 0; k < h->nPoint; k++) {
+                    h->Point[k] = d->curve0.Point[k];
                 }
-                ext += h->num * sizeof(HermiteKey) + 4;
+                ext += h->nPoint * sizeof(HERMITE_1_POINT) + 4;
             } else {
                 rec->ofs[2] = 0;
             }
-            if (d->curve1.num > 0) {
-                Hermite1* h = (Hermite1*) ext;
+            if (d->curve1.nPoint > 0) {
+                HERMITE_1_PTR* h = (HERMITE_1_PTR*) ext;
 
                 rec->ofs[3] = ext - base;
-                h->num = d->curve1.num;
-                for (k = 0; k < h->num; k++) {
-                    h->key[k] = d->curve1.key[k];
+                h->nPoint = d->curve1.nPoint;
+                for (k = 0; k < h->nPoint; k++) {
+                    h->Point[k] = d->curve1.Point[k];
                 }
-                ext += h->num * sizeof(HermiteKey) + 4;
+                ext += h->nPoint * sizeof(HERMITE_1_POINT) + 4;
             } else {
                 rec->ofs[3] = 0;
             }
-            if (d->curve2.num > 0) {
-                Hermite1* h = (Hermite1*) ext;
+            if (d->curve2.nPoint > 0) {
+                HERMITE_1_PTR* h = (HERMITE_1_PTR*) ext;
 
                 rec->ofs[4] = ext - base;
-                h->num = d->curve2.num;
-                for (k = 0; k < h->num; k++) {
-                    h->key[k] = d->curve2.key[k];
+                h->nPoint = d->curve2.nPoint;
+                for (k = 0; k < h->nPoint; k++) {
+                    h->Point[k] = d->curve2.Point[k];
                 }
-                ext += h->num * sizeof(HermiteKey) + 4;
+                ext += h->nPoint * sizeof(HERMITE_1_POINT) + 4;
             } else {
                 rec->ofs[4] = 0;
             }
-            if (d->curve3.num > 0) {
-                Hermite1* h = (Hermite1*) ext;
+            if (d->curve3.nPoint > 0) {
+                HERMITE_1_PTR* h = (HERMITE_1_PTR*) ext;
 
                 rec->ofs[5] = ext - base;
-                h->num = d->curve3.num;
-                for (k = 0; k < h->num; k++) {
-                    h->key[k] = d->curve3.key[k];
+                h->nPoint = d->curve3.nPoint;
+                for (k = 0; k < h->nPoint; k++) {
+                    h->Point[k] = d->curve3.Point[k];
                 }
-                ext += h->num * sizeof(HermiteKey) + 4;
+                ext += h->nPoint * sizeof(HERMITE_1_POINT) + 4;
             } else {
                 rec->ofs[5] = 0;
             }
@@ -3297,14 +3297,14 @@ struct IdRec1 {
     u32 ofs[6];     // 0x70
 };
 
-// Copies a file Hermite curve into an element's IdCurve.
-static inline void idDecodeCurve(IdCurve* c, Hermite1* h)
+// Copies a file Hermite curve into an element's HERMITE_1_FIX.
+static inline void idDecodeCurve(HERMITE_1_FIX* c, HERMITE_1_PTR* h)
 {
     int k;
 
-    c->num = h->num;
-    for (k = 0; k < h->num; k++) {
-        c->key[k] = h->key[k];
+    c->nPoint = h->nPoint;
+    for (k = 0; k < h->nPoint; k++) {
+        c->Point[k] = h->Point[k];
     }
 }
 
@@ -3384,16 +3384,16 @@ int toolIdDataDecode(void* buf, IdTool* w)
                 }
             }
             if (r1->ofs[2] != 0) {
-                idDecodeCurve(&d->curve0, (Hermite1*) (r1->ofs[2] + (u32) base));
+                idDecodeCurve(&d->curve0, (HERMITE_1_PTR*) (r1->ofs[2] + (u32) base));
             }
             if (r1->ofs[3] != 0) {
-                idDecodeCurve(&d->curve1, (Hermite1*) (r1->ofs[3] + (u32) base));
+                idDecodeCurve(&d->curve1, (HERMITE_1_PTR*) (r1->ofs[3] + (u32) base));
             }
             if (r1->ofs[4] != 0) {
-                idDecodeCurve(&d->curve2, (Hermite1*) (r1->ofs[4] + (u32) base));
+                idDecodeCurve(&d->curve2, (HERMITE_1_PTR*) (r1->ofs[4] + (u32) base));
             }
             if (r1->ofs[5] != 0) {
-                idDecodeCurve(&d->curve3, (Hermite1*) (r1->ofs[5] + (u32) base));
+                idDecodeCurve(&d->curve3, (HERMITE_1_PTR*) (r1->ofs[5] + (u32) base));
             }
             break;
         case 2:
@@ -3452,16 +3452,16 @@ int toolIdDataDecode(void* buf, IdTool* w)
                 }
             }
             if (r2->ofs[2] != 0) {
-                idDecodeCurve(&d->curve0, (Hermite1*) (r2->ofs[2] + (u32) base));
+                idDecodeCurve(&d->curve0, (HERMITE_1_PTR*) (r2->ofs[2] + (u32) base));
             }
             if (r2->ofs[3] != 0) {
-                idDecodeCurve(&d->curve1, (Hermite1*) (r2->ofs[3] + (u32) base));
+                idDecodeCurve(&d->curve1, (HERMITE_1_PTR*) (r2->ofs[3] + (u32) base));
             }
             if (r2->ofs[4] != 0) {
-                idDecodeCurve(&d->curve2, (Hermite1*) (r2->ofs[4] + (u32) base));
+                idDecodeCurve(&d->curve2, (HERMITE_1_PTR*) (r2->ofs[4] + (u32) base));
             }
             if (r2->ofs[5] != 0) {
-                idDecodeCurve(&d->curve3, (Hermite1*) (r2->ofs[5] + (u32) base));
+                idDecodeCurve(&d->curve3, (HERMITE_1_PTR*) (r2->ofs[5] + (u32) base));
             }
             break;
         }

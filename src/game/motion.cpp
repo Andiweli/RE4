@@ -136,8 +136,8 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
     MotionWork* w = (MotionWork*) w_;
     MotionData* data = (MotionData*) data_;
     u16* seq = (u16*) seq_;
-    HermitePrm prm;
-    HermitePrm* pp = &prm;
+    HERMITE_SET prm;
+    HERMITE_SET* pp = &prm;
     u16 hist0[3] = { 0, 0, 0 };
     u16 hist1[3] = { 0, 0, 0 };
     Vec v0;
@@ -325,18 +325,18 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
         }
     }
     u32 zero = 0;
-    pp->flags = 0;
-    pp->maxFrame = w->Mot_frame_max;
+    pp->Attr = 0;
+    pp->Frame_max = w->Mot_frame_max;
     if (w->Mot_attr & 2) {
         if (!(w->Mot_attr & 0x1000)) {
             asm("" : : "r"(zero));  // COMPILER-DIFF: dead use makes the zero global (r11), w->flags takes r0
-            pp->flags = 2;
+            pp->Attr = 2;
         }
     } else {
         if (w->Mot_attr & 0x1000) {
-            pp->flags = 2;
+            pp->Attr = 2;
         } else {
-            pp->flags = 0;
+            pp->Attr = 0;
         }
     }
     if (w->pSeq_top == 0) {
@@ -347,36 +347,36 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
     }
     w->Mot_frame_sav = w->Mot_frame;
     w->Mot_frame_old = w->Mot_frame;
-    pp->frame = w->Mot_frame;
+    pp->Frame = w->Mot_frame;
     if (w->Null_pos != 0xFFFF) {
-        pp->type = w->pJoint_kind[w->Null_pos] >> 12;
-        pp->key = (u8*) w->pHermite_data[w->Null_pos];
+        pp->Data_fmt = w->pJoint_kind[w->Null_pos] >> 12;
+        pp->pData = (u8*) w->pHermite_data[w->Null_pos];
         HermiteInterpolation(pp, &w->Pos, hist0);
         w->Pos_old = w->Pos;
     }
     if (w->Null_rot != 0xFFFF) {
-        pp->type = w->pJoint_kind[w->Null_rot] >> 12;
-        pp->key = (u8*) w->pHermite_data[w->Null_rot];
+        pp->Data_fmt = w->pJoint_kind[w->Null_rot] >> 12;
+        pp->pData = (u8*) w->pHermite_data[w->Null_rot];
         HermiteInterpolation(pp, &w->Ang, hist1);
         w->Ang_old = w->Ang;
     }
     if (w->Null_pos != 0xFFFF) {
-        pp->frame = 0.0f;
-        pp->type = w->pJoint_kind[w->Null_pos] >> 12;
-        pp->key = (u8*) w->pHermite_data[w->Null_pos];
+        pp->Frame = 0.0f;
+        pp->Data_fmt = w->pJoint_kind[w->Null_pos] >> 12;
+        pp->pData = (u8*) w->pHermite_data[w->Null_pos];
         HermiteInterpolation(pp, &v0, hist0);
-        pp->frame = w->Mot_frame_max;
-        pp->flags |= 2;
+        pp->Frame = w->Mot_frame_max;
+        pp->Attr |= 2;
         HermiteInterpolation(pp, &v1, hist0);
         PSVECSubtract(&v1, &v0, &w->Pos_dist);
     }
     if (w->Null_rot != 0xFFFF) {
-        pp->frame = 0.0f;
-        pp->type = w->pJoint_kind[w->Null_rot] >> 12;
-        pp->key = (u8*) w->pHermite_data[w->Null_rot];
+        pp->Frame = 0.0f;
+        pp->Data_fmt = w->pJoint_kind[w->Null_rot] >> 12;
+        pp->pData = (u8*) w->pHermite_data[w->Null_rot];
         HermiteInterpolation(pp, &v0, hist1);
-        pp->frame = w->Mot_frame_max;
-        pp->flags |= 2;
+        pp->Frame = w->Mot_frame_max;
+        pp->Attr |= 2;
         HermiteInterpolation(pp, &v1, hist1);
         PSVECSubtract(&v1, &v0, &w->Ang_dist);
         VecRadLimit(&w->Ang_dist);
@@ -385,9 +385,9 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
     if (cam != 0) {
         if (cam->type != 0) {
             if (cam->parts[4] != 0xFF) {
-                pp->frame = 0.0f;
-                pp->type = w->pJoint_kind[cam->parts[4]] >> 12;
-                pp->key = (u8*) w->pHermite_data[cam->parts[4]];
+                pp->Frame = 0.0f;
+                pp->Data_fmt = w->pJoint_kind[cam->parts[4]] >> 12;
+                pp->pData = (u8*) w->pHermite_data[cam->parts[4]];
                 HermiteInterpolation(pp, &v2, hist0);
             }
             cam->frame = 0;
@@ -621,8 +621,8 @@ u16 MotionMoveSub(cModel* pEm, MOTION_INFO* w)
 // parts, with the left/right flip when Mot_attr 0x40. Attach-camera channels 6/7 go to AttachCamera.
 void MotionMoveCore(cModel* pEm, MOTION_INFO* w, CAMERA* pCamera)
 {
-    HermitePrm prm;
-    HermitePrm* pp = &prm;
+    HERMITE_SET prm;
+    HERMITE_SET* pp = &prm;
     ATTACH_CAMERA* cam;
     cParts* p;
     u16* flipTbl = MOTION(pEm)->flip;
@@ -640,25 +640,25 @@ void MotionMoveCore(cModel* pEm, MOTION_INFO* w, CAMERA* pCamera)
     }
     w->Mot_frame_old = w->Mot_frame_sav;
     w->Mot_frame_sav = w->Mot_frame;
-    pp->frame = w->Mot_frame;
-    pp->maxFrame = w->Mot_frame_max;
-    pp->flags = 0;
+    pp->Frame = w->Mot_frame;
+    pp->Frame_max = w->Mot_frame_max;
+    pp->Attr = 0;
     if (w->Mot_attr & 4) {
         if (w->pSeq_top == 0) {
-            pp->flags = 4;
+            pp->Attr = 4;
         }
     }
     if (w->Mot_attr & 2) {
         if (!(w->Mot_attr & 0x1000)) {
-            pp->flags |= 2;
+            pp->Attr |= 2;
         } else {
-            pp->flags &= ~2;
+            pp->Attr &= ~2;
         }
     } else {
         if (w->Mot_attr & 0x1000) {
-            pp->flags |= 2;
+            pp->Attr |= 2;
         } else {
-            pp->flags &= ~2;
+            pp->Attr &= ~2;
         }
     }
     if (!(w->Mot_flag & 0x40000000)) {
@@ -690,8 +690,8 @@ void MotionMoveCore(cModel* pEm, MOTION_INFO* w, CAMERA* pCamera)
             if (cam == 0) {
                 continue;
             }
-            pp->type = info >> 12;
-            pp->key = (u8*) w->pHermite_data[i];
+            pp->Data_fmt = info >> 12;
+            pp->pData = (u8*) w->pHermite_data[i];
             if (i == cam->parts[0]) {
                 HermiteInterpolation(pp, &cam->camera_data[0], cam->history[0]);
                 if (w->Mot_attr & 0x40) {
@@ -741,12 +741,12 @@ void MotionMoveCore(cModel* pEm, MOTION_INFO* w, CAMERA* pCamera)
         if (w->Mot_flag & 0x80000000) {
             p->motParts.flags |= 0x80000000;
         }
-        pp->type = w->pJoint_kind[i] >> 12;
-        pp->key = (u8*) w->pHermite_data[i];
+        pp->Data_fmt = w->pJoint_kind[i] >> 12;
+        pp->pData = (u8*) w->pHermite_data[i];
         if (p->motParts.flags & 0x04000000) {
-            pp->flags |= 8;
+            pp->Attr |= 8;
         } else {
-            pp->flags &= ~8;
+            pp->Attr &= ~8;
         }
         if (kind & 2) {
             HermiteInterpolation(pp, &p->ang, p->getKeyHist()[flip ? 3 : 0]);
@@ -942,28 +942,28 @@ void MotionHokan(cModel* m, MOTION_INFO* w)
 // Mot_attr 0x400 blends the XZ speed from the previous motion's speed over the hokan frames.
 void MotionGetSpeed(cModel* pEm, MOTION_INFO* w, int flg, Vec* Pos_move, Vec* Ang_move)
 {
-    HermitePrm prm;
-    HermitePrm* pp = &prm;
+    HERMITE_SET prm;
+    HERMITE_SET* pp = &prm;
     Vec a = { 0.0f, 0.0f, 0.0f };
     Vec b = { 0.0f, 0.0f, 0.0f };
     Mtx rm;
     int flip;
 
     w->Mot_frame = SEQ_FRAME(w->Seq.frame);
-    pp->flags = 0;
+    pp->Attr = 0;
     w->Ang_old = w->Ang;
     w->Pos_old = w->Pos;
     if (w->Mot_attr & 2) {
         if (w->Mot_attr & 0x1000) {
-            pp->flags = 0;
+            pp->Attr = 0;
         } else {
-            pp->flags = 2;
+            pp->Attr = 2;
         }
     } else {
         if (w->Mot_attr & 0x1000) {
-            pp->flags = 2;
+            pp->Attr = 2;
         } else {
-            pp->flags = 0;
+            pp->Attr = 0;
         }
     }
     flip = 0;
@@ -971,17 +971,17 @@ void MotionGetSpeed(cModel* pEm, MOTION_INFO* w, int flg, Vec* Pos_move, Vec* An
         flip = 1;
     }
     if (w->Null_pos != 0xFFFF) {
-        pp->frame = w->Mot_frame;
-        pp->maxFrame = w->Mot_frame_max;
-        pp->key = (u8*) w->pHermite_data[w->Null_pos];
-        pp->type = w->pJoint_kind[w->Null_pos] >> 12;
+        pp->Frame = w->Mot_frame;
+        pp->Frame_max = w->Mot_frame_max;
+        pp->pData = (u8*) w->pHermite_data[w->Null_pos];
+        pp->Data_fmt = w->pJoint_kind[w->Null_pos] >> 12;
         HermiteInterpolation(pp, &a, MOT_HIST(w, flip, 1));
     }
     if (w->Null_rot != 0xFFFF) {
-        pp->frame = w->Mot_frame;
-        pp->maxFrame = w->Mot_frame_max;
-        pp->key = (u8*) w->pHermite_data[w->Null_rot];
-        pp->type = w->pJoint_kind[w->Null_rot] >> 12;
+        pp->Frame = w->Mot_frame;
+        pp->Frame_max = w->Mot_frame_max;
+        pp->pData = (u8*) w->pHermite_data[w->Null_rot];
+        pp->Data_fmt = w->pJoint_kind[w->Null_rot] >> 12;
         HermiteInterpolation(pp, &b, MOT_HIST(w, flip, 0));
     }
     PSVECSubtract(&b, &w->Ang_old, Ang_move);
@@ -1040,25 +1040,25 @@ void MotionAddSpeed(cModel* pEm, MOTION_INFO* w, Vec* Pos_move, Vec* Ang_move)
 void MotionGetPosition(cModel* pEm, Vec* pPos, Vec* pAng)
 {
     MotionWork* w = MOTION(pEm);
-    HermitePrm prm;
-    HermitePrm* pp;
+    HERMITE_SET prm;
+    HERMITE_SET* pp;
     int flip;
 
     pPos->x = pPos->y = pPos->z = 0.0f;
     pAng->x = pAng->y = pAng->z = 0.0f;
     w->Mot_frame = SEQ_FRAME(w->Seq_old.frame);
     pp = &prm;
-    pp->flags = 0;
+    pp->Attr = 0;
     asm("" : : "r"(pp));  // COMPILER-DIFF: pp must outrank w for r31
     if (w->Mot_attr & 2) {
         if (!(w->Mot_attr & 0x1000)) {
-            pp->flags = 2;
+            pp->Attr = 2;
         }
     } else {
         if (w->Mot_attr & 0x1000) {
-            pp->flags = 2;
+            pp->Attr = 2;
         } else {
-            pp->flags = 0;
+            pp->Attr = 0;
         }
     }
     flip = 0;
@@ -1066,17 +1066,17 @@ void MotionGetPosition(cModel* pEm, Vec* pPos, Vec* pAng)
         flip = 1;
     }
     if (w->Null_pos != 0xFFFF) {
-        pp->frame = w->Mot_frame;
-        pp->maxFrame = w->Mot_frame_max;
-        pp->key = (u8*) w->pHermite_data[w->Null_pos];
-        pp->type = w->pJoint_kind[w->Null_pos] >> 12;
+        pp->Frame = w->Mot_frame;
+        pp->Frame_max = w->Mot_frame_max;
+        pp->pData = (u8*) w->pHermite_data[w->Null_pos];
+        pp->Data_fmt = w->pJoint_kind[w->Null_pos] >> 12;
         HermiteInterpolation(pp, pPos, MOT_HIST(w, flip, 1));
     }
     if (w->Null_rot != 0xFFFF) {
-        pp->frame = w->Mot_frame;
-        pp->maxFrame = w->Mot_frame_max;
-        pp->key = (u8*) w->pHermite_data[w->Null_rot];
-        pp->type = w->pJoint_kind[w->Null_rot] >> 12;
+        pp->Frame = w->Mot_frame;
+        pp->Frame_max = w->Mot_frame_max;
+        pp->pData = (u8*) w->pHermite_data[w->Null_rot];
+        pp->Data_fmt = w->pJoint_kind[w->Null_rot] >> 12;
         HermiteInterpolation(pp, pAng, MOT_HIST(w, flip, 0));
     }
 }
@@ -1236,7 +1236,7 @@ int MotionGetState(cModel* m)
 // starting from the per-axis history index (hist, updated unless flags bit 3), wraps for looping
 // motions (flags 4), holds the last key past the end, and Hermite-interpolates value/tangent pairs
 // decoded by Fcc_get_data_tbl[prm->type]. Returns 1 when a history index was invalid.
-int HermiteInterpolation(HermitePrm* prm, Vec* out, u16* hist)
+int HermiteInterpolation(HERMITE_SET* prm, Vec* out, u16* hist)
 {
     static FccGetData Fcc_get_data_tbl[16] = {
         Fcc_get_data_000, Fcc_get_data_001, Fcc_get_data_002, dummy,
@@ -1245,8 +1245,8 @@ int HermiteInterpolation(HermitePrm* prm, Vec* out, u16* hist)
         dummy,            dummy,            dummy,            Fcc_get_data_033,
     };
     f32 r = 0.0f;
-    f32 frame = prm->frame;
-    u8* p = prm->key;
+    f32 frame = prm->Frame;
+    u8* p = prm->pData;
     f32* o = (f32*) out;
     u16* hp = hist - 1;
     f32 f0 = r;
@@ -1268,23 +1268,23 @@ int HermiteInterpolation(HermitePrm* prm, Vec* out, u16* hist)
         frames = (u16*) (p + 2);
         data = p + n * 2 + 2;
         hp++;
-        p = data + Fcc_next_axis_addr(prm->type, n);
+        p = data + Fcc_next_axis_addr(prm->Data_fmt, n);
         cnt = n;
         found = 0;
-        if (prm->maxFrame <= frame) {
-            if ((prm->flags & 6) == 4) {
-                frame -= prm->maxFrame;
-                if (!(prm->flags & 8)) {
+        if (prm->Frame_max <= frame) {
+            if ((prm->Attr & 6) == 4) {
+                frame -= prm->Frame_max;
+                if (!(prm->Attr & 8)) {
                     *hp = 0;
                 }
             } else {
-                Fcc_get_data_tbl[prm->type](data, n - 1, 0, val, tan);
+                Fcc_get_data_tbl[prm->Data_fmt](data, n - 1, 0, val, tan);
                 cnt = 0;
                 found = 1;
                 r = val[0];
             }
         }
-        if (!(prm->flags & 8)) {
+        if (!(prm->Attr & 8)) {
             idx = *hp;
         } else {
             idx = 0;
@@ -1311,9 +1311,9 @@ int HermiteInterpolation(HermitePrm* prm, Vec* out, u16* hist)
             do {
                 f0 = (f32) *fp;
                 if (f0 == frame) {
-                    Fcc_get_data_tbl[prm->type](data, idx, 0, val, tan);
+                    Fcc_get_data_tbl[prm->Data_fmt](data, idx, 0, val, tan);
                     r = val[0];
-                    if (!(prm->flags & 8)) {
+                    if (!(prm->Attr & 8)) {
                         *hp = idx;
                     }
                     found = 1;
@@ -1327,14 +1327,14 @@ int HermiteInterpolation(HermitePrm* prm, Vec* out, u16* hist)
                     }
                     f1 = (f32) frames[nx];
                     if (frame < f1) {
-                        Fcc_get_data_tbl[prm->type](data, idx, nx, val, tan);
-                        if (!(prm->flags & 8)) {
+                        Fcc_get_data_tbl[prm->Data_fmt](data, idx, nx, val, tan);
+                        if (!(prm->Attr & 8)) {
                             *hp = idx;
                         }
                         break;
                     }
                 }
-                if ((prm->flags & 1) || f0 > frame) {
+                if ((prm->Attr & 1) || f0 > frame) {
                     fp--;
                     idx--;
                     if (idx < 0) {

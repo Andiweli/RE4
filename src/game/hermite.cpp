@@ -1,38 +1,38 @@
-// game/hermite: 1-D Hermite curves (D:/Bio4/Prog/hermite.cpp). A Hermite1 is a list of keys
-// (t, v, in/out tangents); the event fog/focus curves and camera paths evaluate them with
+// game/hermite: 1-D Hermite curves (D:/Bio4/Prog/hermite.cpp). A HERMITE_1_PTR is a list of points
+// (T, Q, in/out tangents); the event fog/focus curves and camera paths evaluate them with
 // Hermite_1CurveCalc, and the tool editors scale/translate/reverse them.
 #include "types.h"
 #include "hermite.h"
 #include "main_mem.h"
 
 // Empties the curve.
-void Hermite_1Clear(Hermite1* pCurve)
+void Hermite_1Clear(HERMITE_1_PTR* pCurve)
 {
     int i;
 
-    for (i = 0; i < pCurve->num; i++) {
-        memclr_asm(&pCurve->key[i], sizeof(HermiteKey));
+    for (i = 0; i < pCurve->nPoint; i++) {
+        memclr_asm(&pCurve->Point[i], sizeof(HERMITE_1_POINT));
     }
-    pCurve->num = 0;
+    pCurve->nPoint = 0;
 }
 
 // 1 when t lies within the curve's key range.
-int Hermite_1CurveRight(Hermite1* pCurve, f32 frame)
+int Hermite_1CurveRight(HERMITE_1_PTR* pCurve, f32 frame)
 {
-    if (pCurve == NULL || pCurve->num <= 0) {
+    if (pCurve == NULL || pCurve->nPoint <= 0) {
         return 0;
     }
-    if (frame < pCurve->key[0].t) {
+    if (frame < pCurve->Point[0].T) {
         return 0;
     }
-    if (frame > pCurve->key[pCurve->num - 1].t) {
+    if (frame > pCurve->Point[pCurve->nPoint - 1].T) {
         return 0;
     }
     return 1;
 }
 
 // Evaluates the curve at t into *out; 0 (no value) when t is outside the key range.
-int Hermite_1CurveCalc(Hermite1* pCurve, f32 frame, f32* pS)
+int Hermite_1CurveCalc(HERMITE_1_PTR* pCurve, f32 frame, f32* pS)
 {
     if (pS == NULL) {
         return 0;
@@ -45,19 +45,19 @@ int Hermite_1CurveCalc(Hermite1* pCurve, f32 frame, f32* pS)
 }
 
 // Evaluates the curve at t (0 when no segment contains t).
-f32 Hermite_1CurveCalc(Hermite1* pCurve, f32 frame)
+f32 Hermite_1CurveCalc(HERMITE_1_PTR* pCurve, f32 frame)
 {
-    int num = pCurve->num;
-    HermiteKey* k0 = NULL;
-    HermiteKey* k1 = NULL;
+    int num = pCurve->nPoint;
+    HERMITE_1_POINT* k0 = NULL;
+    HERMITE_1_POINT* k1 = NULL;
     int found = 0;
     int i;
     f32 result;
 
     for (i = 0; i < num - 1; i++) {
-        k0 = &pCurve->key[i];
-        k1 = &pCurve->key[i + 1];
-        if (frame >= k0->t && frame <= k1->t) {
+        k0 = &pCurve->Point[i];
+        k1 = &pCurve->Point[i + 1];
+        if (frame >= k0->T && frame <= k1->T) {
             found = 1;
             break;
         }
@@ -71,67 +71,67 @@ f32 Hermite_1CurveCalc(Hermite1* pCurve, f32 frame)
 }
 
 // Scales the curve in time (about the first key) by sx and in value by sy, adjusting tangents.
-void Hermite_1Scale(Hermite1* pScurve, f32 Hscale, f32 Vscale)
+void Hermite_1Scale(HERMITE_1_PTR* pScurve, f32 Hscale, f32 Vscale)
 {
     int i;
     f32 base;
 
-    base = pScurve->key[0].t;
-    for (i = 0; i < pScurve->num; i++) {
-        pScurve->key[i].t = (pScurve->key[i].t - base) * Hscale + base;
-        pScurve->key[i].out /= Hscale;
-        pScurve->key[i].in /= Hscale;
+    base = pScurve->Point[0].T;
+    for (i = 0; i < pScurve->nPoint; i++) {
+        pScurve->Point[i].T = (pScurve->Point[i].T - base) * Hscale + base;
+        pScurve->Point[i].dQ[0] /= Hscale;
+        pScurve->Point[i].dQ[1] /= Hscale;
     }
-    base = pScurve->key[0].v;
-    for (i = 0; i < pScurve->num; i++) {
-        pScurve->key[i].v = (pScurve->key[i].v - base) * Vscale + base;
-        pScurve->key[i].out *= Vscale;
-        pScurve->key[i].in *= Vscale;
+    base = pScurve->Point[0].Q;
+    for (i = 0; i < pScurve->nPoint; i++) {
+        pScurve->Point[i].Q = (pScurve->Point[i].Q - base) * Vscale + base;
+        pScurve->Point[i].dQ[0] *= Vscale;
+        pScurve->Point[i].dQ[1] *= Vscale;
     }
 }
 
 // Moves the curve so its first key is at (tx, ty).
-void Hermite_1Trans(Hermite1* pScurve, f32 Xoffset, f32 Yoffset)
+void Hermite_1Trans(HERMITE_1_PTR* pScurve, f32 Xoffset, f32 Yoffset)
 {
     int i;
 
-    Xoffset -= pScurve->key[0].t;
-    for (i = 0; i < pScurve->num; i++) {
-        pScurve->key[i].t += Xoffset;
+    Xoffset -= pScurve->Point[0].T;
+    for (i = 0; i < pScurve->nPoint; i++) {
+        pScurve->Point[i].T += Xoffset;
     }
-    Yoffset -= pScurve->key[0].v;
-    for (i = 0; i < pScurve->num; i++) {
-        pScurve->key[i].v += Yoffset;
+    Yoffset -= pScurve->Point[0].Q;
+    for (i = 0; i < pScurve->nPoint; i++) {
+        pScurve->Point[i].Q += Yoffset;
     }
 }
 
 // Reverses the curve in time (keys mirrored, tangents swapped and negated).
-void Hermite_1Reverse(Hermite1* pScurve)
+void Hermite_1Reverse(HERMITE_1_PTR* pScurve)
 {
-    int num = pScurve->num;
-    HermiteKey* tmp = (HermiteKey*) Debug_alloc(num * sizeof(HermiteKey), 1);
+    int num = pScurve->nPoint;
+    HERMITE_1_POINT* tmp = (HERMITE_1_POINT*) Debug_alloc(num * sizeof(HERMITE_1_POINT), 1);
     f32 t0, t1;
     int i;
 
     for (i = 0; i < num; i++) {
-        tmp[i] = pScurve->key[i];
+        tmp[i] = pScurve->Point[i];
     }
-    t0 = pScurve->key[0].t;
-    t1 = pScurve->key[num - 1].t;
+    t0 = pScurve->Point[0].T;
+    t1 = pScurve->Point[num - 1].T;
     for (i = 0; i < num; i++) {
-        pScurve->key[i].t = t1 - tmp[num - 1 - i].t + t0;
-        pScurve->key[i].v = tmp[num - 1 - i].v;
-        pScurve->key[i].out = -tmp[num - 1 - i].in;
-        pScurve->key[i].in = -tmp[num - 1 - i].out;
+        pScurve->Point[i].T = t1 - tmp[num - 1 - i].T + t0;
+        pScurve->Point[i].Q = tmp[num - 1 - i].Q;
+        pScurve->Point[i].dQ[0] = -tmp[num - 1 - i].dQ[1];
+        pScurve->Point[i].dQ[1] = -tmp[num - 1 - i].dQ[0];
     }
     Debug_free(tmp);
 }
 
 // Cubic Hermite interpolation between two keys at time t.
-void Hermite_1(HermiteKey* pH0, HermiteKey* pH1, f32 t, f32* pP)
+void Hermite_1(HERMITE_1_POINT* pH0, HERMITE_1_POINT* pH1, f32 t, f32* pP)
 {
-    f32 dt = pH1->t - pH0->t;
-    f32 s = (t - pH0->t) / dt;
+    f32 dt = pH1->T - pH0->T;
+    f32 s = (t - pH0->T) / dt;
     f32 s2 = s * s;
     f32 s3 = s * s2;
     f32 h01 = -(s3 + s3) + 3.0f * s2;
@@ -139,19 +139,19 @@ void Hermite_1(HermiteKey* pH0, HermiteKey* pH1, f32 t, f32* pP)
     f32 h10 = h11 - s2 + s;
     f32 h00 = -h01 + 1.0f;
 
-    *pP = h00 * pH0->v + h01 * pH1->v + dt * (h10 * pH0->out + h11 * pH1->in);
+    *pP = h00 * pH0->Q + h01 * pH1->Q + dt * (h10 * pH0->dQ[0] + h11 * pH1->dQ[1]);
 }
 
 // Derivative of the Hermite segment at time t.
-void Hermite_1_dt(HermiteKey* pH0, HermiteKey* pH1, f32 t, f32* pT)
+void Hermite_1_dt(HERMITE_1_POINT* pH0, HERMITE_1_POINT* pH1, f32 t, f32* pT)
 {
-    f32 dt = pH1->t - pH0->t;
-    f32 s = (t - pH0->t) / dt;
+    f32 dt = pH1->T - pH0->T;
+    f32 s = (t - pH0->T) / dt;
     f32 s2 = s * s;
     f32 dh11 = 3.0f * s2 - 2.0f * s;
     f32 dh10 = 3.0f * s2 - 2.0f * s - 2.0f * s + 1.0f;
     f32 dh00 = dh10 + dh11 - 1.0f;
     f32 dh01 = -dh00;
 
-    *pT = dh00 * pH0->v + dh01 * pH1->v + dt * (dh10 * pH0->out + dh11 * pH1->in);
+    *pT = dh00 * pH0->Q + dh01 * pH1->Q + dt * (dh10 * pH0->dQ[0] + dh11 * pH1->dQ[1]);
 }

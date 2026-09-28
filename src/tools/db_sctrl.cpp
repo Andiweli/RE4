@@ -50,7 +50,7 @@ void SctrlInitAxisRange(DbSctrlWork* w, f32 xMax, f32 xMin, f32 yMax, f32 yMin)
 // Automatic range: x up to 1.2 x the last key time (down to -0.2 x), y around the value extremes.
 void SctrlAdjustAxisRange(DbSctrlWork* w)
 {
-    Hermite1* c;
+    HERMITE_1_PTR* c;
     f32 xmax;
     f32 xmin;
     f32 ymax;
@@ -62,28 +62,28 @@ void SctrlAdjustAxisRange(DbSctrlWork* w)
         return;
     }
     c = w->curve;
-    if (c->num <= 1) {
+    if (c->nPoint <= 1) {
         return;
     }
-    xmax = c->key[0].t;
-    ymin = c->key[0].v;
+    xmax = c->Point[0].T;
+    ymin = c->Point[0].Q;
     xmin = xmax;
     ymax = ymin;
     // the .v reads go through `w->curve` (hoisted by loop.c into its own pseudo): the .t and .v address
     // givs then have different base registers and loop.c cannot combine them into one pointer with a
     // -4 displacement -- the target steps two pointers (&key[i].t at +0x14 and &key[i].v at +0x18)
-    for (i = 1; i < c->num; i++) {
-        if (c->key[i].t <= xmin) {
-            xmin = c->key[i].t;
+    for (i = 1; i < c->nPoint; i++) {
+        if (c->Point[i].T <= xmin) {
+            xmin = c->Point[i].T;
         }
-        if (c->key[i].t >= xmax) {
-            xmax = c->key[i].t;
+        if (c->Point[i].T >= xmax) {
+            xmax = c->Point[i].T;
         }
-        if (w->curve->key[i].v <= ymin) {
-            ymin = w->curve->key[i].v;
+        if (w->curve->Point[i].Q <= ymin) {
+            ymin = w->curve->Point[i].Q;
         }
-        if (w->curve->key[i].v >= ymax) {
-            ymax = w->curve->key[i].v;
+        if (w->curve->Point[i].Q >= ymax) {
+            ymax = w->curve->Point[i].Q;
         }
     }
     w->xMax = xmax * 1.2f;
@@ -185,9 +185,9 @@ static int sctrlQuit(DbSctrlWork* w)
 static int sctrlMenu(DbSctrlWork* w)
 {
     JOY* joy = &Joy[0];
-    Hermite1* c = w->curve;
-    f32 tx = c->key[0].t;
-    f32 ty = c->key[0].v;
+    HERMITE_1_PTR* c = w->curve;
+    f32 tx = c->Point[0].T;
+    f32 ty = c->Point[0].Q;
     int x;
     int y;
     int i;
@@ -547,8 +547,8 @@ static int sctrlEdit(DbSctrlWork* w)
     }
     switch (w->step) {
     case 0:
-        if (w->curve->num == 0) {
-            w->curve->num = 1;
+        if (w->curve->nPoint == 0) {
+            w->curve->nPoint = 1;
             w->step = 1;
             break;
         }
@@ -568,8 +568,8 @@ static int sctrlEdit(DbSctrlWork* w)
             switch (hit) {
             case 0:
                 w->step = 2;
-                g2.x = w->curve->key[w->grab].t;
-                g2.y = w->curve->key[w->grab].v;
+                g2.x = w->curve->Point[w->grab].T;
+                g2.y = w->curve->Point[w->grab].Q;
                 posGraph2Screen(w, &g2, cur);
                 break;
             case 1:
@@ -582,8 +582,8 @@ static int sctrlEdit(DbSctrlWork* w)
         } else if (joy->trg & 0x800) {
             if (grabLine(w)) {
                 if (w->grab != -1) {
-                    g.x = w->curve->key[w->grab].t;
-                    g.y = w->curve->key[w->grab].v;
+                    g.x = w->curve->Point[w->grab].T;
+                    g.y = w->curve->Point[w->grab].Q;
                     g.z = 0.0f;
                     posGraph2Screen(w, &g, &w->pos);
                 } else if (w->insertIdx != -1) {
@@ -601,38 +601,38 @@ static int sctrlEdit(DbSctrlWork* w)
             break;
         }
         posScreen2Graph(w, cur, &g);
-        w->curve->key[w->curve->num - 1].t = g.x;
-        w->curve->key[w->curve->num - 1].v = g.y;
-        if ((joy->trg & 0x100) && w->curve->num <= SCTRL_MAX_KEY - 1) {
+        w->curve->Point[w->curve->nPoint - 1].T = g.x;
+        w->curve->Point[w->curve->nPoint - 1].Q = g.y;
+        if ((joy->trg & 0x100) && w->curve->nPoint <= SCTRL_MAX_KEY - 1) {
             posScreen2GridLock(w, cur, &g);
-            w->curve->key[w->curve->num - 1].t = g.x;
-            w->curve->key[w->curve->num - 1].v = g.y;
-            if (w->curve->num > 1) {
+            w->curve->Point[w->curve->nPoint - 1].T = g.x;
+            w->curve->Point[w->curve->nPoint - 1].Q = g.y;
+            if (w->curve->nPoint > 1) {
                 SctrlAdjustAxisRange(w);
                 posGraph2Screen(w, &g, cur);
             }
-            w->curve->num++;
+            w->curve->nPoint++;
         }
         if (joy->trg & 0x200) {
-            if (w->curve->num > 1) {
+            if (w->curve->nPoint > 1) {
                 w->step = 0;
             } else {
                 w->routine = 2;
             }
-            w->curve->num--;
+            w->curve->nPoint--;
         }
         break;
     case 2:
         if (joy->on & 0x100) {
             posScreen2Graph(w, cur, &g2);
-            w->curve->key[w->grab].t = g2.x;
-            w->curve->key[w->grab].v = g2.y;
+            w->curve->Point[w->grab].T = g2.x;
+            w->curve->Point[w->grab].Q = g2.y;
         } else {
             posScreen2GridLock(w, cur, &g2);
-            w->curve->key[w->grab].t = g2.x;
-            w->curve->key[w->grab].v = g2.y;
+            w->curve->Point[w->grab].T = g2.x;
+            w->curve->Point[w->grab].Q = g2.y;
             w->step = 0;
-            if (w->curve->num > 1) {
+            if (w->curve->nPoint > 1) {
                 SctrlAdjustAxisRange(w);
                 posGraph2Screen(w, &g2, cur);
             }
@@ -641,18 +641,18 @@ static int sctrlEdit(DbSctrlWork* w)
     case 3:
     case 4:
         if (joy->on & 0x100) {
-            Hermite1* c;
+            HERMITE_1_PTR* c;
             f32 dx;
             f32 dy;
 
             posScreen2Graph(w, cur, &g2);
             c = w->curve;
-            dx = c->key[w->grab].t - g2.x;
-            dy = c->key[w->grab].v - g2.y;
+            dx = c->Point[w->grab].T - g2.x;
+            dy = c->Point[w->grab].Q - g2.y;
             if (w->step == 3) {
-                c->key[w->grab].in = dy / dx;
+                c->Point[w->grab].dQ[1] = dy / dx;
             } else {
-                c->key[w->grab].out = dy / dx;
+                c->Point[w->grab].dQ[0] = dy / dx;
             }
         } else {
             w->step = 0;
@@ -702,18 +702,18 @@ int grabPoint(DbSctrlWork* w)
     Vec hnd;
     Vec gph;
     Vec dir;
-    Hermite1* c = w->curve;
+    HERMITE_1_PTR* c = w->curve;
     f32 min = SCTRL_GRAB_DIST;
     int ret = -1;
     int i;
 
-    for (i = 0; i < c->num; i++) {
-        HermiteKey* k = &c->key[i];
+    for (i = 0; i < c->nPoint; i++) {
+        HERMITE_1_POINT* k = &c->Point[i];
         f32 ang;
         f32 d;
 
-        gph.x = k->t;
-        gph.y = k->v;
+        gph.x = k->T;
+        gph.y = k->Q;
         posGraph2Screen(w, &gph, &scr);
         d = PSVECDistance(&scr, &w->pos);
         if (d < min) {
@@ -722,9 +722,9 @@ int grabPoint(DbSctrlWork* w)
             ret = 0;
         }
 
-        ang = atanf(k->in) + PI;
-        gph.x = cosf(ang) * SCTRL_HANDLE_LEN + k->t;
-        gph.y = sinf(ang) * SCTRL_HANDLE_LEN + k->v;
+        ang = atanf(k->dQ[1]) + PI;
+        gph.x = cosf(ang) * SCTRL_HANDLE_LEN + k->T;
+        gph.y = sinf(ang) * SCTRL_HANDLE_LEN + k->Q;
         posGraph2Screen(w, &gph, &hnd);
         PSVECSubtract(&hnd, &scr, &dir);
 #line 790 "D:/Bio4/Prog/db_sctrl.cpp"
@@ -738,9 +738,9 @@ int grabPoint(DbSctrlWork* w)
             ret = 1;
         }
 
-        ang = atanf(k->out);
-        gph.x = cosf(ang) * SCTRL_HANDLE_LEN + k->t;
-        gph.y = sinf(ang) * SCTRL_HANDLE_LEN + k->v;
+        ang = atanf(k->dQ[0]);
+        gph.x = cosf(ang) * SCTRL_HANDLE_LEN + k->T;
+        gph.y = sinf(ang) * SCTRL_HANDLE_LEN + k->Q;
         posGraph2Screen(w, &gph, &hnd);
         PSVECSubtract(&hnd, &scr, &dir);
 #line 811 "D:/Bio4/Prog/db_sctrl.cpp"
@@ -764,17 +764,17 @@ int grabLine(DbSctrlWork* w)
     Vec gph;
     Vec scr;
     f32 v;
-    Hermite1* c = w->curve;
+    HERMITE_1_PTR* c = w->curve;
     f32 min = SCTRL_GRAB_DIST;
     int ret = 0;
     int i;
 
     w->insertIdx = -1;
-    for (i = 0; i < c->num - 1; i++) {
-        HermiteKey* a = &c->key[i];
-        HermiteKey* b = &c->key[i + 1];
-        f32 t0 = a->t;
-        f32 span = b->t - a->t;
+    for (i = 0; i < c->nPoint - 1; i++) {
+        HERMITE_1_POINT* a = &c->Point[i];
+        HERMITE_1_POINT* b = &c->Point[i + 1];
+        f32 t0 = a->T;
+        f32 span = b->T - a->T;
         int j;
 
         for (j = 0; j <= 100.0f; j++) {
@@ -796,11 +796,11 @@ int grabLine(DbSctrlWork* w)
         }
     }
     w->grab = -1;
-    for (i = 0; i < c->num; i++) {
+    for (i = 0; i < c->nPoint; i++) {
         f32 d;
 
-        gph.x = c->key[i].t;
-        gph.y = c->key[i].v;
+        gph.x = c->Point[i].T;
+        gph.y = c->Point[i].Q;
         gph.z = 0.0f;
         posGraph2Screen(w, &gph, &scr);
         d = PSVECDistance(&scr, &w->pos);
@@ -816,32 +816,32 @@ int grabLine(DbSctrlWork* w)
 // Removes key w->grab from the curve (the rest shift down, the freed slot is zeroed).
 void deletePoint(DbSctrlWork* w)
 {
-    Hermite1* c = w->curve;
+    HERMITE_1_PTR* c = w->curve;
     int i;
 
-    c->num--;
-    for (i = w->grab; i < c->num; i++) {
-        c->key[i] = c->key[i + 1];
+    c->nPoint--;
+    for (i = w->grab; i < c->nPoint; i++) {
+        c->Point[i] = c->Point[i + 1];
     }
-    memclr_asm(&c->key[c->num], sizeof(HermiteKey));
+    memclr_asm(&c->Point[c->nPoint], sizeof(HERMITE_1_POINT));
 }
 
 // Inserts a key at w->insertIdx with the grabbed curve position (insertPos); no-op at 64 keys.
 void insertPoint(DbSctrlWork* w)
 {
-    Hermite1* c = w->curve;
+    HERMITE_1_PTR* c = w->curve;
     int i;
 
-    if (c->num > SCTRL_MAX_KEY - 1) {
+    if (c->nPoint > SCTRL_MAX_KEY - 1) {
         return;
     }
-    for (i = c->num; i > w->insertIdx; i--) {
-        c->key[i] = c->key[i - 1];
+    for (i = c->nPoint; i > w->insertIdx; i--) {
+        c->Point[i] = c->Point[i - 1];
     }
-    memclr_asm(&c->key[w->insertIdx], sizeof(HermiteKey));
-    c->key[w->insertIdx].t = w->insertPos.x;
-    c->key[w->insertIdx].v = w->insertPos.y;
-    c->num++;
+    memclr_asm(&c->Point[w->insertIdx], sizeof(HERMITE_1_POINT));
+    c->Point[w->insertIdx].T = w->insertPos.x;
+    c->Point[w->insertIdx].Q = w->insertPos.y;
+    c->nPoint++;
 }
 
 // Draws the cross-hair cursor at the screen position (world space through w->mtx) and prints its
@@ -975,25 +975,25 @@ void drawScurve(DbSctrlWork* w)
     Vec wh;
     Vec dir;
     f32 v;
-    Hermite1* c = w->curve;
-    HermiteKey* k;
+    HERMITE_1_PTR* c = w->curve;
+    HERMITE_1_POINT* k;
     int i;
 
     // k as `&c->key[i]` inside the body: loop.c reduces it to a pointer giv whose `addi rK,c,4` init is
     // emitted in the loop preheader (a `k = c->key; ... k++` form puts the init in the entry block
     // before the exit test, which shifts the callee-saved allocation of i/k/&wp)
-    for (i = 0; i < c->num; i++) {
+    for (i = 0; i < c->nPoint; i++) {
         f32 ang;
 
-        k = &c->key[i];
-        gph.x = k->t;
-        gph.y = k->v;
+        k = &c->Point[i];
+        gph.x = k->T;
+        gph.y = k->Q;
         posGraph2World(w, &gph, &wp);
         Draw_sphere(&wp, 2.0f, 0xFFFFFFFF, 0, 0);
 
-        ang = atanf(k->in) + PI;
-        hnd.x = cosf(ang) * SCTRL_HANDLE_LEN + k->t;
-        hnd.y = sinf(ang) * SCTRL_HANDLE_LEN + k->v;
+        ang = atanf(k->dQ[1]) + PI;
+        hnd.x = cosf(ang) * SCTRL_HANDLE_LEN + k->T;
+        hnd.y = sinf(ang) * SCTRL_HANDLE_LEN + k->Q;
         posGraph2World(w, &hnd, &wh);
         PSVECSubtract(&wh, &wp, &dir);
 #line 1116 "D:/Bio4/Prog/db_sctrl.cpp"
@@ -1003,9 +1003,9 @@ void drawScurve(DbSctrlWork* w)
         Draw_sphere(&wh, 2.0f, 0xFFFFFFFF, 0, 0);
         Draw_line3d(&wp, &wh, SCTRL_LINE_COL, 0);
 
-        ang = atanf(k->out);
-        hnd.x = cosf(ang) * SCTRL_HANDLE_LEN + k->t;
-        hnd.y = sinf(ang) * SCTRL_HANDLE_LEN + k->v;
+        ang = atanf(k->dQ[0]);
+        hnd.x = cosf(ang) * SCTRL_HANDLE_LEN + k->T;
+        hnd.y = sinf(ang) * SCTRL_HANDLE_LEN + k->Q;
         posGraph2World(w, &hnd, &wh);
         PSVECSubtract(&wh, &wp, &dir);
 #line 1133 "D:/Bio4/Prog/db_sctrl.cpp"
@@ -1015,11 +1015,11 @@ void drawScurve(DbSctrlWork* w)
         Draw_sphere(&wh, 2.0f, 0xFFFFFFFF, 0, 0);
         Draw_line3d(&wp, &wh, SCTRL_LINE_COL, 0);
     }
-    for (i = 0; i < c->num - 1; i++) {
-        HermiteKey* a = &c->key[i];
-        HermiteKey* b = &c->key[i + 1];
-        f32 t0 = a->t;
-        f32 span = b->t - a->t;
+    for (i = 0; i < c->nPoint - 1; i++) {
+        HERMITE_1_POINT* a = &c->Point[i];
+        HERMITE_1_POINT* b = &c->Point[i + 1];
+        f32 t0 = a->T;
+        f32 span = b->T - a->T;
         int j;
 
         for (j = 0; j <= 99; j++) {

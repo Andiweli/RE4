@@ -55,7 +55,7 @@ struct ID_UNIT {
     f32 v1;          // 0x11C
     void* path0;     // 0x120  FuncPath data
     void* path1;     // 0x124
-    Hermite1* curve[4];  // 0x128
+    HERMITE_1_PTR* curve[4];  // 0x128
 };
 
 // One entry of an id data table (IDSystem::set): ID_DATA_V1 is 0x88 bytes, ID_DATA_V2 0x8C.

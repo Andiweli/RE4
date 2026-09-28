@@ -1059,24 +1059,24 @@ void ToolEvt::SubToolLightMove(ToolEvt* /*t*/)
 // Default fog curves: start / end constant at the current LightMgr fog over the event length.
 int ToolEvt::SubToolFogWkInit(ToolEvt* t, Event* ev)
 {
-    t->DatFogWk.start.num = 2;
-    t->DatFogWk.start.key[0].t = 0.0f;
-    t->DatFogWk.start.key[0].v = LightMgr.getFogStart();
-    t->DatFogWk.start.key[0].out = 0.0f;
-    t->DatFogWk.start.key[0].in = 0.0f;
-    t->DatFogWk.start.key[1].t = (f32) ev->GetMaxFrame();
-    t->DatFogWk.start.key[1].v = LightMgr.getFogStart();
-    t->DatFogWk.start.key[1].out = 0.0f;
-    t->DatFogWk.start.key[1].in = 0.0f;
-    t->DatFogWk.end.num = 2;
-    t->DatFogWk.end.key[0].t = 0.0f;
-    t->DatFogWk.end.key[0].v = LightMgr.getFogEnd();
-    t->DatFogWk.end.key[0].out = 0.0f;
-    t->DatFogWk.end.key[0].in = 0.0f;
-    t->DatFogWk.end.key[1].t = (f32) ev->GetMaxFrame();
-    t->DatFogWk.end.key[1].v = LightMgr.getFogEnd();
-    t->DatFogWk.end.key[1].out = 0.0f;
-    t->DatFogWk.end.key[1].in = 0.0f;
+    t->DatFogWk.start.nPoint = 2;
+    t->DatFogWk.start.Point[0].T = 0.0f;
+    t->DatFogWk.start.Point[0].Q = LightMgr.getFogStart();
+    t->DatFogWk.start.Point[0].dQ[0] = 0.0f;
+    t->DatFogWk.start.Point[0].dQ[1] = 0.0f;
+    t->DatFogWk.start.Point[1].T = (f32) ev->GetMaxFrame();
+    t->DatFogWk.start.Point[1].Q = LightMgr.getFogStart();
+    t->DatFogWk.start.Point[1].dQ[0] = 0.0f;
+    t->DatFogWk.start.Point[1].dQ[1] = 0.0f;
+    t->DatFogWk.end.nPoint = 2;
+    t->DatFogWk.end.Point[0].T = 0.0f;
+    t->DatFogWk.end.Point[0].Q = LightMgr.getFogEnd();
+    t->DatFogWk.end.Point[0].dQ[0] = 0.0f;
+    t->DatFogWk.end.Point[0].dQ[1] = 0.0f;
+    t->DatFogWk.end.Point[1].T = (f32) ev->GetMaxFrame();
+    t->DatFogWk.end.Point[1].Q = LightMgr.getFogEnd();
+    t->DatFogWk.end.Point[1].dQ[0] = 0.0f;
+    t->DatFogWk.end.Point[1].dQ[1] = 0.0f;
     return 1;
 }
 
@@ -1090,9 +1090,9 @@ void ToolEvt::SubToolFogInit(ToolEvt* t, int sw, Event* ev, int which)
             return;
         }
         if (which == 0) {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFogWk.start, (f32) ev->GetMaxFrame(), 100000.0f);
+            t->SctrlToolInit(t, (HERMITE_1_PTR*) &t->DatFogWk.start, (f32) ev->GetMaxFrame(), 100000.0f);
         } else {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFogWk.end, (f32) ev->GetMaxFrame(), 100000.0f);
+            t->SctrlToolInit(t, (HERMITE_1_PTR*) &t->DatFogWk.end, (f32) ev->GetMaxFrame(), 100000.0f);
         }
         t->CurveNo = which;
     } else {
@@ -1119,24 +1119,24 @@ void ToolEvt::SubToolFogMove(ToolEvt* t, Event* ev)
 // Default focus curves: near 0 / far 10000 constant over the event length.
 void ToolEvt::SubToolFocusWkInit(ToolEvt* t, Event* ev)
 {
-    t->DatFocusWk.near_.num = 2;
-    t->DatFocusWk.near_.key[0].t = 0.0f;
-    t->DatFocusWk.near_.key[0].v = 0.0f;
-    t->DatFocusWk.near_.key[0].out = 0.0f;
-    t->DatFocusWk.near_.key[0].in = 0.0f;
-    t->DatFocusWk.near_.key[1].t = (f32) ev->GetMaxFrame();
-    t->DatFocusWk.near_.key[1].v = 0.0f;
-    t->DatFocusWk.near_.key[1].out = 0.0f;
-    t->DatFocusWk.near_.key[1].in = 0.0f;
-    t->DatFocusWk.far_.num = 2;
-    t->DatFocusWk.far_.key[0].t = 0.0f;
-    t->DatFocusWk.far_.key[0].v = 10000.0f;
-    t->DatFocusWk.far_.key[0].out = 0.0f;
-    t->DatFocusWk.far_.key[0].in = 0.0f;
-    t->DatFocusWk.far_.key[1].t = (f32) ev->GetMaxFrame();
-    t->DatFocusWk.far_.key[1].v = 10000.0f;
-    t->DatFocusWk.far_.key[1].out = 0.0f;
-    t->DatFocusWk.far_.key[1].in = 0.0f;
+    t->DatFocusWk.near_.nPoint = 2;
+    t->DatFocusWk.near_.Point[0].T = 0.0f;
+    t->DatFocusWk.near_.Point[0].Q = 0.0f;
+    t->DatFocusWk.near_.Point[0].dQ[0] = 0.0f;
+    t->DatFocusWk.near_.Point[0].dQ[1] = 0.0f;
+    t->DatFocusWk.near_.Point[1].T = (f32) ev->GetMaxFrame();
+    t->DatFocusWk.near_.Point[1].Q = 0.0f;
+    t->DatFocusWk.near_.Point[1].dQ[0] = 0.0f;
+    t->DatFocusWk.near_.Point[1].dQ[1] = 0.0f;
+    t->DatFocusWk.far_.nPoint = 2;
+    t->DatFocusWk.far_.Point[0].T = 0.0f;
+    t->DatFocusWk.far_.Point[0].Q = 10000.0f;
+    t->DatFocusWk.far_.Point[0].dQ[0] = 0.0f;
+    t->DatFocusWk.far_.Point[0].dQ[1] = 0.0f;
+    t->DatFocusWk.far_.Point[1].T = (f32) ev->GetMaxFrame();
+    t->DatFocusWk.far_.Point[1].Q = 10000.0f;
+    t->DatFocusWk.far_.Point[1].dQ[0] = 0.0f;
+    t->DatFocusWk.far_.Point[1].dQ[1] = 0.0f;
     t->DatFocusWk.nearLevel = 5.0f;
     t->DatFocusWk.farLevel = 5.0f;
 }
@@ -1150,9 +1150,9 @@ void ToolEvt::SubToolFocusInit(ToolEvt* t, int sw, Event* ev, int which)
             return;
         }
         if (which == 0) {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFocusWk.near_, (f32) ev->GetMaxFrame(), 10000.0f);
+            t->SctrlToolInit(t, (HERMITE_1_PTR*) &t->DatFocusWk.near_, (f32) ev->GetMaxFrame(), 10000.0f);
         } else {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFocusWk.far_, (f32) ev->GetMaxFrame(), 10000.0f);
+            t->SctrlToolInit(t, (HERMITE_1_PTR*) &t->DatFocusWk.far_, (f32) ev->GetMaxFrame(), 10000.0f);
         }
         t->CurveNo = which;
     } else {
@@ -1339,7 +1339,7 @@ void ToolEvt::SubToolIn(ToolEvt* t, int sw, int bit)
 
 // Sets up the S-curve editor on `curve` ("Frame" / "Param" axes, range -0.2..1.2 of xMax / yMax,
 // grid lock 1), cursor on the first key.
-void ToolEvt::SctrlToolInit(ToolEvt* t, Hermite1* curve, f32 xMax, f32 yMax)
+void ToolEvt::SctrlToolInit(ToolEvt* t, HERMITE_1_PTR* curve, f32 xMax, f32 yMax)
 {
     memset(t->PDatDbSctrl, 0, sizeof(DbSctrlWork));
     t->PDatDbSctrl->curve = curve;
@@ -1350,10 +1350,10 @@ void ToolEvt::SctrlToolInit(ToolEvt* t, Hermite1* curve, f32 xMax, f32 yMax)
     t->PDatDbSctrl->grid.y = 1.0f;
     t->PDatDbSctrl->flags = 1;
     SctrlInitAxisRange(t->PDatDbSctrl, xMax * 1.2f, xMax * -0.2f, yMax * 1.2f, yMax * -0.2f);
-    if (t->PDatDbSctrl->curve->num <= 1) {
+    if (t->PDatDbSctrl->curve->nPoint <= 1) {
         SctrlInitCursor(t->PDatDbSctrl, 0.0f, 0.0f);
     } else {
-        SctrlInitCursor(t->PDatDbSctrl, t->PDatDbSctrl->curve->key[0].t, t->PDatDbSctrl->curve->key[0].v);
+        SctrlInitCursor(t->PDatDbSctrl, t->PDatDbSctrl->curve->Point[0].T, t->PDatDbSctrl->curve->Point[0].Q);
     }
 }
 

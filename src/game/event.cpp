@@ -74,20 +74,14 @@ static inline int EvtChk(u32 f, u32 mask)
     return (f & mask) ? 1 : 0;
 }
 
-// One Hermite curve of the fog / focus data (64 keys).
-struct EvtCurve {
-    s32 num;
-    HermiteKey key[64];
-};
-
 struct EvtFogData {
-    EvtCurve start;    // 0x000
-    EvtCurve end;      // 0x404
+    HERMITE_1_FIX start;    // 0x000
+    HERMITE_1_FIX end;      // 0x404
 };
 
 struct EvtFocusData {
-    EvtCurve near_;    // 0x000
-    EvtCurve far_;     // 0x404
+    HERMITE_1_FIX near_;    // 0x000
+    HERMITE_1_FIX far_;     // 0x404
     f32 nearLevel;     // 0x808
     f32 farLevel;      // 0x80C
 };
@@ -1905,10 +1899,10 @@ void Event::FogMove(Event* pEvt, void* pDatFog)
         return;
     }
     t = (f32) frame;
-    if (Hermite_1CurveCalc((Hermite1*) &d->start, t, &start)) {
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->start, t, &start)) {
         LightMgr.setFogStart(start);
     }
-    if (Hermite_1CurveCalc((Hermite1*) &d->end, t, &end)) {
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->end, t, &end)) {
         LightMgr.setFogEnd(end);
     }
     LightMgr.setFog();
@@ -1930,10 +1924,10 @@ void Event::FocusMove(Event* pEvt, void* pDatFocus)
         return;
     }
     t = (f32) frame;
-    if (Hermite_1CurveCalc((Hermite1*) &d->near_, t, &near_)) {
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->near_, t, &near_)) {
         Filter01SetParam_CamZ(0, d->nearLevel, near_, 1);
     }
-    if (Hermite_1CurveCalc((Hermite1*) &d->far_, t, &far_)) {
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->far_, t, &far_)) {
         Filter01SetParam_CamZ(1, d->farLevel, far_, 1);
     }
 }

@@ -98,7 +98,7 @@ s8 item_total;
 cItem* item_sel;
 int item_frame_on;
 void* item_path0[2];
-Hermite1* item_curve[2];
+HERMITE_1_PTR* item_curve[2];
 void* item_path1[2];
 Vec item_scr[2];
 Vec item_pos[2];

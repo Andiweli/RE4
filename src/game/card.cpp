@@ -3455,7 +3455,7 @@ void CardID::move(cCard* pCard)
             a->path1 = b->path1;
             a->pos0 = b->pos0;
             FuncPathParametrize(a->path0, a->path1);
-            m_IdSave.setTime(a, (s8) a->curve[0]->key[a->curve[0]->num - 1].t);
+            m_IdSave.setTime(a, (s8) a->curve[0]->Point[a->curve[0]->nPoint - 1].T);
             a->rev_flag |= 0xF;
             setAction(0);
             IdSys.unitPtr(5, IDC_SSCRN_NEAR_0)->rev_flag |= 0xF;
@@ -3569,7 +3569,7 @@ void CardID::up_down(cCard* pCard)
         if (m_IdSave.unitPtr(0, IDC_SSCRN_FAR_0)->anima_state & 1) {
             ID_UNIT* u = m_IdSave.unitPtr(0, IDC_SSCRN_FAR_0);
             u->path0 = g_p_path_org[0];
-            u->curve[0] = (Hermite1*) g_p_hrmt_org[0];
+            u->curve[0] = (HERMITE_1_PTR*) g_p_hrmt_org[0];
             u->path1 = g_p_spln_org[0];
             u->pos0 = g_pos0_org;
             FuncPathParametrize(u->path0, u->path1);
@@ -3601,7 +3601,7 @@ void CardID::up_down(cCard* pCard)
 void CardID::save(cCard* pCard)
 {
     ID_UNIT* u = IdSys.unitPtr(1, IDC_SSCRN_NEAR_0);
-    Hermite1* h = u->curve[0];
+    HERMITE_1_PTR* h = u->curve[0];
     int n = ((s8*) h)[3];
     int i;
 
@@ -3614,7 +3614,7 @@ void CardID::save(cCard* pCard)
         return;
     }
     for (i = 0; i < n; i++) {
-        if ((s8) h->key[i].t == (s16) u->timer[0]) {
+        if ((s8) h->Point[i].T == (s16) u->timer[0]) {
             switch (i) {
             case 0:
                 break;

@@ -276,25 +276,25 @@ void IDSystem::set(ID_FILE_HEADER* data, u8 markNo, ID_CLASS classNo, u8 otType,
                     }
                     a = p1->ofs[2];
                     if (a) {
-                        u->curve[0] = (Hermite1*) (a + (u32) data);
+                        u->curve[0] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[0] = 0;
                     }
                     a = p1->ofs[3];
                     if (a) {
-                        u->curve[1] = (Hermite1*) (a + (u32) data);
+                        u->curve[1] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[1] = 0;
                     }
                     a = p1->ofs[4];
                     if (a) {
-                        u->curve[2] = (Hermite1*) (a + (u32) data);
+                        u->curve[2] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[2] = 0;
                     }
                     a = p1->ofs[5];
                     if (a) {
-                        u->curve[3] = (Hermite1*) (a + (u32) data);
+                        u->curve[3] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[3] = 0;
                     }
@@ -384,25 +384,25 @@ void IDSystem::set(ID_FILE_HEADER* data, u8 markNo, ID_CLASS classNo, u8 otType,
                     }
                     a = p2->ofs[2];
                     if (a) {
-                        u->curve[0] = (Hermite1*) (a + (u32) data);
+                        u->curve[0] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[0] = 0;
                     }
                     a = p2->ofs[3];
                     if (a) {
-                        u->curve[1] = (Hermite1*) (a + (u32) data);
+                        u->curve[1] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[1] = 0;
                     }
                     a = p2->ofs[4];
                     if (a) {
-                        u->curve[2] = (Hermite1*) (a + (u32) data);
+                        u->curve[2] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[2] = 0;
                     }
                     a = p2->ofs[5];
                     if (a) {
-                        u->curve[3] = (Hermite1*) (a + (u32) data);
+                        u->curve[3] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[3] = 0;
                     }
@@ -645,12 +645,12 @@ void idSysMove00(ID_UNIT* u)
 
     if (u->path0 != 0 && ((u8*) u->path0)[7] != 0) {
         int num;
-        if (u->curve[0] != 0 && (num = u->curve[0]->num) != -1) {
+        if (u->curve[0] != 0 && (num = u->curve[0]->nPoint) != -1) {
             t = Hermite_1CurveCalc(u->curve[0], (f32) (s16) u->timer[0]);
             u->anima_state &= ~0x1;
             if (!(u->rev_flag & 0x1)) {
                 u->timer[0]++;
-                f32 endT = u->curve[0]->key[num - 1].t;
+                f32 endT = u->curve[0]->Point[num - 1].T;
                 if ((f32) (s16) u->timer[0] >= endT) {
                     if (u->loop_flag & 0x1) {
                         u->timer[0] = 0;
@@ -663,7 +663,7 @@ void idSysMove00(ID_UNIT* u)
                 u->timer[0]--;
                 if ((s16) u->timer[0] <= 0) {
                     if (u->loop_flag & 0x1) {
-                        u->timer[0] = (u16) u->curve[0]->key[num - 1].t;
+                        u->timer[0] = (u16) u->curve[0]->Point[num - 1].T;
                     } else {
                         u->anima_state |= 0x1;
                         u->timer[0] = 0;
@@ -767,14 +767,14 @@ void idSysMove01(ID_UNIT* u)
     int i;
     int num;
 
-    if (u->curve[1] == 0 || (num = u->curve[1]->num) == 0) {
+    if (u->curve[1] == 0 || (num = u->curve[1]->nPoint) == 0) {
         return;
     }
     s = Hermite_1CurveCalc(u->curve[1], (f32) (s16) u->timer[1]);
     u->anima_state &= ~0x2;
     if (!(u->rev_flag & 0x2)) {
         u->timer[1]++;
-        f32 endT = u->curve[1]->key[num - 1].t;
+        f32 endT = u->curve[1]->Point[num - 1].T;
         if ((f32) (s16) u->timer[1] >= endT) {
             if (u->loop_flag & 0x2) {
                 u->timer[1] = 0;
@@ -787,7 +787,7 @@ void idSysMove01(ID_UNIT* u)
         u->timer[1]--;
         if ((s16) u->timer[1] <= 0) {
             if (u->loop_flag & 0x2) {
-                u->timer[1] = (u16) u->curve[1]->key[num - 1].t;
+                u->timer[1] = (u16) u->curve[1]->Point[num - 1].T;
             } else {
                 u->anima_state |= 0x2;
                 u->timer[1] = 0;
@@ -816,7 +816,7 @@ void idSysMove02(ID_UNIT* u)
     f32 r;
     int num;
 
-    if (u->curve[2] != 0 && (num = u->curve[2]->num) != 0) {
+    if (u->curve[2] != 0 && (num = u->curve[2]->nPoint) != 0) {
         r = Hermite_1CurveCalc(u->curve[2], (f32) (s16) u->timer[2]);
         if (*(u32*) u->col1 != 0) {
             u->col[0] = (1.0f - r) * u->col0[0] + r * u->col1[0];
@@ -856,7 +856,7 @@ void idSysMove02(ID_UNIT* u)
         u->anima_state &= ~0x3;
         if (!(u->rev_flag & 0x4)) {
             u->timer[2]++;
-            f32 endT = u->curve[2]->key[num - 1].t;
+            f32 endT = u->curve[2]->Point[num - 1].T;
             if ((f32) (s16) u->timer[2] >= endT) {
                 if (u->loop_flag & 0x4) {
                     u->timer[2] = 0;
@@ -869,7 +869,7 @@ void idSysMove02(ID_UNIT* u)
             u->timer[2]--;
             if ((s16) u->timer[2] <= 0) {
                 if (u->loop_flag & 0x4) {
-                    u->timer[2] = (u16) u->curve[2]->key[num - 1].t;
+                    u->timer[2] = (u16) u->curve[2]->Point[num - 1].T;
                 } else {
                     u->anima_state |= 0x3;
                     u->timer[2] = 0;
@@ -900,12 +900,12 @@ void idSysMove03(ID_UNIT* u)
     int num;
 
     u->rot = u->rot0;
-    if (u->curve[3] != 0 && (num = u->curve[3]->num) != 0) {
+    if (u->curve[3] != 0 && (num = u->curve[3]->nPoint) != 0) {
         a = Hermite_1CurveCalc(u->curve[3], (f32) (s16) u->timer[3]);
         u->anima_state &= ~0x4;
         if (!(u->rev_flag & 0x8)) {
             u->timer[3]++;
-            f32 endT = u->curve[3]->key[num - 1].t;
+            f32 endT = u->curve[3]->Point[num - 1].T;
             if ((f32) (s16) u->timer[3] >= endT) {
                 if (u->loop_flag & 0x8) {
                     u->timer[3] = 0;
@@ -918,7 +918,7 @@ void idSysMove03(ID_UNIT* u)
             u->timer[3]--;
             if ((s16) u->timer[3] <= 0) {
                 if (u->loop_flag & 0x8) {
-                    u->timer[3] = (u16) u->curve[3]->key[num - 1].t;
+                    u->timer[3] = (u16) u->curve[3]->Point[num - 1].T;
                 } else {
                     u->anima_state |= 0x4;
                     u->timer[3] = 0;
