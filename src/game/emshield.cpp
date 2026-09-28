@@ -20,6 +20,16 @@
 #include "em_sub.h"
 #include "est.h"
 
+// One rope node of the falling shield (emShield_R1_Fall): three point masses joined by distance
+// constraints; the model matrix is rebuilt from them every frame.
+struct EMSHIELD_FALLWK {
+    Vec pos;
+    Vec old;
+    Vec spd;
+    f32 len;
+    int reflect;
+};
+
 typedef void (*EmShieldFunc)(cEmShield*);
 
 static EmShieldFunc EmShield_R0_move_tbl[4] = {
@@ -558,13 +568,15 @@ void emShield_R1_Fall(cEmShield* pEm)
         { -200.0f, 30.0f, -800.0f },
         { 500.0f, 30.0f, 0.0f },
     };
-    EmTreeNode node[3];
+    EMSHIELD_FALLWK node[3];
     Vec b;
     Vec c;
     Vec a;
     Vec tmp;
-    EmTreeNode* n;    // shared by every node loop (emtree emTree_R1_Fall: the giv final-value copy)
-    EmTreeNode* nx;
+    EMSHIELD_FALLWK* n;    // reused as the cursor in every node loop below (emtree.cpp's emTree_R1_Fall
+                           // has the identical shape: the compiler's final-value copy of the induction
+                           // variable needs the declaration written this way to match)
+    EMSHIELD_FALLWK* nx;
     f32 floor;
     u32 i;
     u32 k;

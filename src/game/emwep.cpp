@@ -44,7 +44,7 @@ static void plemEscape(cPlayer* pl);
 
 // One rope node of the falling weapon (emWep_R1_Fall): three point masses joined by distance
 // constraints; the model matrix is rebuilt from them every frame.
-struct EmWepNode {
+struct EMWEP_FALLWK {
     Vec pos;      // 0x00
     Vec old;      // 0x0C
     Vec spd;      // 0x18
@@ -525,12 +525,12 @@ void emWep_R1_Fall(cEmWep* pEm)
         { { -140.0f, 60.0f, 140.0f }, { -140.0f, 60.0f, -140.0f }, { 200.0f, 60.0f, 0.0f } },
         { { -140.0f, 30.0f, 140.0f }, { -140.0f, 30.0f, -140.0f }, { 200.0f, 30.0f, 0.0f } },
     };
-    EmWepNode node[3];
+    EMWEP_FALLWK node[3];
     // one pointer shared by every node loop (emtree emTree_R1_Fall): the later mentions keep the
     // k-body loop's giv from being marked replaceable, loop.c emits its final value `&node[2]`
     // after that loop and cse2 makes the last loop's bound a copy of it (`mr r25, r0`)
-    EmWepNode* n;
-    EmWepNode* nx;
+    EMWEP_FALLWK* n;
+    EMWEP_FALLWK* nx;
     Vec b;
     Vec c;
     Vec a;

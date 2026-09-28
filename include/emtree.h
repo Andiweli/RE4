@@ -8,7 +8,7 @@
 
 // One rope node of the falling tree (emTree_R1_Fall): three point masses joined by distance
 // constraints; the model matrix is rebuilt from them every frame.
-struct EmTreeNode {
+struct EMTREE_FALLWK {
     Vec pos;      // 0x00
     Vec old;      // 0x0C  position before this frame's move
     Vec spd;      // 0x18

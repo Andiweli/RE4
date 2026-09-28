@@ -351,9 +351,9 @@ void emTree_R1_Fall(cEmTree* pEm)
         { 0.0f, 0.0f, 0.0f },
         { 500.0f, 3500.0f, 0.0f },
     };
-    EmTreeNode node[3];
-    EmTreeNode* n;
-    EmTreeNode* nx;
+    EMTREE_FALLWK node[3];
+    EMTREE_FALLWK* n;
+    EMTREE_FALLWK* nx;
     Vec b;
     Vec a;
     Vec c;

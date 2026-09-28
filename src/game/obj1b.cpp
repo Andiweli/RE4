@@ -16,7 +16,7 @@
 #include "em_sub.h"
 
 // One point of the falling rope (obj1b_R1_Fall).
-struct Obj1bNode {
+struct OBJ1B_FALLWK {
     Vec pos;
     Vec old;
     Vec spd;
@@ -328,15 +328,15 @@ void obj1b_R1_Fall(cObjSpear* obj)
         { { -140.0f, 60.0f, 140.0f }, { -140.0f, 60.0f, -140.0f }, { 200.0f, 60.0f, 0.0f } },
         { { -140.0f, 30.0f, 140.0f }, { -140.0f, 30.0f, -140.0f }, { 200.0f, 30.0f, 0.0f } },
     };
-    Obj1bNode node[3];
+    OBJ1B_FALLWK node[3];
     Vec vx;
     Vec vy;
     Vec vz;
     Vec d;
     u32 i;
     u32 k;
-    Obj1bNode* p;
-    Obj1bNode* n;
+    OBJ1B_FALLWK* p;
+    OBJ1B_FALLWK* n;
     f32 floor;
     f32 mag;
     f32 diff;

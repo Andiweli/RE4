@@ -4,7 +4,7 @@
 #include "types.h"
 #include "vec.h"
 #include "em.h"
-#include "emtree.h"
+#include "emhit.h"
 
 // Work of the shield enemy (game/emshield.cpp), overlaid on cEm from 0x3E0.
 struct FREE_EMSHIELD {
