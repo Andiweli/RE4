@@ -6135,7 +6135,7 @@ address	size	section	unit	scope	name	demangled
 0x801B339C	0x40	.text	game/cloth.cpp	global	SetPosAng__5ClothG3VecT1	Cloth::SetPosAng
 0x801B33DC	0x38	.text	game/cloth.cpp	global	Destroy__5Cloth	Cloth::Destroy
 0x801B3414	0x88	.text	game/cloth.cpp	global	ClothCalcTplAddr__FPv	ClothCalcTplAddr
-0x801B349C	0xD0	.text	game/cloth.cpp	global	ClothTexSetUp__FPvP8GXTexObjiP9GXTlutObj	ClothTexSetUp
+0x801B349C	0xD0	.text	game/cloth.cpp	global	ClothTexSetUp__FPvP8GXTexObjT1P9GXTlutObj	ClothTexSetUp
 0x801B356C	0x274	.text	game/cloth.cpp	global	calcSpeed__5Clothf	Cloth::calcSpeed
 0x801B37E0	0x40	.text	game/cloth.cpp	global	PullCloth__FPP5Cloth	PullCloth
 0x801B3820	0xC8	.text	game/cloth.cpp	global	move__5Cloth	Cloth::move

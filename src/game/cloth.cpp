@@ -168,8 +168,8 @@ void ClothCalcTplAddr(void* tpl)
     }
 }
 
-// Initialises a GXTexObj (and TLUT for CI formats) from texture `no` of the TPL; 1 on success.
-int ClothTexSetUp(void* tpl, GXTexObj* tex, int no, GXTlutObj* tlut)
+// Initialises a GXTexObj (and TLUT for CI formats); 1 on success.
+int ClothTexSetUp(void* tpl, GXTexObj* tex, GXTexObj* unusedTex, GXTlutObj* tlut)
 {
     TEXDescriptor* d;
     TEXHeader* t;
