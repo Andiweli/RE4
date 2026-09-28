@@ -139,11 +139,11 @@ public:
     cSat* create(void* data, int flag, Vec* pos, Vec* rot, u8 type);
     // Ray from `top` down to `bottom`; returns the hit attribute, hit point in `hit`; `attr`
     // receives the address of the hit polygon's normal (in the piece's space).
-    int hitCheck2(Vec* top, Vec* bottom, Vec* pCross, u32* ppNorm, int flag, int mask);
+    int hitCheck2(Vec* top, Vec* bottom, Vec* pCross, Vec** ppNorm, int flag, int mask);
     // Line segment `a`-`b` against the scenario; hit point and normal out. Returns 0 when nothing was hit.
     int hitCheck(Vec* pos0, Vec* pos1, Vec* pCross, Vec* pNorm, int flag, int mask);
     // Floor height under `pos`, searching `up` above and `down` below it.
-    f32 getFloor(Vec* pos, u32* ppNorm, f32 above_limit, f32 below_limit, int mask);
+    f32 getFloor(Vec* pos, Vec** ppNorm, f32 above_limit, f32 below_limit, int mask);
     // Sphere of radius `r` moving from `a` to `b` against the scenario; `b` is pushed out of the
     // polygons (cLight::hitAdjust). Returns 1 when the sphere was adjusted.
     int polySphereCk(Vec* a, Vec* b, f32 radius, int flag, Vec* pNorm, int mask);

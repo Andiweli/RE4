@@ -21,7 +21,7 @@ void cObj04::move()
     Vec hitPos;
     Vec neg;
     Vec nrm;
-    u32 attr;
+    Vec* pNorm;
     f32 len;
     int hit;
     static f32 obj04_gnd_ratio = 0.0f;
@@ -133,7 +133,7 @@ void cObj04::move()
                 PSVECScale(&w->Ang_plus, &w->Ang_plus, -0.8f);
             }
         } else if (w->Tool_flg & 1) {
-            f32 floor = EatMgr.getFloor(&pos, &attr, 600.0f, 100000.0f, 0);
+            f32 floor = EatMgr.getFloor(&pos, &pNorm, 600.0f, 100000.0f, 0);
             f32 ofs = w->Pt_hit_size;
 
             if (DbgFlagChk(pG, DBG_TEST_MODE)) {

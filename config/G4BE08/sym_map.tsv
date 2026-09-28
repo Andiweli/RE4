@@ -3046,7 +3046,7 @@ address	size	section	unit	scope	name	demangled
 0x800CA708	0x178	.text	game/atari.cpp	global	scrAtCheckSphereAir__7cSatMgrP6cModelP10cAtariInfoi	cSatMgr::scrAtCheckSphereAir
 0x800CA880	0x1B4	.text	game/atari.cpp	global	wallAdjust__7cSatMgrP3VecN21fii	cSatMgr::wallAdjust
 0x800CAA34	0x194	.text	game/atari.cpp	global	adjust__7cSatMgrP3VecN21fii	cSatMgr::adjust
-0x800CABC8	0x98	.text	game/atari.cpp	global	getFloor__7cSatMgrP3VecPUlffi	cSatMgr::getFloor
+0x800CABC8	0x98	.text	game/atari.cpp	global	getFloor__7cSatMgrP3VecPP3Vecffi	cSatMgr::getFloor
 0x800CAC60	0xA4	.text	game/atari.cpp	global	log__7cSatMgrPCce	cSatMgr::log
 0x800CAD04	0x28	.text	game/atari.cpp	global	polyBitSet__FUl	polyBitSet
 0x800CAD2C	0x24	.text	game/atari.cpp	global	polyBitCk__FUl	polyBitCk
@@ -3064,9 +3064,9 @@ address	size	section	unit	scope	name	demangled
 0x800CBA8C	0xE4	.text	game/atari.cpp	global	blkPolySphereCk__FP4cSatP9cSatBlockP3VecT2fiT2i	blkPolySphereCk
 0x800CBB70	0x190	.text	game/atari.cpp	global	blkPolySphereCkCore__FP4cSatP9cSatBlockP3VecT2fiT2i	blkPolySphereCkCore
 0x800CBD00	0x5C	.text	game/atari.cpp	global	hitCheck__7cSatMgrP3VecN31ii	cSatMgr::hitCheck
-0x800CBD5C	0x1F8	.text	game/atari.cpp	global	hitCheck2__7cSatMgrP3VecN21PUlii	cSatMgr::hitCheck2
-0x800CBF54	0x1B4	.text	game/atari.cpp	global	blkPolyLineCk__FP4cSatP9cSatBlockP3VecT2iiT2PUl	blkPolyLineCk
-0x800CC108	0x1AC	.text	game/atari.cpp	global	blkPolyLineCkCore__FP4cSatP9cSatBlockP3VecT2iiT2PUl	blkPolyLineCkCore
+0x800CBD5C	0x1F8	.text	game/atari.cpp	global	hitCheck2__7cSatMgrP3VecN21PP3Vecii	cSatMgr::hitCheck2
+0x800CBF54	0x1B4	.text	game/atari.cpp	global	blkPolyLineCk__FP4cSatP9cSatBlockP3VecT2iiT2PP3Vec	blkPolyLineCk
+0x800CC108	0x1AC	.text	game/atari.cpp	global	blkPolyLineCkCore__FP4cSatP9cSatBlockP3VecT2iiT2PP3Vec	blkPolyLineCkCore
 0x800CC2B4	0x2A4	.text	game/atari.cpp	global	destroy__7cSatMgrP4cSat	cSatMgr::destroy
 0x800CC558	0x24	.text	game/atari.cpp	global	construct__7cSatMgrP4cSatUl	cSatMgr::construct
 0x800CC57C	0x1BC	.text	game/atari.cpp	global	disp__7cSatMgri	cSatMgr::disp
@@ -6131,7 +6131,7 @@ address	size	section	unit	scope	name	demangled
 0x801B2F60	0x28	.text	game/cinesco.cpp	global	CinescoInit__Fv	CinescoInit
 0x801B2F88	0x28	.text	game/cloth.cpp	global	ClothInit__Fv	ClothInit
 0x801B2FB0	0x20	.text	game/cloth.cpp	global	ClothRoomInit__Fv	ClothRoomInit
-0x801B2FD0	0x3CC	.text	game/cloth.cpp	global	Set__5ClothG3VecT1UcUcfP8GXTexObjfPvfP9GXTlutObji	Cloth::Set
+0x801B2FD0	0x3CC	.text	game/cloth.cpp	global	Set__5ClothG3VecT1UcUcfffP8GXTexObjT8P9GXTlutObji	Cloth::Set
 0x801B339C	0x40	.text	game/cloth.cpp	global	SetPosAng__5ClothG3VecT1	Cloth::SetPosAng
 0x801B33DC	0x38	.text	game/cloth.cpp	global	Destroy__5Cloth	Cloth::Destroy
 0x801B3414	0x88	.text	game/cloth.cpp	global	ClothCalcTplAddr__FPv	ClothCalcTplAddr
@@ -6268,7 +6268,7 @@ address	size	section	unit	scope	name	demangled
 0x801BFDA8	0x20	.text	game/esp0f.cpp	global	_._6cEsp0f	cEsp0f::~cEsp0f
 0x801BFDC8	0x44	.text	game/esp10.cpp	global	Esp10_Create__Fv	Esp10_Create
 0x801BFE0C	0x4C	.text	game/esp10.cpp	global	move__6cEsp10	cEsp10::move
-0x801BFE58	0xAC	.text	game/esp10.cpp	global	getFloor_attr__FP3VecPUlffi	getFloor_attr
+0x801BFE58	0xAC	.text	game/esp10.cpp	global	getFloor_attr__FP3VecPP3VecffUl	getFloor_attr
 0x801BFF04	0x158	.text	game/esp10.cpp	global	SetFreeWork__6cEsp10P10cEspSeqTblPUl	cEsp10::SetFreeWork
 0x801C005C	0x20	.text	game/esp10.cpp	global	_._6cEsp10	cEsp10::~cEsp10
 0x801C007C	0x44	.text	game/esp11.cpp	global	Esp11_Create__Fv	Esp11_Create

@@ -79,7 +79,7 @@ void Esp0c_Trans(cEsp* esp)
 int cEsp0c::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     ESP0C_WK* w = &m_Free;
-    u32 attr;
+    Vec* pNorm;
     f32 h;
 
     w->EstNo = pSeq->Work8[0];
@@ -94,10 +94,10 @@ int cEsp0c::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
     case 0:
         break;
     case 1:
-        m_Pos.y = SatMgr.getFloor(&m_Pos, &attr, 600.0f, 100000.0f, 0) + 65.0f + pSeq->Vec0.y;
+        m_Pos.y = SatMgr.getFloor(&m_Pos, &pNorm, 600.0f, 100000.0f, 0) + 65.0f + pSeq->Vec0.y;
         break;
     case 2:
-        m_Pos.y = SatMgr.getFloor(&m_Pos, &attr, 600.0f, 100000.0f, 0) + 65.0f;
+        m_Pos.y = SatMgr.getFloor(&m_Pos, &pNorm, 600.0f, 100000.0f, 0) + 65.0f;
         if (GetWaterHeight(&m_Pos, &h)) {
             if (m_Pos.y < h + pSeq->Vec0.y) {
                 m_Pos.y = h + pSeq->Vec0.y;

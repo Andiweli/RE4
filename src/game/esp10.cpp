@@ -33,9 +33,9 @@ void cEsp10::move()
 }
 
 // Floor height under `pos`: casts a ray from pos.y + up down to pos.y - down against the scenery
-// collision (SatMgr.hitCheck2, mask 0x40) and returns the hit y and its attribute in *attr;
+// collision (SatMgr.hitCheck2, mask 0x40) and returns the hit y and the hit polygon's normal pointer in *ppNorm;
 // -100000 when nothing is hit (or Debug_flg[1] 0x10000000 disables the probe: returns 0).
-f32 getFloor_attr(Vec* pos, u32* attr, f32 up, f32 down, int x)
+f32 getFloor_attr(Vec* pos, Vec** ppNorm, f32 up, f32 down, u32 mask)
 {
     Vec top;
     Vec bottom;
@@ -51,7 +51,7 @@ f32 getFloor_attr(Vec* pos, u32* attr, f32 up, f32 down, int x)
     bottom.x = pos->x;
     bottom.y = pos->y - down;
     bottom.z = pos->z;
-    r = SatMgr.hitCheck2(&top, &bottom, &hit, attr, 0x40, x);
+    r = SatMgr.hitCheck2(&top, &bottom, &hit, ppNorm, 0x40, mask);
     if (r != 0 && !(r & 4)) {
         return hit.y;
     }
@@ -62,14 +62,14 @@ f32 getFloor_attr(Vec* pos, u32* attr, f32 up, f32 down, int x)
 // then applies the Work8[3] rule (0 none, 1 in-room check, 2 water clamp); other values fail.
 int cEsp10::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    u32 attr;
+    Vec* pNorm;
     f32 h;
 
     if (parent != pEffParentWorld) {
         ApplyMatrix(parent->mat);
         parent = pEffParentWorld;
     }
-    m_Pos.y = getFloor_attr(&m_Pos, &attr, 600.0f, 100000.0f, 0) + 65.0f + pSeq->Vec0.y;
+    m_Pos.y = getFloor_attr(&m_Pos, &pNorm, 600.0f, 100000.0f, 0) + 65.0f + pSeq->Vec0.y;
     if (DbgFlagChk(pG, DBG_IN_ESP_TOOL) && !DbgFlagChk(pG, DBG_ESPTOOL_ONSCR)) {
         m_Pos.y = 0.0f;
     }

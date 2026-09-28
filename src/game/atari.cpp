@@ -38,8 +38,8 @@ static cSat* pBypassAt;
 int atck(Vec* vec0, Vec* vec1, cAtariInfo* info, cModel* m, int flag);
 int blkPolySphereCk(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, f32 r, int flag, Vec* nrm, int mask);
 int blkPolySphereCkCore(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, f32 r, int flag, Vec* nrm, int mask);
-int blkPolyLineCk(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, int flag, int mask, Vec* hit, u32* pn);
-int blkPolyLineCkCore(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, int flag, int mask, Vec* hit, u32* pn);
+int blkPolyLineCk(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, int flag, int mask, Vec* hit, Vec** pn);
+int blkPolyLineCkCore(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, int flag, int mask, Vec* hit, Vec** pn);
 void polyBitSet(u32 no);
 int polyBitCk(u32 no);
 cSatFile* createSat(Vec* v, f32 h, u32 attr);
@@ -245,7 +245,7 @@ f32 cSatMgr::scrAtCheckSphere(cModel* pMod, cAtariInfo* pAt, int mask)
     mag = PSVECMag(&pos);
     at_pos_calc(pMod, &pos);
     if (!(pAt->m_flag & 4)) {
-        floor = getFloor(&pMod->pos, (u32*) &pMod->pFloor_norm, 600.0f, 100000.0f, mask);
+        floor = getFloor(&pMod->pos, &pMod->pFloor_norm, 600.0f, 100000.0f, mask);
         if (fabsf(floor - pMod->pos.y) < 1000.0f) {
             pMod->pos.y = floor;
         } else if (pG->shooting_mode == 0) {
@@ -270,7 +270,7 @@ f32 cSatMgr::scrAtCheckSphere(cModel* pMod, cAtariInfo* pAt, int mask)
     if (link) {
         at_pos_calc(link, &pos);
         if (!(((cEm*) link)->atari.m_flag & 4)) {
-            floor = getFloor(&link->pos, (u32*) &link->pFloor_norm, 600.0f, 100000.0f, mask);
+            floor = getFloor(&link->pos, &link->pFloor_norm, 600.0f, 100000.0f, mask);
             if (fabsf(floor - link->pos.y) < 1000.0f) {
                 link->pos.y = floor;
             }
@@ -394,9 +394,9 @@ void cSatMgr::adjust(Vec* pNorm, Vec* pos_old, Vec* pos_new, f32 radius, int fla
 }
 
 // Floor height under `pos`: casts from pos.y + up to pos.y - down against floor polygons
-// (0x40) and returns the hit y with its attribute word in *attr; -100000 when nothing is below
+// (0x40) and returns the hit y with the hit polygon's normal pointer in *ppNorm; -100000 when nothing is below
 // (0 when Debug_flg[1] 0x10000000 disables scenery).
-f32 cSatMgr::getFloor(Vec* pos, u32* ppNorm, f32 above_limit, f32 below_limit, int mask)
+f32 cSatMgr::getFloor(Vec* pos, Vec** ppNorm, f32 above_limit, f32 below_limit, int mask)
 {
     Vec top;
     Vec bottom;
@@ -825,27 +825,27 @@ int blkPolySphereCkCore(cSat* pAt, cSatBlock* pBlock, Vec* pos0, Vec* pos1, f32 
 // `mask` attribute bits to ignore.
 int cSatMgr::hitCheck(Vec* pos0, Vec* pos1, Vec* pCross, Vec* pNorm, int flag, int mask)
 {
-    u32 pn;
+    Vec* pn;
     int ret;
 
     ret = hitCheck2(pos0, pos1, pCross, &pn, flag, mask);
     if (pNorm && ret) {
-        PSMTXMultVecSR(pBypassAt->mat, (Vec*) pn, pNorm);
+        PSMTXMultVecSR(pBypassAt->mat, pn, pNorm);
     }
     return ret;
 }
 
-// Segment a-b against every active piece. The nearest hit goes to hit (world) and `attr`
+// Segment a-b against every active piece. The nearest hit goes to hit (world) and `ppNorm`
 // receives the address of the hit polygon's normal in the piece's space; b is moved onto the
 // piece's grid (mat * inv * b). Returns the attribute word of the hit polygon or 0.
-int cSatMgr::hitCheck2(Vec* pos0, Vec* pos1, Vec* pCross, u32* ppNorm, int flag, int mask)
+int cSatMgr::hitCheck2(Vec* pos0, Vec* pos1, Vec* pCross, Vec** ppNorm, int flag, int mask)
 {
     Vec cur;
     Vec la;
     Vec lb;
     Vec lcur;
     Vec tmp;
-    u32 pn;
+    Vec* pn;
     int ret = 0;
     u32 i;
 
@@ -884,7 +884,7 @@ int cSatMgr::hitCheck2(Vec* pos0, Vec* pos1, Vec* pCross, u32* ppNorm, int flag,
 
 // Line test through the block chain: descends into blocks whose box the segment overlaps and
 // keeps the nearest hit (position, normal pointer in *pn). Returns the attribute of that hit.
-int blkPolyLineCk(cSat* pAt, cSatBlock* pBlock, Vec* pos0, Vec* pos1, int flag, int mask, Vec* pCross, u32* ppNorm)
+int blkPolyLineCk(cSat* pAt, cSatBlock* pBlock, Vec* pos0, Vec* pos1, int flag, int mask, Vec* pCross, Vec** ppNorm)
 {
     static int new_line_check = 1;
     Vec mid;
@@ -939,7 +939,7 @@ int blkPolyLineCk(cSat* pAt, cSatBlock* pBlock, Vec* pos0, Vec* pos1, int flag, 
 
 // Line test of one block's polygons (floor / wall subset by flag), each once per query; keeps
 // the hit closest to pos0 and its normal.
-int blkPolyLineCkCore(cSat* pAt, cSatBlock* pBlock, Vec* pos0, Vec* pos1, int flag, int mask, Vec* pCross, u32* ppNorm)
+int blkPolyLineCkCore(cSat* pAt, cSatBlock* pBlock, Vec* pos0, Vec* pos1, int flag, int mask, Vec* pCross, Vec** ppNorm)
 {
     Vec h;
     int ret = 0;
@@ -980,7 +980,7 @@ int blkPolyLineCkCore(cSat* pAt, cSatBlock* pBlock, Vec* pos0, Vec* pos1, int fl
                 *pCross = h;
                 ret = attr;
                 if (ppNorm) {
-                    *ppNorm = (u32) &pAt->norm_p[pAt->poly_p[*idx].n];
+                    *ppNorm = &pAt->norm_p[pAt->poly_p[*idx].n];
                 }
             }
         }

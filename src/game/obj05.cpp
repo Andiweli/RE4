@@ -23,7 +23,7 @@ void cObj05::move()
     Vec ref;
     Vec hitPos;
     Vec nrm;
-    u32 attr;
+    Vec* pNorm;
     f32 range;
     f32 pow;
     f32 rnd;
@@ -143,7 +143,7 @@ void cObj05::move()
                     PSVECScale(&p->Kaboom_ang_spd, &p->Kaboom_ang_spd, -0.8f);
                 }
             } else if (w->Tool_flg & 1) {
-                f32 floor = EatMgr.getFloor(&p->world, &attr, 600.0f, 100000.0f, 0);
+                f32 floor = EatMgr.getFloor(&p->world, &pNorm, 600.0f, 100000.0f, 0);
                 f32 ofs = (f32) w->Pt_hit_size;
 
                 if (DbgFlagChk(pG, DBG_IN_ESP_TOOL) && !DbgFlagChk(pG, DBG_ESPTOOL_ONSCR)) {

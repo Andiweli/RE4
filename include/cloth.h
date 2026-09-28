@@ -23,7 +23,7 @@ public:
     f32 radius;           // 0x58
     GXTexObj* tex;     // 0x5C
     GXTlutObj* pTlobjC;   // 0x60
-    void* pTobjA;         // 0x64
+    GXTexObj* pTobjA;     // 0x64  second texture, loaded into TEV stage 1 when set
     union {
         GXColor color; // 0x68 material colour (clothTrans passes it by value)
         struct {
@@ -37,7 +37,7 @@ public:
     int isWave;        // 0x70  Set's last argument: 1 pins the top four rows, 0 only the first (PS2 BOOL isWave)
     int blendMode;     // 0x74  1: additive (cloth draw GXSetBlendMode; esp4e sets it from Blend_type) (PS2 blendMode)
 
-    void Set(Vec ang, Vec pos, u8 nx, u8 ny, f32 w, GXTexObj* tex, f32 h, void* p, f32 d, GXTlutObj* tlut,
+    void Set(Vec ang, Vec pos, u8 nx, u8 ny, f32 w, f32 h, f32 d, GXTexObj* tex, GXTexObj* p, GXTlutObj* tlut,
              int flag);
     void SetPosAng(Vec ang, Vec pos);
     void Destroy();
