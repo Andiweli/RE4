@@ -750,7 +750,7 @@ static void r202_CatapultGo()
     r202_work->cat[2].fire = 1;
     pG->Room_flg[0] |= 0x80000000;
     rock = r202_work->cat[2].rock;
-    EstSet(rock, -1, 0, 0, EFF_ROOM, 0, 1, EMROCK_WK(rock)->espKind, rock, zero);
+    EstSet(rock, -1, 0, 0, EFF_ROOM, 0, 1, EMROCK_WK(rock)->EffKindId, rock, zero);
     SceSleep(60);
     pG->Room_flg[0] |= 0x02000000;
     r202_work->em180.setFlag(1);

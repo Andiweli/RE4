@@ -233,7 +233,7 @@ address	size	section	unit	scope	name	demangled
 0x80017884	0x2C0	.text	game/emwep.cpp	global	plemBackjump	plemBackjump
 0x80017B44	0x200	.text	game/emwep.cpp	global	plemFrontEscape	plemFrontEscape
 0x80017D44	0x258	.text	game/emwep.cpp	global	emWepEscapeCamMove	emWepEscapeCamMove
-0x80017F9C	0x4C	.text	game/emwep.cpp	global	setParent__6cEmWepP3cEmii	cEmWep::setParent
+0x80017F9C	0x4C	.text	game/emwep.cpp	global	setParent__6cEmWepP3cEmUlUl	cEmWep::setParent
 0x80017FE8	0x1EC	.text	game/emwep.cpp	global	setFall__6cEmWepiP3Vecf	cEmWep::setFall
 0x800181D4	0x21C	.text	game/emwep.cpp	global	setThrow__6cEmWepP3VecP9EmAtkInfof	cEmWep::setThrow
 0x800183F0	0x1C4	.text	game/emwep.cpp	global	setThrowScythe__6cEmWepP3VecP9EmAtkInfo	cEmWep::setThrowScythe
@@ -266,7 +266,7 @@ address	size	section	unit	scope	name	demangled
 0x800199A8	0x278	.text	game/emwep.cpp	global	emWepShotHitWindowCk	emWepShotHitWindowCk
 0x80019C20	0xFC	.text	game/emwep.cpp	global	setCloth__6cEmWepP6cModel	cEmWep::setCloth
 0x80019D1C	0xA8	.text	game/emwep.cpp	global	moveCloth__6cEmWep	cEmWep::moveCloth
-0x80019DC4	0x370	.text	game/emwep.cpp	global	setParentMatCalc__6cEmWepi	cEmWep::setParentMatCalc
+0x80019DC4	0x370	.text	game/emwep.cpp	global	setParentMatCalc__6cEmWepUl	cEmWep::setParentMatCalc
 0x8001A134	0x170	.text	game/emwep.cpp	global	createBack__t8cManager1Z3cEmi	cManager<cEm>::createBack
 0x8001A2A4	0x20	.text	game/emwep.cpp	global	_._6cEmWep	cEmWep::~cEmWep
 0x8001A2C4	0xAC	.text	game/item.cpp	global	healing	healing
@@ -3915,7 +3915,7 @@ address	size	section	unit	scope	name	demangled
 0x8010CC98	0xE4	.text	game/emrock.cpp	global	plemDropFind	plemDropFind
 0x8010CD7C	0x1B4	.text	game/emrock.cpp	global	plemDropEscape	plemDropEscape
 0x8010CF30	0xE0	.text	game/emrock.cpp	global	emRockRollHitCk	emRockRollHitCk
-0x8010D010	0x58	.text	game/emrock.cpp	global	setParent__7cEmRockP3cEmii	cEmRock::setParent
+0x8010D010	0x58	.text	game/emrock.cpp	global	setParent__7cEmRockP3cEmUlUl	cEmRock::setParent
 0x8010D068	0x13C	.text	game/emrock.cpp	global	setFall__7cEmRockP9EmAtkInfo	cEmRock::setFall
 0x8010D1A4	0x214	.text	game/emrock.cpp	global	setThrow__7cEmRockP3VecP9EmAtkInfo	cEmRock::setThrow
 0x8010D3B8	0x214	.text	game/emrock.cpp	global	setThrow2__7cEmRockP3VecP9EmAtkInfo	cEmRock::setThrow2
@@ -3965,7 +3965,7 @@ address	size	section	unit	scope	name	demangled
 0x80110A74	0xA4	.text	game/emshield.cpp	global	emShield_R1_Lost	emShield_R1_Lost
 0x80110B18	0x390	.text	game/emshield.cpp	global	emShield_R1_Parent	emShield_R1_Parent
 0x80110EA8	0x86C	.text	game/emshield.cpp	global	emShield_R1_Fall	emShield_R1_Fall
-0x80111714	0x4C	.text	game/emshield.cpp	global	setParent__9cEmShieldP6cModelii	cEmShield::setParent
+0x80111714	0x4C	.text	game/emshield.cpp	global	setParent__9cEmShieldP3cEmUlUl	cEmShield::setParent
 0x80111760	0x1D8	.text	game/emshield.cpp	global	setFall__9cEmShieldP3Vecf	cEmShield::setFall
 0x80111938	0x20	.text	game/emshield.cpp	global	_._9cEmShield	cEmShield::~cEmShield
 0x80111958	0x1E8	.text	game/emswitch.cpp	local	emSwitchDmCk__FP9cEmSwitch	emSwitchDmCk
@@ -4021,7 +4021,7 @@ address	size	section	unit	scope	name	demangled
 0x8011422C	0x7CC	.text	game/emtree.cpp	global	emTree_R1_Fall	emTree_R1_Fall
 0x801149F8	0x3B4	.text	game/emtree.cpp	global	emTree_R1_Throw	emTree_R1_Throw
 0x80114DAC	0x424	.text	game/emtree.cpp	global	emTree_R1_Shot	emTree_R1_Shot
-0x801151D0	0x58	.text	game/emtree.cpp	global	setParent__7cEmTreeP6cModelii	cEmTree::setParent
+0x801151D0	0x58	.text	game/emtree.cpp	global	setParent__7cEmTreeP3cEmUlUl	cEmTree::setParent
 0x80115228	0x20	.text	game/emtree.cpp	global	clearParent__7cEmTree	cEmTree::clearParent
 0x80115248	0x120	.text	game/emtree.cpp	global	setFall__7cEmTree	cEmTree::setFall
 0x80115368	0x10	.text	game/emtree.cpp	global	ckCatch__7cEmTree	cEmTree::ckCatch

@@ -5066,7 +5066,7 @@ void em2bDashScrCk(cEm2b* em, Vec* pos, f32 rad)
         }
         p = e->getPartsPtr(0);
         {
-            EmRockWork* rw = EMROCK_WK(e);
+            FREE_EMROCK* rw = EMROCK_WK(e);
             f32 r = rw->Radius + rad;
 
             d = (p->world.x - pos->x) * (p->world.x - pos->x) + (p->world.y - pos->y) * (p->world.y - pos->y) +

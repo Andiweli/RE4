@@ -10,19 +10,19 @@ class cPlayer;
 struct EmAtkInfo;
 
 // Work of the rolling rock enemy (game/emrock.cpp), overlaid on cEm from 0x3E0.
-struct EmRockWork {
+struct FREE_EMROCK {
     u32 Be_flg;            // 0x000 (0x3E0)  bit0: setParent flag (no matrix normalisation), bit1: transparent mode
     int Timer;            // 0x004 (0x3E4)
     int Timer2;           // 0x008 (0x3E8)  Fall / Throw: frames before the rock stops
-    int TmpU32;              // 0x00C (0x3EC)  Drop2: Rnd() & 1 (action button variant)
+    u32 TmpU32;              // 0x00C (0x3EC)  Drop2: Rnd() & 1 (action button variant)
     f32 Radius;           // 0x010 (0x3F0)  collision radius (scale.x * 265 or 450)
     f32 Gravity;             // 0x014 (0x3F4)  gravity per frame
     u8 pad_18[0xC];
-    u32 x24;              // 0x024 (0x404)
-    int rollWait;         // 0x028 (0x408)  Roll: frames before the floor check starts
+    int Fall_wait;        // 0x024 (0x404)
+    int Bound_wait;       // 0x028 (0x408)  Roll: frames before the floor check starts
     cEm* pEm_oya;         // 0x02C (0x40C)  model the rock hangs on (setParent)
-    u32 pEm_old;              // 0x030 (0x410)  pParent at the time of setFall / setThrow
-    int oya_parts;          // 0x034 (0x414)  parts of pParent
+    cEm* pEm_old;         // 0x030 (0x410)  pParent at the time of setFall / setThrow
+    u32 oya_parts;          // 0x034 (0x414)  parts of pParent
     u32 seid_throw;            // 0x038 (0x418)  SndCall handle of the always sound
     int Roll_wait;           // 0x03C (0x41C)  Roll: start delay
     void* Mot_wait;           // 0x040 (0x420)  Drop motions (setDropMot)
@@ -31,22 +31,22 @@ struct EmRockWork {
     void* Mot_subdie;           // 0x04C (0x42C)  sub character death motion (subemDropDie)
     void* Mot_plesc;           // 0x050 (0x430)  setDropMot2: player escape motion (plemDropEscape)
     void* Mot_plfind;           // 0x054 (0x434)  player find motion (plemDropFind)
-    u8 pad_58[0x7C - 0x58];
-    Vec spd;              // 0x07C (0x45C)
+    Vec spd[3];           // 0x058 (0x438)  unused by this file
+    Vec throw_v;          // 0x07C (0x45C)
     u8 seFall[4];         // 0x088 (0x468)  SndCall blk / no / vol of the landing (setSeFall), 0xFF = none
-    u8 se8C;              // 0x08C (0x46C)
-    u8 se8D[3];           // 0x08D (0x46D)  SndCall of the player hit (emRockAtkCk), 0xFF = none
-    u8 se90[3];           // 0x090 (0x470)
-    u8 seAlways[3];       // 0x093 (0x473)  SndCall of the flying sound, 0xFF = none
-    u8 alwaysWait;        // 0x096 (0x476)  frames between the always sound calls (4)
-    u8 se97[3];           // 0x097 (0x477)
+    u8 fall_type;         // 0x08C (0x46C)
+    u8 seHit[3];          // 0x08D (0x46D)  SndCall of the player hit (emRockAtkCk), 0xFF = none
+    u8 seDamage[3];       // 0x090 (0x470)
+    u8 seThrow[3];        // 0x093 (0x473)  SndCall of the flying sound, 0xFF = none
+    u8 throw_se_wait;     // 0x096 (0x476)  frames between the flying sound calls (4)
+    u8 seWall[3];         // 0x097 (0x477)
     u8 effFall[2];        // 0x09A (0x47A)  EstSet id / type when the rock lands (setEffFall), 0xFF = none
-    u8 eff9C[2];          // 0x09C (0x47C)  EmPlBloodSet2 arguments when the player is hit, 0xFF = none
-    u8 eff9E[2];          // 0x09E (0x47E)
-    u8 espKind;           // 0x0A0 (0x480)  EspPullCoreKind at creation
-    u8 xA1;               // 0x0A1 (0x481)
+    u8 effHit[2];         // 0x09C (0x47C)  EmPlBloodSet2 arguments when the player is hit, 0xFF = none
+    u8 effDamage[2];      // 0x09E (0x47E)
+    u8 EffKindId;         // 0x0A0 (0x480)  EspPullCoreKind at creation
+    u8 Catch_ck;          // 0x0A1 (0x481)
     u8 pad_A2[2];
-    int Rock_route;         // 0x0A4 (0x484)  current EMI route point (type 6) of the rolling rock
+    u32 Rock_route;         // 0x0A4 (0x484)  current EMI route point (type 6) of the rolling rock
     EmiEntry* pRoute;     // 0x0A8 (0x488)
     u8 Roll_flag;           // 0x0AC (0x48C)  Set: the roll started
     u8 First_bound;               // 0x0AD (0x48D)  Roll: room 104 flag
@@ -55,11 +55,12 @@ struct EmRockWork {
     u32 Seid;           // 0x0B0 (0x490)  Roll: rolling sound handle
     void* Mot_tbl[16];      // 0x0B4 (0x494)  player motions of the roll escape (setPlMotion)
     struct EmAtkInfo* pAtk;  // 0x0F4 (0x4D4)  attack parameters of the flying rock (emRockAtkCk)
-    u8 pad_F8[0x1FC - 0xF8];
+    YARARE_INFO YarareTbl[5];  // 0x0F8 (0x4D8)  unused by this file
     class cSat* pSat;     // 0x1FC (0x5DC)  scenario piece of the room 11E rock (emRockSatSet)
+    class cSat* pEat;     // 0x200 (0x5E0)  unused by this file
 };
 
-#define EMROCK_WK(em) ((EmRockWork*) (((cEmRock*) (em))->free))
+#define EMROCK_WK(em) ((FREE_EMROCK*) (((cEmRock*) (em))->free))
 
 // Rolling rock enemy (game/emrock.cpp): the boulders that chase the player, hang on a parent
 // model, fall, get thrown by El Gigante or drop on the player.
@@ -69,7 +70,7 @@ public:
     virtual void beginEvent(u32 flag);
     virtual void move();
 
-    void setParent(cEm* pCoord, int oya_parts, int flag);
+    void setParent(cEm* pEm, u32 oya_parts, u32 mode);
     void setFall(EmAtkInfo* atk);
     void setThrow(Vec* spd, EmAtkInfo* atk);
     void setThrow2(Vec* spd, EmAtkInfo* atk);
