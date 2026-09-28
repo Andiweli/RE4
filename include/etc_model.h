@@ -4,7 +4,7 @@
 #include "types.h"
 #include "vec.h"
 
-// Etc model id (PS2 ETCMODEL_ID): EtcSetData::id, getRoomEtc `id`, the EtcModelSet switch. The GC data
+// Etc model id (PS2 ETCMODEL_ID): ETS_DATA::id, getRoomEtc `id`, the EtcModelSet switch. The GC data
 // goes up to 0x67 (ETC_AUTO_DOOR5); ETC_IRON_DOOR26/27 were added on the PS2.
 enum ETCMODEL_ID {
     ETC_WINDOW00 = 0,
@@ -117,8 +117,9 @@ enum ETCMODEL_ID {
 };
 
 // One room etc model record (0x28 bytes, EtcModelListSet steps through them) handed to the
-// Et*_init functions (EtcModel.cpp, et00.cpp).
-struct EtcSetData {
+// Et*_init functions (EtcModel.cpp, et00.cpp). PS2's ETS_DATA is 0x40 bytes: a leading `scale` Vec this
+// data does not carry, then ang/pos/id/no in that order.
+struct ETS_DATA {
     u16 id;          // 0x00  ETCMODEL_ID (EtcModelSet switch, 0x00..0x67)
     union {
         u16 no;      // 0x02  g_EtcTbl slot (< 0x40)
