@@ -6,17 +6,17 @@
 #include "math_sub.h"
 #include "esp.h"
 
-struct Esp0dWork {
+typedef struct tagESP0D_WK {
     u32 Type;        // 0x00
     f32 Dist;        // 0x04
     f32 Pow;       // 0x08
-    cCoord* target;  // 0x0C
-};
+    cParts* pParts;  // 0x0C
+} ESP0D_WK;
 
 // Attractor effect: pulls the sprite toward its parent while inside `dist`.
 class cEsp0d : public cEsp {
 public:
-    Esp0dWork m_Free;  // 0xF8
+    ESP0D_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -32,7 +32,7 @@ cEsp* Esp0d_Create()
 // target's world position to the sprite into m_Speed while len < Dist.
 void cEsp0d::move()
 {
-    Esp0dWork* w = &m_Free;
+    ESP0D_WK* w = &m_Free;
     Vec v;
     f32 len;
 
@@ -40,7 +40,7 @@ void cEsp0d::move()
         if (!AnmMove()) {
             PushEsp(this);
         } else if (w->Type == 0) {
-            PSVECSubtract(&m_Pos, &w->target->world, &v);
+            PSVECSubtract(&m_Pos, &w->pParts->world, &v);
             len = PSVECMag(&v);
             if (len == 0.0f) {
                 v.x = 0.0f;
@@ -65,15 +65,15 @@ void cEsp0d::move()
 // attached model's parts (Tool_flg 0x20) or the parent coordinate.
 int cEsp0d::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp0dWork* w = &m_Free;
+    ESP0D_WK* w = &m_Free;
 
     w->Dist = (f32)(s8)pSeq->Work8[0] * 100.0f;
     w->Pow = (f32)(s8)pSeq->Work8[1] * 0.00005f;
     w->Type = pSeq->WorkSp8[0];
     if (m_Tool_flg & 0x20) {
-        w->target = m_pMod->getPartsPtr(m_Parts_no);
+        w->pParts = m_pMod->getPartsPtr(m_Parts_no);
     } else {
-        w->target = parent;
+        w->pParts = (cParts*) parent;
     }
     if (w->Type != 0) {
         pLog->err(0, 0, "ESP0D : Type[%x] invalid.", w->Type);

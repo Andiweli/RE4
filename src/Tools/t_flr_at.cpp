@@ -23,7 +23,7 @@
 int SetToolLight(int no);  // db_light_tools.cpp
 
 // Tool-side view of the FLR_AT_DATA record (flr_at.h), 0x84 bytes.
-struct TFlrAt {
+struct FLR_AT_DATA_101 {
     u8 be_flg;        // 0x00  bit 0 enabled, bit 1 created
     u8 id;         // 0x01  0 foot SE, 1 SE volume, 2 BGM volume, 3 thunder volume
     u8 no;           // 0x02  record index (set on save)
@@ -78,10 +78,10 @@ struct FlrAtWork {
     u8 defCartridge;  // 0x7D  FLR_AT_HEADER cartridge_type
     u8 pad_7E[2];
     FLR_AT_HEADER head;   // 0x80
-    TFlrAt area[256]; // 0x90
+    FLR_AT_DATA_101 area[256]; // 0x90
     FLR_AT_HEADER fileHead;  // 0x8490
-    TFlrAt file[256];    // 0x84A0
-    TFlrAt copyBuf;      // 0x108A0
+    FLR_AT_DATA_101 file[256];    // 0x84A0
+    FLR_AT_DATA_101 copyBuf;      // 0x108A0
     FLR_AT_SYS flrSys;       // 0x10924
     FLR_AT_SYS* saveFlrSys;  // 0x109B0
 };
@@ -89,7 +89,7 @@ struct FlrAtWork {
 static int flrAtSaveNum;
 static FlrAtWork* flrAtWk;
 #define pW (flrAtWk)
-static TFlrAt* flrAtCur;
+static FLR_AT_DATA_101* flrAtCur;
 #define pCur (flrAtCur)
 
 static const char* flrAtTypeName[4] = {"FOOT SE", "SE VOL CTRL", "BGM VOL CTRL", "THUNDER VOL"};
@@ -396,7 +396,7 @@ static void flrAtAreaEdit_AreaPaste()
 // Empties the copy buffer.
 static void flrAtAreaEdit_CopyBuffClear()
 {
-    memclr_asm(&pW->copyBuf, sizeof(TFlrAt));
+    memclr_asm(&pW->copyBuf, sizeof(FLR_AT_DATA_101));
     pW->copySrc = 0;
     pW->copyValid = 0;
 }
@@ -1077,7 +1077,7 @@ static void flrAtDataLoad()
                         if (pW->area[j].be_flg == 0) {
                             pW->area[j] = pW->area[i];
                             pW->area[j].no = j;
-                            memclr_asm(&pW->area[i], sizeof(TFlrAt));
+                            memclr_asm(&pW->area[i], sizeof(FLR_AT_DATA_101));
                             break;
                         }
                     }
@@ -1191,7 +1191,7 @@ static void flrAtDataSave()
             switch (sel) {
             case 0:
             case 1:
-                ret = HDWrite_only(pathX + sel * 0x40, &pW->fileHead, flrAtSaveNum * sizeof(TFlrAt) + 0x10);
+                ret = HDWrite_only(pathX + sel * 0x40, &pW->fileHead, flrAtSaveNum * sizeof(FLR_AT_DATA_101) + 0x10);
                 break;
             case 2:
                 pW->mode = 0;

@@ -18,13 +18,13 @@ void slideModelAddr(u32 addr, int ofs);
 void slideTplAddr(void* tpl, int ofs);
 
 // Scroll object id -> name table (unused in this build; keeps the strings and the table).
-struct ScrIdRef {
+struct SCR_ID_REF {
     u8 Id;
     const char* Name;
 };
 
 static u32 DmyZeroTpl[3] = {0x0020AF30, 0, 0x0000000C};
-static ScrIdRef ScrIdRefTbl[16] = {
+static SCR_ID_REF ScrIdRefTbl[16] = {
     {2, "NORMAL"}, {3, "ROTATE"}, {6, "SWING ROT"}, {2, "----"}, {2, "----"}, {2, "----"},
     {2, "----"},   {2, "----"},   {2, "----"},      {2, "----"}, {2, "----"}, {2, "----"},
     {2, "----"},   {2, "----"},   {2, "----"},      {2, "MIRROR"},
