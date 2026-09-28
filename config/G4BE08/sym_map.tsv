@@ -666,7 +666,7 @@ address	size	section	unit	scope	name	demangled
 0x80032E08	0x82C	.text	game/obj1b.cpp	global	obj1b_R1_Fall	obj1b_R1_Fall
 0x80033634	0x2D8	.text	game/obj1b.cpp	global	obj1b_R1_Throw	obj1b_R1_Throw
 0x8003390C	0x314	.text	game/obj1b.cpp	global	obj1bHitCk	obj1bHitCk
-0x80033C20	0x4C	.text	game/obj1b.cpp	global	setParent__9cObjSpearP6cModelii	cObjSpear::setParent
+0x80033C20	0x4C	.text	game/obj1b.cpp	global	setParent__9cObjSpearP3cEmUlUl	cObjSpear::setParent
 0x80033C6C	0x218	.text	game/obj1b.cpp	global	setFall__9cObjSpearUcP3Vec	cObjSpear::setFall
 0x80033E84	0x13C	.text	game/obj1b.cpp	global	setThrow__9cObjSpearP3Vec	cObjSpear::setThrow
 0x80033FC0	0x20	.text	game/obj1b.cpp	global	setLost__9cObjSpear	cObjSpear::setLost

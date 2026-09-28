@@ -50,7 +50,7 @@ void (*Obj1b_R1_move_tbl[6])(cObjSpear*) = { obj1b_R1_Set, obj1b_R1_LostWait, ob
 cObj* SetSpear(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cObj* obj;
-    SpearWork* w;
+    FREE_OBJ1B* w;
 
     obj = ObjMgr.create(cObjMgr::ID_SPEAR);
     if (obj == 0) {
@@ -126,7 +126,7 @@ void cObjSpear::beginEvent(u32 flag)
 // invisibility and draw flag; hidden when stuck in the player during Status_flg[0] 0x400.
 void cObjSpear::move()
 {
-    SpearWork* w = SPEAR_WK(this);
+    FREE_OBJ1B* w = SPEAR_WK(this);
 
     if (w->pEm_oya && !w->pEm_oya->isAlive()) {
         ObjMgr.destroy(this);
@@ -177,7 +177,7 @@ void obj1b_R1_Set(cObjSpear* pObj)
 // Rno1 == 1: waits 120 frames then fades out (or vanishes at once when off screen) -> Lost.
 void obj1b_R1_LostWait(cObjSpear* pObj)
 {
-    SpearWork* w = SPEAR_WK(pObj);
+    FREE_OBJ1B* w = SPEAR_WK(pObj);
     Vec scr;
     Vec p;
 
@@ -232,7 +232,7 @@ void obj1b_R1_Lost(cObjSpear* pObj)
 // runs.
 void obj1b_R1_Parent(cObjSpear* pObj)
 {
-    SpearWork* w = SPEAR_WK(pObj);
+    FREE_OBJ1B* w = SPEAR_WK(pObj);
     cModel* parent = w->pEm_oya;
 
     RotMatrix(pObj->mat, &pObj->ang);
@@ -321,7 +321,7 @@ void obj1b_R1_Parent(cObjSpear* pObj)
 // damping, landing sound and effect once), then at rest (node speeds < 25) -> LostWait.
 void obj1b_R1_Fall(cObjSpear* obj)
 {
-    SpearWork* w = SPEAR_WK(obj);
+    FREE_OBJ1B* w = SPEAR_WK(obj);
     Vec ofs[4][3] = {
         { { 0.0f, 0.0f, 600.0f }, { 0.0f, 0.0f, -600.0f }, { 300.0f, 0.0f, 0.0f } },
         { { 0.0f, 0.0f, 1500.0f }, { 0.0f, 0.0f, 0.0f }, { 300.0f, 0.0f, 1300.0f } },
@@ -483,7 +483,7 @@ void obj1b_R1_Fall(cObjSpear* obj)
 // along the velocity; sticks into the scenario (-> LostWait) or a character (obj1bHitCk).
 void obj1b_R1_Throw(cObjSpear* pObj)
 {
-    SpearWork* w = SPEAR_WK(pObj);
+    FREE_OBJ1B* w = SPEAR_WK(pObj);
     Vec d;
     Vec hit;
     Vec p;
@@ -556,7 +556,7 @@ void obj1b_R1_Throw(cObjSpear* pObj)
 // speed-following variant for em2f 0x2F), sound; estTimer 600, falls off after 1800 frames.
 int obj1bHitCk(cObjSpear* pObj)
 {
-    SpearWork* w = SPEAR_WK(pObj);
+    FREE_OBJ1B* w = SPEAR_WK(pObj);
     Vec hit;
     Vec nrm;
     WepTarget target;
@@ -620,10 +620,10 @@ int obj1bHitCk(cObjSpear* pObj)
     return 0;
 }
 
-// Sticks / holds the spear on parts partsNo of `parent` (noNormalize keeps the parts scale) -> Parent.
-void cObjSpear::setParent(cModel* pEm, int oya_parts, int mode)
+// Sticks / holds the spear on parts oya_parts of `pEm` (mode keeps the parts scale) -> Parent.
+void cObjSpear::setParent(cEm* pEm, u32 oya_parts, u32 mode)
 {
-    SpearWork* w = SPEAR_WK(this);
+    FREE_OBJ1B* w = SPEAR_WK(this);
 
     w->pEm_oya = pEm;
     w->oya_parts = oya_parts;
@@ -642,7 +642,7 @@ void cObjSpear::setParent(cModel* pEm, int oya_parts, int mode)
 // a random upward toss.
 void cObjSpear::setFall(u8 type, Vec* pSpd)
 {
-    SpearWork* w = SPEAR_WK(this);
+    FREE_OBJ1B* w = SPEAR_WK(this);
     Mtx m;
     Vec v;
     u32 i;
@@ -705,7 +705,7 @@ void cObjSpear::setFall(u8 type, Vec* pSpd)
 // Throws the spear along dir (or its own forward axis * 1000) from its current position -> Throw.
 void cObjSpear::setThrow(Vec* pSpd)
 {
-    SpearWork* w = SPEAR_WK(this);
+    FREE_OBJ1B* w = SPEAR_WK(this);
     Vec d;
     f32 len;
 
