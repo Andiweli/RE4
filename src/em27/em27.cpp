@@ -290,7 +290,6 @@ static void em27_R0_Init(cEm27* em)
     Vec* pos;
     f32 scale;
     f32 wh;
-    int zero;
 
     em->ot_type = 0;
     if (em->modelInit(ARC(EM27_BIN_004), ARC(EM27_TPL_005)) == 0) {
@@ -307,8 +306,7 @@ static void em27_R0_Init(cEm27* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     scale = fRand0_1() * 0.5f + 1.0f;
     if (em->type == 1) {
         scale = 3.0f;
@@ -323,16 +321,16 @@ static void em27_R0_Init(cEm27* em)
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     YarareInit(em, 0.0f, 0.0f, -100.0f, 100.0f, 250.0f, 5, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     EspDataLoad((u32) ARC(EM27_EFF_006), EFF_EM27, 0);
-    w->Be_flg = zero;
+    w->Be_flg = 0;
     w->Dash_wait = Rnd() % 150 + 210;
-    w->Esc_timer = zero;
+    w->Esc_timer = 0;
     w->Spd.x = 0.0f;
     w->Spd.y = 0.0f;
     w->Spd.z = 0.0f;
     w->Spd_t.x = 0.0f;
     w->Spd_t.y = 0.0f;
     w->Spd_t.z = 0.0f;
-    w->Go_timer = zero;
+    w->Go_timer = 0;
     w->St_pos = *pos;
     w->Water_h = 400.0f;
     if (GetWaterHeight(pos, &wh)) {
@@ -347,7 +345,7 @@ static void em27_R0_Init(cEm27* em)
     w->pCtrlGroup = GetCtrlCtrl12();
     em->setStatus(EM_STATUS_LOCKOFF);
     at->offOba();
-    em->setRno(1, zero, zero, zero);
+    em->setRno(1, 0, 0, 0);
     em->ang.y = fRand1_1() * PI;
     MotionSetCore(em, MOTION(em), ARC(EM27_MOT_007), 0, 0, 1, 0);
     MotionMove(em, 0);

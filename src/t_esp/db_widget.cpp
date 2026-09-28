@@ -879,22 +879,21 @@ void DB_BUTTON_CLOSE::OnClick(DB_POINT* p, int btn)
 // Text label with a `max_`-char buffer holding `s`, white; size from the text (8 x 16 per char).
 DB_STRING::DB_STRING(u32 max_, const char* s)
 {
-    u32 zero = 0;
     max = max_;
     // COMPILER-DIFF: candidate (local-alloc qty order): four sched1-only anchors. Each is a
     // `"=m"` store the colour chain below overwrites; written above the chain, flow1 keeps them
     // (the pool `lfs` sits between anchor and store), sched1 hoists the `lfs` above them, and
     // flow2 deletes them, so sched2 never sees them. At sched1 each is a prio-13 insn issued
     // before the prio-12 vptr store (vt qty life 12 -> 16 = LC's 5000, LC r9 / vt r11) and the
-    // two `zero` reads make it a 5-ref qty above the type constant (zero r0, type r9).
-    asm("" : "=m"(cr) : "r"(zero));
-    asm("" : "=m"(cg) : "r"(zero));
+    // two zero reads make it a 5-ref qty above the type constant (zero r0, type r9).
+    asm("" : "=m"(cr) : "r"(0));
+    asm("" : "=m"(cg) : "r"(0));
     asm("" : "=m"(cb));
     asm("" : "=m"(ca));
     ca = cb = cg = cr = 0.0f;
     type = DB_PRIM_STRING;
-    len = zero;
-    str = (char*) zero;
+    len = 0;
+    str = 0;
     str = new char[max_];
     strcpy(str, s);
     len = strlen(s);
@@ -1015,20 +1014,19 @@ DB_NUMERIC::DB_NUMERIC() : DB_STRING(255, "")
         // block it is a free-unit insn ready at the same cycle as `fmr f1,f31` and, ranking above the
         // fmr by LUID, it takes the block's second issue slot (issue rate 2), which pushes the fmr one
         // store later; `step = one; unit = one;` is the order that survives the asm's move.
-        int zero = 0;
         register f32 one asm("fr13");
-        minus = zero;
-        pNum = (void*) zero;
+        minus = 0;
+        pNum = 0;
         min = 0.0f;
-        ketaFloat = zero;
-        edit = zero;
+        ketaFloat = 0;
+        edit = 0;
         max = 255.0f;
         keta = 3;
         one = 1.0f;
         step = one;
         unit = one;
         SetDefault(0.0f);
-        asm("" : "=m"(def) : "r"(zero), "f"(one));
+        asm("" : "=m"(def) : "r"(0), "f"(one));
     }
 }
 

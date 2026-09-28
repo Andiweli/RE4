@@ -725,7 +725,7 @@ static void R318EventLaserMove(int no)
     // `(clobber (mem:BLK))` of the array (which is what keeps the tbl temporary's dead element-0 store
     // alive in flow's dead-store scan, `stw r14,0x100(r1)`).
     int zero = 0;
-    int preCnt[5] = {zero, 5, zero, zero, zero};
+    int preCnt[5] = {0, 5, 0, 0, zero};
     void* motB[3] = {ROOM_ARC_PTR(pG->pRoom, 0x62), ROOM_ARC_PTR(pG->pRoom, 0x63), ROOM_ARC_PTR(pG->pRoom, 0x64)};
     void* motC[5] = {ROOM_ARC_PTR(pG->pRoom, 0x23), ROOM_ARC_PTR(pG->pRoom, 0x24), ROOM_ARC_PTR(pG->pRoom, 0x25),
                      ROOM_ARC_PTR(pG->pRoom, 0x26), ROOM_ARC_PTR(pG->pRoom, 0x27)};

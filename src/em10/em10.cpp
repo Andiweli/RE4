@@ -19875,7 +19875,7 @@ int em10LadderResetCk(cEm10* em)
             int zero = 0;
             w->pLadder = o;
             o->setResetReserve();
-            em->setRno(1, 0x42, zero, zero);
+            em->setRno(1, 0x42, 0, zero);
             return 1;
         }
     }
@@ -22864,7 +22864,7 @@ extern "C" int em10DashCk(cEm10* em)
     {
         int zero = 0; // shared zero pseudo: lands in r7 ahead of the 1 / 0x11 constants
         w->Route_type = Rnd() % 3;
-        em->setRno(1, 0x11, zero, zero);
+        em->setRno(1, 0x11, 0, zero);
     }
     return 1;
 }

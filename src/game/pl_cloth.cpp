@@ -882,18 +882,18 @@ cObjChain* AdaRibbonSet(cModel* pl, PlCloth* c, void* bin, void* tpl)
     c->At_num = 10;
     c->Flag = 0x200;
     c->pModel = pl;
-    c->WindSin = zero;
-    pos.x = zero;
-    pos.y = zero;
-    pos.z = zero;
-    rot.x = zero;
-    rot.y = zero;
-    rot.z = zero;
+    c->WindSin = 0.0f;
+    pos.x = 0.0f;
+    pos.y = 0.0f;
+    pos.z = 0.0f;
+    rot.x = 0.0f;
+    rot.y = 0.0f;
+    rot.z = 0.0f;
     chain = SetChain(bin, tpl, &pos, &rot);
     chain->setChain((CLOTH_INFO*) c);
-    pos.x = zero;
-    pos.y = zero;
-    pos.z = zero;
+    pos.x = 0.0f;
+    pos.y = 0.0f;
+    pos.z = 0.0f;
     chain->setParent(pl, 0x40, &pos, 0);
     return chain;
 }

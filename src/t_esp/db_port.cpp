@@ -486,12 +486,11 @@ extern "C" void LoadModEff()
     if (s[0] == db_emName[0] && s[1] == db_emName[1] && s[2] == db_emName[2] && s[3] == db_emName[3]) {
         return;
     }
-    u8 zero = 0;
     name[0] = s[0];
     name[1] = s[1];
     name[2] = s[2];
     name[3] = s[3];
-    name[4] = zero;
+    name[4] = 0;
     if (db_emName[0] != 0) {
         EspDataRelease(db_effOwner, 1, 1);
     }
@@ -499,7 +498,7 @@ extern "C" void LoadModEff()
     db_emName[1] = s[1];
     db_emName[2] = s[2];
     db_emName[3] = s[3];
-    db_emName[4] = zero;
+    db_emName[4] = 0;
     if (strcmp(name, "em11") == 0 || strcmp(name, "em12") == 0 || strcmp(name, "em13") == 0 ||
         strcmp(name, "em14") == 0 || strcmp(name, "em15") == 0 || strcmp(name, "em16") == 0 ||
         strcmp(name, "em17") == 0 || strcmp(name, "obm2") == 0) {

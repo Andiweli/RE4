@@ -1052,13 +1052,11 @@ int Event::ExePacket_Cam(Event* pEvt)
     void* dat;
     EvtPacket* pac = pEvt->pPacket;
     int frm = 0;
-    void* zero;
 
     if (EvtMgr.GetBin(&dat, pac->mod.name, 0) == 0) {
         pLog->err(0, 0, "Event::ExePacket_Cam : dat failed");
         return 1;
     }
-    zero = 0;
     if (pEvt->FlgCkStatus(EvtStfToolFrontExec)) {
         frm = pEvt->FFNowFrame;
     }
@@ -1067,8 +1065,8 @@ int Event::ExePacket_Cam(Event* pEvt)
     }
     CamCtrl.MotionSet(dat, (f32) frm, 0);
     pPL->be_flag |= 0x00200000;
-    pEvt->pDatFog = (EvtFogData*) zero;
-    pEvt->pDatFocus = (EvtFocusData*) zero;
+    pEvt->pDatFog = 0;
+    pEvt->pDatFocus = 0;
     pEvt->MotClear();
     if (!pEvt->FlgCkStatus(EvtStfEvtCancelExe)) {
         EventCutEffDelete();
@@ -1660,7 +1658,6 @@ void Event::CalNextPacket()
 void Event::CalNextFrame()
 {
     char buf[0x20];
-    int zero = 0;
 
     if (FlgCkStatus(EvtStfToolExec)) {
         if (NowCut >= MaxCut) {
@@ -1670,14 +1667,14 @@ void Event::CalNextFrame()
     if (GetChangeNowCut() != 0) {
         NowCut = ChangeNowCut - 1;
         NowFrame = MaxFrame;
-        SetChangeNowCut(zero);
+        SetChangeNowCut(0);
     }
     NowFrame++;
     NowTotalFrame++;
     if (NowFrame < MaxFrame) {
         return;
     }
-    NowFrame = zero;
+    NowFrame = 0;
     NowCut++;
     if (CalMaxFrame(&MaxFrame, NowCut) == 0) {
         pLog->err(0, 0, "Event::init : data failed");

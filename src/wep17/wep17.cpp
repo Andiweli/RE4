@@ -210,23 +210,22 @@ int ckEmWep(cPlayer* pl)
 // tails because the scheduler issues the later use of a register early, so it ends up last.
 static void wep17_r3_ready00(cPlayer* pl)
 {
-    const f32 zero = 0.0f;
     cObjWep* obj;
     f32 pitch;
     void* m;
     int md;
 
     pl->m_Work1 = 0;
-    pl->Wep->m_CenterY = zero;
+    pl->Wep->m_CenterY = 0.0f;
     pitch = CamCtrl.getCameraPitch();
-    if (pitch > zero) {
+    if (pitch > 0.0f) {
         pitch += pitch;
     }
     pl->Wep->pitch = pitch;
-    m3r.setDelay(zero);
+    m3r.setDelay(0.0f);
     pitch *= 2.0f / PI;
     m3r.reset(pitch);
-    pl->m_Fwork0 = zero;
+    pl->m_Fwork0 = 0.0f;
     pl->Neck->init(0, 0, 0);
     SndCall(2, 9, &pl->getPartsPtr(0xA)->world, 0, 0, 0);
     obj = WEP_OBJ(pl);
@@ -239,28 +238,28 @@ static void wep17_r3_ready00(cPlayer* pl)
         Vec v0;
         Vec v1;
 
-        v0.x = zero;
+        v0.x = 0.0f;
         v0.y = 1000.0f;
-        v0.z = zero;
+        v0.z = 0.0f;
         PSVECAdd(&v0, &pl->pos, &v0);
-        v1.x = zero;
-        v1.y = zero;
+        v1.x = 0.0f;
+        v1.y = 0.0f;
         v1.z = 1000.0f;
         RotVector(&v1, &pl->ang, &v1);
         PSVECAdd(&v1, &v0, &v1);
         if (SatMgr.hitCheck(&v0, &v1, 0, &nrm, 0, 0)) {
-            v1.x = zero;
+            v1.x = 0.0f;
             v1.y = 500.0f;
-            v1.z = zero;
+            v1.z = 0.0f;
             PSVECAdd(&v1, &pl->pos, &v1);
             v0.x = -1000.0f;
-            v0.y = zero;
-            v0.z = zero;
+            v0.y = 0.0f;
+            v0.z = 0.0f;
             RotVector(&v0, &pl->ang, &v0);
             PSVECAdd(&v0, &v1, &v0);
             if (SatMgr.hitCheck(&v1, &v0, 0, 0, 0, 0) == 0) {
-                v1.x = zero;
-                v1.y = zero;
+                v1.x = 0.0f;
+                v1.y = 0.0f;
                 v1.z = 2000.0f;
                 RotVector(&v1, &pl->ang, &v1);
                 PSVECAdd(&v1, &v0, &v1);
@@ -270,7 +269,7 @@ static void wep17_r3_ready00(cPlayer* pl)
                     pl->r_no_2 = 6;
                     pl->r_no_3 = 0;
                     v0.x = -nrm.x;
-                    v0.y = zero;
+                    v0.y = 0.0f;
                     v0.z = -nrm.z;
                     pl->ang.y += Muku3(pl->ang.y, &v0, PI);
                     return;

@@ -144,7 +144,6 @@ static void em2e_R0_Init(cEm2e* em)
 {
     Em2eWork* w = EM2E_WK(em);
     cAtariInfo* at;
-    int zero;
 
     switch (em->type) {
     case 0:
@@ -164,7 +163,6 @@ static void em2e_R0_Init(cEm2e* em)
         break;
     }
     em->setStatus(EM_STATUS_LOCKOFF);
-    zero = 0;
     at = &em->atari;
     em->be_flag &= ~0x01000000;
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
@@ -176,12 +174,12 @@ static void em2e_R0_Init(cEm2e* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     at->init(0.0f, 0.0f, 0.0f, 150.0f, 150.0f, 150.0f, 300.0f, 1, 0x2000, 10);
     at->offOba();
     em->be_flag &= ~0x10;
     YarareInit(em, 0.0f, 0.0f, 0.0f, 100.0f, 50.0f, 1, YAT_FLAG_ON);
-    w->flags = zero;
+    w->flags = 0;
     w->footAng = 0.0f;
     w->nrm.y = 1.0f;
     w->nrm.x = 0.0f;
@@ -189,7 +187,7 @@ static void em2e_R0_Init(cEm2e* em)
     switch (em->set) {
     case 0:
     default:
-        em->setRno(1, zero, zero, zero);
+        em->setRno(1, 0, 0, 0);
         break;
     case 1: {
         Mtx m;
@@ -213,7 +211,7 @@ static void em2e_R0_Init(cEm2e* em)
             w->nrm = nrm;
         }
         at->offSca();
-        em->setRno(1, 3, zero, zero);
+        em->setRno(1, 3, 0, 0);
         break;
     }
     }

@@ -611,16 +611,14 @@ static void r206_snipe()
         r206_work->timer--;
         if (r206_work->timer == 0) {
             u32 rsf;
-            u32 zero;
 
             r206_work->timer = (u32) (fRand0_1() * 60.0f) + 0x3C;
             rsf = RsfCheck(*(u16*) &pG->stage_no, 6);
-            zero = 0;
             if (rsf) {
                 r206_work->cnt++;
             }
             if (r206_work->cnt > 8) {
-                r206_work->cnt = zero;
+                r206_work->cnt = 0;
                 r206_work->snd = SndCall(6, 5, &pSUB->pos, 0, 0, 0);
             } else {
                 r206_work->snd = SndCall(6, 6, &pSUB->pos, 0, 0, 0);
@@ -1057,7 +1055,6 @@ void luis_set()
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    f32 zero;
     int lit = 4;
 
     obj = SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x32), ROOM_ARC_PTR(pG->pRoom, 0x33), &pos, &rot, 0x10, 1);
@@ -1066,8 +1063,7 @@ void luis_set()
     obj->addModel(ModInfoMgr.create(ROOM_ARC_PTR(pG->pRoom, 0x38), ROOM_ARC_PTR(pG->pRoom, 0x39)));
     obj->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3D), 0xA, 0, 1, 0);
     obj->be_flag |= 0x1000;
-    zero = 0.0f;
-    obj->Motion.Seq_speed = zero;
+    obj->Motion.Seq_speed = 0.0f;
     obj->setNoSuspend(1);
     obj->LightInfo.EnableMask = lit;
     obj->be_flag |= 0x10;
@@ -1075,7 +1071,7 @@ void luis_set()
     obj = SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x3A), ROOM_ARC_PTR(pG->pRoom, 0x3B), &pos, &rot, 0x10, 1);
     obj->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3C), 0xA, 0, 1, 0);
     obj->be_flag |= 0x1000;
-    obj->Motion.Seq_speed = zero;
+    obj->Motion.Seq_speed = 0.0f;
     obj->setNoSuspend(1);
     obj->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3E), 0xA, 0, 1, 0);
     obj->LightInfo.EnableMask = lit;

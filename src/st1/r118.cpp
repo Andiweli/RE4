@@ -267,9 +267,7 @@ static void r118_ThunderMove()
                     // COMPILER-DIFF: candidate #12 (fallthrough-arm form): a plain zero here is folded by cse1 into
                     // the EffGetAreaState result (path re-walk); the code-less `do {} while (0)` ends cse's path
                     // at its NOTE_INSN_LOOP_END, so the zero stays a constant pseudo that loop.c hoists (r28).
-                    void* zero;
                     do { } while (0);
-                    zero = 0;
                     EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, 0, 0);
                 } else {
                     EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_NONE, 0, 0);

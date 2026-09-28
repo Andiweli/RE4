@@ -174,7 +174,6 @@ void cPl0e::setPos(Vec* p, f32 ang)
 static void pl0e_R0_Init(cPl0e* em)
 {
     Pl0eWork* w = PL0E_WK(em);
-    int zero;
 
     em->modelInit(ARC(PL0E_BIN_005), ARC(PL0E_TPL_006));
     em->be_flag &= ~0x10;
@@ -185,14 +184,13 @@ static void pl0e_R0_Init(cPl0e* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 4);
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->setStatus(EM_STATUS_IK_OFF);
     em->atari.m_flag &= 0xFCFF;
     em->atari.setPriority(PRI_LV1);
     em->setStatus(EM_STATUS_LOCKOFF);
     EspDataLoad((u32) ARC(PL0E_EFF_004), EFF_PL0E, 0);
-    w->flags = zero;
+    w->flags = 0;
     w->cnt68 = 0x1D;
     w->sink = 96000.0f;
     // pRailObj / spdX are written LAST: they are the last uses of the shared zero (r28) and 0.0 (f31),
@@ -202,9 +200,9 @@ static void pl0e_R0_Init(cPl0e* em)
     w->rollPhase = 0.0f;
     w->pitchPhase = 0.0f;
     w->x54 = 0.0f;
-    w->x78 = zero;
-    w->x71 = zero;
-    w->x72 = zero;
+    w->x78 = 0;
+    w->x71 = 0;
+    w->x72 = 0;
     w->swayAmp.x = 0.0f;
     w->swayAmp.y = 0.0f;
     w->swayAmp.z = 0.0f;
@@ -213,9 +211,9 @@ static void pl0e_R0_Init(cPl0e* em)
     w->swayPhase.z = 0.0f;
     w->xD8 = 0.0f;
     w->camRate = 0.0f;
-    w->jumpCnt = zero;
-    w->seNo = zero;
-    w->pitch104 = zero;
+    w->jumpCnt = 0;
+    w->seNo = 0;
+    w->pitch104 = 0;
     w->pPath = 0;
     w->ofs.x = 0.0f;
     w->ofs.y = 0.0f;

@@ -256,12 +256,12 @@ CameraScope::CameraScope(Vec* pos, Vec* at)
     param.fovy = 45.0f;
     angle_min = -70.0f * 3.1415927f / 180.0f;
     angle_max = 70.0f * 3.1415927f / 180.0f;
-    param.roll = zero;
-    m_zoom_ratio = zero;
-    angle_x = zero;
-    m_rnd.x = zero;
-    m_rnd.y = zero;
-    m_rnd.z = zero;
+    param.roll = 0.0f;
+    m_zoom_ratio = 0.0f;
+    angle_x = 0.0f;
+    m_rnd.x = 0.0f;
+    m_rnd.y = 0.0f;
+    m_rnd.z = 0.0f;
     m_id.init(&type);
     m_focus.init(0x9A);
 }

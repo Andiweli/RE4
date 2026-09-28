@@ -290,7 +290,6 @@ static void r101_checkTowerBesieged()
 extern "C" void r101_setFlameBottle(Vec* from, Vec* to)
 {
     const f32 spd = 20.0f;
-    void* zero = 0;
     Vec dir;
     cObj* obj;
 
@@ -298,7 +297,7 @@ extern "C" void r101_setFlameBottle(Vec* from, Vec* to)
     CalcParabolaVector(&dir, from, to, 2000.0f);
     Vec zeroVec = {0.0f, 0.0f, 0.0f};
     obj = SetObj01(ROOM_ARC_PTR(pG->pRoom, 0x25), ROOM_ARC_PTR(pG->pRoom, 0x26), from, &zeroVec, &dir, spd, 50.0f, 0xD2, 5);
-    Obj01SetEst(obj, 1, 0x12, 2, 1, 0x11, 0, 0x14, (int) zero, (int) zero);
+    Obj01SetEst(obj, 1, 0x12, 2, 1, 0x11, 0, 0x14, 0, 0);
     EstSet(obj, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, obj, 0);
 }
 

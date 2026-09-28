@@ -934,7 +934,7 @@ static void em2b_R0_Init(cEm2b* em)
     YarareAdd(em, &w->hit[8], 0.0f, 0.0f, 0.0f, 480.0f, 1200.0f, 0xE, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
     YarareAdd(em, &w->hit[9], 0.0f, 0.0f, 0.0f, 300.0f, 800.0f, 0x3F, 0);
     zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     EspDataLoad((u32) ARC(EM2B_EFF_004), EFF_EM2B, 0);
     w->espKind = EspPullCoreKind();
     r11c = 900;
@@ -944,26 +944,26 @@ static void em2b_R0_Init(cEm2b* em)
     w->Tree_brk_wait = r11c;
     w->Compress_y = one;
     w->Eff = t35;
-    w->Be_flg = zero;
-    w->Ft_axis = zero;
+    w->Be_flg = 0;
+    w->Ft_axis = 0;
     w->pHouse = 0;
     w->pTree = 0;
     w->pTreeBrk = 0;
-    w->No_go_sub_timer = zero;
+    w->No_go_sub_timer = 0;
     w->pTreeTarget = 0;
     w->pRock = 0;
     w->pGoto = 0;
-    w->Total_damage = zero;
-    w->Rock_wait = zero;
-    w->Atk_wait = zero;
+    w->Total_damage = 0;
+    w->Rock_wait = 0;
+    w->Atk_wait = 0;
     w->pFriend = 0;
-    w->Dash_wait = zero;
+    w->Dash_wait = 0;
     w->Punch_wait = r11c;
-    w->Go_dog_timer = zero;
-    w->Dog_wait = zero;
-    w->Event_wait = zero;
+    w->Go_dog_timer = 0;
+    w->Dog_wait = 0;
+    w->Event_wait = 0;
     w->pYagura = 0;
-    w->Catch_power = zero;
+    w->Catch_power = 0;
     asm("" : "=r"(dmy7) : "r"(t35), "f"(one), "r"(r11c)); // COMPILER-DIFF: #13
     if (pG->room_id == 0x224) {
         w->Eff = 1;
@@ -1137,10 +1137,9 @@ static void em2b_R1_Walk(cEm2b* em)
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
     case 0: {
-        int zero = 0;
         u32 spd;
 
-        w->TmpU32 = zero;
+        w->TmpU32 = 0;
         spd = 0;
         if (em->l_pl > 64000000.0f) {
             spd = 1;
@@ -1166,7 +1165,7 @@ static void em2b_R1_Walk(cEm2b* em)
                 w->blendB = (int) ARC(EM2B_SEQ_WALK_085);
                 w->blendC = (int) ARC(EM2B_SEQ_WALK_088);
                 w->blendD = 1;
-                w->TmpU32 = zero;
+                w->TmpU32 = 0;
                 break;
             case 1:
                 w->blendM0 = ARC(EM2B_MOT_WALK_03E);
@@ -1193,7 +1192,7 @@ static void em2b_R1_Walk(cEm2b* em)
                 w->blendB = (int) ARC(EM2B_SEQ_WALK_087);
                 w->blendC = (int) ARC(EM2B_SEQ_WALK_08A);
                 w->blendD = spd;
-                w->TmpU32 = zero;
+                w->TmpU32 = 0;
                 break;
             case 1:
                 w->blendM0 = ARC(EM2B_MOT_WALK_03E);
@@ -1218,7 +1217,7 @@ static void em2b_R1_Walk(cEm2b* em)
                 w->blendB = (int) ARC(EM2B_SEQ_WALK_086);
                 w->blendC = (int) ARC(EM2B_SEQ_WALK_089);
                 w->blendD = 1;
-                w->TmpU32 = zero;
+                w->TmpU32 = 0;
                 break;
             case 1:
                 w->blendM0 = ARC(EM2B_MOT_WALK_03E);
@@ -1240,10 +1239,10 @@ static void em2b_R1_Walk(cEm2b* em)
                 w->blendM1 = ARC(EM2B_MOT_WALK_034);
                 w->blendM2 = ARC(EM2B_MOT_WALK_035);
                 w->blendA = (int) ARC(EM2B_SEQ_WALK_079);
-                w->blendB = zero;
-                w->blendC = zero;
+                w->blendB = 0;
+                w->blendC = 0;
                 w->blendD = 1;
-                w->TmpU32 = zero;
+                w->TmpU32 = 0;
                 break;
             case 1:
                 w->blendM0 = ARC(EM2B_MOT_WALK_033);
@@ -4113,7 +4112,6 @@ void em2bClothSet(cEm2b* em)
     FREE_EM2B* w = EM2B_WK(em);
 
     if (em->type == 1) {
-        int zero;
         int num;
         const u8* parts;
         const u8* side;
@@ -4133,8 +4131,7 @@ void em2bClothSet(cEm2b* em)
         // carries a death (COMPILER-DIFF: #13); ours must keep every constant alive past the
         // block (the two "=m" keep-alives name fields the block does not store), else the dying stores
         // are issued first. The 0.0 is expanded after 0.8 for the pool order.
-        zero = 0;
-        w->Cloth.pPtbl = (cParts**) zero;
+        w->Cloth.pPtbl = 0;
         num = 10;
         w->Cloth.Num = num;
         parts = em2b_cloth_parts;
@@ -4165,15 +4162,15 @@ void em2bClothSet(cEm2b* em)
         w->Cloth.Move_rate = zf;
         flags = 0x100;
         w->Cloth.Flag = flags;
-        w->Cloth.pRight = (const u8*) zero;
-        w->Cloth.pUpLeft = (const u8*) zero;
-        w->Cloth.pUpRight = (const u8*) zero;
-        w->Cloth.pWindSin = (const f32*) zero;
-        w->Cloth.pWindRate = (const f32*) zero;
-        w->Cloth.pGravity = (const f32*) zero;
+        w->Cloth.pRight = 0;
+        w->Cloth.pUpLeft = 0;
+        w->Cloth.pUpRight = 0;
+        w->Cloth.pWindSin = 0;
+        w->Cloth.pWindRate = 0;
+        w->Cloth.pGravity = 0;
         w->Cloth.pEm_at = em;
         w->Cloth.WindSin = zf;
-        asm("" : "=m"(w->Dog_wait) : "r"(zero), "r"(num), "r"(parts), "r"(side), "r"(up), "r"(down), "r"(max), "r"(at)); // COMPILER-DIFF: #13
+        asm("" : "=m"(w->Dog_wait) : "r"(0), "r"(num), "r"(parts), "r"(side), "r"(up), "r"(down), "r"(max), "r"(at)); // COMPILER-DIFF: #13
         asm("" : "=m"(w->Event_wait) : "r"(rate), "r"(two), "f"(g20), "f"(g08), "r"(four), "f"(g005), "f"(zf), "r"(flags)); // COMPILER-DIFF: #13
         PenClothSet(em, &w->Cloth, 100.0f);
     }
@@ -4530,7 +4527,6 @@ void em2bShortRopeSet(cEm2b* em)
     f32 g08;
     int k100;
     f32 g01;
-    int zero;
     f32 zf;
 
     zf = 0.0f;
@@ -4564,19 +4560,18 @@ void em2bShortRopeSet(cEm2b* em)
     w->rope[1].Stretchy = g01;
     w->pChain = (cObj*) chain;
     w->rope[1].Num = five;
-    zero = 0;
-    w->rope[1].pPtbl = (cParts**) zero;
-    w->rope[1].pLeft = (const u8*) zero;
-    w->rope[1].pRight = (const u8*) zero;
-    w->rope[1].pUpLeft = (const u8*) zero;
-    w->rope[1].pUpRight = (const u8*) zero;
-    w->rope[1].pMax = (const f32*) zero;
-    w->rope[1].pWindSin = (const f32*) zero;
-    w->rope[1].pWindRate = (const f32*) zero;
-    w->rope[1].pGravity = (const f32*) zero;
-    w->rope[1].pRate = (const f32*) zero;
-    w->rope[1].Flag = zero;
-    asm("" : "=m"(w->Dog_wait) : "r"(zero), "f"(zf), "m"(w->rope[1].Move_rate));                                              // COMPILER-DIFF: 13
+    w->rope[1].pPtbl = 0;
+    w->rope[1].pLeft = 0;
+    w->rope[1].pRight = 0;
+    w->rope[1].pUpLeft = 0;
+    w->rope[1].pUpRight = 0;
+    w->rope[1].pMax = 0;
+    w->rope[1].pWindSin = 0;
+    w->rope[1].pWindRate = 0;
+    w->rope[1].pGravity = 0;
+    w->rope[1].pRate = 0;
+    w->rope[1].Flag = 0;
+    asm("" : "=m"(w->Dog_wait) : "r"(0), "f"(zf), "m"(w->rope[1].Move_rate));                                              // COMPILER-DIFF: 13
     asm("" : "=m"(*(u16*) &w->rope[1].pEm_at) : "r"(chain), "r"(parts), "r"(parts), "r"(parts), "r"(up), "r"(up), "r"(down), "r"(down)); // COMPILER-DIFF: 13
     asm("" : "=m"(*(u32*) &w->rope[1].WindSin) : "r"(at), "r"(at), "r"(k100), "r"(k100), "r"(five), "f"(g20), "f"(g08), "f"(g01)); // COMPILER-DIFF: 13
     chain->setChain(&w->rope[1]);

@@ -3361,7 +3361,6 @@ void CardID::init(int type, CardArc* data)
     int i;
     ID_UNIT* u;
     ID_UNIT* v;
-    f32 zero;
 
     this->m_mode = type;
     pTex = (u8*) (data->ofs[0] + (u32) data);
@@ -3396,14 +3395,13 @@ void CardID::init(int type, CardArc* data)
     IdSys.unitPtr(0, IDC_SSCRN_NEAR_1)->rev_flag |= 0xF;
     IdSys.unitPtr(1, IDC_SSCRN_NEAR_1)->be_flag &= ~8;
     IdSys.unitPtr(1, IDC_SSCRN_NEAR_1)->rev_flag |= 0xF;
-    zero = 0.0f;
     for (int j = 0; j < 7; j++) {
         ID_UNIT* p = g_id->m_IdSave.unitPtr(0x15, (ID_CLASS) (0x40 + j));
         ID_UNIT* q = g_id->m_IdSave.unitPtr((u8) (j + 0x10), IDC_SSCRN_FAR_0);
         q->type = 1;
-        p->pos0.z = zero;
-        p->pos0.y = zero;
-        p->pos0.x = zero;
+        p->pos0.z = 0.0f;
+        p->pos0.y = 0.0f;
+        p->pos0.x = 0.0f;
         g_id->m_IdSave.unitParent(q, p);
     }
     u = g_id->m_IdSave.unitPtr(0, IDC_SSCRN_FAR_0);

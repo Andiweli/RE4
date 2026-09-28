@@ -93,7 +93,6 @@ void R20bInit()
     cEmDoor* door1;
     cEmDoor* door;
     cModel* item;
-    int zero;
 
 #line 60 "D:/Bio4/Prog/r20b.cpp"
     r20b_work = (R20bWork*) MEM_CALLOC(sizeof(R20bWork), 1, 0xd);
@@ -142,7 +141,6 @@ void R20bInit()
         SmdSetTrans(0x8F, 0);
     }
     SceSetItemEvent(0x12, 0x86, 0xD, 6, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x86, 0);
-    zero = 0;
     SceSetItemEvent(0x13, 0x89, 0xE, 9, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x89, 0);
     SceSetItemEvent(0x14, 0x84, 0xF, 8, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x84, 0);
     SceSetItemEvent(0x15, 0x87, 0x10, 7, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x87, 0);
@@ -154,7 +152,7 @@ void R20bInit()
         SceExec(0x12, (TaskFunc) R20bStartCameraMain, 0, 0, SCE_PRIO_DEF_2, 0);
     }
     if (!StaFlagChk(pG, STA_SUB_ASHLEY)) {
-        r20b_work->cnt = zero;
+        r20b_work->cnt = 0;
         SceExec(0x12, (TaskFunc) R20bEmSetMain, 0, 0, SCE_PRIO_DEF_2, 0);
         SceExec(0x12, (TaskFunc) SceBgmCheck, 0, 0, SCE_PRIO_DEF_2, 0);
     }
@@ -163,7 +161,7 @@ void R20bInit()
     TexRenderInit(&r20b_work->tex2, 0xE0, 2);
     SmdSetTrans(0xA1, 0);
     SetSstAddAreaFlag(0x800);
-    r20b_work->str = zero;
+    r20b_work->str = 0;
 }
 
 // Per frame: switch between the upper and lower floor object sets (Room_flg[0] bit 31) from the

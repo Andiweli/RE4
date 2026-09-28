@@ -832,7 +832,6 @@ void cEm35::move()
 static void em35_R0_Init(cEm35* em)
 {
     Em35Work* w = EM35_WK(em);
-    int zero;
 
     switch (em->type) {
     case 0:
@@ -935,17 +934,16 @@ static void em35_R0_Init(cEm35* em)
         YarareAdd(em, &w->hit[21], 0.0f, 0.0f, 0.0f, 200.0f, 400.0f, 0x29, YAT_FLAG_ON);
         break;
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     EspDataLoad((u32) ARC(EM35_EFF_009), EFF_EM35, 0);
     w->espKind = EspPullCoreKind();
-    w->flags = zero;
+    w->flags = 0;
     w->neckAng = 0.0f;
     w->scaleAng = 0.0f;
-    w->atkWait = zero;
-    w->weakDmg = zero;
-    w->dmgCnt = zero;
-    w->sndId = zero;
+    w->atkWait = 0;
+    w->weakDmg = 0;
+    w->dmgCnt = 0;
+    w->sndId = 0;
     w->lockWait = 300;
     w->seTimer = 60;
     em35WeakInit(em);
@@ -959,7 +957,7 @@ static void em35_R0_Init(cEm35* em)
         default:
             EstSet(em, -1, 0, 0, EFF_EM35, 3, 1, w->espKind, em, 0);
             EstSet(em, -1, 0, 0, EFF_EM35, 8, 1, w->espKind, em, 0);
-            em->setRno(1, 1, zero, zero);
+            em->setRno(1, 1, 0, 0);
             MotionSetCore(em, MOTION(em), ARC(EM35_MOT_00A), 0, 0, 1, 0);
             MotionMove(em, 0);
             break;
@@ -967,7 +965,7 @@ static void em35_R0_Init(cEm35* em)
             EstSet(em, -1, 0, 0, EFF_EM35, 4, 1, w->espKind, em, 0);
             EstSet(em, -1, 0, 0, EFF_EM35, 9, 1, w->espKind, em, 0);
             em->atari.off();
-            em->setRno(1, 0xF, zero, zero);
+            em->setRno(1, 0xF, 0, 0);
             MotionSetCore(em, MOTION(em), ARC(EM35_MOT_048), 0, 0, 1, 0);
             MotionMove(em, 0);
             break;
@@ -977,7 +975,7 @@ static void em35_R0_Init(cEm35* em)
         switch (em->type) {
         case 0:
         default:
-            em->setRno(1, 0xE, zero, zero);
+            em->setRno(1, 0xE, 0, 0);
             em->clearStatus(EM_STATUS_LOOK_ME);
             MotionSetCore(em, MOTION(em), ARC(EM35_MOT_046), 0, 0, 1, 0);
             MotionMove(em, 0);
@@ -986,7 +984,7 @@ static void em35_R0_Init(cEm35* em)
             EstSet(em, -1, 0, 0, EFF_EM35, 4, 1, w->espKind, em, 0);
             EstSet(em, -1, 0, 0, EFF_EM35, 9, 1, w->espKind, em, 0);
             em->atari.off();
-            em->setRno(1, 0x1F, zero, zero);
+            em->setRno(1, 0x1F, 0, 0);
             MotionSetCore(em, MOTION(em), ARC(EM35_MOT_088), 0, 0, 1, 0);
             MotionMove(em, 0);
             break;

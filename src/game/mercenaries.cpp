@@ -404,7 +404,7 @@ int MercSysMoveScore(MercSysWork* pWk)
         pWk->flags &= ~MF_ADD_TIME;
         min = pWk->addTime / 60;
         sec = pWk->addTime % 60;
-        cs = zero;
+        cs = 0;
         pWk->addTime = zero;
         IdSetTrans(MID, 0x10, IDC_GAUGE, 1);
         IdSetAnmStart(MID, 0x10, IDC_GAUGE, 1);
@@ -490,8 +490,8 @@ int MercSysMoveMain(MercSysWork* pWk)
     int zero = 0;
     pWk->flags &= ~(MF_BONUS_ON | MF_BONUS_OFF);
     IdSetTrans(&mercId._idSys, 0x40, IDC_GAUGE, 0);
-    pWk->combo = zero;
-    pWk->comboTimer = zero;
+    pWk->combo = 0;
+    pWk->comboTimer = 0;
     pWk->bonusTimer = zero;
     SndCall(6, 0x7A, 0, 0, 0, 0);
     MercSysResultMove(pWk);

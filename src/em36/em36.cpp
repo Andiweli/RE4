@@ -3245,7 +3245,7 @@ static inline void em36DieCore(cEm36* em, int mot0, int mot1)
             f32 zero = 0.0f;
 
             em->invisible_factor = a;
-            if (a <= zero) {
+            if (a <= 0.0f) {
                 em->invisible_factor = zero;
                 em->be_flag &= ~2;
                 em->be_flag |= 0x4000;

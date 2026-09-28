@@ -276,7 +276,6 @@ void cEm2f::move()
 static void em2f_R0_Init(cEm2f* em)
 {
     Em2fWork* w = EM2F_WK(em);
-    int zero;
     u32 i;
 
     switch (em->type) {
@@ -305,7 +304,6 @@ static void em2f_R0_Init(cEm2f* em)
     AtariInit(&em->atari, 0.0f, 0.0f, 0.0f, 700.0f, 3500.0f, 3500.0f, 2000.0f, 1, 2, 0);   // COMPILER-DIFF: #1
     YarareInit(em, 0.0f, -200.0f, 0.0f, 1200.0f, 1000.0f, 9, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[0], 0.0f, -200.0f, 0.0f, 1200.0f, 1400.0f, 2, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    zero = 0;
     YarareAdd(em, &w->hit[1], 0.0f, -100.0f, 0.0f, 1400.0f, 1400.0f, 4, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[2], 0.0f, -200.0f, 0.0f, 1200.0f, 700.0f, 6, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[3], 0.0f, 0.0f, 0.0f, 700.0f, 1400.0f, 0x19, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
@@ -314,24 +312,24 @@ static void em2f_R0_Init(cEm2f* em)
     YarareAdd(em, &w->hit[6], 0.0f, 0.0f, -600.0f, 500.0f, 600.0f, 0x1D, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     em->hp = 1000;
     em->Motion.flip = em2f_flip_tbl;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     EspDataLoad((u32) ARC(EM2F_EFF_008), EFF_EM2F, 0);
-    w->flags = zero;
+    w->flags = 0;
     w->x580 = em->pos.y;
     w->x584 = 0.0f;
-    w->x5C9 = zero;
-    w->x5CB = zero;
+    w->x5C9 = 0;
+    w->x5CB = 0;
     w->effTimer1 = 30;
     w->effTimer2 = 3;
     w->effTimer3 = 3;
     w->atkCnt = Rnd() % 3 + 1;
     // the zero's dying store (pBoat, written last) is issued first, the rest in source order
-    w->seTimer1 = zero;
-    w->seTimer2 = zero;
-    w->seTimer3 = zero;
-    w->sndId1 = zero;
-    w->sndId2 = zero;
-    w->pBoat = (cEm*) zero;
+    w->seTimer1 = 0;
+    w->seTimer2 = 0;
+    w->seTimer3 = 0;
+    w->sndId1 = 0;
+    w->sndId2 = 0;
+    w->pBoat = 0;
     w->rndFlag = Rnd() & 1;
     for (i = 0; i < 6; i++) {
         w->pTentacle[i] = 0;

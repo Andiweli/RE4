@@ -926,9 +926,9 @@ static void r100_Sce_zombi_dead(cEm* em)
     W->ems[1]->flag |= 1;
     W->ems[2]->flag |= 1;
     l = &pG->Em_list[4];
-    l->set = zero;
+    l->set = 0;
     l = &pG->Em_list[5];
-    l->set = zero;
+    l->set = 0;
     r100_Car_pos_move();
     SceSleep(1);
     r100_trap_set();

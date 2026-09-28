@@ -546,7 +546,6 @@ static void em31_R0_Init(cEm31* em)
 {
     FREE_EM31* w = EM31_WK(em);
     cParts* p;
-    int zero;
     int one;
 
     switch (em->type) {
@@ -656,26 +655,25 @@ static void em31_R0_Init(cEm31* em)
     one = 1;
     em->setTarget(one, 0.0f, 0.0f, 0.0f);
     EspDataLoad((u32) ARC(EM31_EFF_009), EFF_EM31, 0);
-    zero = 0;
     w->EffKindId = EspPullCoreKind();
     w->Neck_dir_y = 0.0f;
     w->Berserk_wait = 450;
-    w->Be_flg = zero;
-    w->Atk_wait = zero;
-    w->Berserk_timer = zero;
-    w->pPillar = (cObjPillar*) zero;
-    w->Str_seid = zero;
-    w->pBody = (cEm31*) zero;
-    w->pTen = (cEm31*) zero;
+    w->Be_flg = 0;
+    w->Atk_wait = 0;
+    w->Berserk_timer = 0;
+    w->pPillar = 0;
+    w->Str_seid = 0;
+    w->pBody = 0;
+    w->pTen = 0;
     switch (em->type) {
     case 0:
     default:
         em31EyelidInit(em);
         em31WeakInit(em);
         em->r_no_0 = one;
-        em->r_no_1 = zero;
-        em->r_no_2 = zero;
-        em->r_no_3 = zero;
+        em->r_no_1 = 0;
+        em->r_no_2 = 0;
+        em->r_no_3 = 0;
         MotionSetCore(em, MOTION(em), ARC(EM31_MOT_040), 0, 0, 1, 0);
         MotionMove(em, 0);
         break;
@@ -683,8 +681,8 @@ static void em31_R0_Init(cEm31* em)
         em31WeakInit(em);
         em->r_no_0 = one;
         em->r_no_1 = 0x11;
-        em->r_no_2 = zero;
-        em->r_no_3 = zero;
+        em->r_no_2 = 0;
+        em->r_no_3 = 0;
         MotionSetCore(em, MOTION(em), ARC(EM31_MOT_05C), 0, 0, 1, 0);
         MotionMove(em, 0);
         break;

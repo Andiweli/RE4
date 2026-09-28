@@ -44,7 +44,6 @@ cEmRack* SetRack(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo)
     cEmRack* em;
     FREE_EMRACK* w;
     u16* flg;
-    int zero;
 
     em = (cEmRack*) EmMgr.create(0x45);
     if (em == 0) {
@@ -106,8 +105,7 @@ cEmRack* SetRack(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 0x10);
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->setStatus(EM_STATUS_LOCKOFF);
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     em->be_flag &= ~0x01000000;
@@ -121,7 +119,7 @@ cEmRack* SetRack(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo)
         at->setPriority(PRI_LV3);
         at->m_flag &= ~0x100;
     }
-    w->pSat = (cSat*) zero;
+    w->pSat = 0;
     w->pEatTop = 0;
     w->pEatCenter = 0;
     w->pEatUnder = 0;

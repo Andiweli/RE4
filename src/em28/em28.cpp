@@ -251,7 +251,6 @@ void cEm28::move()
 static void em28_R0_Init(cEm28* em)
 {
     Em28Work* w = EM28_WK(em);
-    int zero;
 
     switch (em->type) {
     case 0:
@@ -272,7 +271,6 @@ static void em28_R0_Init(cEm28* em)
     }
     em->be_flag &= ~0x10;
     em->setStatus(EM_STATUS_IK_OFF);
-    zero = 0;
     em->setStatus(EM_STATUS_LOCKOFF);
     em->Motion.flip = em28_flip_tbl;
     {
@@ -281,18 +279,18 @@ static void em28_R0_Init(cEm28* em)
 
         em->LightInfo.init2(0, 3, &ofs, &size, 2);
     }
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->atari.init(0.0f, 0.0f, 0.0f, 300.0f, 200.0f, 200.0f, 500.0f, 3, 0x2000, 10);
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     YarareInit(em, 0.0f, 0.0f, -130.0f, 200.0f, 100.0f, 3, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     EspDataLoad((u32) ARC(EM28_EFF_00B), EFF_EM28, 0);
-    w->flags = zero;
-    w->escapeWait = zero;
+    w->flags = 0;
+    w->escapeWait = 0;
     w->pCtrl11 = GetCtrlCtrl11();
     w->pCtrl12 = GetCtrlCtrl12();
-    w->x17C = zero;
+    w->x17C = 0;
     em->setStatus(EM_STATUS_ACTIVE);
-    em->setRno(1, zero, zero, zero);
+    em->setRno(1, 0, 0, 0);
     MotionSetCore(em, MOTION(em), ARC(EM28_MOT_00C), 0, 0, 5, 0);
     MotionMove(em, 0);
     em28_R0_Move(em);

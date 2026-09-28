@@ -103,10 +103,8 @@ void Filter00Render()
         return;
     }
     if (filter00_buff) {
-        int zero = 0;
-
         if (StaFlagChk(pG, STA_BLUR)) {
-        col.r = col.g = col.b = zero;
+        col.r = col.g = col.b = 0;
         col.a = blur_rate;
         GXSetTevColor(1, col);
         GXInitTexObj(&tex, filter00_buff, SCR_W / 2, SCR_H / 2, 6, 0, 0, 0);

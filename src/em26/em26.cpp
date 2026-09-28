@@ -252,7 +252,6 @@ void cEm26::move()
 static void em26_R0_Init(cEm26* em)
 {
     Em26Work* w = EM26_WK(em);
-    int zero;
 
     switch (em->type) {
     case 0:
@@ -291,7 +290,6 @@ static void em26_R0_Init(cEm26* em)
         }
     }
     AtariInit(&em->atari, 0.0f, 750.0f, 650.0f, 350.0f, 1250.0f, 1250.0f, 750.0f, 0, 2, 0);   // COMPILER-DIFF: #1
-    zero = 0;
     em->setStatus(EM_STATUS_IK_OFF);
     em->setStatus(EM_STATUS_LOCKOFF);
     em->atari.m_flag &= ~0x100;
@@ -300,15 +298,15 @@ static void em26_R0_Init(cEm26* em)
     YarareAdd(em, &w->hit[0], 0.0f, -50.0f, -100.0f, 300.0f, 350.0f, 5, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[1], 0.0f, 0.0f, -200.0f, 100.0f, 200.0f, 0x18, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     EspDataLoad((u32) ARC(EM26_EFF_007), EFF_EM26, 0);
-    w->flags = zero;
-    w->sndId = zero;
+    w->flags = 0;
+    w->sndId = 0;
     w->breathTimer = Rnd() % 60 + 30;
     w->estTimer = Rnd() % 20 + 10;
     w->pCtrl11 = GetCtrlCtrl11();
     w->pCtrl12 = GetCtrlCtrl12();
-    w->x194 = zero;
+    w->x194 = 0;
     em->setStatus(EM_STATUS_ACTIVE);
-    em->setRno(1, zero, zero, zero);
+    em->setRno(1, 0, 0, 0);
     if (w->flags & 0x10) {
         MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 0x41, 0);
     } else {

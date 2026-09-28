@@ -177,7 +177,7 @@ void em25DmCk(cEm25* em)
     }
     wep = em->dmg.m_Wep;
     zero = 0;
-    em->dmg.m_Flag = zero;
+    em->dmg.m_Flag = 0;
     em->dmg.m_Timer = 1;
     if (wep == 0x10) {
         em->dmg.m_Timer = 0x11;
@@ -303,8 +303,6 @@ void cEm25::move()
 static void em25_R0_Init(cEm25* em)
 {
     FREE_EM25* w = EM25_WK(em);
-    f32 fzero;
-    int zero;
     u32 i;
 
     if (em->modelInit(ARC(EM25_BIN_004), ARC(EM25_TPL_005)) == 0) {
@@ -313,7 +311,6 @@ static void em25_R0_Init(cEm25* em)
         return;
     }
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
-    zero = 0;
     em->Motion.flip = em25_flip_tbl;
     EspDataLoad((u32) ARC(EM25_EFF_007), EFF_EM25, 0);
     {
@@ -321,23 +318,22 @@ static void em25_R0_Init(cEm25* em)
         static const Vec size = {2000.0f, 2000.0f, 2000.0f};
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    fzero = 0.0f;
-    em->setTarget(zero, fzero, fzero, fzero);
-    em->atari.init(fzero, 500.0f, fzero, 350.0f, 350.0f, 350.0f, 1000.0f, 1, 0x2000, 10);
-    YarareInit(em, fzero, fzero, fzero, 300.0f, 200.0f, 2, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[0], fzero, fzero, fzero, 100.0f, 100.0f, 0x1D, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[1], fzero, fzero, fzero, 100.0f, 100.0f, 0x1E, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[2], fzero, fzero, fzero, 100.0f, 100.0f, 0x1F, YAT_FLAG_ON);
-    w->Be_flg = zero;
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
+    em->atari.init(0.0f, 500.0f, 0.0f, 350.0f, 350.0f, 350.0f, 1000.0f, 1, 0x2000, 10);
+    YarareInit(em, 0.0f, 0.0f, 0.0f, 300.0f, 200.0f, 2, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[0], 0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 0x1D, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[1], 0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 0x1E, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[2], 0.0f, 0.0f, 0.0f, 100.0f, 100.0f, 0x1F, YAT_FLAG_ON);
+    w->Be_flg = 0;
     w->Compress_y = 1.0f;
-    w->pEm_oya = (cEm*) zero;
-    w->oya_parts = zero;
-    w->Wm_no = zero;
-    w->Die_ck = zero;
-    w->Eff_wait1 = zero;
-    w->Eff_wait2 = zero;
-    w->Atk_wait = zero;
-    w->Atk_enable = zero;
+    w->pEm_oya = 0;
+    w->oya_parts = 0;
+    w->Wm_no = 0;
+    w->Die_ck = 0;
+    w->Eff_wait1 = 0;
+    w->Eff_wait2 = 0;
+    w->Atk_wait = 0;
+    w->Atk_enable = 0;
     for (i = 0; i < 3; i++) {
         w->pParasite[i] = 0;
     }
@@ -1747,14 +1743,12 @@ void em25PlHeadLost()
     Vec spd;
     cParts* p;
     cObj* obj;
-    int zero;
 
     if (pSys->eff_country == 0) {
         PlSetDamageSe(0xD);
         EstSet(pPL, -1, 0, 0, EFF_EM25, 0xA, 0, ESP_CORE_KIND_NONE, pPL, 0);
         return;
     }
-    zero = 0;
     SndCall(1, 0x3E, &pPL->pos, 0, 0, pPL);
     EstSet(pPL, -1, 0, 0, EFF_EM10, 0x45, 0, ESP_CORE_KIND_NONE, pPL, 0);
     pPL->setHead(0);
@@ -1770,7 +1764,7 @@ void em25PlHeadLost()
     obj = SetObj01(PL_ARC_PTR(pG->pPlayer, 0xC), PL_ARC_PTR(pG->pPlayer, 7), &ofs, &pPL->ang, &spd, 10.0f, 150.0f, 1000, 0x11);
     if (obj) {
         obj->LightInfo.EnableMask = 1;
-        Obj01SetEst(obj, 0, -1, 4, 0, -1, 0, -1, (int) zero, -1);
+        Obj01SetEst(obj, 0, -1, 4, 0, -1, 0, -1, 0, -1);
     }
     EstSet(obj, -1, 0, 0, EFF_EM10, 0x46, 0, ESP_CORE_KIND_NONE, obj, 0);
 }

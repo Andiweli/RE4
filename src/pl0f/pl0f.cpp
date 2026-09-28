@@ -498,12 +498,8 @@ static void pl0f_R1_BossMove(cPl0f* em)
         em->r_no_1 = 1;
         em->r_no_2 = 0;
         em->r_no_3 = 0;
-        {
-            int zero = 0;   // one SImode zero for both stores, separate from the routine's QImode zero
-
-            w->pBoss = (cEm*) zero;
-            w->Boss_chase = zero;
-        }
+        w->pBoss = 0;
+        w->Boss_chase = 0;
         return;
     }
     switch (em->r_no_2) {

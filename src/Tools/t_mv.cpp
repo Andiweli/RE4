@@ -91,7 +91,7 @@ static int mvInit()
     DbgFlagOn(pG, DBG_DBG_CAM);
     ToolArrayPush(0);
     bg.r = bg.g = bg.b = 0x30;
-    bg.a = zero;
+    bg.a = 0;
     bio4_GXSetCopyClear(bg, 0xFFFFFF);
     {
         CAMERA* cam = &pG->Camera;

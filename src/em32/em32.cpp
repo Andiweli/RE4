@@ -297,7 +297,6 @@ void Em32Init(cEm* em)
 void em32DmCk(cEm32* em)
 {
     Em32Work* w = EM32_WK(em);
-    int zero;
     int near;
     int dmg;
     int flag;
@@ -348,8 +347,7 @@ void em32DmCk(cEm32* em)
     if (em->dmg.m_Flag == 0) {
         return;
     }
-    zero = 0;
-    em->dmg.m_Flag = zero;
+    em->dmg.m_Flag = 0;
     near = 0;
     w->flags |= 0x200;
     if (em->dmg.m_pDamageYarare->len < 36000000.0f) {
@@ -372,9 +370,9 @@ void em32DmCk(cEm32* em)
         EmSetDie(em);
         EmSetDieCnt(em);
         em->r_no_0 = 3;
-        em->r_no_1 = zero;
-        em->r_no_2 = zero;
-        em->r_no_3 = zero;
+        em->r_no_1 = 0;
+        em->r_no_2 = 0;
+        em->r_no_3 = 0;
         return;
     }
     if (w->flags & 0x800) {
@@ -597,8 +595,6 @@ static void em32_R0_Init(cEm32* em)
     cModelInfo* info;
     cParts* p;
     Vec v;
-    f32 fzero;
-    int zero;
 
     if (em->modelInit(ARC(EM32_BIN_004), ARC(EM32_TPL_005)) == 0) {
         pLog->err(0, 0, "em32() ModelInit failed.");
@@ -609,8 +605,7 @@ static void em32_R0_Init(cEm32* em)
     if (info) {
         em->addModel(info);
     }
-    zero = 0;
-    w->pTexModel = (cModelInfo*) zero;
+    w->pTexModel = 0;
     info = ModInfoMgr.create(ARC(EM32_BIN_007), ARC(EM32_TPL_005));
     if (info) {
         em->addModel(info);
@@ -619,7 +614,7 @@ static void em32_R0_Init(cEm32* em)
     em->be_flag |= 0x1000000;
     EspDataLoad((u32) ARC(EM32_EFF_008), EFF_EM32, 0);
     em32PlDivideModelInit(em);
-    w->pCatchObj = (cObj*) zero;
+    w->pCatchObj = 0;
     w->pCtrl12 = GetCtrlCtrl12();
     em->pFsdTbl = &Em32_fs_tbl;
     em32ClothSet(em);
@@ -634,50 +629,49 @@ static void em32_R0_Init(cEm32* em)
     em->atari.init(0.0f, 0.0f, 0.0f, 800.0f, 700.0f, 700.0f, 1500.0f, 1, 0x2000, 10);
     em->atari.setPriority(PRI_LV1);
     em->State.SetLightIgnore();
-    fzero = 0.0f;
-    v.x = fzero;
-    v.y = fzero;
-    v.z = fzero;
+    v.x = 0.0f;
+    v.y = 0.0f;
+    v.z = 0.0f;
     SetObaModel((cObj*) em, 0x1C, &v, 700.0f, 900.0f, 0);
     SetObaModel((cObj*) em, 0x1D, &v, 700.0f, 900.0f, 0);
     SetObaModel((cObj*) em, 0x1E, &v, 700.0f, 900.0f, 0);
-    YarareInit(em, fzero, fzero, fzero, 300.0f, 200.0f, 2, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[0], fzero, fzero, fzero, 250.0f, 200.0f, 3, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[1], fzero, fzero, fzero, 320.0f, 200.0f, 4, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[2], fzero, fzero, fzero, 200.0f, 100.0f, 6, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[3], fzero, fzero, -200.0f, 350.0f, 200.0f, 0x1B, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[4], fzero, fzero, -200.0f, 350.0f, 200.0f, 0x1C, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[5], fzero, fzero, -200.0f, 500.0f, 200.0f, 0x1D, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[6], fzero, fzero, -200.0f, 500.0f, 200.0f, 0x1E, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[7], fzero, fzero, -200.0f, 400.0f, 200.0f, 0x1F, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[8], fzero, 50.0f, -150.0f, 350.0f, 150.0f, 0x20, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    YarareAdd(em, &w->hit[9], -450.0f, fzero, fzero, 130.0f, 450.0f, 9, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
-    YarareAdd(em, &w->hit[10], -500.0f, fzero, fzero, 115.0f, 500.0f, 0xA, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
-    YarareAdd(em, &w->hit[11], -150.0f, fzero, fzero, 150.0f, 150.0f, 0xC, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
-    YarareAdd(em, &w->hit[12], fzero, fzero, fzero, 150.0f, 450.0f, 0x12, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
-    YarareAdd(em, &w->hit[13], fzero, fzero, fzero, 150.0f, 300.0f, 0x13, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
-    YarareAdd(em, &w->hit[14], fzero, fzero, fzero, 150.0f, 300.0f, 0x14, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
-    YarareAdd(em, &w->hit[15], fzero, fzero, fzero, 150.0f, 250.0f, 0x15, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
-    YarareAdd(em, &w->hit[16], fzero, fzero, fzero, 130.0f, 250.0f, 0x16, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
-    YarareAdd(em, &w->hit[17], fzero, -500.0f, fzero, 150.0f, 600.0f, 0x22, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[18], fzero, -800.0f, fzero, 150.0f, 800.0f, 0x23, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[19], fzero, -500.0f, fzero, 150.0f, 600.0f, 0x28, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[20], fzero, -800.0f, fzero, 150.0f, 800.0f, 0x29, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[21], fzero, -500.0f, fzero, 150.0f, 600.0f, 0x2E, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[22], fzero, -800.0f, fzero, 150.0f, 800.0f, 0x2F, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[23], fzero, -500.0f, fzero, 150.0f, 600.0f, 0x34, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[24], fzero, -800.0f, fzero, 150.0f, 800.0f, 0x35, YAT_FLAG_ON);
-    YarareAdd(em, &w->hit[25], fzero, fzero, fzero, 250.0f, 300.0f, 0x56, 0);
-    YarareAdd(em, &w->hit[26], fzero, fzero, fzero, 250.0f, 300.0f, 0x57, 0);
-    YarareAdd(em, &w->hit[27], fzero, fzero, fzero, 250.0f, 300.0f, 0x58, 0);
-    em->setTarget(2, fzero, fzero, fzero);
-    w->flags = zero;
-    w->neckAng = fzero;
-    w->wait = zero;
+    YarareInit(em, 0.0f, 0.0f, 0.0f, 300.0f, 200.0f, 2, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[0], 0.0f, 0.0f, 0.0f, 250.0f, 200.0f, 3, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[1], 0.0f, 0.0f, 0.0f, 320.0f, 200.0f, 4, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[2], 0.0f, 0.0f, 0.0f, 200.0f, 100.0f, 6, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[3], 0.0f, 0.0f, -200.0f, 350.0f, 200.0f, 0x1B, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[4], 0.0f, 0.0f, -200.0f, 350.0f, 200.0f, 0x1C, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[5], 0.0f, 0.0f, -200.0f, 500.0f, 200.0f, 0x1D, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[6], 0.0f, 0.0f, -200.0f, 500.0f, 200.0f, 0x1E, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[7], 0.0f, 0.0f, -200.0f, 400.0f, 200.0f, 0x1F, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[8], 0.0f, 50.0f, -150.0f, 350.0f, 150.0f, 0x20, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
+    YarareAdd(em, &w->hit[9], -450.0f, 0.0f, 0.0f, 130.0f, 450.0f, 9, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
+    YarareAdd(em, &w->hit[10], -500.0f, 0.0f, 0.0f, 115.0f, 500.0f, 0xA, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
+    YarareAdd(em, &w->hit[11], -150.0f, 0.0f, 0.0f, 150.0f, 150.0f, 0xC, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
+    YarareAdd(em, &w->hit[12], 0.0f, 0.0f, 0.0f, 150.0f, 450.0f, 0x12, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
+    YarareAdd(em, &w->hit[13], 0.0f, 0.0f, 0.0f, 150.0f, 300.0f, 0x13, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
+    YarareAdd(em, &w->hit[14], 0.0f, 0.0f, 0.0f, 150.0f, 300.0f, 0x14, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
+    YarareAdd(em, &w->hit[15], 0.0f, 0.0f, 0.0f, 150.0f, 250.0f, 0x15, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
+    YarareAdd(em, &w->hit[16], 0.0f, 0.0f, 0.0f, 130.0f, 250.0f, 0x16, YAT_FLAG_ON | YAT_FLAG_X_AXIS);
+    YarareAdd(em, &w->hit[17], 0.0f, -500.0f, 0.0f, 150.0f, 600.0f, 0x22, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[18], 0.0f, -800.0f, 0.0f, 150.0f, 800.0f, 0x23, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[19], 0.0f, -500.0f, 0.0f, 150.0f, 600.0f, 0x28, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[20], 0.0f, -800.0f, 0.0f, 150.0f, 800.0f, 0x29, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[21], 0.0f, -500.0f, 0.0f, 150.0f, 600.0f, 0x2E, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[22], 0.0f, -800.0f, 0.0f, 150.0f, 800.0f, 0x2F, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[23], 0.0f, -500.0f, 0.0f, 150.0f, 600.0f, 0x34, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[24], 0.0f, -800.0f, 0.0f, 150.0f, 800.0f, 0x35, YAT_FLAG_ON);
+    YarareAdd(em, &w->hit[25], 0.0f, 0.0f, 0.0f, 250.0f, 300.0f, 0x56, 0);
+    YarareAdd(em, &w->hit[26], 0.0f, 0.0f, 0.0f, 250.0f, 300.0f, 0x57, 0);
+    YarareAdd(em, &w->hit[27], 0.0f, 0.0f, 0.0f, 250.0f, 300.0f, 0x58, 0);
+    em->setTarget(2, 0.0f, 0.0f, 0.0f);
+    w->flags = 0;
+    w->neckAng = 0.0f;
+    w->wait = 0;
     w->atkWait = Rnd() % 150 + 150;
-    w->x7C4 = zero;
-    w->dmgTotal = zero;
-    w->sndId = zero;
+    w->x7C4 = 0;
+    w->dmgTotal = 0;
+    w->sndId = 0;
     // The 600/0xFF constants are REG_EQUIV pseudos the original never allocates: reload re-materialises
     // them in the spill registers r10/r9 (59 takes r11); ours local-allocs them the other way round.
     {
@@ -693,16 +687,16 @@ static void em32_R0_Init(cEm32* em)
     w->espKind[1] = EspPullCoreKind();
     w->espKind[2] = EspPullCoreKind();
     EstSet(em, -1, 0, 0, EFF_EM32, 4, 0, w->espKind[0], em, 0);
-    w->mode = zero;
+    w->mode = 0;
 #line 1000 "D:/Bio4/Prog/em32.cpp"
     w->pMot = (MOTION_INFO*) MEM_ALLOC(0xD0, 1, 0xD);
     if (w->pMot) {
         memclr_asm(w->pMot, 0xD0);
     }
     p = em->getPartsPtr(0x53);
-    p->scale.x = fzero;
-    p->scale.y = fzero;
-    p->scale.z = fzero;
+    p->scale.x = 0.0f;
+    p->scale.y = 0.0f;
+    p->scale.z = 0.0f;
     // hp = 500 and the routine bytes 6/1 are REG_EQUIV pseudos re-materialised by the original's reload
     // (r0, r11, r0 again): with no dying register the `sth hp` stays in source order ahead of the
     // routine stores. sched2 issues `li r0,1` after `stb r11,0xfd` (both priority 15; ours has one more
@@ -717,8 +711,8 @@ static void em32_R0_Init(cEm32* em)
         one = 1;
         em->r_no_0 = one;
         em->r_no_1 = six;
-        em->r_no_2 = zero;
-        em->r_no_3 = zero;
+        em->r_no_2 = 0;
+        em->r_no_3 = 0;
         MotionSetCore(em, &em->Motion, ARC(EM32_MOT_009), 0, 0, 1, 0);
         // sched2's tie between `li r0,1` and `stb r11,0xfd` (both priority 15) is broken by dependent counts
         // (5 vs 6): the code-less read of `one` gives the `li` its sixth dependent so it is issued first like
@@ -1416,7 +1410,6 @@ static void em32_R1_AtkWalk(cEm32* em)
 {
     Em32Work* w = EM32_WK(em);
     int step = em->r_no_2;
-    int zero;
     int hit;
 
     w->flags |= 0x10;
@@ -1450,7 +1443,6 @@ static void em32_R1_AtkWalk(cEm32* em)
         }
         break;
     case 2:
-        zero = 0;
         w->blendM0 = ARC(EM32_MOT_ATK_WALK_04F);
         w->blendM3 = ARC(EM32_SEQ_ATK_WALK_050);
         w->blendM1 = ARC(EM32_MOT_ATK_WALK_051);
@@ -1458,8 +1450,8 @@ static void em32_R1_AtkWalk(cEm32* em)
         w->blendC = 5;
         EstSet(em, -1, 0, 0, EFF_EM32, 0x26, 0, w->espKind[1], em, 0);
         w->blendCnt = 10;
-        w->blendSeq = zero;
-        w->Atk_ck = zero;
+        w->blendSeq = 0;
+        w->Atk_ck = 0;
         em->r_no_2++;
     case 3:
         EM32_BLEND_TURN2(em, w, &w->targetPos, 0.785398185f);
@@ -2484,7 +2476,6 @@ static void em32_R1_StepDown(cEm32* em)
 static void em32_R1_TunnelAtk(cEm32* em)
 {
     Em32Work* w = EM32_WK(em);
-    int zero;
     int act;
 
     w->flags |= 0xC50;
@@ -2545,10 +2536,9 @@ static void em32_R1_TunnelAtk(cEm32* em)
         }
         break;
     case 2:
-        zero = 0;
         MotionSetCore(em, &em->Motion, ARC(EM32_MOT_TUNNEL_ATK), ARC(EM32_SEQ_TUNNEL_ATK), 10, 1, 0);
         EstSet(em, -1, 0, 0, EFF_EM32, 0x21, 0, ESP_CORE_KIND_NONE, em, 0);
-        w->Atk_ck = zero;
+        w->Atk_ck = 0;
         w->timer = 1;
         em->r_no_2++;
     case 3:
@@ -3306,7 +3296,6 @@ static void em32_R1_Ground(cEm32* em)
     int step = em->r_no_2;
     Mtx m;
     Vec v;
-    int zero;
 
     w->flags |= 0x810;
     w->flags |= 0x10000;
@@ -3387,10 +3376,9 @@ static void em32_R1_Ground(cEm32* em)
             v.z = -2500.0f;
             PSMTXMultVec(m, &v, &em->pos);
         }
-        zero = 0;
         MotionSetCore(em, &em->Motion, ARC(EM32_MOT_GROUND_07F), ARC(EM32_SEQ_GROUND_080), 0, 1, 0);
         EstSet(em, -1, 0, 0, EFF_EM32, 0x1B, 0, ESP_CORE_KIND_NONE, em, 0);
-        w->Atk_ck = zero;
+        w->Atk_ck = 0;
         w->timer = 5;
         em->r_no_2++;
     case 5:
@@ -3407,11 +3395,10 @@ static void em32_R1_Ground(cEm32* em)
         }
         break;
     case 6:
-        zero = 0;
         em32GetGroundPos(em);
         MotionSetCore(em, &em->Motion, ARC(EM32_MOT_GROUND_081), ARC(EM32_SEQ_GROUND_082), 0, 1, 0);
         EstSet(em, -1, 0, 0, EFF_EM32, 0x1C, 0, ESP_CORE_KIND_NONE, em, 0);
-        w->Atk_ck = zero;
+        w->Atk_ck = 0;
         w->timer = 30;
         em->r_no_2++;
     case 7:
@@ -3713,31 +3700,30 @@ void em32NeckMove(cEm32* em)
 void em32ClothSet(cEm32* em)
 {
     Em32Work* w = EM32_WK(em);
-    int zero = 0;
 
     w->cloth.Num = 12;
     w->cloth.pCloth = em32_cloth_parts;
-    w->cloth.pLeft = (u8*) zero;
-    w->cloth.pRight = (u8*) zero;
-    w->cloth.pUpLeft = (u8*) zero;
-    w->cloth.pUpRight = zero;
+    w->cloth.pLeft = 0;
+    w->cloth.pRight = 0;
+    w->cloth.pUpLeft = 0;
+    w->cloth.pUpRight = 0;
     w->cloth.pParent = em32_cloth_up;
     w->cloth.pChild = em32_cloth_down;
-    w->cloth.pWindSin = (f32*) zero;
-    w->cloth.pWindRate = (f32*) zero;
-    w->cloth.pGravity = zero;
-    w->cloth.pRate = (f32*) zero;
+    w->cloth.pWindSin = 0;
+    w->cloth.pWindRate = 0;
+    w->cloth.pGravity = 0;
+    w->cloth.pRate = 0;
     w->cloth.pMax = em32_cloth_max;
-    w->cloth.pAtset = (CLOTH_AT_SET*) zero;
-    w->cloth.At_num = zero;
+    w->cloth.pAtset = 0;
+    w->cloth.At_num = 0;
     w->cloth.Gravity = 40.0f;
     w->cloth.Rate = 0.6f;
     w->cloth.Bundle_num = 3;
     w->cloth.WindSin = 0.0f;
     w->cloth.Stretchy = 0.05f;
     w->cloth.Move_rate = 0.0f;
-    w->cloth.Flag = zero;
-    w->cloth.pPtbl = zero;
+    w->cloth.Flag = 0;
+    w->cloth.pPtbl = 0;
     PenClothSet(em, (CLOTH_INFO*) &w->cloth, 100.0f);
 }
 

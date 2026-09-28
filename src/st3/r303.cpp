@@ -154,10 +154,9 @@ static void door_down()
     cEm* em;
     u32 cnt;
     f32 t;
-    u8 zero = 0;
 
     RsfSet(G_ROOM_ID, 0);
-    SmdGetObjPtr(0xB)->type = zero;
+    SmdGetObjPtr(0xB)->type = 0;
     em = setEm(0x24, -1, 1, 1, 1);
     em->flag |= 1;
     EstSet(em, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, em, 0);

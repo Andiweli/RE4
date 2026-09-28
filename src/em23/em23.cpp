@@ -236,7 +236,6 @@ static void em23_R0_Init(cEm23* em)
 {
     Em23Work* w = EM23_WK(em);
     f32 scale;
-    int zero;
 
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
@@ -244,8 +243,7 @@ static void em23_R0_Init(cEm23* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->atari.init(0.0f, -100.0f, 0.0f, 350.0f, 150.0f, 150.0f, 200.0f, 1, 0x2000, 10);
     em->setStatus(EM_STATUS_LOCKOFF);
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
@@ -265,11 +263,11 @@ static void em23_R0_Init(cEm23* em)
     w->pWingInfo = 0;
     w->wing = 0xFF;
     em23SetWing(em, 1);
-    w->flags = zero;
+    w->flags = 0;
     w->spd.x = 0.0f;
     w->spd.y = 0.0f;
     w->spd.z = 0.0f;
-    w->moveTimer = zero;
+    w->moveTimer = 0;
     w->x20 = 0.0f;
     w->pCorpse = 0;
     w->x3C = 100000000.0f;

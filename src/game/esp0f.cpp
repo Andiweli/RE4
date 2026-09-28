@@ -124,10 +124,10 @@ void Esp0f_Trans(cEsp0f* esp)
     oy = (f32)anm->Cy;
     z = 1.0f;
     zero = 0.0f;
-    if (ox == zero) {
+    if (ox == 0.0f) {
         ox = -anm->Width * 0.5f;
     }
-    if (oy == zero) {
+    if (oy == 0.0f) {
         oy = anm->Height * 0.5f;
     }
     x0 = ox * sx / anm->Width;

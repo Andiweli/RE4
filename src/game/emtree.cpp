@@ -71,7 +71,7 @@ cEmTree* SetTree(void* bin, void* tpl, Vec* pos, Vec* rot)
     f32 zero = 0.0f;
     f32 h = 5000.0f;
     f32 r = 200.0f;
-    em->atari.init(zero, h, zero, r, r, r, h, parts, 2, parts);
+    em->atari.init(0.0f, h, zero, r, r, r, h, parts, 2, parts);
     em->hp_max = em->hp = 1000;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };

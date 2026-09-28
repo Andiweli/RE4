@@ -174,8 +174,8 @@ void rckInit()
     RCK->savedRtp = pG->Rtp;
     RCK->cur = -1;
     RCK->near = -1;
-    RCK->catchTimer = zero;
-    RCK->editMode = zero;
+    RCK->catchTimer = 0;
+    RCK->editMode = 0;
     RCK->x290 = RCK->x298 = RCK->curX = (Screen.x + Screen.width) * 0.5f;
     RCK->x294 = RCK->x29C = RCK->curY = (Screen.y + Screen.height) * 0.5f;
     RCK->camMode = zero;

@@ -212,10 +212,10 @@ static void Filter03DrawBuffer()
     GXSetVtxAttrFmt(0, 13, 1, 4, 0);
     zero = 0.0f;
     GXSetZMode(0, 6, 0);
-    y = zero;
-    x = zero;
-    px = zero;
-    py = zero;
+    y = 0.0f;
+    x = 0.0f;
+    px = 0.0f;
+    py = 0.0f;
     z = 65530.0f;
     Filter03GetEFB(1, 1);
     Filter03GXDraw(px, py, z, 0.0f, 0.0f, 0xFF, 0xFF, 0xFF, 0xFF, 2.0f, 1, 1);

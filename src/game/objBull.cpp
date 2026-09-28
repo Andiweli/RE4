@@ -343,8 +343,8 @@ void objBull_R0_LiftWait(cObjBull* pObj)
         zero = 0;
         if (pG->Room_flg[0] & 0x08000000) {  // RMF_LIFT_START (r30f)
             pObj->r_no_0 = 6;
-            pObj->r_no_1 = zero;
-            pObj->r_no_2 = zero;
+            pObj->r_no_1 = 0;
+            pObj->r_no_2 = 0;
             pObj->r_no_3 = zero;
         }
         break;
@@ -389,8 +389,8 @@ void objBull_R0_Lift(cObjBull* pObj)
         zero = 0;
         if (pG->Room_flg[0] & 0x00400000) {  // RMF_LIFT_END (r30f)
             pObj->r_no_0 = 7;
-            pObj->r_no_1 = zero;
-            pObj->r_no_2 = zero;
+            pObj->r_no_1 = 0;
+            pObj->r_no_2 = 0;
             pObj->r_no_3 = zero;
         }
         break;

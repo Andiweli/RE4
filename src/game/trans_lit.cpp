@@ -348,10 +348,10 @@ static void lightSetQuadratic(cLight* pLi, GXLightObj* pLo)
     }
     f32 zero = 0.0f;
     f32 one = 1.0f;
-    if (pLi->Radius != zero) {
+    if (pLi->Radius != 0.0f) {
         k2 = (pLi->Intensity - 0.1f) / 0.1f / (pLi->Radius * pLi->Radius);
     } else {
-        k2 = zero;
+        k2 = 0.0f;
     }
     GXInitLightAttn(pLo, br, zero, zero, one, zero, k2);
 }

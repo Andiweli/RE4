@@ -203,12 +203,12 @@ void msqToolInit()
     zero = 0.0f;
     cam = &pG->Camera;
     cam->param.at.y = 1000.0f;
-    cam->param.at.x = zero;
-    cam->param.at.z = zero;
-    cam->param.pos.x = zero;
+    cam->param.at.x = 0.0f;
+    cam->param.at.z = 0.0f;
+    cam->param.pos.x = 0.0f;
     cam->param.pos.y = 1000.0f;
     cam->param.pos.z = 3000.0f;
-    cam->param.roll = zero;
+    cam->param.roll = 0.0f;
     CameraSetOrientationRoll(cam);
     rect.x = 0.0f;
     rect.y = 0.0f;

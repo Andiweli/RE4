@@ -781,10 +781,10 @@ void r202_initCatapult()
         r202_work->cat[i].obj->be_flag |= 0x20;
         r202_work->cat[i].obj->ang.y = LIMIT_ANGLE(tbl[i].ang);
         zero = 0;
-        r202_work->cat[i].state = zero;
-        r202_work->cat[i].timer = zero;
-        r202_work->cat[i].thrown = zero;
-        r202_work->cat[i].nArea = zero;
+        r202_work->cat[i].state = 0;
+        r202_work->cat[i].timer = 0;
+        r202_work->cat[i].thrown = 0;
+        r202_work->cat[i].nArea = 0;
         r202_work->cat[i].speed = 3500.0f;
         r202_work->cat[i].emNo = tbl[i].emNo;
         r202_work->cat[i].setRockTask = 0;

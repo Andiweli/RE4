@@ -183,7 +183,6 @@ static void em24_R0_Init(cEm24* em)
     FREE_EM24* w = EM24_WK(em);
     cAtariInfo* at;
     f32 scale;
-    int zero;
     int two;
 
     if (em->modelInit(ARC(EM24_BIN_005), ARC(EM24_TPL_006)) == 0) {
@@ -195,7 +194,6 @@ static void em24_R0_Init(cEm24* em)
     em->scale.x = scale;
     em->scale.y = scale;
     em->scale.z = scale;
-    zero = 0;
     two = 2;
     EspDataLoad((u32) ARC(EM24_EFF_004), EFF_EM24, 0);
     {
@@ -205,7 +203,7 @@ static void em24_R0_Init(cEm24* em)
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
     at = &em->atari;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     at->init(0.0f, -50.0f, 0.0f, 350.0f, 150.0f, 150.0f, 100.0f, 1, 0x2000, 10);
     at->offOba();
     em->setStatus(EM_STATUS_LOCKOFF);
@@ -217,8 +215,8 @@ static void em24_R0_Init(cEm24* em)
     YarareAdd(em, &w->hit[2], 0.0f, 0.0f, 0.0f, 50.0f, 50.0f, 8, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[3], 0.0f, 0.0f, 0.0f, 50.0f, 50.0f, 0xA, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[4], 0.0f, 0.0f, 0.0f, 50.0f, 50.0f, 0xC, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    w->Be_flg = zero;
-    w->HoseiCnt = zero;
+    w->Be_flg = 0;
+    w->HoseiCnt = 0;
     w->Water_eff_wait = two;
     w->slopeRot.x = 0.0f;
     w->slopeRot.y = 0.0f;
@@ -227,7 +225,7 @@ static void em24_R0_Init(cEm24* em)
     default:
         MotionSetCore(em, MOTION(em), ARC(EM24_MOT_00F), 0, 0, 5, 0);
         MotionMove(em, 0);
-        em->setRno(1, two, zero, zero);
+        em->setRno(1, two, 0, 0);
         break;
     case 0:
         MotionSetCore(em, MOTION(em), ARC(EM24_MOT_00F), 0, 0, 5, 0);

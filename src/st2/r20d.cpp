@@ -1204,7 +1204,6 @@ void cLanternUnit::setThrowLantern(Vec* target)
     void* tpl;
     void* bin;
     cObj* obj;
-    void* zero = NULL;
     const f32 spd0 = 20.0f;   // pool order (20 first) and `lis r25` at the top
 
     from.x = em->pList->mat[0][3];
@@ -1215,6 +1214,6 @@ void cLanternUnit::setThrowLantern(Vec* target)
     EspGetEfmTplAddr(0xF, &tpl);
     CalcParabolaVector(&spd, &from, target, PSVECDistance(&from, target) / 10.0f + 1.0f);
     obj = SetObj01(bin, tpl, &from, &rot, &spd, spd0, 50.0f, 0xD2, 5);
-    Obj01SetEst(obj, 0, 0x10, 3, 1, 1, 0, 0x14, (int) zero, (int) zero);
+    Obj01SetEst(obj, 0, 0x10, 3, 1, 1, 0, 0x14, 0, 0);
     EstSet(obj, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, obj, 0);
 }

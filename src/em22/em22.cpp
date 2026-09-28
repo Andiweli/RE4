@@ -368,7 +368,6 @@ static void em22_R0_Init(cEm22* em)
 {
     Em22Work* w = EM22_WK(em);
     void* mot;
-    int zero;
     u32 i;
 
     if (em->modelInit(ARC(EM22_BIN_004), ARC(EM22_TPL_005)) == 0) {
@@ -376,7 +375,6 @@ static void em22_R0_Init(cEm22* em)
         em->r_no_0 = 0xFF;
         return;
     }
-    zero = 0;
     mot = MOTION(em);
     EspDataLoad((u32) ARC(EM22_EFF_006), EFF_EM22, 0);
     em->Motion.flip = em22_flip;
@@ -386,24 +384,24 @@ static void em22_R0_Init(cEm22* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->atari.init(0.0f, 0.0f, 0.0f, 450.0f, 400.0f, 400.0f, 500.0f, 3, 0x2000, 10);
     em22YarareInit(em);
     w->pCtrl11 = GetCtrlCtrl11();
     w->pCtrl12 = GetCtrlCtrl12();
     w->tilt = 0.0f;
-    w->stuckTimer = zero;
+    w->stuckTimer = 0;
     w->neckX = 0.0f;
     w->neckY = 0.0f;
-    w->sndId[0] = zero;
-    w->sndId[1] = zero;
-    w->sndId[2] = zero;
-    w->slaverTimer = zero;
-    w->x2D0 = zero;
+    w->sndId[0] = 0;
+    w->sndId[1] = 0;
+    w->sndId[2] = 0;
+    w->slaverTimer = 0;
+    w->x2D0 = 0;
     w->plDist = 100000000.0f;
     w->scale = 1.0f;
     w->paraWait = (int) Rnd() % 900 + 300;
-    w->voiceTimer = zero;
+    w->voiceTimer = 0;
     for (i = 0; i < 5; i++) {
         w->pPara[i] = 0;
     }
@@ -787,14 +785,9 @@ static void em22_R1_Wait(cEm22* em)
         em->setRno(1, 7, 0, 0);
         return;
     }
-    {
-        // the zero of the last routine set is a block-local pseudo set before the test (its
-        // `li` lands at the top of the test block, above the pG load)
-        int zero = 0;
-        if (StaFlagChk(pG, STA_PL_FIRE) && em->l_pl < 625000000.0f) {
-            em->setRno(1, 7, zero, zero);
-            return;
-        }
+    if (StaFlagChk(pG, STA_PL_FIRE) && em->l_pl < 625000000.0f) {
+        em->setRno(1, 7, 0, 0);
+        return;
     }
     em22SlaverSet(em, 0);
 }

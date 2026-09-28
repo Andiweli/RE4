@@ -852,12 +852,11 @@ void cEm2d::move()
 void em2dInitRtnSet(cEm2d* em)
 {
     Em2dWork* w = EM2D_WK(em);
-    int zero = 0;
 
-    w->flags = zero;
-    w->atkWait = zero;
-    w->jumpWait = zero;
-    w->poisonWait = zero;
+    w->flags = 0;
+    w->atkWait = 0;
+    w->jumpWait = 0;
+    w->poisonWait = 0;
     // x4F8, spd, wallNrm x/y/z: the dying-store rule (1.0 dies at wallNrm.y, 0.0 at wallNrm.z) issues them y, z, x4F8,
     // spd, x like the target -- no keep-alive needed.
     w->Compress_y = 1.0f;
@@ -869,16 +868,16 @@ void em2dInitRtnSet(cEm2d* em)
     w->wallNrm.z = 0.0f;
     w->humTimer = Rnd() % 90 + 90;
     w->effTimer = 5;
-    w->revealTimer = zero;
-    w->poisonTimer = zero;
-    w->dmgTotal = zero;
-    w->atkCnt = zero;
-    w->wakeWait = zero;
-    w->sndId = zero;
-    w->dmGuard = zero;
-    w->catchGuard = zero;
-    w->humSeWait = zero;
-    w->Reset_enable = zero;
+    w->revealTimer = 0;
+    w->poisonTimer = 0;
+    w->dmgTotal = 0;
+    w->atkCnt = 0;
+    w->wakeWait = 0;
+    w->sndId = 0;
+    w->dmGuard = 0;
+    w->catchGuard = 0;
+    w->humSeWait = 0;
+    w->Reset_enable = 0;
     w->homePos = em->pos;
     if (em->type != 4) {
         EstSet(em, -1, 0, 0, EFF_EM2D, 4, 0, w->espKind, em, 0);
@@ -1529,7 +1528,6 @@ static void em2d_R1_BackJump(cEm2d* em)
 static void em2d_R1_Atk(cEm2d* em)
 {
     Em2dWork* w = EM2D_WK(em);
-    int zero;
 
     w->flags |= 0x10000;
     switch (em->r_no_2) {
@@ -1544,13 +1542,12 @@ static void em2d_R1_Atk(cEm2d* em)
         } else {
             w->dmgTotal = 0;
         }
-        zero = 0;
         w->timer = 15;
-        w->atkCnt = zero;
+        w->atkCnt = 0;
         w->spd.x = 0.0f;
         w->spd.y = 0.0f;
         w->spd.z = 0.0f;
-        w->atkHit = zero;
+        w->atkHit = 0;
         em->r_no_2++;
     case 1:
         em2dGravityMove(em, w);
@@ -1634,7 +1631,6 @@ static void em2d_R1_AtkPoison(cEm2d* em)
 static void em2d_R1_CriticalAtk(cEm2d* em)
 {
     Em2dWork* w = EM2D_WK(em);
-    int zero;
 
     w->flags |= 0x10000;
     switch (em->r_no_2) {
@@ -1649,10 +1645,9 @@ static void em2d_R1_CriticalAtk(cEm2d* em)
         } else {
             w->dmgTotal = 0;
         }
-        zero = 0;
         w->timer = 5;
-        w->atkCnt = zero;
-        w->atkHit = zero;
+        w->atkCnt = 0;
+        w->atkHit = 0;
         em->r_no_2++;
     case 1:
         if (w->timer) {
@@ -2379,7 +2374,6 @@ static void em2d_R1_WakeupWait(cEm2d* em)
 static void em2d_R1_Wakeup(cEm2d* em)
 {
     Em2dWork* w = EM2D_WK(em);
-    int zero;
     int hit;
 
     w->flags |= 0x100;
@@ -2393,11 +2387,10 @@ static void em2d_R1_Wakeup(cEm2d* em)
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
-            zero = 0;
-            w->dmgTotal = zero;
+            w->dmgTotal = 0;
             hit = em2dLockCk(em);
             if (hit) {
-                em->setRno(1, 4, zero, zero);
+                em->setRno(1, 4, 0, 0);
             } else if (w->targetAngAbs > 2.09439516f) {
                 em->setRno(1, 3, hit, hit);
             } else {
@@ -5553,14 +5546,12 @@ void em2dPlHeadLost()
     Vec rot;
     cParts* p3;
     cObj* obj;
-    int zero;
 
     if (pSys->eff_country == 0) {
         PlSetDamageSe(0xD);
         EstSet(pPL, -1, 0, 0, EFF_EM2D, 0x2C, 0, ESP_CORE_KIND_NONE, pPL, 0);
         return;
     }
-    zero = 0;
     SndCall(1, 0x3E, &pPL->pos, 0, 0, pPL);
     EstSet(pPL, -1, 0, 0, EFF_EM2D, 0x2D, 0, ESP_CORE_KIND_NONE, pPL, 0);
     pPL->setHead(0);
@@ -5579,7 +5570,7 @@ void em2dPlHeadLost()
     obj = SetObj01(PL_ARC_PTR(pG->pPlayer, 0xC), PL_ARC_PTR(pG->pPlayer, 7), &ofs, &rot, &spd, 15.0f, 150.0f, 1000, 0x11);
     if (obj) {
         obj->LightInfo.EnableMask = 1;
-        Obj01SetEst(obj, 0, -1, 4, 0, -1, 0, -1, (int) zero, -1);
+        Obj01SetEst(obj, 0, -1, 4, 0, -1, 0, -1, 0, -1);
     }
     EstSet(obj, -1, 0, 0, EFF_EM2D, 0x2E, 0, ESP_CORE_KIND_NONE, obj, 0);
 }

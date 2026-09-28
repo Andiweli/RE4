@@ -87,7 +87,6 @@ cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo)
     FREE_EMDOOR* w;
     u16* flg;
     Vec v;
-    int zero;
     f32 ry;
 
     em = (cEmDoor*) EmMgr.create(0x41);
@@ -117,9 +116,8 @@ cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo)
     }
     em->Motion.flip = emDoor_xflip_tbl;
     EtcSetAddAmb(em, ETC_AMB_DOOR);
-    zero = 0;
     w->Eff_id = 0xFF;
-    AtariInit(&em->atari, -w->Width, w->Height * 0.5f, 0.0f, w->Width + 50.0f, 150.0f, 150.0f, w->Height * 0.5f + 50.0f, zero, 2, zero);
+    AtariInit(&em->atari, -w->Width, w->Height * 0.5f, 0.0f, w->Width + 50.0f, 150.0f, 150.0f, w->Height * 0.5f + 50.0f, 0, 2, 0);
     em->atari.setPriority(PRI_LV3);
     em->atari.offSca();
     em->setStatus(EM_STATUS_ACTIVE);
@@ -2857,7 +2855,6 @@ void cEmDoor::setShock(int mode, Vec* pPos, int se_off)
 void cEmDoor::setBreak(Vec* pPos)
 {
     FREE_EMDOOR* w = EMDOOR_WK(this);
-    int zero;
 
     if (hp <= 0) {
         return;
@@ -2873,10 +2870,9 @@ void cEmDoor::setBreak(Vec* pPos)
         setOpen(pPos, 0, 0, 0);
         return;
     }
-    zero = 0;
     EstSet(this, -1, 0, 0, w->Eff_id, 6, 0, ESP_CORE_KIND_NONE, this, 0);
     SndCall(6, 0x37, &this->pos, 0, 0, this);
-    hp = zero;
+    hp = 0;
     r_no_0 = 1;
     r_no_1 = 4;
     r_no_2 = 0;

@@ -71,7 +71,6 @@ void R405Init()
 #line 69 "D:/Bio4/Prog/r405.cpp"
     r405_work = (R405Work*) MEM_CALLOC(sizeof(R405Work), 1, 0xd);
     st4_initAdaGame();
-    void* zero = 0;
     GamePointInit(1);
     EvtMgr.SetFunc("evt_r405s00_func", (void*) Evt_R405S00_Func);
     EvtMgr.SetFunc("evt_r405s99_func", (void*) Evt_R405S00_Func);
@@ -90,9 +89,9 @@ void R405Init()
     if (pG->pl_type == 2) {
         PlRegistMotion(ROOM_ARC_PTR(pG->pRoom, 0x21), ROOM_ARC_PTR(pG->pRoom, 0x22), ROOM_ARC_PTR(pG->pRoom, 0x23),
                        ROOM_ARC_PTR(pG->pRoom, 0x24), ROOM_ARC_PTR(pG->pRoom, 0x25), ROOM_ARC_PTR(pG->pRoom, 0x26), 0, 0,
-                       zero, zero, zero, zero);
+                       0, 0, 0, 0);
     } else {
-        PlRegistMotion(ROOM_ARC_PTR(pG->pRoom, 0x1F), ROOM_ARC_PTR(pG->pRoom, 0x20), 0, 0, 0, 0, 0, 0, zero, zero, zero, zero);
+        PlRegistMotion(ROOM_ARC_PTR(pG->pRoom, 0x1F), ROOM_ARC_PTR(pG->pRoom, 0x20), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
     setTexRender();
     SceSetRoomExitFunc(snd_tbl_set, 0);

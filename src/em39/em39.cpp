@@ -1719,8 +1719,8 @@ static void em39_R1_Goto(cEm39* em)
         } else if ((em->pos.x - w->Goto_pos.x) * (em->pos.x - w->Goto_pos.x) + (em->pos.y - w->Goto_pos.y) * (em->pos.y - w->Goto_pos.y) + (em->pos.z - w->Goto_pos.z) * (em->pos.z - w->Goto_pos.z) < 1000000.0f) {
             {
                 u8 zero = 0;
-                w->Goto_mode = zero;
-                em->setRno(1, 4, zero, zero);
+                w->Goto_mode = 0;
+                em->setRno(1, 4, 0, zero);
             }
         }
         break;
@@ -4878,9 +4878,9 @@ static void em39_R1_T_LongAtk(cEm39* em)
         if (end) {
             int zero = 0;
 
-            w->Arm_rno = zero;
+            w->Arm_rno = 0;
             if ((s16) pG->pl_life <= 0) {
-                em->setRno(1, 4, zero, zero);
+                em->setRno(1, 4, 0, 0);
             } else {
                 w->Atk_wait = 30;
                 em->setRno(1, 0xE, zero, 1);
@@ -4957,9 +4957,9 @@ static void em39_R1_T_JumpAtk(cEm39* em)
         if (MotionMove(em, 0)) {
             int zero = 0;
 
-            w->Arm_rno = zero;
+            w->Arm_rno = 0;
             if ((s16) pG->pl_life <= 0) {
-                em->setRno(1, 4, zero, zero);
+                em->setRno(1, 4, 0, 0);
             } else {
                 w->Atk_wait = 30;
                 em->setRno(1, 0xE, zero, 1);
@@ -8300,10 +8300,10 @@ void cEm39::set2ndBattle()
     zero = 0;
     w->Atk_wait = 30;
     w->Locate = 3;
-    w->Flash_damage = zero;
-    w->pGotoPoint = (EmiEntry*) zero;
-    w->Appear_damage = zero;
-    w->Total_damage = zero;
+    w->Flash_damage = 0;
+    w->pGotoPoint = 0;
+    w->Appear_damage = 0;
+    w->Total_damage = 0;
     setRno(1, 4, 0, 0);
     asm volatile("" : : "r"(zero), "r"(w)); // COMPILER-DIFF: #13 -- neither the zero nor w dies at its last store in the original (pure source order)
 }

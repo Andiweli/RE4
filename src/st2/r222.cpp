@@ -565,7 +565,6 @@ static void box_appear1()
 static void dragon_down2()
 {
     Vec pos;
-    int zero = 0;
     cObj* oA;
     cObj* oB;
     f32 spd;
@@ -659,7 +658,6 @@ static void box_appear2()
 static void dragon_down3()
 {
     Vec pos;
-    int zero = 0;
     cObj* oA;
     cObj* oB;
     f32 spd;

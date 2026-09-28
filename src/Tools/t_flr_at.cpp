@@ -151,11 +151,11 @@ void flrAtInit()
     pW->head.magic[0] = 'F';
     pW->head.magic[1] = 'S';
     pW->head.magic[2] = 'E';
-    pW->head.magic[3] = zero;
+    pW->head.magic[3] = 0;
     pW->head.version = 0x103;
     pW->head.num = 256;
-    pW->head.cartridge_type = zero;
-    pW->copySrc = zero;
+    pW->head.cartridge_type = 0;
+    pW->copySrc = 0;
     pW->copyValid = zero;
     pW->saveFlrSys = pFlrSys;
     pW->dispGroup = -1;

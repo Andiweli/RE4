@@ -499,7 +499,6 @@ void cEm3c::move()
 static void em3c_R0_Init(cEm3c* em)
 {
     FREE_EM3C* w = EM3C_WK(em);
-    int zero = 0;
     u32 i;
     u32 j;
     u32 k;
@@ -512,7 +511,7 @@ static void em3c_R0_Init(cEm3c* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->atari.init(0.0f, -900.0f, 0.0f, 550.0f, 450.0f, 450.0f, 1800.0f, 1, 0x2000, 10);
     YarareInit(em, 0.0f, 0.0f, 0.0f, 200.0f, 250.0f, 2, YAT_FLAG_ON);
     YarareAdd(em, &w->hit[0], 0.0f, 0.0f, 0.0f, 150.0f, 100.0f, 5, YAT_FLAG_ON);
@@ -527,18 +526,18 @@ static void em3c_R0_Init(cEm3c* em)
     YarareAdd(em, &w->hit[9], 0.0f, 300.0f, 0.0f, 150.0f, 50.0f, 3, 0);
     YarareAdd(em, &w->hit[10], 0.0f, 0.0f, 0.0f, 300.0f, 0.0f, 3, 0);
     EspDataLoad((u32) ARC(EM3C_EFF_004), EFF_EM3C, 0);
-    w->Be_flg = zero;
+    w->Be_flg = 0;
     w->Core_se_wait = 60;
     w->Run_wait = 300;
-    w->HeadOffTimer = zero;
-    w->timer74 = zero;
-    w->Atk_wait = zero;
+    w->HeadOffTimer = 0;
+    w->timer74 = 0;
+    w->Atk_wait = 0;
     w->Set_pos = em->pos;
     w->Set_ang = em->ang;
     w->Head_hp = (s16) (em->hp_max / 14) + Rnd() % 25 + 1;
     w->Head_cnt = Rnd() % 3 + 1;
     if (em->type != 1 && em->type != 3) {
-        w->Wep_type = zero;
+        w->Wep_type = 0;
     } else {
         w->Wep_type = 1;
     }

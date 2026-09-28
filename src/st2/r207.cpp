@@ -733,7 +733,6 @@ void r207_SetSword(int which, int mode)
 // Both swords swapped: the wall slides open.
 static void r207_WallMove()
 {
-    void* zero = 0;
     cObj* obj;
     void* bin;
     void* tpl;
@@ -744,14 +743,14 @@ static void r207_WallMove()
     SceAtSetEnable(0x87, 0);
     SceAtSetEnable(0xD, 0);
     SceAtSetEnable(0xE, 0);
-    r207_work->item1 = (cObj*) zero;
+    r207_work->item1 = 0;
     if (ItemGetBinTplAddr(0xC4, &bin, &tpl) == 1) {
         r207_work->item1 = SetObj00(bin, tpl, &r207_work->wallOfs, &r207_wallRot);
         OyaSetObj00(r207_work->item1, obj, 0);
         r207_work->item1->setNoSuspend(1);
         SceSleep(1);
     }
-    r207_work->item0 = (cObj*) zero;
+    r207_work->item0 = 0;
     if (ItemGetBinTplAddr(0x80, &bin, &tpl) == 1) {
         r207_work->item0 = SetObj00(bin, tpl, &r207_swordPos, &r207_swordRot);
         SceSleep(1);

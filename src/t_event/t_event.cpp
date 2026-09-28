@@ -459,8 +459,8 @@ void ToolEvt::MainMenu(ToolEvt* t)
     sel = ToolMenuDisp_cur(0x40, 0x40, 1, &t->CursolMain, mainMenu, sizeof(mainMenu), t->pJoy1);
     if (sel != -1) {
         t->r_no_0 = sel + 1;
-        t->r_no_1 = zero;
-        t->r_no_2 = zero;
+        t->r_no_1 = 0;
+        t->r_no_2 = 0;
         t->r_no_3 = zero;
     }
 }

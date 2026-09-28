@@ -767,7 +767,7 @@ static void r221_checkBossAppear_end()
                 emDeadWords(list)[0x8C >> 5] &= ~(0x80000000 >> (0x8C & 31));
             }
         }
-        pG->Em_list[0x8C].set = zero;
+        pG->Em_list[0x8C].set = 0;
         pG->Em_list[0x8C].be_flag = zero;
         pG->Em_list[0x8C].pos[0] = -0x4F8;
         pG->Em_list[0x8C].pos[1] = 0x58;

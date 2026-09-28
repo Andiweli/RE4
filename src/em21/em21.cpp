@@ -216,7 +216,6 @@ static void em21_R0_Init(cEm21* em)
 {
     Em21Work* w = EM21_WK(em);
     cAtariInfo* at;
-    int zero;
 
     switch (em->type) {
     case 0:
@@ -236,7 +235,6 @@ static void em21_R0_Init(cEm21* em)
         break;
     }
     em->setStatus(EM_STATUS_LOCKOFF);
-    zero = 0;
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     at = &em->atari;
     em->hp = 1000;
@@ -247,16 +245,16 @@ static void em21_R0_Init(cEm21* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     at->init(0.0f, -500.0f, 0.0f, 450.0f, 400.0f, 400.0f, 1000.0f, 3, 0x2000, 10);
     em21YarareInit(em);
     w->tilt = 0.0f;
     w->plDist = 100000000.0f;
-    w->stuckTimer = zero;
+    w->stuckTimer = 0;
     w->neckX = 0.0f;
     w->neckY = 0.0f;
-    w->pTrap = (cEm*) zero;
-    w->sndId = zero;
+    w->pTrap = 0;
+    w->sndId = 0;
     switch (em->set) {
     default:
         em->setRno(1, 0, 0, 0);
@@ -529,7 +527,7 @@ static void em21_R1_Bark(cEm21* em)
         if (MotionMove(em, 0)) {
             int zero = 0;
 
-            em->r_no_2 = zero;
+            em->r_no_2 = 0;
             if (w->routeAngAbs > PI / 4.0f) {
                 em->setRno(1, 2, 0, 0);
             } else {

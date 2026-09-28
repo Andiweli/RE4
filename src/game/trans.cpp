@@ -2475,7 +2475,7 @@ static void primBuffDebugDisp(int n)
     f32 zero = 0.0f;
     f32 h = 448.0f;
     f32 one = 1.0f;
-    GXSetViewport(zero, zero, h, one, (f32) n, one);
+    GXSetViewport(0.0f, 0.0f, h, one, (f32) n, one);
 }
 
 // Skin `n` vertices (s16 x/y/z + s16 matrix index, 8 bytes) from src into dst (s16 x/y/z, 6 bytes)

@@ -348,7 +348,6 @@ static void em29_R0_Init(cEm29* em)
 {
     Em29Work* w = EM29_WK(em);
     int one;
-    int zero;
 
     one = 1;
     em->ot_type = one;
@@ -366,8 +365,7 @@ static void em29_R0_Init(cEm29* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->scale.x = 1.5f;
     em->scale.y = 1.5f;
     em->scale.z = 1.5f;
@@ -376,10 +374,10 @@ static void em29_R0_Init(cEm29* em)
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     YarareInit(em, 0.0f, -30.0f, 0.0f, 100.0f, 60.0f, 5, YAT_FLAG_ON);
     EspDataLoad((u32) ARC(EM29_EFF_006), EFF_EM29, 0);
-    w->flags = zero;
+    w->flags = 0;
     w->atkTimer = 180;
-    w->escTimer = zero;
-    w->x90 = zero;
+    w->escTimer = 0;
+    w->x90 = 0;
     w->spd.x = 0.0f;
     w->spd.y = 0.0f;
     w->spd.z = 0.0f;
@@ -393,10 +391,10 @@ static void em29_R0_Init(cEm29* em)
     switch (em->set) {
     case 0:
     default:
-        em->setRno(one, zero, zero, zero);
+        em->setRno(one, 0, 0, 0);
         break;
     case 1:
-        em->setRno(1, 1, zero, zero);
+        em->setRno(1, 1, 0, 0);
         break;
     }
     em->ang.y = fRand1_1() * PI;

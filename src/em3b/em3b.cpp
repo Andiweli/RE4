@@ -385,7 +385,6 @@ static void em3b_R0_Init(cEm3b* em)
 {
     Em3bWork* w = EM3B_WK(em);
     cAtariInfo* at;
-    int zero;
 
     switch (em->type) {
     case 0:
@@ -438,15 +437,14 @@ static void em3b_R0_Init(cEm3b* em)
         YarareInitCube(em, 0.0f, 0.0f, 0.0f, 700.0f, 1000.0f, 1300.0f, 1, YAT_FLAG_ON);
         break;
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->setStatus(EM_STATUS_ACTIVE);
     EspDataLoad((u32) ARC(EM3B_EFF_006), EFF_EM3B, 0);
     w->espKind = EspPullCoreKind();
-    w->flags = zero;
-    w->sndId2 = zero;
-    w->sndId = zero;
-    w->dmgWait = zero;
+    w->flags = 0;
+    w->sndId2 = 0;
+    w->sndId = 0;
+    w->dmgWait = 0;
     switch (em->type) {
     case 0:
     default:
@@ -454,7 +452,7 @@ static void em3b_R0_Init(cEm3b* em)
         break;
     case 1:
     case 2:
-        em->setRno(1, 3, zero, zero);
+        em->setRno(1, 3, 0, 0);
         break;
     }
     em3b_R0_Move(em);
@@ -688,12 +686,10 @@ static void em3b_R1_Cart_Run(cEm3b* em)
             w->timer--;
         } else {
             Vec v;
-            int zero;
 
             em->hp = t;
             v = em->pos;
             v.y += 1000.0f;
-            zero = 0;
             PlWepHitCheck2(0, &v, &v, 0x13, 2, 6000.0f);
             StaFlagOn(pG, STA_PL_FIRE);
             EffectEspDelete(0, w->espKind, em, 0);
@@ -703,7 +699,7 @@ static void em3b_R1_Cart_Run(cEm3b* em)
             w->dmgWait = 150;
             SndStop(w->sndId2, 0);
             SndCall(6, 0xA, &em->pos, 0, 0, em);
-            em->setRno(1, 6, zero, zero);
+            em->setRno(1, 6, 0, 0);
         }
         em3bRunDownCkCart(em);
         break;
@@ -810,11 +806,9 @@ void em3bRunDownCkTruck(cEm3b* em)
 
     if ((s16) pG->pl_life > 0) {
         for (i = 0; i < 3; i++) {
-            int zero = 0;
-
             p = em->getPartsPtr(parts[i]);
             if (em3bDistXZ(p, &pPL->pos) < 6250000.0f) {
-                pG->pl_life = zero;
+                pG->pl_life = 0;
                 pPL->ang.y += Muku(&pPL->pos, &p->world, pPL->ang.y, PI);
                 pPL->ang.y = LIMIT_ANGLE(em->ang.y);
                 PlSetDamage(PL_DM_AUTO, 0, 0);
@@ -825,11 +819,9 @@ void em3bRunDownCkTruck(cEm3b* em)
     }
     if (pSUB && (s16) pG->ashley_life > 0) {
         for (i = 0; i < 3; i++) {
-            int zero = 0;
-
             p = em->getPartsPtr(parts[i]);
             if (em3bDistXZ(p, &pSUB->pos) < 6250000.0f) {
-                pG->ashley_life = zero;
+                pG->ashley_life = 0;
                 // reference store: pSUB and rot.y are re-read for LIMIT_ANGLE (a plain store is forwarded)
                 (pSUB->ang.y = pSUB->ang.y + Muku(&pSUB->pos, &p->world, pSUB->ang.y, PI));
                 pSUB->ang.y = LIMIT_ANGLE(pSUB->ang.y);
@@ -842,7 +834,6 @@ void em3bRunDownCkTruck(cEm3b* em)
     p = em->getPartsPtr(0);
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEm* e = EmMgr.fastAt(i);
-        int zero = 0;
 
         if (!e->isAlive()) {
             continue;
@@ -863,8 +854,8 @@ void em3bRunDownCkTruck(cEm3b* em)
             continue;
         }
         if (em3bDistXZ(p, &e->pos) < 20250000.0f) {
-            e->hp = zero;
-            e->setRno(3, 4, zero, zero);
+            e->hp = 0;
+            e->setRno(3, 4, 0, 0);
             SndCall(1, 0x4B, &em->pos, 0, 0, 0);
         }
     }
@@ -893,7 +884,6 @@ void em3bRunDownCkCart(cEm3b* em)
     p = em->getPartsPtr(1);
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEm* e = EmMgr.fastAt(i);
-        int zero = 0;
 
         if (!e->isAlive()) {
             continue;
@@ -912,8 +902,8 @@ void em3bRunDownCkCart(cEm3b* em)
         }
         if ((p->world.x - e->pos.x) * (p->world.x - e->pos.x) + (p->world.y - e->pos.y) * (p->world.y - e->pos.y)
             + (p->world.z - e->pos.z) * (p->world.z - e->pos.z) < 2890000.0f) {
-            e->hp = zero;
-            e->setRno(3, 4, zero, zero);   // the ff store is the zero's last use: issued first
+            e->hp = 0;
+            e->setRno(3, 4, 0, 0);   // the ff store is the zero's last use: issued first
         }
     }
 }

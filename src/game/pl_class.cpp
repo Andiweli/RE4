@@ -561,7 +561,7 @@ int cPlayer::actionSelect()
 
             StaFlagOn(pG, STA_SSCRN_ENABLE);
             if (joyKamae()) {
-                setRno(zero, 6, zero, zero);
+                setRno(0, 6, 0, zero);
                 return 1;
             }
     if (joyLKamae()) {

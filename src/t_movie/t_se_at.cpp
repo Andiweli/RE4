@@ -158,7 +158,7 @@ void seAtInit()
     pW->head.magic[0] = 'E';
     pW->head.magic[1] = 'S';
     pW->head.magic[2] = 'E';
-    pW->head.magic[3] = zero;
+    pW->head.magic[3] = 0;
     pW->head.version = 0x100;
     pW->head.num = 64;
     pW->x0 = 0x2D;
@@ -180,8 +180,8 @@ void seAtInit()
     pW->camPos = g->Camera.param.pos;
     pW->camAt = g->Camera.param.at;
     pW->mode = 2;
-    pW->sub = zero;
-    pW->step = zero;
+    pW->sub = 0;
+    pW->step = 0;
     pW->step2 = zero;
 }
 

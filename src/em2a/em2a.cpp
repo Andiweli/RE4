@@ -302,7 +302,7 @@ static void em2a_R0_Init(cEm2a* em)
     em2aYarareInit(em);
     w->espKind = EspPullCoreKind();
     EspDataLoad((u32) ARC(EM2A_EFF_012), EFF_EM2A, 0);
-    w->flags = zero;
+    w->flags = 0;
     w->pCtrl11 = GetCtrlCtrl11();
     w->pCtrl12 = GetCtrlCtrl12();
     em->setStatus(EM_STATUS_ACTIVE);
@@ -311,10 +311,10 @@ static void em2a_R0_Init(cEm2a* em)
     default:
         switch (em->set) {
         default:
-            em->setRno(1, 0, zero, zero);
+            em->setRno(1, 0, 0, 0);
             break;
         case 1:
-            em->setRno(1, 5, zero, zero);
+            em->setRno(1, 5, 0, 0);
             break;
             // dead loop: its LOOP_END note stops cse from following `beq case2`, so the arm does not
             // know zero == 0 and `z` is a fresh SI zero pseudo set before the clearStatus call (li r30,0)
@@ -331,11 +331,11 @@ static void em2a_R0_Init(cEm2a* em)
         break;
     case 1:
         EstSet(em, -1, 0, 0, EFF_EM2A, 3, 0x800, (u8) w->espKind, em, 0);
-        em->setRno(1, 6, zero, zero);
+        em->setRno(1, 6, 0, 0);
         break;
     case 2:
         EstSet(em, -1, 0, 0, EFF_EM2A, 5, 0x800, (u8) w->espKind, em, 0);
-        em->setRno(1, 6, zero, zero);
+        em->setRno(1, 6, 0, 0);
         break;
     }
     em2a_R0_Move(em);

@@ -325,7 +325,7 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
         }
     }
     u32 zero = 0;
-    pp->flags = zero;
+    pp->flags = 0;
     pp->maxFrame = w->Mot_frame_max;
     if (w->Mot_attr & 2) {
         if (!(w->Mot_attr & 0x1000)) {

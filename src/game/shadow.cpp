@@ -747,7 +747,7 @@ void make_comn_parallel_light(ShadowMng* mng, cModel* m)
         const f32 zero = 0.0f;
         rot.x = (f32) w->rotX * 6.2831855f / 360.0f;
         rot.y = (f32) w->rotY * 6.2831855f / 360.0f;
-        rot.z = zero;
+        rot.z = 0.0f;
     }
     RotMatrix(rm, &rot);
     PSMTXMultVecSR(rm, &mng->dir, &v);
@@ -936,7 +936,7 @@ void MakeSoftShadow(ShadowMng* mng)
     // Two zero variables: the pool 0.0 is a declaration initialiser (f28, loaded before SetNoScissor,
     // live through the whole function) and the argument variable is a copy of it, assigned here and
     // again at the top of the else arm (`fmr f31,f28` twice; a second cse ebb keeps the second copy).
-    zero = zero0;
+    zero = 0.0f;
     SoftShadowGetEFB(mng, 0.5f, 1.0f, 1);
     a = 0xFF;
     alpha = (f32) (u8) a;
