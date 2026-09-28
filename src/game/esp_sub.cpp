@@ -21,13 +21,11 @@
 
 int GetDrawTmpBufType();        // game/TmpBuf.cpp (C++ linkage)
 
-extern "C" {
 void EspCommonTransShimmer(cEsp* esp, int type, u32 blur);
 void EspCommonTransNega(cEsp* esp, u32 type);
 int EspEstSetSelect(int owner, int id, int no, cEsp** out, int bNoSuspend);
 void GetPosXY(Vec* p0, Vec* p1, Vec* p2, Vec* p3, f32 u, f32 v, Vec* out);
 void Esp1b_SpTrans(cEsp* esp);
-}
 
 
 // The effect code converts with 3.14, not PI.

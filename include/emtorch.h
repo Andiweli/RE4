@@ -39,7 +39,6 @@ public:
 // C++ linkage (EtcModel.cpp calls it as SetTorch__FPvT0P3VecT2ii)
 cEmTorch* SetTorch(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int etcNo);
 
-extern "C" {
 void emTorchDmCk(cEmTorch* pEm);
 void emTorchSetBreak(cEmTorch* em, u32 kind);   // 0/1: break effect 2, 2: effect 3
 void emTorch_R0_Init(cEmTorch* pEm);
@@ -49,6 +48,5 @@ void emTorch_R1_Parent(cEmTorch* pEm);
 void emTorch_R1_Break(cEmTorch* pEm);
 void emTorch_R1_Fall(cEmTorch* pEm);
 void emTorchYarareInit(cEmTorch* pEm);
-}
 
 #endif

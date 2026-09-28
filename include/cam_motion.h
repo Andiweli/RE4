@@ -43,6 +43,6 @@ public:
     void setBaseMatPtr(Mtx* p_mat) { m_p_base_mat = p_mat; }
 };
 
-extern "C" u32 CameraSequenceCtrl(CameraMotionWork* w);
+u32 CameraSequenceCtrl(CameraMotionWork* w);
 
 #endif

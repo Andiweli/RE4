@@ -223,7 +223,7 @@ void systemVSyncPost()
 
 // VI post-retrace callback: counts vsyncs, resumes the interrupt task scheduler once the frame's
 // vsync count is reached, and checks for a hang.
-void postVSyncCallback()
+void postVSyncCallback(u32 retraceCount)
 {
     vsync_cnt++;
     if (vsync_cnt >= GetSystemVcnt()) {

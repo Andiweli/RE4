@@ -22,7 +22,6 @@
 #include "motion.h"
 #include "em_sub.h"
 
-extern "C" {
 void objBull_R0_Set(cObjBull* obj);
 void objBull_R0_Break1st(cObjBull* obj);
 void objBull_R0_To2nd(cObjBull* obj);
@@ -51,7 +50,6 @@ void Sub_bull_lookback(cEm* em);
 void Sub_bull_look(cEm* em);
 void Sub_dm_bull(cEm* em);
 int SubCkNearEm();
-}
 
 void (*ObjBull_R0_move_tbl[12])(cObjBull*) = {
     objBull_R0_Set,      objBull_R0_Break1st, objBull_R0_To2nd, objBull_R0_Break2nd,

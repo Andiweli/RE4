@@ -22,9 +22,7 @@
 class cPlayer;
 
 
-extern "C" {
 void plemEscape(cPlayer* pl);
-}
 
 typedef void (*EmBarFunc)(cEmBar*);
 

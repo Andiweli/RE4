@@ -209,12 +209,10 @@ struct SeAt {
 
 // game/se_at.cpp
 void SeAtCheck();
-extern "C" {
 void SeAtInit();
 int SeAtSetOnOff(int no, int sw);
 SeAt* GetSeAtPtr(int no);
 u32 SeAtSndCall(int no);
-}
 
 // ARAM / MRAM sound data map (`SndMem`, 0xA0 bytes).
 struct SndMemWork {

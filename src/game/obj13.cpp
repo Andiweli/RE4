@@ -22,7 +22,6 @@
 #include "etc_model.h"
 #include "motion.h"
 
-extern "C" {
 cObj* SetLadder(void* bin, void* tpl, Vec* pos, Vec* rot, int no);
 void objLadder_R1_Set(cObjLadder* obj);
 void objLadder_R1_Fall(cObjLadder* obj);
@@ -46,7 +45,6 @@ void plobjLadderReset(cPlayer* pl);
 void objLadderResetCamMove(cEm* em);
 int LadderNearCk(Vec* pos);
 void LadderEventTrans(int mode);
-}
 
 void (*ObjLadder_R1_move_tbl[4])(cObjLadder*) = {
     objLadder_R1_Set, objLadder_R1_Fall, objLadder_R1_Down, objLadder_R1_Reset,

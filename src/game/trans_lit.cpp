@@ -11,10 +11,9 @@
 #include "math_sub.h"
 #include "main_mem.h"
 
-extern "C" {
 void LightSetInit();
 void LightSetModel(cModel* m);
-void commonClothLightSet(cLight** list, int n, Vec* pos, f32 size);
+void commonClothLightSet(cLight** list, int n, Vec pos, f32 size);
 void commonWaterLightSet(cLight** list, int n, u32 alpha);
 void commonEspLightSet(cLight** list, int n);
 void lightSetConstant(cLight* l, GXLightObj* obj);
@@ -28,7 +27,6 @@ void lightSetLocalAmb(cLight* l, GXColor* amb);
 void lightSetColor(GXLightObj* obj, cLight* l, cEm* em);
 void lightSetAmbient(GXColor* col0);
 void LightDisable();
-}
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
@@ -148,7 +146,7 @@ void LightSetModel(cModel* pMod)
 
 // Lighting for a cloth chain at `pos` (no distance fade, obj_flag 0): its lights, the scenery
 // ambient, white material.
-void commonClothLightSet(cLight** list, int n, Vec* pos, f32 size)
+void commonClothLightSet(cLight** list, int n, Vec pos, f32 size)
 {
     LIGHT_FUNC_TABLE;
     GXLightObj lobj[8];
@@ -158,7 +156,7 @@ void commonClothLightSet(cLight** list, int n, Vec* pos, f32 size)
     int i;
 
     obj_flag = 0;
-    obj_pos = *pos;
+    obj_pos = pos;
     obj_size = size;
     mask = 0;
     amb.a = amb.b = amb.g = amb.r = 0;

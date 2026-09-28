@@ -34,7 +34,7 @@ struct R30aWork {
 static R30aWork* r30a_work;
 
 // game/EtcModel.cpp (Bio4.sym marks it local; the room imports it): break-object display on/off.
-extern "C" int setRoomEtcBreakDisp(int no, int on, int flag);
+int setRoomEtcBreakDisp(int no, int on, int flag);
 
 static void r30a_setElvCamera(u32 mode);
 static void r30a_moveElevator(u32 dir);

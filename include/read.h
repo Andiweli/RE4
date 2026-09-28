@@ -32,7 +32,6 @@ extern ReadModule EmReadModule[4];
 extern ReadModule PlReadModule;
 extern ReadModule WepReadModule;
 
-extern "C" {
 void CoreDataRead();
 void OptionDataRead();
 // Loads enemy module `id` (the rooms preload the enemies of their events); the read address
@@ -46,10 +45,9 @@ void ReleasePlData();
 void ReadWepData(u32 no, u32 type);
 void ReleaseWepData();
 void ContinueWepData();
-}
 
 // Clears the enemy module list (r106 before the chapter-end event reloads them).
-extern "C" void EmReadInit();
+void EmReadInit();
 
 // The enemy module entry of enemy `id` (the rooms swap event data into the boss module's block).
 ReadModule* SearchEmModule(int id);

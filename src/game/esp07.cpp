@@ -28,12 +28,10 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 void Esp07_ChkGnd(cEsp07* esp, f32 floorY);
 void Esp07_HitGndLight(cEsp07* esp);
 void Esp07_HitGnd(cEsp07* esp);
 void Esp07_HitWall(cEsp07* esp);
-}
 
 // EspCreateTbl[0x07] factory.
 cEsp* Esp07_Create()

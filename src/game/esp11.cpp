@@ -27,9 +27,7 @@ public:
     virtual void Destruct();
 };
 
-extern "C" {
 void Esp11_SetParam(cEsp11* esp);
-}
 
 // EspCreateTbl[0x11] factory.
 cEsp* Esp11_Create()

@@ -59,7 +59,6 @@ struct EtcAmbRgb {
     u8 b;
 };
 
-extern "C" {
 // game/obj13.cpp (obj13.h is not included: this unit keeps its own cObjLadder view)
 cObj* SetLadder(void* bin, void* tpl, Vec* pos, Vec* rot, int no);
 
@@ -94,7 +93,7 @@ int Et60_init(void* arc, EtcSetData* d, cModel** out, int flag);
 int Et64_init(void* arc, EtcSetData* d, cModel** out, int flag);
 int Et65_init(void* arc, EtcSetData* d, cModel** out, int flag);
 
-// this unit (C linkage: every caller uses the plain names)
+// Defined in this unit
 void EtcModelDebugDisp();
 int getRoomEtc(int no, ETCMODEL_ID id, cEm** out, int flag);
 int getRoomEtc2(int no, cEm** out, int flag);
@@ -196,7 +195,6 @@ int getRoomEtcDram(int no, cEmBarrel** out, int flag);
 ETC_AMB_TYPE GetEtcAmbType();
 int GetEm10EyeEffectEnable();
 void EtcSetAddAmb(cModel* m, int no);
-}
 
 
 // One slot of the room etc table.

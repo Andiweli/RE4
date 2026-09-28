@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// Cinema-scope letterbox bars (game/cinesco.cpp, C linkage).
+// Cinema-scope letterbox bars (game/cinesco.cpp).
 typedef struct {
     u8 rno0;    // 0x00  index into cine_tbl (0 poll, 1 fade in, 2 fade out)
     u8 alpha;   // 0x01
@@ -13,7 +13,6 @@ typedef struct {
 } CineWork;     // 0x08
 
 #ifdef __cplusplus
-extern "C" {
 #endif
 extern CineWork cine_work;
 
@@ -21,7 +20,6 @@ void CinescoMove(void);
 void Draw_cinesco(void);
 void CinescoInit(void);
 #ifdef __cplusplus
-}
 #endif
 
 #endif

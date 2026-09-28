@@ -11,13 +11,11 @@
 
 typedef struct tagESPGEN00_WK ESPGEN00_WK;
 
-extern "C" {
 void espgen00_UpdateMatrix(cEspgen* w);
 void espgen00_Update(cEspgen* w);
 void espgen00_Move00(cEspgen* w);
 void espgen00_Move01(cEspgen* w);
 static f32 Calc_D256(ESPGEN00_WK* p, u8 d, f32 rate);
-}
 
 // Effect controller 00: emits one esp record repeatedly (Set_num at a time, every Next_max frames).
 typedef struct tagESPGEN00_WK {

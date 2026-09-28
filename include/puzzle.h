@@ -168,10 +168,8 @@ public:
 
 extern PieceInfo piece_info[];
 
-extern "C" {
 pieceData* searchItemPieceData(int item_id, PieceInfo* p_info);
 u8* searchItemModelData(int item_id, PieceInfo* p_info);
 int PutInCase(ITEM_ID item_id, u16 item_num, int size);
-}
 
 #endif

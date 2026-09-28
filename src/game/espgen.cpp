@@ -12,7 +12,6 @@
 #define ESPGEN_ID_MAX 0x46
 #define ESPGEN_APP_ID 0x40
 
-extern "C" {
 static void EspgenDummyMove(cEspgen* w);
 void EspgenFreeSizeCheckApp();
 void EspgenFreeSizeCheck();
@@ -37,7 +36,6 @@ int Espgen01_SetFreeWork(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel*
                          Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
 int Espgen02_SetFreeWork(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
-}
 // game/espgen40.cpp (declared with the record type in the original)
 void Espgen40_Move(cEspSeqTbl* gen);
 

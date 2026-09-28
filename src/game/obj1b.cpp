@@ -34,7 +34,6 @@ struct SpearEstOpt {
     u8 pad_10[0xC];
 };
 
-extern "C" {
 void obj1b_R1_Set(cObjSpear* obj);
 void obj1b_R1_LostWait(cObjSpear* obj);
 void obj1b_R1_Lost(cObjSpear* obj);
@@ -42,7 +41,6 @@ void obj1b_R1_Parent(cObjSpear* obj);
 void obj1b_R1_Fall(cObjSpear* obj);
 void obj1b_R1_Throw(cObjSpear* obj);
 int obj1bHitCk(cObjSpear* obj);
-}
 
 void (*Obj1b_R1_move_tbl[6])(cObjSpear*) = { obj1b_R1_Set, obj1b_R1_LostWait, obj1b_R1_Lost, obj1b_R1_Parent, obj1b_R1_Fall, obj1b_R1_Throw };
 

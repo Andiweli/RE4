@@ -64,7 +64,6 @@ public:
     void setFall(Vec* pSpd, f32 gravity);
 };
 
-extern "C" {
 cEmShield* SetShield(void* bin, void* tpl, Vec* pos, Vec* rot);
 void emShieldDmCk(cEmShield* pEm);
 void emShield_R0_Init(cEmShield* pEm);
@@ -74,6 +73,5 @@ void emShield_R1_LostWait(cEmShield* pEm);
 void emShield_R1_Lost(cEmShield* pEm);
 void emShield_R1_Parent(cEmShield* pEm);
 void emShield_R1_Fall(cEmShield* pEm);
-}
 
 #endif

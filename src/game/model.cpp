@@ -17,14 +17,12 @@
 
 // Model / parts / model info (cModel, cParts, cModelInfo) and their pools (PartsMgr, ModInfoMgr).
 
-extern "C" {
 void calcModelAddr(cModelData* data);
 void calcModelOffset(cModelData* data);
 void calcTplOffset(TEXPalette* tpl);
 void getBoundingBox(cModelData* data, ModelBound* bound);
 void drawBoundingBox(Mtx m, ModelBound* bound);
 int GetModelInfoNum(cModelInfo* info);
-}
 cModelInfo* GetModelInfoAddr(cModelInfo* info, int no);
 
 cModInfoMgr* cModel::mm = &ModInfoMgr;

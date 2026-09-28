@@ -60,7 +60,6 @@ struct PenAtWork {
 extern Vec GlobalWind;
 extern f32 GlobalWindAdd;
 
-extern "C" {
 void PenClothSet(cModel* m, CLOTH_INFO* pInfo, f32 min_len);
 void PenClothFixSet(cModel* m, CLOTH_INFO* pInfo, int no, Vec* pos);
 void PenClothFixClear(cModel* m, CLOTH_INFO* pInfo, int no);
@@ -73,6 +72,5 @@ int penClothAtCkBorder(Vec* pos, Vec* up, PenAtWork* wk);
 void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk);
 // global wind: direction (radians), strength, x (cPenWind::set in light.cpp)
 void PenWindSet(f32 dir, f32 power, f32 x);
-}
 
 #endif

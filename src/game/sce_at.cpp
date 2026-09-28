@@ -206,7 +206,6 @@ static SceAtReleaseModel releaseModelTbl[8];
 static cModel* p_imodel_bak = NULL;
 static void* lbl_80314D6C = NULL;
 
-extern "C" {
 int sceAtFunc_normal(SceAtWork* w, cModel* m);
 int sceAtFunc_door(SceAtWork* w, cModel* m);
 static int sceAtFunc_exec(SceAtWork* w, cModel* m);
@@ -236,7 +235,6 @@ void sceAtCamCtrlCheck();
 void sceAtDebugDisp();
 void sceAtItemFindCheck();
 static void sceAtDataLoopInit();
-}
 
 static SceAtFuncTbl sceAtFunc_tbl[21] = {
     {sceAtFunc_normal, 0},      // 0x00

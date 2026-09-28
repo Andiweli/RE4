@@ -16,12 +16,10 @@ struct TvModeWork {
 extern TvModeWork* pTv;
 extern u8 tv_mode_cnt;
 
-extern "C" {
 void SetTvMode(GXRenderModeObj* pRmode);
 void tvModeCheckTask();
 void tvModeTrigger(TvModeWork* pTv);
 void tvModeMenu_progressive(TvModeWork* pTv);
 void tvModeExit(TvModeWork* pTv);
-}
 
 #endif

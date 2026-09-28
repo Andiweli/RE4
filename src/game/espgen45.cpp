@@ -36,12 +36,10 @@ struct Esp4cWork {
     u8 x1F;       // 0x1F
 };
 
-extern "C" {
 void Espgen45_Move00(cEspgen* w);
 void Espgen45_TransSub(cEspgen* w);
 void SetIndMtx_801291F4(Espgen42Work* p);   // the DOL's local SetIndMtx (Espgen42 owns the global one); sym_map name
 cEspgen* SetWaterWork45(cEspgen* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate);
-}
 
 cEspgen* g_pWater45;
 static int g_bTargetCamera = 1;

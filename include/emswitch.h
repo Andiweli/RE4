@@ -48,7 +48,6 @@ public:
     void setLongCk();
 };
 
-extern "C" {
 cEmSwitch* SetEmSwitch(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo);
 void emSwitch_R1_Set(cEmSwitch* pEm);
 void emSwitch_R1_Open(cEmSwitch* pEm);
@@ -56,6 +55,5 @@ void emSwitch_R1_Close(cEmSwitch* pEm);
 void emSwitchOperationActEvtCk(cEmSwitch* pObj);
 void emSwitchActOpen(cEmSwitch* ptr);
 void emSwitchActClose(cEmSwitch* ptr);
-}
 
 #endif

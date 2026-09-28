@@ -16,13 +16,11 @@
 // Blur filter with an optional ID-texture mask (filter0a_mask_id) blended over the result.
 
 
-extern "C" {
 void filter0a_mask_tex();
 void Filter0aRender();
 void Filter0aGetEFB(int div, int div2);
 void Filter0aGXDraw(f32 x, f32 y, f32 z, f32 u, f32 v, f32 alpha, f32 s, int div, int mask);
 void Filter0aDrawBuffer();
-}
 
 u8 use_filter0a = 0;
 u8 filter0a_mask_flag = 0;

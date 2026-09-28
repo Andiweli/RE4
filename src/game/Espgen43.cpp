@@ -34,7 +34,6 @@ typedef struct tagESPGEN43_WK {
     u8 texRep;         // 0x99 texture repeats across the grid
 } ESPGEN43_WK;
 
-extern "C" {
 // game/trans_lit.cpp defines it with Vec* pos; this unit was built with the by-value prototype, so trans_lit.h is not included.
 void commonClothLightSet(cLight** list, int n, Vec pos, f32 radius);
 // game/espgen.cpp
@@ -45,7 +44,6 @@ void GetSandHeightSub(cEspgen* w);
 void Espgen43_Move00(cEspgen* w);
 void Espgen43_TransSub(cEspgen* w);
 cEspgen* SetSandWork(cEspgen* w, Vec* pos, Vec* rot, f32 size, f32 sizeRate, u32 nx, u32 ny);
-}
 
 static Vec Chk_pos;
 static f32 Height_ret;

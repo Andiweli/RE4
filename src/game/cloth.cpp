@@ -13,11 +13,9 @@
 #include "trans_ot.h"
 #include <dolphin/os.h>
 
-extern "C" {
 // game/trans_lit.cpp defines it with Vec* pos; this unit was built with the by-value prototype (three words
 // in r5..r7), so trans_lit.h is not included.
 void commonClothLightSet(cLight** list, int n, Vec pos, f32 radius);
-}
 
 Cloth ClothWk[8];
 

@@ -81,7 +81,7 @@ void cEsp0b::move()
 
 // EspTransTbl[0x0B]: for Core_flg 0x8000 effects computes the jitter here, draws with the offset
 // applied and removes it again; otherwise a plain EspCommonTrans.
-extern "C" void Esp0b_Trans(cEsp0b* esp)
+void Esp0b_Trans(cEsp0b* esp)
 {
     Vec look;
     Vec up;

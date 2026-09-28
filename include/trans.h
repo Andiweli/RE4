@@ -40,7 +40,6 @@ void lightSetEm(cModel* m);
 int commonScreenMat(cModel* m);
 void ModelRender(cModel* m);
 
-extern "C" {
 void org_LoadTexObj(u32 id, int map);
 void Trans();
 void lightSetObj(cModel* m);
@@ -60,7 +59,6 @@ void SpecularInit(struct TEXPalette* spec, struct TEXPalette* ind, struct TEXPal
 void GlobalIlmTexInit(struct TEXPalette* tpl);
 void GetEfbTex(cModel* m);
 void ClearZbuf();
-}
 
 extern GXTexObj g_Get_tex_obj;   // EFB copy the refraction shader samples (esp_sub/id_sys/esp18 reuse it)
 extern u8 gxCsScale[];           // colour scale of the TEV stages (light.cpp writes the cut's tev_scale into it); [4]: the complete type ahead of trans.cpp's definition changes its code

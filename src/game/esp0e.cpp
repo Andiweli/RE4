@@ -38,11 +38,9 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 static f32 GetDistAlpha(cEsp0e* esp);
 static f32 GetDirAlpha(cEsp0e* esp, Vec* dir);
 void Esp0e_HideCheck(cEsp* esp);
-}
 
 // EspCreateTbl[0x0E] factory.
 cEsp* Esp0e_Create()
@@ -146,7 +144,7 @@ void cEsp0e::move()
 
 // EspTransTbl[0x0E]: when alpha > 0.01 draws a one-frame screen-sprite copy (Parts_no 0xF8) at
 // scr + random R_pos jitter with the colour alpha and size scaled by `alpha`, via EspCommonTrans.
-extern "C" void Esp0e_Trans(cEsp0e* esp)
+void Esp0e_Trans(cEsp0e* esp)
 {
     ESP0E_WK* w = &esp->m_Free;
 

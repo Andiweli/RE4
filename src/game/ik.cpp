@@ -9,10 +9,8 @@
 #include "math_sub.h"
 #include "db_log.h"
 
-extern "C" {
 void ikCalc(cParts* root, cParts* joint, cParts* eff);
 static void heel2toe(Mtx m, cParts* p, Vec* pos);
-}
 
 #define IK_FLAGS(p) ((p)->motParts.flags)
 #define BIND_X(p) (p->lt_inv_mat[0][3])

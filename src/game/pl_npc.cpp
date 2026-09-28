@@ -36,13 +36,11 @@
 #include "shape.h"
 #include "obj13.h"
 
-extern "C" {
 void pl_fall_ok0();
 void pl_fall_ok(cPlayer* pl);
 void catchOn();
 int getFallPos(cSubChar* pl, Vec* pos, Vec* rot);
 void waterProc(cSubChar* pl);
-}
 
 // Motion data `no` of the partner's motion archive.
 #define SUB_MOT(pl, no) PL_ARC_PTR((pl)->subArc, no)

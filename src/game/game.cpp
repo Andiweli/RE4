@@ -147,7 +147,6 @@ u32 g_at_cyc[20];
 u32 g_at2_cnt[20];
 u32 g_at2_cyc[20];
 
-extern "C" {
 void DoorFlagInit();
 void gameInit();
 void gameStageInit();
@@ -161,7 +160,6 @@ void gameRoomMemInit();
 void gameStopMove();
 void gameDebugDisp();
 void gameDebug();
-}
 
 SAVE_DATA_HEAD* pSaveData;
 cGameSave GameSave;

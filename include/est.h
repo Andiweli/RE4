@@ -7,7 +7,6 @@
 #include "esp.h"
 
 // game/est.cpp: effect set table (est) helpers. EstSet itself is declared in esp.h.
-extern "C" {
 void AreaSstSet(int id);
 int GetSstDispFlag(u32 id);
 void SetSstDispFlag(u32 id, int flg);
@@ -29,7 +28,6 @@ void EventCutEffDelete();
 void EventAllEffDelete();
 int ChkWaterEffectEnable(Vec* pos);
 void EstSetEm10WaterFall(Vec* pMod);
-}
 
 // Drop effect (owner a, kind b) in all three effect systems (r318, r31b, r31c).
 static inline void EffectDelete(int a, int b)

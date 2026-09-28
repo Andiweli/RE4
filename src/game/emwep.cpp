@@ -33,13 +33,11 @@
 #include "em10.h"
 #include "em_sub.h"
 
-extern "C" {
 static void emWep_R1_Parent(cEmWep* em);
 // The original is a `static plemEscape` (emBar.cpp has a global one); the name carries the split's
 // address suffix in sym_map.
 #define plemEscape plemEscape_80017688
 static void plemEscape(cPlayer* pl);
-}
 
 
 // One rope node of the falling weapon (emWep_R1_Fall): three point masses joined by distance

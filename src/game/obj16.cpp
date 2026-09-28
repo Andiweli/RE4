@@ -22,7 +22,6 @@
 #include "motion.h"
 #include "em_sub.h"
 
-extern "C" {
 cObj* SetObj16(void* bin, void* tpl, cModel* target, cModel* body, int partsNo, u8 type, Vec* pos, Vec* rot);
 void obj16_R1_Set(cObj16* obj);
 void obj16_R1_CoreMove(cObj16* obj);
@@ -34,7 +33,6 @@ int obj16AtkCk(cObj16* obj, u32 kind, int partsNo);
 void obj16PlHeadLost(cObj16* obj);
 static void obj16NeckMove(cObj16* obj);
 void plemDmMStar(cPlayer* pl);
-}
 
 void (*Obj16_R1_move_tbl[5])(cObj16*) = {
     obj16_R1_Set, obj16_R1_CoreMove, obj16_R1_Atk, obj16_R1_Critical, obj16_R1_Damage,

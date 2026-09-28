@@ -24,9 +24,7 @@
 #include "sce_sys.h"
 #include "yz2code.h"
 
-extern "C" {
 extern void* EmInitFunc;                  // game/em.cpp (set by the enemy dll prolog)
-}
 
 
 
@@ -54,7 +52,6 @@ struct DataExtHeader {
     u32 ofs[1];   // 0x10
 };
 
-extern "C" {
 void decodeData();
 static void* readEm(int id, void* addr, u32 size);
 static int checkAshleyId(int id);
@@ -72,7 +69,6 @@ void ReleasePlData();
 void ReleaseWepData();
 void ReadWepData(u32 no, u32 type);
 void ContinueWepData();
-}
 void* GetDataExt(void* arc, const char* tag, int no);
 
 static void* in_data_addr;

@@ -26,13 +26,11 @@ public:
 
 extern cItmSys* g_pItemModelSys;
 
-extern "C" {
 void ItemModelInit();
 void ItemModelRoomInit();
 int ItemModelDataLoad(void* data);
 int ItemGetBinAddr(u8 id, void** pBin_addr);
 int ItemGetTplAddr(u8 id, void** pTpl_addr);
 int ItemGetBinTplAddr(u8 id, void** pBin_addr, void** pTpl_addr);
-}
 
 #endif

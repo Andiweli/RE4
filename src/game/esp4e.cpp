@@ -36,10 +36,8 @@ public:
     virtual void Destruct();
 };
 
-extern "C" {
 cEsp* Esp4e_Create();
 void Esp4e_Trans();
-}
 
 // Create entry of the EffSetId function table for effect id 0x4E.
 cEsp* Esp4e_Create()

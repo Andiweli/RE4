@@ -11,12 +11,10 @@
 #include "motion.h"
 #include "est.h"
 
-extern "C" {
 void obj1c_R1_Set(cObj1c* obj);
 void obj1c_R1_Crash(cObj1c* obj);
 void obj1c_R1_CrashBig(cObj1c* obj);
 void obj1cSpdMove(cObj1c* obj);
-}
 
 void (*Obj1c_R1_move_tbl[3])(cObj1c*) = { obj1c_R1_Set, obj1c_R1_Crash, obj1c_R1_CrashBig };
 

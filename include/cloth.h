@@ -47,7 +47,6 @@ public:
     void disturbance(u32 w, u32 h, f32 pow);
 };
 
-extern "C" {
 void ClothInit();
 void ClothRoomInit();
 void ClothCalcTplAddr(void* tpl);
@@ -55,6 +54,5 @@ int ClothTexSetUp(void* tpl, GXTexObj* tex, int no, GXTlutObj* tlut);
 int PullCloth(Cloth** ppCl);
 void ClothDraw();
 void clothTrans(Cloth* pCL);
-}
 
 #endif

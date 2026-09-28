@@ -27,12 +27,10 @@ struct test {
     u8 pad_18[0x38 - 0x18];
 };
 
-extern "C" {
 void roomJumpInit(test* w);
 void roomJumpMove(test* w);
 void roomJumpExec(test* w);
 void roomJumpExit(test* w);
-}
 
 // The original stores GLOBAL_WK fields through references: GCC then reloads pG after every store.
 

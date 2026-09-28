@@ -13,9 +13,7 @@
 #include "pl_wep.h"
 #include "motion.h"
 
-extern "C" {
 int obj01AddSpeed(cObj01* obj);
-}
 
 // r_no_0 dispatch: 0 flying/held, 1 exploded (fading out).
 void cObj01::move()

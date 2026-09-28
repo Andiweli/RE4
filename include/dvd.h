@@ -234,7 +234,6 @@ struct FileTblEntry {
 };
 extern FileTblEntry FileTbl[];
 
-extern "C" {
 int DvdRead(int fileNo, void* dst, u32 aram, u32 ofs, u32 length, int mode, const char* file, int line);
 // Queue a file read; returns the request number. `mode` 3 = allocate the destination.
 int DvdReadN(const char* name, void* dst, int a, int b, int c, int mode, const char* file, int line);
@@ -255,6 +254,5 @@ void MesSysMessage(int msg, int disc);
 void RomFontPrint(int x, int y, const char* mes_ptr);
 void RomFontMessage(u32 mes_no, int disc_no);
 void RomFontSetting();
-}
 
 #endif

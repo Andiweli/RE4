@@ -44,7 +44,7 @@ void cEsp0f::move()
 // EspTransTbl[0x0F]: builds the sprite matrix (screen ortho / camera-facing / fully rotated with
 // Tool_flg bit0), copies the frame buffer into a half-size texture, sets up 3 TEV stages (frame
 // copy scaled by Pow, sprite texture as alpha) and draws the quad; then restores the GX state.
-extern "C" void Esp0f_Trans(cEsp0f* esp)
+void Esp0f_Trans(cEsp0f* esp)
 {
     static Mtx Matrix = {
         { 0.001953125f, 0.0f, 0.0f, 0.0f },

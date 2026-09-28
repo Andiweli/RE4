@@ -237,7 +237,7 @@ int AddOtModelPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
 
 // Adds a callback into table `ot` at bucket `no` (clamped), optionally frustum-culled by
 // (pos, radius). Returns the bucket, 0xFFFF when culled or out of buffer.
-extern "C" int AddOtDirect(int ot, void* data, void (*func)(), u32 no, u16 flag, Vec* pos, f32 radius)
+int AddOtDirect(int ot, void* data, void (*func)(), u32 no, u16 flag, Vec* pos, f32 radius)
 {
     OtWork* w;
     OtData* p;

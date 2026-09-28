@@ -20,12 +20,10 @@
 
 extern GXTlutObj ThermoTlut;   // game/trans.cpp; uninitialised there, so not in trans.h (a header extern reorders trans.cpp's .bss)
 
-extern "C" {
 void Filter07Render();
 void Filter07GetEFB(int div, int div2);
 static void Filter07GXDraw(f32 x, f32 y, f32 z, f32 u, f32 v, f32 alpha, f32 s, int div, int tlut);
 void Filter07DrawBuffer();
-}
 
 void* filter07_buff = 0;
 static int filter07_noize = 0;

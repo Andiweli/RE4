@@ -3,11 +3,9 @@
 
 #include "types.h"
 
-// Effect system init and room setup (game/eff_sys.cpp). C linkage.
+// Effect system init and room setup (game/eff_sys.cpp).
 
-extern "C" {
 void EspInit();
 void EspRoomInit();
-}
 
 #endif

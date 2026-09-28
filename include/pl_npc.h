@@ -223,10 +223,8 @@ public:
 
 u32 SubCharGetStatus();  // game/pl_npc.cpp: routine bits for the camera / scenario (C++ linkage)
 
-extern "C" {
 // game/pl_npc.cpp: partner condition bits for the HUD (cockpit: 1, 2, 8, 0x10, 0x24)
 u32 SubCharGetCondition();
 int SubCharHideCheck();
-}
 
 #endif

@@ -13,7 +13,7 @@
 
 // Creates the obstacle on `parent` (parts partsNo + ofs for type 0, parent origin + ofs for type 1),
 // collision radius rad / height h, priority level 1, not drawn.
-extern "C" cObj* SetObaModel(cObj* parent, int partsNo, Vec* ofs, f32 rad, f32 h, u8 type)
+cObj* SetObaModel(cObj* parent, int partsNo, Vec* ofs, f32 rad, f32 h, u8 type)
 {
     cObj* obj;
     FREE_OBJ20* w;

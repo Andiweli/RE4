@@ -62,7 +62,6 @@ struct ShdHeader {
     ShdEntry entry[1];  // 0x10
 };
 
-extern "C" {
 void SetShadowCamMoveSize(f32 size);
 void ResetShadowCamMoveSize();
 void SetShadowParallelDirX(f32 x);
@@ -95,7 +94,6 @@ void shadowModelTrans(cModel* m, class cModelInfo* info, Mtx viewMat, ShadowMng*
 void shadowModelTrans2(cModel* m, class cModelInfo* info, Mtx viewMat);
 void TransLightTexture(GXTexObj* tex, GXTlutObj* tlut, s16 x, s16 y, s16 z, s16 w, s16 h, ShadowMng* mng, int flag2, int flag1);
 ShadowMng* GetCastShadowMngPtr(cModel* m);
-}
 
 // game/shadow.cpp: self shadow switches and the shadow texture matrix constants (trans.cpp SelfShadowSetup).
 extern int isSelfUse;

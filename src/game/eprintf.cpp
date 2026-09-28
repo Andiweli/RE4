@@ -46,7 +46,6 @@ u32 color_data[] = {
     0x00C000FF, 0x005800FF, 0x585858FF, 0x303030FF, 0xFF9600FF, 0x905100FF, 0x60A0A0FF,
 };
 
-extern "C" {
 int EprintfSetCurrentNo();
 void EprintfSetEnv(int x, int y, int color, int page, int a);
 void eprintf_main(int w, int h, const char* fmt, va_list ap);
@@ -57,7 +56,6 @@ void font_draw(char* str, int color, int y, int x, int z, int w, int h);
 void EprintfDrawing();
 void EprintfFlush();
 void EprintfInit();
-}
 
 // Spreads the 8 bits of `bits` into the 8 hex digits of the result (for printing a byte as
 // "01010101" with %08X).

@@ -13,9 +13,7 @@
 #include "pl_wep.h"
 #include "player.h"
 
-extern "C" {
 void setThrowSpeed(Vec* spd, f32 power);
-}
 
 // r_no_0 0: flying / bouncing (moveNormal), 1: sunk in water, waiting to blow (moveWater).
 void cSubWep::move()

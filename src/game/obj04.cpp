@@ -8,9 +8,7 @@
 #include "math_sub.h"
 #include "motion.h"
 
-extern "C" {
 void Efm04RotMatrix(cObj* obj, Mtx m);
-}
 
 // Per-frame Efm04 update: dies with its parent (pointer + serial), detaches from the parent at
 // rotFrame, position/speed/scale/rotation/colour envelopes (fadeStart / fadeLen / life like the

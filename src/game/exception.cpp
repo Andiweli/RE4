@@ -29,14 +29,12 @@
 #include <dolphin/os.h>
 #include <dolphin/db.h>
 
-extern "C" {
 // game/exception.cpp
 void ExceptionInit();
 int excepLoadSymbolSub(char* name, OSModuleHeader* module);
 void excepLoadSymbol();
 char* excepGetSymbolName(u32 addr);
 void ErrorHandler(OSError error, OSContext* context, ...);
-}
 
 // Symbol file (Bio4*.sym) header: entries, file names and symbol names by offset.
 struct SymEntry {
@@ -73,12 +71,10 @@ struct MemDump {
     u32 curAddr;  // 0x0C  jump address
 };
 
-extern "C" {
 char* excepGetSymbolNameSub(u32 addr, SYMBOL_INFO* info);
 void excepMemoryDumpMove(MemDump* w, int y);
 void excepMemoryDump(MemDump* w, int y);
 void excepRegConsoleDump(int error, u32 dsisr, u32 dar);
-}
 
 // A store through a scalar reference is not a struct-member MEM: the static `addr` is reloaded
 // after it, as the original does.

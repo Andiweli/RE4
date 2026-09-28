@@ -249,7 +249,6 @@ public:
     void operator delete(void* p) { Mem_free(p); }
 };
 
-extern "C" {
 void CardFirstCheck();
 int CardCheckDone();
 void CardSave(int terminal_no, int attr);
@@ -258,7 +257,6 @@ void CardSysSave();
 void CardInit();
 void CardDbgCacheSet();
 void CardMainTask(int mode);
-}
 
 // pSys->language == n (0 jpn, 1 eng(US), 2 eng(EU), 3 ger, 4 fra, 5 esp, 6 ita, 7 eng) (card, option).
 static inline int isLang(u8 lang, int n)

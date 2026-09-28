@@ -42,12 +42,10 @@ struct FuncPathWork {
     Vec alpha[1]; // 0x08  n coefficients
 };
 
-extern "C" {
 int PathGetMatEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Mtx pMat);
 void PathGetVtxMat(Mtx pMat, cModel* pMod, PathVtx* pPunit);
 int FuncPathParametrize(void* pPath, void* pB);
 int FuncPathCalc(void* pPath, void* pB, f32 t, Vec* p);
 void FuncPathClear(void* pPath);
-}
 
 #endif

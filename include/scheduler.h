@@ -73,9 +73,6 @@ void TaskSleep(int ctr);
 void TaskExit();
 void TaskSuspend(int level);
 void TaskSignal(int level);
-extern "C" {
-// Inside extern "C" GCC 2.95 reads `void (*)()` as `void (*)(...)` and then mangles a function
-// taking it by value; the same type through a typedef keeps C linkage.
 typedef void (*TaskFunc)();
 void TaskSchedulerInit();
 void TaskAllClear();
@@ -97,7 +94,6 @@ void iTaskKill();
 void iTaskExit();
 void iTaskSuspend();
 int iTaskStatus();
-}
 
 // C++ overload: kill the task `t` (sce_sys SceKill).
 void TaskKill(TASK* t);

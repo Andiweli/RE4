@@ -25,7 +25,7 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" void Esp03_HitWall(cEsp03* esp);
+void Esp03_HitWall(cEsp03* esp);
 
 // EspCreateTbl[0x03] factory.
 cEsp* Esp03_Create()
@@ -75,7 +75,7 @@ void cEsp03::move()
 
 // EspTransTbl[0x03]: GX line state in the parent * local matrix; draws the diamond quad
 // (maxPoints 10) or the line strip through the last maxPoints history points, newest first.
-extern "C" void Esp03_Trans(cEsp03* esp)
+void Esp03_Trans(cEsp03* esp)
 {
     ESP03_WK* w = &esp->m_Free;
     Vec* p;

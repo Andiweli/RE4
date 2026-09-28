@@ -39,7 +39,6 @@
 
 typedef void (*FccGetData)(u8* data, int i0, int i1, f32* val, f32* tan);
 
-extern "C" {
 void Fcc_get_data_000(u8* d, int i0, int i1, f32* v, f32* t);
 void Fcc_get_data_001(u8* d, int i0, int i1, f32* v, f32* t);
 void Fcc_get_data_002(u8* d, int i0, int i1, f32* v, f32* t);
@@ -51,7 +50,6 @@ void Fcc_get_data_021(u8* d, int i0, int i1, f32* v, f32* t);
 void Fcc_get_data_022(u8* d, int i0, int i1, f32* v, f32* t);
 void Fcc_get_data_033(u8* d, int i0, int i1, f32* v, f32* t);
 void dummy(u8* d, int i0, int i1, f32* v, f32* t);
-}
 
 // Moves every parts' world position/matrix by the model's displacement since the last pose
 // computation (Pos_world), without recomputing the pose (cheap follow after setPos-style moves).

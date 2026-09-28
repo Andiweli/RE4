@@ -480,7 +480,7 @@ void SceInitItemEvent()
 #include <stdio.h>
 #include <string.h>
 
-extern "C" void SceExecItemEvent(SceItemEvent* e);
+void SceExecItemEvent(SceItemEvent* e);
 
 // Task of an item event (the action button on its area): disables the area, enables the linked
 // item areas, sets the room save flag, plays the camera cut while `func(arg)` runs, then forgets

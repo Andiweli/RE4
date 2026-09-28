@@ -46,6 +46,6 @@ public:
 // room_jmp.cpp and title.cpp each own a file-scope `cRoomJmp* pRj` of their own.
 
 void RoomJump();
-extern "C" void GetNextPos(u8 stage, u8 room);
+void GetNextPos(u8 stage, u8 room);
 
 #endif

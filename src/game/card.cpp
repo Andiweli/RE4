@@ -32,13 +32,11 @@
 #include <dolphin/os.h>
 #include <dolphin/db.h>
 
-extern "C" {
 void debugInfoDisp(int slot, int type);
 void CRCInit();
 u32 CRCCalc(u8* data, u32 len);
 int CRCVerify(u8* data, u32 len, u32 saved);
 void setMsgBG(int a, int flag);
-}
 
 // Sub screen data archive (SndMem.sub_adr): offsets to its sub-files.
 // Archive header shared by the sub screen sound data (SndMem.sub_adr: [0] icon/banner TPL,

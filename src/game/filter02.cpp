@@ -14,13 +14,11 @@
 // (Filter02DrawBuffer) and blended back through a Z-derived C8 mask (Filter02DrawBuffer2).
 
 
-extern "C" {
 void Filter02GetEFB(f32 scale, int div, void* buf, int mip);
 void Filter02Render();
 void Filter02GXDraw(f32 x, f32 y, f32 z, f32 u, f32 v, f32 alpha, f32 s, f32 s2, void* buf);
 void Filter02DrawBuffer();
 void Filter02DrawBuffer2();
-}
 
 void* filter02_buff = 0;
 static void* filter02_buff2 = 0;

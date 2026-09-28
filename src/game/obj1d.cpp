@@ -7,12 +7,10 @@
 #include "math_sub.h"
 #include "motion.h"
 
-extern "C" {
 void obj1d_R1_Set(cObjChain* obj);
 void obj1d_R1_LostWait(cObjChain* obj);
 void obj1d_R1_Lost(cObjChain* obj);
 void obj1d_R1_Parent(cObjChain* obj);
-}
 
 static void (*Obj1d_R1_move_tbl[4])(cObjChain*) = { obj1d_R1_Set, obj1d_R1_LostWait, obj1d_R1_Lost,
                                                      obj1d_R1_Parent };

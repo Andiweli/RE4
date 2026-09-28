@@ -7,11 +7,9 @@
 #include "math_sub.h"
 #include "db_log.h"
 
-extern "C" {
 void espgen10_Update(cEspgen* w);
 void espgen10_Move00(cEspgen* w);
 void espgen10_Move01(cEspgen* w);
-}
 
 // Spawns record `no` of the sequence: Kind 0 -> one esp via EspSeqSet (pos is passed only when
 // flag != 0), Kind 1 -> a controller via EspgenSeqSet. In event mode (Core_flg 0x1000) the parent

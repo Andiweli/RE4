@@ -58,10 +58,8 @@ public:
     void quit();
 };
 
-extern "C" {
 // Replaces the language part of an "SS/___/..." path (name + 3).
 void setLangExt3(char* name);
 int OptionOpenCheck();
-}
 
 #endif

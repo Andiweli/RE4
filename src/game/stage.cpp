@@ -20,7 +20,6 @@
 #include "merchant.h"
 #include "emitem.h"
 
-extern "C" {
 int checkEmListNo(u16 room);
 const char* getEmListName(u32 no);
 const char* getEmListDbgName(int no);
@@ -32,7 +31,6 @@ void subMissionSt1();
 void subMissionSt2();
 void subMissionSt3();
 void SubMissionCheck();
-}
 
 // Village rooms 200..208: list 2 until the church bell (Scenario_flg[1] 0x40000), then 3.
 static inline int emListVillage(int room)

@@ -53,7 +53,6 @@ void Filter00SetPower(s8 pow);
 void Filter00SetType(u32 type);
 void Filter00SetContrast(u8 r, u8 g, u8 bias);
 
-extern "C" {
 // filter00.cpp: additive radial blur request (highest priority wins)
 void Filter00SetAddSpread(u32 pri, int on, u8 r, u8 g, u8 b, u8 rate, u8 type, u32 num, f32 cx, f32 cy, f32 pow);
 // filter03.cpp
@@ -72,7 +71,6 @@ void Filter0bAllocBuf();
 void Filter0bFreeBuf();
 void Filter0bCapture();
 void Filter0bSetAlpha(u8 alpha);
-}
 
 // filter0a.cpp: the mask filter switch and its parameters (cam_extra.cpp sets them per camera cut).
 extern u8 use_filter0a;

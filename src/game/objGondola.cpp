@@ -29,7 +29,6 @@ struct GondolaMotWork {
     f32 blendRate;        // 0xC8
 };
 
-extern "C" {
 void objGondola_R0_Set(cObjGondola* obj);
 void objGondola_R0_Move(cObjGondola* obj);
 void objGondola_R0_Down(cObjGondola* obj);
@@ -38,7 +37,6 @@ void objGondola_R0_Break(cObjGondola* obj);
 void objGondolaSatClear(cObjGondola* obj);
 void objGondolaSatSet(cObjGondola* obj);
 void objGondolaRideEmAdjust(cObjGondola* obj, Vec* pVec);
-}
 
 static void (*ObjGondola_R0_move_tbl[5])(cObjGondola*) = {
     objGondola_R0_Set, objGondola_R0_Move, objGondola_R0_Down, objGondola_R0_Up, objGondola_R0_Break,

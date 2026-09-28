@@ -16,14 +16,12 @@
 #include "obj15.h"
 
 
-extern "C" {
 void obj15_R1_Set(cObjGatling* obj);
 void obj15_R1_Break(cObjGatling* obj);
 void obj15BarrelMove(cObjGatling* obj);
 void obj15MatCalc(cObjGatling* obj);
 int obj15GunHitck(cObjGatling* obj);
 void obj15DmCk(cObjGatling* obj);
-}
 
 void (*Obj15_R1_move_tbl[2])(cObjGatling*) = { obj15_R1_Set, obj15_R1_Break };
 ATK_INFO Obj15_atk_info_tbl = { 100.0f, PL_DM_AUTO, 600, 0, 10, 0 };

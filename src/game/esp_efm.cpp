@@ -14,7 +14,6 @@
 #include "TexRender.h"
 #include "db_log.h"
 
-extern "C" {
 u32 GetEfmMoveIdMax();
 u8 GetEfmMoveId(u32 no);
 void EfmDeleteSub(cObj* obj);
@@ -24,7 +23,6 @@ cObj* EfmSetObj05(cObj* obj, cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* 
 cObj* EfmSetObj09(cObj* obj, cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate);
 void setModTexRender(cObj* obj, int no);
 cObj* SetEffModel(void* bin, void* tpl, Vec* pos, Vec* rot);   // embox.cpp declares it `void` locally
-}
 
 // The effect code converts with 3.14, not PI.
 #undef DEG2RAD

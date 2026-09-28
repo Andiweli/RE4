@@ -8,14 +8,12 @@
 #include <string.h>
 #include "motion.h"
 
-extern "C" {
 int ShapeMove(cModelInfo* info);
 void SetOriginalShape(cModelInfo* info);
 void ClrShape(cModel* m);
 int SetShape(cModelInfo* info, f32 rate, ShapeData* data);
 void ResetShape(cModelInfo* info, void* dst);
 void CalculateShape_new(cModelInfo* info, f32 rate, ShapeData* data, u8* dst);
-}
 
 void ShapeEnd(void* work);
 

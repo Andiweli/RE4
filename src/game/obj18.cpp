@@ -11,9 +11,7 @@
 #include <string.h>
 #include "em_cloth.h"
 
-extern "C" {
 void obj18SetOya(cObj18* obj);
-}
 
 // Unused work-size error message.
 // Never called: the original keeps the message of this unused inline in .rodata.

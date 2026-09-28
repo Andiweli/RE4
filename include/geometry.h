@@ -4,7 +4,7 @@
 #include "types.h"
 #include "vec.h"
 
-// game/geometry.cpp: collision primitives (C linkage).
+// game/geometry.cpp: collision primitives.
 
 // Cone (or fan/cylinder) volume: apex at pos, axis dir, half angle, height; radius is derived.
 struct GEOM_CONE_REV {
@@ -30,10 +30,8 @@ struct GeoHexahedron {
     Vec pointB;     // 0x90
 };
 
-extern "C" {
 int collision_point_cone_rev_play(Vec* pPoint, GEOM_CONE_REV* pConeRev, f32 play);
 int collision_point_cone_rev_play_face(Vec* pPoint, GEOM_CONE_REV* pConeRev, f32 play, Vec* pDirection, f32 open_angle);
 int collision_sphere_hexahedron(GeoSphere* pSphere, GeoHexahedron* pHexahedron);
-}
 
 #endif

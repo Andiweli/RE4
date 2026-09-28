@@ -30,9 +30,7 @@
 #include "ref_access.h"
 #include <string.h>
 
-extern "C" {
 static void IdSetColLoop(IDSystem* id, int no, u8 type, int on);
-}
 
 #define DATA_PTR(d, ofs) ((void*) (*(u32*) ((u8*) (d) + (ofs)) + (u32) (d)))
 #define DVD_READ_N(name, dst, a, b, c, mode) DvdReadN(name, dst, a, b, c, mode, __FILE__, __LINE__)

@@ -596,15 +596,15 @@ static inline void SetAngV(cModel* m, Vec* v) { m->setAng(v); }
 // SetAngY` does the same: game/model, exception, t_bugcheck, r205, db_light, db_mod swap two `lis` of pool
 // labels). The rooms that need it keep a per-file SetAngY (r315, r31c, r321).
 
-// game/model.cpp (C linkage): parts `no` of a parts list (NULL when out of range).
-extern "C" cParts* GetPartsAddr(cParts* pList, u32 idx);
-// game/model.cpp (C linkage): relocate a TPL's file offsets to pointers (trans SpecularInit).
-extern "C" void calcTplAddr(struct TEXPalette* tpl);
-// game/model.cpp (C linkage): the inverse, pointers back to file offsets (mes.cpp releases the font TPL).
-extern "C" void calcTplOffset(struct TEXPalette* tpl);
+// game/model.cpp: parts `no` of a parts list (NULL when out of range).
+cParts* GetPartsAddr(cParts* pList, u32 idx);
+// game/model.cpp: relocate a TPL's file offsets to pointers (trans SpecularInit).
+void calcTplAddr(struct TEXPalette* tpl);
+// game/model.cpp: the inverse, pointers back to file offsets (mes.cpp releases the font TPL).
+void calcTplOffset(struct TEXPalette* tpl);
 
 // game/model.cpp: shows / hides model info `no` of `m` (the rooms hide the player's weapon models).
-extern "C" void ModelInfoSetTrans(cModel* m, int no, int on);
+void ModelInfoSetTrans(cModel* m, int no, int on);
 // game/model.cpp: turns on the reflection flag of model info `no` (r11b: the water render targets).
 void ModelInfoRefrectOn(cModel* pMod, int modelInfoNo);
 

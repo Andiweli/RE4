@@ -8,9 +8,7 @@
 #include "math_sub.h"
 #include "rnd.h"
 
-extern "C" {
 void Efm05RotMatrix(cObj* obj, Mtx m);
-}
 
 // Per-frame Efm05 update: body scale/colour/life envelopes; parts within the growing radius start
 // flying (Kaboom_flg 1) with speed pow/range along the radial direction plus random spread; flying

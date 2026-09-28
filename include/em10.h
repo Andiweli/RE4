@@ -287,6 +287,6 @@ void Obj01SetEst(cObj* pObj, u32 eff, u32 est, u32 action, u32 eff2, u32 est2, u
 int GetWepDmVal(cEm* pEm, u32 wep_no, int near);
 void EmCatchSubSet(cEm* pEm, cEm* pSub, f32 pl_dir, u32 mode, f32 x, f32 y, f32 z, void (*ft)(cSubChar*));   // em_sub.cpp; PS2 order (the ang / mode swap is not visible in the bytes)
 void MotSetObj16(cObj* obj, void* mot, int a, int b);
-extern "C" int GetEm10EyeEffectEnable();
+int GetEm10EyeEffectEnable();
 
 #endif

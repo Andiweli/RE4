@@ -43,7 +43,7 @@ struct R200Work {
 static R200Work* r200_work;
 
 // game/EtcModel.cpp (Bio4.sym marks it local; the room imports it)
-extern "C" int setRoomEtcBreakDisp(int no, int on, int flag);
+int setRoomEtcBreakDisp(int no, int on, int flag);
 void Obj18CmfOn(cObj* o, u32 n);   // game/obj18.cpp
 
 void r200_openBox_main(int id, int mode);

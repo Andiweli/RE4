@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-// Exception handler install (game/exception.cpp): main.cpp calls it once at boot. C linkage.
+// Exception handler install (game/exception.cpp): main.cpp calls it once at boot.
 
-extern "C" void ExceptionInit();
+void ExceptionInit();
 
 #endif

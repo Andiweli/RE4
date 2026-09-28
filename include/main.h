@@ -63,15 +63,14 @@ extern KEY Key;
 struct SYSTEM_SAVE_WORK;
 extern SYSTEM_SAVE_WORK* pSys;
 
-extern "C" int GetSystemVcnt();
-extern "C" void SetSystemVcnt(int vcnt);
+int GetSystemVcnt();
+void SetSystemVcnt(int vcnt);
 
 extern const Vec vecZero;  // main.cpp
 
-// game/main.cpp (C linkage)
-extern "C" {
-void systemVSyncPost();
-void postVSyncCallback();
+// game/main.cpp
+extern "C" void systemVSyncPost();   // plain symbol on PS2
+void postVSyncCallback(u32 retraceCount);
 void haltExecCheck();
 void systemStartInit();
 void systemRestartInit();
@@ -82,7 +81,6 @@ void systemResetCommon();
 void systemHardReset();
 void systemSoftReset();
 void setLanguage();
-}
 extern int vsync_cnt;
 extern char* pUser_name;
 extern void* roomInfoAddr;

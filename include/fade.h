@@ -4,7 +4,7 @@
 #include "types.h"
 #include "gx.h"
 
-// game/fade.cpp: up to 4 full-screen colour fades (C linkage).
+// game/fade.cpp: up to 4 full-screen colour fades.
 struct FADE_WORK {
     GXColor s_col;  // 0x00
     GXColor e_col;    // 0x04
@@ -19,7 +19,6 @@ struct FADE_WORK {
 
 extern FADE_WORK Fade[4];
 
-extern "C" {
 void FadeSet(int no, GXColor* start, GXColor* end, u32 time, u32 z, int late);
 void FadeKillAll();
 enum FADE_NO {
@@ -34,7 +33,6 @@ void FadeKill(int no);
 void FadeInit();
 void FadeControl(int flag);
 void fadeDraw(FADE_WORK* pF);
-}
 
 // Full-screen fade between black and clear (every game-side FadeSet call). The colour pair is a
 // local of this inline: a class with a user copy constructor is BLKmode (cp/class.c finish_struct_1),

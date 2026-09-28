@@ -69,7 +69,7 @@ void cEsp0c::move()
 }
 
 // EspTransTbl[0x0C]: never expected to run (the effect dies in its first move); logs an error.
-extern "C" void Esp0c_Trans(cEsp* esp)
+void Esp0c_Trans(cEsp* esp)
 {
     pLog->err(0, 0, "ESP0C : Invalid Trans.");
 }

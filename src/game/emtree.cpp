@@ -19,9 +19,7 @@
 #include "est.h"
 #include "em_sub.h"
 
-extern "C" {
 static void emTree_R0_Move(cEmTree* em);
-}
 
 typedef void (*EmTreeFunc)(cEmTree*);
 

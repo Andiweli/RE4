@@ -52,7 +52,6 @@ struct EffData {
     u32 ofsEfm;        // 0x2C EffOfsTbl of EffEfmEnt
 };
 
-extern "C" {
 
 void EspInit();
 void EspRoomInit();
@@ -86,7 +85,6 @@ u8 EffGetToolState();
 void EffClearToolState();
 void EffSetToolStateCallBack(int no, void (*on)(), void (*off)());
 void EffCallToolStateCallBack();
-}
 void RoomEfmRegist(cModel* m, u8 id);
 void RoomEfmRegist(void* model, void* tpl, u8 id);
 
@@ -1098,7 +1096,7 @@ void EffClearToolState()
     g_pEspSys->ToolState = 0;
 }
 
-extern "C" void EffSetToolStateCallBack(int no, void (*on)(), void (*off)())
+void EffSetToolStateCallBack(int no, void (*on)(), void (*off)())
 {
     cEspSystem* sys = g_pEspSys;
 

@@ -215,7 +215,6 @@ typedef int (*EspgenSetFreeWorkAppFunc)(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead
                                         u16 parts, Mtx* mtx, Vec* pos, Vec* rot, ESPSEQ_CONTROL* p8);
 typedef void (*EspgenDestructFunc)(cEspgen* w);
 
-extern "C" {
 // game/espgen.cpp
 u32 GetEspgenIdMax();
 int PullEspgen(cEspgen** ppEspgen);
@@ -331,21 +330,18 @@ void Espgen45_Trans(cEspgen* pGen);
 void Espgen45_Destruct(cEspgen* pGen);
 int Espgen45_SetFreeWork(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct);
-}
 
 // Debug tools (tools.cpp ToolArrayPush/ToolWorkPop): swap the espgen pool like EspArrayPush.
-extern "C" int EspgenArrayPush(int num);
-extern "C" int EspgenArrayPop();
+int EspgenArrayPush(int num);
+int EspgenArrayPop();
 
-// game/espgen.cpp: the generator pool's init / room setup / frame update / draw and its debug view (C linkage).
-extern "C" {
+// game/espgen.cpp: the generator pool's init / room setup / frame update / draw and its debug view.
 int EspgenInit();
 int EspgenRoomInit();
 int EspgenArrayAlloc(int workNum);
 int EspgenMove();
 int EspgenTrans();
 int EspgenDispInfo();
-}
 extern cEspgen* g_pWater45;   // espgen45.cpp: the running water surface generator (Espgen42 rain hits it)
 
 #endif

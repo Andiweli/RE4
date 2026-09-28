@@ -11,11 +11,9 @@
 
 CineWork cine_work;
 
-extern "C" {
 void cine_polling(CineWork* w);
 void cine_on_move(CineWork* w);
 void cine_off_move(CineWork* w);
-}
 
 // Per-frame: marks the letterbox request bit (Status_flg[0] 0x1000000; the room / event code
 // clears it to turn the bars off) and runs the fade state (0 polling, 1 fading in, 2 fading out).

@@ -15,7 +15,6 @@ u16 esp_num_list[EFF_MAX];
 EspTransFunc EspTransTbl[0xFF];
 EspCreateFunc EspCreateTbl[0xFF];
 
-extern "C" {
 void EspDummyTrans(cEsp* esp);
 void EspFuncTblInit();
 int ESP_IsActive(cEsp* esp);
@@ -28,7 +27,6 @@ int EspArrayAlloc(u32 n);
 int EspArrayFree();
 int EspArrayPush(u32 n);
 int EspArrayPop();
-}
 
 // Default EspTransTbl entry: an effect whose id has no registered trans function is reported and
 // released.

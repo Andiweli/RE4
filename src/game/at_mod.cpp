@@ -13,11 +13,9 @@
 #include "db_log.h"
 #include "em_sub.h"
 
-extern "C" {
 void yarareInit0(YARARE_INFO* y, f32 x, f32 yy, f32 z, f32 w, f32 h, s16 no, u16 flags);
 static bool priorityCheck(cModel* pMod, cModel* pMod2);
 static u32 sphereRectCk(cAtariInfo* info, Vec& p, f32 rad);
-}
 
 // MTX_COPY (vec.h) as a do/while counting from 2, with `i_ = 2` between the pointer inits and
 // `d_++` before `s_++`. This keeps ComnHitCheck's counter live across the getPartsPtr call and

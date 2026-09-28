@@ -11,13 +11,11 @@
 
 typedef struct tagESPGEN02_WK ESPGEN02_WK;
 
-extern "C" {
 void espgen02_UpdateMatrix(cEspgen* w);
 void espgen02_Update(cEspgen* w);
 static void espgen02_Move00(cEspgen* w);
 void espgen02_Move01(cEspgen* w);
 static f32 Calc_D256(ESPGEN02_WK* p, u8 d, f32 rate);
-}
 
 // Effect controller 02: like controller 00 but places every emitted esp on a path (path.cpp),
 // optionally oriented along it.

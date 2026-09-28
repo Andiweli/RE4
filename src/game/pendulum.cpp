@@ -10,10 +10,7 @@
 #include "rnd.h"
 #include "dbmodule.h"
 
-extern "C" {
-// static but declared with C linkage: Bio4.sym names it unmangled
 static void PenClothReset(cModel* m, CLOTH_INFO* c);
-}
 
 Vec GlobalWind = {0.0f, 0.0f, 20.0f};
 f32 GlobalWindAdd = 1.0471976f;

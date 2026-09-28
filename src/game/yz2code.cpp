@@ -4,11 +4,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-extern "C" {
-void yz2Decode_Decode(void* ctx, void* dst, u32 size, void* ev);
+extern "C" void yz2Decode_Decode(void* ctx, void* dst, u32 size, void* ev);
 u32 Yz2DecodeSet(char* str, void* buf);
 void Yz2DecodeExec(void* dst);
-}
 
 // Input state shared with the assembly decoder (yz2asm).
 struct Yz2InEv {

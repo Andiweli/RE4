@@ -51,9 +51,7 @@ static inline s8* rtpNextTbl()
 }
 
 
-extern "C" {
 static int rckLineHitCheck(Vec* from, Vec* to, int attr, int flag);
-}
 
 // Once per frame before the enemies move: clears every live enemy's and the player's RckStat so
 // the near point is looked up again.

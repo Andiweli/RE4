@@ -111,7 +111,7 @@ static void Draw_line3d_local_222(Vec* p0, Vec* p1, Mtx mat, u32 col, cEsp* pEsp
 
 // EspTransTbl[0x19]: packs the current colour and draws the line from m_Pos (plus the camera
 // quake offset) to Vec0.
-extern "C" void Esp19_Trans(cEsp19* esp)
+void Esp19_Trans(cEsp19* esp)
 {
     ESP19_WK* w = &esp->m_Free;
     Vec p;

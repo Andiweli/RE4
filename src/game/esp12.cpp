@@ -63,7 +63,7 @@ void cEsp12::move()
 // EspTransTbl[0x12]: draws min(Life_time + 1, Num) history points as a strip of 2 vertices each,
 // widened perpendicular to the segment and the camera direction, width interpolated head -> tail,
 // in view space rotated by m_Ang.
-extern "C" void Esp12_Trans(cEsp12* esp)
+void Esp12_Trans(cEsp12* esp)
 {
     ESP12_WK* w = &esp->m_Free;
     cAnm* anm;

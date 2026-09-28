@@ -7,7 +7,6 @@
 // The primitive is handed over as the OT tag word and cast at every access: a pointer kept in an
 // integer variable has no REG_POINTER flag, so its loads may alias the stack stores of the make_f*
 // conversions and stay in source order (a POLY_F3* parameter hoists all loads above the stores).
-extern "C" {
 void make_g3(u32 tag);
 void make_g4(u32 tag);
 void make_f3(u32 tag);
@@ -19,7 +18,6 @@ void make_lg4(u32 tag);
 void make_lf2(u32 tag);
 void make_lf3(u32 tag);
 void make_lf4(u32 tag);
-}
 
 // Links a primitive at the head of an ordering-table entry (PS1 libgpu AddPrim).
 void AddPrim(u32* pOt, u32* pWk)

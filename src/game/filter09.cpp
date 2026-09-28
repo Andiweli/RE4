@@ -15,14 +15,12 @@
 
 int GetDrawTmpBufType();
 
-extern "C" {
 void Filter09Render();
 void Filter09GetEFB(int div, int div2);
 static void Filter09GXDraw(f32 x, f32 y, f32 z, f32 u, f32 v, f32 alpha, f32 s, f32 ofs, int div);
 void Filter09DrawBuffer();
 void Filter09GetEFB_801D19E0();
 void Filter09SetbUse(int use, int spred);
-}
 
 void* filter09_buff = 0;
 static int g_bUse;

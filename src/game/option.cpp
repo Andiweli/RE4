@@ -24,7 +24,6 @@
 
 #define KEY_START 0x2000
 
-extern "C" {
 int top_menu(OptionScreen* o);
 void back_to_top_menu(OptionScreen* o);
 int retry_load_menu(OptionScreen* o);
@@ -32,7 +31,6 @@ int controller_menu(OptionScreen* o);
 int brightness_menu(OptionScreen* o);
 int audio_menu(OptionScreen* o);
 void num(int val, int n, int mode, int base, u8 type, int reverse);
-}
 
 OptionScreen OptScrn;
 

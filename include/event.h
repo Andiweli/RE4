@@ -658,10 +658,8 @@ public:
 
 extern EventDebug EvtDebug;
 
-// game/event.cpp (C linkage): streamed sound blocks of the running event
-extern "C" {
+// game/event.cpp: streamed sound blocks of the running event
 int SndStrPlayBlock(int blk, int no, f32 s_time);
 void SndStrStopBlock(int sndId);
-}
 
 #endif

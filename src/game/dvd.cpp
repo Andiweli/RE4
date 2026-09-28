@@ -277,13 +277,11 @@ FileTblEntry FileTbl[] = {
 #include "eprintf.h"
 #include "gx.h"
 
-extern "C" {
-void ADXGC_SetupDvdFs(int mode);   // lib/adx_sugc.c (the CRI headers are not in include/)
+extern "C" void ADXGC_SetupDvdFs(int mode);   // lib/adx_sugc.c (the CRI headers are not in include/)
 void trans2aram_cb(u32 req);
 void dvdread_callback(s32 result, DVDFileInfo* fi);
 void aram_cb(u32 req);
 void readcancel_cb(s32 result, DVDCommandBlock* cb);
-}
 
 
 #include <dolphin/os.h>
@@ -319,7 +317,7 @@ struct DvdSndStrWork {
     u8 cancel;    // 0x25
     u8 pad_26[0x14C - 0x26];
 };
-extern "C" DvdSndStrWork Snd_str_work[4];   // game/snd_ram.cpp SND_STR_WORK Snd_str_work[SND_STR_MAX], seen through the view struct above
+extern DvdSndStrWork Snd_str_work[4];   // game/snd_ram.cpp SND_STR_WORK Snd_str_work[SND_STR_MAX], seen through the view struct above
 
 #define DVD_BUFF ((void*) 0x80350000)
 #define DVD_BUFF2 ((void*) 0x80360000)

@@ -28,7 +28,6 @@ public:
     void setMotion(void* mot);
 };
 
-extern "C" {
 cEmBar* SetBar(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo);
 void emBarDmCk(cEmBar* em);
 void emBarSetBreak(cEmBar* pEm, u32 type);
@@ -39,6 +38,5 @@ void emBar_R1_Break(cEmBar* pEm);
 void emBarActEscape(cEmBar* ptr);
 void emBarYarareInit(cEmBar* pEm);
 int emBarHitCk(cEmBar* pEm);
-}
 
 #endif

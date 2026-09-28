@@ -23,14 +23,12 @@ extern MessageFont MesFont[4];
 #include "ref_access.h"
 #include <stdio.h>
 
-extern "C" {
 u16 getCharCode(u16 code);
 int isCtrlCode(u16 code);
 void setAttribute(FONT_TEX* t);
 void draw(MesQue* q);
 void messageCamera();
 void messageTrans(MesQue* q);
-}
 
 // Dolphin OS ROM font header (only the fields RomFont reads).
 struct OSFontHeader {

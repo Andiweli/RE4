@@ -33,12 +33,10 @@ Flt04Work flt04;
 
 static const f32 level_tbl4[32] = { 0.016f, 0.008f, 0.008f, 0.008f, 0.008f, 0.016f, 0.008f, 0.016f };
 
-extern "C" {
 void Filter04Render();
 void Filter04GetEFB(int div, int div2, void* buf, int mipmap);
 void Filter04GXDraw(f32 x, f32 y, f32 z, f32 u, f32 v, u8 r, u8 g, u8 b, u8 a, f32 s, int div, int fmt, void* buf);;;
 void Filter04DrawBuffer();
-}
 
 // Boot: forgets the buffer.
 void Filter04Init()

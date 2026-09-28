@@ -29,12 +29,10 @@ struct LightAreaHed {
 
 static LightAreaHed* g_pLightAreaHed;
 
-extern "C" {
 void LightAreaInit();
 int LightAreaDataLoad(LightAreaHed* p);
 void LightAreaUpdate();
 void LightAreaUpdateSub(cEm* em, int type);
-}
 
 // pl_wep.h view: the weapon object and the rocket a launcher carries
 struct LightAreaWep {

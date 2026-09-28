@@ -35,11 +35,9 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 cEsp* Esp08_Create();
 void Esp08_Trans(cEsp08* esp);
 void Esp08_TransShimmer(cEsp08* esp, int type);
-}
 
 
 #define ESP_PARTS_SCREEN(esp) ((s8) (esp)->m_Parts_no >= -8 && (s8) (esp)->m_Parts_no <= -3)

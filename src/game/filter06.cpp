@@ -48,9 +48,7 @@ struct Filter06Work {
     u8 pad_45[3];
 };
 
-extern "C" {
 void Filter06Render();
-}
 
 Filter06Work flt06;
 static Vec cam_vec_LR;

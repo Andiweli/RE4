@@ -415,7 +415,7 @@ void knife_r2_fire(cPlayer* pl);
 void knife_r2_down(cPlayer* pl);
 void setWepTrans(cPlayer* pl, int onoff);
 
-// game/player.cpp: one-time init of the player system (game.cpp GameInit). C linkage.
-extern "C" void PlayerInit();
+// game/player.cpp: one-time init of the player system (game.cpp GameInit).
+void PlayerInit();
 
 #endif

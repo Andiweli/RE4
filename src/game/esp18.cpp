@@ -29,10 +29,8 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 cEsp* Esp18_Create();
 void Esp18_Trans(cEsp18* esp);
-}
 int GetDrawTmpBufType();       // game/TmpBuf.cpp (C++ linkage)
 
 // EspCreateTbl[0x18] factory.

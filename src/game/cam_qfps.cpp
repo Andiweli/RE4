@@ -21,10 +21,8 @@
 #include "pl_npc.h"
 
 
-extern "C" {
 void offsetCorrection(CAMERA_POINT* o);
 static void offsetArrayCorrection(CAMERA_POINT (*o)[3]);
-}
 
 
 f32 g_crouch_cam_z_back = 600.0f;

@@ -38,7 +38,6 @@ typedef struct tagESPGEN01_WK {
     u32 Rand_seed;          // 0x6C
 } ESPGEN01_WK;
 
-extern "C" {
 void espgen01_Move00(cEspgen* w);
 void espgen01_Move01(cEspgen* w);
 void SetEsp(cEspgen* w);
@@ -47,7 +46,6 @@ cEsp* SetEstTbl(cEspgen* w, cEspSeqHead* head, int no);
 static f32 GetDistAlpha(cEspgen* w);
 static f32 GetDirAlpha(cEspgen* w, Vec* dir);
 void HideCheck(cEsp* esp);
-}
 
 // Step 0 of Espgen01MoveTbl: first frame, then step 1.
 void espgen01_Move00(cEspgen* w)

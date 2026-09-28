@@ -86,6 +86,6 @@ void SetDebugAlloc();
 void ResetDebugAlloc();
 void* MemAlloc(u32 size, int release_flag);
 void MemFree(void* addr);
-extern "C" void MemCheckUsedHeap();  // C linkage in the DOL (debug.cpp calls `bl MemCheckUsedHeap`)
+void MemCheckUsedHeap();
 
 #endif

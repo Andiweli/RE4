@@ -18,10 +18,8 @@ struct OBJ00_FALLWK {
     int reflect;
 };
 
-extern "C" {
 void obj00FallMove(cObj00* obj);
 void obj00SetOya(cObj00* obj);
-}
 
 // Per-frame: plays the motion when set; follows the parent (destroyed with it), runs the fall
 // simulation, updates the parts and collision unless flagged, fades out on be_flag 0x20.

@@ -28,11 +28,9 @@ LensEffectWork g_LeLit;
 
 static const f32 level_tbl1[11] = { 0.0f, 0.6f, 1.5f, 2.6f, 1.5f, 1.6f, 1.6f, 2.5f, 2.6f, 4.5f, 6.6f };
 
-extern "C" {
 void Filter01Render(LensEffectWork* w);
 void Filter01SetParam(int mode, int z, u8 type, f32 level);
 void Filter01SetParam_CamZ(int mode, u8 type, f32 level, f32 camz);
-}
 
 // Boot: focus off in the light environment and both near/far works.
 void Filter01Init()

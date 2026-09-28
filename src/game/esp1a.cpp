@@ -21,7 +21,7 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" void get_angle(Vec* v, f32* rx, f32* ry);
+void get_angle(Vec* v, f32* rx, f32* ry);
 
 // EspCreateTbl[0x1A] factory.
 cEsp* Esp1a_Create()

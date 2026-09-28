@@ -30,7 +30,6 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 void Esp09_ClearPrevPos(cEsp09* esp);
 void EspChannelSet09(cEsp09* esp);
 void Esp09_Trans_Setup(cEsp09* esp);
@@ -40,7 +39,6 @@ void Esp09_PolyTrans(cEsp09* esp, u8 r, u8 g, u8 b, u8 a);
 void Esp09_StripDrawPoly(cEsp09* esp, int no, Vec* v, u8 r, u8 g, u8 b, u8* a);
 f32 GetVecLen(Vec* a, Vec* b);
 void Esp09_HideCheck(cEsp* esp);
-}
 
 // EspCreateTbl[0x09] factory.
 cEsp* Esp09_Create()
@@ -145,7 +143,7 @@ void cEsp09::move()
 
 // EspTransTbl[0x09]: common GX setup, then the textured quad strip, the 2D line strip or the 3D
 // line strip depending on Tex_id and flg bit0.
-extern "C" void Esp09_Trans(cEsp09* esp)
+void Esp09_Trans(cEsp09* esp)
 {
     ESP09_WK* w = &esp->m_Free;
     u8 r = (u8)esp->m_Col_r;

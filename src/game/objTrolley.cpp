@@ -58,7 +58,6 @@ public:
     virtual void setTrolleyLost();
 };
 
-extern "C" {
 void objTrolley_R0_Set(cObjTrolley* obj);
 void objTrolley_R0_Move(cObjTrolley* obj);
 void objTrolley_R0_Break(cObjTrolley* obj);
@@ -76,7 +75,6 @@ void objTrolleyMoveAdjustEM(cObjTrolley* obj);
 void objTrolleyHitCk(cObjTrolley* obj);
 void objTrolleyFallEM(cObjTrolley* obj);
 void objTrolleyLostEM(cObjTrolley* obj);
-}
 static void objTrolleySatClear(cObjTrolley* obj);
 
 void (*ObjTrolley_R0_move_tbl[3])(cObjTrolley*) = {

@@ -25,7 +25,6 @@
 #include "rnd.h"
 #include "em_sub.h"
 
-extern "C" {
 
 int actWallCheck(cPlayer* pl);
 int fanceCheck(cPlayer* pl);
@@ -43,7 +42,6 @@ void holdOn();
 int jumpCheck(cPlayer* pl);
 void jumpFallOn();
 u32 upDownCk(cPlayer* pl);
-}
 
 // cPlNeck's checks compile to the folded `addis 0x8000; cmplwi 0x02FFFFFF` range form.
 #define VALID_PTR2(p) ((u32) (p) - 0x80000000 <= 0x02FFFFFF)

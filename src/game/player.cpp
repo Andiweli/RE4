@@ -26,7 +26,6 @@
 #include "read.h"
 #include "shape.h"
 
-extern "C" {
 int fanceWidthCheck(cPlayer* pl);
 void fanceAdjust(cPlayer* pl);
 int fallCheck(cPlayer* pl);
@@ -54,7 +53,6 @@ void pl_R1_Fance(cPlayer* pl);
 void pl_R1_Fall(cPlayer* pl);
 void pl_R0_Dijection(cPlayer* pl);
 void pl_R1_BoatDrive(cPlayer* pl);
-}
 void Pl_R0_Damage(cPlayer* pl);   // game/pl_dmg.cpp
 void Pl_R0_Die(cPlayer* pl);
 

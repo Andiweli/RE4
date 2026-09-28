@@ -27,7 +27,6 @@
 #include "game.h"
 #include "em_sub.h"
 
-extern "C" {
 void objPillar_R0_Set(cObjPillar* obj);
 void objPillar_R0_Break(cObjPillar* obj);
 void objPillar_R0_Throw(cObjPillar* obj);
@@ -39,14 +38,11 @@ void EscapeCamMove();
 void EscapeAction2(cObjPillar* obj);
 void plemEscape2(cPlayer* pl);
 void objPillarEatSet(cObjPillar* obj);
-}
 // The original is a `static plemEscape` (emBar.cpp has a global one); the name carries the split's
 // address suffix so the report can pair it with the local symbol.
 #define plemEscape plemEscape_8003C33C
-extern "C" {
 static void plemEscape(cPlayer* pl);
 
-}
 
 void (*ObjPillar_R0_move_tbl[5])(cObjPillar*) = {
     objPillar_R0_Set, objPillar_R0_Break, objPillar_R0_Throw, objPillar_R0_Escape, objPillar_R0_Fall,

@@ -17,13 +17,11 @@
 #include "pl_npc.h"
 
 
-extern "C" {
 void obj08AddSpeed(cObj08* obj);
 int obj08ScrHitCk(cObj08* obj);
 int obj08ToEmHitCk(cObj08* obj);
 int obj08ToPlHitCk(cObj08* obj);
 void obj08DmEstSet(cObj08* obj, cModel* em, Vec* oldPos, YARARE_INFO* part);
-}
 
 Vec obj08HitBox[8] = {
     { -500.0f, -500.0f, 0.0f },   { 500.0f, -500.0f, 0.0f },

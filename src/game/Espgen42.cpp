@@ -21,7 +21,6 @@
 // texture built every frame from the normals. Shared with the weather water (espgen45):
 // AddWaterPower / GetWaterHeight / GetWaterCrossPos test both generators.
 
-extern "C" {
 
 void AddWaterPowerSub(cEspgen* w);
 void GetWaterHeightSub(cEspgen* w);
@@ -30,7 +29,6 @@ void Espgen42_Move00(cEspgen* w);
 void Espgen42_TransSub(cEspgen* w);
 void SetIndMtx(Espgen42Work* p);
 cEspgen* SetWaterWork(cEspgen* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate);
-}
 
 static cEspgen* g_pWater;
 static Vec Chk_pos;

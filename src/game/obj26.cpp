@@ -11,11 +11,9 @@
 #include "motion.h"
 #include "em.h"
 
-extern "C" {
 void obj26_R1_Set(cObj26* obj);
 void obj26_R1_Die(cObj26* obj);
 void obj26MatCalc(cObj26* obj);
-}
 
 static void (*Obj26_R1_move_tbl[2])(cObj26*) = { obj26_R1_Set, obj26_R1_Die };
 

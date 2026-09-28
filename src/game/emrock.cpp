@@ -42,8 +42,8 @@ struct RockMotData {
 
 typedef void (*EmRockFunc)(cEmRock*);
 
-extern "C" void emRock_R0_Move(cEmRock* em);
-extern "C" void emRock_R1_Lost(cEmRock* em);
+void emRock_R0_Move(cEmRock* em);
+void emRock_R1_Lost(cEmRock* em);
 
 EmRockFunc EmRock_R0_move_tbl[4] = {
     emRock_R0_Init,

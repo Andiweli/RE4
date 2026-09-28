@@ -40,13 +40,13 @@
 #line 1 "D:/Bio4/Prog/trans.cpp"
 
 
-extern "C" {
 // esp.cpp / espgen.cpp. esp.h (and espgen.h, which includes it) is not included: it declares Specular as a
 // scalar, this unit defines Specular[9].
 int EspTrans();
 void EspgenTrans();
-void Filter09Render(int);   // filter09.cpp defines it with no parameter; this unit passes one (vendor prototype), so it stays local
-}
+// filter09.cpp defines it with no parameter; this unit passes one (vendor prototype), so it is declared locally under
+// the real symbol.
+void Filter09RenderI(int) asm("Filter09Render__Fv");
 void SetDrawTmpBufType(int type);   // game/TmpBuf.cpp (C++)
 
 // The renderer's view of pG+0x184..0x4F14: the stage counters, the skinning matrix palette, the
@@ -288,7 +288,6 @@ public:
 #define TEV_STAGE_ID() (((cTevStage*) &tev_stage)->getID())
 #define IND_STAGE_ID() (((cIndTexStage*) &ind_stage)->getID())
 
-extern "C" {
 void ThermoShaderSetup(cModel* m, cModelInfo* info, ModelPart* part);
 void shaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv);
 void TextureBlend(ModelPart* part, cModelInfo* info, int colIn, int alphaIn);
@@ -309,7 +308,6 @@ int MakeWeightPaletteExt(WeightExt* w, int n);
 int MakeWeightPalette(Weight* w, int n);
 void updateMatrices(Mtx m, Mtx dst, cModel* model);
 void RefractShaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv);
-}
 
 // Binds model texture `id` to texture map `map`: from the GX work's texture objects (0..0xF7), or
 // a render-to-texture manager's texture (0xF8..).
@@ -963,7 +961,7 @@ void Render()
     GXSetFog(0, 0.0f, 0.0f, ZNEAR, ZFAR, c);
     ExecOt(0x15);
     if (Filter09GetbUse() == 1) {
-        Filter09Render(0);
+        Filter09RenderI(0);
     }
     GXSetDrawSync(0xADEB);
     GXSetDrawSyncCallback(Render_DrawSyncCallback);

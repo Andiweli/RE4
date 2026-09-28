@@ -28,14 +28,12 @@
 
 int GetDrawTmpBufType();
 
-extern "C" {
 void getEFB();
 static void gxDraw(f32 x, f32 y, f32 z, f32 alpha, void* buf);
 void drawBuffer();
 void store();
 void render();
 ExamInfo* examInfo(int id, int ext);
-}
 
 f32 cap_dist_min = 8000.0f;
 f32 cap_dist_max = 10000.0f;

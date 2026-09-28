@@ -144,10 +144,6 @@ extern "C" void DB_VecMulEmPartsMat(u32 parts, Vec* in, Vec* out, Mtx* m, cEspSe
 extern "C" void DB_GetCursorPos(cEspSeqHead* head, cEspSeqTbl* gen, int flag, Vec* out, Mtx* m);
 extern "C" void DB_DrawCross3D(Vec* pos, Mtx* m, f32 size);
 extern "C" void drawTexture2(GXTexObj* obj, s16 x, s16 y, s16 z, s16 w, s16 h);
-extern "C" int comment_check(char** pp);
-extern "C" char* space_skip(char* p);
-extern "C" int num_get(char** pp);
-extern "C" int symbol_check(char** pp, const char* sym);
 extern "C" void sp_PosRand_trans_1a(cEspSeqHead* head, cEspSeqTbl* gen);
 // COMPILER-DIFF: #1 (the original moves the cModel* argument before the f32 one: `mr r4; fmr f1`)
 
@@ -2032,7 +2028,7 @@ extern "C" void DB_DispProc()
 }
 
 // Config parser: skips a [[ ]], /* */ or // comment at *pp; 0 when one was skipped, -1 otherwise.
-extern "C" int comment_check(char** pp)
+int comment_check(char** pp)
 {
     char* p = *pp;
 
@@ -2061,7 +2057,7 @@ extern "C" int comment_check(char** pp)
 }
 
 // Config parser: skips blanks / tabs / newlines.
-extern "C" char* space_skip(char* p)
+char* space_skip(char* p)
 {
     do {
         while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r') {
@@ -2072,7 +2068,7 @@ extern "C" char* space_skip(char* p)
 }
 
 // Config parser: reads a decimal or 0x hex number at *pp.
-extern "C" int num_get(char** pp)
+int num_get(char** pp)
 {
     *pp = space_skip(*pp);
     if (strncmp(*pp, "0x", 2) == 0) {
@@ -2195,7 +2191,7 @@ extern "C" int DB_ConfigLoad(const char* file)
 }
 
 // Config parser: 1 and advance when `sym` is at *pp.
-extern "C" int symbol_check(char** pp, const char* sym)
+int symbol_check(char** pp, const char* sym)
 {
     int len = strlen(sym);
 

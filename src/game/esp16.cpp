@@ -134,7 +134,7 @@ void cEsp16::move()
 // EspTransTbl[0x16]: draws min(Life_time + 1, Num) points as a triangle strip of width
 // interpolated Size_base_x -> Size_base_y, widened perpendicular to segment and view; Tool_flg
 // bit1 flips s, bit2 runs t backwards.
-extern "C" void Esp16_Trans(cEsp16* esp)
+void Esp16_Trans(cEsp16* esp)
 {
     ESP16_WK* w = &esp->m_Free;
     Mtx inv;

@@ -110,14 +110,12 @@ typedef POLY_F3 LINE_F3;
 typedef POLY_F4 LINE_F4;
 
 #ifdef __cplusplus
-extern "C" {
 #endif
 void AddPrim(u32* pOt, u32* pWk);
 void DelPrim(u32* pOt, u32* pWk);
 void ClearOTagR(u32* pOt, int n);
 void DrawOTag(u32* pOt);
 #ifdef __cplusplus
-}
 #endif
 
 #endif

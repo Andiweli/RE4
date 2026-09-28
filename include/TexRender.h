@@ -71,7 +71,6 @@ extern TexRenderMng g_RndMgr[8];
 extern u32 g_RndMgrNum;
 extern int g_TexUse;
 
-extern "C" {
 TexRenderMng* GetTexRenderMgrAddr(int no);
 void TexRenderMgrInit();
 void TexRenderMgrRoomInit();
@@ -87,6 +86,5 @@ void TexRenderModAddOtMirror(int ot, cModel* m);
 void TexRenderCamAddOt(int ot, TexRenderCam* pWk, TexRenderEvt* evt, void* data);
 void CamRenderPrev(TexRenderCam* pWk);
 void CamRenderAfter(TexRenderCam* pWk);
-}
 
 #endif

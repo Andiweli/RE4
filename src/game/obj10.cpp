@@ -15,10 +15,8 @@
 #include "player.h"
 #include "motion.h"
 
-extern "C" {
 int obj10AddSpeed(cWepItem* obj);
 int effWaterCheck(cModel* obj);
-}
 
 // r_no_0 dispatch: 0 flying, 1 exploded.
 void cWepItem::move()

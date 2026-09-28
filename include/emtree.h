@@ -69,7 +69,6 @@ public:
 
 extern ATK_INFO emTreeAtk;
 
-extern "C" {
 cEmTree* SetTree(void* bin, void* tpl, Vec* pos, Vec* rot);
 void emTreeDmCk(cEmTree* pEm);
 void emTree_R0_Init(cEmTree* pEm);
@@ -80,6 +79,5 @@ void emTree_R1_Parent(cEmTree* pEm);
 void emTree_R1_Fall(cEmTree* pEm);
 void emTree_R1_Throw(cEmTree* pEm);
 void emTree_R1_Shot(cEmTree* pEm);
-}
 
 #endif

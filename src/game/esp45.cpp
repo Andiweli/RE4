@@ -40,12 +40,10 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 cEsp* Esp45_Create();
 void Esp45_Trans(cEsp* esp);
 static f32 GetDistAlpha(cEsp45* esp);
 void Esp45_HideCheck(cEsp* esp);
-}
 
 // EspCreateTbl[0x45] factory.
 cEsp* Esp45_Create()
