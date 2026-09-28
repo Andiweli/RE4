@@ -461,15 +461,15 @@ int ChkWaterEffectEnable(Vec* pos)
 }
 
 // Ganado falling into water: est 1/0x32 when the room has it, else the generic 0x10/0x8D; the
-// position pointer doubles as the owner key.
-void EstSetEm10WaterFall(Vec* pMod)
+// model pointer doubles as the owner key.
+void EstSetEm10WaterFall(cModel* pMod)
 {
     cEspSeqHead* head = EspGetEstAddr(EFF_ROOM, 0x32, 1);
 
     if (head != NULL) {
-        EstSet((cModel*) pMod, -1, NULL, NULL, EFF_ROOM, 0x32, 0, ESP_CORE_KIND_NONE, pMod, NULL);
+        EstSet(pMod, -1, NULL, NULL, EFF_ROOM, 0x32, 0, ESP_CORE_KIND_NONE, pMod, NULL);
     } else {
-        EstSet((cModel*) pMod, -1, NULL, NULL, EFF_EM10, 0x8D, 0, ESP_CORE_KIND_NONE, pMod, NULL);
+        EstSet(pMod, -1, NULL, NULL, EFF_EM10, 0x8D, 0, ESP_CORE_KIND_NONE, pMod, NULL);
     }
 }
 

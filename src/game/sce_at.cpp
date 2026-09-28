@@ -2541,7 +2541,7 @@ int SceAtSetParent(SceAtWork* w, cModel* parent, int flag)
 }
 
 // SceAtSetParent for area number `no`; 0 when the area does not exist.
-int SceAtSetParent(int no, cObj* obj, int flag)
+int SceAtSetParent(int no, cModel* parent, int flag)
 {
     SceAtWork* w = SceAtPtr(no);
 
@@ -2549,7 +2549,7 @@ int SceAtSetParent(int no, cObj* obj, int flag)
         pLog->err(0, 0, "sceAtSetParent(): AT NOT FOUND");
         return 0;
     }
-    return SceAtSetParent(w, obj, flag);
+    return SceAtSetParent(w, parent, flag);
 }
 
 // Dead-stripped by the original linker (STRIP_UNUSED): only its constant pool (1e10) survives in

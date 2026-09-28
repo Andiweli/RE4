@@ -2423,7 +2423,7 @@ int EventMgr::EvtReadExec(char* pNameEvt, int emId, u32 evtReadFlag)
         SceSleep(2);
     }
     if (EvtReadMram(pNameEvt, emId, &addr, 0, 0)) {
-        if (EvtMgr.SetEvt((void*) addr, (u32*) &evt)) {
+        if (EvtMgr.SetEvt((void*) addr, &evt)) {
             if (evtReadFlag & EvtReadFlagDiedemo) {
                 evt->FlgOnStatus(EvtStfEndSleepOrder);
                 evt->FlgOnStatus(EvtStfDiedemo);
@@ -2516,7 +2516,7 @@ void EventMgr::ToolCoreEvdDel()
 
 // Starts an event from a loaded "event" block: validates the tag, registers it (SetEvd) and creates
 // the Event; *key receives it. Refused while Stop_flg 0x400 or Debug_flg[3] 0x80.
-int EventMgr::SetEvt(void* data, u32* key)
+int EventMgr::SetEvt(void* data, Event** ppEvt)
 {
     Event* evt;
     EvtHeader* hdr = (EvtHeader*) data;
@@ -2527,8 +2527,8 @@ int EventMgr::SetEvt(void* data, u32* key)
     if (DbgFlagChk(pG, DBG_NO_EVENT)) {
         return 0;
     }
-    if (key != 0) {
-        *key = 0;
+    if (ppEvt != 0) {
+        *ppEvt = 0;
     }
     if ((int) hdr >= 0) {
         pLog->err(0, 0, "EventMgr::SetEvs : non addr[%x]", hdr);
@@ -2546,8 +2546,8 @@ int EventMgr::SetEvt(void* data, u32* key)
         pLog->err(0, 0, "EventMgr::SetEvt : SetEvt failed[%s]", hdr);
         return 0;
     }
-    if (key != 0) {
-        *key = (u32) evt;
+    if (ppEvt != 0) {
+        *ppEvt = evt;
     }
     return 1;
 }

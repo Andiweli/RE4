@@ -835,31 +835,31 @@ static void r227_execEvent00()
         SmdGetObjPtr(0x9B)->be_flag &= ~2;
     }
     if (r227_work->evd[0]->waitLoadOk() != 0) {
-        u32 key0;
+        Event* evt0;
 
-        EvtMgr.SetEvt(r227_work->evd[0]->getAddr(), &key0);
-        ((Event*) key0)->FlgOnStatus(EvtStfPlPosNoSet);
+        EvtMgr.SetEvt(r227_work->evd[0]->getAddr(), &evt0);
+        evt0->FlgOnStatus(EvtStfPlPosNoSet);
         r227_waitEvt();
         SysFlagOn(pG, SYS_SCREEN_STOP);
         r227_work->evd[0]->setCommand(CMND_DEL_DATA, 0, 0);
         if (pG->Room_flg[0] & 0x80000000) {
             if (r227_work->evd[1]->waitLoadOk() != 0) {
-                u32 key1;
+                Event* evt1;
 
                 r227_work->evd[1]->setCommand(CMND_MRAM_LOAD, 0, 1);
-                if (EvtMgr.SetEvt(r227_work->evd[1]->getAddr(), &key1)) {
-                    ((Event*) key1)->FlgOnStatus(EvtStfPlPosNoSet);
+                if (EvtMgr.SetEvt(r227_work->evd[1]->getAddr(), &evt1)) {
+                    evt1->FlgOnStatus(EvtStfPlPosNoSet);
                 }
                 r227_waitEvt();
             }
         } else {
             if (r227_work->evd[2]->waitLoadOk() != 0) {
-                u32 key2;
+                Event* evt2;
 
                 r227_work->evd[2]->setCommand(CMND_MRAM_LOAD, 0, 1);
-                if (EvtMgr.SetEvt(r227_work->evd[2]->getAddr(), &key2)) {
-                    ((Event*) key2)->FlgOnStatus(EvtStfEndSleepOrder);
-                    ((Event*) key2)->FlgOnStatus(EvtStfDiedemo);
+                if (EvtMgr.SetEvt(r227_work->evd[2]->getAddr(), &evt2)) {
+                    evt2->FlgOnStatus(EvtStfEndSleepOrder);
+                    evt2->FlgOnStatus(EvtStfDiedemo);
                 }
                 r227_waitEvt();
                 SceExit();

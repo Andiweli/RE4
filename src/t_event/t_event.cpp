@@ -36,10 +36,8 @@
 void DbMenuSetExecTool(const char* name);
 
 // cFileList::init really takes the list buffer and the host directory (the symbol keeps the
-// parameterless name); XmlSimple::SetXmlElemStart/End take the element name as well.
+// parameterless name).
 int FileListInit(cFileList* l, char* buf, const char* dir) __asm__("init__9cFileList");
-int XmlElemStart(XmlSimple* x, char** cur, char* buf, const char* name) __asm__("SetXmlElemStart__9XmlSimplePiPc");
-int XmlElemEnd(XmlSimple* x, char** cur, char* buf, const char* name) __asm__("SetXmlElemEnd__9XmlSimplePiPc");
 
 // EvtDebug's leading fields: the event name and the header copy the tool fills at load
 struct EvtDebugView {
@@ -534,7 +532,7 @@ void ToolEvt::MainPreview(ToolEvt* t)
         EvtDebugView* d = EVTDBG;
 
         d->hdr = *h;
-        if (EvtMgr.SetEvt(t->PFil, (u32*) &ev) == 0) {
+        if (EvtMgr.SetEvt(t->PFil, &ev) == 0) {
             pLog->err(0, 0, "ToolEvt_Main_Preview : failed");
             t->r_no_0 = 1;
             t->r_no_1 = 4;
@@ -1507,36 +1505,36 @@ static inline char* EvtWriteXml(XmlNodeData* d, char* tmp, char* buf)
     int i;
 
     cur = buf;
-    xml.SetXmlStart((int*) &cur, buf);
+    xml.SetXmlStart(&cur, buf);
     for (i = 0; i < d->num; i++) {
         XmlNode* n = &d->node[i];
 
-        XmlElemStart(&xml, &cur, cur, "Node");
+        xml.SetXmlElemStart(&cur, cur, "Node");
         strcpy(tmp, n->s[XN_SETFLG]);
-        xml.SetXmlElem((int*) &cur, cur, "SetFlg", tmp);
+        xml.SetXmlElem(&cur, cur, "SetFlg", tmp);
         strcpy(tmp, n->s[XN_SETOWNER]);
-        xml.SetXmlElem((int*) &cur, cur, "SetOwner", "3");
+        xml.SetXmlElem(&cur, cur, "SetOwner", "3");
         strcpy(tmp, n->s[XN_SETEDIT]);
-        xml.SetXmlElem((int*) &cur, cur, "SetEdit", "true");
+        xml.SetXmlElem(&cur, cur, "SetEdit", "true");
         strcpy(tmp, n->s[XN_NAMEPAC]);
-        xml.SetXmlElem((int*) &cur, cur, "NamePac", "\203\201\203b\203Z\201[\203W");
+        xml.SetXmlElem(&cur, cur, "NamePac", "\203\201\203b\203Z\201[\203W");
         strcpy(tmp, n->s[XN_CUTNO]);
-        xml.SetXmlElem((int*) &cur, cur, "CutNo", tmp);
+        xml.SetXmlElem(&cur, cur, "CutNo", tmp);
         strcpy(tmp, n->s[XN_FRAME]);
-        xml.SetXmlElem((int*) &cur, cur, "Frame", tmp);
+        xml.SetXmlElem(&cur, cur, "Frame", tmp);
         strcpy(tmp, n->s[XN_COMFLAG]);
-        xml.SetXmlElem((int*) &cur, cur, "ComFlag", "0");
+        xml.SetXmlElem(&cur, cur, "ComFlag", "0");
         strcpy(tmp, n->s[XN_SETBIN]);
-        xml.SetXmlElem((int*) &cur, cur, "SetBin", "false");
+        xml.SetXmlElem(&cur, cur, "SetBin", "false");
         strcpy(tmp, n->s[XN_SETTPL]);
-        xml.SetXmlElem((int*) &cur, cur, "SetTpl", "false");
+        xml.SetXmlElem(&cur, cur, "SetTpl", "false");
         strcpy(tmp, n->s[XN_DAT0]);
-        xml.SetXmlElem((int*) &cur, cur, "Dat0", tmp);
+        xml.SetXmlElem(&cur, cur, "Dat0", tmp);
         strcpy(tmp, n->s[XN_DAT1]);
-        xml.SetXmlElem((int*) &cur, cur, "Dat1", tmp);
-        XmlElemEnd(&xml, &cur, cur, "Node");
+        xml.SetXmlElem(&cur, cur, "Dat1", tmp);
+        xml.SetXmlElemEnd(&cur, cur, "Node");
     }
-    xml.SetXmlEnd((int*) &cur, cur);
+    xml.SetXmlEnd(&cur, cur);
     return cur;
 }
 

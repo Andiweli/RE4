@@ -1084,7 +1084,7 @@ static void r201_checkSwitch(int on)
 static void r201_execEvent00()
 {
     ReadModule* m;
-    u32 key;
+    Event* evt;
 
     ScfFlagOn(pG, SCF_R201_EVENT00);
     SceEventStart(0);
@@ -1093,8 +1093,8 @@ static void r201_execEvent00()
         SceSleep(2);
         m = SearchEmModule(0x1B);
         MemorySwap(m->pArc, r201_work->evd->getAddr(), r201_work->evd->getSize());
-        EvtMgr.SetEvt(m->pArc, &key);
-        ((Event*) key)->FlgOnStatus(EvtStfPlPosNoSet);
+        EvtMgr.SetEvt(m->pArc, &evt);
+        evt->FlgOnStatus(EvtStfPlPosNoSet);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }

@@ -8447,7 +8447,7 @@ static void em10_R1_LadderReset(cEm10* em)
         EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);                                                  \
         SndCall(6, 0xA, &em->pos, 0, 0, em);                                                           \
     } else {                                                                                           \
-        EstSetEm10WaterFall((Vec*) em);                                                                \
+        EstSetEm10WaterFall(em);                                                                \
         SndCall(6, 0x16, &em->pos, 0, 0, em);                                                          \
     }
 
@@ -8566,7 +8566,7 @@ static void em10_R1_JumpDown(cEm10* em)
         EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);                                                  \
         SndCall(6, 0xA, &em->pos, 0, 0, em);                                                           \
     } else {                                                                                           \
-        EstSetEm10WaterFall((Vec*) em);                                                                \
+        EstSetEm10WaterFall(em);                                                                \
         SndCall(6, 0x16, &em->pos, 0, 0, em);                                                          \
     }
 
@@ -12973,7 +12973,7 @@ static void em10_R1_DashCatch(cEm10* em)
         EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);                                                  \
         SndCall(6, 0xA, &em->pos, 0, 0, em);                                                           \
     } else {                                                                                           \
-        EstSetEm10WaterFall((Vec*) em);                                                                \
+        EstSetEm10WaterFall(em);                                                                \
         SndCall(6, 0x16, &em->pos, 0, 0, em);                                                          \
     }
 
@@ -14410,7 +14410,7 @@ static void em10_R1_Dm_FS(cEm10* em)
                 EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);
                 SndCall(6, 0xA, &em->pos, 0, 0, em);
             } else {
-                EstSetEm10WaterFall((Vec*) em);
+                EstSetEm10WaterFall(em);
                 SndCall(6, 0x16, &em->pos, 0, 0, em);
             }
         }
@@ -14636,7 +14636,7 @@ static void em10_R1_Dm_Showtay(cEm10* em)
                     EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);
                     SndCall(6, 0xA, &em->pos, 0, 0, em);
                 } else {
-                    EstSetEm10WaterFall((Vec*) em);
+                    EstSetEm10WaterFall(em);
                     SndCall(6, 0x16, &em->pos, 0, 0, em);
                 }
             }
@@ -15003,7 +15003,7 @@ static void em10_R1_Dm_Blow(cEm10* em)
                     EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);
                     SndCall(6, 0xA, &em->pos, 0, 0, em);
                 } else {
-                    EstSetEm10WaterFall((Vec*) em);
+                    EstSetEm10WaterFall(em);
                     SndCall(6, 0x16, &em->pos, 0, 0, em);
                 }
             }
@@ -15095,7 +15095,7 @@ static void em10_R1_Dm_Blow(cEm10* em)
                     EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);
                     SndCall(6, 0xA, &em->pos, 0, 0, em);
                 } else {
-                    EstSetEm10WaterFall((Vec*) em);
+                    EstSetEm10WaterFall(em);
                     SndCall(6, 0x16, &em->pos, 0, 0, em);
                 }
             }
@@ -15456,7 +15456,7 @@ static void em10_R1_Dm_Roof(cEm10* em)
                     EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);
                     SndCall(6, 0xA, &em->pos, 0, 0, em);
                 } else {
-                    EstSetEm10WaterFall((Vec*) em);
+                    EstSetEm10WaterFall(em);
                     SndCall(6, 0x16, &em->pos, 0, 0, em);
                 }
             }
@@ -15498,7 +15498,7 @@ static void em10_R1_Dm_Roof(cEm10* em)
                     EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);
                     SndCall(6, 0xA, &em->pos, 0, 0, em);
                 } else {
-                    EstSetEm10WaterFall((Vec*) em);
+                    EstSetEm10WaterFall(em);
                     SndCall(6, 0x16, &em->pos, 0, 0, em);
                 }
             }
@@ -15542,7 +15542,7 @@ static void em10_R1_Dm_Roof(cEm10* em)
                         EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);
                         SndCall(6, 0xA, &em->pos, 0, 0, em);
                     } else {
-                        EstSetEm10WaterFall((Vec*) em);
+                        EstSetEm10WaterFall(em);
                         SndCall(6, 0x16, &em->pos, 0, 0, em);
                     }
                 }
@@ -17577,13 +17577,12 @@ int em10LostHeadCk(cEm10* em)
 int em10LostHead(cEm10* em, int a, int b)
 {
     FREE_EM10* w = EM10_WK(em);
-    int hit;
     int paras;
     int no;
     Mtx m;
     Vec spd;
 
-    if ((a == 0 || a == 1) && !(hit = em10LostHeadCk(em))) {
+    if ((a == 0 || a == 1) && !em10LostHeadCk(em)) {
         SndStop(w->Seid_voice, 0);
         SndStop(w->Seid_breath, 0);
         SndCall(8, 7, &em->pos, em->id, 0, em);
@@ -17671,14 +17670,11 @@ int em10LostHead(cEm10* em, int a, int b)
     em10HeadSet(em, 1);
     if (a == 3) {
         EstSet(em, -1, 0, 0, EFF_EM10, 0x78, 0, ESP_CORE_KIND_NONE, em, 0);
+    } else if (Ctrl12Ck(w->pCtrlGroup, CTRL12_ID_BIGEFF)) {
+        EstSet(em, -1, 0, 0, EFF_EM10, 0x34, 0, ESP_CORE_KIND_NONE, em, 0);
     } else {
-        hit = Ctrl12Ck(w->pCtrlGroup, CTRL12_ID_BIGEFF);
-        if (hit) {
-            EstSet(em, -1, 0, 0, EFF_EM10, 0x34, 0, ESP_CORE_KIND_NONE, em, 0);
-        } else {
-            Ctrl12Set(w->pCtrlGroup, CTRL12_ID_BIGEFF, 0x2D);
-            EstSet(em, -1, 0, 0, EFF_EM10, 3, 0, ESP_CORE_KIND_NONE, em, 0);
-        }
+        Ctrl12Set(w->pCtrlGroup, CTRL12_ID_BIGEFF, 0x2D);
+        EstSet(em, -1, 0, 0, EFF_EM10, 3, 0, ESP_CORE_KIND_NONE, em, 0);
     }
     EstSet(em, -1, 0, 0, EFF_EM10, 6, 0, ESP_CORE_KIND_NONE, em, 0);
     EffectEspDelete(0, w->EffKindIdEye, em, 0);
@@ -27280,7 +27276,7 @@ extern "C" void em10FallWaterCk(cEm10* em)
             EstSet(0, -1, &em->pos, 0, EFF_ROOM, 3, 0, ESP_CORE_KIND_NONE, 0, 0);
             SndCall(6, 0xA, &em->pos, 0, 0, em);
         } else {
-            EstSetEm10WaterFall((Vec*) em);
+            EstSetEm10WaterFall(em);
             SndCall(6, 0x16, &em->pos, 0, 0, em);
         }
     }

@@ -98,8 +98,8 @@ void ScenarioTaskAllOff();
 void scenarioLoopBeforeInit();
 void scenarioLoopAfterInit();
 void ScenarioMove();
-u32* scenarioSetOtStart();
-u32* scenarioGetOtAddr(u32* pSceOt);
+SCE_TASK* scenarioSetOtStart();
+SCE_TASK* scenarioGetOtAddr(SCE_TASK* pSceOt);
 void SceTaskDelete(TASK* t);
 enum SCE_PRIORITY {
     SCE_PRIO_0 = 0,

@@ -55,8 +55,8 @@ int XmlSimple::GetXmlElem(char* pOut, const char* pIn, const char* pName)
     return 1;
 }
 
-// Writes the document opening tag; *size grows by its length.
-int XmlSimple::SetXmlStart(int* pOut, char* pIn)
+// Writes the document opening tag; *pOut advances past it.
+int XmlSimple::SetXmlStart(char** pOut, char* pIn)
 {
     strcpy(pIn, "<XSDSchemaSof xmlns=\"http://tempuri.org/XSDSchemaSof.xsd\">\n");
     *pOut += strlen(pIn);
@@ -64,7 +64,7 @@ int XmlSimple::SetXmlStart(int* pOut, char* pIn)
 }
 
 // Writes the document closing tag.
-int XmlSimple::SetXmlEnd(int* pOut, char* pIn)
+int XmlSimple::SetXmlEnd(char** pOut, char* pIn)
 {
     strcpy(pIn, "</XSDSchemaSof>\n");
     *pOut += strlen(pIn);
@@ -72,23 +72,23 @@ int XmlSimple::SetXmlEnd(int* pOut, char* pIn)
 }
 
 // Writes "<Node>".
-int XmlSimple::SetXmlElemStart(int* size, char* buf)
+int XmlSimple::SetXmlElemStart(char** pOut, char* pIn, char* pName)
 {
-    strcpy(buf, "\t<Node xmlns=\"\">\n");
-    *size += strlen(buf);
+    strcpy(pIn, "\t<Node xmlns=\"\">\n");
+    *pOut += strlen(pIn);
     return 1;
 }
 
 // Writes "</Node>".
-int XmlSimple::SetXmlElemEnd(int* size, char* buf)
+int XmlSimple::SetXmlElemEnd(char** pOut, char* pIn, char* pName)
 {
-    strcpy(buf, "\t</Node>\n");
-    *size += strlen(buf);
+    strcpy(pIn, "\t</Node>\n");
+    *pOut += strlen(pIn);
     return 1;
 }
 
 // Writes "<name>value</name>".
-int XmlSimple::SetXmlElem(int* pOut, char* pIn, const char* pName, const char* pText)
+int XmlSimple::SetXmlElem(char** pOut, char* pIn, const char* pName, const char* pText)
 {
     char tmp[256];
 

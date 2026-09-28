@@ -21,6 +21,12 @@ struct SsArc {
 };
 #define SS_ARC_PTR(arc, no) ((void*) ((arc)->ofs[no] + (u32) (arc)))
 
+// The sub screen's record in the save image (PS2 SSCRN_SAVE_DATA, 4 bytes). GC saves the whole word
+// at SUB_SCREEN::save (map_mode, map_mark, ...); PS2 keeps only map_mark here.
+struct SSCRN_SAVE_DATA {
+    u32 save;
+};
+
 // The work is the `SUB_SCREEN` of the Sscrn module's `Widget<SUB_SCREEN>` template (the module's
 // mangled names carry the tag); SubScreenWork is the DOL-side alias.
 struct SUB_SCREEN {
@@ -159,8 +165,8 @@ struct ItemScreenWork {
 extern SubScreenWork SubScreenWk;
 
 int SscrnDataSize();
-void SscrnDataSave(u32* dst);
-void SscrnDataLoad(u32* pData);
+void SscrnDataSave(SSCRN_SAVE_DATA* dst);
+void SscrnDataLoad(SSCRN_SAVE_DATA* pData);
 void SubScreenAramRead();
 void sscrnSetLanguage(SubScreenWork* pSscrn, int language);
 void sscrnDataFilename(SubScreenWork* pSscrn, const char* name);

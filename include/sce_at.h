@@ -348,7 +348,7 @@ void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel);
 
 // Overloads of the functions above.
 // Area `no` follows parts `parts` of `obj`; 0 when the area does not exist.
-int SceAtSetParent(int no, cObj* obj, int parts);
+int SceAtSetParent(int no, cModel* parent, int parts);
 int SceAtItemFlgCk(int at_no);
 int SceAtSetEmItem(cEm* em, SceAtWork* w);
 int SceAtSetItemModel(SceAtWork* w, cModel* m);

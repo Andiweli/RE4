@@ -27,7 +27,7 @@ void EventCutEstSet(int owner, u32 cut_no);
 void EventCutEffDelete();
 void EventAllEffDelete();
 int ChkWaterEffectEnable(Vec* pos);
-void EstSetEm10WaterFall(Vec* pMod);
+void EstSetEm10WaterFall(cModel* pMod);
 
 // Drop effect (owner a, kind b) in all three effect systems (r318, r31b, r31c).
 static inline void EffectDelete(int a, int b)

@@ -360,7 +360,7 @@ static void r117_EventAshleyFind()
     ScfFlagOff(pG, SCF_90);
     if (W->evd0->waitLoadOk() == 1) {
         MemorySwap(W->mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
-        EvtMgr.SetEvt(W->mod->pArc, (u32*) 0);
+        EvtMgr.SetEvt(W->mod->pArc, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
@@ -401,7 +401,7 @@ static void r117_EventSaddlerAppear()
     SceSleep(3);
     if (W->evd1->waitLoadOk() == 1) {
         MemorySwap(W->mod->pArc, W->evd1->getAddr(), W->evd1->getSize());
-        if (EvtMgr.SetEvt(W->mod->pArc, (u32*) &ev)) {
+        if (EvtMgr.SetEvt(W->mod->pArc, &ev)) {
             ev->FlgOnStatus(EvtStfFadeOut);
         }
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {

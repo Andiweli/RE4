@@ -361,7 +361,7 @@ static void r106_Event()
     if (r106_work->evd->waitLoadOk()) {
         EventMgr* evt;
 
-        if (EvtMgr.SetEvt(r106_work->evd->getAddr(), (u32*) &ev)) {
+        if (EvtMgr.SetEvt(r106_work->evd->getAddr(), &ev)) {
             ev->FlgOnStatus(EvtStfFadeOut);
         }
         evt = &EvtMgr;

@@ -263,8 +263,8 @@ extern "C" void freeEvent(int no)
 static void R10b_chkEmDie()
 {
     void* evt;
-    u32 key;
-    u32 key2;
+    Event* pEvt;
+    Event* pEvt2;
     cEm* boss;
 
     SceSleep(1);
@@ -294,17 +294,17 @@ static void R10b_chkEmDie()
             }
             if (r10b_work->count > 14) {
                 if (readEvent(2, 1, &evt)) {
-                    if (EvtMgr.SetEvt(evt, &key) != 0) {
-                        ((Event*) key)->FlgOnStatus(EvtStfFadeOut);
+                    if (EvtMgr.SetEvt(evt, &pEvt) != 0) {
+                        pEvt->FlgOnStatus(EvtStfFadeOut);
                     }
                     r10b_waitEvt();
                     freeEvent(2);
                 }
             } else {
                 if (readEvent(1, 1, &evt)) {
-                    if (EvtMgr.SetEvt(evt, &key2) != 0) {
-                        ((Event*) key2)->FlgOnStatus(EvtStfEndSleepOrder);
-                        ((Event*) key2)->FlgOnStatus(EvtStfDiedemo);
+                    if (EvtMgr.SetEvt(evt, &pEvt2) != 0) {
+                        pEvt2->FlgOnStatus(EvtStfEndSleepOrder);
+                        pEvt2->FlgOnStatus(EvtStfDiedemo);
                     }
                     r10b_waitEvt();
                     return;

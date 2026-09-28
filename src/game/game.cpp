@@ -845,7 +845,7 @@ bool cGameSave::load(SAVE_DATA_HEAD* head)
         pG->room_id = 0x120;
     } else {
         RoomData.load(head->pRm);
-        SscrnDataLoad(head->pSscrn);
+        SscrnDataLoad(head->pSs);
         MerchantDataLoad(head->pMr);
         ItemMgr.load(head->pItm);
         PlSetCostume();
@@ -868,7 +868,7 @@ bool cGameSave::save(SAVE_DATA_HEAD* data, int mode)
     pG->SaveKind = mode;
     *data->pGlobal = *(GameSaveBlock*) pG->save_data_start_addr;
     RoomData.save(data->pRm);
-    SscrnDataSave(data->pSscrn);
+    SscrnDataSave(data->pSs);
     MerchantDataSave(data->pMr);
     ItemMgr.save(data->pItm);
     return 1;
@@ -902,8 +902,8 @@ void cGameSave::calcOffset(SAVE_DATA_HEAD* head, u32 headaddr)
     head->pGlobal = (GameSaveBlock*) (p - headaddr);
     p = (u32) head->pRm;
     head->pRm = (void*) (p - headaddr);
-    p = (u32) head->pSscrn;
-    head->pSscrn = (u32*) (p - headaddr);
+    p = (u32) head->pSs;
+    head->pSs = (SSCRN_SAVE_DATA*) (p - headaddr);
     p = (u32) head->pMr;
     head->pMr = (void*) (p - headaddr);
     p = (u32) head->pItm;
@@ -923,8 +923,8 @@ void cGameSave::calcAddr(SAVE_DATA_HEAD* head)
     head->pGlobal = (GameSaveBlock*) ((u32) head + p);
     p = (u32) head->pRm;
     head->pRm = (void*) ((u32) head + p);
-    p = (u32) head->pSscrn;
-    head->pSscrn = (u32*) ((u32) head + p);
+    p = (u32) head->pSs;
+    head->pSs = (SSCRN_SAVE_DATA*) ((u32) head + p);
     p = (u32) head->pMr;
     head->pMr = (void*) ((u32) head + p);
     p = (u32) head->pItm;
@@ -959,7 +959,7 @@ SAVE_DATA_HEAD* cGameSave::alloc()
     d = (SAVE_DATA_HEAD*) MEM_CALLOC(size, 1, 13);
     d->pGlobal = (GameSaveBlock*) globalOfs;
     d->pRm = (void*) roomOfs;
-    d->pSscrn = (u32*) sscrnOfs;
+    d->pSs = (SSCRN_SAVE_DATA*) sscrnOfs;
     d->pMr = (void*) merchantOfs;
     d->pItm = (void*) itemOfs;
     d->size = size;

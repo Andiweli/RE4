@@ -488,7 +488,7 @@ private:
     int EvtFree(char* name);
     void ToolCoreEvdDel();
     // Starts the loaded event data ("even" "t" header); `key` (optional) receives its key.
-    int SetEvt(void* data, u32* key);
+    int SetEvt(void* data, Event** ppEvt);
     int SetEvt(char* name, Event** out);
     int GetEvt(const char* pName, void** ppEvt);
     int DelEvt(void* evt, int a);

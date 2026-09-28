@@ -57,15 +57,15 @@ int SscrnDataSize()
 }
 
 // Writes the sub screen's save word.
-void SscrnDataSave(u32* dst)
+void SscrnDataSave(SSCRN_SAVE_DATA* dst)
 {
-    *dst = SubScreenWk.save;
+    dst->save = SubScreenWk.save;
 }
 
 // Reads the sub screen's save word.
-void SscrnDataLoad(u32* pData)
+void SscrnDataLoad(SSCRN_SAVE_DATA* pData)
 {
-    SubScreenWk.save = *pData;
+    SubScreenWk.save = pData->save;
 }
 
 // Game start: loads the sub screen REL ("rel/Sscrn.rel"), the common data ("SS/<lang>/ss_cmmn.dat")

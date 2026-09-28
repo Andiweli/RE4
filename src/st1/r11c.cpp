@@ -342,7 +342,7 @@ static void r11c_EventBesiegedStart()
         }
     } else {
         MemorySwap(mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
-        EvtMgr.SetEvt(mod->pArc, (u32*) 0);
+        EvtMgr.SetEvt(mod->pArc, 0);
         SceSleep(2);
         SceSleep(2);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
@@ -561,7 +561,7 @@ static void r11c_EventBesiegedStart()
             pLog->err(0, 0, "r11c_Event10 exec error");
         } else {
             MemorySwap(mod2->pArc, W->evd1->getAddr(), W->evd1->getSize());
-            if (EvtMgr.SetEvt(mod2->pArc, (u32*) &ev)) {
+            if (EvtMgr.SetEvt(mod2->pArc, &ev)) {
                 ev->FlgOnStatus(EvtStfFadeOut);
             }
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {

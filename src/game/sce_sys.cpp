@@ -138,19 +138,19 @@ void ScenarioMove()
 }
 
 // Iteration start over the scenario tasks (ordering table head).
-u32* scenarioSetOtStart()
+SCE_TASK* scenarioSetOtStart()
 {
-    return &SceSys.SceTaskOt[15];
+    return (SCE_TASK*) &SceSys.SceTaskOt[15];
 }
 
 // Next SCE_TASK in the task ordering table after `p`; 0 at the end.
-u32* scenarioGetOtAddr(u32* pSceOt)
+SCE_TASK* scenarioGetOtAddr(SCE_TASK* pSceOt)
 {
-    u32 v;
+    u32 tag;
 
-    while ((v = *pSceOt) != 0xFFFFFFFF) {
-        pSceOt = (u32*) (v | 0x80000000);
-        if ((s32) v < 0) {
+    while ((tag = pSceOt->tag) != 0xFFFFFFFF) {
+        pSceOt = (SCE_TASK*) (tag | 0x80000000);
+        if ((s32) tag < 0) {
             return pSceOt;
         }
     }
@@ -160,9 +160,9 @@ u32* scenarioGetOtAddr(u32* pSceOt)
 // Unlinks the SCE_TASK of task `t` from the ordering table (and drops its event-cancel role).
 void SceTaskDelete(TASK* t)
 {
-    SCE_TASK* p = (SCE_TASK*) scenarioSetOtStart();
+    SCE_TASK* p = scenarioSetOtStart();
 
-    while ((p = (SCE_TASK*) scenarioGetOtAddr((u32*) p)) != 0) {
+    while ((p = scenarioGetOtAddr(p)) != 0) {
         if (p->getTaskPtr() == t) {
             DelPrim(&SceSys.SceTaskOt[15], (u32*) p);
             if (p->cancel_flag == 1) {
@@ -199,8 +199,8 @@ void cSceSys::scheduler()
             prim[i].exec_flag = 1;
         }
     }
-    p = (SCE_TASK*) scenarioSetOtStart();
-    while ((p = (SCE_TASK*) scenarioGetOtAddr((u32*) p)) != 0) {
+    p = scenarioSetOtStart();
+    while ((p = scenarioGetOtAddr(p)) != 0) {
         if (SpfFlagChk(pG, SPF_SCE)) {
             break;
         }
@@ -237,7 +237,7 @@ void cSceSys::scheduler()
             p->exec_flag = 0;
             setDrawDone(0);
         }
-        p = (SCE_TASK*) scenarioSetOtStart();
+        p = scenarioSetOtStart();
     }
     pParentThread = parent;
     pCTask = ctask;
@@ -353,9 +353,9 @@ void SceKill(TASK* t)
 // Kills every scenario task running `func`.
 void SceKill(void (*func)(int))
 {
-    SCE_TASK* p = (SCE_TASK*) scenarioSetOtStart();
+    SCE_TASK* p = scenarioSetOtStart();
 
-    while ((p = (SCE_TASK*) scenarioGetOtAddr((u32*) p)) != 0) {
+    while ((p = scenarioGetOtAddr(p)) != 0) {
         if (p->getTaskPtr()->pFunc == func) {
             SceKill(p->getTaskPtr());
         }

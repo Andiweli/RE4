@@ -535,7 +535,7 @@ static void r100_GakeEvent(int arg)
         W->car->setNoSuspend(1);
         W->carSub->setNoSuspend(1);
         if (readEvent(4, 1, &evt)) {
-            EvtMgr.SetEvt(evt, (u32*) 0);
+            EvtMgr.SetEvt(evt, 0);
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
                 SceSleep(1);
             }
@@ -565,7 +565,7 @@ static void r100_StartEvent()
     }
     if (!FlagChk((u32) &pG->System_flg, SYS_START_EVT_SKIP) && !ScfFlagChk(pG, SCF_R120_EVENT_CANCEL)) {
         if (readEvent(9, 1, &evt)) {
-            EvtMgr.SetEvt(evt, (u32*) 0);
+            EvtMgr.SetEvt(evt, 0);
             SceSleep(1);
             FadeSetW(0x80000002, 30, 0, 0);
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
@@ -852,7 +852,7 @@ static void r100_Sce_look()
     SysFlagOn(pG, SYS_SCREEN_STOP);
     SceSleep(2);
     if (readEvent(0, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) 0);
+        EvtMgr.SetEvt(evt, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
@@ -911,7 +911,7 @@ static void r100_Sce_zombi_dead(cEm* em)
     DC.setAramSort(0);
     r100_em_set();
     if (readEvent(3, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) &ev);
+        EvtMgr.SetEvt(evt, &ev);
         ev->FlgOnStatus(EvtStfPlPosNoSet);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
@@ -1092,7 +1092,7 @@ static void r100_MesCar00()
         SndStop(W->se, 0);
     }
     if (readEvent(5, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) 0);
+        EvtMgr.SetEvt(evt, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
@@ -1121,7 +1121,7 @@ static void r100_MesCar01()
         SndStop(W->se, 0);
     }
     if (readEvent(7, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) 0);
+        EvtMgr.SetEvt(evt, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
@@ -1173,7 +1173,7 @@ static void r100_EventBrige()
     W->cop[1]->setNoSuspend(0);
     StaFlagOn(pG, STA_CAMERA_SET_ROOM);
     if (readEvent(8, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) 0);
+        EvtMgr.SetEvt(evt, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }

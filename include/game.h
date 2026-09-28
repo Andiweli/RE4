@@ -12,6 +12,8 @@ struct GameSaveBlock {
     u8 pad_8[0x36F8 - 0x8];
 };
 
+struct SSCRN_SAVE_DATA;
+
 // Save data image (cGameSave::alloc). The section pointers are stored as offsets from the image
 // start while it travels (calcOffset) and turned back into addresses by calcAddr; `base` is 0 in
 // the offset form.
@@ -21,7 +23,7 @@ struct SAVE_DATA_HEAD {
     GameSaveBlock* pGlobal;   // 0x08  offset 0x40
     void* pItm;              // 0x0C  cItemMgr::save/load
     void* pRm;              // 0x10  cRoomData::save/load (0x3740)
-    u32* pSscrn;              // 0x14  SscrnDataSave/Load
+    SSCRN_SAVE_DATA* pSs;     // 0x14  SscrnDataSave/Load
     void* pMr;          // 0x18  MerchantDataSave/Load
 };
 

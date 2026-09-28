@@ -1267,8 +1267,8 @@ address	size	section	unit	scope	name	demangled
 0x80060CCC	0x20	.text	game/snd.cpp	global	SndSeAbsFadeOutAll_5msec__Fs	SndSeAbsFadeOutAll_5msec
 0x80060CEC	0x28	.text	game/snd.cpp	global	SndSeqFadeOutAll_sec__FUci	SndSeqFadeOutAll_sec
 0x80060D14	0x8	.text	game/sscrn.cpp	global	SscrnDataSize__Fv	SscrnDataSize
-0x80060D1C	0x10	.text	game/sscrn.cpp	global	SscrnDataSave__FPUl	SscrnDataSave
-0x80060D2C	0x10	.text	game/sscrn.cpp	global	SscrnDataLoad__FPUl	SscrnDataLoad
+0x80060D1C	0x10	.text	game/sscrn.cpp	global	SscrnDataSave__FP15SSCRN_SAVE_DATA	SscrnDataSave
+0x80060D2C	0x10	.text	game/sscrn.cpp	global	SscrnDataLoad__FP15SSCRN_SAVE_DATA	SscrnDataLoad
 0x80060D3C	0x19C	.text	game/sscrn.cpp	global	SubScreenAramRead__Fv	SubScreenAramRead
 0x80060ED8	0xF8	.text	game/sscrn.cpp	global	sscrnSetLanguage__FP10SUB_SCREENi	sscrnSetLanguage
 0x80060FD0	0x3C	.text	game/sscrn.cpp	global	sscrnDataFilename__FP10SUB_SCREENPCc	sscrnDataFilename
@@ -4260,7 +4260,7 @@ address	size	section	unit	scope	name	demangled
 0x8012CC60	0x50	.text	game/est.cpp	global	EventCutEffDelete__Fv	EventCutEffDelete
 0x8012CCB0	0x54	.text	game/est.cpp	global	EventAllEffDelete__Fv	EventAllEffDelete
 0x8012CD04	0x40	.text	game/est.cpp	global	ChkWaterEffectEnable__FP3Vec	ChkWaterEffectEnable
-0x8012CD44	0xA0	.text	game/est.cpp	global	EstSetEm10WaterFall__FP3Vec	EstSetEm10WaterFall
+0x8012CD44	0xA0	.text	game/est.cpp	global	EstSetEm10WaterFall__FP6cModel	EstSetEm10WaterFall
 0x8012CDE4	0x130	.text	game/EtcModel.cpp	global	EtcModelDebugDisp__Fv	EtcModelDebugDisp
 0x8012CF14	0xB8	.text	game/EtcModel.cpp	global	getRoomEtc__Fi11ETCMODEL_IDPP3cEmi	getRoomEtc
 0x8012CFCC	0x7C	.text	game/EtcModel.cpp	global	getRoomEtc2__FiPP3cEmi	getRoomEtc2
@@ -4457,7 +4457,7 @@ address	size	section	unit	scope	name	demangled
 0x8013938C	0x2BC	.text	game/event.cpp	global	EvtReadExec__8EventMgrPciUl	EventMgr::EvtReadExec
 0x80139648	0x154	.text	game/event.cpp	global	EvtFree__8EventMgrPc	EventMgr::EvtFree
 0x8013979C	0x40	.text	game/event.cpp	global	ToolCoreEvdDel__8EventMgr	EventMgr::ToolCoreEvdDel
-0x801397DC	0x140	.text	game/event.cpp	global	SetEvt__8EventMgrPvPUl	EventMgr::SetEvt
+0x801397DC	0x140	.text	game/event.cpp	global	SetEvt__8EventMgrPvPP5Event	EventMgr::SetEvt
 0x8013991C	0x148	.text	game/event.cpp	global	SetEvt__8EventMgrPcPP5Event	EventMgr::SetEvt
 0x80139A64	0x24	.text	game/event.cpp	global	GetEvt__8EventMgrPCcPPv	EventMgr::GetEvt
 0x80139A88	0x150	.text	game/event.cpp	global	DelEvt__8EventMgrPvi	EventMgr::DelEvt
@@ -5635,7 +5635,7 @@ address	size	section	unit	scope	name	demangled
 0x80187964	0x58	.text	game/sce_at.cpp	global	SceAtSetActColor__Fii	SceAtSetActColor
 0x801879BC	0x70	.text	game/sce_at.cpp	global	SceAtGetCenterPos__FP3Veci	SceAtGetCenterPos
 0x80187A2C	0x374	.text	game/sce_at.cpp	global	SceAtSetParent__FP9SceAtWorkP6cModeli	SceAtSetParent
-0x80187DA0	0x68	.text	game/sce_at.cpp	global	SceAtSetParent__FiP4cObji	SceAtSetParent
+0x80187DA0	0x68	.text	game/sce_at.cpp	global	SceAtSetParent__FiP6cModeli	SceAtSetParent
 0x80187E08	0xB8	.text	game/sce_at.cpp	global	InScreenCheck__FP3Vec	InScreenCheck
 0x80187EC0	0x6C	.text	game/sce_at.cpp	global	SceAtExecRoomJump__FUsP3VecT1i	SceAtExecRoomJump
 0x80187F2C	0x98	.text	game/sce_at.cpp	global	SceAtCheckFieldInfo__FP3Vec	SceAtCheckFieldInfo
@@ -5723,7 +5723,7 @@ address	size	section	unit	scope	name	demangled
 0x8018F118	0x24	.text	game/sce_sys.cpp	global	scenarioLoopAfterInit__Fv	scenarioLoopAfterInit
 0x8018F13C	0xB0	.text	game/sce_sys.cpp	global	ScenarioMove__Fv	ScenarioMove
 0x8018F1EC	0xC	.text	game/sce_sys.cpp	global	scenarioSetOtStart__Fv	scenarioSetOtStart
-0x8018F1F8	0x24	.text	game/sce_sys.cpp	global	scenarioGetOtAddr__FPUl	scenarioGetOtAddr
+0x8018F1F8	0x24	.text	game/sce_sys.cpp	global	scenarioGetOtAddr__FP8SCE_TASK	scenarioGetOtAddr
 0x8018F21C	0x7C	.text	game/sce_sys.cpp	global	SceTaskDelete__FP4TASK	SceTaskDelete
 0x8018F298	0x198	.text	game/sce_sys.cpp	global	scheduler__7cSceSys	cSceSys::scheduler
 0x8018F430	0x1E8	.text	game/sce_sys.cpp	global	SceExec__FiPvT1UciT1	SceExec
@@ -6115,11 +6115,11 @@ address	size	section	unit	scope	name	demangled
 0x801B20DC	0x64	.text	game/xml.cpp	global	GetXmlStart__9XmlSimplePPcPCcT2	XmlSimple::GetXmlStart
 0x801B2140	0x24	.text	game/xml.cpp	global	GetXmlNext__9XmlSimplePPcPCcT2	XmlSimple::GetXmlNext
 0x801B2164	0xEC	.text	game/xml.cpp	global	GetXmlElem__9XmlSimplePcPCcT2	XmlSimple::GetXmlElem
-0x801B2250	0xA8	.text	game/xml.cpp	global	SetXmlStart__9XmlSimplePiPc	XmlSimple::SetXmlStart
-0x801B22F8	0x70	.text	game/xml.cpp	global	SetXmlEnd__9XmlSimplePiPc	XmlSimple::SetXmlEnd
-0x801B2368	0x70	.text	game/xml.cpp	global	SetXmlElemStart__9XmlSimplePiPc	XmlSimple::SetXmlElemStart
-0x801B23D8	0x60	.text	game/xml.cpp	global	SetXmlElemEnd__9XmlSimplePiPc	XmlSimple::SetXmlElemEnd
-0x801B2438	0x70	.text	game/xml.cpp	global	SetXmlElem__9XmlSimplePiPcPCcT3	XmlSimple::SetXmlElem
+0x801B2250	0xA8	.text	game/xml.cpp	global	SetXmlStart__9XmlSimplePPcPc	XmlSimple::SetXmlStart
+0x801B22F8	0x70	.text	game/xml.cpp	global	SetXmlEnd__9XmlSimplePPcPc	XmlSimple::SetXmlEnd
+0x801B2368	0x70	.text	game/xml.cpp	global	SetXmlElemStart__9XmlSimplePPcPcT2	XmlSimple::SetXmlElemStart
+0x801B23D8	0x60	.text	game/xml.cpp	global	SetXmlElemEnd__9XmlSimplePPcPcT2	XmlSimple::SetXmlElemEnd
+0x801B2438	0x70	.text	game/xml.cpp	global	SetXmlElem__9XmlSimplePPcPcPCcT3	XmlSimple::SetXmlElem
 0x801B24A8	0x8C	.text	game/yz2code.cpp	global	Yz2DecodeSet__FPcPv	Yz2DecodeSet
 0x801B2534	0x4E4	.text	game/yz2code.cpp	global	Yz2DecodeExec__FPv	Yz2DecodeExec
 0x801B2A18	0x128	.text	game/at_sub2.cpp	global	getWepEff__9AtEffInfoiPUlT2	AtEffInfo::getWepEff

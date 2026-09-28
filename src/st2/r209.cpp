@@ -1016,7 +1016,7 @@ static void r209_2ndBattle()
     SubScreenWait(60);
     if (r209_work->evd->waitLoadOk() == 1) {
         MemorySwap(m->pArc, r209_work->evd->getAddr(), r209_work->evd->getSize());
-        EvtMgr.SetEvt(m->pArc, (u32*) 0);
+        EvtMgr.SetEvt(m->pArc, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
