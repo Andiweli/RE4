@@ -46,7 +46,7 @@ u32 color_data[] = {
     0x00C000FF, 0x005800FF, 0x585858FF, 0x303030FF, 0xFF9600FF, 0x905100FF, 0x60A0A0FF,
 };
 
-int EprintfSetCurrentNo();
+int EprintfSetCurrentNo(int no);
 void EprintfSetEnv(int x, int y, int color, int page, int a);
 void eprintf_main(int w, int h, const char* fmt, va_list ap);
 int Sp_char_ck(int c);
@@ -71,7 +71,7 @@ int BtoX(int b)
 }
 
 // The current text environment number.
-int EprintfSetCurrentNo()
+int EprintfSetCurrentNo(int no)
 {
     return Moji.cur_no;
 }

@@ -4053,7 +4053,7 @@ address	size	section	unit	scope	name	demangled
 0x801171B8	0x40	.text	game/emwindow.cpp	global	ChkEnableFence__9cEmWindowi	cEmWindow::ChkEnableFence
 0x801171F8	0x20	.text	game/emwindow.cpp	global	_._9cEmWindow	cEmWindow::~cEmWindow
 0x80117218	0x30	.text	game/eprintf.cpp	global	BtoX__Fi	BtoX
-0x80117248	0xC	.text	game/eprintf.cpp	global	EprintfSetCurrentNo__Fv	EprintfSetCurrentNo
+0x80117248	0xC	.text	game/eprintf.cpp	global	EprintfSetCurrentNo__Fi	EprintfSetCurrentNo
 0x80117254	0xB4	.text	game/eprintf.cpp	global	eprintf__FiiiiPCce	eprintf
 0x80117308	0xC4	.text	game/eprintf.cpp	global	eprintf2__FiiiiiiPCce	eprintf2
 0x801173CC	0x20	.text	game/eprintf.cpp	global	EprintfSetEnv__Fiiiii	EprintfSetEnv
