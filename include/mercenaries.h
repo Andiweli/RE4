@@ -173,7 +173,6 @@ enum MERCE_TYPE {
     MT_ITEM = 9
 };
 
-extern "C" {
 int MercSysInitStage();
 int MercSysInitRoom(MercInit* pMInit);
 int MercSysMoveStart(MercSysWork* wk);
@@ -194,6 +193,5 @@ void IdSetColStart(IDSystem* pIdSys, int idmNo0, int idmNo1, u8 idcNo);
 void IdSetNum(IDSystem* pIdSys, int idmNo, u8 idcNo, int num, int max, int keta, int mode);
 void IdSetTexNo(IDSystem* pIdSys, int idmNo, u8 idcNo, int texNo);
 int IdIsAnimEnd(IDSystem* pIdSys, int idmNo, u8 idcNo);
-}
 
 #endif

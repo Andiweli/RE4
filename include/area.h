@@ -59,7 +59,6 @@ struct GEOM_CONE_REV;
 
 BOOL AreaHitCheck(AREA_HIT_DATA* pAre, Vec* pPos);
 
-extern "C" {
 BOOL areaHitCheck_xz4(AREA_XZ4* pXz4, Vec* pPos);
 BOOL areaHitCheck_Cylinder(AREA_CYLINDER* pCld, Vec* pPos);
 BOOL AreaViewCheck(AREA_HIT_DATA* pAre, GEOM_CONE_REV* pCrev);
@@ -78,6 +77,5 @@ void area_cylinder_Disp(AREA_CYLINDER* pCld, u32 color, int flag, Mtx mtx);
 void area_eye_trigger_Disp(AREA_EYE_TRIGGER* pEtg, u32 col, int flg, Mtx pMat);
 void AreaDataInfoDisp(AREA_HIT_DATA* pArea, int x, s16 y);
 void AreaDataHelpDisp(AREA_HIT_DATA* pArea, int x, s16 y);
-}
 
 #endif

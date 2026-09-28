@@ -8,7 +8,6 @@
 
 extern cEm* errEm;   // returned by EmSetFromList2 when no enemy was created
 
-extern "C" {
 int checkListId(int no);                    // 0 when an alive enemy already carries list entry `no`
 void EmSetFromList();                       // create every enemy of the current room from the list
 cEm* EmSetFromList2(int no, int flag);   // create list entry `no`; errEm on failure
@@ -20,7 +19,6 @@ void EmSetDie(cEm* em);                     // remember the death of `em` in pG-
 void EmSetDieCnt(cEm* pEm);
 void EmSetRoomInit();                       // clear the "set" bit of every entry
 void EmListWaitDelete();
-}
 
 // Creates an enemy from a list record built by the caller (C++ linkage; sce_at, the stage rooms).
 cEm* EmSetEvent(EM_LIST* pData);

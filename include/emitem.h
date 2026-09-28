@@ -39,7 +39,6 @@ public:
     void setRotType(u8 type);
 };
 
-extern "C" {
 cEmItem* SetEmItem(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int etcNo);
 void emItemDmCk(cEmItem* pEm);
 void emItem_R0_Init(cEmItem* pEm);
@@ -51,6 +50,5 @@ void emItem_R1_Drop(cEmItem* pEm);
 void emItem_R1_Break(cEmItem* pEm);
 void emItemYarareInit(cEmItem* pEm);
 void emItemRotMove(cEmItem* pEm);
-}
 
 #endif

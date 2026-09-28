@@ -31,7 +31,6 @@ struct RtpData {
     u32 nextOfs;   // 0x14  s8 next[nPoint][nPoint]: next hop from row to column, -1 = unreachable
 };
 
-extern "C" {
 void RouteCk();
 // Next position for `em` on its way to `target`; returns 1 when the target itself is reachable.
 int RouteCkToEm(cEm* pMy, cEm* pTo, Vec* pDest, int mode);
@@ -51,6 +50,5 @@ int getNearInfo(cEm* pEm, int mode, int flag);
 s8 getNearPoint(Vec* pPos, int mode, int flag);
 void Draw_rtp();
 void Draw_eminfo();
-}
 
 #endif

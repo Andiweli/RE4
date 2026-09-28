@@ -30,7 +30,6 @@ typedef struct {
 
 #define EMRACK_WK(em) ((FREE_EMRACK*) ((cEmRack*) (em))->free)
 
-extern "C" {
 cEmRack* SetRack(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo);
 void emRackDmCk(cEmRack* pEm);
 void emRack_R0_Init(cEmRack* pEm);
@@ -42,6 +41,5 @@ void emRack_R1_Shock(cEmRack* pEm);
 void emRackSatSet(cEmRack* pEm);
 void emRackSatClear(cEmRack* pEm);
 void emRackYarareInit(cEm* pEm);
-}
 
 #endif
