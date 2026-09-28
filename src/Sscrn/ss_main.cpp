@@ -725,7 +725,7 @@ void IdNumErase()
     int i;
 
     for (i = 0; i < 0x3E; i++) {
-        IdNum.kill(0xFF, 0x40 + i);
+        IdNum.kill(0xFF, (ID_CLASS) (0x40 + i));
     }
     IdNum.kill(0xFF, IDC_SSCRN_NEAR_0);
     IdNum.kill(0xFF, IDC_SSCRN_NEAR_1);
@@ -843,10 +843,10 @@ void numDisp(int id, int num, Vec* pos, u32 flags)
     ID_UNIT* u;
     int i;
 
-    u = IdNum.unitPtr(0, id);
+    u = IdNum.unitPtr(0, (ID_CLASS) id);
     u->be_flag &= ~8;
     for (i = 1; i <= 3; i++) {
-        u = IdNum.unitPtr(i, id);
+        u = IdNum.unitPtr(i, (ID_CLASS) id);
         u->be_flag &= ~8;
         if (flags & 2) {
             u->col0[0] = col1->col0[0];
@@ -861,7 +861,7 @@ void numDisp(int id, int num, Vec* pos, u32 flags)
         }
     }
     for (i = 0x11; i <= 0x13; i++) {
-        u = IdNum.unitPtr(i, id);
+        u = IdNum.unitPtr(i, (ID_CLASS) id);
         u->be_flag &= ~8;
     }
     if (pos) {
@@ -879,14 +879,14 @@ void numDisp(int id, int num, Vec* pos, u32 flags)
                 }
                 on = 1;
             }
-            u = IdNum.unitPtr(i + 1, id);
+            u = IdNum.unitPtr(i + 1, (ID_CLASS) id);
             u->be_flag |= 8;
             u->tex_flag |= 2;
             u->texNo = d[i];
-            u = IdNum.unitPtr(i + 0x11, id);
+            u = IdNum.unitPtr(i + 0x11, (ID_CLASS) id);
             u->be_flag |= 8;
         }
-        u = IdNum.unitPtr(0, id);
+        u = IdNum.unitPtr(0, (ID_CLASS) id);
         u->be_flag |= 8;
         u->pos0 = *pos;
     }

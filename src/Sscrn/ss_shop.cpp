@@ -2800,25 +2800,25 @@ void dispPrice(int type, int num, int price, Vec* pos, u32 flags)
     int n;
 
     if (flags == 0) {
-        IdSub.unitPtr(0, type)->be_flag &= ~8;
+        IdSub.unitPtr(0, (ID_CLASS) type)->be_flag &= ~8;
         return;
     }
-    IdSub.unitPtr(0, type)->be_flag |= 8;
+    IdSub.unitPtr(0, (ID_CLASS) type)->be_flag |= 8;
     if (pos) {
-        IdSub.unitPtr(0, type)->pos0 = *pos;
+        IdSub.unitPtr(0, (ID_CLASS) type)->pos0 = *pos;
     }
     if (price_disp_num & flags) {
         int digit[4];
         int on;
 
-        IdSub.unitPtr(0x10, type)->be_flag |= 8;
+        IdSub.unitPtr(0x10, (ID_CLASS) type)->be_flag |= 8;
         n = num;
         for (int i = 0; i < 4; i++) {
             digit[i] = n % 10;
             n /= 10;
         }
         for (int i = 0; i < 4; i++) {
-            IdSub.unitPtr(0x11 + i, type)->be_flag &= ~8;
+            IdSub.unitPtr(0x11 + i, (ID_CLASS) type)->be_flag &= ~8;
         }
         on = 0;
         for (int i = 3; i >= 0; i--) {
@@ -2830,26 +2830,26 @@ void dispPrice(int type, int num, int price, Vec* pos, u32 flags)
                 }
                 on = 1;
             }
-            d = IdSub.unitPtr(0x11 + i, type);
+            d = IdSub.unitPtr(0x11 + i, (ID_CLASS) type);
             d->be_flag |= 8;
             d->tex_flag |= 2;
             d->texNo = digit[i];
         }
     } else {
-        IdSub.unitPtr(0x10, type)->be_flag &= ~8;
+        IdSub.unitPtr(0x10, (ID_CLASS) type)->be_flag &= ~8;
     }
     if (price_disp_price & flags) {
         int digit[7];
         int on;
 
-        IdSub.unitPtr(0xFE, type)->be_flag |= 8;
+        IdSub.unitPtr(0xFE, (ID_CLASS) type)->be_flag |= 8;
         n = price;
         for (int i = 0; i < 7; i++) {
             digit[i] = n % 10;
             n /= 10;
         }
         for (int i = 0; i < 7; i++) {
-            IdSub.unitPtr(1 + i, type)->be_flag &= ~8;
+            IdSub.unitPtr(1 + i, (ID_CLASS) type)->be_flag &= ~8;
         }
         on = 0;
         for (int i = 6; i >= 0; i--) {
@@ -2861,18 +2861,18 @@ void dispPrice(int type, int num, int price, Vec* pos, u32 flags)
                 }
                 on = 1;
             }
-            d = IdSub.unitPtr(1 + i, type);
+            d = IdSub.unitPtr(1 + i, (ID_CLASS) type);
             d->be_flag |= 8;
             d->tex_flag |= 2;
             d->texNo = digit[i];
         }
     } else {
-        IdSub.unitPtr(0xFE, type)->be_flag &= ~8;
+        IdSub.unitPtr(0xFE, (ID_CLASS) type)->be_flag &= ~8;
     }
     if (price_disp_sold & flags) {
-        IdSub.unitPtr(0x20, type)->be_flag |= 8;
+        IdSub.unitPtr(0x20, (ID_CLASS) type)->be_flag |= 8;
     } else {
-        IdSub.unitPtr(0x20, type)->be_flag &= ~8;
+        IdSub.unitPtr(0x20, (ID_CLASS) type)->be_flag &= ~8;
     }
 }
 

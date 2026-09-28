@@ -3152,7 +3152,7 @@ void CardDbgCacheSet()
         for (i = 0; i <= (digits_) - 1; i++) {            \
             d[i] = num % 10;                              \
             num /= 10;                                    \
-            u = (id)->unitPtr((idNo_) - i, type);         \
+            u = (id)->unitPtr((idNo_) - i, (ID_CLASS) type);         \
             u->tex_flag |= 2;                             \
             u->texNo = d[i];                                 \
         }                                                 \
@@ -3174,7 +3174,7 @@ void dispSaveInfo(int no, SaveInfo* p_info, int type, int flag)
     int num;
 
     putNumber(id, no + 1, 2, 2, type);
-    u = id->unitPtr(0x16, type);
+    u = id->unitPtr(0x16, (ID_CLASS) type);
     if (p_info == 0) {
         u->be_flag &= ~8;
         return;
@@ -3182,29 +3182,29 @@ void dispSaveInfo(int no, SaveInfo* p_info, int type, int flag)
     u->be_flag |= 8;
     special = 0;
     chapter = p_info->chapter;
-    id->unitPtr(0x20, type)->be_flag &= ~8;
-    id->unitPtr(7, type)->be_flag &= ~8;
-    id->unitPtr(6, type)->be_flag &= ~8;
-    id->unitPtr(0x21, type)->be_flag &= ~8;
-    id->unitPtr(0x19, type)->be_flag &= ~8;
+    id->unitPtr(0x20, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(7, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(6, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(0x21, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(0x19, (ID_CLASS) type)->be_flag &= ~8;
     if (flag) {
-        u = id->unitPtr(0x20, type);
+        u = id->unitPtr(0x20, (ID_CLASS) type);
     } else {
         switch (p_info->mode) {
         case 1:
             if (chapter == 0x12) {
-                u = id->unitPtr(0x19, type);
+                u = id->unitPtr(0x19, (ID_CLASS) type);
                 special = 1;
             } else {
-                u = id->unitPtr(7, type);
+                u = id->unitPtr(7, (ID_CLASS) type);
             }
             break;
         case 2:
             chapter--;
-            u = id->unitPtr(6, type);
+            u = id->unitPtr(6, (ID_CLASS) type);
             break;
         case 3:
-            u = id->unitPtr(0x21, type);
+            u = id->unitPtr(0x21, (ID_CLASS) type);
             special = 1;
             break;
         default:
@@ -3214,59 +3214,59 @@ void dispSaveInfo(int no, SaveInfo* p_info, int type, int flag)
     u->be_flag |= 8;
 skip:
     getChapterSection(chapter, &chap, &sec);
-    u = id->unitPtr(5, type);
+    u = id->unitPtr(5, (ID_CLASS) type);
     u->tex_flag |= 2;
     u->texNo = sec;
-    u = id->unitPtr(3, type);
+    u = id->unitPtr(3, (ID_CLASS) type);
     u->tex_flag |= 2;
     u->texNo = chap;
     if (flag || special) {
-        id->unitPtr(3, type)->be_flag &= ~8;
-        id->unitPtr(4, type)->be_flag &= ~8;
-        id->unitPtr(5, type)->be_flag &= ~8;
+        id->unitPtr(3, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(4, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(5, (ID_CLASS) type)->be_flag &= ~8;
     } else {
-        id->unitPtr(3, type)->be_flag |= 8;
-        id->unitPtr(4, type)->be_flag |= 8;
-        id->unitPtr(5, type)->be_flag |= 8;
+        id->unitPtr(3, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(4, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(5, (ID_CLASS) type)->be_flag |= 8;
     }
     putNumber(id, p_info->save_cnt, 0xA, 3, type);
     if (flag) {
-        id->unitPtr(8, type)->be_flag &= ~8;
-        id->unitPtr(9, type)->be_flag &= ~8;
-        id->unitPtr(0xA, type)->be_flag &= ~8;
+        id->unitPtr(8, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(9, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xA, (ID_CLASS) type)->be_flag &= ~8;
     } else {
-        id->unitPtr(8, type)->be_flag |= 8;
-        id->unitPtr(9, type)->be_flag |= 8;
-        id->unitPtr(0xA, type)->be_flag |= 8;
+        id->unitPtr(8, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(9, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xA, (ID_CLASS) type)->be_flag |= 8;
     }
     SecToTime(p_info->playTime, &h, &m, &s);
     putNumber(id, h, 0xC, 2, type);
-    u = id->unitPtr(0xD, type);
+    u = id->unitPtr(0xD, (ID_CLASS) type);
     u->texNo = 0xB;
     u->tex_flag |= 2;
     putNumber(id, m, 0xF, 2, type);
-    u = id->unitPtr(0x10, type);
+    u = id->unitPtr(0x10, (ID_CLASS) type);
     u->texNo = 0xB;
     u->tex_flag |= 2;
     putNumber(id, s, 0x12, 2, type);
     if (flag) {
-        id->unitPtr(0xB, type)->be_flag &= ~8;
-        id->unitPtr(0xC, type)->be_flag &= ~8;
-        id->unitPtr(0xD, type)->be_flag &= ~8;
-        id->unitPtr(0xE, type)->be_flag &= ~8;
-        id->unitPtr(0xF, type)->be_flag &= ~8;
-        id->unitPtr(0x10, type)->be_flag &= ~8;
-        id->unitPtr(0x11, type)->be_flag &= ~8;
-        id->unitPtr(0x12, type)->be_flag &= ~8;
+        id->unitPtr(0xB, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xC, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xD, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xE, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xF, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0x10, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0x11, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0x12, (ID_CLASS) type)->be_flag &= ~8;
     } else {
-        id->unitPtr(0xB, type)->be_flag |= 8;
-        id->unitPtr(0xC, type)->be_flag |= 8;
-        id->unitPtr(0xD, type)->be_flag |= 8;
-        id->unitPtr(0xE, type)->be_flag |= 8;
-        id->unitPtr(0xF, type)->be_flag |= 8;
-        id->unitPtr(0x10, type)->be_flag |= 8;
-        id->unitPtr(0x11, type)->be_flag |= 8;
-        id->unitPtr(0x12, type)->be_flag |= 8;
+        id->unitPtr(0xB, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xC, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xD, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xE, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xF, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0x10, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0x11, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0x12, (ID_CLASS) type)->be_flag |= 8;
     }
     num = p_info->count + 1;
     if (p_info->mode == 3) {
@@ -3274,49 +3274,49 @@ skip:
     }
     putNumber(id, num, 0x14, 2, type);
     if (flag) {
-        id->unitPtr(0x13, type)->be_flag &= ~8;
-        id->unitPtr(0x14, type)->be_flag &= ~8;
+        id->unitPtr(0x13, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0x14, (ID_CLASS) type)->be_flag &= ~8;
     } else {
-        id->unitPtr(0x13, type)->be_flag |= 8;
-        id->unitPtr(0x14, type)->be_flag |= 8;
+        id->unitPtr(0x13, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0x14, (ID_CLASS) type)->be_flag |= 8;
     }
-    id->unitPtr(0x22, type)->be_flag &= ~8;
-    id->unitPtr(0x17, type)->be_flag &= ~8;
-    id->unitPtr(0x18, type)->be_flag &= ~8;
+    id->unitPtr(0x22, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(0x17, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(0x18, (ID_CLASS) type)->be_flag &= ~8;
     if (pSys->language == 0) {
         switch (p_info->game_mode_disp) {
         case 1:
-            id->unitPtr(0x22, type)->be_flag |= 8;
+            id->unitPtr(0x22, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 3:
         default:
-            id->unitPtr(0x17, type)->be_flag |= 8;
+            id->unitPtr(0x17, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 5:
-            id->unitPtr(0x18, type)->be_flag |= 8;
+            id->unitPtr(0x18, (ID_CLASS) type)->be_flag |= 8;
             break;
         }
     } else if (pSys->language == 1) {
         switch (p_info->game_mode_disp) {
         case 5:
         default:
-            id->unitPtr(0x17, type)->be_flag |= 8;
+            id->unitPtr(0x17, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 6:
-            id->unitPtr(0x18, type)->be_flag |= 8;
+            id->unitPtr(0x18, (ID_CLASS) type)->be_flag |= 8;
             break;
         }
     } else {
         switch (p_info->game_mode_disp) {
         case 3:
-            id->unitPtr(0x22, type)->be_flag |= 8;
+            id->unitPtr(0x22, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 5:
         default:
-            id->unitPtr(0x17, type)->be_flag |= 8;
+            id->unitPtr(0x17, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 6:
-            id->unitPtr(0x18, type)->be_flag |= 8;
+            id->unitPtr(0x18, (ID_CLASS) type)->be_flag |= 8;
             break;
         }
     }
@@ -3342,7 +3342,7 @@ void CardID::updateSaveInfo(cCard* pCard)
         if (no > 19) {
             no -= 20;
         }
-        g_id->m_IdSave.unitPtr(0x15, type)->be_flag |= 8;
+        g_id->m_IdSave.unitPtr(0x15, (ID_CLASS) type)->be_flag |= 8;
         f = pCard->getSlotInfo(sl)->fileFlag[no];
         if (f & 1) {
             if (f & 2) {
@@ -3400,7 +3400,7 @@ void CardID::init(int type, CardArc* data)
     IdSys.unitPtr(1, IDC_SSCRN_NEAR_1)->rev_flag |= 0xF;
     zero = 0.0f;
     for (int j = 0; j < 7; j++) {
-        ID_UNIT* p = g_id->m_IdSave.unitPtr(0x15, 0x40 + j);
+        ID_UNIT* p = g_id->m_IdSave.unitPtr(0x15, (ID_CLASS) (0x40 + j));
         ID_UNIT* q = g_id->m_IdSave.unitPtr((u8) (j + 0x10), IDC_SSCRN_FAR_0);
         q->type = 1;
         p->pos0.z = zero;

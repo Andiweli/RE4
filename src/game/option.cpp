@@ -978,9 +978,9 @@ void num(int no, int digit_num, int flag, int mark_bottom, u8 id_class, int reve
         ID_UNIT* u;
 
         if (reverse == 0) {
-            u = IdSys.unitPtr((u8) (mark_bottom + i), id_class);
+            u = IdSys.unitPtr((u8) (mark_bottom + i), (ID_CLASS) id_class);
         } else {
-            u = IdSys.unitPtr((u8) (mark_bottom - i), id_class);
+            u = IdSys.unitPtr((u8) (mark_bottom - i), (ID_CLASS) id_class);
         }
         if (show == 0 && d[i] == 0 && i != 0) {
             u->be_flag &= ~8;

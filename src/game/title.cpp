@@ -840,8 +840,8 @@ void titleLoop(TITLE_WORK* w)
 // Copies the colour of id unit `src` to unit `dst`.
 void id_color_copy(int src, int dst, u8 idc)
 {
-    ID_UNIT* s = IdSys.unitPtr(src, idc);
-    ID_UNIT* d = IdSys.unitPtr(dst, idc);
+    ID_UNIT* s = IdSys.unitPtr(src, (ID_CLASS) idc);
+    ID_UNIT* d = IdSys.unitPtr(dst, (ID_CLASS) idc);
 
     d->col0[0] = s->col0[0];
     d->col0[1] = s->col0[1];

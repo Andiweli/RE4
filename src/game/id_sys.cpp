@@ -37,14 +37,14 @@ static inline int IdBitChk(u32* tbl, u8 n) { return FlagChkVar(tbl, (u32) n) ? 1
 #define ID_UNIT(i) ((ID_UNIT*) ((i) * sizeof(ID_UNIT) + (u32) m_IdUnit))
 
 // Allocates the pool of n IdUnits (memory group 13) and clears it.
-void IDSystem::gameInit(int n)
+void IDSystem::gameInit(int maxId)
 {
 #line 66 "D:/Bio4/Prog/id_sys.cpp"
-    m_IdUnit = (ID_UNIT*) MEM_ALLOC(n * sizeof(ID_UNIT), 1, 0xD);
-    m_maxId = n;
+    m_IdUnit = (ID_UNIT*) MEM_ALLOC(maxId * sizeof(ID_UNIT), 1, 0xD);
+    m_maxId = maxId;
     if (m_IdUnit == 0) {
         m_maxId = 0;
-        if (n != 0) {
+        if (maxId != 0) {
             pLog->err(0, 0, "IDSystem::gameInit() malloc failed");
         }
     }
@@ -74,14 +74,14 @@ void IDSystem::free()
 }
 
 // 1 when a table of class `type` is currently set (m_set_flag bit).
-int IDSystem::setCk(int classNo)
+int IDSystem::setCk(ID_CLASS classNo)
 {
     u8 t = classNo;
     return IdBitChk(m_set_flag, t);
 }
 
-// Shows (sw 1) or hides (sw 0) every unit of class `type` at draw time (m_disp_off bit).
-void IDSystem::dispSw(int classNo, int sw)
+// Shows (sw 1) or hides (sw 0) every unit of class `classNo` at draw time (m_disp_off bit).
+void IDSystem::dispSw(ID_CLASS classNo, int sw)
 {
     switch (sw) {
     case 1:
@@ -94,25 +94,25 @@ void IDSystem::dispSw(int classNo, int sw)
 }
 
 // Frees a unit (and, for a group, all its children); warns when it is still queued in the OT.
-void IDSystem::unitPush(ID_UNIT* u)
+void IDSystem::unitPush(ID_UNIT* pIdUnit)
 {
     int i;
 
-    if (u->be_flag == 0xFF) {
+    if (pIdUnit->be_flag == 0xFF) {
         return;
     }
-    if (u->type == 1) {
+    if (pIdUnit->type == 1) {
         for (i = 0; i < m_maxId; i++) {
             ID_UNIT* c = ID_UNIT(i);
-            if (c->be_flag != 0xFF && u == c->pParent) {
+            if (c->be_flag != 0xFF && pIdUnit == c->pParent) {
                 unitPush(c);
             }
         }
     }
-    if (u->be_flag & 0x10) {
-        pLog->err(0, 0, "unitPush(0x%p):[%02x,%02x] ID_UNIT wait for being Drawn.", u, u->classNo, u->unitNo);
+    if (pIdUnit->be_flag & 0x10) {
+        pLog->err(0, 0, "unitPush(0x%p):[%02x,%02x] ID_UNIT wait for being Drawn.", pIdUnit, pIdUnit->classNo, pIdUnit->unitNo);
     }
-    u->be_flag = 0xFF;
+    pIdUnit->be_flag = 0xFF;
     m_nId--;
 }
 
@@ -157,25 +157,25 @@ void IDSystem::unitLevel(ID_UNIT* u, u8 level)
 }
 
 // Links child under parent and renumbers its level.
-void IDSystem::unitParent(ID_UNIT* parent, ID_UNIT* child)
+void IDSystem::unitParent(ID_UNIT* pParent, ID_UNIT* pChild)
 {
-    child->pParent = parent;
-    unitLevel(child, parent->levelNo + 1);
+    pChild->pParent = pParent;
+    unitLevel(pChild, pParent->levelNo + 1);
 }
 
-// Finds the live unit with mark id `id` of class `type`; logs and returns a static dummy when absent.
-ID_UNIT* IDSystem::unitPtr(u8 id, int type)
+// Finds the live unit with mark id `markNo` of class `classNo`; logs and returns a static dummy when absent.
+ID_UNIT* IDSystem::unitPtr(u8 markNo, ID_CLASS classNo)
 {
     static ID_UNIT tmpId;
     int i;
     ID_UNIT* u = m_IdUnit;
 
     for (i = 0; i < m_maxId; i++, u++) {
-        if (u->be_flag != 0xFF && id == u->markNo && (u8) type == u->classNo) {
+        if (u->be_flag != 0xFF && markNo == u->markNo && (u8) classNo == u->classNo) {
             return u;
         }
     }
-    pLog->err(0, 0, "IDSystem::unitPtr(m[%02x],c[%02x]): Not found.", id, type);
+    pLog->err(0, 0, "IDSystem::unitPtr(m[%02x],c[%02x]): Not found.", markNo, classNo);
     return &tmpId;
 }
 
@@ -456,7 +456,7 @@ void IDSystem::set(ID_FILE_HEADER* data, u8 markNo, ID_CLASS classNo, u8 otType,
 
 // Frees the units of class `type` with mark id `id` (0xFF = whole class; type 0xFF = everything)
 // and clears the class set bit.
-void IDSystem::kill(u8 id, int type)
+void IDSystem::kill(u8 markNo, ID_CLASS classNo)
 {
     int i;
     ID_UNIT* u = m_IdUnit;
@@ -465,17 +465,17 @@ void IDSystem::kill(u8 id, int type)
         if (u->be_flag == 0xFF) {
             continue;
         }
-        if (type == 0xFF) {
+        if (classNo == 0xFF) {
             unitPush(u);
-        } else if ((u8) type == u->classNo) {
-            if (id == 0xFF) {
+        } else if ((u8) classNo == u->classNo) {
+            if (markNo == 0xFF) {
                 unitPush(u);
-            } else if (id == u->markNo) {
+            } else if (markNo == u->markNo) {
                 unitPush(u);
             }
         }
     }
-    FlagOffVar(m_set_flag, (u32) ((u8) type));
+    FlagOffVar(m_set_flag, (u32) ((u8) classNo));
 }
 
 // Rewinds every live unit's four timers by one step against their direction (holds the animation
@@ -551,7 +551,7 @@ void IDSystem::move()
 }
 
 // Starts (1) or freezes (0) the animation of a unit and its children (be_flag 0x4).
-void IDSystem::beMove(ID_UNIT* u, int on_off)
+void IDSystem::beMove(ID_UNIT* pParent, int on_off)
 {
     int i;
     ID_UNIT* c = m_IdUnit;
@@ -560,22 +560,22 @@ void IDSystem::beMove(ID_UNIT* u, int on_off)
         if (c->be_flag == 0xFF || !(c->be_flag & 0x1)) {
             continue;
         }
-        if (u == c->pParent) {
+        if (pParent == c->pParent) {
             beMove(c, on_off);
         }
     }
     switch (on_off) {
     case 1:
-        u->be_flag |= 0x4;
+        pParent->be_flag |= 0x4;
         break;
     case 0:
-        u->be_flag &= ~0x4;
+        pParent->be_flag &= ~0x4;
         break;
     }
 }
 
 // Sets all four curve timers of a unit and its children to `time` (frames).
-void IDSystem::setTime(ID_UNIT* u, s16 time)
+void IDSystem::setTime(ID_UNIT* pParent, s16 time)
 {
     int i;
     ID_UNIT* c = m_IdUnit;
@@ -584,29 +584,29 @@ void IDSystem::setTime(ID_UNIT* u, s16 time)
         if (c->be_flag == 0xFF || !(c->be_flag & 0x1)) {
             continue;
         }
-        if (u == c->pParent) {
+        if (pParent == c->pParent) {
             setTime(c, time);
         }
     }
-    u->timer[3] = time;
-    u->timer[2] = time;
-    u->timer[1] = time;
-    u->timer[0] = time;
+    pParent->timer[3] = time;
+    pParent->timer[2] = time;
+    pParent->timer[1] = time;
+    pParent->timer[0] = time;
 }
 
 // Recomputes the position of a unit and its children immediately (idSysMove00).
-void IDSystem::movePos(ID_UNIT* u)
+void IDSystem::movePos(ID_UNIT* pParent)
 {
     int i;
     ID_UNIT* c;
 
-    idSysMove00(u);
+    idSysMove00(pParent);
     c = m_IdUnit;
     for (i = 0; i < m_maxId; i++, c++) {
         if (c->be_flag == 0xFF || !(c->be_flag & 0x1)) {
             continue;
         }
-        if (u == c->pParent) {
+        if (pParent == c->pParent) {
             movePos(c);
         }
     }
@@ -1019,7 +1019,7 @@ void IDSystem::trans()
 }
 
 // Queues a unit (and, for groups, its children first) into the OT with IdGeneralTrans.
-void IDSystem::unitTrans(ID_UNIT* u)
+void IDSystem::unitTrans(ID_UNIT* pIdUnit)
 {
     ID_UNIT* c = m_IdUnit; // declared before i: decides the r25/r26 split of the i+1 / c+1 loop temps
     int i;
@@ -1030,9 +1030,9 @@ void IDSystem::unitTrans(ID_UNIT* u)
             continue;
         }
         if (c->be_flag & 0x8) {
-            switch (u->type) {
+            switch (pIdUnit->type) {
             case 1:
-                if (u == c->pParent) {
+                if (pIdUnit == c->pParent) {
                     unitTrans(c);
                 }
                 break;
@@ -1048,9 +1048,9 @@ void IDSystem::unitTrans(ID_UNIT* u)
             }
         }
     }
-    if (u != 0) {
-        u->be_flag |= 0x10;
-        AddOtDirect(u->otType, u, (void (*)()) IdGeneralTrans, u->otNo, 0x1000, 0, 0.0f);
+    if (pIdUnit != 0) {
+        pIdUnit->be_flag |= 0x10;
+        AddOtDirect(pIdUnit->otType, pIdUnit, (void (*)()) IdGeneralTrans, pIdUnit->otNo, 0x1000, 0, 0.0f);
     }
 }
 

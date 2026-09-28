@@ -256,7 +256,7 @@ void SsItemMain::init(SUB_SCREEN* wk)
         int type = k * 8 + 0x40;
         for (int n = -3; n <= 4; n++) {
             ID_UNIT* parent = IdNum.unitPtr(frameMarkNo(n, k) - 0x30, IDC_SSCRN_1);
-            IdNum.unitParent(parent, IdNum.unitPtr(0, type));
+            IdNum.unitParent(parent, IdNum.unitPtr(0, (ID_CLASS) type));
             type++;
         }
     }

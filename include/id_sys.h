@@ -201,25 +201,25 @@ public:
 
     static Mtx m_scrn_mat;
 
-    void gameInit(int n);
+    void gameInit(int maxId);
     void roomInit();
     void free();
-    int setCk(int classNo);
-    void dispSw(int classNo, int sw);
-    void unitPush(ID_UNIT* u);
+    int setCk(ID_CLASS classNo);
+    void dispSw(ID_CLASS classNo, int sw);
+    void unitPush(ID_UNIT* pIdUnit);
     ID_UNIT* unitPull();
     void unitLevel(ID_UNIT* u, u8 level);
-    void unitParent(ID_UNIT* parent, ID_UNIT* child);
-    ID_UNIT* unitPtr(u8 id, int type);
+    void unitParent(ID_UNIT* pParent, ID_UNIT* pChild);
+    ID_UNIT* unitPtr(u8 markNo, ID_CLASS classNo);
     void set(ID_FILE_HEADER* data, u8 markNo, ID_CLASS classNo, u8 otType, u8 otNo, u32 Attr);
-    void kill(u8 id, int type);
+    void kill(u8 markNo, ID_CLASS classNo);
     void stop();
     void move();
-    void beMove(ID_UNIT* u, int on_off);
-    void setTime(ID_UNIT* u, s16 time);
-    void movePos(ID_UNIT* u);
+    void beMove(ID_UNIT* pParent, int on_off);
+    void setTime(ID_UNIT* pParent, s16 time);
+    void movePos(ID_UNIT* pParent);
     void trans();
-    void unitTrans(ID_UNIT* u);
+    void unitTrans(ID_UNIT* pIdUnit);
 };
 
 extern IDSystem IdSys;
