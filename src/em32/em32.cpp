@@ -254,7 +254,7 @@ static Em32Func Em32_R3_move_tbl[1] = {
 };
 
 // Attack parameters per em32AtkCk kind.
-static EmAtkInfo em32_atk_tbl[6] = {
+static ATK_INFO em32_atk_tbl[6] = {
     { 400.0f, PL_DM_AUTO, 0x44C, 0, 10, 0 },
     { 400.0f, PL_DM_AUTO, 0, 4, 10, 0 },
     { 400.0f, PL_DM_AUTO, 0x44C, 0, 10, 0 },

@@ -478,7 +478,7 @@ void cObj12::throwMove()
     if (!(w->be_flag & 0x100)) {
         return;
     }
-    static EmAtkInfo obj12Atk = { 300.0f, PL_DM_AUTO, 400, 0, 10, 0 };
+    static ATK_INFO obj12Atk = { 300.0f, PL_DM_AUTO, 400, 0, 10, 0 };
 
     w->spd[0][1] -= 15;
     spd.x = (f32) w->spd[0][0];

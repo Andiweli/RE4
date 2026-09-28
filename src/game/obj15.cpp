@@ -26,7 +26,7 @@ void obj15DmCk(cObjGatling* obj);
 }
 
 void (*Obj15_R1_move_tbl[2])(cObjGatling*) = { obj15_R1_Set, obj15_R1_Break };
-EmAtkInfo Obj15_atk_info_tbl = { 100.0f, PL_DM_AUTO, 600, 0, 10, 0 };
+ATK_INFO Obj15_atk_info_tbl = { 100.0f, PL_DM_AUTO, 600, 0, 10, 0 };
 
 // Creates the gatling at pos/rot with its three hit bodies, 40 rounds and no rider.
 cObjGatling* SetObjGatling(void* bin, void* tpl, Vec* pos, Vec* rot)
@@ -319,10 +319,10 @@ int obj15GunHitck(cObjGatling* pObj)
 {
     Vec ofs;
     Vec mzl;
-    EmAtkInfo info;
+    ATK_INFO info;
     Vec hit;
     Vec dir;
-    cEm* em;
+    YARARE_INFO* part;
     cParts* parts;
     u32 attr;
 
@@ -338,8 +338,8 @@ int obj15GunHitck(cObjGatling* pObj)
     PSMTXMultVec(parts->mat, &ofs, &ofs);
     PSMTXMultVec(parts->mat, &mzl, &mzl);
     PlWepHitCheck2(0, &ofs, &mzl, 0xC, 3, 6000.0f);
-    em = EmAtkLineHitCk(&ofs, &mzl, &hit, &dir, &attr);
-    if (em == 0) {
+    part = EmAtkLineHitCk(&ofs, &mzl, &hit, &dir, &attr);
+    if (part == 0) {
         int eff = 0;
 
         if (EatGetEffectType(attr)) {
@@ -372,7 +372,7 @@ int obj15GunHitck(cObjGatling* pObj)
     QuakeExec(0, 0, 5, 22.0f, 2);
     EmPlBloodSet2(pObj, &pObj->pos, 1, 1, 0x1C);
     info = Obj15_atk_info_tbl;
-    EmAtkSetDamagePL(em, &info, &ofs, &mzl);
+    EmAtkSetDamagePL(part, &info, &ofs, &mzl);
     return 1;
 }
 

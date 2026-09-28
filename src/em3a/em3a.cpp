@@ -237,7 +237,7 @@ static u16 em3a_flip_tbl[120] = {
 };
 
 // Gun hit damage handed to EmAtkSetDamagePL (em3aGunHitCk): range, type, damage, ...
-static EmAtkInfo em3a_atk_info = { 100.0f, PL_DM_AUTO, 600, 0, 0xA, 0 };
+static ATK_INFO em3a_atk_info = { 100.0f, PL_DM_AUTO, 600, 0, 0xA, 0 };
 
 // Per-frame update (emMove): damage, the attack hold-off countdown (90 frames while the player is
 // down), the r_no_0 routine (0xFF after a failed init destroys the work), the rotors, parts
@@ -1483,7 +1483,7 @@ int em3aGunHitCk(cEm3a* em)
 {
     Vec a;
     Vec b;
-    EmAtkInfo atk;
+    ATK_INFO atk;
     Vec hit;
     Vec nrm;
     Vec s;
@@ -1491,7 +1491,7 @@ int em3aGunHitCk(cEm3a* em)
     Vec d;
     u32 attr;
     cParts* p;
-    cEm* hitEm;
+    YARARE_INFO* part;
     s16 hp;
     f32 len;
     int ret;
@@ -1510,16 +1510,16 @@ int em3aGunHitCk(cEm3a* em)
     hp = em->hp;
     em->hp = 0;
     PlWepHitCheck2(0, &a, &b, 0xC, 3, 6000.0f);
-    hitEm = EmAtkLineHitCk(&a, &b, &hit, &nrm, &attr);
+    part = EmAtkLineHitCk(&a, &b, &hit, &nrm, &attr);
     em->hp = hp;
-    if (hitEm == 0) {
+    if (part == 0) {
         len = SQRTF(nrm.x * nrm.x + nrm.z * nrm.z);
         rot.x = -atan2f(nrm.y, len);
         rot.y = atan2f(nrm.x, nrm.z);
         rot.z = 0.0f;
         PSVECScale(&nrm, &s, 30.0f);
         PSVECAdd(&hit, &s, &hit);
-        EstSet(0, -1, &hit, &rot, EFF_EM3A, 4, 0, ESP_CORE_KIND_NONE, hitEm, hitEm);
+        EstSet(0, -1, &hit, &rot, EFF_EM3A, 4, 0, ESP_CORE_KIND_NONE, part, part);
         PSVECSubtract(&hit, &a, &d);
         EspSetGatling(a, d);
         SndCall(6, 0xA, &hit, 0, 0, 0);
@@ -1530,7 +1530,7 @@ int em3aGunHitCk(cEm3a* em)
         QuakeExec(0, 0, 5, 22.0f, 2);
         EmPlBloodSet2(em, &em->pos, 1, 2, 7);
         atk = em3a_atk_info;
-        EmAtkSetDamagePL(hitEm, &atk, &a, &b);
+        EmAtkSetDamagePL(part, &atk, &a, &b);
         ret = 1;
     }
     return ret;

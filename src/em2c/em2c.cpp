@@ -240,7 +240,7 @@ static u16 em2c_xflip_tbl[120] = {
 };
 
 // Attack parameters per attack number (em2cAtkCk).
-static EmAtkInfo em2c_atk_info[8] = {
+static ATK_INFO em2c_atk_info[8] = {
     { 500.0f, PL_DM_AUTO, 650, 0, 10, 0 },
     { 500.0f, PL_DM_AUTO, 650, 0, 10, 0 },
     { 500.0f, PL_DM_AUTO, 650, 0, 10, 0 },
@@ -4946,7 +4946,7 @@ int em2cSetDmVal(cEm2c* em)
 int em2cAtkCk(cEm2c* em, int no, int parts)
 {
     Em2cWork* w = EM2C_WK(em);
-    EmAtkInfo* atk;
+    ATK_INFO* atk;
     cParts* p;
     int hit;
 

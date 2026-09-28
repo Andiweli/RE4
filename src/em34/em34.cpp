@@ -146,7 +146,7 @@ static Em34Func Em34_R3_move_tbl[1] = {
 };
 
 // Bite attack (em34AtkCk): range, type, damage, ...
-static EmAtkInfo em34_atk_tbl[1] = {
+static ATK_INFO em34_atk_tbl[1] = {
     { 300.0f, PL_DM_AUTO, 9999, 0, 0xA, 0 },
 };
 static int em34_atk_pad = 0;
@@ -615,7 +615,7 @@ int em34AtkCk(cEm34* em, int no, int parts)
         return 0;
     }
     {
-        EmAtkInfo* atk = &em34_atk_tbl[no];
+        ATK_INFO* atk = &em34_atk_tbl[no];
         cParts* p = em->getPartsPtr(parts);
         int hit = EmAtkHitCk(atk, &p->world, &p->world_old, 0);
 

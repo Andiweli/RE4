@@ -4629,7 +4629,7 @@ static void em10_R1_R10FGJump(cEm10* em)
 // Thrown-weapon attack parameters (.data): axe / dynamite throw, scythe throw.
 // Attack parameters by attack number (em10AtkCk / em10BellAtkCk index it; the axe / scythe throws
 // hand entries 5 / 6 to cEmWep::setThrow).
-static EmAtkInfo Em10AtkTbl[19] = {
+static ATK_INFO Em10AtkTbl[19] = {
     { 250.0f, PL_DM_AUTO, 380, 0, 10, 0 },
     { 250.0f, PL_DM_AUTO, 380, 0, 10, 0 },
     { 500.0f, PL_DM_AUTO, 480, 0, 10, 0 },
@@ -17451,7 +17451,7 @@ int em10CatchSubCk(cEm10* em)
 int em10CsawHitCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
-    EmAtkInfo info;
+    ATK_INFO info;
     Vec a;
     Vec b;
     int hit;
@@ -23075,7 +23075,7 @@ void em10ChainSawMove(cEm10* em)
 int em10AtkCk(cEm10* em, Vec* a, Vec* b, int no, int parts)
 {
     FREE_EM10* w = EM10_WK(em);
-    EmAtkInfo info;
+    ATK_INFO info;
     Vec pos;
     Vec rot;
     Vec d;
@@ -23091,25 +23091,25 @@ int em10AtkCk(cEm10* em, Vec* a, Vec* b, int no, int parts)
     pw = em10GetPower(em);
     info = Em10AtkTbl[no];
     if (no != 0xD) {
-        info.dmg = (f32) info.dmg * pw;
+        info.power = (f32) info.power * pw;
     } else {
         switch (w->TmpU32) {
         case 0:
-            info.dmg = 0x280;
+            info.power = 0x280;
             break;
         case 1:
-            info.dmg = 0x140;
+            info.power = 0x140;
             break;
         default:
-            info.dmg = 0xA0;
+            info.power = 0xA0;
             break;
         }
     }
     if ((em->flag & 4) && !SysFlagChk(pG, SYS_HARD_MODE)) {
-        info.dmg = info.dmg / 2 + 1;
+        info.power = info.power / 2 + 1;
     }
     if (StaFlagChk(pG, STA_PL_CATCHHOLD) && pG->Game_level > 3) {
-        info.dmg = 9999;
+        info.power = 9999;
         info.flag = 4;
     }
     hit = EmAtkHitCk(&info, a, b, 0);
@@ -23409,14 +23409,14 @@ extern "C" int em10GatlingHitCk(cEm10* em)
 {
     Vec a;
     Vec b;
-    EmAtkInfo info;
+    ATK_INFO info;
     Vec hit;
     Vec nrm;
     Vec dir;
     Vec rot;
     Vec s;
     u32 attr;
-    cEm* e;
+    YARARE_INFO* part;
     cParts* p;
     f32 l;
 
@@ -23434,15 +23434,15 @@ extern "C" int em10GatlingHitCk(cEm10* em)
     em->dmg.m_Timer = 1;
     PlWepHitCheck2(0, &a, &b, 0xC, 3, 6000.0f);
     em->dmg.m_Timer = 0;
-    e = EmAtkLineHitCk(&a, &b, &hit, &nrm, &attr);
+    part = EmAtkLineHitCk(&a, &b, &hit, &nrm, &attr);
     const f32 k = 30.0f; // pool order: the 30 of PSVECScale before the 22 of QuakeExec
-    if (e != 0) {
+    if (part != 0) {
         VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
         SndCall(8, 0x81, &pPL->getPartsPtr(0)->world, em->id, 0, pPL);
         QuakeExec(0, 0, 5, 22.0f, 2);
         EmPlBloodSet2(em, &a, 1, 0xCC, 2);
         info = Em10AtkTbl[15];
-        EmAtkSetDamagePL(e, &info, &a, &b);
+        EmAtkSetDamagePL(part, &info, &a, &b);
         return 1;
     }
     l = SQRTF(nrm.x * nrm.x + nrm.z * nrm.z);
@@ -23462,7 +23462,7 @@ extern "C" int em10GatlingHitCk(cEm10* em)
 // point passes within range + 300 of its bell part (room 218).
 extern "C" void em10BellAtkCk(cEm10* em, Vec* pos, u32 no)
 {
-    EmAtkInfo info = Em10AtkTbl[no];
+    ATK_INFO info = Em10AtkTbl[no];
     cObjBell* o;
     Vec v;
     cParts* p;
@@ -23486,7 +23486,7 @@ extern "C" void em10BellAtkCk(cEm10* em, Vec* pos, u32 no)
                 f32 dx = v.x - pos->x;
                 f32 dy = v.y - pos->y;
                 f32 dz = v.z - pos->z;
-                if (dx * dx + dy * dy + dz * dz < (info.range + 300.0f) * (info.range + 300.0f)) {
+                if (dx * dx + dy * dy + dz * dz < (info.radius + 300.0f) * (info.radius + 300.0f)) {
                     o->setBreak();
                     SndCall(6, 0xF, &em->pos, 0, 0, em);
                 }

@@ -198,14 +198,14 @@ static u16 em2d_xflip_tbl[120] = {
 };
 
 // Attack parameters per em2dAtkCk kind: 0 bite, 1 wall bite, 2 critical (head).
-static EmAtkInfo em2d_atk_info[3] = {
+static ATK_INFO em2d_atk_info[3] = {
     { 500.0f, PL_DM_AUTO, 500, 0, 10, 0 },
     { 500.0f, PL_DM_AUTO, 500, 0, 10, 0 },
     { 500.0f, PL_DM_AUTO, 9999, 0, 10, 0 },
 };
 
 // Poison projectile (SetObj08) attack parameters.
-static EmAtkInfo em2d_poison_atk[1] = {
+static ATK_INFO em2d_poison_atk[1] = {
     { 500.0f, PL_DM_AUTO, 500, 0, 10, 0 },
 };
 
@@ -4771,7 +4771,7 @@ int em2dSetDmVal(cEm2d* em)
 int em2dAtkCk(cEm2d* em, int no, int parts)
 {
     Em2dWork* w = EM2D_WK(em);
-    EmAtkInfo* atk;
+    ATK_INFO* atk;
     cParts* p;
     int hit;
 
@@ -5597,7 +5597,7 @@ void em2dPlHeadMelt(cPlayer* pl)
 void em2dSetPoison(cEm2d* em, int type)
 {
     cObj* obj;
-    EmAtkInfo* atk;
+    ATK_INFO* atk;
     cParts* p;
     Vec spd;
 

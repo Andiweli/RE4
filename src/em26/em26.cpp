@@ -219,7 +219,7 @@ static u16 em26_flip_tbl[32] = {
 };
 
 // Bite attack (em26AtkCk): range, type, damage, ...
-static EmAtkInfo em26_atk_info = { 600.0f, PL_DM_AUTO, 0x12C, 4, 0xA, 0 };
+static ATK_INFO em26_atk_info = { 600.0f, PL_DM_AUTO, 0x12C, 4, 0xA, 0 };
 
 // Per-frame update: damage check, clears the per-frame flags, the R0 table (Init / Move / Damage /
 // Die), then the collision and scenario check and the breath SE.
@@ -573,7 +573,7 @@ int em26AtkCk(cEm26* em)
         return 0;
     }
     {
-        EmAtkInfo* atk = &em26_atk_info;
+        ATK_INFO* atk = &em26_atk_info;
         cParts* p = em->getPartsPtr(4);
         int hit = EmAtkHitCk(atk, &p->world, &p->world_old, 0);
 

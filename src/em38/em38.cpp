@@ -254,7 +254,7 @@ static u16 em38_flip[120] = {
 };
 
 // Attacks (em38AtkCk): [0] tentacle sweep, [1] tentacle slam, [2] head stamp, [3] head bite, [4] catch.
-static EmAtkInfo em38_atk_tbl[5] = {
+static ATK_INFO em38_atk_tbl[5] = {
     { 1000.0f, PL_DM_AUTO, 500, 0, 0xA, 0 },
     { 1000.0f, PL_DM_AUTO, 0, 0, 0xA, 0 },
     { 1000.0f, PL_DM_AUTO, 500, 0, 0xA, 0 },

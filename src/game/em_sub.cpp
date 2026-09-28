@@ -2067,7 +2067,7 @@ static void EmSubDead0(f32* p)
 
 // Attack sphere of `info` at a (from b) against the player (and the partner unless noSub):
 // bit0 player hit, bit1 partner hit.
-int EmAtkHitCk(EmAtkInfo* info, Vec* pPos, Vec* pPosOld, int noSub)
+int EmAtkHitCk(ATK_INFO* info, Vec* pPos, Vec* pPosOld, int noSub)
 {
     int ret = 0;
     int hit;
@@ -2080,7 +2080,7 @@ int EmAtkHitCk(EmAtkInfo* info, Vec* pPos, Vec* pPosOld, int noSub)
         if (info->flag & 4) {
             keep = 1;
         }
-        LifeDownSet2(pPL, info->dmg, 0, keep);
+        LifeDownSet2(pPL, info->power, 0, keep);
         if (info->flag & 8) {
             pG->pl_life = 0;
         }
@@ -2100,7 +2100,7 @@ int EmAtkHitCk(EmAtkInfo* info, Vec* pPos, Vec* pPosOld, int noSub)
 
 // Attack sphere against the player: 0 = miss, else the damage motion type + 1 (front/back, and the
 // height: 4 low, 2 middle).
-int EmAtkHitCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
+int EmAtkHitCk2(ATK_INFO* pAtk, Vec* pPos, Vec* pPosOld)
 {
     Vec d;
     Vec fwd;
@@ -2110,7 +2110,7 @@ int EmAtkHitCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
     f32 dy;
 
     if (DbgFlagChk(pG, DBG_YARARE_DISP)) {
-        Draw_sphere(pPos, pAtk->range, 0xFFFF00FF, 1, 1);
+        Draw_sphere(pPos, pAtk->radius, 0xFFFF00FF, 1, 1);
     }
     if ((s16) pG->pl_life <= 0) {
         return 0;
@@ -2122,7 +2122,7 @@ int EmAtkHitCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
     if (EatMgr.hitCheck(&parts->world, pPos, 0, 0, 0, 0) != 0) {
         return 0;
     }
-    part = emSphereAtCk(pPL, pPos, pPosOld, pAtk->range, 0x18, pAtk->range);
+    part = emSphereAtCk(pPL, pPos, pPosOld, pAtk->radius, 0x18, pAtk->radius);
     if (part == 0) {
         return 0;
     }
@@ -2147,9 +2147,9 @@ int EmAtkHitCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
     return ret + 1;
 }
 
-// Line a-b against the scenario and the player's hit boxes: the hit box (as the emhit.h cEm* view),
-// with the scenario hit in `hit` / `nrm` / `attr`.
-cEm* EmAtkLineHitCk(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm, u32* pAttr)
+// Line a-b against the scenario and the player's hit boxes: the hit box, with the scenario hit in
+// `hit` / `nrm` / `attr`.
+YARARE_INFO* EmAtkLineHitCk(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm, u32* pAttr)
 {
     Mtx m;
     Vec d;
@@ -2211,7 +2211,7 @@ cEm* EmAtkLineHitCk(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm, u32* pAttr)
         return 0;
     }
     part->flag |= YAT_FLAG_DMPOS;
-    return (cEm*) part;
+    return part;
 }
 
 // EmAtkLineHitCk for the partner.
@@ -2279,7 +2279,7 @@ YARARE_INFO* EmAtkLineHitCkSub(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm)
 }
 
 // Damage from a line attack that hit the player's box `part`: life loss and the damage motion.
-void EmAtkSetDamagePL(cEm* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
+void EmAtkSetDamagePL(YARARE_INFO* pAt, ATK_INFO* pAtk, Vec* pPos, Vec* pPos2)
 {
     Vec d;
     Vec fwd;
@@ -2287,7 +2287,7 @@ void EmAtkSetDamagePL(cEm* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
     int keep;
     f32 dy;
 
-    pPL->dmg.m_pDamageYarare = (YARARE_INFO*) pAt;
+    pPL->dmg.m_pDamageYarare = pAt;
     if ((pPos->x - pPos2->x) * (pPos->x - pPos2->x) + (pPos->z - pPos2->z) * (pPos->z - pPos2->z) < 10000.0f) {
         PSVECSubtract(&pPL->pos, pPos, &d);
     } else {
@@ -2308,7 +2308,7 @@ void EmAtkSetDamagePL(cEm* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
     if (pAtk->flag & 4) {
         keep = 1;
     }
-    LifeDownSet2(pPL, pAtk->dmg, 0, keep);
+    LifeDownSet2(pPL, pAtk->power, 0, keep);
     if (pAtk->flag & 8) {
         pG->pl_life = 0;
     }
@@ -2316,7 +2316,7 @@ void EmAtkSetDamagePL(cEm* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
 }
 
 // Damage from a line attack that hit the partner's box `part`.
-void EmAtkSetDamageSub(YARARE_INFO* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
+void EmAtkSetDamageSub(YARARE_INFO* pAt, ATK_INFO* pAtk, Vec* pPos, Vec* pPos2)
 {
     if (pSUB) {
         pSUB->dmg.set(0, 10, 0x18, pPos, pAt->len, pAt);
@@ -2324,13 +2324,13 @@ void EmAtkSetDamageSub(YARARE_INFO* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
 }
 
 // Attack sphere against the partner: the hit box or NULL.
-YARARE_INFO* EmAtkHitSubCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
+YARARE_INFO* EmAtkHitSubCk2(ATK_INFO* pAtk, Vec* pPos, Vec* pPosOld)
 {
     cParts* parts;
     YARARE_INFO* part;
 
     if (DbgFlagChk(pG, DBG_YARARE_DISP)) {
-        Draw_sphere(pPos, pAtk->range, 0xFFFF00FF, 1, 1);
+        Draw_sphere(pPos, pAtk->radius, 0xFFFF00FF, 1, 1);
     }
     if (pSUB == 0) {
         return 0;
@@ -2345,7 +2345,7 @@ YARARE_INFO* EmAtkHitSubCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
     if (EatMgr.hitCheck(&parts->world, pPos, 0, 0, 0, 0) != 0) {
         return 0;
     }
-    part = emSphereAtCk(pSUB, pPos, pPosOld, pAtk->range, 0x18, pAtk->range);
+    part = emSphereAtCk(pSUB, pPos, pPosOld, pAtk->radius, 0x18, pAtk->radius);
     if (part == 0) {
         return 0;
     }

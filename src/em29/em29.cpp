@@ -302,7 +302,7 @@ static u16 em29_flip_tbl[22] = {
 };
 
 // Bite attack (em29AtkCk): range, type, damage, ...
-static EmAtkInfo em29_atk_tbl[1] = {
+static ATK_INFO em29_atk_tbl[1] = {
     { 350.0f, PL_DM_AUTO, 10, 1, 10, 0 },
 };
 
@@ -1260,7 +1260,7 @@ void em29CallSe(cEm29* em, int type)
 int em29AtkCk(cEm29* em, int no)
 {
     Em29Work* w = EM29_WK(em);
-    EmAtkInfo* atk = &em29_atk_tbl[no];
+    ATK_INFO* atk = &em29_atk_tbl[no];
     cParts* p = GetPartsAddr(em->pList, 2);
     int hit = EmAtkHitCk(atk, &p->world, &p->world_old2, 0);
 

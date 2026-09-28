@@ -59,7 +59,7 @@ struct FREE_EMWEP {
     u8 EffKindId;           // 0x215 (0x5F5)  effect kind deleted with the weapon (50)
     u8 Water_ck;           // 0x216 (0x5F6)
     u8 Act_ck;           // 0x217 (0x5F7)  Grenade: the player took the escape action
-    EmAtkInfo* pAtk;      // 0x218 (0x5F8)  attack info used against the player (emWepAtk by default)
+    ATK_INFO* pAtk;      // 0x218 (0x5F8)  attack info used against the player (emWepAtk by default)
     YARARE_INFO YarareTbl[5];  // 0x21C (0x5FC)  unused by this file (setYarare/setYarareCube write cEm::hitInfo instead)
 };
 
@@ -75,11 +75,11 @@ public:
 
     void setParent(cEm* pEm, u32 oya_parts, u32 mode);
     void setFall(int type, Vec* pSpd, f32 gravity);
-    void setThrow(Vec* spd, EmAtkInfo* atk, f32 grav);
-    void setThrowScythe(Vec* spd, EmAtkInfo* atk);
-    void setShot(Vec* spd, EmAtkInfo* atk);
-    void setShotArrow(Vec* spd, EmAtkInfo* atk);
-    void setRocket(cEm* owner, Vec* spd, EmAtkInfo* atk);
+    void setThrow(Vec* spd, ATK_INFO* atk, f32 grav);
+    void setThrowScythe(Vec* spd, ATK_INFO* atk);
+    void setShot(Vec* spd, ATK_INFO* atk);
+    void setShotArrow(Vec* spd, ATK_INFO* atk);
+    void setRocket(cEm* owner, Vec* spd, ATK_INFO* atk);
     void setBombThrow(Vec* pSpd, int bomb_wait);
     void setFlashThrow(Vec* pSpd, int bomb_wait);
     void setGrenadeThrow(Vec* spd, int fuse, void* motEscape, void* motEscape2, void* motBackjump, void* motFront);
@@ -106,7 +106,7 @@ public:
     void setParentMatCalc(u32 mode);   // objTrolley objTrolleyMoveAdjustEM (0x80019DC4)
 };
 
-extern EmAtkInfo emWepAtk;
+extern ATK_INFO emWepAtk;
 
 extern "C" {
 cEmWep* SetWeapon(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type);

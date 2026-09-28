@@ -43,7 +43,7 @@ struct FREE_EMTREE {
     u8 EffKindId;         // 0x074 (0x454)  effect kind deleted when the tree lands (50)
     u8 Catch_ck;          // 0x075 (0x455)  setCatch / ckCatch
     u8 pad_76[2];
-    EmAtkInfo* pAtk;      // 0x078 (0x458)  attack info used against the player (emTreeAtk by default)
+    ATK_INFO* pAtk;      // 0x078 (0x458)  attack info used against the player (emTreeAtk by default)
     YARARE_INFO YarareTbl[5];  // 0x07C (0x45C)  unused by this file
 };
 
@@ -60,14 +60,14 @@ public:
     void setParent(cEm* pEm, u32 oya_parts, u32 mode);
     void clearParent();
     void setFall();
-    void setThrow(Vec* spd, EmAtkInfo* atk);
-    void setShot(Vec* spd, EmAtkInfo* atk);
+    void setThrow(Vec* spd, ATK_INFO* atk);
+    void setShot(Vec* spd, ATK_INFO* atk);
     int ckCatch();        // 1 while not caught
     void setCatch();
     void setLost();
 };
 
-extern EmAtkInfo emTreeAtk;
+extern ATK_INFO emTreeAtk;
 
 extern "C" {
 cEmTree* SetTree(void* bin, void* tpl, Vec* pos, Vec* rot);

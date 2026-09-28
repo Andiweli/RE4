@@ -9,7 +9,7 @@
 #include "main_mem.h"
 
 class cModel;
-struct EmAtkInfo;
+struct ATK_INFO;
 
 class cObj;
 

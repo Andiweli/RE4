@@ -42,7 +42,7 @@ EmTreeFunc EmTree_R1_move_tbl[7] = {
     emTree_R1_Shot,
 };
 
-EmAtkInfo emTreeAtk = { 200.0f, PL_DM_AUTO, 400, 0, 10, 0 };
+ATK_INFO emTreeAtk = { 200.0f, PL_DM_AUTO, 400, 0, 10, 0 };
 
 // Creates a tree enemy (id 0x49, at the back of the pool) from a model / TPL at pos / rot: the
 // trunk El Gigante (r119) tears out and throws. Hit boxes, a solid atari, unlockable, SE / effect
@@ -645,7 +645,7 @@ void emTree_R1_Shot(cEmTree* pEm)
         TransMatrix(pEm->mat, &pEm->pos);
         pEm->partsWorldCalc();
         pEm->r_no_2 = 2;
-    } else if (w->pAtk && (part = (YARARE_INFO*) EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0)) != 0) {
+    } else if (w->pAtk && (part = EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0)) != 0) {
         VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
         if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
             SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
@@ -657,7 +657,7 @@ void emTree_R1_Shot(cEmTree* pEm)
         } else {
             EmPlBloodSet2(pEm, &pEm->pos, 1, 0xFF, 0xFF);
         }
-        EmAtkSetDamagePL((cEm*) part, w->pAtk, &pEm->pos_old, &pEm->pos);
+        EmAtkSetDamagePL(part, w->pAtk, &pEm->pos_old, &pEm->pos);
         if ((part->flag & YAT_FLAG_DMPOS) == 0) {
             pEm->setFall();
         } else {
@@ -752,7 +752,7 @@ void cEmTree::setFall()
 
 // Never called in the DOL: the linker dropped the bodies and kept the constant pools
 // ({10, 20, 75, 350, 0, PI/2} twice after setFall's), see STRIP_UNUSED.
-void cEmTree::setThrow(Vec* spd, EmAtkInfo* atk)
+void cEmTree::setThrow(Vec* spd, ATK_INFO* atk)
 {
     FREE_EMTREE* w = EMTREE_WK(this);
     Vec v;
@@ -796,7 +796,7 @@ void cEmTree::setThrow(Vec* spd, EmAtkInfo* atk)
 // Launches the trunk straight at the player (Rno1 6) with speed `spd` (default: forward + a
 // little up in the parent's frame) and attack info `atk` (default emTreeAtk: 200 range, 400
 // damage); the trunk is laid horizontal along its path.
-void cEmTree::setShot(Vec* spd, EmAtkInfo* atk)
+void cEmTree::setShot(Vec* spd, ATK_INFO* atk)
 {
     FREE_EMTREE* w = EMTREE_WK(this);
     Vec v;

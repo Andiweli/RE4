@@ -318,7 +318,7 @@ static u16 em2b_xflip_tbl[90] = {
 };
 
 // Attack parameters per attack number (em2bAtkCk).
-static EmAtkInfo em2b_atk_info[7] = {
+static ATK_INFO em2b_atk_info[7] = {
     { 1000.0f, PL_DM_AUTO, 800, 0, 10, 0 },
     { 1100.0f, PL_DM_AUTO, 800, 0, 10, 0 },
     { 1500.0f, PL_DM_AUTO, 800, 0, 10, 0 },
@@ -2290,7 +2290,7 @@ static void em2b_R1_ThrowRock(cEm2b* em)
                 Mtx m;
                 Vec spd;
                 f32 ang;
-                EmAtkInfo* atk;
+                ATK_INFO* atk;
 
                 if ((w->Be_flg & 4) && w->pFriend) {
                     ang = GetXZAngle(&p->world, &w->pFriend->pos);
@@ -3074,7 +3074,7 @@ static void em2b_R1_Dm_Face(cEm2b* em)
         }
         EstSet(em, -1, 0, 0, w->Eff, 0xA, 0, ESP_CORE_KIND_NONE, em, 0);
         if (w->pRock) {
-            EmAtkInfo* atk = &em2b_atk_info[6];
+            ATK_INFO* atk = &em2b_atk_info[6];
 
             if ((s16) pG->pl_life > 1) {
                 atk->flag |= 4;
@@ -4194,7 +4194,7 @@ void em2bClothMove(cEm2b* em)
 int em2bAtkCk(cEm2b* em, Vec* a, Vec* b, int no)
 {
     FREE_EM2B* w = EM2B_WK(em);
-    EmAtkInfo* atk;
+    ATK_INFO* atk;
     int hit;
 
     em->flag |= 4;

@@ -367,7 +367,7 @@ static Em3cFunc Em3c_R3_move_tbl[1] = {
 };
 
 // Attacks (em3cAtkCk): [0] grab, [1] kick, [2] the parasite bite.
-static EmAtkInfo em3c_atk_tbl[3] = {
+static ATK_INFO em3c_atk_tbl[3] = {
     { 400.0f, PL_DM_AUTO, 0x30C, 0, 0xA, 0 },
     { 400.0f, PL_DM_AUTO, 0x17C, 0, 0xA, 0 },
     { 1000.0f, PL_DM_AUTO, 0x30C, 0, 0xA, 0 },
@@ -1600,7 +1600,7 @@ static void em3c_R1_Die_Normal(cEm3c* em)
 int em3cAtkCk(cEm3c* em, Vec* pos, int no)
 {
     FREE_EM3C* w = EM3C_WK(em);
-    EmAtkInfo* atk = &em3c_atk_tbl[no];
+    ATK_INFO* atk = &em3c_atk_tbl[no];
     cParts* p = GetPartsAddr(em->pList, 0x1A);
     int hit = EmAtkHitCk(atk, pos, &p->world_old2, no == 2);
 

@@ -160,7 +160,7 @@ static Em36Func Em36_R3_move_tbl[2] = {
 };
 
 // The attack ranges (em36AtkCk2: 0 the stamp, 1 the spine).
-static EmAtkInfo em36_atk_tbl[2] = {
+static ATK_INFO em36_atk_tbl[2] = {
     { 400.0f, PL_DM_AUTO, 0x030C, 0x0000, 0x000A, 0x0000 },
     { 1500.0f, PL_DM_AUTO, 0x030C, 0x0000, 0x000A, 0x0000 },
 };

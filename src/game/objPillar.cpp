@@ -52,7 +52,7 @@ void (*ObjPillar_R0_move_tbl[5])(cObjPillar*) = {
     objPillar_R0_Set, objPillar_R0_Break, objPillar_R0_Throw, objPillar_R0_Escape, objPillar_R0_Fall,
 };
 
-EmAtkInfo ObjPillar_atk_info = { 1000.0f, PL_DM_AUTO, 1000, 0, 10, 0 };
+ATK_INFO ObjPillar_atk_info = { 1000.0f, PL_DM_AUTO, 1000, 0, 10, 0 };
 
 CAMERA Cam;   // escape sequence camera
 
@@ -491,7 +491,7 @@ void cObjPillar::setFall(void* mot0, void* mot1)
 void objPillarAtkCk(cObjPillar* pObj, Vec* pPos)
 {
     FREE_PILLAR* w = PILLAR_WK(pObj);
-    EmAtkInfo* atk = &ObjPillar_atk_info;
+    ATK_INFO* atk = &ObjPillar_atk_info;
     int hit;
 
     if ((s16) pG->pl_life > 500) {

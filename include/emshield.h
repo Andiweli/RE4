@@ -44,7 +44,7 @@ struct FREE_EMSHIELD {
     u8 EffKindId;         // 0x0A3 (0x483)  effect number deleted when the shield lands (50)
     u8 Water_ck;           // 0x0A4 (0x484)  landed in water
     u8 pad_A5[3];
-    EmAtkInfo* pAtk;      // 0x0A8 (0x488)  unused by this file
+    ATK_INFO* pAtk;      // 0x0A8 (0x488)  unused by this file
     // PS2 has 10 slots; this file only ever indexes 0..8 (9 planks, parts 2..10) and keeps the
     // body hit cube in cEm::hitInfo instead of using YarareTbl[0] for it.
     YARARE_INFO YarareTbl[9];     // 0x0AC (0x48C)  plank hit boxes (parts 2..10)

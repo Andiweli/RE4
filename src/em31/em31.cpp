@@ -163,7 +163,7 @@ static Em31Func Em31_R3_move_tbl[1] = {
 
 // Attacks (em31AtkCk): [0]/[1] stamp, [2] dash, [3] back hand, [4] jump landing, [5]/[6] tentacle,
 // [7] tail.
-static EmAtkInfo em31_atk_tbl[8] = {
+static ATK_INFO em31_atk_tbl[8] = {
     { 1200.0f, PL_DM_AUTO, 1100, 0, 0xA, 0 },
     { 1200.0f, PL_DM_AUTO, 1100, 0, 0xA, 0 },
     { 1500.0f, PL_DM_AUTO, 2000, 0, 0xA, 0 },
@@ -3377,7 +3377,7 @@ static inline void em31PlBlow(cEm31* em)
 int em31AtkCk(cEm31* em, Vec* pos, Vec* oldPos, int no)
 {
     FREE_EM31* w = EM31_WK(em);
-    EmAtkInfo* info;
+    ATK_INFO* info;
     int hit;
 
     em31PillarAtkCk(em, pos);

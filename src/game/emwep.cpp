@@ -78,7 +78,7 @@ EmWepFunc EmWep_R1_move_tbl[13] = {
     emWep_R1_GrenadeThrow,
 };
 
-EmAtkInfo emWepAtk = { 200.0f, PL_DM_AUTO, 400, 0, 10, 0 };
+ATK_INFO emWepAtk = { 200.0f, PL_DM_AUTO, 400, 0, 10, 0 };
 
 // Cloth chain of the whip-like weapons (setCloth): parts per link and the neighbour tables.
 u8 emWepClothP[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -920,7 +920,7 @@ void emWep_R1_Shot(cEmWep* pEm)
         return;
     }
     if (w->pAtk) {
-        part = (YARARE_INFO*) EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0);
+        part = EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0);
         if (part) {
             VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
@@ -933,7 +933,7 @@ void emWep_R1_Shot(cEmWep* pEm)
             } else {
                 EmPlBloodSet2(pEm, &pEm->pos, 1, 0xFF, 0xFF);
             }
-            EmAtkSetDamagePL((cEm*) part, w->pAtk, &pEm->pos_old, &pEm->pos);
+            EmAtkSetDamagePL(part, w->pAtk, &pEm->pos_old, &pEm->pos);
             if ((part->flag & YAT_FLAG_DMPOS) == 0) {
                 pEm->setFall(0, 0, 20.0f);
                 return;
@@ -1098,7 +1098,7 @@ void emWep_R1_ShotArrow(cEmWep* pEm)
         return;
     }
     if (w->pAtk) {
-        part = (YARARE_INFO*) EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hit, &nrm, 0);
+        part = EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hit, &nrm, 0);
         if (part) {
             VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
@@ -1111,7 +1111,7 @@ void emWep_R1_ShotArrow(cEmWep* pEm)
             } else {
                 EmPlBloodSet2(pEm, &pEm->pos, 1, 0xFF, 0xFF);
             }
-            EmAtkSetDamagePL((cEm*) part, w->pAtk, &pEm->pos_old, &pEm->pos);
+            EmAtkSetDamagePL(part, w->pAtk, &pEm->pos_old, &pEm->pos);
             // `mr r3,part` is the LAST argument move in the original (part does not die there).
             asm("" : "=m"(hit) : "r"(part));  // COMPILER-DIFF: #13 (keep-alive)
         } else {
@@ -1878,7 +1878,7 @@ void cEmWep::setFall(int type, Vec* pSpd, f32 gravity)
 }
 
 // Throws the weapon with speed `spd` (a random forward throw in the parent's frame when NULL).
-void cEmWep::setThrow(Vec* spd, EmAtkInfo* atk, f32 grav)
+void cEmWep::setThrow(Vec* spd, ATK_INFO* atk, f32 grav)
 {
     FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
@@ -1929,7 +1929,7 @@ void cEmWep::setThrow(Vec* spd, EmAtkInfo* atk, f32 grav)
 }
 
 // Scythe throw: flies straight (no gravity) spinning about its axis (emWep_R1_ThrowScythe).
-void cEmWep::setThrowScythe(Vec* spd, EmAtkInfo* atk)
+void cEmWep::setThrowScythe(Vec* spd, ATK_INFO* atk)
 {
     FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
@@ -1975,7 +1975,7 @@ void cEmWep::setThrowScythe(Vec* spd, EmAtkInfo* atk)
 }
 
 // Shoots the weapon along `spd` (emWep_R1_Shot): it sticks into the player on a hit.
-void cEmWep::setShot(Vec* spd, EmAtkInfo* atk)
+void cEmWep::setShot(Vec* spd, ATK_INFO* atk)
 {
     FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
@@ -2027,7 +2027,7 @@ void cEmWep::setShot(Vec* spd, EmAtkInfo* atk)
 }
 
 // Shoots an (explosive) arrow (emWep_R1_ShotArrow).
-void cEmWep::setShotArrow(Vec* spd, EmAtkInfo* atk)
+void cEmWep::setShotArrow(Vec* spd, ATK_INFO* atk)
 {
     FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
@@ -2078,7 +2078,7 @@ void cEmWep::setShotArrow(Vec* spd, EmAtkInfo* atk)
 }
 
 // Fires the weapon as a rocket (emWep_R1_Rocket) for `owner`.
-void cEmWep::setRocket(cEm* owner, Vec* spd, EmAtkInfo* atk)
+void cEmWep::setRocket(cEm* owner, Vec* spd, ATK_INFO* atk)
 {
     FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;

@@ -18,7 +18,7 @@ struct FREE_OBJ1B {
     u32 oya_parts;          // 0x1C
     Vec spd[3];             // 0x20  rope point speeds (R1_Fall)
     Vec throw_v;            // 0x44
-    EmAtkInfo* pAtk;        // 0x50  always 0, never dereferenced (PS2 ATK_INFO*)
+    ATK_INFO* pAtk;        // 0x50  always 0, never dereferenced
     int Lost_wait;          // 0x54  frames until the spear falls off its parent (1800)
     int Eff_timer;          // 0x58  frames of the stuck-in-boss effect (600, every 2nd frame)
     u8 se_id_fall;          // 0x5C  landing SE (0xFF = none)

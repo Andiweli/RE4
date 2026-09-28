@@ -705,7 +705,7 @@ static u16 em35_flip1[120] = {
 
 // Attacks (em35AtkCk): [0] punch, [1] punch (left), [2] stamp, [3] double punch, [4] hook, [5]/[6] second
 // floor punch, [7] critical, [8]/[9] upper body hand, [0xA]/[0xB] upper, [0xC] spear.
-static EmAtkInfo em35_atk_tbl[13] = {
+static ATK_INFO em35_atk_tbl[13] = {
     { 400.0f, PL_DM_AUTO, 800, 0, 0xA, 0 },
     { 400.0f, PL_DM_AUTO, 800, 0, 0xA, 0 },
     { 400.0f, PL_DM_AUTO, 800, 0, 0xA, 0 },
@@ -3910,7 +3910,7 @@ static inline void em35PlKnock(cEm35* em)
 int em35AtkCk(cEm35* em, u32 no, int parts)
 {
     Em35Work* w = EM35_WK(em);
-    EmAtkInfo* info;
+    ATK_INFO* info;
     cParts* p;
     int hit;
 

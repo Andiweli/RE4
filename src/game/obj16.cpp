@@ -42,7 +42,7 @@ void (*Obj16_R1_move_tbl[5])(cObj16*) = {
 };
 
 // Attack parameters per obj16AtkCk kind (EmAtkHitCk).
-EmAtkInfo obj16_atk_info[4] = {
+ATK_INFO obj16_atk_info[4] = {
     { 500.0f, PL_DM_AUTO, 0x320, 0, 0xA, 0 },
     { 500.0f, PL_DM_AUTO, 0x320, 0, 0xA, 0 },
     { 500.0f, PL_DM_AUTO, 0x1F4, 0, 0xA, 0 },
@@ -1005,7 +1005,7 @@ int obj16AtkCk(cObj16* obj, u32 atk_type, int parts_no)
     cParts* p;
     Vec* pp;
     Vec plPos;
-    EmAtkInfo info;
+    ATK_INFO info;
     Vec pos;
     int hit;
     f32 ang;

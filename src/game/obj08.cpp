@@ -84,7 +84,7 @@ cObj* SetObj08(cModel* parent, void* bin, void* tpl, Vec* pos, Vec* rot, int fla
     if (flags & 0x40000000) {
         w->be_flag |= 0x20;
     }
-    w->pAtk = (EmAtkInfo*) atk;
+    w->pAtk = (ATK_INFO*) atk;
     w->wep_id = flags & 0xFFFF;
     return obj;
 }

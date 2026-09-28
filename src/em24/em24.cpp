@@ -116,7 +116,7 @@ static Em24Func Em24_R1_move_tbl[4] = {
 };
 
 // Jump attack (em24AtkCk): range, type, damage, ...
-static EmAtkInfo em24_atk_tbl[1] = {
+static ATK_INFO em24_atk_tbl[1] = {
     { 500.0f, PL_DM_AUTO, 100, 4, 0xA, 0 },
 };
 

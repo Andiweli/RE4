@@ -65,7 +65,7 @@ static EmRockFunc EmRock_R1_move_tbl[9] = {
 };
 
 // Attack parameters of a falling / thrown rock without its own (setFall / setThrow); range = radius.
-static EmAtkInfo emRockAtk = { 1500.0f, PL_DM_AUTO, 9999, 0, 10, 0 };
+static ATK_INFO emRockAtk = { 1500.0f, PL_DM_AUTO, 9999, 0, 10, 0 };
 
 // Event camera of the escape / drop scenes (CamCtrl.x250 points at it while they run).
 static CAMERA emRockCam = { 0 };
@@ -142,7 +142,7 @@ cEmRock* SetRock(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
     w->Fall_wait = zero;
     w->pEm_oya = (cEm*) zero;
     w->pEm_old = (cEm*) zero;
-    w->pAtk = (EmAtkInfo*) zero;
+    w->pAtk = (ATK_INFO*) zero;
     w->Catch_ck = zero;
     w->fall_type = zero;
     w->seFall[0] = 0xFF;
@@ -1099,7 +1099,7 @@ void cEmRock::setParent(cEm* pEm, u32 oya_parts, u32 mode)
 }
 
 // Drops the rock off its parent: it falls straight down (emRock_R1_Fall) with `atk` as its attack.
-void cEmRock::setFall(EmAtkInfo* atk)
+void cEmRock::setFall(ATK_INFO* atk)
 {
     FREE_EMROCK* w = EMROCK_WK(this);
     Mtx m;
@@ -1125,7 +1125,7 @@ void cEmRock::setFall(EmAtkInfo* atk)
         w->pAtk = atk;
     } else {
         w->pAtk = &emRockAtk;
-        emRockAtk.range = w->Radius;
+        emRockAtk.radius = w->Radius;
     }
     r_no_0 = 1;
     r_no_1 = 3;
@@ -1134,7 +1134,7 @@ void cEmRock::setFall(EmAtkInfo* atk)
 }
 
 // Throws the rock with speed `spd` (a random forward throw in the parent's frame when NULL).
-void cEmRock::setThrow(Vec* spd, EmAtkInfo* atk)
+void cEmRock::setThrow(Vec* spd, ATK_INFO* atk)
 {
     FREE_EMROCK* w = EMROCK_WK(this);
     Vec v;
@@ -1176,7 +1176,7 @@ void cEmRock::setThrow(Vec* spd, EmAtkInfo* atk)
         w->pAtk = atk;
     } else {
         w->pAtk = &emRockAtk;
-        emRockAtk.range = w->Radius;
+        emRockAtk.radius = w->Radius;
     }
     r_no_0 = 1;
     r_no_1 = 4;
@@ -1185,7 +1185,7 @@ void cEmRock::setThrow(Vec* spd, EmAtkInfo* atk)
 }
 
 // setThrow variant that breaks on the first scenario hit (emRock_R1_Throw2).
-void cEmRock::setThrow2(Vec* spd, EmAtkInfo* atk)
+void cEmRock::setThrow2(Vec* spd, ATK_INFO* atk)
 {
     FREE_EMROCK* w = EMROCK_WK(this);
     Vec v;
@@ -1227,7 +1227,7 @@ void cEmRock::setThrow2(Vec* spd, EmAtkInfo* atk)
         w->pAtk = atk;
     } else {
         w->pAtk = &emRockAtk;
-        emRockAtk.range = w->Radius;
+        emRockAtk.radius = w->Radius;
     }
     r_no_0 = 1;
     r_no_1 = 5;
@@ -2099,14 +2099,14 @@ void emRockRunDownCk(cEmRock* pEm)
 }
 
 // Flying rock against the player (`atk` with the rock's radius as range): 1 on a hit.
-int emRockAtkCk(cEmRock* em, EmAtkInfo* atk, int type, f32 r)
+int emRockAtkCk(cEmRock* em, ATK_INFO* atk, int type, f32 r)
 {
     FREE_EMROCK* w = EMROCK_WK(em);
-    EmAtkInfo a;
+    ATK_INFO a;
 
     if (atk) {
         a = *atk;
-        a.range = w->Radius;
+        a.radius = w->Radius;
         if (EmAtkHitCk(&a, &em->pos, &em->pos_old, 1)) {
             VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {

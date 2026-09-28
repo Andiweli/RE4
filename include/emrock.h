@@ -7,7 +7,7 @@
 #include "embarrel.h"
 
 class cPlayer;
-struct EmAtkInfo;
+struct ATK_INFO;
 
 // Work of the rolling rock enemy (game/emrock.cpp), overlaid on cEm from 0x3E0.
 struct FREE_EMROCK {
@@ -54,7 +54,7 @@ struct FREE_EMROCK {
     u8 pad_AF;
     u32 Seid;           // 0x0B0 (0x490)  Roll: rolling sound handle
     void* Mot_tbl[16];      // 0x0B4 (0x494)  player motions of the roll escape (setPlMotion)
-    struct EmAtkInfo* pAtk;  // 0x0F4 (0x4D4)  attack parameters of the flying rock (emRockAtkCk)
+    struct ATK_INFO* pAtk;  // 0x0F4 (0x4D4)  attack parameters of the flying rock (emRockAtkCk)
     YARARE_INFO YarareTbl[5];  // 0x0F8 (0x4D8)  unused by this file
     class cSat* pSat;     // 0x1FC (0x5DC)  scenario piece of the room 11E rock (emRockSatSet)
     class cSat* pEat;     // 0x200 (0x5E0)  unused by this file
@@ -71,9 +71,9 @@ public:
     virtual void move();
 
     void setParent(cEm* pEm, u32 oya_parts, u32 mode);
-    void setFall(EmAtkInfo* atk);
-    void setThrow(Vec* spd, EmAtkInfo* atk);
-    void setThrow2(Vec* spd, EmAtkInfo* atk);
+    void setFall(ATK_INFO* atk);
+    void setThrow(Vec* spd, ATK_INFO* atk);
+    void setThrow2(Vec* spd, ATK_INFO* atk);
     void setSeFall(u8 se_id, u8 se_no, u8 em_id);
     void setEffFall(u8 eff_id, u8 est_id);
     void setEffAlways(u8 eff_id, u8 est_id);
@@ -118,7 +118,7 @@ void emRockPushCamMove(cEmRock* pEm);
 void emRockPushCamMove2(cEmRock* pEm);
 void emRockDropCamMove(cEmRock* em);
 void emRockRunDownCk(cEmRock* pEm);
-int emRockAtkCk(cEmRock* em, struct EmAtkInfo* atk, int type, f32 r);
+int emRockAtkCk(cEmRock* em, struct ATK_INFO* atk, int type, f32 r);
 void emRockPushCk(cEmRock* pEm, int frame);
 int emRockDropHitCk(cEmRock* pEm);
 int emRockDropHitCkSub(cEmRock* pEm);

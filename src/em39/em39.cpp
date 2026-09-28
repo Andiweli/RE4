@@ -487,10 +487,10 @@ static u16 em39_flip_tbl[120] = {
 };
 
 // Machine gun damage handed to EmAtkSetDamagePL (em39GunHitCk).
-static EmAtkInfo em39_gun_atk_info = { 300.0f, PL_DM_AUTO, 800, 0, 0xA, 0 };
+static ATK_INFO em39_gun_atk_info = { 300.0f, PL_DM_AUTO, 800, 0, 0xA, 0 };
 
 // Melee attack table (em39AtkCk / em39AtkCk2 index it by attack number).
-static EmAtkInfo em39_atk_tbl[10] = {
+static ATK_INFO em39_atk_tbl[10] = {
     { 300.0f, PL_DM_AUTO, 1500, 0, 0xA, 0 },
     { 200.0f, PL_DM_AUTO, 800, 0, 0xA, 0 },
     { 6000.0f, PL_DM_AUTO, 1000, 0, 0xA, 0 },
@@ -6516,13 +6516,13 @@ int em39GunHitCk(cEm39* em)
     FREE_EM39* w = EM39_WK(em);
     Vec from;
     Vec to;
-    EmAtkInfo atk;
+    ATK_INFO atk;
     Vec hit;
     Vec nrm;
     Vec a;
     Vec rot;
     Vec b;
-    cEm* target;
+    YARARE_INFO* part;
     cParts* p;
     s16 hp;
     f32 len;
@@ -6549,13 +6549,13 @@ int em39GunHitCk(cEm39* em)
     PlWepHitCheck2(0, &from, &to, 0x1B, 3, 6000.0f);
     em->hp = hp;
     SndCall(8, 0xC, &em->pos, em->id, 0, em);
-    target = EmAtkLineHitCk(&from, &to, &hit, &nrm, 0);
-    if (target) {
+    part = EmAtkLineHitCk(&from, &to, &hit, &nrm, 0);
+    if (part) {
         VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
         SndCall(6, 0x15, &pPL->pos, 0, 0, pPL);
         QuakeExec(0, 0, 5, 22.0f, 2);
         EmPlBloodSet2(em, &from, 1, 0x2F, 0x2C);
-        EmAtkSetDamagePL(target, &atk, &from, &to);
+        EmAtkSetDamagePL(part, &atk, &from, &to);
         w->Atk_ck = 1;
         return 1;
     }
@@ -6565,7 +6565,7 @@ int em39GunHitCk(cEm39* em)
     rot.z = 0.0f;
     PSVECScale(&nrm, &a, 30.0f);
     PSVECAdd(&hit, &a, &hit);
-    EstSet(0, -1, &hit, &rot, EFF_EM39, 4, 0, ESP_CORE_KIND_NONE, target, (void*) target);
+    EstSet(0, -1, &hit, &rot, EFF_EM39, 4, 0, ESP_CORE_KIND_NONE, part, (void*) part);
     PSVECSubtract(&hit, &from, &b);
     EspSetGatling(from, b);
     SndCall(6, 0xA, &hit, 0, 0, 0);

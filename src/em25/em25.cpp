@@ -113,13 +113,13 @@ static u16 em25_flip_tbl[80] = {
 };
 
 // Attack parameters per em25AtkCk kind: 0 bite (floor), 1 bite from the host.
-static EmAtkInfo em25_atk_tbl[2] = {
+static ATK_INFO em25_atk_tbl[2] = {
     { 300.0f, PL_DM_AUTO, 500, 4, 10, 0 },
     { 500.0f, PL_DM_AUTO, 800, 0, 10, 0 },
 };
 
 // Poison projectile (SetObj08) attack parameters.
-static EmAtkInfo em25_poison_atk[1] = {
+static ATK_INFO em25_poison_atk[1] = {
     { 500.0f, PL_DM_AUTO, 800, 0, 10, 0 },
 };
 static int em25_atk_pad = 0;
@@ -1416,7 +1416,7 @@ void cEm25::setBirth(Vec* ppos, f32 ang)
 int em25AtkCk(cEm25* em, int no, int parts)
 {
     FREE_EM25* w = EM25_WK(em);
-    EmAtkInfo* atk;
+    ATK_INFO* atk;
     cParts* p;
     int hit;
 
@@ -1788,7 +1788,7 @@ void em25SetPoison(cEm25* em)
     cParts* p;
     cParts* t;
     cObj* obj;
-    EmAtkInfo* atk;
+    ATK_INFO* atk;
     f32 d;
     f32 ang;
 

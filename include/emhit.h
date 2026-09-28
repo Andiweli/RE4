@@ -60,7 +60,7 @@ void EmDmBloodSet2(cEm* pEm, u32 est_id, u32 type, u32 mode, u16 esp_core_flg, u
 int VehicleAdjust(Vec* pPos);                                                     // em_sub.cpp: rides `pos` along the trolley (room 21B)
 }
 
-// Player damage motion kind (PS2 PL_DM_TYPE): EmAtkInfo::type, PlSetDamage `type`. Bit0 back, +2 middle,
+// Player damage motion kind (PS2 PL_DM_TYPE): ATK_INFO::dm_type, PlSetDamage `type`. Bit0 back, +2 middle,
 // +4 down (EmAtkSetDamagePL computes it from the hit height); AUTO picks from the hit direction.
 enum PL_DM_TYPE {
     PL_DM_UP_FRONT = 0,
@@ -76,20 +76,22 @@ enum PL_DM_TYPE {
 };
 
 // Attack parameters handed to EmAtkSetDamagePL (obj15 Obj15_atk_info_tbl: {100.0, 8, 600, 0, 10, 0}).
-struct EmAtkInfo {
-    f32 range;   // 0x00
-    int type;    // 0x04  PL_DM_TYPE (PS2 ATK_INFO.dm_type)
-    u16 dmg;     // 0x08
-    u16 flag;     // 0x0A  bit2: LifeDownSet2 keep, bit3: pl_life = 0 (PS2 ATK_INFO.flag)
-    u16 dm_cnt;     // 0x0C  (PS2 ATK_INFO.dm_cnt)
-    u16 x0E;     // 0x0E
+struct ATK_INFO {
+    f32 radius;    // 0x00
+    PL_DM_TYPE dm_type;  // 0x04
+    u16 power;    // 0x08
+    u16 flag;     // 0x0A  bit2: LifeDownSet2 keep, bit3: pl_life = 0
+    u16 dm_cnt;     // 0x0C
+    u8 esp_attr;  // 0x0E  unused by this file
+    u8 padding;   // 0x0F
 };
 
 extern "C" {
 void EmPlBloodSet2(cModel* pEm, Vec* pos, u32 a, u8 eff_id, u8 type);                 // em_sub.cpp
-// Line `a`-`b` against the enemies: the hit enemy or NULL; hit point / normal and the scenario attribute out.
-cEm* EmAtkLineHitCk(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm, u32* pAttr);              // em_sub.cpp
-void EmAtkSetDamagePL(cEm* em, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2);                 // em_sub.cpp
+// Line `a`-`b` against the player's hit boxes: the hit box or NULL; hit point / normal and the
+// scenario attribute out.
+YARARE_INFO* EmAtkLineHitCk(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm, u32* pAttr);              // em_sub.cpp
+void EmAtkSetDamagePL(YARARE_INFO* pAt, ATK_INFO* pAtk, Vec* pPos, Vec* pPos2);                 // em_sub.cpp
 }
 
 void PlSetDamage(int damage_type, int damage_val, int flag);                                   // em_sub.cpp (C++ linkage; obj10 hitCkPl)
