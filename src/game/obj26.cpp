@@ -9,6 +9,7 @@
 #include "global.h"
 #include "math_sub.h"
 #include "motion.h"
+#include "em.h"
 
 extern "C" {
 void obj26_R1_Set(cObj26* obj);
@@ -38,7 +39,7 @@ static cObj* SetObj26(cObj* parent, Vec* scale)
     static const Vec p1 = { 1000.0f, 1000.0f, 1000.0f };
 
     obj->LightInfo.init2(0, 1, &p0, &p1, 0x10);
-    OBJ26_WK((cObj26*) obj)->pEm = parent;
+    OBJ26_WK((cObj26*) obj)->pEm = (cEm*) parent;
     OBJ26_WK((cObj26*) obj)->Scale = *scale;
     obj->scale.x = obj->scale.y = obj->scale.z = 0.0f;
     obj->invisible_factor = 1.0f;
@@ -63,7 +64,7 @@ void cObj26::move()
 // Rno1 == 0: eases the scale to tgtScale (10% per frame) and plays the motion.
 void obj26_R1_Set(cObj26* pObj)
 {
-    Obj26Work* w = OBJ26_WK(pObj);
+    FREE_OBJ26* w = OBJ26_WK(pObj);
 
     switch (pObj->r_no_2) {
     case 0:
