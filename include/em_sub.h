@@ -32,7 +32,7 @@ YARARE_INFO* emLineAtCk2(cEm* pEm, Vec* pPos, Vec* pPos2, f32 hit_len, Vec* pCro
 int emLineCapsuleCrossCk(Vec* a, Vec* b, Vec* pTop, Vec* pBtm, Vec* pCross, f32 r);
 int emLineCubeCrossCk(Vec* a, Vec* b, Mtx m, Vec* ofs, Vec* hit, f32 sx, f32 sy, f32 sz);
 int emLinePolyCrossCk(Vec* pPos, Vec* pPos2, Vec* pRect, Vec* pCross);
-YARARE_INFO* emSphereAtCk(cEm* em, Vec* pos, Vec* pos2, f32 r, int flag, f32 r2);
+YARARE_INFO* emSphereAtCk(cEm* em, Vec* pos, Vec* pos2, f32 r, f32 r2, int flag);
 u32 GetWepTargetList(Vec* box, Vec* pos, WepTarget* list, u32 max, int flag);
 u32 GetWepTargetList2(Vec* pPos, Vec* pPos2, WepTarget* list, u32 max, Vec* hit, Vec* nrm, u32* attr, int type,
                       int flag);

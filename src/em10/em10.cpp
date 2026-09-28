@@ -11356,7 +11356,7 @@ static void plem10_ClawCriHit(cPlayer* pl)
         pl->atari.off();
         MotionSetCore(pl, MOTION(pl), PL_ARC_PTR(pl->subArc, 0x123), 0, 5, 1, 0);
         EstSet(pl, -1, 0, 0, EFF_EM10, 0x8B, 0, ESP_CORE_KIND_NONE, pl, 0);
-        pl->atari.set(10, 400.0f, 700.0f);
+        pl->atari.set(400.0f, 700.0f, 10);
         pl->m_Work2 = SndCall(1, 0xC, &pPL->pos, 0, 0, pPL);
         pl->m_Work0 = 10;
         pl->r_no_2++;
@@ -11569,7 +11569,7 @@ static void plem10_C_SawHit(cPlayer* pl)
     switch (pl->r_no_2) {
     case 0:
         MotionSetCore(pl, MOTION(pl), PL_ARC_PTR(pl->subArc, 0x101), 0, 5, 1, 0);
-        pl->atari.set(10, 400.0f, 700.0f);
+        pl->atari.set(400.0f, 700.0f, 10);
         pl->m_Work2 = SndCall(1, 0xC, &pPL->pos, 0, 0, pPL);
         if (pSys->eff_country == 0) {
             SndCall(6, 0x5C, &pPL->pos, 0, 0, pPL);
@@ -11756,7 +11756,7 @@ static void plem10_C_SawCriHit(cPlayer* pl)
     switch (pl->r_no_2) {
     case 0:
         MotionSetCore(pl, MOTION(pl), PL_ARC_PTR(pl->subArc, 0x103), 0, 5, 1, 0);
-        pl->atari.set(10, 400.0f, 700.0f);
+        pl->atari.set(400.0f, 700.0f, 10);
         pl->m_Work2 = SndCall(1, 0xC, &pPL->pos, 0, 0, pPL);
         pl->r_no_2++;
     case 1:
@@ -12100,7 +12100,7 @@ static void plem10_NeckHang(cPlayer* pl)
     case 0:
         MotionSetCore(pl, MOTION(pl), PL_ARC_PTR(arc, 0x297), 0, 5, 1, 0);
         PlSetFace(1);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         pl->Wep->setTrans(0, 0);
         VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xC, 1);
         pl->r_no_2++;
@@ -12302,7 +12302,7 @@ static void subem10_NeckHang_Luis(cSubChar* sub)
     case 0:
         MotionSetCore(s, MOTION(s), PL_ARC_PTR(arc, 0x297), 0, 5, 1, 0);
         SubCharSetFace(1);
-        s->atari.set(10, 480.00003f, 400.0f);
+        s->atari.set(480.00003f, 400.0f, 10);
         SndCall(8, 9, &s->pos, s->id, 0, s);
         s->r_no_2++;
     case 1:
@@ -12470,7 +12470,7 @@ static void subem10_NeckHang_Ashley(cSubChar* sub)
     switch (pl->r_no_2) {
     case 0:
         MotionSetCore(pl, MOTION(pl), PL_ARC_PTR(arc, 0x1AC), 0, 5, 1, 0);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xC, 1);
         pl->r_no_2++;
     case 1:
@@ -12679,7 +12679,7 @@ static void plem10_Backhold(cPlayer* pl)
         MotionSetCore(pl, MOTION(pl), PL_ARC_PTR(arc, 0x29A), 0, 5, 1, 0);
         PlSetFace(1);
         pl->Wep->setTrans(0, 0);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         pl->dmg.set(0, 10);
         pl->r_no_2++;
     case 1:
@@ -12868,7 +12868,7 @@ static void plem10_Bombhold(cPlayer* pl)
         MotionSetCore(pl, MOTION(pl), PL_ARC_PTR(arc, 0x29A), 0, 5, 1, 0);
         PlSetFace(1);
         pl->Wep->setTrans(0, 0);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         pl->r_no_2++;
     case 1:
         EmCatchMotionMove(pl, 0.3f, 0.2f);
@@ -24270,14 +24270,14 @@ static void plem10Kick(cPlayer* pl)
                 v.y = 1500.0f;
                 v.z = 300.0f;
                 PSMTXMultVec(pPL->mat, &v, &v);
-                if (PlWepHitCheck3(&v, 0x14, 0xA, 1200.0f)) {
+                if (PlWepHitCheck3(&v, 0x14, 1200.0f, 0xA)) {
                     SndCall(1, 0xF, &pl->pos, 0, 0, pPL);
                 }
                 v.x = 0.0f;
                 v.y = 1000.0f;
                 v.z = 300.0f;
                 PSMTXMultVec(pPL->mat, &v, &v);
-                if (PlWepHitCheck3(&v, 0x14, 0xA, 1200.0f)) {
+                if (PlWepHitCheck3(&v, 0x14, 1200.0f, 0xA)) {
                     SndCall(1, 0xF, &pl->pos, 0, 0, pPL);
                 }
             }
@@ -24337,14 +24337,14 @@ static void plem10Kick2(cPlayer* pl)
             v.y = 1500.0f;
             v.z = 300.0f;
             PSMTXMultVec(pPL->mat, &v, &v);
-            if (PlWepHitCheck3(&v, 0x24, 0xA, 1200.0f)) {
+            if (PlWepHitCheck3(&v, 0x24, 1200.0f, 0xA)) {
                 SndCall(1, 0xF, &pl->pos, 0, 0, pPL);
             }
             v.x = 0.0f;
             v.y = 1000.0f;
             v.z = 300.0f;
             PSMTXMultVec(pPL->mat, &v, &v);
-            if (PlWepHitCheck3(&v, 0x24, 0xA, 1200.0f)) {
+            if (PlWepHitCheck3(&v, 0x24, 1200.0f, 0xA)) {
                 SndCall(1, 0xF, &pl->pos, 0, 0, pPL);
             }
         }
@@ -24353,14 +24353,14 @@ static void plem10Kick2(cPlayer* pl)
             v.y = 1500.0f;
             v.z = 300.0f;
             PSMTXMultVec(pPL->mat, &v, &v);
-            if (PlWepHitCheck3(&v, 0x14, 0xA, 1200.0f)) {
+            if (PlWepHitCheck3(&v, 0x14, 1200.0f, 0xA)) {
                 SndCall(1, 0xF, &pl->pos, 0, 0, pPL);
             }
             v.x = 0.0f;
             v.y = 1000.0f;
             v.z = 300.0f;
             PSMTXMultVec(pPL->mat, &v, &v);
-            if (PlWepHitCheck3(&v, 0x14, 0xA, 1200.0f)) {
+            if (PlWepHitCheck3(&v, 0x14, 1200.0f, 0xA)) {
                 SndCall(1, 0xF, &pl->pos, 0, 0, pPL);
             }
         }
@@ -24650,7 +24650,7 @@ static void plem10Showtay(cPlayer* pl)
         f = MOTION(pl)->Seq_frame;
         if ((f > 12.7f && f < 13.3f) || (f > 13.7f && f < 14.3f) || (f > 14.7f && f < 15.3f) || (f > 15.7f && f < 16.3f) ||
             (f > 16.7f && f < 17.3f)) {
-            if (PlWepHitCheck3(&pl->getPartsPtr(10)->world, 0x25, 0xA, 800.0f)) {
+            if (PlWepHitCheck3(&pl->getPartsPtr(10)->world, 0x25, 800.0f, 0xA)) {
                 SndCall(1, 0x51, &pl->pos, 0, 0, pPL);
             }
         }

@@ -811,15 +811,15 @@ void cEm2d::move()
     EmAtCheck(this);
     at->move();
     if (w->flags & 0x800) {
-        at->set(5, 700.0f, 550.0f);
+        at->set(700.0f, 550.0f, 5);
         SatMgr.checkAir(this, 0x980800);
     } else if (w->flags & 0xE0) {
-        at->set(5, 210.000015f, 550.0f);
+        at->set(210.000015f, 550.0f, 5);
         if (!(w->flags & 0x20)) {
             SatMgr.checkAir(this, 0x980800);
         }
     } else {
-        at->set(5, 700.0f, 550.0f);
+        at->set(700.0f, 550.0f, 5);
         SatMgr.check(this, 0);
     }
     atari.m_flag = atFlags;
@@ -1953,7 +1953,7 @@ static void plem2d_JumpAtkHit(cPlayer* pl)
     case 0:
         MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM2D_MOT_05F), 0, 5, 1, 0);
         PlSetFace(1);
-        pl->atari.set(10, 480.000031f, 400.0f);
+        pl->atari.set(480.000031f, 400.0f, 10);
         pl->m_Work0 = 127;
         EstSet(pl, -1, 0, 0, EFF_EM2D, 0x13, 0, ESP_CORE_KIND_NONE, pl, (void*) fe);
         pl->r_no_3 = Rnd() & 1;
@@ -2341,12 +2341,12 @@ static void plem2dKick(cPlayer* pl)
             pos.y = 1500.0f;
             pos.z = 300.0f;
             PSMTXMultVec(pPL->mat, &pos, &pos);
-            PlWepHitCheck3(&pos, 0x14, 10, 1200.0f);
+            PlWepHitCheck3(&pos, 0x14, 1200.0f, 10);
             pos.x = 0.0f;
             pos.y = 1000.0f;
             pos.z = 300.0f;
             PSMTXMultVec(pPL->mat, &pos, &pos);
-            PlWepHitCheck3(&pos, 0x14, 10, 1200.0f);
+            PlWepHitCheck3(&pos, 0x14, 1200.0f, 10);
         }
         break;
     }
@@ -3787,7 +3787,7 @@ static void plem2d_A_CatchHit(cPlayer* pl)
     case 0:
         MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM2D_MOT_05F), 0, 5, 1, 0);
         PlSetFace(1);
-        pl->atari.set(10, 480.000031f, 400.0f);
+        pl->atari.set(480.000031f, 400.0f, 10);
         pl->m_Work0 = 127;
         EstSet(pl, -1, 0, 0, EFF_EM2D, 0x13, 0, ESP_CORE_KIND_NONE, pl, (void*) fe);
         pl->r_no_3 = Rnd() & 1;
@@ -5610,14 +5610,14 @@ void em2dSetPoison(cEm2d* em, int type)
         spd.x = 0.0f;
         spd.y = 0.0f;
         spd.z = 0.0f;
-        SetObj08Spd(obj, &spd, 30, 10.0f, 100.0f);
+        SetObj08Spd(obj, &spd, 10.0f, 100.0f, 30);
         SetObj08Est(obj, 0, 0, 0, 0, 0x25, 0xA, 0x25, 0x20, 1);
     } else {
         spd.x = 0.0f;
         spd.y = 100.0f;
         spd.z = 220.0f;
         PSMTXMultVecSR(em->mat, &spd, &spd);
-        SetObj08Spd(obj, &spd, 30, 10.0f, 100.0f);
+        SetObj08Spd(obj, &spd, 10.0f, 100.0f, 30);
         SetObj08Est(obj, 0, 0, 0x25, 0xB, 0x25, 0xA, 0x25, 0x1D, 1);
     }
     SetObj08Se(obj, 8, 0x18);

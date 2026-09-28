@@ -944,7 +944,7 @@ static void r100_Sce_zombi_dead(cEm* em)
     at[3].x = -750.0f;
     at[3].y = 0.0f;
     at[3].z = -750.0f;
-    if (SceAtCreateExecAt(em, at, 1, 8, 1, 1000.0f, 1, 0.0f, 0.0f, 1, SCE_LEVEL10, (TaskFunc) r100_MesGanado, zero, 2) == -1) {
+    if (SceAtCreateExecAt(em, at, 1000.0f, 1, 8, 1, 1, 0.0f, 0.0f, 1, SCE_LEVEL10, (TaskFunc) r100_MesGanado, zero, 2) == -1) {
         pLog->err(0, 0, "move : SceAt no create");
     }
     SceAtSetEnable(1, 1);

@@ -3141,7 +3141,7 @@ static void plem39_KnifeHit(cPlayer* pl)
     case 0:
         MotionSetCore(pl, MOTION(pl), PL_ARC_PTR(pl->subArc, 0x113), 0, 5, 1, 0);
         PlSetFace(1);
-        pl->atari.set(0xA, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 0xA);
         pl->Wep->setTrans(0, 0);
         PlSetFace(1);
         pl->r_no_2++;
@@ -5480,7 +5480,7 @@ static void plem39_LowKickHit(cPlayer* pl)
         }
         PlSetDamageSe(0);
         PlSetFace(1);
-        pl->atari.set(0xA, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 0xA);
         pl->Wep->setTrans(0, 0);
         pl->r_no_2++;
     case 1:

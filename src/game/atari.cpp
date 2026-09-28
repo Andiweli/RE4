@@ -42,9 +42,9 @@ int blkPolyLineCk(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, int flag, int
 int blkPolyLineCkCore(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, int flag, int mask, Vec* hit, u32* pn);
 void polyBitSet(u32 no);
 int polyBitCk(u32 no);
-cSatFile* createSat(Vec* v, u32 attr, f32 h);
-cSatFile* createBoxSat(Vec* v, u32 attr, f32 h);
-static cSatFile* createFloorSat(Vec* v, u32 attr, f32 h);
+cSatFile* createSat(Vec* v, f32 h, u32 attr);
+cSatFile* createBoxSat(Vec* v, f32 h, u32 attr);
+static cSatFile* createFloorSat(Vec* v, f32 h, u32 attr);
 void at_pos_calc(cModel* m, Vec* vec);
 
 // Model-vs-scenario collision for a character (its cAtariInfo, m_flag 0x100 = collision on):
@@ -685,11 +685,11 @@ cSat* cSatMgr::create(Vec* pPos, Vec* pAng, Vec* pVec, f32 height, u32 attr, u32
     cSat* sat;
 
     if (flag & 0x200) {
-        f = createFloorSat(pVec, attr, height);
+        f = createFloorSat(pVec, height, attr);
     } else if (flag & 0x100) {
-        f = createBoxSat(pVec, attr, height);
+        f = createBoxSat(pVec, height, attr);
     } else {
-        f = createSat(pVec, attr, height);
+        f = createSat(pVec, height, attr);
     }
     if (f == 0) {
         return 0;
@@ -1359,7 +1359,7 @@ static cSatFile* createFloorSat2(cSat* sat, Vec* v, u32 attr, f32 h)
 }
 
 // Wall piece over the 4-corner polygon v (closed side box of height h, no top/bottom).
-cSatFile* createSat(Vec* v, u32 attr, f32 h)
+cSatFile* createSat(Vec* v, f32 h, u32 attr)
 {
     static const AtPoly poly0[8] = {
         { { 5, 2, 1 }, 0, { 0, 1, 2 } },
@@ -1475,7 +1475,7 @@ cSatFile* createSat(Vec* v, u32 attr, f32 h)
 }
 
 // Closed box piece over the 4-corner polygon v (height h): floor, walls and ceiling groups.
-cSatFile* createBoxSat(Vec* v, u32 attr, f32 h)
+cSatFile* createBoxSat(Vec* v, f32 h, u32 attr)
 {
     static const AtPoly poly0[12] = {
         { { 4, 6, 5 }, 0, { 0, 1, 2 } },
@@ -1595,7 +1595,7 @@ cSatFile* createBoxSat(Vec* v, u32 attr, f32 h)
 }
 
 // Floor piece: the 4-corner polygon v as two triangles.
-static cSatFile* createFloorSat(Vec* v, u32 attr, f32 h)
+static cSatFile* createFloorSat(Vec* v, f32 h, u32 attr)
 {
     static const AtPoly poly0[2] = {
         { { 0, 2, 1 }, 0, { 0, 1, 2 } },

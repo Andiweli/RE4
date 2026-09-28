@@ -15,7 +15,7 @@ void espgen02_UpdateMatrix(cEspgen* w);
 void espgen02_Update(cEspgen* w);
 static void espgen02_Move00(cEspgen* w);
 void espgen02_Move01(cEspgen* w);
-static f32 Calc_D256(ESPGEN02_WK* p, u8 d, f32 rate);
+static f32 Calc_D256(ESPGEN02_WK* p, f32 rate, u8 d);
 
 // Effect controller 02: like controller 00 but places every emitted esp on a path (path.cpp),
 // optionally oriented along it.
@@ -99,7 +99,7 @@ void espgen02_UpdateMatrix(cEspgen* pEspgen)
 }
 
 // Rate curve: d >= 0 fades 1 -> 1 - d/128 over the life, d < 0 grows 1 -> 1 + 10 * -d/128.
-static f32 Calc_D256(ESPGEN02_WK* p, u8 d, f32 rate)
+static f32 Calc_D256(ESPGEN02_WK* p, f32 rate, u8 d)
 {
     s8 v = d;
     f32 t;
@@ -149,15 +149,15 @@ void espgen02_Update(cEspgen* pEspgen)
         f32 rate = (f32) p->Time_cnt / (f32) (int) p->Life_max;
 
         if (p->D_size) {
-            scaleR = Calc_D256(p, p->D_size, rate);
+            scaleR = Calc_D256(p, rate, p->D_size);
             bScale = 1;
         }
         if (p->D_speed) {
-            spdR = Calc_D256(p, p->D_speed, rate);
+            spdR = Calc_D256(p, rate, p->D_speed);
             bSpd = 1;
         }
         if (p->D_alpha) {
-            colR = Calc_D256(p, p->D_alpha, rate);
+            colR = Calc_D256(p, rate, p->D_alpha);
             bCol = 1;
         }
         if (p->D_inter) {

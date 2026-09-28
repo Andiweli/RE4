@@ -433,7 +433,7 @@ extern "C" void DB_EventCamStart()
 {
     if (db_camMotion) {
         DbgFlagOff(pG, DBG_DBG_CAM);
-        CamCtrl.MotionSet(db_camMotion, 0, 0.0f);
+        CamCtrl.MotionSet(db_camMotion, 0.0f, 0);
         CameraMove();
     }
 }

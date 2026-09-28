@@ -1661,7 +1661,7 @@ static void plem35_BearHug(cPlayer* pl)
         PSMTXMultVec(pl->pEmCatch->mat, &v, &pl->pos);
         MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM35_MOT_PL_BEAR_HUG_093), 0, 5, 1, 0);
         PlSetFace(1);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         pl->dmg.set(0, 0);
         pl->r_no_2++;
     }
@@ -2483,7 +2483,7 @@ static void plem35_CatchHit(cPlayer* pl)
         PSMTXMultVec(pl->pEmCatch->mat, &v, &pl->pos);
         MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM35_MOT_PL_CATCH_HIT_08C), 0, 5, 1, 0);
         PlSetFace(1);
-        at->set(10, 480.00003f, 400.0f);
+        at->set(480.00003f, 400.0f, 10);
         EstSet(pl, -1, 0, 0, EFF_EM35, 0xE, 0, ESP_CORE_KIND_NONE, pl, 0);
         pl->r_no_2++;
     }

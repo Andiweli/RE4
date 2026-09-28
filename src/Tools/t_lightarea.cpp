@@ -92,7 +92,7 @@ void InitWork(LIGHT_AREA* w, int no)
 {
     memclr_asm(w, sizeof(LIGHT_AREA));
     w->no = no;
-    AreaDataInit(&w->area, &pPL->pos, 1, 7000.0f, 5000.0f);
+    AreaDataInit(&w->area, &pPL->pos, 7000.0f, 5000.0f, 1);
 }
 
 // Position column pressed: the shared AreaDataEdit editor on the slot's area; 0 on B.

@@ -845,7 +845,7 @@ void cSubChar::moveBehind()
         StaFlagOff(pG, STA_CRITICAL);
         atari.on();
         inSat();
-        atari.set(-10, 300.0f, 200.0f);
+        atari.set(300.0f, 200.0f, -10);
         setRno(0, 0, 0x28, 0);
         break;
     }
@@ -3428,7 +3428,7 @@ skip:
 }
 
 // Scenario damage area hit (sce_at sceAtFunc_damage): `power` is the hit direction (123 = none).
-void cSubChar::setDamage(u8 kind, int arg, f32 power, int a, int b)
+void cSubChar::setDamage(u8 kind, int arg, int a, int b, f32 power)
 {
     dmg.set(0, 30);
     beginDamage();

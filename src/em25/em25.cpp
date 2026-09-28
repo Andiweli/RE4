@@ -730,7 +730,7 @@ static void plem25_Bite(cPlayer* pl)
     case 0:
         MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM25_MOT_PL_BITE_02F), 0, 0, 1, 0);
         PlSetFace(1);
-        pl->atari.set(10, 480.000031f, 400.0f);
+        pl->atari.set(480.000031f, 400.0f, 10);
         pl->m_Work0 = 10;
         pl->r_no_2++;
     case 1:
@@ -747,7 +747,7 @@ static void plem25_Bite(cPlayer* pl)
         break;
     case 2:
         MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM25_MOT_PL_BITE_030), 0, 0, 1, 0);
-        pl->atari.set(10, 480.000031f, 400.0f);
+        pl->atari.set(480.000031f, 400.0f, 10);
         pl->r_no_2++;
     case 3:
         MotionMove(pl, 0);
@@ -1818,7 +1818,7 @@ void em25SetPoison(cEm25* em)
     spd.y = 40.0f;
     spd.z = 130.0f;
     PSMTXMultVecSR(m, &spd, &spd);
-    SetObj08Spd(obj, &spd, 30, 10.0f, 100.0f);
+    SetObj08Spd(obj, &spd, 10.0f, 100.0f, 30);
     SetObj08Est(obj, 0, 0, 0x1D, 8, 0x1D, 7, 0x1D, 9, 1);
     SetObj08Se(obj, 8, 0x1F);
     rot.x = 0.0f;

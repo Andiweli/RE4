@@ -35,7 +35,7 @@ void cEsp10::move()
 // Floor height under `pos`: casts a ray from pos.y + up down to pos.y - down against the scenery
 // collision (SatMgr.hitCheck2, mask 0x40) and returns the hit y and its attribute in *attr;
 // -100000 when nothing is hit (or Debug_flg[1] 0x10000000 disables the probe: returns 0).
-f32 getFloor_attr(Vec* pos, u32* attr, int x, f32 up, f32 down)
+f32 getFloor_attr(Vec* pos, u32* attr, f32 up, f32 down, int x)
 {
     Vec top;
     Vec bottom;
@@ -69,7 +69,7 @@ int cEsp10::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
         ApplyMatrix(parent->mat);
         parent = pEffParentWorld;
     }
-    m_Pos.y = getFloor_attr(&m_Pos, &attr, 0, 600.0f, 100000.0f) + 65.0f + pSeq->Vec0.y;
+    m_Pos.y = getFloor_attr(&m_Pos, &attr, 600.0f, 100000.0f, 0) + 65.0f + pSeq->Vec0.y;
     if (DbgFlagChk(pG, DBG_IN_ESP_TOOL) && !DbgFlagChk(pG, DBG_ESPTOOL_ONSCR)) {
         m_Pos.y = 0.0f;
     }

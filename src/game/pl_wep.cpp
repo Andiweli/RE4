@@ -462,7 +462,7 @@ u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, 
 
 // Radius damage at `pos` without a shooter: every enemy within `len` gets dmg.set(type) at the
 // given priority (max 0x14). Ashley is spared by 0x14, Ashley / Luis by the bow types unless first.
-u32 PlWepHitCheck3(Vec* pos, int type, u32 prio, f32 len)
+u32 PlWepHitCheck3(Vec* pos, int type, f32 len, u32 prio)
 {
     WepTarget list[20];
     u32 n;
@@ -657,7 +657,7 @@ void cPlWep::lockMove()
         m_LockTime = 0;
     }
     if (pl->m_pEm && m_LockTime != 0 && (CfgFlagChk(pSys, CFG_LOCK_ON))) {
-        PlWepAutoTrack(pl, 0, 1.0f);
+        PlWepAutoTrack(pl, 1.0f, 0);
     }
 }
 
@@ -1014,7 +1014,7 @@ rand:
     PlWepLockRand(pl, moved, &tmp, &pl->m_Fwork0);
     m3r = tmp;
     if (DbgFlagChk(pG, DBG_PL_LOCK_FOLLOW) && lockCtr != 0) {
-        PlWepAutoTrack(pl, 1, 0.03f);
+        PlWepAutoTrack(pl, 0.03f, 1);
     }
     m3r.move();
     mot3.move(m3r);
@@ -1066,7 +1066,7 @@ void PlWepLockRand(cModel* pEm, int mflag, f32* ang_x, f32* ang_y)
 
 // Turns the aim toward the locked enemy's lock point: yaw by at most 30 degrees * rate (mode 1
 // moves the waist within 12 degrees, else the body), pitch blend by at most 0.05 per frame.
-void PlWepAutoTrack(cModel* plm, int mode, f32 rate)
+void PlWepAutoTrack(cModel* plm, f32 rate, int mode)
 {
     cPlayer* pl = (cPlayer*) plm;
     Vec* hand;

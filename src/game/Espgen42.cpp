@@ -28,7 +28,7 @@ void GetWaterCrossPosSub(cEspgen* w);
 void Espgen42_Move00(cEspgen* w);
 void Espgen42_TransSub(cEspgen* w);
 void SetIndMtx(Espgen42Work* p);
-cEspgen* SetWaterWork(cEspgen* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate);
+cEspgen* SetWaterWork(cEspgen* w, Vec* pos, Vec* rot, u32 nx, u32 ny, f32 size, f32 rate);
 
 static cEspgen* g_pWater;
 static Vec Chk_pos;
@@ -895,14 +895,14 @@ static cEspgen* SetWater(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate)
         pLog->err(0, 0, "Espgen42 : work pull failed");
         return NULL;
     }
-    return SetWaterWork(w, pos, rot, size, nx, ny, rate);
+    return SetWaterWork(w, pos, rot, nx, ny, size, rate);
 }
 
 // Builds an nx x ny water grid of cell `size` at pos / rot (y scaled by size x 0.05 + 100, then
 // `rate`): allocates the height, position, normal, bump buffers and the display list of
 // (nx + 1) x 2 strip vertices per row with texture coordinates, and fills the flat start state.
 // Returns NULL (and releases the generator) on memory failure.
-cEspgen* SetWaterWork(cEspgen* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate)
+cEspgen* SetWaterWork(cEspgen* w, Vec* pos, Vec* rot, u32 nx, u32 ny, f32 size, f32 rate)
 {
     Espgen42Work* p = (Espgen42Work*) w->Free.buff;
     Mtx m;
@@ -1173,7 +1173,7 @@ int Espgen42_SetFreeWork(cEspgen* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, 
     }
     rate = 1.0f - (f32) (int) pSeq->WorkSp8[2] / 255.0f;
     PSVECScale(&pSeq->Ang, &r, 6.28f / 360.0f);
-    if (SetWaterWork(pGen, (Vec*) &pSeq->Pos.x, &r, pSeq->Size_base_x, nx, ny, rate) != NULL) {
+    if (SetWaterWork(pGen, (Vec*) &pSeq->Pos.x, &r, nx, ny, pSeq->Size_base_x, rate) != NULL) {
         p->col.r = pSeq->Col_start_r;
         p->col.g = pSeq->Col_start_g;
         p->col.b = pSeq->Col_start_b;

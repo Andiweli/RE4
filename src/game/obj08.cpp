@@ -88,7 +88,7 @@ cObj* SetObj08(cModel* parent, void* bin, void* tpl, Vec* pos, Vec* rot, int fla
 }
 
 // Sets speed, life in frames (-1 = until it hits), gravity per frame and hit radius (min 1).
-void SetObj08Spd(cObj* obj, Vec* spd, int life, f32 grav, f32 rad)
+void SetObj08Spd(cObj* obj, Vec* spd, f32 grav, f32 rad, int life)
 {
     FREE_OBJ08* w;
 

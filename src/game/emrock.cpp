@@ -432,7 +432,7 @@ void emRock_R1_Fall(cEmRock* pEm)
         return;
     }
     if (w->pAtk) {
-        emRockAtkCk(pEm, w->pAtk, 0, w->Radius);
+        emRockAtkCk(pEm, w->pAtk, w->Radius, 0);
     }
     {
         Mtx m;
@@ -550,7 +550,7 @@ void emRock_R1_Throw(cEmRock* pEm)
         }
     }
     if (w->pAtk) {
-        emRockAtkCk(pEm, w->pAtk, 1, w->Radius);
+        emRockAtkCk(pEm, w->pAtk, w->Radius, 1);
     }
     {
         Mtx m;
@@ -2099,7 +2099,7 @@ void emRockRunDownCk(cEmRock* pEm)
 }
 
 // Flying rock against the player (`atk` with the rock's radius as range): 1 on a hit.
-int emRockAtkCk(cEmRock* em, ATK_INFO* atk, int type, f32 r)
+int emRockAtkCk(cEmRock* em, ATK_INFO* atk, f32 r, int type)
 {
     FREE_EMROCK* w = EMROCK_WK(em);
     ATK_INFO a;

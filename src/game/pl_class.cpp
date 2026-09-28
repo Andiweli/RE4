@@ -659,21 +659,21 @@ void cPlayer::dmgCheck()
     switch (DmgMgr.hitCheck(&getPartsPtr(0)->world, 0)) {
     case DMG_TYPE_GRENADE_BLAST:
     case DMG_TYPE_GRENADE:
-        setDamage(0, 0, 123.0f, 0, 8);
+        setDamage(0, 0, 0, 8, 123.0f);
         break;
     case DMG_TYPE_FIRE:
     case DMG_TYPE_LAMP:
-        setDamage(0, 3, 123.0f, 0, 0x19);
+        setDamage(0, 3, 0, 0x19, 123.0f);
         break;
     case DMG_TYPE_FLAME:
-        setDamage(0, 10, 123.0f, 0, 0x18);
+        setDamage(0, 10, 0, 0x18, 123.0f);
         break;
     }
 }
 
 // Damage entry: life down, and once the accumulated count passes 0xFE a damage routine (0/kind,
 // kind 7-8: routine 1/1, kind 9: routine 1/2) facing `ang` (123.0 = keep the direction).
-void cPlayer::setDamage(u8 kind, int arg, f32 ang, int a, int b)
+void cPlayer::setDamage(u8 kind, int arg, int a, int b, f32 ang)
 {
     beginDamage();
     LifeDownSet2(this, arg, 0, 1);

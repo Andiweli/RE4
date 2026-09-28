@@ -64,7 +64,7 @@ address	size	section	unit	scope	name	demangled
 0x80008DD4	0x90	.text	game/cam_ctrl.cpp	global	HoldBinocular__13CameraControlPvT1P3VecT3	CameraControl::HoldBinocular
 0x80008E64	0x8C	.text	game/cam_ctrl.cpp	global	LowerBinocular__13CameraControl	CameraControl::LowerBinocular
 0x80008EF0	0x1C	.text	game/cam_ctrl.cpp	global	GetBinocularIDAddr__13CameraControlPPvT1	CameraControl::GetBinocularIDAddr
-0x80008F0C	0x80	.text	game/cam_ctrl.cpp	global	MotionSet__13CameraControlPvif	CameraControl::MotionSet
+0x80008F0C	0x80	.text	game/cam_ctrl.cpp	global	MotionSet__13CameraControlPvfi	CameraControl::MotionSet
 0x80008F8C	0x18	.text	game/cam_ctrl.cpp	global	IsMotionSet__13CameraControl	CameraControl::IsMotionSet
 0x80008FA4	0x2C	.text	game/cam_ctrl.cpp	global	IsMotionEnd__13CameraControl	CameraControl::IsMotionEnd
 0x80008FD0	0xC	.text	game/cam_ctrl.cpp	global	setMotionBaseMatPtr__13CameraControlPA2_A3_f	CameraControl::setMotionBaseMatPtr
@@ -1106,7 +1106,7 @@ address	size	section	unit	scope	name	demangled
 0x80054F3C	0x250	.text	game/pl_npc.cpp	global	checkAnotherRoute__8cSubChar	cSubChar::checkAnotherRoute
 0x8005518C	0x180	.text	game/pl_npc.cpp	global	moveAnotherRoute__8cSubChar	cSubChar::moveAnotherRoute
 0x8005530C	0x268	.text	game/pl_npc.cpp	global	damageCheck__8cSubChar	cSubChar::damageCheck
-0x80055574	0x15C	.text	game/pl_npc.cpp	global	setDamage__8cSubCharUcifii	cSubChar::setDamage
+0x80055574	0x15C	.text	game/pl_npc.cpp	global	setDamage__8cSubCharUciiif	cSubChar::setDamage
 0x800556D0	0x34	.text	game/pl_npc.cpp	global	registPlAction__8cSubCharP3VecfUc	cSubChar::registPlAction
 0x80055704	0x16C	.text	game/pl_npc.cpp	global	waterProc__FP8cSubChar	waterProc
 0x80055870	0x1C8	.text	game/pl_npc.cpp	global	moveBust__8cSubChar	cSubChar::moveBust
@@ -1179,9 +1179,9 @@ address	size	section	unit	scope	name	demangled
 0x8005B8E0	0x8C	.text	game/snd.cpp	global	sndPanCalc__Ff	sndPanCalc
 0x8005B96C	0x34	.text	game/snd.cpp	global	sndSpanCalc__Ff	sndSpanCalc
 0x8005B9A0	0x64	.text	game/snd.cpp	global	sndVolCalc__Fiif	sndVolCalc
-0x8005BA04	0xEC	.text	game/snd.cpp	global	sndVolCalcSub__FP11SndCurveTblff	sndVolCalcSub
+0x8005BA04	0xEC	.text	game/snd.cpp	global	sndVolCalcSub__FfP11SndCurveTblf	sndVolCalcSub
 0x8005BAF0	0x5C	.text	game/snd.cpp	global	sndPitchCalc__Fif	sndPitchCalc
-0x8005BB4C	0xD8	.text	game/snd.cpp	global	sndPitchCalcSub__FP11SndCurveTblf	sndPitchCalcSub
+0x8005BB4C	0xD8	.text	game/snd.cpp	global	sndPitchCalcSub__FfP11SndCurveTbl	sndPitchCalcSub
 0x8005BC24	0x98	.text	game/snd.cpp	local	sndFilterCalc__Fif	sndFilterCalc
 0x8005BCBC	0x88	.text	game/snd.cpp	global	sndExistCheck__FiUl	sndExistCheck
 0x8005BD44	0x100	.text	game/snd.cpp	global	sndWallCheck__FP7SND_SITPUcT1P3Vec	sndWallCheck
@@ -2989,7 +2989,7 @@ address	size	section	unit	scope	name	demangled
 0x800C3C04	0x12C	.text	game/area.cpp	global	AreaViewCheck__FP13AREA_HIT_DATAP13GEOM_CONE_REV	AreaViewCheck
 0x800C3D30	0xDC	.text	game/area.cpp	global	AreaGetCenterPos__FP3VecP13AREA_HIT_DATA	AreaGetCenterPos
 0x800C3E0C	0x27C	.text	game/area.cpp	global	AreaGetInsidePos__FP3VecP13AREA_HIT_DATA	AreaGetInsidePos
-0x800C4088	0x1A4	.text	game/area.cpp	global	AreaDataInit__FP13AREA_HIT_DATAP3VecUcff	AreaDataInit
+0x800C4088	0x1A4	.text	game/area.cpp	global	AreaDataInit__FP13AREA_HIT_DATAP3VecffUc	AreaDataInit
 0x800C422C	0x64	.text	game/area.cpp	global	area_Draw_sphere__FG3VecfUlPA3_f	area_Draw_sphere
 0x800C4290	0x84	.text	game/area.cpp	global	area_Draw_line__FG3VecT0UlPA3_f	area_Draw_line
 0x800C4314	0x3E4	.text	game/area.cpp	global	AreaDataEdit__FP13AREA_HIT_DATAUliPA3_ff	AreaDataEdit
@@ -3079,9 +3079,9 @@ address	size	section	unit	scope	name	demangled
 0x800CCCFC	0x8	.text	game/atari.cpp	global	getVertexPtr__8cSatFile	cSatFile::getVertexPtr
 0x800CCD04	0x14	.text	game/atari.cpp	global	dataCheck__8cSatFile	cSatFile::dataCheck
 0x800CCD18	0x14	.text	game/atari.cpp	global	getSat__10cSatHeaderi	cSatHeader::getSat
-0x800CCD2C	0x548	.text	game/atari.cpp	global	createSat__FP3VecUlf	createSat
-0x800CD274	0x534	.text	game/atari.cpp	global	createBoxSat__FP3VecUlf	createBoxSat
-0x800CD7A8	0x49C	.text	game/atari.cpp	local	createFloorSat__FP3VecUlf	createFloorSat
+0x800CCD2C	0x548	.text	game/atari.cpp	global	createSat__FP3VecfUl	createSat
+0x800CD274	0x534	.text	game/atari.cpp	global	createBoxSat__FP3VecfUl	createBoxSat
+0x800CD7A8	0x49C	.text	game/atari.cpp	local	createFloorSat__FP3VecfUl	createFloorSat
 0x800CDC44	0x100	.text	game/atari.cpp	global	at_pos_calc__FP6cModelP3Vec	at_pos_calc
 0x800CDD44	0x50	.text	game/atari.cpp	local	__t8cManager1Z4cSatUlUc	cManager<cSat>::cManager
 0x800CDD94	0x8	.text	game/atari.cpp	global	setName__t8cManager1Z4cSatPCc	cManager<cSat>::setName
@@ -3103,7 +3103,7 @@ address	size	section	unit	scope	name	demangled
 0x800CE470	0x34	.text	game/atariInfo.cpp	global	__10cAtariInfo	cAtariInfo::cAtariInfo
 0x800CE4A4	0x48	.text	game/atariInfo.cpp	global	init0__10cAtariInfofffffffiii	cAtariInfo::init0
 0x800CE4EC	0x44	.text	game/atariInfo.cpp	global	init__10cAtariInfofffffffiii	cAtariInfo::init
-0x800CE530	0x44	.text	game/atariInfo.cpp	global	set__10cAtariInfoiff	cAtariInfo::set
+0x800CE530	0x44	.text	game/atariInfo.cpp	global	set__10cAtariInfoffi	cAtariInfo::set
 0x800CE574	0x10C	.text	game/atariInfo.cpp	global	getSpeedVector__10cAtariInfoP6cModelP3VecT2	cAtariInfo::getSpeedVector
 0x800CE680	0x58	.text	game/atariInfo.cpp	global	move__10cAtariInfo	cAtariInfo::move
 0x800CE6D8	0x78	.text	game/atariInfo.cpp	global	getPos__10cAtariInfoP6cModelP3Vec	cAtariInfo::getPos
@@ -3661,7 +3661,7 @@ address	size	section	unit	scope	name	demangled
 0x800F188C	0x610	.text	game/em_sub.cpp	global	emLineCapsuleCrossCk__FP3VecN40f	emLineCapsuleCrossCk
 0x800F1E9C	0x49C	.text	game/em_sub.cpp	global	emLineCubeCrossCk__FP3VecT0PA3_fT0T0fff	emLineCubeCrossCk
 0x800F2338	0x314	.text	game/em_sub.cpp	global	emLinePolyCrossCk__FP3VecN30	emLinePolyCrossCk
-0x800F264C	0x624	.text	game/em_sub.cpp	global	emSphereAtCk__FP3cEmP3VecT1fif	emSphereAtCk
+0x800F264C	0x624	.text	game/em_sub.cpp	global	emSphereAtCk__FP3cEmP3VecT1ffi	emSphereAtCk
 0x800F2C70	0x254	.text	game/em_sub.cpp	global	GetWepTargetList__FP3VecT0P9WepTargetUli	GetWepTargetList
 0x800F2EC4	0x6CC	.text	game/em_sub.cpp	global	GetWepTargetList2__FP3VecT0P9WepTargetUlT0T0PUlii	GetWepTargetList2
 0x800F3590	0x53C	.text	game/em_sub.cpp	global	GetWepTargetListBomb__FP3VecfP9WepTargetiii	GetWepTargetListBomb
@@ -3941,7 +3941,7 @@ address	size	section	unit	scope	name	demangled
 0x8010ECD4	0x1AC	.text	game/emrock.cpp	global	emRockPushCamMove2__FP7cEmRock	emRockPushCamMove2
 0x8010EE80	0x124	.text	game/emrock.cpp	global	emRockDropCamMove__FP7cEmRock	emRockDropCamMove
 0x8010EFA4	0x148	.text	game/emrock.cpp	global	emRockRunDownCk__FP7cEmRock	emRockRunDownCk
-0x8010F0EC	0x164	.text	game/emrock.cpp	global	emRockAtkCk__FP7cEmRockP8ATK_INFOif	emRockAtkCk
+0x8010F0EC	0x164	.text	game/emrock.cpp	global	emRockAtkCk__FP7cEmRockP8ATK_INFOfi	emRockAtkCk
 0x8010F250	0x120	.text	game/emrock.cpp	global	emRockPushCk__FP7cEmRocki	emRockPushCk
 0x8010F370	0x34	.text	game/emrock.cpp	global	setDropMot__7cEmRockPvN31	cEmRock::setDropMot
 0x8010F3A4	0x50	.text	game/emrock.cpp	global	setDropMot2__7cEmRockPvN61	cEmRock::setDropMot2
@@ -4155,7 +4155,7 @@ address	size	section	unit	scope	name	demangled
 0x80121158	0x100	.text	game/espgen.cpp	global	EspgenSetFreeWork__FP7cEspgenP10cEspSeqTblP11cEspSeqHeadP6cModelUsPA2_A3_fP3VecT6P14ESPSEQ_CONTROLi	EspgenSetFreeWork
 0x80121258	0x154	.text	game/espgen.cpp	global	EspgenSeqSet__FP11cEspSeqHeadiP11cEffectCoreP6cModelUsPA2_A3_fP3VecT6P14ESPSEQ_CONTROLi	EspgenSeqSet
 0x801213AC	0x17C	.text	game/espgen00.cpp	global	espgen00_UpdateMatrix__FP7cEspgen	espgen00_UpdateMatrix
-0x80121528	0x6C	.text	game/espgen00.cpp	local	Calc_D256__FP14tagESPGEN00_WKUcf	Calc_D256
+0x80121528	0x6C	.text	game/espgen00.cpp	local	Calc_D256__FP14tagESPGEN00_WKfUc	Calc_D256
 0x80121594	0x3E8	.text	game/espgen00.cpp	global	espgen00_Update__FP7cEspgen	espgen00_Update
 0x8012197C	0x34	.text	game/espgen00.cpp	global	espgen00_Move00__FP7cEspgen	espgen00_Move00
 0x801219B0	0x20	.text	game/espgen00.cpp	global	espgen00_Move01__FP7cEspgen	espgen00_Move01
@@ -4173,7 +4173,7 @@ address	size	section	unit	scope	name	demangled
 0x8012239C	0x2BC	.text	game/espgen01.cpp	global	HideCheck__FP4cEsp	HideCheck
 0x80122658	0x224	.text	game/espgen01.cpp	global	Espgen01_SetFreeWork__FP7cEspgenP10cEspSeqTblP11cEspSeqHeadP6cModelUsPA2_A3_fP3VecT6P14ESPSEQ_CONTROLi	Espgen01_SetFreeWork
 0x8012287C	0x17C	.text	game/espgen02.cpp	global	espgen02_UpdateMatrix__FP7cEspgen	espgen02_UpdateMatrix
-0x801229F8	0x6C	.text	game/espgen02.cpp	local	Calc_D256__FP14tagESPGEN02_WKUcf	Calc_D256
+0x801229F8	0x6C	.text	game/espgen02.cpp	local	Calc_D256__FP14tagESPGEN02_WKfUc	Calc_D256
 0x80122A64	0xB94	.text	game/espgen02.cpp	global	espgen02_Update__FP7cEspgen	espgen02_Update
 0x801235F8	0x34	.text	game/espgen02.cpp	local	espgen02_Move00__FP7cEspgen	espgen02_Move00
 0x8012362C	0x20	.text	game/espgen02.cpp	global	espgen02_Move01__FP7cEspgen	espgen02_Move01
@@ -4200,7 +4200,7 @@ address	size	section	unit	scope	name	demangled
 0x80125538	0x58	.text	game/Espgen42.cpp	global	Espgen42_Trans__FP7cEspgen	Espgen42_Trans
 0x80125590	0x98	.text	game/Espgen42.cpp	global	SetIndMtx__FP12Espgen42Work	SetIndMtx
 0x80125628	0xAD4	.text	game/Espgen42.cpp	global	Espgen42_TransSub__FP7cEspgen	Espgen42_TransSub
-0x801260FC	0x910	.text	game/Espgen42.cpp	global	SetWaterWork__FP7cEspgenP3VecT1fUlUlf	SetWaterWork
+0x801260FC	0x910	.text	game/Espgen42.cpp	global	SetWaterWork__FP7cEspgenP3VecT1UlUlff	SetWaterWork
 0x80126A0C	0xC0	.text	game/Espgen42.cpp	global	Espgen42_Destruct__FP7cEspgen	Espgen42_Destruct
 0x80126ACC	0x324	.text	game/Espgen42.cpp	global	Espgen42_SetFreeWork__FP7cEspgenP10cEspSeqTblP11cEspSeqHeadP6cModelUsPA2_A3_fP3VecT6P14ESPSEQ_CONTROL	Espgen42_SetFreeWork
 0x80126DF0	0x440	.text	game/Espgen43.cpp	global	AddSandPowerSub__FP7cEspgen	AddSandPowerSub
@@ -4211,7 +4211,7 @@ address	size	section	unit	scope	name	demangled
 0x801275C0	0x34	.text	game/Espgen43.cpp	global	Espgen43_Move__FP7cEspgen	Espgen43_Move
 0x801275F4	0x58	.text	game/Espgen43.cpp	global	Espgen43_Trans__FP7cEspgen	Espgen43_Trans
 0x8012764C	0x34C	.text	game/Espgen43.cpp	global	Espgen43_TransSub__FP7cEspgen	Espgen43_TransSub
-0x80127998	0x960	.text	game/Espgen43.cpp	global	SetSandWork__FP7cEspgenP3VecT1ffUlUl	SetSandWork
+0x80127998	0x960	.text	game/Espgen43.cpp	global	SetSandWork__FP7cEspgenP3VecT1UlUlff	SetSandWork
 0x801282F8	0x70	.text	game/Espgen43.cpp	global	Espgen43_Destruct__FP7cEspgen	Espgen43_Destruct
 0x80128368	0x168	.text	game/Espgen43.cpp	global	Espgen43_SetFreeWork__FP7cEspgenP10cEspSeqTblP11cEspSeqHeadP6cModelUsPA2_A3_fP3VecT6P14ESPSEQ_CONTROL	Espgen43_SetFreeWork
 0x801284D0	0x4	.text	game/espgen44.cpp	global	Espgen44_Move__FP7cEspgen	Espgen44_Move
@@ -4224,7 +4224,7 @@ address	size	section	unit	scope	name	demangled
 0x8012918C	0x68	.text	game/espgen45.cpp	global	Espgen45_Trans__FP7cEspgen	Espgen45_Trans
 0x801291F4	0xC0	.text	game/espgen45.cpp	global	SetIndMtx_801291F4	SetIndMtx
 0x801292B4	0x1B40	.text	game/espgen45.cpp	global	Espgen45_TransSub__FP7cEspgen	Espgen45_TransSub
-0x8012ADF4	0xA5C	.text	game/espgen45.cpp	global	SetWaterWork45__FP7cEspgenP3VecT1fUlUlf	SetWaterWork45
+0x8012ADF4	0xA5C	.text	game/espgen45.cpp	global	SetWaterWork45__FP7cEspgenP3VecT1UlUlff	SetWaterWork45
 0x8012B850	0xC0	.text	game/espgen45.cpp	global	Espgen45_Destruct__FP7cEspgen	Espgen45_Destruct
 0x8012B910	0x370	.text	game/espgen45.cpp	global	Espgen45_SetFreeWork__FP7cEspgenP10cEspSeqTblP11cEspSeqHeadP6cModelUsPA2_A3_fP3VecT6P14ESPSEQ_CONTROL	Espgen45_SetFreeWork
 0x8012BC80	0x8	.text	game/espgen45.cpp	global	Estgen45SetTargetCamera__Fi	Estgen45SetTargetCamera
@@ -4562,8 +4562,8 @@ address	size	section	unit	scope	name	demangled
 0x8013F028	0x60	.text	game/filter01.cpp	global	Filter01RoomInit__Fv	Filter01RoomInit
 0x8013F088	0x148	.text	game/filter01.cpp	global	Filter01Trans__Fv	Filter01Trans
 0x8013F1D0	0x1184	.text	game/filter01.cpp	global	Filter01Render__FP14LensEffectWork	Filter01Render
-0x80140354	0xD4	.text	game/filter01.cpp	global	Filter01SetParam_CamZ__FiUcff	Filter01SetParam_CamZ
-0x80140428	0x48	.text	game/filter01.cpp	global	Filter01SetParam__FiiUcf	Filter01SetParam
+0x80140354	0xD4	.text	game/filter01.cpp	global	Filter01SetParam_CamZ__FiffUc	Filter01SetParam_CamZ
+0x80140428	0x48	.text	game/filter01.cpp	global	Filter01SetParam__FifiUc	Filter01SetParam
 0x80140470	0x4	.text	game/filter05.cpp	global	Filter05Init__Fv	Filter05Init
 0x80140474	0x4	.text	game/filter05.cpp	global	Filter05RoomInit__Fv	Filter05RoomInit
 0x80140478	0x4	.text	game/filter05.cpp	global	Filter05Trans__Fv	Filter05Trans
@@ -5163,7 +5163,7 @@ address	size	section	unit	scope	name	demangled
 0x801645C8	0x60	.text	game/obj06.cpp	global	move__7cObjBox	cObjBox::move
 0x80164628	0x20	.text	game/obj06.cpp	global	_._7cObjBox	cObjBox::~cObjBox
 0x80164648	0x1DC	.text	game/obj08.cpp	global	SetObj08__FP6cModelPvT1P3VecT3iT1	SetObj08
-0x80164824	0x68	.text	game/obj08.cpp	global	SetObj08Spd__FP4cObjP3Veciff	SetObj08Spd
+0x80164824	0x68	.text	game/obj08.cpp	global	SetObj08Spd__FP4cObjP3Vecffi	SetObj08Spd
 0x8016488C	0x5C	.text	game/obj08.cpp	global	SetObj08Est__FP4cObjiiiiiiiiUc	SetObj08Est
 0x801648E8	0x34	.text	game/obj08.cpp	global	SetObj08Se__FP4cObjUsUs	SetObj08Se
 0x8016491C	0x18C	.text	game/obj08.cpp	global	move__6cObj08	cObj08::move
@@ -5272,7 +5272,7 @@ address	size	section	unit	scope	name	demangled
 0x8017336C	0x80	.text	game/pl_class.cpp	global	dmMotCk__Fv	dmMotCk
 0x801733EC	0x5A0	.text	game/pl_class.cpp	global	actionSelect__7cPlayer	cPlayer::actionSelect
 0x8017398C	0x10C	.text	game/pl_class.cpp	global	dmgCheck__7cPlayer	cPlayer::dmgCheck
-0x80173A98	0x1C4	.text	game/pl_class.cpp	global	setDamage__7cPlayerUcifii	cPlayer::setDamage
+0x80173A98	0x1C4	.text	game/pl_class.cpp	global	setDamage__7cPlayerUciiif	cPlayer::setDamage
 0x80173C5C	0x64	.text	game/pl_class.cpp	global	visibleCtrl__7cPlayer	cPlayer::visibleCtrl
 0x80173CC0	0x88	.text	game/pl_class.cpp	global	subScrCheck__7cPlayer	cPlayer::subScrCheck
 0x80173D48	0xA0	.text	game/pl_class.cpp	global	setNoSuspend__7cPlayeri	cPlayer::setNoSuspend
@@ -5377,7 +5377,7 @@ address	size	section	unit	scope	name	demangled
 0x80177DFC	0x80	.text	game/pl_sub.cpp	global	SubCharCheckCtrl__Fv	SubCharCheckCtrl
 0x80177E7C	0x94	.text	game/pl_sub.cpp	global	SubCharCtrlHide__FP3Veci	SubCharCtrlHide
 0x80177F10	0xC4	.text	game/pl_sub.cpp	global	SubCharMoveTo__Fffffi	SubCharMoveTo
-0x80177FD4	0x12C	.text	game/pl_sub.cpp	global	PlSetLadder__FP3Vecif	PlSetLadder
+0x80177FD4	0x12C	.text	game/pl_sub.cpp	global	PlSetLadder__FP3Vecfi	PlSetLadder
 0x80178100	0x2C	.text	game/pl_sub.cpp	global	PlSetNeck__Fi	PlSetNeck
 0x8017812C	0x6C	.text	game/pl_sub.cpp	global	PlEndCamera__Fv	PlEndCamera
 0x80178198	0x138	.text	game/pl_sub.cpp	global	PlRegistMotion__FPvN11_0	PlRegistMotion
@@ -5406,7 +5406,7 @@ address	size	section	unit	scope	name	demangled
 0x80178F54	0x38	.text	game/pl_wep.cpp	global	weaponLoad__7cPlayerii	cPlayer::weaponLoad
 0x80178F8C	0x98	.text	game/pl_wep.cpp	global	weaponInit__7cPlayer	cPlayer::weaponInit
 0x80179024	0x61C	.text	game/pl_wep.cpp	global	PlWepHitCheck2__FP6cModelP3VecT1iUlf	PlWepHitCheck2
-0x80179640	0xF8	.text	game/pl_wep.cpp	global	PlWepHitCheck3__FP3VeciUlf	PlWepHitCheck3
+0x80179640	0xF8	.text	game/pl_wep.cpp	global	PlWepHitCheck3__FP3VecifUl	PlWepHitCheck3
 0x80179738	0x54	.text	game/pl_wep.cpp	global	getAngle__6cPlWep	cPlWep::getAngle
 0x8017978C	0x58	.text	game/pl_wep.cpp	global	getPitch__6cPlWep	cPlWep::getPitch
 0x801797E4	0x40	.text	game/pl_wep.cpp	global	move__6cPlWep	cPlWep::move
@@ -5425,7 +5425,7 @@ address	size	section	unit	scope	name	demangled
 0x8017A154	0x65C	.text	game/pl_wep.cpp	global	PlWepLockCtrl__FP6cModel	PlWepLockCtrl
 0x8017A7B0	0x10	.text	game/pl_wep.cpp	global	PlWepLockRandInit__Fv	PlWepLockRandInit
 0x8017A7C0	0x148	.text	game/pl_wep.cpp	global	PlWepLockRand__FP6cModeliPfT2	PlWepLockRand
-0x8017A908	0x254	.text	game/pl_wep.cpp	global	PlWepAutoTrack__FP6cModelif	PlWepAutoTrack
+0x8017A908	0x254	.text	game/pl_wep.cpp	global	PlWepAutoTrack__FP6cModelfi	PlWepAutoTrack
 0x8017AB5C	0x118	.text	game/pl_wep.cpp	global	wepSetWaterShot__FP3VecT0Uc	wepSetWaterShot
 0x8017AC74	0x58	.text	game/pl_wep.cpp	global	setWaterShot__FP3Vec	setWaterShot
 0x8017ACCC	0xCC	.text	game/pl_wep.cpp	global	PlSetLockPitch__FP6cModel	PlSetLockPitch
@@ -5654,8 +5654,8 @@ address	size	section	unit	scope	name	demangled
 0x80188EF4	0xB8	.text	game/sce_at.cpp	global	sceAtItemFindFlgOn__FP9SceAtItem	sceAtItemFindFlgOn
 0x80188FAC	0xC4	.text	game/sce_at.cpp	global	sceAtItemFindFlgCk__FP9SceAtItem	sceAtItemFindFlgCk
 0x80189070	0x88	.text	game/sce_at.cpp	global	SceAtDestroy__Fi	SceAtDestroy
-0x801890F8	0x1D8	.text	game/sce_at.cpp	global	SceAtCreateExecAt__FP6cModelP3VeciiififfiiPFv_viUc	SceAtCreateExecAt
-0x801892D0	0x1E8	.text	game/sce_at.cpp	global	SceAtCreateFieldAt__FP6cModelP3VeciiifififiPP10SceAtField	SceAtCreateFieldAt
+0x801890F8	0x1D8	.text	game/sce_at.cpp	global	SceAtCreateExecAt__FP6cModelP3VecfiiiiffiiPFv_viUc	SceAtCreateExecAt
+0x801892D0	0x1E8	.text	game/sce_at.cpp	global	SceAtCreateFieldAt__FP6cModelP3VecfiiiiffiiPP10SceAtField	SceAtCreateFieldAt
 0x801894B8	0x32C	.text	game/sce_at.cpp	global	SceAtCreateItemAt__FP3VecUsiiiP6cModeli	SceAtCreateItemAt
 0x801897E4	0x1D4	.text	game/sce_at.cpp	global	SceAtReserveItemAt__FP3cEmP3VecUsiii	SceAtReserveItemAt
 0x801899B8	0x78	.text	game/sce_at.cpp	global	SceAtCancelItemAt__FP3cEm	SceAtCancelItemAt
@@ -5903,7 +5903,7 @@ address	size	section	unit	scope	name	demangled
 0x801993C4	0x54	.text	game/sub2.cpp	global	Muku3__FfP3Vecf	Muku3
 0x80199418	0x54	.text	game/sub2.cpp	global	Front_check__FP6cModelT0f	Front_check
 0x8019946C	0x50	.text	game/sub2.cpp	global	Front_check__FP6cModelP3Vecf	Front_check
-0x801994BC	0x48	.text	game/sub2.cpp	global	Front_check__FP3VecT0ff	Front_check
+0x801994BC	0x48	.text	game/sub2.cpp	global	Front_check__FP3VecfT0f	Front_check
 0x80199504	0x7C	.text	game/sub2.cpp	global	AddSpeed__FP6cModelPC3Vec	AddSpeed
 0x80199580	0x38	.text	game/sub2.cpp	global	RootSumSquare3__FP3Vec	RootSumSquare3
 0x801995B8	0x58	.text	game/sub2.cpp	global	GetDistance3__FP3VecT0	GetDistance3
@@ -6151,13 +6151,13 @@ address	size	section	unit	scope	name	demangled
 0x801B49AC	0x190	.text	game/db_work.cpp	global	dispLit__7cDbWork	cDbWork::dispLit
 0x801B4B3C	0x24	.text	game/emobj.cpp	global	EmObjInit__6cEmObj	cEmObj::EmObjInit
 0x801B4B60	0xAC	.text	game/emobj.cpp	global	EmObjMove__6cEmObj	cEmObj::EmObjMove
-0x801B4C0C	0x70	.text	game/emobj.cpp	global	setSat__6cEmObjP3Veciiifff	cEmObj::setSat
+0x801B4C0C	0x70	.text	game/emobj.cpp	global	setSat__6cEmObjfffP3Veciii	cEmObj::setSat
 0x801B4C7C	0xEC	.text	game/emobj.cpp	global	setSatMain__6cEmObj	cEmObj::setSatMain
 0x801B4D68	0x28	.text	game/emobj.cpp	global	clrSat__6cEmObj	cEmObj::clrSat
-0x801B4D90	0x70	.text	game/emobj.cpp	global	setEat__6cEmObjP3Veciiifff	cEmObj::setEat
+0x801B4D90	0x70	.text	game/emobj.cpp	global	setEat__6cEmObjfffP3Veciii	cEmObj::setEat
 0x801B4E00	0xEC	.text	game/emobj.cpp	global	setEatMain__6cEmObj	cEmObj::setEatMain
 0x801B4EEC	0x28	.text	game/emobj.cpp	global	clrEat__6cEmObj	cEmObj::clrEat
-0x801B4F14	0xA0	.text	game/emobj.cpp	global	setYarare__6cEmObjsP3VecUsifff	cEmObj::setYarare
+0x801B4F14	0xA0	.text	game/emobj.cpp	global	setYarare__6cEmObjsfffP3VecUsi	cEmObj::setYarare
 0x801B4FB4	0x8	.text	game/emobj.cpp	global	setEff__6cEmObjUc	cEmObj::setEff
 0x801B4FBC	0x8	.text	game/emobj.cpp	global	getEff__6cEmObj	cEmObj::getEff
 0x801B4FC4	0x8	.text	game/emobj.cpp	global	setEtc__6cEmObjUc	cEmObj::setEtc
@@ -6268,7 +6268,7 @@ address	size	section	unit	scope	name	demangled
 0x801BFDA8	0x20	.text	game/esp0f.cpp	global	_._6cEsp0f	cEsp0f::~cEsp0f
 0x801BFDC8	0x44	.text	game/esp10.cpp	global	Esp10_Create__Fv	Esp10_Create
 0x801BFE0C	0x4C	.text	game/esp10.cpp	global	move__6cEsp10	cEsp10::move
-0x801BFE58	0xAC	.text	game/esp10.cpp	global	getFloor_attr__FP3VecPUliff	getFloor_attr
+0x801BFE58	0xAC	.text	game/esp10.cpp	global	getFloor_attr__FP3VecPUlffi	getFloor_attr
 0x801BFF04	0x158	.text	game/esp10.cpp	global	SetFreeWork__6cEsp10P10cEspSeqTblPUl	cEsp10::SetFreeWork
 0x801C005C	0x20	.text	game/esp10.cpp	global	_._6cEsp10	cEsp10::~cEsp10
 0x801C007C	0x44	.text	game/esp11.cpp	global	Esp11_Create__Fv	Esp11_Create
@@ -6459,7 +6459,7 @@ address	size	section	unit	scope	name	demangled
 0x801CAB9C	0x8	.text	game/filter00.cpp	global	Filter00SetAlpha__FUc	Filter00SetAlpha
 0x801CABA4	0x8	.text	game/filter00.cpp	global	Filter00SetPower__FSc	Filter00SetPower
 0x801CABAC	0x4C	.text	game/filter00.cpp	global	Filter00SetType__FUl	Filter00SetType
-0x801CABF8	0x68	.text	game/filter00.cpp	global	Filter00SetAddSpread__FUliUcUcUcUcUcUlfff	Filter00SetAddSpread
+0x801CABF8	0x68	.text	game/filter00.cpp	global	Filter00SetAddSpread__FUliUcUcUcUcUcfffUl	Filter00SetAddSpread
 0x801CAC60	0x57C	.text	game/filter00.cpp	global	Filter00RenderContrast__Fv	Filter00RenderContrast
 0x801CB1DC	0x14	.text	game/filter02.cpp	global	Filter02Init__Fv	Filter02Init
 0x801CB1F0	0x20	.text	game/filter02.cpp	global	Filter02RoomInit__Fv	Filter02RoomInit

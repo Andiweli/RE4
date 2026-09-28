@@ -84,8 +84,8 @@ void Esp45_Trans(cEsp* pEsp)
     if (esp->m_Parts_no >= ESP_PARTS_SCR_NO_END && esp->m_Parts_no <= ESP_PARTS_SCR_NO_START) {
         f32 cx = esp->m_Pos.x * 0.001953125f - 0.5f;
         f32 cy = esp->m_Pos.y * 0.001953125f - 0.5f;
-        Filter00SetAddSpread(w->type, 1, (u8) esp->m_Col_r, (u8) esp->m_Col_g, (u8) esp->m_Col_b, w->alpha, w->rate, 1,
-                             cx, cy, w->power);
+        Filter00SetAddSpread(w->type, 1, (u8) esp->m_Col_r, (u8) esp->m_Col_g, (u8) esp->m_Col_b, w->alpha, w->rate, cx,
+                             cy, w->power, 1);
     } else {
         Vec view;
         Vec scr;
@@ -115,8 +115,8 @@ void Esp45_Trans(cEsp* pEsp)
             a = (u8) ((f32) a * w->hide_alpha);
         }
         a = (u8) ((f32) a * GetDistAlpha(esp));
-        Filter00SetAddSpread(w->type, 1, (u8) esp->m_Col_r, (u8) esp->m_Col_g, (u8) esp->m_Col_b, a, w->rate, 1, cx, cy,
-                             w->power);
+        Filter00SetAddSpread(w->type, 1, (u8) esp->m_Col_r, (u8) esp->m_Col_g, (u8) esp->m_Col_b, a, w->rate, cx, cy, w->power,
+                             1);
         PSMTX44MultVec(pG->Camera.ProjMat, &view, &scr);
         sx = (scr.x * 0.5f + 0.5f) * Screen.width;
         sy = (-scr.y * 0.5f + 0.5f) * Screen.height;

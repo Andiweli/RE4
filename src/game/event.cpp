@@ -1065,7 +1065,7 @@ int Event::ExePacket_Cam(Event* pEvt)
     if (pEvt->FlgCkStatus(EvtStfEvtCancelExe)) {
         frm = pEvt->MaxFrame - 1;
     }
-    CamCtrl.MotionSet(dat, 0, (f32) frm);
+    CamCtrl.MotionSet(dat, (f32) frm, 0);
     pPL->be_flag |= 0x00200000;
     pEvt->pDatFog = (EvtFogData*) zero;
     pEvt->pDatFocus = (EvtFocusData*) zero;
@@ -1934,10 +1934,10 @@ void Event::FocusMove(Event* pEvt, void* pDatFocus)
     }
     t = (f32) frame;
     if (Hermite_1CurveCalc((Hermite1*) &d->near_, t, &near_)) {
-        Filter01SetParam_CamZ(0, 1, d->nearLevel, near_);
+        Filter01SetParam_CamZ(0, d->nearLevel, near_, 1);
     }
     if (Hermite_1CurveCalc((Hermite1*) &d->far_, t, &far_)) {
-        Filter01SetParam_CamZ(1, 1, d->farLevel, far_);
+        Filter01SetParam_CamZ(1, d->farLevel, far_, 1);
     }
 }
 

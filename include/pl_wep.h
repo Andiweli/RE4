@@ -225,8 +225,8 @@ public:
 u32 PlWepHitCheck2(cModel* pl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, f32 radius);
 void PlWepLockCtrl(cModel* pl);
 
-u32 PlWepHitCheck3(Vec* pos, int type, u32 prio, f32 len);
-void PlWepAutoTrack(cModel* pl, int mode, f32 rate);
+u32 PlWepHitCheck3(Vec* pos, int type, f32 len, u32 prio);
+void PlWepAutoTrack(cModel* pl, f32 rate, int mode);
 void PlWepLockRandInit();
 void PlWepLockRand(cModel* pl, int mflag, f32* ang_x, f32* ang_y);
 void PlSetLockPitch(cModel* pl);

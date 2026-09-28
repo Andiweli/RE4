@@ -553,13 +553,13 @@ static void tSceAtAreaEdit_AreaCreate()
             if ((pW->editCursor != pCur->area.type - 1 && pCur->flag) || pCur->flag == 0) {
                 switch (sel) {
                 case 0:
-                    AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_XZ4, 1500.0f, 1000.0f);
+                    AreaDataInit(&pCur->area, &pPL->pos, 1500.0f, 1000.0f, AREA_TYPE_XZ4);
                     break;
                 case 1:
-                    AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_CYLINDER, 1000.0f, 1000.0f);
+                    AreaDataInit(&pCur->area, &pPL->pos, 1000.0f, 1000.0f, AREA_TYPE_CYLINDER);
                     break;
                 case 2:
-                    AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_EYE, 200.0f, 1000.0f);
+                    AreaDataInit(&pCur->area, &pPL->pos, 200.0f, 1000.0f, AREA_TYPE_EYE);
                     break;
                 }
             }
@@ -1812,7 +1812,7 @@ static void tSceAtDataInput_cam_ctrl_pos_edit()
     case 0:
         if (c->pos_set == 0) {
             AreaGetCenterPos(&center, &pCur->area);
-            AreaDataInit(&pW->editArea, &center, AREA_TYPE_EYE, 200.0f, 1000.0f);
+            AreaDataInit(&pW->editArea, &center, 200.0f, 1000.0f, AREA_TYPE_EYE);
             c->range = 1000.0f;
             c->range2 = 500.0f;
             c->pos_set = 1;
@@ -2029,7 +2029,7 @@ static void tSceAtDataInput_ladder_ETedit()
     switch (pW->step2) {
     case 0:
         AreaGetCenterPos(&center, &pCur->area);
-        AreaDataInit(&pW->editArea, &center, AREA_TYPE_EYE, 100.0f, 1000.0f);
+        AreaDataInit(&pW->editArea, &center, 100.0f, 1000.0f, AREA_TYPE_EYE);
         if (l->posSet == 0) {
             l->posSet = 1;
         } else {
@@ -2192,7 +2192,7 @@ static void tSceAtDataInput_hide_pos_edit()
     switch (pW->step2) {
     case 0:
         AreaGetCenterPos(&center, &pCur->area);
-        AreaDataInit(&pW->editArea, &center, AREA_TYPE_EYE, 100.0f, 1000.0f);
+        AreaDataInit(&pW->editArea, &center, 100.0f, 1000.0f, AREA_TYPE_EYE);
         if (h->posSet == 0) {
             h->posSet = 1;
         } else {
@@ -2218,7 +2218,7 @@ static void tSceAtDataInput_hide_area_edit()
     switch (pW->step2) {
     case 0:
         AreaGetCenterPos(&center, &pCur->area);
-        AreaDataInit(&pW->editArea, &center, AREA_TYPE_XZ4, 1500.0f, 1000.0f);
+        AreaDataInit(&pW->editArea, &center, 1500.0f, 1000.0f, AREA_TYPE_XZ4);
         if (h->areaSet == 0) {
             h->areaSet = 1;
         } else {
@@ -2248,11 +2248,11 @@ void tSceAtHideDataDisp(TSceAtHide* h, int cur)
 
     if (cur == 1) col = 0xA0FFA0;
     if (h->posSet == 1) {
-        AreaDataInit(&a, &h->pos, AREA_TYPE_EYE, 100.0f, 1000.0f);
+        AreaDataInit(&a, &h->pos, 100.0f, 1000.0f, AREA_TYPE_EYE);
         AreaDataDisp(&a, col, 1, NULL);
     }
     if (h->areaSet == 1) {
-        AreaDataInit(&a, &h->pos, AREA_TYPE_XZ4, 1500.0f, 1000.0f);
+        AreaDataInit(&a, &h->pos, 1500.0f, 1000.0f, AREA_TYPE_XZ4);
         *(AreaXZ4Pts*) a.xz4.p = h->pts;
         AreaDataDisp(&a, col, 1, NULL);
     }
@@ -2332,7 +2332,7 @@ static void tSceAtDataInput_pos_jump_ETedit()
     switch (pW->step2) {
     case 0:
         AreaGetCenterPos(&center, &pCur->area);
-        AreaDataInit(&pW->editArea, &center, AREA_TYPE_EYE, 100.0f, 1000.0f);
+        AreaDataInit(&pW->editArea, &center, 100.0f, 1000.0f, AREA_TYPE_EYE);
         if (j->posSet == 0) {
             j->posSet = 1;
         } else {

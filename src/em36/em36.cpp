@@ -1776,7 +1776,7 @@ static void plem36_CatchHit(cPlayer* pl)
     case 0:
         MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM36_MOT_PL_CATCH_HIT), 0, 5, 1, 0);
         PlSetFace(1);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         pl->m_Work0 = 10;
         pl->m_Work1 = 0;
         pl->r_no_2++;
@@ -1971,7 +1971,7 @@ static void plem36_LongCatchHit(cPlayer* pl)
     case 0:
         MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM36_MOT_PL_LONG_CATCH_HIT), 0, 0, 1, 0);
         PlSetFace(1);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         pl->r_no_2++;
     case 1:
         EmCatchMotionMove(pl, 1.0f, 1.0f);
@@ -2070,7 +2070,7 @@ static void plem36_SpineCatchHit(cPlayer* pl)
             EstSet(pl, -1, 0, 0, EFF_EM36, 0x44, 0, ESP_CORE_KIND_NONE, pl, (void*) step);
         }
         PlSetFace(1);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         pl->m_Work0 = 10;
         pl->r_no_2++;
     case 1: {
@@ -2683,7 +2683,7 @@ static void plem36_D_CatchHit(cPlayer* pl)
     case 0:
         MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM36_MOT_PL_D_CATCH_HIT_07B), 0, 0, 1, 0);
         PlSetFace(1);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         VibSetData(VIB_TBL, 0xF, 1);
         pl->m_Work1 = SndCall(8, 0x37, &pPL->getPartsPtr(4)->world, pl->pEmCatch->id, 0, pl);
         pl->r_no_2++;

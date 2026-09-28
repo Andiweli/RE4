@@ -250,7 +250,7 @@ public:
     void HoldBinocular(void* id_a, void* id_b, Vec* pos, Vec* at);
     void LowerBinocular();
     void GetBinocularIDAddr(void** eff_addr, void** uwf_addr);
-    void MotionSet(void* motion, int frame, f32 speed);
+    void MotionSet(void* motion, f32 speed, int frame);
     int IsMotionSet();
     int IsMotionEnd();
     void setMotionBaseMatPtr(Mtx* p_mat);

@@ -64,7 +64,7 @@ BOOL areaHitCheck_Cylinder(AREA_CYLINDER* pCld, Vec* pPos);
 BOOL AreaViewCheck(AREA_HIT_DATA* pAre, GEOM_CONE_REV* pCrev);
 void AreaGetCenterPos(Vec* pos, AREA_HIT_DATA* area);
 void AreaGetInsidePos(Vec* pos, AREA_HIT_DATA* area);
-void AreaDataInit(AREA_HIT_DATA* area, Vec* pos, u8 type, f32 size, f32 height);
+void AreaDataInit(AREA_HIT_DATA* area, Vec* pos, f32 size, f32 height, u8 type);
 void area_Draw_sphere(Vec pos, f32 r, u32 rgb, Mtx pMat);
 void area_Draw_line(Vec pos1, Vec pos2, u32 rgb, Mtx pMat);
 void AreaDataEdit(AREA_HIT_DATA* area, u32 col, int flg, Mtx pMat, f32 move_scale);

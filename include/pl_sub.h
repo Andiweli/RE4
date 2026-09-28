@@ -38,7 +38,7 @@ void SubCharCtrl(int mode, int sccf);
 int SubCharCheckCtrl();
 void SubCharCtrlHide(Vec* pos, int type);
 void SubCharMoveTo(f32 x, f32 y, f32 z, f32 ry, int mode);
-void PlSetLadder(Vec* pos, int level, f32 ang);
+void PlSetLadder(Vec* pos, f32 ang, int level);
 void PlSetNeck(int mode);
 void PlEndCamera();
 void PlRegistMotion(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7,

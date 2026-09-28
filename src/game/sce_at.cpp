@@ -1703,9 +1703,9 @@ int sceAtFunc_damage(SceAtWork* w, cModel* pModel)
                 b = (u8) w->dmg.time;
             }
             if (fl & 2) {
-                pPL->setDamage(w->dmg.kind, w->dmg.arg, w->dmg.power, a, b);
+                pPL->setDamage(w->dmg.kind, w->dmg.arg, a, b, w->dmg.power);
             } else {
-                pPL->setDamage(w->dmg.kind, w->dmg.arg, 123.0f, a, b);
+                pPL->setDamage(w->dmg.kind, w->dmg.arg, a, b, 123.0f);
             }
         }
     }
@@ -1728,9 +1728,9 @@ int sceAtFunc_damage(SceAtWork* w, cModel* pModel)
                     b = (u8) w->dmg.time;
                 }
                 if (fl & 2) {
-                    SUB_CHAR()->setDamage(w->dmg.kind, w->dmg.arg, w->dmg.power, a, b);
+                    SUB_CHAR()->setDamage(w->dmg.kind, w->dmg.arg, a, b, w->dmg.power);
                 } else {
-                    SUB_CHAR()->setDamage(w->dmg.kind, w->dmg.arg, 123.0f, a, b);
+                    SUB_CHAR()->setDamage(w->dmg.kind, w->dmg.arg, a, b, 123.0f);
                 }
             }
         }
@@ -1841,7 +1841,7 @@ int sceAtFunc_ladder(SceAtWork* w, cModel* pModel)
     f32 ang;
 
     sceAtGetLadderPos(&w->ladder, &pos, &ang);
-    PlSetLadder(&pos, w->ladder.level, ang);
+    PlSetLadder(&pos, ang, w->ladder.level);
     if (w->ladder.cut1 != 0) {
         SceSys.pLadderTask = SceExec(5, (TaskFunc) sceAtLadder, (int) w, 0, SCE_PRIO_DEF_2, 0);
     }
@@ -1874,7 +1874,7 @@ int sceAtCheckLadderUp(SceAtLadder* ladder, cModel* pEm)
     u32 i;
 
     sceAtGetLadderPos(ladder, &pos, &ang);
-    AreaDataInit(&area, &pos, 2, 500.0f, 2000.0f);
+    AreaDataInit(&area, &pos, 500.0f, 2000.0f, 2);
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEm* em = EmMgr.fastAt(i);
 
@@ -3121,7 +3121,7 @@ int SceAtDestroy(int at_no)
 // Creates a type 2 (exec) area at run time on model `m`: quad of the four `pos` corners (floor =
 // their mean y, height h), checkFlag a, trigger b, checkType c, otNo d, facing angle / range (radians),
 // action button kind e, task prio / func / arg / flag. Returns the area number, -1 on failure.
-int SceAtCreateExecAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f32 ang, f32 range, int e, int prio, TaskFunc func, int arg, u8 flag)
+int SceAtCreateExecAt(cModel* m, Vec* pos, f32 h, int a, int b, int c, int d, f32 ang, f32 range, int e, int prio, TaskFunc func, int arg, u8 flag)
 {
     SceAtWork* w;
 
@@ -3148,7 +3148,7 @@ int SceAtCreateExecAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f3
     w->parentParts = -1;
     w->angle = (s8) (ang * 0.5f * 57.295776f);
     w->angleRange = (s8) (range * 0.5f * 57.295776f);
-    AreaDataInit(&w->area, &m->pos, 1, 1500.0f, h);
+    AreaDataInit(&w->area, &m->pos, 1500.0f, h, 1);
     w->area.xz4.floor = (pos[0].y + pos[1].y + pos[2].y + pos[3].y) * 0.25f;
     w->area.xz4.p[0].x = pos[0].x;
     w->area.xz4.p[0].z = pos[0].z;
@@ -3165,7 +3165,7 @@ int SceAtCreateExecAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f3
 #line 3936 "D:/Bio4/Prog/sce_at.cpp"
 // Creates a type 0xD (field info) area on model `m` (same shape arguments as SceAtCreateExecAt)
 // carrying `val`; *out receives the payload. Returns the area number, -1 on failure.
-int SceAtCreateFieldAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f32 ang, int e, f32 range, int val, SceAtField** out)
+int SceAtCreateFieldAt(cModel* m, Vec* pos, f32 h, int a, int b, int c, int d, f32 ang, f32 range, int e, int val, SceAtField** out)
 {
     SceAtWork* w;
 
@@ -3193,7 +3193,7 @@ int SceAtCreateFieldAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f
     w->pParent = m;
     w->angle = (s8) (ang * 0.5f * 57.295776f);
     w->angleRange = (s8) (range * 0.5f * 57.295776f);
-    AreaDataInit(&w->area, &m->pos, 1, 1500.0f, h);
+    AreaDataInit(&w->area, &m->pos, 1500.0f, h, 1);
     w->area.xz4.floor = (pos[0].y + pos[1].y + pos[2].y + pos[3].y) * 0.25f;
     w->area.xz4.p[0].x = pos[0].x;
     w->area.xz4.p[0].z = pos[0].z;
@@ -4167,7 +4167,7 @@ void SceAtItemAutoArea(AREA_HIT_DATA* area, Vec* pos, f32 radius)
         if (radius == 0.0f) {
             radius = 1500.0f;
         }
-        AreaDataInit(area, &p, 2, radius + radius, h);
+        AreaDataInit(area, &p, radius + radius, h, 2);
     }
 }
 

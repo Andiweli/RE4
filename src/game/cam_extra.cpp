@@ -167,7 +167,7 @@ void FocusAnimation::move(int anim_flag)
         } else {
             cnt = m_counter;
         }
-        Filter01SetParam(1, 100, 1, level_max * (f32) cnt / m_focus_frame);
+        Filter01SetParam(1, level_max * (f32) cnt / m_focus_frame, 100, 1);
         filter0a_mask_alpha = 0;
     }
 }

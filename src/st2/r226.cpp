@@ -1346,7 +1346,7 @@ static void playerRunDieBridge(cPlayer* pl)
     switch (pl->r_no_2) {
     case 0:
         MotionSetCore(pl, &pl->Motion, ROOM_ARC_PTR(pG->pRoom, 0x36), 0, 3, 1, 0);
-        CamCtrl.MotionSet(ROOM_ARC_PTR(pG->pRoom, 0x60), 0, 0.0f);
+        CamCtrl.MotionSet(ROOM_ARC_PTR(pG->pRoom, 0x60), 0.0f, 0);
         pG->pl_life = 0;
         pl->atari.off();
         PlSetDamageSe(0xA);

@@ -241,18 +241,18 @@ int cEmWindow::init(void* bin, void* tpl, Vec* pos_, Vec* rot_, int type_, u8 et
     if (WindowData[type].satType == 1) {
         cube = 0;
         if (WindowData[type].field == 1) {
-            setSat(&satPos, 0x40, 0, 0, size.x, size.y, size.z);
+            setSat(size.x, size.y, size.z, &satPos, 0x40, 0, 0);
         }
-        setEat(&satPos, 0x400000, 0, 0, size.x, size.y, size.z);
+        setEat(size.x, size.y, size.z, &satPos, 0x400000, 0, 0);
     } else {
         cube = 1;
         if (WindowData[type].field == 1) {
-            setSat(&satPos, 0x40, 0, 1, size.x, size.y, size.z);
+            setSat(size.x, size.y, size.z, &satPos, 0x40, 0, 1);
         }
-        setEat(&satPos, 0, 0, 1, size.x * 0.7f, size.y, size.z * 0.7f);
+        setEat(size.x * 0.7f, size.y, size.z * 0.7f, &satPos, 0, 0, 1);
     }
     size.z = (WindowData[type].sizeZ + 50.0f) * 0.5f;
-    setYarare(0, &satPos, 0x21, cube, size.x, size.y, size.z);
+    setYarare(0, size.x, size.y, size.z, &satPos, 0x21, cube);
     be_flag &= ~0x01000000;
     hp_max = hp = 1000;
     setStatus(EM_STATUS_LOCKOFF);
@@ -277,7 +277,7 @@ int cEmWindow::init(void* bin, void* tpl, Vec* pos_, Vec* rot_, int type_, u8 et
         pt[3].x = -500.0f;
         pt[3].y = -2000.0f;
         pt[3].z = -1000.0f;
-        no = SceAtCreateFieldAt(this, pt, 3, 0, 0, 3000.0f, 5, 0.0f, 0, 1.3962635f, 1, &out);
+        no = SceAtCreateFieldAt(this, pt, 3000.0f, 3, 0, 0, 5, 0.0f, 1.3962635f, 0, 1, &out);
         if (no == -1) {
             pLog->err(0, 0, "move : SceAt no create");
         }
@@ -294,7 +294,7 @@ int cEmWindow::init(void* bin, void* tpl, Vec* pos_, Vec* rot_, int type_, u8 et
         pt[3].x = -500.0f;
         pt[3].y = -2000.0f;
         pt[3].z = -1000.0f;
-        no = SceAtCreateFieldAt(this, pt, 3, 0, 0, 3000.0f, 5, -PI, 0, 1.3962635f, 1, &out);
+        no = SceAtCreateFieldAt(this, pt, 3000.0f, 3, 0, 0, 5, -PI, 1.3962635f, 0, 1, &out);
         if (no == -1) {
             pLog->err(0, 0, "move : SceAt no create");
         }

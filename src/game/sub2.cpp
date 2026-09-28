@@ -178,7 +178,7 @@ int Front_check(cModel* a, Vec* b, f32 ang)
 }
 
 // 1 when `b` is within +-ang of the facing `rot` at `a`.
-int Front_check(Vec* a, Vec* b, f32 rot, f32 ang)
+int Front_check(Vec* a, f32 rot, Vec* b, f32 ang)
 {
     f32 d = GetXZAngleLocal(a, b, rot);
     int ret = 0;

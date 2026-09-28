@@ -298,7 +298,7 @@ public:
     void weaponLoad(int wep_id, int wep_type);  // stores pG 0x4FB0/0x4FB1, then ReadWepData
     void weaponInit();
     // game/pl_class.cpp: scenario damage area hit (sce_at sceAtFunc_damage)
-    void setDamage(u8 kind, int arg, f32 power, int a, int b);
+    void setDamage(u8 kind, int arg, int a, int b, f32 power);
 };
 
 // Leon (game/pl_leon.cpp): the player model set for the main character.

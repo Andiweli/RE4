@@ -2373,7 +2373,7 @@ void CameraControl::GetBinocularIDAddr(void** eff_addr, void** uwf_addr)
 
 // Plays a camera motion file (cutscene camera, r0 5) interpolating from the current camera over
 // `frame` frames; flags the event camera (m_system_flag 0x28, Status_flg[2] 0x10000000).
-void CameraControl::MotionSet(void* motion, int frame, f32 speed)
+void CameraControl::MotionSet(void* motion, f32 speed, int frame)
 {
     m_system_flag |= 0x28;
     StaFlagOn(pG, STA_CUT_CHANGE);

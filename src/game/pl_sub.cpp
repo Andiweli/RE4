@@ -310,7 +310,7 @@ void EndPlDamage()
     pl->subArc = pl->subArc2;
     at->on();
     at->setPriority(0);
-    at->set(10, 400.0f, 200.0f);
+    at->set(400.0f, 200.0f, 10);
     pl->endDamage();
 }
 
@@ -400,7 +400,7 @@ void EndSubDamage()
     at = &sub->atari;
     at->on();
     at->setPriority(0);
-    at->set(10, 400.0f, 200.0f);
+    at->set(400.0f, 200.0f, 10);
 }
 
 // Creates the partner enemy if none exists: type 0 = Luis (em 2), 1 = Ashley (em 3, or 5 in the
@@ -614,7 +614,7 @@ void SubCharMoveTo(f32 x, f32 y, f32 z, f32 ry, int mode)
 
 // Scenario: puts the player on a ladder at pos / ang: level > 1 climbs up (m_Work0 = level - 2
 // rungs), level < -1 climbs down (r_no_2 0xA); routine 0/0x10.
-void PlSetLadder(Vec* pos, int level, f32 ang)
+void PlSetLadder(Vec* pos, f32 ang, int level)
 {
     cPlayer* pl;
 

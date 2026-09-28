@@ -928,7 +928,7 @@ int emLinePolyCrossCk(Vec* pPos, Vec* pPos2, Vec* pRect, Vec* pCross)
 
 // Hit boxes of `em` touched by the sphere (pos, r): the one best facing the pos2 -> pos direction
 // (or the nearest when pos2 is at pos); rad = squared distance centre -> pos.
-YARARE_INFO* emSphereAtCk(cEm* em, Vec* pos, Vec* pos2, f32 r, int flag, f32 r2)
+YARARE_INFO* emSphereAtCk(cEm* em, Vec* pos, Vec* pos2, f32 r, f32 r2, int flag)
 {
     Vec pTop;
     Vec pBtm;
@@ -1488,7 +1488,7 @@ int GetWepTargetListBomb(Vec* pPos, f32 radius, WepTarget* list, int num, int we
             }
             break;
         }
-        part = emSphereAtCk(em, pPos, pPos, rr, wep_no, r2);
+        part = emSphereAtCk(em, pPos, pPos, rr, r2, wep_no);
         if (part == 0) {
             continue;
         }
@@ -2055,7 +2055,7 @@ void PlSetDamage(int damage_type, int damage_val, int flag)
         p->r_no_2 = 0;
         p->r_no_3 = 0;
     } else {
-        pPL->setDamage((u8) damage_type, 0, 123.0f, 0, 0xFF);
+        pPL->setDamage((u8) damage_type, 0, 0, 0xFF, 123.0f);
     }
 }
 
@@ -2122,7 +2122,7 @@ int EmAtkHitCk2(ATK_INFO* pAtk, Vec* pPos, Vec* pPosOld)
     if (EatMgr.hitCheck(&parts->world, pPos, 0, 0, 0, 0) != 0) {
         return 0;
     }
-    part = emSphereAtCk(pPL, pPos, pPosOld, pAtk->radius, 0x18, pAtk->radius);
+    part = emSphereAtCk(pPL, pPos, pPosOld, pAtk->radius, pAtk->radius, 0x18);
     if (part == 0) {
         return 0;
     }
@@ -2345,7 +2345,7 @@ YARARE_INFO* EmAtkHitSubCk2(ATK_INFO* pAtk, Vec* pPos, Vec* pPosOld)
     if (EatMgr.hitCheck(&parts->world, pPos, 0, 0, 0, 0) != 0) {
         return 0;
     }
-    part = emSphereAtCk(pSUB, pPos, pPosOld, pAtk->radius, 0x18, pAtk->radius);
+    part = emSphereAtCk(pSUB, pPos, pPosOld, pAtk->radius, pAtk->radius, 0x18);
     if (part == 0) {
         return 0;
     }

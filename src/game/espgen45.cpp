@@ -39,7 +39,7 @@ struct Esp4cWork {
 void Espgen45_Move00(cEspgen* w);
 void Espgen45_TransSub(cEspgen* w);
 void SetIndMtx_801291F4(Espgen42Work* p);   // the DOL's local SetIndMtx (Espgen42 owns the global one); sym_map name
-cEspgen* SetWaterWork45(cEspgen* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate);
+cEspgen* SetWaterWork45(cEspgen* w, Vec* pos, Vec* rot, u32 nx, u32 ny, f32 size, f32 rate);
 
 cEspgen* g_pWater45;
 static int g_bTargetCamera = 1;
@@ -757,14 +757,14 @@ static cEspgen* SetWater(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate)
         pLog->err(0, 0, "Espgen45 : work pull failed");
         return NULL;
     }
-    return SetWaterWork45(w, pos, rot, size, nx, ny, rate);
+    return SetWaterWork45(w, pos, rot, nx, ny, size, rate);
 }
 
 // Builds the surface work: id 0x45, nx x ny cells of `size` units, matrix (with the rotation
 // override), allocates hA/hB/pos/nrm/bump and the strip display list (memory group 13), fills the
 // zig-zag triangle strip indices/UVs, the flat grid positions (random +-0.2 ripple), the sloped
 // normals and zero edge heights. Returns NULL (controller released) when an allocation fails.
-cEspgen* SetWaterWork45(cEspgen* w, Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny, f32 rate)
+cEspgen* SetWaterWork45(cEspgen* w, Vec* pos, Vec* rot, u32 nx, u32 ny, f32 size, f32 rate)
 {
     Espgen42Work* p = (Espgen42Work*) w->Free.buff;
     Mtx m;
@@ -1044,7 +1044,7 @@ int Espgen45_SetFreeWork(cEspgen* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, 
     rate = 1.0f - (f32) (int) pSeq->WorkSp8[2] / 255.0f;
     p->rotY = pSeq->WorkSp8[2];
     PSVECScale(&pSeq->Ang, &r, 6.28f / 360.0f);
-    if (SetWaterWork45(pGen, (Vec*) &pSeq->Pos.x, &r, pSeq->Size_base_x, nx, ny, rate) != 0) {
+    if (SetWaterWork45(pGen, (Vec*) &pSeq->Pos.x, &r, nx, ny, pSeq->Size_base_x, rate) != 0) {
         p->col.r = pSeq->Col_start_r;
         p->col.g = pSeq->Col_start_g;
         p->col.b = pSeq->Col_start_b;

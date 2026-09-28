@@ -1388,7 +1388,7 @@ static void plem22_JumpAtkHit(cPlayer* pl)
     case 0:
         MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM22_MOT_PL_JUMP_ATK_HIT_035), 0, 0, 1, 0);
         PlSetFace(1);
-        pl->atari.set(10, 480.00003f, 400.0f);
+        pl->atari.set(480.00003f, 400.0f, 10);
         pl->Wep->setTrans(0, 0);
         VibSetData(VIB_TBL, 0xF, 1);
         pl->r_no_2++;

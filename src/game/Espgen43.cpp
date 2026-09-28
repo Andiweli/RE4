@@ -43,7 +43,7 @@ void AddSandPowerSub(cEspgen* w);
 void GetSandHeightSub(cEspgen* w);
 void Espgen43_Move00(cEspgen* w);
 void Espgen43_TransSub(cEspgen* w);
-cEspgen* SetSandWork(cEspgen* w, Vec* pos, Vec* rot, f32 size, f32 sizeRate, u32 nx, u32 ny);
+cEspgen* SetSandWork(cEspgen* w, Vec* pos, Vec* rot, u32 nx, u32 ny, f32 size, f32 sizeRate);
 
 static Vec Chk_pos;
 static f32 Height_ret;
@@ -324,7 +324,7 @@ static int SetSand(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny)
         pLog->err(0, 0, "Espgen43 : work pull failed");
         return 0;
     }
-    return (int) SetSandWork(w, pos, rot, size, 1.0f, nx, ny);
+    return (int) SetSandWork(w, pos, rot, nx, ny, size, 1.0f);
 }
 
 // Texture coordinate wrap: keeps the repeat in 0..1 by mirroring at 1.
@@ -339,7 +339,7 @@ static int SetSand(Vec* pos, Vec* rot, f32 size, u32 nx, u32 ny)
 // Builds the grid at pos / rot with cell `size` (height axis scaled by sizeRate): allocates the
 // height and normal buffers and the display list (texture repeated texRep times across the
 // grid). Returns NULL (and releases the generator) on memory failure.
-cEspgen* SetSandWork(cEspgen* w, Vec* pos, Vec* rot, f32 size, f32 sizeRate, u32 nx, u32 ny)
+cEspgen* SetSandWork(cEspgen* w, Vec* pos, Vec* rot, u32 nx, u32 ny, f32 size, f32 sizeRate)
 {
     ESPGEN43_WK* p = (ESPGEN43_WK*) w->Free.buff;
     Mtx m;
@@ -571,7 +571,7 @@ int Espgen43_SetFreeWork(cEspgen* pGen, cEspSeqTbl* pSeq, cEspSeqHead* pSeqHed, 
     p->TexNo = pSeq->Tex_id;
     p->texRep = 1 << (s8) pSeq->Work8[0];
     PSVECScale(&pSeq->Ang, &r, 6.28f / 360.0f);
-    if (SetSandWork(pGen, (Vec*) &pSeq->Pos.x, &r, pSeq->Size_base_x, pSeq->Size_plus + 1.0f, nx, ny) == NULL) {
+    if (SetSandWork(pGen, (Vec*) &pSeq->Pos.x, &r, nx, ny, pSeq->Size_base_x, pSeq->Size_plus + 1.0f) == NULL) {
         return 0;
     }
     Espgen43_Move(pGen);

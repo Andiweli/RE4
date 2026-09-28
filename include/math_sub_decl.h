@@ -93,7 +93,7 @@ f32 GetDistance(Vec& v0, Vec& v1);
 class cModel;
 int Front_check(cModel* a, cModel* b, f32 ang);   // b within +-ang of a's heading
 int Front_check(cModel* a, Vec* b, f32 ang);
-int Front_check(Vec* a, Vec* b, f32 rot, f32 ang);
+int Front_check(Vec* a, f32 rot, Vec* b, f32 ang);
 
 // Debug-checked normalize: zero vectors are reported with the caller's file/line.
 #define VECNormalize(src, dst)                                                          \

@@ -1487,7 +1487,7 @@ void emDoor_R1_Open(cEmDoor* pEm)
                     hp = pSUB->hp;
                     pSUB->hp = 0;
                 }
-                if (PlWepHitCheck3(&v, 0x18, 10, 400.0f)) {
+                if (PlWepHitCheck3(&v, 0x18, 400.0f, 10)) {
                     SndCall(1, 0xF, &v, 0, 0, pEm);
                 }
                 if (pSUB) {
@@ -1690,7 +1690,7 @@ void emDoor_R1_Down(cEmDoor* pEm)
                     hp = pSUB->hp;
                     pSUB->hp = 0;
                 }
-                if (PlWepHitCheck3(&v, 0x14, 10, 400.0f)) {
+                if (PlWepHitCheck3(&v, 0x14, 400.0f, 10)) {
                     SndCall(1, 0xF, &pPL->pos, 0, 0, pPL);
                 }
                 if (pSUB) {

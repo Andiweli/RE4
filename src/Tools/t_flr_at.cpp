@@ -359,10 +359,10 @@ static void flrAtAreaEdit_AreaCreate()
     if (sel < 0) return;
     switch (sel) {
     case 0:
-        AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_XZ4, 1000.0f, 1000.0f);
+        AreaDataInit(&pCur->area, &pPL->pos, 1000.0f, 1000.0f, AREA_TYPE_XZ4);
         break;
     case 1:
-        AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_CYLINDER, 1000.0f, 1000.0f);
+        AreaDataInit(&pCur->area, &pPL->pos, 1000.0f, 1000.0f, AREA_TYPE_CYLINDER);
         break;
     }
     pCur->priority = 8;

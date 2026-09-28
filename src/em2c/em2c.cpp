@@ -957,9 +957,9 @@ void cEm2c::move()
         w->flags |= 0x400;
     }
     if (w->wallNrm.y < 0.699999988f) {  // member calls in the arms: `&atari` is PRE'd into both (`mr r30,r0` copy)
-        atari.set(10, 600.0f, 250.0f);
+        atari.set(600.0f, 250.0f, 10);
     } else {
-        atari.set(10, 600.0f, 500.0f);
+        atari.set(600.0f, 500.0f, 10);
     }
     at = &atari;
     em2cNeckMove(this);
@@ -973,12 +973,12 @@ void cEm2c::move()
     EmAtCheck(this);
     at->move();
     if (w->flags & 0x60) {
-        at->set(5, 180.0f, 500.0f);
+        at->set(180.0f, 500.0f, 5);
         if (!(w->flags & 0x20)) {
             SatMgr.checkAir(this, 0x980800);
         }
     } else {
-        at->set(5, 600.0f, 500.0f);
+        at->set(600.0f, 500.0f, 5);
         SatMgr.check(this, 0);
     }
     atari.m_flag = atFlags;
@@ -4577,14 +4577,14 @@ static void plemKick(cPlayer* pl)
                 pos.y = 1500.0f;
                 pos.z = 300.0f;
                 PSMTXMultVec(pPL->mat, &pos, &pos);
-                if (PlWepHitCheck3(&pos, 0x14, 10, 1200.0f)) {
+                if (PlWepHitCheck3(&pos, 0x14, 1200.0f, 10)) {
                     SndCall(1, 0xF, &pl->pos, 0, 0, pl);
                 }
                 pos.x = 0.0f;
                 pos.y = 1000.0f;
                 pos.z = 300.0f;
                 PSMTXMultVec(pPL->mat, &pos, &pos);
-                if (PlWepHitCheck3(&pos, 0x14, 10, 1200.0f)) {
+                if (PlWepHitCheck3(&pos, 0x14, 1200.0f, 10)) {
                     SndCall(1, 0xF, &pl->pos, 0, 0, pl);
                 }
             }

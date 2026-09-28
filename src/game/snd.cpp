@@ -238,8 +238,8 @@ s8 sndSpanCalc(f32 h_angle)
     return (s8) (127.0f - fabsf(h_angle) * 40.743664f);
 }
 
-s8 sndVolCalcSub(SndCurveTbl* t, f32 dist, f32 vol);
-s16 sndPitchCalcSub(SndCurveTbl* t, f32 dist);
+s8 sndVolCalcSub(f32 dist, SndCurveTbl* t, f32 vol);
+s16 sndPitchCalcSub(f32 dist, SndCurveTbl* t);
 
 // .text order of the original: the callers precede their curve helpers.
 // Volume through the room's distance curve `no` (SndRoomHdr vol_ofs); `vol` unchanged when the
@@ -260,11 +260,11 @@ int sndVolCalc(int iss_vol, int tbl_no, f32 dist)
     if (ofs == 0) {
         return iss_vol;
     }
-    return sndVolCalcSub((SndCurveTbl*) ((u8*) h + ofs), dist, (s8) iss_vol);
+    return sndVolCalcSub(dist, (SndCurveTbl*) ((u8*) h + ofs), (s8) iss_vol);
 }
 
 // Interpolates the curve's value at `dist` (clamped to the ends) and scales `vol` by it / 128.
-s8 sndVolCalcSub(SndCurveTbl* t, f32 dist, f32 vol)
+s8 sndVolCalcSub(f32 dist, SndCurveTbl* t, f32 vol)
 {
     u32 i;
     SndCurveEnt* e = t->e;
@@ -309,11 +309,11 @@ s16 sndPitchCalc(int tbl_no, f32 dist)
     if (ofs == 0) {
         return 0;
     }
-    return sndPitchCalcSub((SndCurveTbl*) ((u8*) h + ofs), dist);
+    return sndPitchCalcSub(dist, (SndCurveTbl*) ((u8*) h + ofs));
 }
 
 // Interpolated curve value at `dist`.
-s16 sndPitchCalcSub(SndCurveTbl* t, f32 dist)
+s16 sndPitchCalcSub(f32 dist, SndCurveTbl* t)
 {
     u32 i;
     SndCurveEnt* e = t->e;

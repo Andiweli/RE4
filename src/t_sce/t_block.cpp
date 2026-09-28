@@ -726,7 +726,7 @@ static void tBlockArea_Create()
     TBlockArea* a = &pW->area[pW->areaNo];
 
     if (!(a->flags & 2)) {
-        AreaDataInit(&a->area, &pPL->pos, AREA_TYPE_XZ4, 10000.0f, 5000.0f);
+        AreaDataInit(&a->area, &pPL->pos, 10000.0f, 5000.0f, AREA_TYPE_XZ4);
     }
     a->flags |= 3;
     a->slot = pW->areaNo;

@@ -117,7 +117,7 @@ void emRockPushCamMove(cEmRock* pEm);
 void emRockPushCamMove2(cEmRock* pEm);
 void emRockDropCamMove(cEmRock* em);
 void emRockRunDownCk(cEmRock* pEm);
-int emRockAtkCk(cEmRock* em, struct ATK_INFO* atk, int type, f32 r);
+int emRockAtkCk(cEmRock* em, struct ATK_INFO* atk, f32 r, int type);
 void emRockPushCk(cEmRock* pEm, int frame);
 int emRockDropHitCk(cEmRock* pEm);
 int emRockDropHitCkSub(cEmRock* pEm);

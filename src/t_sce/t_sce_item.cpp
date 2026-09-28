@@ -555,13 +555,13 @@ static void tSceItemAreaEdit_AreaCreate()
             if ((pW->editCursor != pCur->area.type - 1 && pCur->flag) || pCur->flag == 0) {
                 switch (sel) {
                 case 0:
-                    AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_XZ4, 1500.0f, 1000.0f);
+                    AreaDataInit(&pCur->area, &pPL->pos, 1500.0f, 1000.0f, AREA_TYPE_XZ4);
                     break;
                 case 1:
-                    AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_CYLINDER, 1000.0f, 1000.0f);
+                    AreaDataInit(&pCur->area, &pPL->pos, 1000.0f, 1000.0f, AREA_TYPE_CYLINDER);
                     break;
                 case 2:
-                    AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_EYE, 200.0f, 1000.0f);
+                    AreaDataInit(&pCur->area, &pPL->pos, 200.0f, 1000.0f, AREA_TYPE_EYE);
                     break;
                 }
             }
@@ -1140,7 +1140,7 @@ static void tSceItemDataInput_item_ETedit()
     case 0:
         if (!(it->flag & 1)) {
             AreaGetCenterPos(&c, &pCur->area);
-            AreaDataInit(&pW->editArea, &c, AREA_TYPE_EYE, 200.0f, 1000.0f);
+            AreaDataInit(&pW->editArea, &c, 200.0f, 1000.0f, AREA_TYPE_EYE);
             it->flag |= 1;
         } else {
             SceAtDataEyeTriggreCopy(&pW->editArea, pCur);

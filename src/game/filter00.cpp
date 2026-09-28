@@ -289,7 +289,7 @@ void Filter00SetType(u32 type)
 
 // Requests a one-frame additive flash spreading from screen point (cx, cy) (-0.5..0.5) with colour
 // r,g,b, alpha rate, `num` passes and growth pow; only when pri is at most the pending priority.
-void Filter00SetAddSpread(u32 pri, int on, u8 r, u8 g, u8 b, u8 rate, u8 type, u32 num, f32 cx, f32 cy, f32 pow)
+void Filter00SetAddSpread(u32 pri, int on, u8 r, u8 g, u8 b, u8 rate, u8 type, f32 cx, f32 cy, f32 pow, u32 num)
 {
     if (eff_spread_pri >= pri) {
         eff_spread_pri = pri;

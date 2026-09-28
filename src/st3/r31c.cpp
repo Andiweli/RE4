@@ -829,7 +829,7 @@ static void r31c_KrauserDieCheckEndProc(cEm39* em)
     at[3].x = -750.0f;
     at[3].y = 0.0f;
     at[3].z = -750.0f;
-    SceAtCreateExecAt(r31c_work->krauser2.getPtr(), at, 1, 8, 1, 1000.0f, 1, 0.0f, 0.0f, 1, 0x12,
+    SceAtCreateExecAt(r31c_work->krauser2.getPtr(), at, 1000.0f, 1, 8, 1, 1, 0.0f, 0.0f, 1, 0x12,
                       (TaskFunc) r31c_KrauserCorpseMes, zero, flag);
     r31c_work->countDown.setPause(0);
     r31c_work->countDown.setDisp(1);
