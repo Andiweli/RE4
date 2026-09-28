@@ -1092,13 +1092,13 @@ static void r201_execEvent00()
         SysFlagOn(pG, SYS_SCREEN_STOP);
         SceSleep(2);
         m = SearchEmModule(0x1B);
-        MemorySwap(m->pArc, (u32) r201_work->evd->getAddr(), r201_work->evd->getSize());
+        MemorySwap(m->pArc, r201_work->evd->getAddr(), r201_work->evd->getSize());
         EvtMgr.SetEvt(m->pArc, &key);
         ((Event*) key)->FlgOnStatus(EvtStfPlPosNoSet);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r201_work->evd->getAddr(), r201_work->evd->getSize());
+        MemorySwap(m->pArc, r201_work->evd->getAddr(), r201_work->evd->getSize());
     }
     r201_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     SceEventEnd(0);

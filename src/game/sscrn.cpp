@@ -431,7 +431,7 @@ void SubScreenExec()
             RoomData.stopRelData();
             wk->pBuf = pG->pStFnt;
             DC.setDataCtrl(0);
-            MemorySwap(wk->pBuf, SS_ARAM, SS_ARAM_SIZE);
+            MemorySwap(wk->pBuf, (void*) SS_ARAM, SS_ARAM_SIZE);
             MemSuspendHeap(4);
             if (wk->open_flag & 0x10) {
                 wk->pHeapOffs = wk->pFreeOffs + 0x50000;
@@ -441,9 +441,9 @@ void SubScreenExec()
                 wk->pHeapOffs = wk->pSwitchOffs + 0xE4000;
             }
             if (wk->open_flag & 0x30) {
-                MemCreateHeap(12, (u32) wk->pBuf + wk->pHeapOffs, (u32) wk->pBuf + SS_ARAM_SIZE);
+                MemCreateHeap(12, (void*) ((u32) wk->pBuf + wk->pHeapOffs), (void*) ((u32) wk->pBuf + SS_ARAM_SIZE));
             } else {
-                MemCreateHeap(12, (u32) wk->pBuf + wk->pHeapOffs, (u32) wk->pBuf + 0x2E5E00);
+                MemCreateHeap(12, (void*) ((u32) wk->pBuf + wk->pHeapOffs), (void*) ((u32) wk->pBuf + 0x2E5E00));
             }
             MemSetCurrentHeap(12);
             if (wk->relAddr >= 0) {
@@ -560,7 +560,7 @@ void SubScreenExitCore(SubScreenWork* pSscrn)
         MemDestroyHeap(12);
         MemSignalHeap(4);
         MemSetCurrentHeap(4);
-        MemorySwap(pSscrn->pBuf, SS_ARAM, SS_ARAM_SIZE);
+        MemorySwap(pSscrn->pBuf, (void*) SS_ARAM, SS_ARAM_SIZE);
         DC.setDataCtrl(1);
         RoomData.restartRelData();
         cModel::mm = &ModInfoMgr;

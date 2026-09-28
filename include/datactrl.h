@@ -35,10 +35,10 @@ private:
     u8 m_wait;     // 0x0E  set while waitUseOk/waitLoadOk spin
     u8 m_malloc_heap;         // 0x0F  heap the allocation came from
     void* m_addr;      // 0x10  current address of the data
-    u32 m_arg_addr;         // 0x14  setCommand argument: destination (0 = allocate)
+    void* m_arg_addr;       // 0x14  setCommand argument: destination (0 = allocate)
     void* m_malloc_addr;// 0x18
-    u32 m_dest_addr;        // 0x1C  destination of the running transfer
-    u32 m_fix_addr;     // 0x20  fixed MRAM destination (fixMramAddr)
+    void* m_dest_addr;      // 0x1C  destination of the running transfer
+    void* m_fix_addr;   // 0x20  fixed MRAM destination (fixMramAddr)
     u32 m_size;        // 0x24
     u8 pad_28[4];
     char m_name[0x20]; // 0x2C
@@ -50,7 +50,7 @@ public:
 
     void setName(char* s);
 
-    void setCommand(int cmd, u32 arg, u8 wait);
+    void setCommand(int cmd, void* arg, u8 wait);
     int getCommand();
     void setCondition(int c);
     int getCondition();
@@ -58,7 +58,7 @@ private:
     void checkMallocRelease();
     void setMallocInfo(int set, void* malloc_addr);
 public:
-    void fixMramAddr(u32 a);
+    void fixMramAddr(void* a);
     int isUseOk();
     int waitUseOk();
     int isLoadOk();
@@ -82,10 +82,10 @@ public:
     void setWait(u8 wait) { m_wait = wait; }
     u8 getMode() { return m_mode; }
     void setMode(u8 mode) { m_mode = mode; }
-    u32 getDestAddr() { return m_dest_addr; }
-    void setDestAddr(u32 addr) { m_dest_addr = addr; }
-    u32 getArgAddr() { return m_arg_addr; }
-    void setArgAddr(u32 addr) { m_arg_addr = addr; }
+    void* getDestAddr() { return m_dest_addr; }
+    void setDestAddr(void* addr) { m_dest_addr = addr; }
+    void* getArgAddr() { return m_arg_addr; }
+    void setArgAddr(void* addr) { m_arg_addr = addr; }
     void* getAddr() { return m_addr; }
     void setAddr(void* addr) { m_addr = addr; }
     u32 getSize() { return m_size; }

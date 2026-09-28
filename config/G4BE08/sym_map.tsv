@@ -3309,13 +3309,13 @@ address	size	section	unit	scope	name	demangled
 0x800DA564	0x218	.text	game/ctrl.cpp	global	destroy__t8cManager1Z5cCtrlP5cCtrl	cManager<cCtrl>::destroy
 0x800DA77C	0x2C	.text	game/ctrl.cpp	global	_GLOBAL_.I.__8cCtrlMgr	global constructors keyed to cCtrlMgr::cCtrlMgr
 0x800DA7A8	0x2C	.text	game/ctrl.cpp	global	_GLOBAL_.D.__8cCtrlMgr	global destructors keyed to cCtrlMgr::cCtrlMgr
-0x800DA7D4	0x44	.text	game/datactrl.cpp	global	setCommand__9cDataUnitiUlUc	cDataUnit::setCommand
+0x800DA7D4	0x44	.text	game/datactrl.cpp	global	setCommand__9cDataUnitiPvUc	cDataUnit::setCommand
 0x800DA818	0x8	.text	game/datactrl.cpp	global	getCommand__9cDataUnit	cDataUnit::getCommand
 0x800DA820	0x8	.text	game/datactrl.cpp	global	setCondition__9cDataUniti	cDataUnit::setCondition
 0x800DA828	0x8	.text	game/datactrl.cpp	global	getCondition__9cDataUnit	cDataUnit::getCondition
 0x800DA830	0x7C	.text	game/datactrl.cpp	global	checkMallocRelease__9cDataUnit	cDataUnit::checkMallocRelease
 0x800DA8AC	0x98	.text	game/datactrl.cpp	global	setMallocInfo__9cDataUnitiPv	cDataUnit::setMallocInfo
-0x800DA944	0x8	.text	game/datactrl.cpp	global	fixMramAddr__9cDataUnitUl	cDataUnit::fixMramAddr
+0x800DA944	0x8	.text	game/datactrl.cpp	global	fixMramAddr__9cDataUnitPv	cDataUnit::fixMramAddr
 0x800DA94C	0x5C	.text	game/datactrl.cpp	global	isUseOk__9cDataUnit	cDataUnit::isUseOk
 0x800DA9A8	0xA0	.text	game/datactrl.cpp	global	waitUseOk__9cDataUnit	cDataUnit::waitUseOk
 0x800DAA48	0x50	.text	game/datactrl.cpp	global	isLoadOk__9cDataUnit	cDataUnit::isLoadOk
@@ -3461,7 +3461,7 @@ address	size	section	unit	scope	name	demangled
 0x800E77B8	0x2C	.text	game/dmg.cpp	global	global_destructors_keyed_to_cDmgMgr_cDmgMgr	global destructors keyed to cDmgMgr::cDmgMgr
 0x800E77E4	0xA0	.text	game/dvd.cpp	global	DvdRead__FiPvUlUlUliPCci	DvdRead
 0x800E7884	0xB8	.text	game/dvd.cpp	global	DvdReadN__FPCcPviiiiT0i	DvdReadN
-0x800E793C	0x13C	.text	game/dvd.cpp	global	MemorySwap__FPvUlUl	MemorySwap
+0x800E793C	0x13C	.text	game/dvd.cpp	global	MemorySwap__FPvT0Ul	MemorySwap
 0x800E7A78	0x54	.text	game/dvd.cpp	global	trans2mram__9cDvdQueuePvUlUl	cDvdQueue::trans2mram
 0x800E7ACC	0x24	.text	game/dvd.cpp	global	trans2aram_cb__FUl	trans2aram_cb
 0x800E7AF0	0x78	.text	game/dvd.cpp	global	trans2aram__9cDvdQueuePvUlUl	cDvdQueue::trans2aram
@@ -4899,7 +4899,7 @@ address	size	section	unit	scope	name	demangled
 0x80154214	0x18	.text	game/main_mem.cpp	global	MemGetHeapStartAddr__Fi	MemGetHeapStartAddr
 0x8015422C	0x18	.text	game/main_mem.cpp	global	MemGetHeapEndAddr__Fi	MemGetHeapEndAddr
 0x80154244	0x9C	.text	game/main_mem.cpp	global	MemCheckHeapEnd__Fi	MemCheckHeapEnd
-0x801542E0	0xD4	.text	game/main_mem.cpp	global	MemCreateHeap__FiUlUl	MemCreateHeap
+0x801542E0	0xD4	.text	game/main_mem.cpp	global	MemCreateHeap__FiPvT1	MemCreateHeap
 0x801543B4	0xA0	.text	game/main_mem.cpp	global	MemDestroyHeap__Fi	MemDestroyHeap
 0x80154454	0x158	.text	game/main_mem.cpp	global	MemReplaceHeap__Fii	MemReplaceHeap
 0x801545AC	0x54	.text	game/main_mem.cpp	global	MemClearAllHeap__Fv	MemClearAllHeap

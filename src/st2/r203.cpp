@@ -237,12 +237,12 @@ static void r203_EventMeetAgain()
     m = SearchEmModule(0x11);
     SceEventStart(0);
     if (r203_work->data->waitLoadOk() == 1) {
-        MemorySwap(m->pArc, (u32) r203_work->data->getAddr(), r203_work->data->getSize());
+        MemorySwap(m->pArc, r203_work->data->getAddr(), r203_work->data->getSize());
         EvtMgr.SetEvt(m->pArc, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r203_work->data->getAddr(), r203_work->data->getSize());
+        MemorySwap(m->pArc, r203_work->data->getAddr(), r203_work->data->getSize());
         r203_work->data->setCommand(CMND_DEL_DATA, 0, 0);
     }
     {

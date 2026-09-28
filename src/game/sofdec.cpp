@@ -520,10 +520,10 @@ int cSofdec::initWork(const char* fname)
     pG->Disp_flg = 0xFFFFFFFF;
     if (!StaFlagChk(pG, STA_TITLE)) {
         m_save_cur_heap = MemGetCurrentHeap();
-        m_clrsize = MemGetHeapStartAddr(m_save_cur_heap);
+        m_clrsize = (u32) MemGetHeapStartAddr(m_save_cur_heap);
         Aram.DmaTransReq(0, m_clrsize, 0x740000, 0x500000, 1);
         MemSuspendHeap(m_save_cur_heap);
-        MemCreateHeap(11, m_clrsize, m_clrsize + 0x500000);
+        MemCreateHeap(11, (void*) m_clrsize, (void*) (m_clrsize + 0x500000));
         MemSetCurrentHeap(11);
     }
     SysFlagOn(pG, SYS_TRANS_STOP);

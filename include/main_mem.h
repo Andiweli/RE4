@@ -46,8 +46,8 @@ struct OSHeapDescriptor {
 // Heap table entry (main_mem.cpp `Heap[13]`).
 struct HEAP_TBL {
     s32 handle;  // 0x00  OSAlloc heap handle, -1 = none
-    u32 start;   // 0x04
-    u32 end;     // 0x08
+    void* start; // 0x04
+    void* end;   // 0x08
     u8 status;   // 0x0C  1 = suspended
     u8 pad_D[3];
 };
@@ -74,10 +74,10 @@ int MemSetCurrentHeap(int heap_no);
 int MemSetCurrentDbgHeap(int heap_no);
 u8 MemGetCurrentHeap();
 u8 MemGetCurrentDbgHeap();
-u32 MemGetHeapStartAddr(int heap_no);
-u32 MemGetHeapEndAddr(int heap_no);
+void* MemGetHeapStartAddr(int heap_no);
+void* MemGetHeapEndAddr(int heap_no);
 u32 MemCheckHeapEnd(int heap_no);
-int MemCreateHeap(int no, u32 start, u32 end);
+int MemCreateHeap(int no, void* start, void* end);
 int MemDestroyHeap(int heap_no);
 int MemReplaceHeap(int old_heap, int new_heap);
 void MemClearAllHeap();

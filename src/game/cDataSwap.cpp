@@ -64,7 +64,7 @@ int cDataSwap::SwapOut(u32 maddr, u32 size, u32 aaddr)
     if (m_be_flag & 3) {
         MemSuspendHeap(m_CurHeapNo);
         ret = 1;
-        MemCreateHeap(11, this->m_SwapMaddr, this->m_SwapMaddr + this->m_SwapSize);
+        MemCreateHeap(11, (void*) this->m_SwapMaddr, (void*) (this->m_SwapMaddr + this->m_SwapSize));
         MemSetCurrentHeap(11);
     }
     return ret;

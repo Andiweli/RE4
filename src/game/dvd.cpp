@@ -382,7 +382,7 @@ int DvdReadN(const char* name, void* dst, int a, int b, int c, int mode, const c
 
 // Exchanges `size` bytes between MRAM and ARAM in 64 KB pieces through the DVD scratch buffers
 // (synchronous DMAs), after letting a running read finish its current piece.
-void MemorySwap(void* mram, u32 aram, u32 size)
+void MemorySwap(void* mram, void* aram, u32 size)
 {
     u8* p;
     u32 q;
@@ -395,7 +395,7 @@ void MemorySwap(void* mram, u32 aram, u32 size)
         }
     }
     rest = ALIGN32(size);
-    q = aram;
+    q = (u32) aram;
     OSReport("MemorySwap Mram:%08x Aram:%08x Size:%08x\n", mram, q, size);
     p = (u8*) mram;
     DCFlushRange(mram, size);

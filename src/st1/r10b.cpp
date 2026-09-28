@@ -236,7 +236,7 @@ extern "C" int readEvent(int no, int wait, void** out)
             pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", r10b_work->evt[no]->getSize(), max);
             return 0;
         }
-        MemorySwap(m->pArc, (u32) r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
+        MemorySwap(m->pArc, r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
         *out = m->pArc;
     } else {
         r10b_work->evt[no]->setCommand(CMND_ARAM_LOAD, 0, 0);
@@ -254,7 +254,7 @@ extern "C" void freeEvent(int no)
         ReadModule* m;
 
         m = SearchEmModule(0x2F);
-        MemorySwap(m->pArc, (u32) r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
+        MemorySwap(m->pArc, r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
         EspEmDataSwapPop(0x2F);
         r10b_work->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);
     }

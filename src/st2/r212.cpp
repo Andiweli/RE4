@@ -352,12 +352,12 @@ static void r212_EventTrap()
     RsfSet(G_ROOM_ID, 0);
     SceEventStart(0);
     if (r212_work->evd->waitLoadOk() == 1 && m != 0) {
-        MemorySwap(m->pArc, (u32) r212_work->evd->getAddr(), r212_work->evd->getSize());
+        MemorySwap(m->pArc, r212_work->evd->getAddr(), r212_work->evd->getSize());
         EvtMgr.SetEvt(m->pArc, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r212_work->evd->getAddr(), r212_work->evd->getSize());
+        MemorySwap(m->pArc, r212_work->evd->getAddr(), r212_work->evd->getSize());
         r212_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     }
     Vec* pa = &ang;

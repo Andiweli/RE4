@@ -341,14 +341,14 @@ static void r11c_EventBesiegedStart()
             pl->setAng(&ang);
         }
     } else {
-        MemorySwap(mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
+        MemorySwap(mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
         EvtMgr.SetEvt(mod->pArc, (u32*) 0);
         SceSleep(2);
         SceSleep(2);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
+        MemorySwap(mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
     }
     W->evd0->setCommand(CMND_DEL_DATA, 0, 0);
     SysFlagOn(pG, SYS_SCREEN_STOP);
@@ -560,14 +560,14 @@ static void r11c_EventBesiegedStart()
         if (W->evd1->getSize() > mod2->size) {
             pLog->err(0, 0, "r11c_Event10 exec error");
         } else {
-            MemorySwap(mod2->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
+            MemorySwap(mod2->pArc, W->evd1->getAddr(), W->evd1->getSize());
             if (EvtMgr.SetEvt(mod2->pArc, (u32*) &ev)) {
                 ev->FlgOnStatus(EvtStfFadeOut);
             }
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
                 SceSleep(1);
             }
-            MemorySwap(mod2->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
+            MemorySwap(mod2->pArc, W->evd1->getAddr(), W->evd1->getSize());
         }
     }
     W->evd1->setCommand(CMND_DEL_DATA, 0, 0);

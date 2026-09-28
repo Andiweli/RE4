@@ -362,13 +362,13 @@ static void r117_EventAshleyFind()
     ScfFlagOn(pG, SCF_R117_FIND_ASHLEY);
     ScfFlagOff(pG, SCF_90);
     if (W->evd0->waitLoadOk() == 1) {
-        MemorySwap(W->mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
+        MemorySwap(W->mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
         EvtMgr.SetEvt(W->mod->pArc, (u32*) 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
         SysFlagOn(pG, SYS_SCREEN_STOP);
-        MemorySwap(W->mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
+        MemorySwap(W->mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
         W->evd0->setCommand(CMND_DEL_DATA, 0, 0);
     }
     StaFlagOn(pG, STA_SUB_ASHLEY);
@@ -403,14 +403,14 @@ static void r117_EventSaddlerAppear()
     StaFlagOff(pG, STA_SUB_ASHLEY);
     SceSleep(3);
     if (W->evd1->waitLoadOk() == 1) {
-        MemorySwap(W->mod->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
+        MemorySwap(W->mod->pArc, W->evd1->getAddr(), W->evd1->getSize());
         if (EvtMgr.SetEvt(W->mod->pArc, (u32*) &ev)) {
             ev->FlgOnStatus(EvtStfFadeOut);
         }
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(W->mod->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
+        MemorySwap(W->mod->pArc, W->evd1->getAddr(), W->evd1->getSize());
         W->evd1->setCommand(CMND_DEL_DATA, 0, 0);
     }
     EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM01, 0, 0);

@@ -114,7 +114,7 @@ void SystemMemInit()
     OSSetArenaLo((void*) arenaLo);
     OSSetArenaHi((void*) arenaHi);
     memInitHeapTbl();
-    MemCreateHeap(0, arenaLo, SysMem.heap_end);
+    MemCreateHeap(0, (void*) arenaLo, (void*) SysMem.heap_end);
     MemSetCurrentHeap(0);
     pMemTile = NULL;
 #line 145
@@ -218,13 +218,13 @@ u8 MemGetCurrentDbgHeap()
 }
 
 // Start address of heap no.
-u32 MemGetHeapStartAddr(int heap_no)
+void* MemGetHeapStartAddr(int heap_no)
 {
     return Heap[heap_no].start;
 }
 
 // End address of heap no.
-u32 MemGetHeapEndAddr(int heap_no)
+void* MemGetHeapEndAddr(int heap_no)
 {
     return Heap[heap_no].end;
 }
@@ -262,7 +262,7 @@ u32 MemCheckHeapEnd(int heap_no)
 }
 
 // Creates (or recreates) heap no over [start, end).
-int MemCreateHeap(int no, u32 start, u32 end)
+int MemCreateHeap(int no, void* start, void* end)
 {
     if (!memCheckHeapActive(no)) {
         return 0;
@@ -271,7 +271,7 @@ int MemCreateHeap(int no, u32 start, u32 end)
         MemDestroyHeap(no);
     }
     OSReport("-- MemCreateHeap %d %08x - %08x  ", no, start, end);
-    Heap[no].handle = OSCreateHeap((void*) start, (void*) end);
+    Heap[no].handle = OSCreateHeap(start, end);
     if (Heap[no].handle >= 0) {
         Heap[no].start = start;
         Heap[no].end = end;
@@ -332,16 +332,16 @@ int MemReplaceHeap(int old_heap, int new_heap)
     }
     if (Heap[old_heap].handle >= 0) {
         start = MemCheckHeapEnd(old_heap);
-        end = Heap[old_heap].end;
+        end = (u32) Heap[old_heap].end;
         MemDestroyHeap(old_heap);
     } else {
-        start = Heap[new_heap].start;
-        end = Heap[new_heap].end;
+        start = (u32) Heap[new_heap].start;
+        end = (u32) Heap[new_heap].end;
     }
     if (start == 0) {
         return 0;
     }
-    return MemCreateHeap(new_heap, start, end);
+    return MemCreateHeap(new_heap, (void*) start, (void*) end);
 }
 
 // Destroys every heap (soft reset).
@@ -602,8 +602,8 @@ void MemCheckUsedHeap()
     } else {
         end = SysMem.heap_end;
     }
-    start = Heap[CurrentHeap].start;
-    heapEnd = Heap[CurrentHeap].end;
+    start = (u32) Heap[CurrentHeap].start;
+    heapEnd = (u32) Heap[CurrentHeap].end;
     eprintf2(8, 16, 440, 404, 0, 0, "%X", rest);
     r = OSCheckHeap(Heap[CurrentDbgHeap].handle);
     if (r >= 0) {

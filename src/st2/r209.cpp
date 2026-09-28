@@ -1015,12 +1015,12 @@ static void r209_2ndBattle()
     SysFlagOn(pG, SYS_SCREEN_STOP);
     SubScreenWait(60);
     if (r209_work->evd->waitLoadOk() == 1) {
-        MemorySwap(m->pArc, (u32) r209_work->evd->getAddr(), r209_work->evd->getSize());
+        MemorySwap(m->pArc, r209_work->evd->getAddr(), r209_work->evd->getSize());
         EvtMgr.SetEvt(m->pArc, (u32*) 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r209_work->evd->getAddr(), r209_work->evd->getSize());
+        MemorySwap(m->pArc, r209_work->evd->getAddr(), r209_work->evd->getSize());
         r209_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     }
     SceAtSetEnable(0, 0);

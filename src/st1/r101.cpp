@@ -636,7 +636,7 @@ static void r101_Event20()
         if (r101_work->evt21->getSize() > m->size) {
             pLog->err(0, 0, "r101_Event20 exec error");
         } else {
-            MemorySwap(m->pArc, (u32) r101_work->evt21->getAddr(), r101_work->evt21->getSize());
+            MemorySwap(m->pArc, r101_work->evt21->getAddr(), r101_work->evt21->getSize());
             EvtMgr.SetEvt(m->pArc, 0);
             SceSleep(3);
             for (;;) {
@@ -655,7 +655,7 @@ static void r101_Event20()
                 SceSleep(1);
             }
             SysFlagOff(pG, SYS_SCREEN_STOP);
-            MemorySwap(m->pArc, (u32) r101_work->evt21->getAddr(), r101_work->evt21->getSize());
+            MemorySwap(m->pArc, r101_work->evt21->getAddr(), r101_work->evt21->getSize());
         }
     }
     r101_work->evt21->setCommand(CMND_DEL_DATA, 0, 0);
@@ -962,12 +962,12 @@ static void r101_Event00()
             SysFlagOn(pG, SYS_SCREEN_STOP);
             SceSleep(2);
             m = SearchEmModule(0x26);
-            MemorySwap(m->pArc, (u32) r101_work->evt00->getAddr(), r101_work->evt00->getSize());
+            MemorySwap(m->pArc, r101_work->evt00->getAddr(), r101_work->evt00->getSize());
             EvtMgr.SetEvt(m->pArc, 0);
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
                 SceSleep(1);
             }
-            MemorySwap(m->pArc, (u32) r101_work->evt00->getAddr(), r101_work->evt00->getSize());
+            MemorySwap(m->pArc, r101_work->evt00->getAddr(), r101_work->evt00->getSize());
         }
         r101_work->evt00->setCommand(CMND_DEL_DATA, 0, 0);
         r101_setEmSuspend(0);

@@ -1728,7 +1728,7 @@ int cCard::initialize(int type)
         if (pG->CardStatus & 0x80) {
             addr = (u32) pG->pOption;
         } else {
-            addr = MemGetHeapStartAddr(heap);
+            addr = (u32) MemGetHeapStartAddr(heap);
             if (!(pG->CardStatus & 8)) {
                 c0 = 0;
                 c1 = 0xFF;

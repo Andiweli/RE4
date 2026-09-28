@@ -440,7 +440,7 @@ extern "C" int readEvent(int no, int wait, void** out)
                 pLog->err(0, 0, "r100::readEvent() : out of memory");
                 goto fail;
             }
-            MemorySwap(m->pArc, (u32) W->evt[no]->getAddr(), W->evt[no]->getSize());
+            MemorySwap(m->pArc, W->evt[no]->getAddr(), W->evt[no]->getSize());
             {
                 void* arc = m->pArc;
 
@@ -485,7 +485,7 @@ extern "C" void freeEvent(int no, int swap)
             ReadModule* m;
 
             m = SearchEmModule(0x12);
-            MemorySwap(m->pArc, (u32) W->evt[no]->getAddr(), W->evt[no]->getSize());
+            MemorySwap(m->pArc, W->evt[no]->getAddr(), W->evt[no]->getSize());
             EspEmDataSwapPop(0x12);
         }
         W->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);
