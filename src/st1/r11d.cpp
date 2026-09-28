@@ -437,14 +437,14 @@ static void r11d_execHide0(int mode)
     if (mode == 0) {
         if (RsfCheck(G_ROOM_ID, 1) == 0) {
             RsfSet(G_ROOM_ID, 1);
-            SceAtPtr(3)->hide.cut = 8;
+            SceAtPtr(3)->hide.cam_no = 8;
         } else {
             r11d_hideCnt++;
             if (r11d_hideCnt > 7) {
                 RsfClear(G_ROOM_ID, 1);
                 r11d_hideCnt = mode;
             }
-            SceAtPtr(3)->hide.cut = 0xC;
+            SceAtPtr(3)->hide.cam_no = 0xC;
         }
     }
     r11d_execHide_main(mode, 0x23);

@@ -240,7 +240,7 @@ struct GLOBAL_WK {
     // (game/t_flag.cpp scf_s) names them, index 0 being bit 31 of word 0. DoorFlagInit presets bits
     // of words 3 to 5.
     u32 Scenario_flg[8];
-    u32 Key_flg[2];        // 0x51DC  one bit per locked door (t_flag KEY_LOCK; sce_at SceAtWork::lockFlag)
+    u32 Key_flg[2];        // 0x51DC  one bit per locked door (t_flag KEY_LOCK; sce_at SCE_AT_DATA::lockFlag)
     u32 Frame_cnt;         // 0x51E4  frame counter (em: `& 3` vs emset_no staggers per-enemy work; tools blink on % 30)
     u32 save_free_work[64];      // 0x51E8  scenario free words (sce_com SetFree/GetFree)
     EM_LIST Em_list[256];     // 0x52E8  enemy list (ESL file) read by stage.cpp

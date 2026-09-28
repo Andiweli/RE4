@@ -714,7 +714,7 @@ static void door5_close()
     cnt = 0;
     while (SmdGetObjPtr(0x39)->pos.y > 0.0f) {
         if (cnt == 0x1E || cnt == 0x3C || cnt == 0x4B) {
-            SceAtWork* at = SceAtPtr(0x19);
+            SCE_AT_DATA* at = SceAtPtr(0x19);
             u32 j;
 
             for (j = 0; j <= 10; j++) {

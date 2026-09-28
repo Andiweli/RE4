@@ -897,17 +897,17 @@ static void r105_checkCloseCover()
 }
 
 // Moves the item model of area 0x8D onto area 0x9B's model position and hides it.
-static inline void r105_setItemModel(SceAtWork* at)
+static inline void r105_setItemModel(SCE_AT_DATA* at)
 {
-    SceAtWork* at2;
+    SCE_AT_DATA* at2;
 
-    at->item.id = 0x8A;
+    ((SCE_AT_ITEM*) at)->item.item_id = 0x8A;
     at2 = SceAtPtr(0x9B);
-    if (at2->item.pModel && at->item.pModel) {
-        at2->item.pModel->pos = at->item.pModel->pos;
-        at2->item.pModel->ang = at->item.pModel->ang;
-        at->item.pModel->be_flag &= ~2;
-        at->item.pModel = at2->item.pModel;
+    if (((SCE_AT_ITEM*) at2)->item.pModel && ((SCE_AT_ITEM*) at)->item.pModel) {
+        ((SCE_AT_ITEM*) at2)->item.pModel->pos = ((SCE_AT_ITEM*) at)->item.pModel->pos;
+        ((SCE_AT_ITEM*) at2)->item.pModel->ang = ((SCE_AT_ITEM*) at)->item.pModel->ang;
+        ((SCE_AT_ITEM*) at)->item.pModel->be_flag &= ~2;
+        ((SCE_AT_ITEM*) at)->item.pModel = ((SCE_AT_ITEM*) at2)->item.pModel;
     }
 }
 
@@ -916,7 +916,7 @@ static inline void r105_setItemModel(SceAtWork* at)
 // prompt on area 0xC and fall through to state 1.
 extern "C" void r105_checkCesspit0()
 {
-    SceAtWork* at = SceAtPtr(0x8D);
+    SCE_AT_DATA* at = SceAtPtr(0x8D);
 
     for (;;) {
         if (RsfCheck(G_ROOM_ID, 4) == 0) {
@@ -929,7 +929,7 @@ extern "C" void r105_checkCesspit0()
             break;
         }
     }
-    at->item.seFind = 0x5B;
+    ((SCE_AT_ITEM*) at)->item.se_no = 0x5B;
     SceAtSetEnable(0x11, 1);
     if (RsfCheck(G_ROOM_ID, 5)) {
         SceAtSetEnable(0x8D, 0);
@@ -944,7 +944,7 @@ extern "C" void r105_checkCesspit0()
 // the lid; exits if the item is already taken, else state 2.
 extern "C" void r105_checkCesspit1()
 {
-    SceAtWork* at = SceAtPtr(0x8D);
+    SCE_AT_DATA* at = SceAtPtr(0x8D);
 
     for (;;) {
         if (RsfCheck(G_ROOM_ID, 3) == 0) {
@@ -966,15 +966,15 @@ extern "C" void r105_checkCesspit1()
             break;
         }
     }
-    at->item.seFind = 0x5A;
+    ((SCE_AT_ITEM*) at)->item.se_no = 0x5A;
     SceAtSetEnable(0x11, 0);
     SceAtSetEnable(0xC, 0);
     if (SceAtItemFlgCk(0x8D) == 1) {
         SceExit();
     }
     if (RsfCheck(G_ROOM_ID, 5)) {
-        at->item.flag2 |= 0x10;
-        at->item.pModel->pos.y += 10.0f;
+        ((SCE_AT_ITEM*) at)->item.ctrl_flag |= 0x10;
+        ((SCE_AT_ITEM*) at)->item.pModel->pos.y += 10.0f;
         SceAtSetEnable(0x8D, 1);
     }
     r105_checkCesspit2();
@@ -983,7 +983,7 @@ extern "C" void r105_checkCesspit1()
 // Cesspit state 2 (lid open): waits for the item to be found and moves its model onto the lid once (bit 5).
 extern "C" void r105_checkCesspit2()
 {
-    SceAtWork* at = SceAtPtr(0x8D);
+    SCE_AT_DATA* at = SceAtPtr(0x8D);
 
     while (1) {
         if (RsfCheck(G_ROOM_ID, 5) == 0 && SceAtItemFindFlgCk(0x8D) == 1) {
@@ -999,7 +999,7 @@ extern "C" void r105_checkCesspit2()
 // clear -> cover off, lid closed (open prompt, state 1); bit 3 set -> lid open (state 2).
 static void r105_initCesspit()
 {
-    SceAtWork* at = SceAtPtr(0x8D);
+    SCE_AT_DATA* at = SceAtPtr(0x8D);
 
     SceAtSetEnable(0x9B, 1);
     SmdGetObjPtr(0x30)->be_flag |= 0x20;

@@ -391,10 +391,10 @@ static void r30c_PlaneMoveEndProc(cObj* obj)
 // The item inside the plane: link the item attribute to the plane object.
 void r30c_LinkObjItemAt(int no, cObj* obj)
 {
-    SceAtWork* at = SceAtPtr(no);
+    SCE_AT_DATA* at = SceAtPtr(no);
 
     if (at && obj) {
-        at->item.pModel = obj;
+        ((SCE_AT_ITEM*) at)->item.pModel = obj;
         obj->LightInfo.EnableMask = (obj->LightInfo.EnableMask | 0x20) & ~0x10;
     }
 }

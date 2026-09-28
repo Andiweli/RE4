@@ -64,7 +64,7 @@ public:
     s8 m_room_flag;      // 0x72  flags_174 bit set when the event is cancelled (-1 = none)
     u8 m_init_loop_flag;  // 0x73  set while readEmData waits inside a scenario task
     u8 m_chapter_no;      // 0x74  chapter number (SceSetChapterEnd)
-    u8 m_door_fade_eff;   // 0x75  fade effect at the door jump (SceAtDoor doorFadeEff; game: 0 filter fade, 1 quick fade)
+    u8 m_door_fade_eff;   // 0x75  fade effect at the door jump (SCE_AT_DATA_DOOR fade_eff; game: 0 filter fade, 1 quick fade)
     u8 m_item_get;        // 0x76  set while the sceAtGetItem task runs (SceSys move skips while set)
     u8 x77;               // 0x77
     s16 m_chapter_door;   // 0x78  door area the chapter end returns through (-1 = none; sce_com)

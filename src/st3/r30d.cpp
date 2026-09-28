@@ -361,13 +361,13 @@ static void R30dShutterFrontEvent()
         return;
     }
     if (!(pG->Room_flg[0] & 0x20000000)) {
-        SceAtWork* at;
+        SCE_AT_DATA* at;
 
         SceUpCut(0xA, -1, -1, 0);
         pG->Room_flg[0] |= 0x20000000;
         at = SceAtPtr(0x18);
         if (at) {
-            at->actBtnKind = 0x33;
+            at->act_type = 0x33;
         }
         return;
     }

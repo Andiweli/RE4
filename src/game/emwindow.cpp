@@ -101,7 +101,7 @@ cEmWindow* SetWindow(void* bin, void* tpl, Vec* pos, Vec* rot, int type, u8 etcN
 // the crossing direction, the window position, its status word and the window.
 int ChkWindow(cModel* pModTar, Vec* pos0, Vec* pos1, int field_id, u16* etc_flag, Vec* pNorm, Vec* pCenter, cEmWindow** o_pEm)
 {
-    SceAtField* info;
+    SCE_AT_DATA_FIELD_INFO* info;
     cEmWindow* win;
 
     if (o_pEm) {
@@ -115,10 +115,10 @@ int ChkWindow(cModel* pModTar, Vec* pos0, Vec* pos1, int field_id, u16* etc_flag
     if (info == 0) {
         return 0;
     }
-    if (info->value != field_id) {
+    if (info->id != field_id) {
         return 0;
     }
-    win = (cEmWindow*) info->pModel;
+    win = (cEmWindow*) info->pParent;
     if (win == 0) {
         pLog->err(0, 0, "SceAtCheck : failed");
         return 0;
@@ -186,7 +186,7 @@ int cEmWindow::init(void* bin, void* tpl, Vec* pos_, Vec* rot_, int type_, u8 et
     Vec pt[4];
     Vec size;
     Vec satPos;
-    SceAtField* out;
+    SCE_AT_DATA_FIELD_INFO* out;
     f32 frame;
     int cube;
     int no;

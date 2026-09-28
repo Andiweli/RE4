@@ -1315,7 +1315,7 @@ static void appear_f_exit()
 static void appear_f()
 {
     cEm3d* heri;
-    SceAtWork* at;
+    SCE_AT_DATA* at;
     u32 i;
 
     R320_SAVE_FLAGS |= 0x00040000;
@@ -1980,8 +1980,8 @@ static void destroy_1()
 // Gun tower 2 destroyed (as destroy_1).
 static void destroy_2()
 {
-    SceAtWork* at;
-    SceAtWork* w;
+    SCE_AT_DATA* at;
+    SCE_AT_DATA* w;
 
     while (!RmfFlagChk(pG, RMF_TARGET_DESTROY)) {
         SceSleep(1);
@@ -2017,8 +2017,8 @@ static void destroy_2()
     }
     w = sceAtSetOtStart();
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (w->type == 3) {
-            if (AreaHitCheck(&at->area, &w->dstPos)) {
+        if (w->id == 3) {
+            if (AreaHitCheck(&at->area, &w->door.next_pos)) {
                 SceAtSetEnable(w->no, 0);
             }
         }

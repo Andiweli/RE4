@@ -72,7 +72,7 @@ void r206_die_event();
 static void r206_gouryuu_event();
 static void item_chk();
 void r206_openTerm();
-SceAtWork* GetKeyItemAtari();
+SCE_AT_DATA* GetKeyItemAtari();
 static void r206_auto_door_ck();
 static void Evt_R206S00_Func(Event* e);
 static void Evt_R206S10_Func(Event* e);
@@ -228,13 +228,13 @@ void r206_openTerm()
 }
 
 // The area of the key item (type 3, item 0xA3).
-SceAtWork* GetKeyItemAtari()
+SCE_AT_DATA* GetKeyItemAtari()
 {
-    SceAtWork* p;
+    SCE_AT_DATA* p;
 
     p = sceAtSetOtStart();
     while ((p = sceAtGetOtAddr(p)) != NULL) {
-        if (p->type == 3 && p->item.id == 0xA3) {
+        if (p->id == 3 && ((SCE_AT_ITEM*) p)->item.item_id == 0xA3) {
             return p;
         }
     }
@@ -556,7 +556,7 @@ static void r206_snipe()
     cEmHit* subHit0;
     cEmHit* subHit1;
     cEmBarred* gate;
-    SceAtWork* at;
+    SCE_AT_DATA* at;
     int done;
     int moved;
     int wave;
@@ -859,7 +859,7 @@ wave_done:
     }
     at = GetKeyItemAtari();
     if (at != NULL) {
-        SubCharMoveTo(at->item.pos.x, at->item.pos.y, at->item.pos.z, 193.0f, 0);
+        SubCharMoveTo(((SCE_AT_ITEM*) at)->item.item_pos.x, ((SCE_AT_ITEM*) at)->item.item_pos.y, ((SCE_AT_ITEM*) at)->item.item_pos.z, 193.0f, 0);
     } else {
         pLog->err(0, 0, "KEY ATARI NOT FOUND!!");
     }
@@ -1119,7 +1119,7 @@ static void r206_openedShelf(int no)
 // After the reunion: disable the key item's area (it was taken in Ashley's section).
 static void destroy_key_atari()
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     SceSleep(1);
     at = GetKeyItemAtari();

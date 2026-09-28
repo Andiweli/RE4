@@ -347,24 +347,24 @@ void SceMesCamSndSet(int mes_no, int cam_no, int se_no, int attr)
 // (block 0 when flags bit1); waits for the message.
 void SceUpCut(int a, int b, int c, int attr)
 {
-    SceAtMesData m;
+    SCE_AT_DATA_MES m;
 
     // Both flag bytes stored in each arm (jump2 cross-jumps the else arm's store into the
     // then arm's): the byte stays in r0 and `sth a` precedes the `&m` argument.
     if (attr & 1) {
-        m.type = 1;
+        m.mes_type = 1;
     } else {
-        m.type = 0;
+        m.mes_type = 0;
     }
     if (attr & 2) {
-        m.seBlk = 1;
+        m.se_type = 1;
     } else {
-        m.seBlk = 0;
+        m.se_type = 0;
     }
-    m.no = a;
-    m.camCut = b + 1;
-    m.se = c + 1;
-    m.flag = attr;
+    m.mes_no = a;
+    m.cam_no = b + 1;
+    m.se_no = c + 1;
+    m.attr = attr;
     SceAtSetMes(&m);
     SceMesWait();
 }
@@ -606,9 +606,9 @@ void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, TaskFunc func, T
         return;
     }
     if (SceAtPtr(atNo)) {
-        SceAtPtr(atNo)->trigger = 8;
-        SceAtPtr(atNo)->actBtnKind = 0x10;
-        SceAtPtr(atNo)->otNo = 5;
+        SceAtPtr(atNo)->trg_type = 8;
+        SceAtPtr(atNo)->act_type = 0x10;
+        SceAtPtr(atNo)->priority = 5;
     }
     ne = (SceItemEvent*) __builtin_new(sizeof(SceItemEvent));
     for (k = 0; k < 8; k++) {
@@ -792,16 +792,16 @@ void SceChapterEnd()
         plRot = pPL->ang;
         room = pG->room_id;
         x4F9E = pG->Part;
-        if (SceAtPtr(SceSys.m_chapter_door)->type == 1) {
-            pPL->pos.x = SceAtPtr(SceSys.m_chapter_door)->dstPos.x;
-            pPL->pos.y = SceAtPtr(SceSys.m_chapter_door)->dstPos.y;
-            pPL->pos.z = SceAtPtr(SceSys.m_chapter_door)->dstPos.z;
-            pPL->ang.y = SceAtPtr(SceSys.m_chapter_door)->dstAngle;  // the pG load of room_id_prev waits for the store
+        if (SceAtPtr(SceSys.m_chapter_door)->id == 1) {
+            pPL->pos.x = SceAtPtr(SceSys.m_chapter_door)->door.next_pos.x;
+            pPL->pos.y = SceAtPtr(SceSys.m_chapter_door)->door.next_pos.y;
+            pPL->pos.z = SceAtPtr(SceSys.m_chapter_door)->door.next_pos.z;
+            pPL->ang.y = SceAtPtr(SceSys.m_chapter_door)->door.next_ang_y;  // the pG load of room_id_prev waits for the store
             (pG->room_id_prev = pG->room_id);
             pG->Part_old = pG->Part;
-            pG->stage_no = SceAtPtr(SceSys.m_chapter_door)->dstStage;
-            pG->room_no = SceAtPtr(SceSys.m_chapter_door)->dstRoom;
-            pG->Part = SceAtPtr(SceSys.m_chapter_door)->dstPart;
+            pG->stage_no = SceAtPtr(SceSys.m_chapter_door)->door.next_stage_no;
+            pG->room_no = SceAtPtr(SceSys.m_chapter_door)->door.next_room_no;
+            pG->Part = SceAtPtr(SceSys.m_chapter_door)->door.next_part_no;
             pG->JumpPoint = 0;
             pG->r_continue_cnt = 0;
         } else {
@@ -839,7 +839,7 @@ void SceChapterEnd()
         pG->room_id = room;
         pG->Part = x4F9E;
         if (SceAtPtr(SceSys.m_chapter_door)) {
-            SceAtPtr(SceSys.m_chapter_door)->doorFadeEff = 2;
+            SceAtPtr(SceSys.m_chapter_door)->door.fade_eff = 2;
             SceAtExecute(SceSys.m_chapter_door);
         }
     } else {

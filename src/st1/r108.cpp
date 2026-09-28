@@ -291,7 +291,7 @@ extern "C" void r108_initPuzzle(int dial, int coverL, int coverR, int mesNo)
         r108_coverR->pos.x -= 220.0f;
         if (!ItfFlagChk(pG, ITF_R108_ITEM)) {
             SceAtDataSet_exec(0xA, SCE_LEVEL10, 0, (TaskFunc) r108_getItem, 0, 1);
-            SceAtPtr(0xA)->actBtnKind = 0x28;
+            SceAtPtr(0xA)->act_type = 0x28;
         }
     }
 }
@@ -411,7 +411,7 @@ static void r108_execPuzzle()
             r108_openCover();
             ScfFlagOn(pG, SCF_R108_PUZZLE_CLEAR);
             SceAtDataSet_exec(0xA, SCE_LEVEL10, 0, (TaskFunc) r108_getItem, 0, 1);
-            SceAtPtr(0xA)->actBtnKind = 0x28;
+            SceAtPtr(0xA)->act_type = 0x28;
             break;
         }
         SceSleep(1);

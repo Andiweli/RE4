@@ -340,20 +340,20 @@ static void r103_checkCloseCover(R103Cesspit* c)
 }
 
 // The item model of area `at` moves to area `at2`'s model position and `at2` takes it over.
-static inline void r103_moveItemModel(SceAtWork* at, SceAtWork* at2)
+static inline void r103_moveItemModel(SCE_AT_DATA* at, SCE_AT_DATA* at2)
 {
-    if (at2->item.pModel != 0 && at->item.pModel != 0) {
-        at2->item.pModel->pos = at->item.pModel->pos;
-        at2->item.pModel->ang = at->item.pModel->ang;
-        at->item.pModel->be_flag &= ~2;
-        at->item.pModel = at2->item.pModel;
+    if (((SCE_AT_ITEM*) at2)->item.pModel != 0 && ((SCE_AT_ITEM*) at)->item.pModel != 0) {
+        ((SCE_AT_ITEM*) at2)->item.pModel->pos = ((SCE_AT_ITEM*) at)->item.pModel->pos;
+        ((SCE_AT_ITEM*) at2)->item.pModel->ang = ((SCE_AT_ITEM*) at)->item.pModel->ang;
+        ((SCE_AT_ITEM*) at)->item.pModel->be_flag &= ~2;
+        ((SCE_AT_ITEM*) at)->item.pModel = ((SCE_AT_ITEM*) at2)->item.pModel;
     }
 }
 
 // Cesspit state 0: the cover is still closed; the item found in it moves onto the lid.
 extern "C" void r103_checkCesspit0(R103Cesspit* c)
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     at = SceAtPtr(c->itemAt);
     while (1) {
@@ -361,7 +361,7 @@ extern "C" void r103_checkCesspit0(R103Cesspit* c)
             if (!ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT)) {
                 if (SceAtItemFindFlgCk(c->itemAt) == 1) {
                     ScfFlagOn(pG, SCF_R103_ITEM_IN_CESSPIT);
-                    at->item.id = 0x89;
+                    ((SCE_AT_ITEM*) at)->item.item_id = 0x89;
                     r103_moveItemModel(at, SceAtPtr(c->itemAt2));
                 }
             }
@@ -370,7 +370,7 @@ extern "C" void r103_checkCesspit0(R103Cesspit* c)
             break;
         }
     }
-    at->item.seFind = 5;
+    ((SCE_AT_ITEM*) at)->item.se_no = 5;
     SceAtSetEnable(c->at10, 1);
     if (ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT)) {
         SceAtSetEnable(c->itemAt, 0);
@@ -383,7 +383,7 @@ extern "C" void r103_checkCesspit0(R103Cesspit* c)
 // Cesspit state 1: the cover is open; the item area follows the found / taken flags.
 extern "C" void r103_checkCesspit1(R103Cesspit* c)
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     at = SceAtPtr(c->itemAt);
     while (1) {
@@ -406,15 +406,15 @@ extern "C" void r103_checkCesspit1(R103Cesspit* c)
             break;
         }
     }
-    at->item.seFind = 4;
+    ((SCE_AT_ITEM*) at)->item.se_no = 4;
     SceAtSetEnable(c->at10, 0);
     SceAtSetEnable(c->at18, 0);
     if (SceAtItemFlgCk(c->itemAt) == 1) {
         SceExit();
     }
     if (ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT)) {
-        at->item.flag2 |= 0x10;
-        at->item.pModel->pos.y += 10.0f;
+        ((SCE_AT_ITEM*) at)->item.ctrl_flag |= 0x10;
+        ((SCE_AT_ITEM*) at)->item.pModel->pos.y += 10.0f;
         SceAtSetEnable(c->itemAt, 1);
     }
     r103_checkCesspit2(c);
@@ -423,13 +423,13 @@ extern "C" void r103_checkCesspit1(R103Cesspit* c)
 // Cesspit state 2: the lid is open; the item found moves onto the lid.
 extern "C" void r103_checkCesspit2(R103Cesspit* c)
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     at = SceAtPtr(c->itemAt);
     while (1) {
         if (!ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT) && SceAtItemFindFlgCk(c->itemAt) == 1) {
             ScfFlagOn(pG, SCF_R103_ITEM_IN_CESSPIT);
-            at->item.id = 0x89;
+            ((SCE_AT_ITEM*) at)->item.item_id = 0x89;
             r103_moveItemModel(at, SceAtPtr(c->itemAt2));
             break;
         }
@@ -440,7 +440,7 @@ extern "C" void r103_checkCesspit2(R103Cesspit* c)
 // Cesspit setup from the saved state.
 extern "C" void r103_initCesspit(R103Cesspit* c)
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     at = SceAtPtr(c->itemAt);
     SceAtSetEnable(c->itemAt2, 1);
@@ -477,7 +477,7 @@ extern "C" void r103_initCesspit(R103Cesspit* c)
     }
     SceSleep(1);
     if (ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT)) {
-        at->item.id = 0x89;
+        ((SCE_AT_ITEM*) at)->item.item_id = 0x89;
         r103_moveItemModel(at, SceAtPtr(c->itemAt2));
     }
 }

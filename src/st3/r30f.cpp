@@ -149,7 +149,7 @@ static void em_set();
 static void lift_start_task();
 static void r30f_switch();
 void addPos(Vec* add, cModel* m);
-void addPos_sca(Vec* add, SceAtWork* at);
+void addPos_sca(Vec* add, SCE_AT_DATA* at);
 void setLiftMoveAdd(Vec* add);
 static void em_set2();
 static void gate_open();
@@ -1276,7 +1276,7 @@ void AreaSet(u32 no)
 // Removes the live list enemies standing in area `at`.
 void em_destroy_area(int at)
 {
-    SceAtWork* w = SceAtPtr(at);
+    SCE_AT_DATA* w = SceAtPtr(at);
     u32 i;
 
     for (i = 0; i < 90; i++) {
@@ -1544,7 +1544,7 @@ void addPos(Vec* add, cModel* m)
 }
 
 // Moves a 4-point area with the lift.
-void addPos_sca(Vec* add, SceAtWork* at)
+void addPos_sca(Vec* add, SCE_AT_DATA* at)
 {
     at->area.xz4.p[0].x += add->x;
     at->area.xz4.p[0].z += add->z;
@@ -1565,7 +1565,7 @@ void setLiftMoveAdd(Vec* add)
     u32 i;
     // One at/s1/s2/c for all nine SceAt blocks: function-scope pseudos, so s1 is the first
     // callee-saved allocation (r31) and the loop offset / &v take r31 in global.c pass 0.
-    SceAtWork* at;
+    SCE_AT_DATA* at;
     cSat* s1;
     cSat* s2;
     Vec c;
@@ -1588,12 +1588,12 @@ void setLiftMoveAdd(Vec* add)
         }
     }
     at = SceAtPtr(7);
-    s1 = at->scr.pSat;
-    s2 = at->scr.pEat;
+    s1 = at->scr_at.pSat;
+    s2 = at->scr_at.pEat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
         if (s2) {
@@ -1601,65 +1601,65 @@ void setLiftMoveAdd(Vec* add)
         }
     }
     at = SceAtPtr(0xE);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x10);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x13);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x14);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x11);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x12);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(6);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }

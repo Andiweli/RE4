@@ -26143,7 +26143,7 @@ extern "C" void em10SetTakeawayPos(cEm10* em)
     f32 ang;
     f32 a;
     u32 i;
-    SceAtWork* p;
+    SCE_AT_DATA* p;
 
     // Both loops write the `bestAng < PI/2` and `d < bestD` cases as separate arms with their own
     // copy of the update (jump2 cross-jumps them into the `||` shape): at global-alloc time the extra
@@ -26201,10 +26201,10 @@ extern "C" void em10SetTakeawayPos(cEm10* em)
     p = sceAtSetOtStart();
     found = -1;
     while ((p = sceAtGetOtAddr(p)) != 0) {
-        if (!(p->flag & 1)) {
+        if (!(p->be_flg & 1)) {
             continue;
         }
-        if (p->type != 1) {
+        if (p->id != 1) {
             continue;
         }
         AreaGetCenterPos(&c, &p->area);

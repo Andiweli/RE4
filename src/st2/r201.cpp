@@ -228,8 +228,8 @@ void R201Init()
     {
         u8 kind = 1;
 
-        SceAtPtr(0x26)->actBtnKind = kind;
-        SceAtPtr(0x27)->actBtnKind = kind;
+        SceAtPtr(0x26)->act_type = kind;
+        SceAtPtr(0x27)->act_type = kind;
     }
 }
 
@@ -1049,12 +1049,12 @@ void r201_setSwitchEnv(int on)
         SceAtSetEnable(5, 1);
         if (SceAtHitCheck(2) == 0) {
             SceAtSetEnable(0, 1);
-            SceAtPtr(3)->dstAngle = 0.0f;
-            SceAtPtr(0x28)->dstAngle = 0.0f;
+            SceAtPtr(3)->door.next_ang_y = 0.0f;
+            SceAtPtr(0x28)->door.next_ang_y = 0.0f;
         } else {
             SceAtSetEnable(1, 1);
-            SceAtPtr(3)->dstAngle = 3.1415927f;
-            SceAtPtr(0x28)->dstAngle = 3.1415927f;
+            SceAtPtr(3)->door.next_ang_y = 3.1415927f;
+            SceAtPtr(0x28)->door.next_ang_y = 3.1415927f;
         }
     }
 }

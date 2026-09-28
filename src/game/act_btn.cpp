@@ -79,11 +79,11 @@ void cActionButton::move()
                 SceExec(0x12, (TaskFunc) w->func, w->arg, flag, w->slot, (void*) w->d);
                 break;
             case ACT_FUNC_SCE_AT: {
-                SceAtWork* at = (SceAtWork*) w->arg;
+                SCE_AT_DATA* at = (SCE_AT_DATA*) w->arg;
 
                 SceAtSetExecFlg(at->no);
                 ((ActBtnFunc) w->func)(w->arg, w->d);
-                if (at->trigger & 0x80) {
+                if (at->trg_type & 0x80) {
                     SceAtSetEnable(at->no, 0);
                 }
                 break;

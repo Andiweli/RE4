@@ -136,7 +136,7 @@ enum ACTION_FUNC_TYPE {
 struct ActBtnWork {
     u32 tag;       // 0x00  OTag link
     void* func;    // 0x04  void (*)(int arg, int d): the action (NULL = none)
-    void* arg;     // 0x08  first argument (type 2: the SceAtWork*)
+    void* arg;     // 0x08  first argument (type 2: the SCE_AT_DATA*)
     u8 kind;       // 0x0C  ACTION_TYPE: prompt message kind + 0x16 (clamped to 0x41)
     u8 slot;       // 0x0D  ot slot / SceExec priority
     u8 type;       // 0x0E  ACTION_FUNC_TYPE: 0 call func, 1 SceExec(0x12, func...), 2 SceAt area action

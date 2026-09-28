@@ -556,13 +556,13 @@ void R208Main()
         Vec pos;
         cSat* sat;
 
-        sat = SceAtPtr(0x1B)->scr.pSat;
+        sat = SceAtPtr(0x1B)->scr_at.pSat;
         pos.x = -5700.79f;
         pos.y = 124.796f;
         pos.z = -67214.7f;
         pos.y -= W->doorB;
         sat->setCoord(&pos, (Vec*) &vecZero);
-        sat = SceAtPtr(0x1C)->scr.pSat;
+        sat = SceAtPtr(0x1C)->scr_at.pSat;
         pos.x = 3425.79f;
         pos.y = 124.796f;
         pos.z = -67283.7f;
