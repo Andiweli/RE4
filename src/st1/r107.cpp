@@ -56,7 +56,7 @@ void R107Init()
         RsfSet(G_ROOM_ID, 0);
     }
     SceSetItemEvent(3, 0x92, 1, 0xB, r104_openKiln, r104_openedKiln, 0, 0);
-    SceSetItemEvent(5, 0x93, 2, 0xC, r104_openKiln, r104_openedKiln, 1, 0);
+    SceSetItemEvent(5, 0x93, 2, 0xC, r104_openKiln, r104_openedKiln, (void*) 1, 0);
     EatMgr.registEffInfo(EAT_ET_WATER, (AtEffInfo*) &r107_eff_info);
     SceExec(0x12, (TaskFunc) r107_setFish, 0, 0, SCE_PRIO_DEF_2, 0);
 }

@@ -211,7 +211,7 @@ int MercSysInitRoom(MercInit* pMInit)
     pPL->setAng(&pMInit->rot);
     pPL->matUpdate();
     CamCtrl.Comeback(0);
-    SceExec(0x12, (TaskFunc) MercSysMoveMain, (int) wk, 4, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) MercSysMoveMain, wk, 4, SCE_PRIO_DEF_2, 0);
     {
         int strTbl[5] = {0x3F, 0x40, 0x41, 0x42, 0x3D};
 

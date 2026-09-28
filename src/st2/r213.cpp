@@ -144,9 +144,9 @@ void R213Init()
         R213EmSet();
     }
     R213SuInit();
-    SceSetItemEvent(0xA, 0x81, 9, 9, OpenBoxTreasure, OpenedBoxTreasure, 0x81, 0);
-    SceSetItemEvent(0xB, 0x84, 0xA, 0xC, OpenBoxTreasure, OpenedBoxTreasure, 0x84, 0);
-    SceSetItemEvent(0xC, 0x90, 0xB, 0xD, OpenBoxTreasure, OpenedBoxTreasure, 0x90, 0);
+    SceSetItemEvent(0xA, 0x81, 9, 9, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x81, 0);
+    SceSetItemEvent(0xB, 0x84, 0xA, 0xC, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x84, 0);
+    SceSetItemEvent(0xC, 0x90, 0xB, 0xD, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x90, 0);
     R213BridgeInit();
     SceExec(0x12, (TaskFunc) SceBgmCheck, 0, 0, SCE_PRIO_DEF_2, 0);
     SetSstAddAreaFlag(0x800);
@@ -632,7 +632,7 @@ static void R213BridgeManager()
                         which = 1;
                     }
                 }
-                SceExec(0x12, (TaskFunc) R213EventChainBreakMove, which, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) R213EventChainBreakMove, (void*) which, 0, SCE_PRIO_DEF_2, 0);
             }
             if (RsfCheck(G_ROOM_ID, 3) && RsfCheck(G_ROOM_ID, 4)) {
                 break;

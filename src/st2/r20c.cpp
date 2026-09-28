@@ -610,7 +610,7 @@ static void R20cDoorOpenMain()
         }
         SceAtSetEnable(9, 0);
         SceEventStart(0);
-        SceSetEventCancel(1, (TaskFunc) R20cDoorOpenCancel, 1, -1, 1);
+        SceSetEventCancel(1, (TaskFunc) R20cDoorOpenCancel, (void*) 1, -1, 1);
         CamCtrl.CutCall(0xE);
         SmdSetTrans(9, 0);
         EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_NONE, 0, 0);

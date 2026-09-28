@@ -139,12 +139,12 @@ void R318Init()
         SceAtDataSet_exec(9, 0x12, 0, (TaskFunc) R318ExecSwitchCheck, 0, 1);
     }
     SceExec(0x12, (TaskFunc) R318AutoDoorMgr, 0, 0, 2, 0);
-    SceExec(0x12, (TaskFunc) R318AutoDoorMgr, 1, 0, 2, 0);
-    SceExec(0x12, (TaskFunc) R318AutoDoorMgr, 2, 0, 2, 0);
+    SceExec(0x12, (TaskFunc) R318AutoDoorMgr, (void*) 1, 0, 2, 0);
+    SceExec(0x12, (TaskFunc) R318AutoDoorMgr, (void*) 2, 0, 2, 0);
     SceAtDataSet_exec(1, 0x12, 0, (TaskFunc) SceElevator, &r318_elvLeave, 1);
     SceAtSetActColor(1, 1);
     if (pG->room_id_prev == 0x31A) {
-        SceExec(0x12, (TaskFunc) SceElevator, (int) &r318_elvArrive, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) SceElevator, &r318_elvArrive, 0, 2, 0);
     }
     if (RsfCheck(G_ROOM_ID, 1) == 0) {
         SceAtDataSet_exec(0xE, 0x12, 0, (TaskFunc) R318ExecSitMain, 0, 1);
@@ -557,7 +557,7 @@ void R318ExecSwitchCheckEnd()
         v.y = -1.5707964f;
         pPL->setAng(&v);
     }
-    SceExec(0x12, (TaskFunc) R318EventLaserMove, 4, 0, 2, 0);
+    SceExec(0x12, (TaskFunc) R318EventLaserMove, (void*) 4, 0, 2, 0);
     SceExit();
 }
 
@@ -663,16 +663,16 @@ static void R318EventLaserMgr()
         if ((pG->Room_flg[2] & 0x08000000) && (pG->Room_flg[0] & 0x10000000) == 0) {
             pG->Room_flg[0] |= 0x10000000;
             R318EventLaserEnd(0);
-            SceExec(0x12, (TaskFunc) R318EventLaserMove, 1, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R318EventLaserMove, (void*) 1, 0, 2, 0);
         }
         if ((pG->Room_flg[2] & 0x04000000) && (pG->Room_flg[0] & 0x08000000) == 0) {
             pG->Room_flg[0] |= 0x08000000;
             R318EventLaserEnd(1);
-            SceExec(0x12, (TaskFunc) R318EventLaserMove, 2, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R318EventLaserMove, (void*) 2, 0, 2, 0);
         }
         if ((pG->Room_flg[2] & 0x02000000) && FlagChkSign(pG->Room_flg, 21) && FlagChkSign(pG->Room_flg, 5) == 0) {
             pG->Room_flg[0] |= 0x04000000;
-            SceExec(0x12, (TaskFunc) R318EventLaserMove, 3, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R318EventLaserMove, (void*) 3, 0, 2, 0);
         }
         SceSleep(1);
     }
@@ -864,7 +864,7 @@ static void R318EventLaserMove(int no)
                                 r318_work->dodgeTimer = 60;
                                 pG->Room_flg[0] |= 0x00010000;
                             }
-                            ActBtn.set(ACT_GUARD, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_L_R, ACT_FUNC_SCE, zero);
+                            ActBtn.set(ACT_GUARD, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_L_R, ACT_FUNC_SCE, (void*) zero);
                             if (DodgePressed()) {
                                 pG->Room_flg[0] |= 0x00040000;
                                 SetPlDamage(0, playerEscape03);
@@ -894,7 +894,7 @@ static void R318EventLaserMove(int no)
 
                     if (p2) {
                         if (__builtin_fabsf(p2->world.x - pPL->pos.x) <= dist[no]) {
-                            ActBtn.set(ACT_GUARD, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_L_R, ACT_FUNC_SCE, mode);
+                            ActBtn.set(ACT_GUARD, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_L_R, ACT_FUNC_SCE, (void*) mode);
                             if (DodgePressed()) {
                                 pG->Room_flg[0] |= 0x00040000;
                                 switch (no) {

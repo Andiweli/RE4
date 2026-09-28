@@ -192,7 +192,7 @@ void R226Init()
     if (!(SysFlagChk(pG, SYS_CONTINUE) && RsfCheck(G_ROOM_ID, 17))) {
         if (!SysFlagChk(pG, SYS_LOAD_GAME)) {
             if (pG->room_id_prev == 0x225) {
-                SceExec(0x12, (TaskFunc) SceElevator, (int) &r226_elvArrive, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) SceElevator, &r226_elvArrive, 0, SCE_PRIO_DEF_2, 0);
             }
         }
     }
@@ -359,7 +359,7 @@ void R226Main()
         RsfClear(G_ROOM_ID, 7);
     }
     if (Joy[2].trg & 0x200) {
-        SceExec(0x12, (TaskFunc) R226EventPassageSwitchMain, 1, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) R226EventPassageSwitchMain, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         RsfClear(G_ROOM_ID, 8);
     }
     if (Joy[2].trg & 0x800) {
@@ -485,9 +485,9 @@ static void R226EventRoboStartMain()
     CamCtrl.CutCall(8);
     EstSet(0, -1, 0, 0, EFF_ROOM, 0x1F, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     r226_work->str = SndStrPlayBlock(1, 0x2B, 0.0f);
-    SceExec(0x12, (TaskFunc) R226EventRoboStartMainSub, 0x3D, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) R226EventRoboStartMainSub, (void*) 0x3D, 0, SCE_PRIO_DEF_2, 0);
     SceSleep(30);
-    SceExec(0x12, (TaskFunc) R226EventRoboStartMainSub, 0x3E, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) R226EventRoboStartMainSub, (void*) 0x3E, 0, SCE_PRIO_DEF_2, 0);
     SceSleep(60);
     SceSleep(10);
     while (CamCtrl.IsMotionEnd() == 0) {
@@ -609,7 +609,7 @@ static void R226EventPassageSwitchMain(int side)
     }
     SceAtSetEnable(atNo, 0);
     SceEventStart(1);
-    SceSetEventCancel(1, (TaskFunc) R226EventPassageSwitchEnd, side, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) R226EventPassageSwitchEnd, (void*) side, -1, 1);
     CamCtrl.CutCall(cut);
     o = SmdGetObjPtr(objAng);
     if (o) {
@@ -1154,7 +1154,7 @@ static void playerRunMovePassage(cPlayer* pl)
             RmfFlagOff(pG, RMF_PILLAR_ESCAPE_ING);
             if (RmfFlagChk(pG, RMF_PILLAR_ESCAPE_LAST)) {
                 pl->r_no_2 = 5;
-                SceExec(0x12, (TaskFunc) R226EventRoboWalkPassageGoal, (int) robo, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) R226EventRoboWalkPassageGoal, robo, 0, SCE_PRIO_DEF_2, 0);
                 EndPlDamage();
             } else {
                 pl->r_no_2 = 1;
@@ -1450,7 +1450,7 @@ extern "C" void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, 
         if (o) {
             if (pPL->pos.x < o->pos.x + dist) {
                 rw->ActBtnType = idx;
-                SceExec(0x12, (TaskFunc) playerPillarDownTask, smdNo, 6, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) playerPillarDownTask, (void*) smdNo, 6, SCE_PRIO_DEF_2, 0);
                 FlagOnVar(&pG->Room_flg, (u32) flagNo);
             }
         }

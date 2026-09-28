@@ -187,9 +187,9 @@ void R30dInit()
             }
         }
     }
-    SceSetItemEvent(4, 0x80, 0, 3, OpenBoxTreasure, OpenedBoxTreasure, 0x80, 0);
-    SceSetItemEvent(5, 0x81, 1, 4, OpenBoxTreasure, OpenedBoxTreasure, 0x81, 0);
-    SceSetItemEvent(0x1B, 0x87, 5, 9, OpenBoxTreasure, OpenedBoxTreasure, 0x87, 0);
+    SceSetItemEvent(4, 0x80, 0, 3, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x80, 0);
+    SceSetItemEvent(5, 0x81, 1, 4, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x81, 0);
+    SceSetItemEvent(0x1B, 0x87, 5, 9, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x87, 0);
     if (pG->room_id_prev == 0x30F) {
         r30d_work->em[0].setEm(0x5E, -1, 0, 1, 1);
         v.y = r30d_work->em[0].getAngY() + PI;

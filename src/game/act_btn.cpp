@@ -76,7 +76,7 @@ void cActionButton::move()
                 ((ActBtnFunc) w->func)(w->arg, w->d);
                 break;
             case ACT_FUNC_SCE:
-                SceExec(0x12, (TaskFunc) w->func, (int) w->arg, flag, w->slot, (void*) w->d);
+                SceExec(0x12, (TaskFunc) w->func, w->arg, flag, w->slot, (void*) w->d);
                 break;
             case ACT_FUNC_SCE_AT: {
                 SceAtWork* at = (SceAtWork*) w->arg;
@@ -334,7 +334,7 @@ ActBtnWork* cActionButton::pullWork()
 
 // Offers an action for this frame: message kind, priority slot 0..15, callback and its
 // arguments, flags, button kind and call type.
-void cActionButton::set(int kind, int slot, void* func, void* arg, int flags, int btn, int type, int d)
+void cActionButton::set(int kind, int slot, void* func, void* arg, int flags, int btn, int type, void* d)
 {
     ActBtnWork* w = pullWork();
 
@@ -351,7 +351,7 @@ void cActionButton::set(int kind, int slot, void* func, void* arg, int flags, in
     w->flags = flags;
     w->btn = btn;
     w->slot = slot;
-    w->d = d;
+    w->d = (int) d;
     AddPrim(&m_ot[slot], (u32*) w);
     switch (w->btn) {
     case DISP_A_NORMAL:

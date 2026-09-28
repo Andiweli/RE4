@@ -70,7 +70,7 @@ void R308Init()
 
 #line 54 "D:/Bio4/Prog/r308.cpp"
     r308_work = (R308Work*) MEM_CALLOC(sizeof(R308Work), 1, 0xd);
-    SceSetItemEvent(3, 0x80, 1, 3, OpenBoxTreasure, OpenedBoxTreasure, 0x80, 1);
+    SceSetItemEvent(3, 0x80, 1, 3, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x80, 1);
     r308_work->se = -1;
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
         SceAtDataSet_exec(1, 0x12, 0, (TaskFunc) R308SwitchMain, 0, 1);

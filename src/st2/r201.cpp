@@ -224,7 +224,7 @@ void R201Init()
     }
     SceExec(0x12, (TaskFunc) r201_checkBellBreak, 0, 0, SCE_PRIO_DEF_2, 0);
     SceSetItemEvent(0x26, 0x8F, 0xC, 0x10, r201_openShelf, r201_openedShelf, 0, 0);
-    SceSetItemEvent(0x27, 0x90, 0xD, 0x11, r201_openShelf, r201_openedShelf, 1, 0);
+    SceSetItemEvent(0x27, 0x90, 0xD, 0x11, r201_openShelf, r201_openedShelf, (void*) 1, 0);
     {
         u8 kind = 1;
 
@@ -785,7 +785,7 @@ void r201_setBattleArea(int open, int init)
         } else {
             SndCall(6, 0x26, 0, 0, 0, 0);
         }
-        SceExec(0x12, (TaskFunc) r201_setBattleArea_sub, open, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r201_setBattleArea_sub, (void*) open, 0, SCE_PRIO_DEF_2, 0);
         if (open == 1) {
             EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_NONE, 0, 0);
         } else {

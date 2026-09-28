@@ -46,8 +46,8 @@ void R326Init()
     r326_work = (R326Work*) MEM_CALLOC(sizeof(R326Work), 1, 0xd);
     SceExec(0x12, (TaskFunc) r326_setCorpseBag, 0, 0, 2, 0);
     SceSetItemEvent(3, 0x80, 0, 3, r326_openBox, r326_openedBox, 0, 0);
-    SceSetItemEvent(4, 0x81, 1, 4, r326_openBox, r326_openedBox, 1, 0);
-    SceSetItemEvent(5, -1, 2, 5, r326_openBox, r326_openedBox, 2, 0);
+    SceSetItemEvent(4, 0x81, 1, 4, r326_openBox, r326_openedBox, (void*) 1, 0);
+    SceSetItemEvent(5, -1, 2, 5, r326_openBox, r326_openedBox, (void*) 2, 0);
     PlRegistMotion(ROOM_ARC_PTR(pG->pRoom, 0x1F), ROOM_ARC_PTR(pG->pRoom, 0x20), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     SceExec(0x12, (TaskFunc) r326_setSubCharMotion, 0, 0, 2, 0);
 }

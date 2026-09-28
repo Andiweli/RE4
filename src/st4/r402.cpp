@@ -99,9 +99,9 @@ void R402Init()
     R402Work*& wp = r402_work;
 #line 45 "D:/Bio4/Prog/r402.cpp"
     wp = (R402Work*) MEM_CALLOC(sizeof(R402Work), 1, 0xd);
-    SceSetItemEvent(0x14, 0x80, 2, -1, OpenBoxTreasure, OpenedBoxTreasure, 0x80, 0);
-    SceSetItemEvent(0x15, 0x81, 3, -1, OpenBoxTreasure, OpenedBoxTreasure, 0x81, 0);
-    SceSetItemEvent(0x16, 0x82, 4, -1, OpenBoxTreasure, OpenedBoxTreasure, 0x82, 0);
+    SceSetItemEvent(0x14, 0x80, 2, -1, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x80, 0);
+    SceSetItemEvent(0x15, 0x81, 3, -1, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x81, 0);
+    SceSetItemEvent(0x16, 0x82, 4, -1, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x82, 0);
     if (getRoomEtcDoor(0x18, &door0, 1) && getRoomEtcDoor(0x19, &door1, 1)) {
         door0->setDoor(door1);
     }
@@ -269,7 +269,7 @@ static void R402ExecEvent01Main()
     }
     SceEventStart(1);
     SceSetEventCancel(1, (TaskFunc) R402ExecEvent01End, 0, -1, 1);
-    SceExec(0x12, (TaskFunc) R402MoveDoor02, 1, 2, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) R402MoveDoor02, (void*) 1, 2, SCE_PRIO_DEF_2, 0);
     CamCtrl.CutCall(0xB);
     for (i = 0; i < 20; i++) {
         SceSleep(1);

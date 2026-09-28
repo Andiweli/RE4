@@ -23,8 +23,8 @@ void R410Init()
 {
 #line 28 "D:/Bio4/Prog/r410.cpp"
     r410_work = (R410Work*) MEM_CALLOC(sizeof(R410Work), 1, 0xd);
-    SceSetItemEvent(2, 0x82, 0, 3, r410_ItemBoxOpen, r410_ItemBoxOpened, 0xF, 0);
-    SceSetItemEvent(3, 0x80, 1, 4, r410_ItemBoxOpen, r410_ItemBoxOpened, 0x14, 0);
+    SceSetItemEvent(2, 0x82, 0, 3, r410_ItemBoxOpen, r410_ItemBoxOpened, (void*) 0xF, 0);
+    SceSetItemEvent(3, 0x80, 1, 4, r410_ItemBoxOpen, r410_ItemBoxOpened, (void*) 0x14, 0);
 }
 
 // Per-frame room main: nothing.

@@ -163,9 +163,9 @@ void R404Init()
         init.m.mes[9] = 0xB;
         MercSysInitRoom(&init.m);
     }
-    SceSetItemEvent(0x19, 0xA5, 0xD, -1, r404_openBox, r404_openedBox, 1, 0);
-    SceSetItemEvent(0x1A, 0xA6, 0xE, -1, r404_openBox, r404_openedBox, 2, 0);
-    SceSetItemEvent(0x1B, 0x93, 0xF, -1, r404_openBox, r404_openedBox, 3, 0);
+    SceSetItemEvent(0x19, 0xA5, 0xD, -1, r404_openBox, r404_openedBox, (void*) 1, 0);
+    SceSetItemEvent(0x1A, 0xA6, 0xE, -1, r404_openBox, r404_openedBox, (void*) 2, 0);
+    SceSetItemEvent(0x1B, 0x93, 0xF, -1, r404_openBox, r404_openedBox, (void*) 3, 0);
 }
 
 // Per frame: debug lines only.

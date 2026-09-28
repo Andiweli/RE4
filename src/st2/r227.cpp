@@ -137,7 +137,7 @@ void R227Init()
     r227_initCargoElv();
     PlRegistMotion(ROOM_ARC_PTR(pG->pRoom, 0x22), ROOM_ARC_PTR(pG->pRoom, 0x23), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     SceSetItemEvent(0x11, 0x86, 4, 9, r227_openShelf, r227_openedShelf, 0, 0);
-    SceSetItemEvent(0x12, 0x85, 5, 0xA, r227_openShelf, r227_openedShelf, 1, 0);
+    SceSetItemEvent(0x12, 0x85, 5, 0xA, r227_openShelf, r227_openedShelf, (void*) 1, 0);
 }
 
 // Per-frame room main: nothing.

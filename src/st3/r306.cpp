@@ -105,9 +105,9 @@ void R306Init()
     } else {
         SndRoomStrStart(1, 0, 1);
     }
-    SceSetItemEvent(0xB, 0x80, 0, 9, r306_DuraluminCaseOpen, r306_DuraluminCaseOpened, 0x17, 0);
-    SceSetItemEvent(0xC, 0x84, 1, 8, r306_TanaOpen, r306_TanaOpened, 0x19, 0);
-    SceSetItemEvent(0xD, 0x83, 2, 7, r306_TanaOpen, r306_TanaOpened, 0x1B, 0);
+    SceSetItemEvent(0xB, 0x80, 0, 9, r306_DuraluminCaseOpen, r306_DuraluminCaseOpened, (void*) 0x17, 0);
+    SceSetItemEvent(0xC, 0x84, 1, 8, r306_TanaOpen, r306_TanaOpened, (void*) 0x19, 0);
+    SceSetItemEvent(0xD, 0x83, 2, 7, r306_TanaOpen, r306_TanaOpened, (void*) 0x1B, 0);
 }
 
 // Item-event opener: the duralumin case (type 7) opens.

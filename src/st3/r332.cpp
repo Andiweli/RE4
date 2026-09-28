@@ -361,7 +361,7 @@ void R332Main()
             }
             if (RsfCheck(G_ROOM_ID, 4) == 0 && em->hp <= 0) {
                 RsfSet(G_ROOM_ID, 4);
-                SceExec(0x12, (TaskFunc) R332RocketShootMain, 1, 0, 2, 0);
+                SceExec(0x12, (TaskFunc) R332RocketShootMain, (void*) 1, 0, 2, 0);
                 return;
             }
             if (RsfCheck(G_ROOM_ID, 2) == 0 && (em->ckRocketEnable() || DebugTrg(1))) {
@@ -873,7 +873,7 @@ static void R332BridgeTask(int no)
         R332BridgeInit(no, 0);
     }
     if (DbgFlagChk(pG, DBG_EVENT_TOOL) == 0) {
-        R332_TASK_SET(no, SceExec(0x12, (TaskFunc) R332BridgeTask, no, 0, 2, 0));
+        R332_TASK_SET(no, SceExec(0x12, (TaskFunc) R332BridgeTask, (void*) no, 0, 2, 0));
     }
 }
 
@@ -989,7 +989,7 @@ static void R332RocketShootMain(int type)
         r332_work->strBlk = SndStrPlayBlock(1, 0xED, 0.0f);
     }
     SysFlagOff(pG, SYS_SCREEN_STOP);
-    SceSetEventCancel(1, (TaskFunc) R332RocketShootEnd, type, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) R332RocketShootEnd, (void*) type, -1, 1);
     pG->Room_flg[0] |= 0x02000000;
     if (type == 0) {
         cObjLauncher* lau;
@@ -1337,7 +1337,7 @@ static void R332ExecCrane(int no)
                 loopOn = 0;
                 step++;
                 pPL->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x36), 5, 0, 0x200, 0);
-                SceExec(0x12, (TaskFunc) R332RevaCommonMoveDw, no, 0, 2, 0);
+                SceExec(0x12, (TaskFunc) R332RevaCommonMoveDw, (void*) no, 0, 2, 0);
             }
             break;
         }
@@ -1401,7 +1401,7 @@ static void R332ExecCrane(int no)
         R332ExecCraneEnd(no, atNo);
     }
     if (RsfCheck(G_ROOM_ID, rsfNo) == 0) {
-        SceExec(0x12, (TaskFunc) R332RevaCommonMoveUp, no, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) R332RevaCommonMoveUp, (void*) no, 0, 2, 0);
     }
     FlagOffVar(R332_FLAGS, (u32) flgNo);
 }
@@ -1485,7 +1485,7 @@ void R332EventS00End()
     R332BridgeInit(0, 0);
     R332BridgeInit(1, 0);
     r332_work->task[0] = SceExec(0x12, (TaskFunc) R332BridgeTask, 0, 0, 2, 0);
-    r332_work->task[1] = SceExec(0x12, (TaskFunc) R332BridgeTask, 1, 0, 2, 0);
+    r332_work->task[1] = SceExec(0x12, (TaskFunc) R332BridgeTask, (void*) 1, 0, 2, 0);
     pPL->setNoSuspend(0);
     pPL->setPos(-32900.0f, 15811.0f, 47140.0f);
     pPL->setAng(0.0f, 0.766f, 0.0f);

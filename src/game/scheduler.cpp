@@ -197,7 +197,7 @@ void* TaskExec_hook(void* value)
 
 // Starts `func(arg)` in slot `prio` (fails with an error when the slot is busy): the thread is
 // created on the next scheduler pass; flag 6 (skipped by events and the sub screen), priority 0xF.
-TASK* TaskExec(int prio, TaskFunc func, int arg)
+TASK* TaskExec(int prio, TaskFunc func, void* arg)
 {
     TASK* t;
 
@@ -239,7 +239,7 @@ void TaskSleep(int ctr)
 
 // Called from a task: replaces itself with `func(arg)` in the same slot (started next frame) and
 // ends the current thread.
-void TaskChain(TaskFunc func, int arg)
+void TaskChain(TaskFunc func, void* arg)
 {
     pCTask->hook = TaskExec_hook;
     pCTask->pFunc = (void (*)(int)) func;

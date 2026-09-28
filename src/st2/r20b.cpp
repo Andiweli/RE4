@@ -141,12 +141,12 @@ void R20bInit()
         SceAtSetEnable(5, 0);
         SmdSetTrans(0x8F, 0);
     }
-    SceSetItemEvent(0x12, 0x86, 0xD, 6, OpenBoxTreasure, OpenedBoxTreasure, 0x86, 0);
+    SceSetItemEvent(0x12, 0x86, 0xD, 6, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x86, 0);
     zero = 0;
-    SceSetItemEvent(0x13, 0x89, 0xE, 9, OpenBoxTreasure, OpenedBoxTreasure, 0x89, 0);
-    SceSetItemEvent(0x14, 0x84, 0xF, 8, OpenBoxTreasure, OpenedBoxTreasure, 0x84, 0);
-    SceSetItemEvent(0x15, 0x87, 0x10, 7, OpenBoxTreasure, OpenedBoxTreasure, 0x87, 0);
-    SceSetItemEvent(0x18, 0x8D, 0x13, 0xB, OpenBoxTreasure, OpenedBoxTreasure, 0x8D, 0);
+    SceSetItemEvent(0x13, 0x89, 0xE, 9, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x89, 0);
+    SceSetItemEvent(0x14, 0x84, 0xF, 8, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x84, 0);
+    SceSetItemEvent(0x15, 0x87, 0x10, 7, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x87, 0);
+    SceSetItemEvent(0x18, 0x8D, 0x13, 0xB, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x8D, 0);
     if (RsfCheck(G_ROOM_ID, 17) == 0) {
         SceAtDataSet_exec(0x16, SCE_LEVEL10, 0, (TaskFunc) R20bOpenTerm, 0, 1);
     }

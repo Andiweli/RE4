@@ -95,8 +95,8 @@ void R304Init()
             em->setAng(&v);
         }
     }
-    SceSetItemEvent(4, 0x81, 2, 2, r304_DuraluminCaseOpen, r304_DuraluminCaseOpened, 0x17, 0);
-    SceSetItemEvent(5, 0x82, 3, 1, r304_LockerOpen, r304_LockerOpened, 0x20, 0);
+    SceSetItemEvent(4, 0x81, 2, 2, r304_DuraluminCaseOpen, r304_DuraluminCaseOpened, (void*) 0x17, 0);
+    SceSetItemEvent(5, 0x82, 3, 1, r304_LockerOpen, r304_LockerOpened, (void*) 0x20, 0);
     TexRenderInit(&r304_work->tex, 0, 1);
     TexRenderInit(&r304_work->tex2, 0, 1);
 }

@@ -294,7 +294,7 @@ void r21d_searchEmReset()
                     break;
                 }
                 r21d_work->resetting[i] = 1;
-                SceExec(0x12, (TaskFunc) r21d_setEmReset, i, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) r21d_setEmReset, (void*) i, 0, SCE_PRIO_DEF_2, 0);
                 r21d_work->emSetCount++;
                 break;
             }

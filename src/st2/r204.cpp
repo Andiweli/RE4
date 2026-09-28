@@ -295,7 +295,7 @@ static void setTexRender()
     SceAtLinkEtcDead(8, 0x2B, 1);
     SceAtLinkEtcDead(0x16, 2, 1);
     SceSetItemEvent(8, 0x88, 3, 5, r204_openBox, r204_openedBox, 0, 0);
-    SceSetItemEvent(0x16, 0x81, 4, 6, r204_openBox, r204_openedBox, 1, 0);
+    SceSetItemEvent(0x16, 0x81, 4, 6, r204_openBox, r204_openedBox, (void*) 1, 0);
     SceSetItemEvent(0x17, 0x87, 5, 7, (void (*)(int)) r204_openTana, (void (*)(int)) r204_openedTana, 0, 0);
 }
 

@@ -103,7 +103,7 @@ void R40dInit()
         }
         SceAtDataSet_exec(7, SCE_LEVEL10, 0, (TaskFunc) r40d_getItem, 0, 1);
     }
-    SceSetItemEvent(8, 0x83, 6, 5, r40d_openShelf, r40d_openedShelf, 1, 0);
+    SceSetItemEvent(8, 0x83, 6, 5, r40d_openShelf, r40d_openedShelf, (void*) 1, 0);
 }
 
 // Per-frame room main: nothing.

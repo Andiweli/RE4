@@ -66,7 +66,7 @@ void R219Init()
         if (pG->Part == 1) {
             SceExec(0x12, (TaskFunc) toroko_ret, 0, 0, SCE_PRIO_DEF_2, 0);
         } else if (pG->Part == 2) {
-            SceExec(0x12, (TaskFunc) toroko_ret, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) toroko_ret, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         }
     }
     if ((pG->room_id_prev == 0x219 && pG->Part == 2) || pG->room_id_prev == 0x201) {

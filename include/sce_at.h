@@ -48,7 +48,7 @@ struct SceAtDoor {
     u8 dstRoom;       // 0x11 (0x6D)
     u8 lockType;      // 0x12 (0x6E)  1 locked, 2 locked until the flag is set
     u8 lockFlag;      // 0x13 (0x6F)  pG->flags_51DC bit
-    void (*func)();   // 0x14 (0x70)  SceSys.x10 / x14 handed over at the jump (SceAtSetDoorFunc)
+    TaskFunc func;    // 0x14 (0x70)  SceSys.x10 / x14 handed over at the jump (SceAtSetDoorFunc)
     u8 dstPart;       // 0x18 (0x74)  pG->Part in the destination room
     s8 se;            // 0x19 (0x75)  locked door SE
     u8 doorNo;        // 0x1A (0x76)  pG->door_no
@@ -195,7 +195,7 @@ struct SceAtWork {
     u8 checkType;     // 0x39  who may trigger it: 1 player, 2 enemy, 8 partner (SceAtCheck type mask)
     u8 prio;          // 0x3A  SceExec priority (0 = call func directly)
     u8 prioBak;       // 0x3B  trigger saved by SceAtDataSet_exec
-    int arg;          // 0x3C
+    void* arg;        // 0x3C
     TaskFunc func;    // 0x40
     u8 otNo;          // 0x44  ordering table index (0..15) passed to SceExec / ActBtn.set
     u8 execFlag;      // 0x45  SceExec flag
@@ -220,7 +220,7 @@ struct SceAtWork {
             u8 dstRoom;       // 0x6D
             u8 lockType;      // 0x6E
             u8 lockFlag;      // 0x6F
-            void (*doorFunc)();  // 0x70
+            TaskFunc doorFunc;   // 0x70
             u8 dstPart;       // 0x74  pG->Part in the destination room
             s8 doorSe;        // 0x75
             u8 doorNo;        // 0x76
@@ -319,7 +319,7 @@ void sceAtItemFindFlgOn(SceAtItem* it);
 int sceAtItemFindFlgCk(SceAtItem* it);
 int SceAtDestroy(int at_no);
 // Area of the four corners `pos` around `m`: (x37, x38, x39, height, x44, angle, angle range, x4A, prio, func, arg, flag).
-int SceAtCreateExecAt(cModel* m, Vec* pos, f32 h, int a, int b, int c, int d, f32 ang, f32 range, int e, int prio, TaskFunc func, int arg, u8 flag);
+int SceAtCreateExecAt(cModel* m, Vec* pos, f32 h, int a, int b, int c, int d, f32 ang, f32 range, int e, int prio, TaskFunc func, void* arg, u8 flag);
 int SceAtCreateFieldAt(cModel* m, Vec* pos, f32 h, int a, int b, int c, int d, f32 ang, f32 range, int e, int val, SceAtField** out);
 int SceAtCreateItemAt(Vec* pos, ITEM_ID id, int num, int effType, int saveNo, cModel* parent, int parts);
 void SceAtReserveItemAt(cEm* pEm, Vec* pos, ITEM_ID item_id, int item_num, int item_eff, int save_no);

@@ -367,7 +367,7 @@ void R209Init()
 
         m->setSca(&sca);
     }
-    SceSetItemEvent(0x17, 0x82, 0xA, 0x17, r209_TreasureBoxOpen, r209_TreasureBoxOpened, 0xB7, 0);
+    SceSetItemEvent(0x17, 0x82, 0xA, 0x17, r209_TreasureBoxOpen, r209_TreasureBoxOpened, (void*) 0xB7, 0);
 }
 
 // Per frame during the bowgun battle (stage flag 3): builds the occupancy bits of the eight balcony
@@ -1096,9 +1096,9 @@ static void r209_2ndBattleEmSet()
             break;
         case 1:
             if ((u32) r209_work->snipeCnt <= 2) {
-                SceExec(0x12, (TaskFunc) r209_RotateDoor, 4, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) r209_RotateDoor, (void*) 4, 0, SCE_PRIO_DEF_2, 0);
                 step = 2;
-                SceExec(0x12, (TaskFunc) r209_RotateDoor, 5, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) r209_RotateDoor, (void*) 5, 0, SCE_PRIO_DEF_2, 0);
             }
             break;
         case 2:
@@ -1146,7 +1146,7 @@ static void r209_2ndBattleEmSet()
                 }
             }
             if (open) {
-                SceExec(0x12, (TaskFunc) r209_OpenPicture, arg, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) r209_OpenPicture, (void*) arg, 0, SCE_PRIO_DEF_2, 0);
             }
         }
         SceSleep(1);
@@ -1165,15 +1165,15 @@ static void r209_2ndBattleBowgunAppear()
     wp->task[0] = 0;
     SceEventStart(1);
     r209_work->task[0] = SceExec(0x12, (TaskFunc) r209_RotateDoor, 0, 0, SCE_PRIO_DEF_2, 0);
-    r209_work->task[1] = SceExec(0x12, (TaskFunc) r209_RotateDoor, 1, 0, SCE_PRIO_DEF_2, 0);
-    r209_work->task[2] = SceExec(0x12, (TaskFunc) r209_RotateDoor, 2, 0, SCE_PRIO_DEF_2, 0);
+    r209_work->task[1] = SceExec(0x12, (TaskFunc) r209_RotateDoor, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
+    r209_work->task[2] = SceExec(0x12, (TaskFunc) r209_RotateDoor, (void*) 2, 0, SCE_PRIO_DEF_2, 0);
     pG->Room_flg[0] &= ~0x00100000;
     SceSetEventCancel(1, (TaskFunc) r209_2ndBattleBowgunAppearEndProc, 0, 0xB, 1);
     CamCtrl.CutCall(0x12);
     while (CamCtrl.IsMotionEnd() == 0) {
         SceSleep(1);
     }
-    r209_work->task[3] = SceExec(0x12, (TaskFunc) r209_RotateDoor, 3, 0, SCE_PRIO_DEF_2, 0);
+    r209_work->task[3] = SceExec(0x12, (TaskFunc) r209_RotateDoor, (void*) 3, 0, SCE_PRIO_DEF_2, 0);
     CamCtrl.CutCall(0x13);
     while (CamCtrl.IsMotionEnd() == 0) {
         SceSleep(1);

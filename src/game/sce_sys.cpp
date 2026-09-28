@@ -247,7 +247,7 @@ void cSceSys::scheduler()
 // > 17 = the highest free slot. Linked into ordering slot otPrio (SCE_PRIO_*), OS priority 0xE,
 // `model` as the task's model; `flag` (0 = inherit the caller's event kind). Warns when fewer
 // than 3 slots remain. Returns the SCE_TASK, 0 when none is free.
-SCE_TASK* SceExec(int prio, TaskFunc func, int arg, u8 flag, int otPrio, void* model)
+SCE_TASK* SceExec(int prio, TaskFunc func, void* arg, u8 flag, int otPrio, void* model)
 {
     TASK* t;
     SCE_TASK* p;
@@ -257,7 +257,7 @@ SCE_TASK* SceExec(int prio, TaskFunc func, int arg, u8 flag, int otPrio, void* m
 
     if (prio == 0) {
         SetTaskModelPtr(model, 0);
-        ((void (*)(int)) func)(arg);
+        ((void (*)(int)) func)((int) arg);
         return 0;
     }
     if ((u32) prio > 17) {
@@ -281,7 +281,7 @@ SCE_TASK* SceExec(int prio, TaskFunc func, int arg, u8 flag, int otPrio, void* m
         pLog->err(0, 0, "SCE_TASK DON'T EXEC");
         return 0;
     }
-    t = TaskExec(prio, func, arg);
+    t = TaskExec(prio, func, (void*) arg);
     if (t == 0) {
         return 0;
     }
@@ -454,7 +454,7 @@ void SceExecCheckCondition()
         if ((s32) v < 0) {
             if (SceExecCheckCondition_sub(c) == 1) {
                 if (c->func != 0) {
-                    SceExec(c->prio, c->func, (int) c->arg, c->flag, SCE_PRIO_DEF_2, 0);
+                    SceExec(c->prio, c->func, c->arg, c->flag, SCE_PRIO_DEF_2, 0);
                 }
                 DelPrim(&SceExecOt, (u32*) c);
                 Mem_free(c);
@@ -540,7 +540,7 @@ void SceExecEventCancel()
 
 // Event script: makes the calling task skippable (`on`): `func(arg)` runs after a skip, event flag
 // `flagNo` (cleared now) is set by the skip, sndFlag = stop the event stream too.
-void SceSetEventCancel(int on, TaskFunc func, int arg, int flagNo, int sndFlag)
+void SceSetEventCancel(int on, TaskFunc func, void* arg, int flagNo, int sndFlag)
 {
     u32 no;
     cSceSys* s;

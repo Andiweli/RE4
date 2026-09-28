@@ -368,7 +368,7 @@ void fanceOn()
 // Action button: go through the window (its event as a scenario task).
 void windowOn(cEmWindow* pEmWindow)
 {
-    SceExec(0x12, (TaskFunc) cEmWindow::ExeWindowEvent, (int) pEmWindow, 2, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) cEmWindow::ExeWindowEvent, pEmWindow, 2, SCE_PRIO_DEF_2, 0);
     PlFanceFlag = 1;
 }
 

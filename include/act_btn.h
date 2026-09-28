@@ -170,7 +170,7 @@ public:
     // set(kind, slot, func, arg, flags, btn, type, d): pulls a work, fills it and adds the prim.
     // PS2: set(ACTION_TYPE act_type, SCE_PRIORITY priority, func, param, ctrl_flag, DISP_FLAG button_type,
     // ACTION_FUNC_TYPE func_type, model); the ints are fixed by the mangled name.
-    void set(int kind, int slot, void* func, void* arg, int flags, int btn, int type, int d);
+    void set(int kind, int slot, void* func, void* arg, int flags, int btn, int type, void* d);
     void setStopFlagOld(int flag) { m_stop_flag_old = flag; }
     void setActive(int on) {
         if (on) {

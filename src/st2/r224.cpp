@@ -181,7 +181,7 @@ void R224Main()
         // its `li` waits for the `stw` that reads v and it shares v's r0, like the
         // reload-materialised original; a fresh `0` is born early and takes r9 from pG)
         v = 0;
-        ActBtn.set(ACT_SLIDE_DOWN, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, v);
+        ActBtn.set(ACT_SLIDE_DOWN, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, (void*) v);
         if (Key.trg & 0x00080000) {
             SceExec(0x12, (TaskFunc) r224_toroko, 0, 0, SCE_PRIO_DEF_2, 0);
         }

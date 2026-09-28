@@ -68,11 +68,11 @@ void R20aInit()
     }
     SceExec(0x12, (TaskFunc) r20a_DoorLock, 0, 0, SCE_PRIO_DEF_2, 0);
     setTexRender();
-    SceSetItemEvent(7, 0x88, 2, 9, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, 0x21, 0);
-    SceSetItemEvent(8, 0x90, 3, 0xA, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, 0x23, 0);
-    SceSetItemEvent(0xC, 0x8A, 4, 0xB, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, 0x26, 0);
-    SceSetItemEvent(0xB, 0x80, 5, 0xC, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, 0x27, 0);
-    SceSetItemEvent(0xE, 0x91, 6, 0xD, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, 0x2A, 0);
+    SceSetItemEvent(7, 0x88, 2, 9, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, (void*) 0x21, 0);
+    SceSetItemEvent(8, 0x90, 3, 0xA, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, (void*) 0x23, 0);
+    SceSetItemEvent(0xC, 0x8A, 4, 0xB, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, (void*) 0x26, 0);
+    SceSetItemEvent(0xB, 0x80, 5, 0xC, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, (void*) 0x27, 0);
+    SceSetItemEvent(0xE, 0x91, 6, 0xD, r20a_TreasureBoxOpen, r20a_TreasureBoxOpened, (void*) 0x2A, 0);
     if (ScfFlagChk(pG, SCF_R206_ASHLEY_RESCUE) == 0) {
         SceAtSetEnable(0xD, 0);
     } else {

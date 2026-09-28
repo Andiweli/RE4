@@ -731,7 +731,7 @@ void cCatapult214::move()
         timer--;
         break;
     case 1:
-        SceExec(0x12, (TaskFunc) r214_setRock, (int) this, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r214_setRock, this, 0, SCE_PRIO_DEF_2, 0);
         rockReady = 0;
         step = 2;
         break;
@@ -770,7 +770,7 @@ void cCatapult214::move()
         timer--;
         break;
     case 7:
-        SceExec(0x12, (TaskFunc) r214_throwRock, (int) this, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r214_throwRock, this, 0, SCE_PRIO_DEF_2, 0);
         step = 8;
         break;
     case 8:

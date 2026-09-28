@@ -903,8 +903,8 @@ extern "C" void r11c_moveLever(int dir, int noGear)
         SceSleep(1);
     }
     if (noGear == 0) {
-        W->gear = SceExec(0x12, (TaskFunc) r11c_moveGear, dir, 0, SCE_PRIO_DEF_2, 0);
-        W->chain = SceExec(0x12, (TaskFunc) r11c_moveChain, dir, 0, SCE_PRIO_DEF_2, 0);
+        W->gear = SceExec(0x12, (TaskFunc) r11c_moveGear, (void*) dir, 0, SCE_PRIO_DEF_2, 0);
+        W->chain = SceExec(0x12, (TaskFunc) r11c_moveChain, (void*) dir, 0, SCE_PRIO_DEF_2, 0);
     }
 }
 
@@ -996,9 +996,9 @@ static void r11c_selectRoute()
     case 1:
         if ((r11c_save()->flags & 0x40000000) && !(r11c_save()->flags & 0x20000000)) {
             r11c_moveLever(-1, 1);
-            SceExec(0x12, (TaskFunc) r11c_moveLever2, -1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r11c_moveLever2, (void*) -1, 0, SCE_PRIO_DEF_2, 0);
         } else {
-            SceSetEventCancel(1, (TaskFunc) r11c_selectRoute_end, -1, 3, 1);
+            SceSetEventCancel(1, (TaskFunc) r11c_selectRoute_end, (void*) -1, 3, 1);
             r11c_moveLever(-1, 0);
             CamCtrl.CutCall(4);
             while (CamCtrl.IsMotionEnd() == 0) {
@@ -1011,12 +1011,12 @@ static void r11c_selectRoute()
             CamCtrl.CutCall(6);
             r11c_openGate(0x33);
             if (r11c_save()->flags & 0x40000000) {
-                W->closeGate = SceExec(0x12, (TaskFunc) r11c_closeGate, 0x34, 0, SCE_PRIO_DEF_2, 0);
+                W->closeGate = SceExec(0x12, (TaskFunc) r11c_closeGate, (void*) 0x34, 0, SCE_PRIO_DEF_2, 0);
             }
             while (CamCtrl.IsMotionEnd() == 0) {
                 SceSleep(1);
             }
-            SceExec(0x12, (TaskFunc) r11c_moveLever2, -1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r11c_moveLever2, (void*) -1, 0, SCE_PRIO_DEF_2, 0);
             SceSetEventCancel(0, 0, 0, -1, 1);
             r11c_selectRoute_end(-1);
             return;
@@ -1025,9 +1025,9 @@ static void r11c_selectRoute()
     case 2:
         if ((r11c_save()->flags & 0x40000000) && (r11c_save()->flags & 0x20000000)) {
             r11c_moveLever(1, 1);
-            SceExec(0x12, (TaskFunc) r11c_moveLever2, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r11c_moveLever2, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         } else {
-            SceSetEventCancel(1, (TaskFunc) r11c_selectRoute_end, 1, 3, 1);
+            SceSetEventCancel(1, (TaskFunc) r11c_selectRoute_end, (void*) 1, 3, 1);
             r11c_moveLever(1, 0);
             CamCtrl.CutCall(4);
             while (CamCtrl.IsMotionEnd() == 0) {
@@ -1040,12 +1040,12 @@ static void r11c_selectRoute()
             CamCtrl.CutCall(7);
             r11c_openGate(0x34);
             if (r11c_save()->flags & 0x40000000) {
-                W->closeGate = SceExec(0x12, (TaskFunc) r11c_closeGate, 0x33, 0, SCE_PRIO_DEF_2, 0);
+                W->closeGate = SceExec(0x12, (TaskFunc) r11c_closeGate, (void*) 0x33, 0, SCE_PRIO_DEF_2, 0);
             }
             while (CamCtrl.IsMotionEnd() == 0) {
                 SceSleep(1);
             }
-            SceExec(0x12, (TaskFunc) r11c_moveLever2, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r11c_moveLever2, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
             SceSetEventCancel(0, 0, 0, -1, 1);
             r11c_selectRoute_end(1);
             return;

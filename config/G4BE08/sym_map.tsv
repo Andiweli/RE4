@@ -2979,7 +2979,7 @@ address	size	section	unit	scope	name	demangled
 0x800C357C	0x26C	.text	game/act_btn.cpp	global	checkButton__13cActionButtonP10ActBtnWork	cActionButton::checkButton
 0x800C37E8	0xB8	.text	game/act_btn.cpp	global	checkPLStatus__13cActionButtonP10ActBtnWork	cActionButton::checkPLStatus
 0x800C38A0	0x34	.text	game/act_btn.cpp	global	pullWork__13cActionButton	cActionButton::pullWork
-0x800C38D4	0xD8	.text	game/act_btn.cpp	global	set__13cActionButtoniiPvT3iiii	cActionButton::set
+0x800C38D4	0xD8	.text	game/act_btn.cpp	global	set__13cActionButtoniiPvT3iiiT3	cActionButton::set
 0x800C39AC	0x4	.text	game/act_btn.cpp	local	__static_initialization_and_destruction_0_800C39AC	__static_initialization_and_destruction_0
 0x800C39B0	0x2C	.text	game/act_btn.cpp	global	global_constructors_keyed_to_cActionButton_init	global constructors keyed to cActionButton::init
 0x800C39DC	0x2C	.text	game/act_btn.cpp	global	global_destructors_keyed_to_cActionButton_init	global destructors keyed to cActionButton::init
@@ -5625,8 +5625,8 @@ address	size	section	unit	scope	name	demangled
 0x80187444	0x9C	.text	game/sce_at.cpp	global	SceAtCheckMoveScrAt__Fv	SceAtCheckMoveScrAt
 0x801874E0	0x58	.text	game/sce_at.cpp	global	SceAtPtr__Fi	SceAtPtr
 0x80187538	0xB0	.text	game/sce_at.cpp	global	sceAtPullAtNo__FPUc	sceAtPullAtNo
-0x801875E8	0x60	.text	game/sce_at.cpp	global	SceAtSetDoorFunc__FiPFv_vPv	SceAtSetDoorFunc
-0x80187648	0xE4	.text	game/sce_at.cpp	global	SceAtDataSet_exec__FiiiPFv_vPvi	SceAtDataSet_exec
+0x801875E8	0x60	.text	game/sce_at.cpp	global	SceAtSetDoorFunc__FiPvT1	SceAtSetDoorFunc
+0x80187648	0xE4	.text	game/sce_at.cpp	global	SceAtDataSet_exec__FiiiPvT3i	SceAtDataSet_exec
 0x8018772C	0x70	.text	game/sce_at.cpp	global	SceAtDataReset__Fi	SceAtDataReset
 0x8018779C	0xB0	.text	game/sce_at.cpp	global	SceAtSetEnable__Fii	SceAtSetEnable
 0x8018784C	0x30	.text	game/sce_at.cpp	global	SceAtHitCheck__FUl	SceAtHitCheck
@@ -5654,7 +5654,7 @@ address	size	section	unit	scope	name	demangled
 0x80188EF4	0xB8	.text	game/sce_at.cpp	global	sceAtItemFindFlgOn__FP9SceAtItem	sceAtItemFindFlgOn
 0x80188FAC	0xC4	.text	game/sce_at.cpp	global	sceAtItemFindFlgCk__FP9SceAtItem	sceAtItemFindFlgCk
 0x80189070	0x88	.text	game/sce_at.cpp	global	SceAtDestroy__Fi	SceAtDestroy
-0x801890F8	0x1D8	.text	game/sce_at.cpp	global	SceAtCreateExecAt__FP6cModelP3VecfiiiiffiiPFv_viUc	SceAtCreateExecAt
+0x801890F8	0x1D8	.text	game/sce_at.cpp	global	SceAtCreateExecAt__FP6cModelP3VecfiiiiffiiPvT11_Uc	SceAtCreateExecAt
 0x801892D0	0x1E8	.text	game/sce_at.cpp	global	SceAtCreateFieldAt__FP6cModelP3VecfiiiiffiiPP10SceAtField	SceAtCreateFieldAt
 0x801894B8	0x32C	.text	game/sce_at.cpp	global	SceAtCreateItemAt__FP3VecUsiiiP6cModeli	SceAtCreateItemAt
 0x801897E4	0x1D4	.text	game/sce_at.cpp	global	SceAtReserveItemAt__FP3cEmP3VecUsiii	SceAtReserveItemAt
@@ -5688,7 +5688,7 @@ address	size	section	unit	scope	name	demangled
 0x8018C590	0x1A8	.text	game/sce_com.cpp	global	SceUpCutStart__Fv	SceUpCutStart
 0x8018C738	0x104	.text	game/sce_com.cpp	global	SceUpCutEnd__Fv	SceUpCutEnd
 0x8018C83C	0x30	.text	game/sce_com.cpp	global	SceCheckEventStart__Fv	SceCheckEventStart
-0x8018C86C	0x14	.text	game/sce_com.cpp	global	SceSetRoomExitFunc__FPFv_vPv	SceSetRoomExitFunc
+0x8018C86C	0x14	.text	game/sce_com.cpp	global	SceSetRoomExitFunc__FPvT0	SceSetRoomExitFunc
 0x8018C880	0x1C	.text	game/sce_com.cpp	global	SetFree__FiUl	SetFree
 0x8018C89C	0x24	.text	game/sce_com.cpp	global	GetFree__Fi	GetFree
 0x8018C8C0	0xD0	.text	game/sce_com.cpp	global	SceMesSet__FiUliii	SceMesSet
@@ -5702,7 +5702,7 @@ address	size	section	unit	scope	name	demangled
 0x8018CC90	0xC4	.text	game/sce_com.cpp	global	SceDestroyEm__Fii	SceDestroyEm
 0x8018CD54	0x24	.text	game/sce_com.cpp	global	SceInitItemEvent__Fv	SceInitItemEvent
 0x8018CD78	0x1C4	.text	game/sce_com.cpp	global	SceExecItemEvent__FP12SceItemEvent	SceExecItemEvent
-0x8018CF3C	0x2D8	.text	game/sce_com.cpp	global	SceSetItemEvent__FiiiiPFi_vT4ii	SceSetItemEvent
+0x8018CF3C	0x2D8	.text	game/sce_com.cpp	global	SceSetItemEvent__FiiiiPvN24i	SceSetItemEvent
 0x8018D214	0x184	.text	game/sce_com.cpp	global	getChapterSection__FiPiT1	getChapterSection
 0x8018D398	0x638	.text	game/sce_com.cpp	global	SceChapterEnd__Fv	SceChapterEnd
 0x8018D9D0	0xE4	.text	game/sce_com.cpp	global	SceSetChapterEnd__Fii	SceSetChapterEnd
@@ -5726,7 +5726,7 @@ address	size	section	unit	scope	name	demangled
 0x8018F1F8	0x24	.text	game/sce_sys.cpp	global	scenarioGetOtAddr__FPUl	scenarioGetOtAddr
 0x8018F21C	0x7C	.text	game/sce_sys.cpp	global	SceTaskDelete__FP4TASK	SceTaskDelete
 0x8018F298	0x198	.text	game/sce_sys.cpp	global	scheduler__7cSceSys	cSceSys::scheduler
-0x8018F430	0x1E8	.text	game/sce_sys.cpp	global	SceExec__FiPFv_viUciPv	SceExec
+0x8018F430	0x1E8	.text	game/sce_sys.cpp	global	SceExec__FiPvT1UciT1	SceExec
 0x8018F618	0x44	.text	game/sce_sys.cpp	global	SceSleep__Fi	SceSleep
 0x8018F65C	0x3C	.text	game/sce_sys.cpp	global	SceExit__Fv	SceExit
 0x8018F698	0x44	.text	game/sce_sys.cpp	global	SceKill__FUl	SceKill
@@ -5738,11 +5738,11 @@ address	size	section	unit	scope	name	demangled
 0x8018F7EC	0x28	.text	game/sce_sys.cpp	global	SceExecInitCondition__Fv	SceExecInitCondition
 0x8018F814	0x164	.text	game/sce_sys.cpp	global	SceExecCheckCondition_sub__FP7SceCond	SceExecCheckCondition_sub
 0x8018F978	0x90	.text	game/sce_sys.cpp	global	SceExecCheckCondition__Fv	SceExecCheckCondition
-0x8018FA08	0x80	.text	game/sce_sys.cpp	global	SceExecLinkCondition__FiPvUcPFv_vT1Uc	SceExecLinkCondition
-0x8018FA88	0x44	.text	game/sce_sys.cpp	global	SceExecLinkEmDead__FPvUcPFv_vT0Uc	SceExecLinkEmDead
+0x8018FA08	0x80	.text	game/sce_sys.cpp	global	SceExecLinkCondition__FiPvUcT1T1Uc	SceExecLinkCondition
+0x8018FA88	0x44	.text	game/sce_sys.cpp	global	SceExecLinkEmDead__FPvUcT0T0Uc	SceExecLinkEmDead
 0x8018FACC	0x58	.text	game/sce_sys.cpp	global	EmMoveActiveCheck__FP3cEm	EmMoveActiveCheck
 0x8018FB24	0x134	.text	game/sce_sys.cpp	global	SceExecEventCancel__Fv	SceExecEventCancel
-0x8018FC58	0x98	.text	game/sce_sys.cpp	global	SceSetEventCancel__FiPFv_viii	SceSetEventCancel
+0x8018FC58	0x98	.text	game/sce_sys.cpp	global	SceSetEventCancel__FiPvT1ii	SceSetEventCancel
 0x8018FCF0	0xC0	.text	game/sce_sys.cpp	global	scenarioCheckEventCancel__Fv	scenarioCheckEventCancel
 0x8018FDB0	0x44	.text	game/sce_sys.cpp	local	__static_initialization_and_destruction_0_8018FDB0	__static_initialization_and_destruction_0
 0x8018FDF4	0x2C	.text	game/sce_sys.cpp	global	global_constructors_keyed_to_ScenarioInit	global constructors keyed to ScenarioInit
@@ -5754,9 +5754,9 @@ address	size	section	unit	scope	name	demangled
 0x80190128	0x11C	.text	game/scheduler.cpp	global	stackUsedCheck__Fv	stackUsedCheck
 0x80190244	0x94	.text	game/scheduler.cpp	global	StackOverflowCheck__FP4TASK	StackOverflowCheck
 0x801902D8	0x88	.text	game/scheduler.cpp	global	TaskExec_hook__FPv	TaskExec_hook
-0x80190360	0xA4	.text	game/scheduler.cpp	global	TaskExec__FiPFv_vi	TaskExec
+0x80190360	0xA4	.text	game/scheduler.cpp	global	TaskExec__FiPvT1	TaskExec
 0x80190404	0x8C	.text	game/scheduler.cpp	global	TaskSleep__Fi	TaskSleep
-0x80190490	0x80	.text	game/scheduler.cpp	global	TaskChain__FPFv_vi	TaskChain
+0x80190490	0x80	.text	game/scheduler.cpp	global	TaskChain__FPvT0	TaskChain
 0x80190510	0x68	.text	game/scheduler.cpp	global	TaskExit__Fv	TaskExit
 0x80190578	0x30	.text	game/scheduler.cpp	global	TaskKill__Fi	TaskKill
 0x801905A8	0x78	.text	game/scheduler.cpp	global	TaskKill__FP4TASK	TaskKill
@@ -5765,7 +5765,7 @@ address	size	section	unit	scope	name	demangled
 0x8019068C	0x18	.text	game/scheduler.cpp	global	TaskStatus__Fi	TaskStatus
 0x801906A4	0x1C	.text	game/scheduler.cpp	global	SetTaskModelPtr__FPvP4TASK	SetTaskModelPtr
 0x801906C0	0x70	.text	game/scheduler.cpp	global	iTaskScheduler__Fv	iTaskScheduler
-0x80190730	0x54	.text	game/scheduler.cpp	global	iTaskExec__FPFv_v	iTaskExec
+0x80190730	0x54	.text	game/scheduler.cpp	global	iTaskExec__FPv	iTaskExec
 0x80190784	0x30	.text	game/scheduler.cpp	global	iTaskKill__Fv	iTaskKill
 0x801907B4	0x28	.text	game/scheduler.cpp	global	iTaskExit__Fv	iTaskExit
 0x801907DC	0x50	.text	game/scheduler.cpp	global	iTaskSuspend__Fv	iTaskSuspend

@@ -120,7 +120,7 @@ static void r30a_moveElevator(u32 dir)
             obj->pModelInfo->uvScrollU = -0.05f;
         }
     }
-    SceExec(0x12, (TaskFunc) r30a_setElvCamera, dir, 0, 2, 0);
+    SceExec(0x12, (TaskFunc) r30a_setElvCamera, (void*) dir, 0, 2, 0);
     {
         cPlayer* pl = pPL;
         cSceObj* elv = &r30a_work->elv;

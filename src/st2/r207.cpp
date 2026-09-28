@@ -191,7 +191,7 @@ void R207Init()
     r207_work->em[8].em.setEm(0xD9, -1, 0, 1, 1);
     r207_work->em[9].em.setEm(0xDA, -1, 0, 1, 1);
     SceSetItemEvent(3, 0x83, 2, 5, r207_ShelfOpen, r207_ShelfOpened, 0, 0);
-    SceSetItemEvent(4, 0x84, 3, 6, r207_ShelfOpen, r207_ShelfOpened, 1, 0);
+    SceSetItemEvent(4, 0x84, 3, 6, r207_ShelfOpen, r207_ShelfOpened, (void*) 1, 0);
     SceExec(0x12, (TaskFunc) r207_StrCheck, 0, 0, SCE_PRIO_DEF_2, 0);
     if (RsfCheck(G_ROOM_ID, 10) == 0) {
         SceExec(0x12, (TaskFunc) r207_openTerm, 0, 0, SCE_PRIO_DEF_2, 0);
@@ -314,7 +314,7 @@ void r207_EmMoveCk()
     } else {
         return;
     }
-    SceExec(0x12, (TaskFunc) r207_GotoPos, (int) e, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r207_GotoPos, e, 0, SCE_PRIO_DEF_2, 0);
     r207_work->timer = 150;
 }
 

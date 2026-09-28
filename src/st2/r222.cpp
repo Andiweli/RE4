@@ -222,9 +222,9 @@ void R222Init()
 
         m->setSca(&sca);
     }
-    SceSetItemEvent(1, 0x80, 6, 8, r222_TreasureBoxOpen, r222_TreasureBoxOpened, 0x1A, 0);
-    SceSetItemEvent(9, 0x82, 7, 0xD, r222_TreasureBox2Open, r222_TreasureBox2Opened, 9, 0);
-    SceSetItemEvent(0xA, 0x81, 8, 0xF, r222_TreasureBox2Open, r222_TreasureBox2Opened, 7, 0);
+    SceSetItemEvent(1, 0x80, 6, 8, r222_TreasureBoxOpen, r222_TreasureBoxOpened, (void*) 0x1A, 0);
+    SceSetItemEvent(9, 0x82, 7, 0xD, r222_TreasureBox2Open, r222_TreasureBox2Opened, (void*) 9, 0);
+    SceSetItemEvent(0xA, 0x81, 8, 0xF, r222_TreasureBox2Open, r222_TreasureBox2Opened, (void*) 7, 0);
 }
 
 // Item-event opener: chest `id` lid up (+Z).

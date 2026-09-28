@@ -2216,7 +2216,7 @@ void CardSave(int no, int f)
         pG->CardStatus |= 0x98;
     }
     pG->terminal_no = no;
-    TaskExec(1, (TaskFunc) CardMainTask, 1);
+    TaskExec(1, (TaskFunc) CardMainTask, (void*) 1);
     TaskSleep(1);
 }
 
@@ -2224,7 +2224,7 @@ void CardSave(int no, int f)
 void CardSysSave()
 {
     pG->CardStatus |= 0x98;
-    TaskExec(1, (TaskFunc) CardMainTask, 1);
+    TaskExec(1, (TaskFunc) CardMainTask, (void*) 1);
     TaskSleep(1);
 }
 
@@ -2235,7 +2235,7 @@ void CardFirstCheck()
         pG->CardStatus |= 0x80000000;
         TaskExit();
     }
-    TaskChain((TaskFunc) CardMainTask, 2);
+    TaskChain((TaskFunc) CardMainTask, (void*) 2);
 }
 
 // Probes slot `chan` (CARDProbeEx): records size / sector size or the error flag (no card, wrong

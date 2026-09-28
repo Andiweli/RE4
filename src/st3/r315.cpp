@@ -66,9 +66,9 @@ void R315Init()
         RsfSet(G_ROOM_ID, 0);
         SceExec(0x12, (TaskFunc) first_in, 0, 0, 2, 0);
     }
-    SceSetItemEvent(4, 0x83, 1, 4, r315_DuraluminCaseOpen, r315_DuraluminCaseOpened, 0x14, 0);
-    SceSetItemEvent(3, 0x82, 3, 3, r315_TanaOpen, r315_TanaOpened, 0x1F, 0);
-    SceSetItemEvent(2, 0x84, 2, 2, r315_TanaOpen, r315_TanaOpened, 0x22, 0);
+    SceSetItemEvent(4, 0x83, 1, 4, r315_DuraluminCaseOpen, r315_DuraluminCaseOpened, (void*) 0x14, 0);
+    SceSetItemEvent(3, 0x82, 3, 3, r315_TanaOpen, r315_TanaOpened, (void*) 0x1F, 0);
+    SceSetItemEvent(2, 0x84, 2, 2, r315_TanaOpen, r315_TanaOpened, (void*) 0x22, 0);
     if (getRoomEtcDoor(6, &door, 1)) {
         door->LightInfo.SelectMask &= ~4;
     }

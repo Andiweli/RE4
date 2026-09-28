@@ -135,7 +135,7 @@ void R30cInit()
     }
     r30c_work->em[0].setEm(0x40, 6, 0, 1, 1);
     r30c_work->em[1].setEm(0x50, 6, 0, 1, 1);
-    SceSetItemEvent(7, 0x80, 2, 3, r30c_ItemBoxOpen, r30c_ItemBoxOpened, 0xF, 0);
+    SceSetItemEvent(7, 0x80, 2, 3, r30c_ItemBoxOpen, r30c_ItemBoxOpened, (void*) 0xF, 0);
     if (RsfCheck(G_ROOM_ID, 3) == 0) {
         SceAtSetEnable(0x82, 0);
     } else {
@@ -358,7 +358,7 @@ static void r30c_PlaneMove()
     obj->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x23), 0, 0, 0x201, 0);
     SndStrReq(r30c_work->strId, 2, 0, 0);
     pG->Room_flg[0] &= 0x7FFFFFFF;
-    SceSetEventCancel(1, (TaskFunc) r30c_PlaneMoveEndProc, (int) obj, 0, 1);
+    SceSetEventCancel(1, (TaskFunc) r30c_PlaneMoveEndProc, obj, 0, 1);
     while (!(MotionGetState(obj) & 4)) {
         SceSleep(1);
     }

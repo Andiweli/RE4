@@ -144,8 +144,8 @@ void R212Init()
     r212_work->door[2].setOpened();
     r212_TrapInit();
     SceExec(0x12, (TaskFunc) r212_DoorLock, 0, 0, SCE_PRIO_DEF_2, 0);
-    SceSetItemEvent(0xB, 0x81, 3, 0xA, r212_TreasureBoxOpen, r212_TreasureBoxOpened, 6, 0);
-    SceSetItemEvent(0xC, 0x80, 4, 0xB, r212_TreasureBoxOpen, r212_TreasureBoxOpened, 0x3E, 0);
+    SceSetItemEvent(0xB, 0x81, 3, 0xA, r212_TreasureBoxOpen, r212_TreasureBoxOpened, (void*) 6, 0);
+    SceSetItemEvent(0xC, 0x80, 4, 0xB, r212_TreasureBoxOpen, r212_TreasureBoxOpened, (void*) 0x3E, 0);
 }
 
 // The trap room: its attribute piece; until the trap ran (Room_flg bit 0) area 1 = the roof trap event

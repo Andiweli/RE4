@@ -531,7 +531,7 @@ void SceExecItemEvent(SceItemEvent* data)
 // (added to an existing event on the same area) with camera cut `cut` and `func(arg)`; if room
 // save flag `flagNo` is already set the event is skipped, the item enabled (unless taken) and
 // `doneFunc(arg)` run instead. `enable` shows the item model beforehand.
-void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, void (*func)(int), void (*doneFunc)(int), int arg, int enable)
+void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, TaskFunc func, TaskFunc doneFunc, void* arg, int enable)
 {
     u16 room = pG->room_id;
     SceItemEvent* e;   // the searched entry; the new'd one is a second variable (one pseudo for both
@@ -548,7 +548,7 @@ void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, void (*func)(int
                 SceAtSetEnable(itemNo, 1);
             }
         }
-        SceExec(0x12, (TaskFunc) doneFunc, arg, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, doneFunc, arg, 0, SCE_PRIO_DEF_2, 0);
         return;
     }
     if (itemNo >= 0) {
@@ -617,8 +617,8 @@ void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, void (*func)(int
     ne->item[0] = itemNo;
     ItemEventTbl[i] = ne;
     ne->cut = cut;
-    ne->func = func;
-    ne->arg = arg;
+    ne->func = (void (*)(int)) func;
+    ne->arg = (int) arg;
     ne->flag = flagNo;
     ne->atNo = atNo;
     SceAtDataSet_exec(atNo, SCE_LEVEL10, 0, (TaskFunc) SceExecItemEvent, ne, 1);

@@ -31,7 +31,7 @@ public:
 // Deferred scenario execution condition (0x14 bytes, SceExecOt list)
 struct SceCond {
     u32 next;             // 0x00
-    void (*func)();       // 0x04
+    TaskFunc func;        // 0x04
     void* arg;            // 0x08
     u8 prio;              // 0x0C
     u8 flag;              // 0x0D
@@ -45,12 +45,12 @@ private:
     int m_draw_done;      // 0x00  1 = GXDrawDone before the next task
     int m_chapter_end;    // 0x04  nonzero from SceSetChapterEnd until the chapter end task runs: scenario stopped
 public:
-    void (*pExitFunc)();         // 0x08
+    TaskFunc pExitFunc;          // 0x08
     void* pExitParam;             // 0x0C
-    void (*pDoorFunc)();        // 0x10
+    TaskFunc pDoorFunc;         // 0x10
     void* pDoorParam;            // 0x14
-    void (*pCancelFunc)(); // 0x18  task started by SceExecEventCancel
-    int pCancelParam;        // 0x1C
+    TaskFunc pCancelFunc;  // 0x18  task started by SceExecEventCancel
+    void* pCancelParam;      // 0x1C
     u32 SceTaskOt[16];         // 0x20  ordering table, otag[15] is the list head
     u32 stop_bak;         // 0x60  pG->Stop_flg saved by SceUpCutStart
     u32 system_bak;              // 0x64  pG->flags_54 saved by SceEventStart
@@ -129,7 +129,7 @@ enum SCE_PRIORITY {
     SCE_PRIO_ATTACK_2 = 12
 };
 
-SCE_TASK* SceExec(int prio, TaskFunc func, int arg, u8 flag, int otPrio, void* model);
+SCE_TASK* SceExec(int prio, TaskFunc func, void* arg, u8 flag, int otPrio, void* model);
 void SceSleep(int ctr);
 void SceExit();
 SCE_TASK* SceCTask();
@@ -140,7 +140,7 @@ void SceExecLinkCondition(int type, void* param, u8 prio, TaskFunc func, void* a
 void SceExecLinkEmDead(void* param, u8 prio, TaskFunc func, void* arg, u8 flag);
 int EmMoveActiveCheck(cEm* pEm);
 void SceExecEventCancel();
-void SceSetEventCancel(int on, TaskFunc func, int arg, int flagNo, int sndFlag);
+void SceSetEventCancel(int on, TaskFunc func, void* arg, int flagNo, int sndFlag);
 int scenarioCheckEventCancel();
 
 void SceKill(u32 level);

@@ -558,7 +558,7 @@ int sceAtCheck_main(cEm* em, int target_type)
                     continue;
                 }
                 if (RouteCkPosToPosDis(&pPL->pos, &pSUB->pos) < 5000.0f) {
-                    ActBtn.set(kind, w->otNo, (void*) sceAtFunc_tbl[SCEAT_ID_HIDE].func, w, ACTCTR_WEP_SET_IGNORE, DISP_X, ACT_FUNC_SCE_AT, (int) em);
+                    ActBtn.set(kind, w->otNo, (void*) sceAtFunc_tbl[SCEAT_ID_HIDE].func, w, ACTCTR_WEP_SET_IGNORE, DISP_X, ACT_FUNC_SCE_AT, (void*) em);
                 }
                 continue;
             case SCEAT_ID_ITEM:
@@ -570,7 +570,7 @@ int sceAtCheck_main(cEm* em, int target_type)
                 }
                 break;
             }
-            ActBtn.set(kind, w->otNo, (void*) sceAtFunc_tbl[ft].func, w, c, DISP_A_NORMAL, ACT_FUNC_SCE_AT, (int) em);
+            ActBtn.set(kind, w->otNo, (void*) sceAtFunc_tbl[ft].func, w, c, DISP_A_NORMAL, ACT_FUNC_SCE_AT, (void*) em);
             continue;
         }
         if (!(t == 1 && w->func == 0 && (w->trigger & 2) && (flag & 4))) {
@@ -817,7 +817,7 @@ int sceAtFunc_door(SceAtWork* w, cModel* pModel)
         switch (lt) {
         case 1:
         case 2:
-            TaskExec(1, (TaskFunc) sceInLock, (int) w);
+            TaskExec(1, (TaskFunc) sceInLock, w);
             w->flag &= ~1;
             return 1;
         }
@@ -856,7 +856,7 @@ static int sceAtFunc_exec(SceAtWork* w, cModel* pModel)
     }
     if (w->prio == 0) {
         SetTaskModelPtr(pModel, 0);
-        ((void (*)(int)) w->func)(w->arg);
+        ((void (*)(void*)) w->func)(w->arg);
     } else {
         SceExec(w->prio, w->func, w->arg, w->execFlag, w->otNo, pModel);
     }
@@ -1491,14 +1491,14 @@ int sceAtFunc_item(SceAtWork* w, cModel* m)
     KeyClear(0xEFCF0000);
     ret = itemZoom(w);
     if (ret == 1) {
-        p = SceExec(5, (TaskFunc) sceAtGetItem, (int) w, 0, SCE_PRIO_15, 0);
+        p = SceExec(5, (TaskFunc) sceAtGetItem, w, 0, SCE_PRIO_15, 0);
         if (p != 0) {
             SceSys.m_item_get = ret;
             p->setNoSuspend(1);
             it->pModel->setNoSuspend(1);
         }
     } else {
-        p = SceExec(5, (TaskFunc) sceAtGetItem_NoModel, (int) w, 0, SCE_PRIO_15, 0);
+        p = SceExec(5, (TaskFunc) sceAtGetItem_NoModel, w, 0, SCE_PRIO_15, 0);
         if (p != 0) {
             SceSys.m_item_get = 1;
             p->setNoSuspend(1);
@@ -1584,7 +1584,7 @@ int sceAtFunc_mes(SceAtWork* w, cModel* pModel)
     SceAtMesData* d = &w->mes;
 
     if (d->camCut != 0) {
-        SceExec(5, (TaskFunc) SceAtSetMes, (int) d, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(5, (TaskFunc) SceAtSetMes, d, 0, SCE_PRIO_DEF_2, 0);
     } else {
         SceAtSetMes(d);
     }
@@ -1791,7 +1791,7 @@ int sceAtFunc_skey(SceAtWork* w, cModel* pModel)
     pS->m_stop_flag_backup = pG->Stop_flg;
     KeyStop(0xEFCF0000);
     pG->Stop_flg = -1;
-    TaskExec(1, (TaskFunc) sceAtSkey, (int) w);
+    TaskExec(1, (TaskFunc) sceAtSkey, w);
     return 0;
 }
 
@@ -1843,7 +1843,7 @@ int sceAtFunc_ladder(SceAtWork* w, cModel* pModel)
     sceAtGetLadderPos(&w->ladder, &pos, &ang);
     PlSetLadder(&pos, ang, w->ladder.level);
     if (w->ladder.cut1 != 0) {
-        SceSys.pLadderTask = SceExec(5, (TaskFunc) sceAtLadder, (int) w, 0, SCE_PRIO_DEF_2, 0);
+        SceSys.pLadderTask = SceExec(5, (TaskFunc) sceAtLadder, w, 0, SCE_PRIO_DEF_2, 0);
     }
     return 0;
 }
@@ -1981,7 +1981,7 @@ FOUND:
             p = 0;
             if (w->hide.func != 0) {
                 SceKill(w->hide.func);
-                p = SceExec(0x12, (TaskFunc) w->hide.func, 1, 0, SCE_PRIO_DEF_2, 0);
+                p = SceExec(0x12, (TaskFunc) w->hide.func, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
             }
             SpfFlagOff(pG, SPF_KEY);
             SubCharCtrlHide(&pPL->pos, 0);
@@ -2322,7 +2322,7 @@ void SceAtDataSet_exec(int no, int prio, int a, TaskFunc func, void* obj, int b)
         w->prio = prio;
     }
     w->func = func;
-    w->arg = (int) obj;
+    w->arg = obj;
     w->execFlag = b;
 }
 
@@ -3121,7 +3121,7 @@ int SceAtDestroy(int at_no)
 // Creates a type 2 (exec) area at run time on model `m`: quad of the four `pos` corners (floor =
 // their mean y, height h), checkFlag a, trigger b, checkType c, otNo d, facing angle / range (radians),
 // action button kind e, task prio / func / arg / flag. Returns the area number, -1 on failure.
-int SceAtCreateExecAt(cModel* m, Vec* pos, f32 h, int a, int b, int c, int d, f32 ang, f32 range, int e, int prio, TaskFunc func, int arg, u8 flag)
+int SceAtCreateExecAt(cModel* m, Vec* pos, f32 h, int a, int b, int c, int d, f32 ang, f32 range, int e, int prio, TaskFunc func, void* arg, u8 flag)
 {
     SceAtWork* w;
 

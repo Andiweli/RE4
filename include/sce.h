@@ -34,7 +34,7 @@ int SceCheckEmAlive(cEm* pEm);
 int SceCountEmAlive(int em_id, int em_id_end);
 void SceDestroyEm(int em_id, int em_id_end);
 void SceInitItemEvent();
-void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, void (*func)(int), void (*doneFunc)(int), int arg, int enable);
+void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, TaskFunc func, TaskFunc doneFunc, void* arg, int enable);
 void getChapterSection(int no, int* chap, int* sect);
 void SceChapterEnd();
 enum CHAPTER_NO {

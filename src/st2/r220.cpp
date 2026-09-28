@@ -172,7 +172,7 @@ void r220_initElevator()
     if ((pG->room_id_prev == 0x221 || pG->room_id_prev == 0x22B) && FlagChkSignW(pG->System_flg, SYS_LOAD_GAME) == 0
         && FlagChkSignW(pG->System_flg, SYS_CONTINUE) == 0) {
         r220_moveElevatoDoor(0, 1);
-        SceExec(0x12, (TaskFunc) r220_moveElevator, 1, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r220_moveElevator, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
     } else {
         r220_moveElevatoDoor(1, 1);
     }

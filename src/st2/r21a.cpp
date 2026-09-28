@@ -96,10 +96,10 @@ void R21aInit()
     R21aWork*& wp = r21a_work;
 #line 50 "D:/Bio4/Prog/r21a.cpp"
     wp = (R21aWork*) MEM_CALLOC(sizeof(R21aWork), 1, 0xd);
-    SceSetItemEvent(0xA, 0x84, 5, 1, r21a_moveShelf, r21a_movedShelf, 0x84, 0);
-    SceSetItemEvent(9, 0x85, 4, 2, r21a_moveShelf, r21a_movedShelf, 0x85, 0);
-    SceSetItemEvent(9, 0x88, 4, 2, r21a_moveShelf, r21a_movedShelf, 0x88, 0);
-    SceSetItemEvent(9, 0x89, 4, 2, r21a_moveShelf, r21a_movedShelf, 0x89, 0);
+    SceSetItemEvent(0xA, 0x84, 5, 1, r21a_moveShelf, r21a_movedShelf, (void*) 0x84, 0);
+    SceSetItemEvent(9, 0x85, 4, 2, r21a_moveShelf, r21a_movedShelf, (void*) 0x85, 0);
+    SceSetItemEvent(9, 0x88, 4, 2, r21a_moveShelf, r21a_movedShelf, (void*) 0x88, 0);
+    SceSetItemEvent(9, 0x89, 4, 2, r21a_moveShelf, r21a_movedShelf, (void*) 0x89, 0);
     if (getRoomEtcWindow(0x12, &win, 1)) {
         win->SetBreakModel();
         win->be_flag &= ~2;
@@ -598,7 +598,7 @@ static void R21aFallRoofMove()
             EffectEfmDelete(1, ESP_CORE_KIND_ROOM04, 0);
             obj->setPos(obj->pos.x, obj->pos.y - spd, obj->pos.z);
             if (obj->pos.y <= 0.0f) {
-                SceExec(0x12, (TaskFunc) R21aFallRoofDie, (int) spd, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) R21aFallRoofDie, (void*) (int) spd, 0, SCE_PRIO_DEF_2, 0);
                 return;
             }
             break;

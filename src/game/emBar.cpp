@@ -285,7 +285,7 @@ void emBar_R1_Set(cEmBar* pEm)
 
         if (esc == 0) {
             if (fabsf(Muku(&pEm->pos, &pPL->pos, pEm->ang.y, 3.1415927f)) < 1.5707964f) {
-                ActBtn.set(ACT_GUARD, 5, (void*) emBarActEscape, pEm, ACTCTR_WEP_SET_IGNORE, DISP_L_R, ACT_FUNC_NORMAL, esc);
+                ActBtn.set(ACT_GUARD, 5, (void*) emBarActEscape, pEm, ACTCTR_WEP_SET_IGNORE, DISP_L_R, ACT_FUNC_NORMAL, (void*) esc);
             }
         }
     }

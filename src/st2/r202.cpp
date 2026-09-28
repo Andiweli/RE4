@@ -228,7 +228,7 @@ void R202Init()
     r202_work->box->pos.z = -26500.0f;
     r202_work->box->atari.init(0.0f, 0.0f, 0.0f, 0.0f, 3000.0f, 3000.0f, 50000.0f, 0, 0x18, 0);
     SceSetItemEvent(0x13, 0x81, 4, 6, r202_openBox, r202_openedBox, 0, 0);
-    SceSetItemEvent(0x14, 0x83, 5, 7, r202_openBox, r202_openedBox, 1, 0);
+    SceSetItemEvent(0x14, 0x83, 5, 7, r202_openBox, r202_openedBox, (void*) 1, 0);
     if (RsfCheck(G_ROOM_ID, 6) == 0) {
         SceAtDataSet_exec(0x17, SCE_LEVEL10, 0, (TaskFunc) r202_execEmSet2, 0, 1);
     }
@@ -399,10 +399,10 @@ void r202_initEmPatrol()
     r202_work->pat[1].pos[0] = p2;
     r202_work->pat[1].pos[1] = p3;
     if (r202_work->pat[0].em.isAlive() == 1) {
-        SceExec(0x12, (TaskFunc) r202_checkEmPatrol, (int) &r202_work->pat[0], 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r202_checkEmPatrol, &r202_work->pat[0], 0, SCE_PRIO_DEF_2, 0);
     }
     if (r202_work->pat[1].em.isAlive() == 1) {
-        SceExec(0x12, (TaskFunc) r202_checkEmPatrol, (int) &r202_work->pat[1], 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r202_checkEmPatrol, &r202_work->pat[1], 0, SCE_PRIO_DEF_2, 0);
     }
 }
 
@@ -521,7 +521,7 @@ static void r202_operateCannon()
         }
     }
     SceSleep(30);
-    SceExec(0x12, (TaskFunc) r202_checkBgmPlay, 1, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r202_checkBgmPlay, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
 }
 
 // The player turns the crank: the wall rises while the button is held.
@@ -715,7 +715,7 @@ static void r202_CatapultGo_end()
 
         r202_work->em180.setFlag(1);
         r202_work->cat[2].state = 5;
-        SceExec(0x12, (TaskFunc) r202_waitRockImpact, (int) rock, 4, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r202_waitRockImpact, rock, 4, SCE_PRIO_DEF_2, 0);
     }
     r202_work->em180.setNoSuspend(0);
     r202_work->cat[2].em.setNoSuspend(0);
@@ -755,7 +755,7 @@ static void r202_CatapultGo()
     pG->Room_flg[0] |= 0x02000000;
     r202_work->em180.setFlag(1);
     r202_work->cat[2].state = 5;
-    SceExec(0x12, (TaskFunc) r202_waitRockImpact, (int) rock, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r202_waitRockImpact, rock, 0, SCE_PRIO_DEF_2, 0);
     SceSleep(60);
     SceSetEventCancel(0, 0, 0, -1, 1);
     r202_CatapultGo_end();
@@ -915,7 +915,7 @@ void cCatapult::move()
         timer--;
         break;
     case 1:
-        setRockTask = SceExec(0x12, (TaskFunc) r202_setRock, (int) this, 0, SCE_PRIO_DEF_2, 0);
+        setRockTask = SceExec(0x12, (TaskFunc) r202_setRock, this, 0, SCE_PRIO_DEF_2, 0);
         rockSet = 0;
         state = 2;
         break;
@@ -974,7 +974,7 @@ void cCatapult::move()
         timer--;
         break;
     case 7:
-        throwRockTask = SceExec(0x12, (TaskFunc) r202_throwRock, (int) this, 0, SCE_PRIO_DEF_2, 0);
+        throwRockTask = SceExec(0x12, (TaskFunc) r202_throwRock, this, 0, SCE_PRIO_DEF_2, 0);
         state = 8;
         break;
     case 8:

@@ -58,8 +58,8 @@ void R303Init()
         SmdGetObjPtr(0xB)->setAng(&r303_doorAng);
     }
     SceSetItemEvent(5, 0x80, 2, 1, r303_openTana, r303_openedTana, 0, 0);
-    SceSetItemEvent(7, 0x81, 4, 3, r303_DuraluminCaseOpen, r303_DuraluminCaseOpened, 0x19, 0);
-    SceSetItemEvent(8, 0x83, 5, 2, r303_DustBoxOpen, r303_DustBoxOpened, 0x1B, 0);
+    SceSetItemEvent(7, 0x81, 4, 3, r303_DuraluminCaseOpen, r303_DuraluminCaseOpened, (void*) 0x19, 0);
+    SceSetItemEvent(8, 0x83, 5, 2, r303_DustBoxOpen, r303_DustBoxOpened, (void*) 0x1B, 0);
     if (RsfCheck(G_ROOM_ID, 3) == 0) {
         SceAtDataSet_exec(6, 0x12, 0, (TaskFunc) oneshot_bgm, 0, 1);
     }

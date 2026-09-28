@@ -1047,7 +1047,7 @@ void DiedemoExec(int time, int type)
     IdSys.kill(0xFF, IDC_ACT_BUTTON);
     Cckpt.endCountDownTimer();
     PlEndCamera();
-    TaskExec(1, (TaskFunc) gameDiedemo, (int) &diedemo_work);
+    TaskExec(1, (TaskFunc) gameDiedemo, &diedemo_work);
 }
 
 // Per-frame: starts the death demo when the partner's life (ashley_life) or the player's life

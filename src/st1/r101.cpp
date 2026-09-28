@@ -237,7 +237,7 @@ void R101Init()
                 pG->Em_list[0x49].be_flag |= 1;
                 pG->Em_list[0x4A].be_flag |= 1;
             }
-            SceExec(0x12, (TaskFunc) r101_checkFindPlayer, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r101_checkFindPlayer, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         }
     }
     if (!KyfFlagChk(pG, KYF_R105_TO_R101_DOOR)) {
@@ -817,7 +817,7 @@ static void r101_checkEmReset()
         r101_work->pEm[9]->setNoSuspend(1);
         CamCtrl.CutCall(4);
     }
-    SceSetEventCancel(1, (TaskFunc) r101_checkEmReset_end, side, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) r101_checkEmReset_end, (void*) side, -1, 1);
     while (CamCtrl.IsMotionEnd() == 0) {
         SceSleep(1);
     }

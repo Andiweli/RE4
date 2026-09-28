@@ -321,7 +321,7 @@ static void r311_execEmAppear()
         em[i].setPtr(list[i], -1, 0);
     }
     if (em[0].isAlive() == 1 || em[1].isAlive() == 1 || em[2].isAlive() == 1 || em[3].isAlive() == 1) {
-        r311_work->doorTask = SceExec(0x12, (TaskFunc) r311_moveEmDoor, 1, 0, 2, 0);
+        r311_work->doorTask = SceExec(0x12, (TaskFunc) r311_moveEmDoor, (void*) 1, 0, 2, 0);
         SceSleep(20);
         em[0].setGoto(&center, 1);
         SceSleep(10);

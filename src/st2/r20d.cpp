@@ -167,7 +167,7 @@ void R20dInit()
         if (RsfCheck(G_ROOM_ID, 0) == 0) {
             SceExec(0x12, (TaskFunc) r20d_checkSwitch, 0, 0, SCE_PRIO_DEF_2, 0);
         } else {
-            SceExec(0x12, (TaskFunc) r20d_checkSwitch, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r20d_checkSwitch, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         }
         SceAtDataSet_exec(6, SCE_LEVEL10, 0, (TaskFunc) r20d_execThrough, (void*) 0, 1);
         SceAtDataSet_exec(7, SCE_LEVEL10, 0, (TaskFunc) r20d_execThrough, (void*) 1, 1);
@@ -195,8 +195,8 @@ void R20dInit()
     r20d_initRoundSwitch();
     SceSetItemEvent(0x14, 0x81, 4, 6, r20d_openShelf, r20d_openedShelf, 0, 0);
     SceSetItemEvent(0x15, 0x80, 5, 5, r20d_openDrawer, r20d_openedDrawer, 0, 0);
-    SceSetItemEvent(0x16, 0x83, 6, 7, r20d_openDrawer, r20d_openedDrawer, 1, 0);
-    SceSetItemEvent(0x17, 0x86, 7, 8, r20d_openDrawer, r20d_openedDrawer, 2, 0);
+    SceSetItemEvent(0x16, 0x83, 6, 7, r20d_openDrawer, r20d_openedDrawer, (void*) 1, 0);
+    SceSetItemEvent(0x17, 0x86, 7, 8, r20d_openDrawer, r20d_openedDrawer, (void*) 2, 0);
     SceExec(0x12, (TaskFunc) r20d_checkBgmPlay, 0, 0, SCE_PRIO_DEF_2, 0);
     SceAtSetActColor(0x1B, 1);
 }
@@ -1017,7 +1017,7 @@ void cLantern::initLantern(void* arc, void* m1, void* m2, void* m3, void* m4, vo
             num++;
         }
     }
-    SceExec(0x12, (TaskFunc) cLantern::checkLantern, (int) this, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) cLantern::checkLantern, this, 0, SCE_PRIO_DEF_2, 0);
 }
 
 // Task over all lantern units: state 0 checks the pickup prompt, 1 is being thrown, 2 destroys the unit.

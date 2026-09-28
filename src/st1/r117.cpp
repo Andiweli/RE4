@@ -572,7 +572,7 @@ static void r117_LightMechanismMove()
         SceAtDataReset(8);
         CamCtrl.CutCall(5);
         W->se = RoomSeCall(0xD, 0, 0, 0, 0);
-        SceSetEventCancel(1, (TaskFunc) r117_LightMechanismEndProc, 1, -1, 1);
+        SceSetEventCancel(1, (TaskFunc) r117_LightMechanismEndProc, (void*) 1, -1, 1);
         EstSet(0, -1, 0, 0, EFF_ROOM, 0x28, 1, ESP_CORE_KIND_NONE, 0, 0);
         {
             f32 spd = 22.0f;

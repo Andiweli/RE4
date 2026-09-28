@@ -106,7 +106,7 @@ static inline void EffectDelete2001()
                                                                              \
         pG->Disp_flg = v;                                                    \
         v = 0;                                                               \
-        ActBtn.set(ACT_NO_DISP, 5, (void*) action, 0, ACTCTR_ENFORCE_EXEC | ACTCTR_EXACT_KEY, btn, ACT_FUNC_NORMAL, v);               \
+        ActBtn.set(ACT_NO_DISP, 5, (void*) action, 0, ACTCTR_ENFORCE_EXEC | ACTCTR_EXACT_KEY, btn, ACT_FUNC_NORMAL, (void*) v);               \
     } while (0)
 
 static void R317ContinuePointSet();
@@ -369,7 +369,7 @@ void SceElevator2Main(SceElevator2Data* d)
     gear1->pModelInfo->flagsDC |= 1;
     gear2->pModelInfo->flagsDC |= 1;
     SceEventStart(0);
-    SceSetEventCancel(1, (TaskFunc) SceElevator2End, (int) d, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) SceElevator2End, d, -1, 1);
     obj->setNoSuspend(1);
     obj->setPos(&d->pos);
     pPL->setNoSuspend(1);

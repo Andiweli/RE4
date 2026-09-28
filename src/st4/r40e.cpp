@@ -184,7 +184,7 @@ static void r40e_moveElevator(u32 dir)
             obj->pModelInfo->uvScrollU = -0.05f;
         }
     }
-    SceExec(0x12, (TaskFunc) r40e_setElvCamera, dir, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r40e_setElvCamera, (void*) dir, 0, SCE_PRIO_DEF_2, 0);
     if (dir <= 1) {
         cPlayer* pl = pPL;
         cSceObj* elv = &r40e_work->elv;

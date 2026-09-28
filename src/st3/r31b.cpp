@@ -515,7 +515,7 @@ void R31bExecSwitchMainSub(int no, int flagNo, int count, int atNo, int cut)
         SceAtSetEnable(atNo, 0);
         r31b_work->switchCount++;
         SceEventStart(1);
-        SceSetEventCancel(1, (TaskFunc) R31bExecSwitchEnd, no, -1, 1);
+        SceSetEventCancel(1, (TaskFunc) R31bExecSwitchEnd, (void*) no, -1, 1);
         r31b_work->snd = 0;
         if (cut != -1) {
             CamCtrl.CutCall((s8) cut);
@@ -593,7 +593,7 @@ void R31bExecSwitchEndSub(int no, int room, int flagNo, int count, int emMode, i
         EffectEspDelete(1, (u8) smdOff, 0, 0);
         EffectEspgenDelete(1, (u8) smdOff, 0);
         EffectEfmDelete(1, (u8) smdOff, 0);
-        SceExec(0x12, (TaskFunc) R31bExecDeathTimerMain, room, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) R31bExecDeathTimerMain, (void*) room, 0, 2, 0);
     }
     em = (cEm32*) r31b_work->em.getPtr();
     if (em) {
@@ -676,7 +676,7 @@ void R31bExecShutterOpenMainSub(int no, int flagNo, u32 objId, int satNo, u32 la
         }
         if (RsfCheck(G_ROOM_ID, 0x1D) == 0) {
             SceEventStart(1);
-            SceSetEventCancel(1, (TaskFunc) R31bExecShutterOpenEnd, no, -1, 1);
+            SceSetEventCancel(1, (TaskFunc) R31bExecShutterOpenEnd, (void*) no, -1, 1);
         }
         if (RsfCheck(G_ROOM_ID, 0x1D) == 0 && cut != -1) {
             CamCtrl.CutCall((s8) cut);
@@ -797,7 +797,7 @@ void R31bExecDeathTimerMainSub(int no, int light, int frames)
         over = Cckpt.isZeroCountDownTimer();
         if (over == 1) {
             pG->Room_flg[0] |= 0x80000000;
-            SceExec(0x12, (TaskFunc) R31bExecFallMain, no, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R31bExecFallMain, (void*) no, 0, 2, 0);
             return;
         }
         if (frame == frame / 90 * 90) {
@@ -839,7 +839,7 @@ void R31bExecDoorMainSub(int no, int flagOpen, int flagDoor, int doorFlag, int a
             }
             SceEventStart(0);
             pG->Room_flg[0] &= ~0x20000000;
-            SceSetEventCancel(1, (TaskFunc) R31bExecDoorEnd, no, 2, 1);
+            SceSetEventCancel(1, (TaskFunc) R31bExecDoorEnd, (void*) no, 2, 1);
             if (cut != -1) {
                 CamCtrl.CutCall((s8) cut);
             }
@@ -971,7 +971,7 @@ void R31bExecDoorEndSub(int no, int emMode, int light, u32 objId0, u32 objId1, i
             R31bExecFallEnd(no);
             return;
         }
-        SceExec(0x12, (TaskFunc) R31bExecFallMain, no, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) R31bExecFallMain, (void*) no, 0, 2, 0);
     }
     pPL->setNoSuspend(0);
     CamCtrl.Comeback(0);
@@ -999,7 +999,7 @@ void R31bExecFallMainSub(int no, int flagNo, int cut)
     if (RsfCheck(G_ROOM_ID, flagNo) == 0) {
         RsfSet(G_ROOM_ID, flagNo);
         SceEventStart(0);
-        SceSetEventCancel(1, (TaskFunc) R31bExecFallEnd, no, -1, 1);
+        SceSetEventCancel(1, (TaskFunc) R31bExecFallEnd, (void*) no, -1, 1);
         if (pG->Room_flg[0] & 0x80000000) {
             SndCall(6, 0x10, 0, 0, 0, 0);
             pPL->beginEvent(0);
@@ -1609,7 +1609,7 @@ static void R31bExecGondolaMain(int dir)
         SceAtSetEnable(0x10, 0);
     }
     SceEventStart(0);
-    SceSetEventCancel(1, (TaskFunc) R31bExecGondolaEnd, dir, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) R31bExecGondolaEnd, (void*) dir, -1, 1);
     r31b_work->snd = 0;
     faded = 0;
     obj->setNoSuspend(1);
@@ -1865,7 +1865,7 @@ void R31bKoushiSatCk2(int no, int flagNo, int koushiNo)
     if (RsfCheck(G_ROOM_ID, flagNo) == 0) {
         if (r31b_work->koushi[koushiNo] && r31b_work->koushi[koushiNo]->ckStatus() == 1) {
             SndCall(6, 8, &r31b_work->koushi[koushiNo]->pos, 0, 0, 0);
-            SceExec(0x12, (TaskFunc) R31bExecShutterOpenMain, no, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R31bExecShutterOpenMain, (void*) no, 0, 2, 0);
         }
     }
 }

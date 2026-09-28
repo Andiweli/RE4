@@ -189,9 +189,9 @@ void R403Init()
         }
         MercSysInitRoom(&init.m);
     }
-    SceSetItemEvent(0x2A, 0x80, 4, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, 0x15, 0);
-    SceSetItemEvent(0x2B, 0x82, 5, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, 0x14, 0);
-    SceSetItemEvent(0x2C, 0x83, 6, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, 0x17, 0);
+    SceSetItemEvent(0x2A, 0x80, 4, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, (void*) 0x15, 0);
+    SceSetItemEvent(0x2B, 0x82, 5, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, (void*) 0x14, 0);
+    SceSetItemEvent(0x2C, 0x83, 6, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, (void*) 0x17, 0);
 }
 
 // Item-event opener: case `no` (lid up -X) opens.

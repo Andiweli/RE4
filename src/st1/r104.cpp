@@ -190,10 +190,10 @@ void R104Init()
         SceAtDataSet_exec(0xE, SCE_LEVEL10, 0, (TaskFunc) r104_execEmDash, 0, 1);
     }
     SceSetItemEvent(0xB, 0x84, 0x10, 7, r104_openShelf, (void (*)(int)) r104_openedShelf, 0, 0);
-    SceSetItemEvent(0xC, 0x8E, 0x11, 8, r104_openShelf, (void (*)(int)) r104_openedShelf, 1, 0);
-    SceSetItemEvent(0xD, 0x89, 0x12, 9, r104_openShelf, (void (*)(int)) r104_openedShelf, 2, 0);
+    SceSetItemEvent(0xC, 0x8E, 0x11, 8, r104_openShelf, (void (*)(int)) r104_openedShelf, (void*) 1, 0);
+    SceSetItemEvent(0xD, 0x89, 0x12, 9, r104_openShelf, (void (*)(int)) r104_openedShelf, (void*) 2, 0);
     SceSetItemEvent(0xF, 0x8F, 0x13, 0xA, r104_openBox, (void (*)(int)) r104_openedBox, 0, 0);
-    SceSetItemEvent(0x10, 0x90, 0x14, 0xB, r104_openBox, (void (*)(int)) r104_openedBox, 1, 0);
+    SceSetItemEvent(0x10, 0x90, 0x14, 0xB, r104_openBox, (void (*)(int)) r104_openedBox, (void*) 1, 0);
     SceExec(0x12, (TaskFunc) r104_checkBgmPlay, 0, 0, SCE_PRIO_DEF_2, 0);
 }
 

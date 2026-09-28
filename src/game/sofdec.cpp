@@ -552,7 +552,7 @@ int cSofdec::initSub(const char* fname, u32 flags)
     sprintf(m_fname, "%s", fname);
     if (!(flags & 0x200)) {
         TaskSuspend(0);
-        TaskExec(1, (TaskFunc) ThreadMove, (int) this);
+        TaskExec(1, (TaskFunc) ThreadMove, this);
     } else {
         if (!initWork(fname)) {
             return 0;

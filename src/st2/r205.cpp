@@ -182,7 +182,7 @@ void R205Init()
         }
     }
     SceAtSetDoorFunc(0, (TaskFunc) r205_RoomExitFunc, 0);
-    SceSetItemEvent(5, 0x8E, 0xB, 0xB, r205_TreasureBoxOpen, r205_TreasureBoxOpened, 0x8B, 0);
+    SceSetItemEvent(5, 0x8E, 0xB, 0xB, r205_TreasureBoxOpen, r205_TreasureBoxOpened, (void*) 0x8B, 0);
 }
 
 // Per frame: player OT type 5 (water); marks each wave Ganado dead once it stops being active; records

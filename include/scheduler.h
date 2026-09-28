@@ -33,7 +33,7 @@ public:
     u16 SleepCtr;                // 0x0A
     u16 StackSize;           // 0x0C
     u16 pad_E;
-    int arg;                  // 0x10
+    void* arg;                // 0x10
     u8 pad_14[4];
     OSThread Thread;          // 0x18
     OSThreadQueue Queue;      // 0x330
@@ -73,7 +73,7 @@ void TaskSleep(int ctr);
 void TaskExit();
 void TaskSuspend(int level);
 void TaskSignal(int level);
-typedef void (*TaskFunc)();
+typedef void* TaskFunc;
 void TaskSchedulerInit();
 void TaskAllClear();
 u32 GetStackSize(int level);
@@ -82,8 +82,8 @@ void TaskSchedulerMain(TASK* pT);
 void stackUsedCheck();
 void StackOverflowCheck(TASK* pTask);
 void* TaskExec_hook(void* value);
-TASK* TaskExec(int prio, TaskFunc func, int arg);
-void TaskChain(TaskFunc func, int arg);
+TASK* TaskExec(int prio, TaskFunc func, void* arg);
+void TaskChain(TaskFunc func, void* arg);
 void TaskKill(int prio);
 u8 TaskStatus(int level);
 void SetTaskModelPtr(void* model, TASK* t);

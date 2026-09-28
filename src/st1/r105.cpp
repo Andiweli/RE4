@@ -125,11 +125,11 @@ void R105Init()
     EvtMgr.SetFunc("evt_r105s00_func", (void*) Evt_R105S00_Func);
     EvtMgr.SetFunc("evt_r105s10_func", (void*) Evt_R105S10_Func);
     EvtMgr.SetFunc("evt_r105s99_func", (void*) Evt_R105S10_Func);
-    SceSetItemEvent(0xA, 0x92, 6, 8, r105_moveShelf, r105_movedShelf, 0x92, 0);
-    SceSetItemEvent(0xB, 0x93, 7, 6, r105_moveShelf, r105_movedShelf, 0x93, 0);
-    SceSetItemEvent(0xD, 0x94, 8, 9, r105_moveShelf, r105_movedShelf, 0x94, 0);
-    SceSetItemEvent(0xE, 0x88, 9, 0xB, r105_moveShelf, r105_movedShelf, 0x88, 0);
-    SceSetItemEvent(0xF, 0x8B, 0xA, 0xA, r105_moveShelf, r105_movedShelf, 0x8B, 0);
+    SceSetItemEvent(0xA, 0x92, 6, 8, r105_moveShelf, r105_movedShelf, (void*) 0x92, 0);
+    SceSetItemEvent(0xB, 0x93, 7, 6, r105_moveShelf, r105_movedShelf, (void*) 0x93, 0);
+    SceSetItemEvent(0xD, 0x94, 8, 9, r105_moveShelf, r105_movedShelf, (void*) 0x94, 0);
+    SceSetItemEvent(0xE, 0x88, 9, 0xB, r105_moveShelf, r105_movedShelf, (void*) 0x88, 0);
+    SceSetItemEvent(0xF, 0x8B, 0xA, 0xA, r105_moveShelf, r105_movedShelf, (void*) 0x8B, 0);
     if (RsfCheck(G_ROOM_ID, 12) == 0) {
         SceAtDataSet_exec(0x1A, SCE_LEVEL10, 0, r105_keyItem, 0, 1);
     }

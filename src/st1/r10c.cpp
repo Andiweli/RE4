@@ -971,7 +971,7 @@ static void SetEmHitAtari()
         cObj* obj;
 
         SmdSetTrans(0x6A, 0);
-        SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x61), 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x61), 0, SCE_PRIO_DEF_2, 0);
         obj = SmdGetObjPtr(0x61);
         obj->pos.x = 93412.0f;
         obj->pos.y = -16601.0f;
@@ -991,7 +991,7 @@ static void SetEmHitAtari()
         cObj* obj;
 
         SmdSetTrans(0x6B, 0);
-        SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x62), 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x62), 0, SCE_PRIO_DEF_2, 0);
         obj = SmdGetObjPtr(0x62);
         obj->pos.x = 93412.0f;
         obj->pos.y = -16601.0f;
@@ -1011,7 +1011,7 @@ static void SetEmHitAtari()
         cObj* obj;
 
         SmdSetTrans(0x6C, 0);
-        SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x63), 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x63), 0, SCE_PRIO_DEF_2, 0);
         obj = SmdGetObjPtr(0x63);
         obj->pos.x = 93412.0f;
         obj->pos.y = -16601.0f;
@@ -1105,7 +1105,7 @@ static void SetEmHitAtari()
                 SmdSetTrans(0x6A, 0);
                 SndCall(6, 1, &SmdGetObjPtr(0x61)->pos, 0, 0, 0);
                 EstSet(0, -1, &SmdGetObjPtr(0x61)->pos, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
-                SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x61), 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x61), 0, SCE_PRIO_DEF_2, 0);
                 RsfSet(G_ROOM_ID, 14);
             }
         }
@@ -1118,7 +1118,7 @@ static void SetEmHitAtari()
                 SmdSetTrans(0x6B, 0);
                 SndCall(6, 1, &SmdGetObjPtr(0x62)->pos, 0, 0, 0);
                 EstSet(0, -1, &SmdGetObjPtr(0x62)->pos, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
-                SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x62), 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x62), 0, SCE_PRIO_DEF_2, 0);
                 RsfSet(G_ROOM_ID, 15);
             }
         }
@@ -1131,7 +1131,7 @@ static void SetEmHitAtari()
                 SmdSetTrans(0x6C, 0);
                 SndCall(6, 1, &SmdGetObjPtr(0x63)->pos, 0, 0, 0);
                 EstSet(0, -1, &SmdGetObjPtr(0x63)->pos, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
-                SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x63), 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x63), 0, SCE_PRIO_DEF_2, 0);
                 RsfSet(G_ROOM_ID, 16);
             }
         }

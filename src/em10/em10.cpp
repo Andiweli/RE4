@@ -24423,9 +24423,9 @@ extern "C" void em10ActEvtSetFS(cEm10* em)
         return;
     }
     if (pG->pl_type == 4) {
-        ActBtn.set(ACT_POISON_NEEDLE, 0xB, (void*) em10FSAction, em, ACTCTR_WEP_SET_IGNORE, DISP_A_NORMAL, ACT_FUNC_NORMAL, hit);
+        ActBtn.set(ACT_POISON_NEEDLE, 0xB, (void*) em10FSAction, em, ACTCTR_WEP_SET_IGNORE, DISP_A_NORMAL, ACT_FUNC_NORMAL, (void*) hit);
     } else {
-        ActBtn.set(ACT_SUPLEX, 0xB, (void*) em10FSAction, em, ACTCTR_WEP_SET_IGNORE, DISP_A_NORMAL, ACT_FUNC_NORMAL, hit);
+        ActBtn.set(ACT_SUPLEX, 0xB, (void*) em10FSAction, em, ACTCTR_WEP_SET_IGNORE, DISP_A_NORMAL, ACT_FUNC_NORMAL, (void*) hit);
     }
 }
 

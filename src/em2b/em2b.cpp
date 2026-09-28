@@ -3125,7 +3125,7 @@ static void em2b_R1_Dm_Face(cEm2b* em)
         if (end) {
             em->r_no_2++;
         } else if (em->l_pl < 25000000.0f) {
-            ActBtn.set(ACT_CLIMB, 0xB, (void*) em2bSetActAtkParasite, em, ACTCTR_NONE, DISP_A_NORMAL, ACT_FUNC_NORMAL, end);
+            ActBtn.set(ACT_CLIMB, 0xB, (void*) em2bSetActAtkParasite, em, ACTCTR_NONE, DISP_A_NORMAL, ACT_FUNC_NORMAL, (void*) end);
         }
         break;
     }

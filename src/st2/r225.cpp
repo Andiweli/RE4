@@ -122,7 +122,7 @@ void R225Init()
     if (pG->room_id_prev == 0x226) {
         if (!SysFlagChk(pG, SYS_CONTINUE)) {
             if (!SysFlagChk(pG, SYS_LOAD_GAME)) {
-                SceExec(0x12, (TaskFunc) SceElevator_r225, (int) &r225_elvArrive, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) SceElevator_r225, &r225_elvArrive, 0, SCE_PRIO_DEF_2, 0);
             }
         }
     }

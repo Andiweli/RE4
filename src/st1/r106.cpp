@@ -89,7 +89,7 @@ void R106Init()
         door->setLock(ROOM_ARC_PTR(pG->pRoom, 0x32), ROOM_ARC_PTR(pG->pRoom, 0x33), 0, 0);
     }
     SceSetItemEvent(6, 0x85, 0, 6, r106_openShelf, r106_openedShelf, 0, 0);
-    SceSetItemEvent(7, 0x86, 1, 7, r106_openShelf, r106_openedShelf, 1, 0);
+    SceSetItemEvent(7, 0x86, 1, 7, r106_openShelf, r106_openedShelf, (void*) 1, 0);
     if (!ScfFlagChk(pG, SCF_R106_EVENT)) {
         SceAtDataSet_exec(2, SCE_LEVEL10, 0, (TaskFunc) r106_Event, 0, 1);
         r106_work->evd = DC.setData(EvtMgr.NameChange("evd/r106s00.evd"));
@@ -471,9 +471,9 @@ static void r106_setCloset()
             Vec sp = {157059.0f, -9245.0f, -43597.0f};
 
             SndCall(6, 4, &sp, 0, 0, 0);
-            SceExec(0x12, (TaskFunc) r106_shakeClosetBody, (int) body, 0, SCE_PRIO_DEF_2, 0);
-            SceExec(0x12, (TaskFunc) r106_shakeClosetDoorR, (int) doorR, 0, SCE_PRIO_DEF_2, 0);
-            SceExec(0x12, (TaskFunc) r106_shakeClosetDoorL, (int) doorL, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r106_shakeClosetBody, body, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r106_shakeClosetDoorR, doorR, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r106_shakeClosetDoorL, doorL, 0, SCE_PRIO_DEF_2, 0);
             cnt = ((Rnd() >> 2) & 0xFF) + 5;
         }
         cnt--;
