@@ -249,7 +249,7 @@ void SsItemMain::init(SUB_SCREEN* wk)
     IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pItemDat, 7), 0xFF, IDC_SSCRN_1, 0xC, 6, 0);
     for (int i = 0; i < 32; i++) {
         int no = i + 0x40;
-        IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, no, 0xC, 5, 0);
+        IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, (ID_CLASS) no, 0xC, 5, 0);
         numDisp(no, 0, 0, 0);
     }
     for (int k = 0; k < 2; k++) {

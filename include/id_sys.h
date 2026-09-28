@@ -211,7 +211,7 @@ public:
     void unitLevel(ID_UNIT* u, u8 level);
     void unitParent(ID_UNIT* parent, ID_UNIT* child);
     ID_UNIT* unitPtr(u8 id, int type);
-    void set(ID_FILE_HEADER* data, u8 id, int type, u8 ot, u8 prio, u8 mode);
+    void set(ID_FILE_HEADER* data, u8 markNo, ID_CLASS classNo, u8 otType, u8 otNo, u32 Attr);
     void kill(u8 id, int type);
     void stop();
     void move();

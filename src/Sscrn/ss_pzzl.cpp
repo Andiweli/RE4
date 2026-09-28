@@ -1358,7 +1358,7 @@ void SsPzzlMain::init(SUB_SCREEN* wk)
         if (i == 0) {
             IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, IDC_NUM_00, 0x13, 8, 0);
         } else {
-            IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, 0x40 + i, 0x13, 9, 0);
+            IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, (ID_CLASS) (0x40 + i), 0x13, 9, 0);
         }
     }
     IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xD), 0xFF, IDC_SSCRN_CKPT_0, 0x13, 2, 0);

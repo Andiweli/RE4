@@ -500,7 +500,7 @@ void SsShopMain::init(SUB_SCREEN* wk)
             if (i == 0) {
                 IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, IDC_NUM_00, 0x13, 8, 0);
             } else {
-                IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, 0x40 + i, 0x13, 9, 0);
+                IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, (ID_CLASS) (0x40 + i), 0x13, 9, 0);
             }
         }
     }
@@ -508,7 +508,7 @@ void SsShopMain::init(SUB_SCREEN* wk)
     {
         int i;
         for (i = 0; i < 5; i++) {
-            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pShopDat, 8), 0xFF, 0x80 + i, 0x13, 5, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pShopDat, 8), 0xFF, (ID_CLASS) (0x80 + i), 0x13, 5, 0);
         }
     }
     IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pShopDat, 7), 0xFF, IDC_SSCRN_CKPT_0, 0x13, 4, 0);

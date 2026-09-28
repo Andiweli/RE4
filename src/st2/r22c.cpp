@@ -1926,7 +1926,7 @@ void ScoreSet(int pt, Vec* pos)
     }
     r22c_work->scoreTimer[slot] = 30;
     type = slot + 0x40;
-    r22c_work->score2.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, type, 0x13, 6, 0);
+    r22c_work->score2.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, (ID_CLASS) type, 0x13, 6, 0);
     u = r22c_work->score2.unitPtr(0, type);
     v = *pos;
     GetScreenPos(&v, &scr);

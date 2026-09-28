@@ -3385,7 +3385,7 @@ void CardID::init(int type, CardArc* data)
     IdSys.kill(0xFF, IDC_OPTION);
     m_IdSave.set((ID_FILE_HEADER*) pFrame, 0xFF, IDC_SSCRN_FAR_0, 9, 3, 0);
     for (i = 0; i < 7; i++) {
-        m_IdSave.set((ID_FILE_HEADER*) pFile, 0xFF, 0x40 + i, 0xC, 6, 0);
+        m_IdSave.set((ID_FILE_HEADER*) pFile, 0xFF, (ID_CLASS) (0x40 + i), 0xC, 6, 0);
     }
     if (this->m_mode == 1) {
         IdSys.set((ID_FILE_HEADER*) pSaveDat, 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
