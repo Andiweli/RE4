@@ -639,12 +639,13 @@ f32 PathGetLength(void* pPdat);
 int PathGetPos(void* pPdat, f32 dist, u16* pPntNo, Vec* pPos);  // f32 second: callee copies f1 right after r3
 int PathGetPosEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Vec* pPos);
 int EspGetTplAddr(int no, void** pTpl_addr);
+struct ESPSEQ_CONTROL;
 // game/est.cpp. void: no caller reads r3 after the call, and with an `int` result the call's
 // set of r3 changes the haifa depend counts, moving `li r3,0` to the end of the arg setup
 // (obj01/obj10 move00, obj10AddSpeed).
-void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void* g, void* h);
+void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void* g, ESPSEQ_CONTROL* h);
 // game/est.cpp: the C++ overload the plain EstSet forwards to, with the est data block resolved.
-void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, void* h);
+void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, ESPSEQ_CONTROL* h);
 // game/eff_sys.cpp
 int EspGenGetMoveLoop();
 extern cCoord* pEffParentWorld;

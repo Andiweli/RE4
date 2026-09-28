@@ -83,15 +83,14 @@ static void r11d_str_check();
 // sisters' appearance, the iron door with its key-use watcher and five patrols.
 void R11dInit()
 {
-    void* zero = 0;
     Vec pos[2];
     cObjLadder* ladder;
 
 #line 52 "D:/Bio4/Prog/r11d.cpp"
     r11d_work = (R11dWork*) MEM_CALLOC(sizeof(R11dWork), 1, 0xd);
 
-    EstSet(pPL, -1, 0, 0, EFF_PL00, 1, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 0, 0x800, ESP_CORE_KIND_NONE, zero, zero);
+    EstSet(pPL, -1, 0, 0, EFF_PL00, 1, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 0, 0x800, ESP_CORE_KIND_NONE, 0, 0);
     StaFlagOn(pG, STA_ROOM_RAIN);
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
         SceAtDataSet_exec(2, SCE_LEVEL10, 0, (TaskFunc) r11d_checkEmReset, 0, 1);
@@ -214,7 +213,7 @@ extern "C" void r11d_appearBigSister()
             r11d_work->em0.addModel(r11d_work->mi);
         }
         r11d_work->eff0 = EspPullCoreKind();
-        EstSet(obj, -1, 0, 0, EFF_CORE, 0x2D, 0x801, r11d_work->eff0, zero, zero);
+        EstSet(obj, -1, 0, 0, EFF_CORE, 0x2D, 0x801, r11d_work->eff0, zero, 0);
         SceExec(0x12, (TaskFunc) r11d_checkEmDead, 0, 0, SCE_PRIO_DEF_2, 0);
     }
 }
@@ -229,18 +228,16 @@ extern "C" void r11d_appearLittleSister()
             ((cEmGanado*) em)->setR11DMotion(ROOM_ARC_PTR(pG->pRoom, 0x23));
         }
     }
-    // The two EstSet stack zeros come from one callee-saved `li r31,0` set here (after the join).
-    int zero = 0;
     pG->Room_flg[0] |= 0x40000000;
     SmdGetObjPtr(0x32)->be_flag &= ~2;
     SmdGetObjPtr(0x1A)->be_flag |= 2;
     if (RsfCheck(G_ROOM_ID, 5) == 0) {
         RsfSet(G_ROOM_ID, 5);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_NONE, 0, 0);
     }
     // Outside the `if`: the original's `bne` skips only the first EstSet (a source-logic bug had both
     // inside, which also gave the first call's `li`s output dependents and sank its stack stores).
-    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 1, ESP_CORE_KIND_NONE, 0, 0);
 }
 
 // End of the sisters' appearance: set them from flags, drop the flash effect, let them suspend, camera
@@ -382,7 +379,7 @@ static void r11d_execShowView()
     SceEventStart(1);
     StaFlagOff(pG, STA_SUSPEND);
     r11d_work->eff2 = EspPullCoreKind();
-    EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, r11d_work->eff2, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, r11d_work->eff2, zero, 0);
     CamCtrl.CutCall(2);
     while (CamCtrl.IsMotionEnd() == 0) {
         SceSleep(1);

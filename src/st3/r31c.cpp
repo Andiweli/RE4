@@ -487,7 +487,7 @@ static void r31c_CrestDoorOpen()
     SceAtSetEnable(0, 1);
     SceAtSetEnable(0x10, 0);
     SceEventStart(1);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x19, 1, ESP_CORE_KIND_ROOM00, 0, model);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x19, 1, ESP_CORE_KIND_ROOM00, 0, (ESPSEQ_CONTROL*) model);
     r31c_work->door[0].setOpen();
     CamCtrl.CutCall(0x18);
     pG->Room_flg[0] &= ~0x80000000;
@@ -1078,7 +1078,7 @@ static void r31c_SwitchPushCheck()
         pG->Room_flg[0] &= ~0x80000000;
         SceSetEventCancel(1, (TaskFunc) r31c_SwitchPushCheckEndProc, 0, 0, 1);
         CamCtrl.CutCall(0x12);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 1, ESP_CORE_KIND_ROOM00, 0, model);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 1, ESP_CORE_KIND_ROOM00, 0, (ESPSEQ_CONTROL*) model);
         r31c_work->door[4].setOpen();
         while (r31c_work->door[4].getStatus() != 1) {
             SceSleep(1);
@@ -1184,14 +1184,14 @@ static void r31c_LeverOperate(int no)
     SceSetEventCancel(1, (TaskFunc) r31c_LeverOperateEndProc, (void*) no, 0, 1);
     if (no == 0) {
         CamCtrl.CutCall(0x13);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0x11, 1, ESP_CORE_KIND_NONE, 0, model);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0x11, 1, ESP_CORE_KIND_NONE, 0, 0);
         r31c_work->door[1].setOpen();
         while (r31c_work->door[1].getStatus() != 1) {
             SceSleep(1);
         }
     } else {
         CamCtrl.CutCall(0x14);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0x12, 1, ESP_CORE_KIND_NONE, 0, model);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0x12, 1, ESP_CORE_KIND_NONE, 0, (ESPSEQ_CONTROL*) model);
         r31c_work->door[6].setOpen();
         while (r31c_work->door[6].getStatus() != 1) {
             SceSleep(1);
@@ -1267,7 +1267,7 @@ static void r31c_TowerEntranceClose()
     pG->Room_flg[0] &= ~0x80000000;
     SceSetEventCancel(1, (TaskFunc) r31c_TowerEntranceCloseEndProc, 0, 0, 1);
     CamCtrl.CutCall(0x20);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x16, 1, ESP_CORE_KIND_ROOM00, 0, model);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x16, 1, ESP_CORE_KIND_ROOM00, 0, (ESPSEQ_CONTROL*) model);
     r31c_work->door[8].setClose();
     while (r31c_work->door[8].getStatus() != 0) {
         SceSleep(1);

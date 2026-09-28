@@ -760,7 +760,7 @@ static void r207_WallMove()
     CamCtrl.CutCall(3);
     SceSetEventCancel(1, (TaskFunc) r207_WallMoveEndProc, 0, -1, 1);
     RoomSeCall(0, &obj->pos, 0, 0, obj);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, 0, 0);
     while (obj->pos.z < -9500.0f) {
         obj->pos.z += 30.0f;
         obj->matUpdate();

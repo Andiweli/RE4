@@ -659,7 +659,7 @@ void em3dRoterMove(cEm3d* em)
             rot.z = 0.0f;                                                               \
             PSVECScale(&nrm, &s, 30.0f);                                                \
             PSVECAdd(&hit, &s, &hit);                                                   \
-            EstSet(0, -1, &hit, &rot, EFF_EM3D, 6, 0, ESP_CORE_KIND_NONE, (void*) (zero), (void*) (zero));             \
+            EstSet(0, -1, &hit, &rot, EFF_EM3D, 6, 0, ESP_CORE_KIND_NONE, (void*) (zero), 0);             \
             if (se) {                                                                   \
                 SndCall(6, 0xA, &hit, 0, 0, em);                                        \
             }                                                                           \
@@ -721,8 +721,8 @@ void em3dChainGunMove(cEm3d* em)
         return;
     }
     w->Fire_wait = 2;
-    EstSet(em, -1, 0, 0, EFF_EM3D, 1, 1, ESP_CORE_KIND_NONE, em, (void*) t);
-    EstSet(em, -1, 0, 0, EFF_EM3D, 2, 1, ESP_CORE_KIND_NONE, em, (void*) t);
+    EstSet(em, -1, 0, 0, EFF_EM3D, 1, 1, ESP_CORE_KIND_NONE, em, 0);
+    EstSet(em, -1, 0, 0, EFF_EM3D, 2, 1, ESP_CORE_KIND_NONE, em, 0);
     SndCall(6, 1, &em->pos, 0, 0, em);
     EM3D_GUN_SHOT(em, 4, 5000.0f, 100000.0f, 1, t);
     EM3D_GUN_SHOT(em, 7, 2000.0f, 300000.0f, 0, t);

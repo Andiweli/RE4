@@ -299,7 +299,7 @@ extern "C" void r101_setFlameBottle(Vec* from, Vec* to)
     Vec zeroVec = {0.0f, 0.0f, 0.0f};
     obj = SetObj01(ROOM_ARC_PTR(pG->pRoom, 0x25), ROOM_ARC_PTR(pG->pRoom, 0x26), from, &zeroVec, &dir, spd, 50.0f, 0xD2, 5);
     Obj01SetEst(obj, 1, 0x12, 2, 1, 0x11, 0, 0x14, (int) zero, (int) zero);
-    EstSet(obj, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, obj, zero);
+    EstSet(obj, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, obj, 0);
 }
 
 // Starts the bell event (s30): the fight is over.

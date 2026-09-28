@@ -26,13 +26,11 @@ static const AtEffInfo r11a_eff_info = {
 // pPL) and the water hit-effect table for attribute type EAT_ET_WATER.
 void R11aInit()
 {
-    void* zero = 0;
-
 #line 46 "D:/Bio4/Prog/r11a.cpp"
     r11a_work = (R11aWork*) MEM_CALLOC(1, 1, 0xd);
 
-    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0, ESP_CORE_KIND_NONE, pPL, zero);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, pPL, zero);
+    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0, ESP_CORE_KIND_NONE, pPL, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, pPL, 0);
     EatMgr.registEffInfo(EAT_ET_WATER, (AtEffInfo*) &r11a_eff_info);
 }
 

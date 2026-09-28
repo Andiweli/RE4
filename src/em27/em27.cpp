@@ -144,7 +144,7 @@ void em27DmCk(cEm27* em)
             EmDmBloodSet2(em, 0x1F, 6, 0, 0, 0);
         } else {
             EmDmBloodSet2(em, 0x1F, 7, 0, 0, 0);
-            EstSet(em, -1, 0, 0, EFF_EM27, 8, 0, ESP_CORE_KIND_NONE, em, (void*) zero);
+            EstSet(em, -1, 0, 0, EFF_EM27, 8, 0, ESP_CORE_KIND_NONE, em, (ESPSEQ_CONTROL*) zero);
         }
     }
     em->invisible_factor = 1.0f;

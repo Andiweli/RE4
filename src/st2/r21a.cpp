@@ -301,14 +301,12 @@ static void R21aDoorMain()
 {
     cObj* obj;
     Vec pos;
-    void* zero;
     int i;
 
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
         while (ItemMgr.check(0x7B) != 1) {
             SceSleep(1);
         }
-        zero = 0;
         SceEventStart(1);
         ScfFlagOn(pG, SCF_86);
         RsfSet(G_ROOM_ID, 0);
@@ -324,7 +322,7 @@ static void R21aDoorMain()
         if (obj) {
             const f32 base = -25321.0f;
 
-            EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 1, ESP_CORE_KIND_NONE, zero, zero);
+            EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 1, ESP_CORE_KIND_NONE, 0, 0);
             SndCall(6, 9, &obj->pos, 0, 0, 0);
             for (i = 0; i < 60; i++) {
                 f32 y = obj->pos.y;

@@ -84,15 +84,14 @@ static void r113_ThunderMove();
 void R113Init()
 {
     cEmRack* rack;
-    void* zero = 0;
 
 #line 73 "D:/Bio4/Prog/r113.cpp"
     r113_work = (R113Work*) MEM_CALLOC(sizeof(R113Work), 1, 0xd);
 
     SceExec(0x12, (TaskFunc) r113_ThunderMove, 0, 0, SCE_PRIO_DEF_2, 0);
-    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 4, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 3, 0x800, ESP_CORE_KIND_NONE, zero, zero);
+    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 4, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 3, 0x800, ESP_CORE_KIND_NONE, 0, 0);
     StaFlagOn(pG, STA_ROOM_RAIN);
     SceAtDataSet_exec(2, SCE_LEVEL10, 0, (TaskFunc) r113_DoorCheck, 0, 1);
     if (!KyfFlagChk(pG, KYF_R113_TO_R11C_DOOR) && StaFlagChk(pG, STA_SUB_ASHLEY)) {

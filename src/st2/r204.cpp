@@ -100,7 +100,6 @@ static const Vec r204_chandOfs = {0.0f, 5826.0f, 5610.0f};
 void R204Init()
 {
     R204Work** wp;
-    void* zero;
     u32 i;
     u32 no;
 
@@ -192,7 +191,6 @@ void R204Init()
             }
         }
         SmdSetTrans(0x14, 1);
-        zero = NULL;
         SmdSetTrans(0x17, 1);
         SmdSetTrans(0x18, 1);
         SceAtSetEnable(7, 1);
@@ -208,10 +206,10 @@ void R204Init()
         SmdGetObjPtr(0x1C)->be_flag |= 0x20;
         SmdGetObjPtr(0x1C)->ang.y = -2.72f;
         SceAtSetEnable(0xD, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_NONE, 0, 0);
         SmdSetTrans(0x3C, 0);
         SmdSetTrans(0x3D, 1);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, 0, 0);
     } else {
         SmdSetTrans(0x14, 0);
         SmdSetTrans(0x17, 0);
@@ -225,12 +223,11 @@ void R204Init()
         SmdSetTrans(0x3B, 1);
         SceAtSetEnable(0x12, 1);
         SceAtSetEnable(0x13, 1);
-        zero = NULL;
-        EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_NONE, 0, 0);
         SceAtSetEnable(0xD, 1);
         SmdSetTrans(0x3C, 1);
         SmdSetTrans(0x3D, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, 0, 0);
     }
     if (pG->em_list_no == 3) {
         cEm* em0;

@@ -226,7 +226,7 @@ static void r228_execEvent00()
         }
     }
     SceEventEnd(0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0x801, (u8) r228_work->eff2, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0x801, (u8) r228_work->eff2, zero, (ESPSEQ_CONTROL*) zero);
     SceAtSetEnable(8, 1);
     if (r228_work->obj76) {
         r228_work->obj76->be_flag |= 2;

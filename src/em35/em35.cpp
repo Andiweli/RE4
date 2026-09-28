@@ -957,15 +957,15 @@ static void em35_R0_Init(cEm35* em)
         switch (em->type) {
         case 0:
         default:
-            EstSet(em, -1, 0, 0, EFF_EM35, 3, 1, w->espKind, em, (void*) zero);
-            EstSet(em, -1, 0, 0, EFF_EM35, 8, 1, w->espKind, em, (void*) zero);
+            EstSet(em, -1, 0, 0, EFF_EM35, 3, 1, w->espKind, em, 0);
+            EstSet(em, -1, 0, 0, EFF_EM35, 8, 1, w->espKind, em, 0);
             em->setRno(1, 1, zero, zero);
             MotionSetCore(em, MOTION(em), ARC(EM35_MOT_00A), 0, 0, 1, 0);
             MotionMove(em, 0);
             break;
         case 1:
-            EstSet(em, -1, 0, 0, EFF_EM35, 4, 1, w->espKind, em, (void*) zero);
-            EstSet(em, -1, 0, 0, EFF_EM35, 9, 1, w->espKind, em, (void*) zero);
+            EstSet(em, -1, 0, 0, EFF_EM35, 4, 1, w->espKind, em, 0);
+            EstSet(em, -1, 0, 0, EFF_EM35, 9, 1, w->espKind, em, 0);
             em->atari.off();
             em->setRno(1, 0xF, zero, zero);
             MotionSetCore(em, MOTION(em), ARC(EM35_MOT_048), 0, 0, 1, 0);
@@ -983,8 +983,8 @@ static void em35_R0_Init(cEm35* em)
             MotionMove(em, 0);
             break;
         case 1:
-            EstSet(em, -1, 0, 0, EFF_EM35, 4, 1, w->espKind, em, (void*) zero);
-            EstSet(em, -1, 0, 0, EFF_EM35, 9, 1, w->espKind, em, (void*) zero);
+            EstSet(em, -1, 0, 0, EFF_EM35, 4, 1, w->espKind, em, 0);
+            EstSet(em, -1, 0, 0, EFF_EM35, 9, 1, w->espKind, em, 0);
             em->atari.off();
             em->setRno(1, 0x1F, zero, zero);
             MotionSetCore(em, MOTION(em), ARC(EM35_MOT_088), 0, 0, 1, 0);

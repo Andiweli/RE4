@@ -2874,7 +2874,7 @@ void cEmDoor::setBreak(Vec* pPos)
         return;
     }
     zero = 0;
-    EstSet(this, -1, 0, 0, w->Eff_id, 6, 0, ESP_CORE_KIND_NONE, this, (void*) zero);
+    EstSet(this, -1, 0, 0, w->Eff_id, 6, 0, ESP_CORE_KIND_NONE, this, 0);
     SndCall(6, 0x37, &this->pos, 0, 0, this);
     hp = zero;
     r_no_0 = 1;

@@ -57,7 +57,6 @@ void R304Init()
 {
     cEmWindow* win;
     int i;
-    void* zero = 0;
 
 #line 55 "D:/Bio4/Prog/r304.cpp"
     r304_work = (R304Work*) MEM_CALLOC(sizeof(R304Work), 1, 0xd);
@@ -65,7 +64,7 @@ void R304Init()
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
         SceAtDataSet_exec(2, 0x12, 0, (TaskFunc) R304EventS00, 0, 1);
         EvtMgr.EvtReadAram("event/evd/r304s00.evd", (u8) GetEmIdFromList(0x28), 0, 0, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, 0, 0);
         for (i = 0x19; i <= 0x1F; i++) {
             if (getRoomEtcWindow(i, &win, 1)) {
                 win->SetEnableDamage(0);
@@ -73,7 +72,7 @@ void R304Init()
         }
     } else {
         SeAtSetOnOff(0, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0, ESP_CORE_KIND_NONE, 0, 0);
     }
     if (RsfCheck(G_ROOM_ID, 1) == 0) {
         SceAtDataSet_exec(3, 0x12, 0, (TaskFunc) r304_EnemySet, 0, 1);

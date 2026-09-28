@@ -126,7 +126,6 @@ static void playerDie(cPlayer* pl);
 // (bit 1); the fifteen laser emitter objects (SetObjSmd with the per-frame callback, hidden).
 void R318Init()
 {
-    void* zero = 0;
     int i;
 
 #line 86 "D:/Bio4/Prog/r318.cpp"
@@ -149,7 +148,7 @@ void R318Init()
     if (RsfCheck(G_ROOM_ID, 1) == 0) {
         SceAtDataSet_exec(0xE, 0x12, 0, (TaskFunc) R318ExecSitMain, 0, 1);
     }
-    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0x2001, ESP_CORE_KIND_ROOM03, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0x2001, ESP_CORE_KIND_ROOM03, 0, 0);
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     for (i = 0; i < 15; i++) {
@@ -640,7 +639,7 @@ static void R226EventLaserStEnd()
         SndCall(6, 3, 0, 0, 0, 0);
     }
     EffectDelete(0x2001, ESP_CORE_KIND_ROOM03);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 9, 0x2001, ESP_CORE_KIND_ROOM03, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 9, 0x2001, ESP_CORE_KIND_ROOM03, zero, 0);
     SceAtSetEnable(0xA, 1);
     SceAtSetEnable(0xB, 1);
     pPL->setNoSuspend(0);
@@ -687,16 +686,13 @@ void R318LaserEspInit(int n, int type, int kind)
         cObj* laser = r318_work->laser[i];
 
         if (laser) {
-            void* zero;
-
             if (type == 0) {
                 pG->Room_flg[0] |= 0x00020000;
             }
             if (type == 2) {
                 r318_work->laserSnd = SndCall(6, 0xC, &laser->pos, 0, 0, 0);
             }
-            zero = 0;
-            EstSet(laser, -1, 0, 0, EFF_ROOM, (u8) type, 1, (u8) kind, zero, zero);
+            EstSet(laser, -1, 0, 0, EFF_ROOM, (u8) type, 1, (u8) kind, 0, 0);
         }
     }
 }
@@ -948,8 +944,8 @@ void R318EventLaserEnd(int no)
                 Matrix2AxisAngle(t->mat, &rot[0]);
                 Matrix2AxisAngle(p4->mat, &rot[1]);
                 if (p2->world.x != 0.0f) {
-                    EstSet(0, -1, &t->world, &rot[0], EFF_ROOM, 6, 0x801, ESP_CORE_KIND_NONE, zero, zero);
-                    EstSet(0, -1, &p4->world, &rot[1], EFF_ROOM, 7, 0x801, ESP_CORE_KIND_NONE, zero, zero);
+                    EstSet(0, -1, &t->world, &rot[0], EFF_ROOM, 6, 0x801, ESP_CORE_KIND_NONE, 0, 0);
+                    EstSet(0, -1, &p4->world, &rot[1], EFF_ROOM, 7, 0x801, ESP_CORE_KIND_NONE, zero, 0);
                 }
                 asm("" : : "r"(laser), "r"(t), "r"(p4));
             }

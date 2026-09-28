@@ -284,7 +284,6 @@ void R317EventS00()
         }
         EvtMgr.EvtReadExec("event/evd/r317s05.evd", 0, EvtReadFlagNone);
         SceEventEnd(0);
-        void* zero = 0;
         pPL->setPos(6970.0f, 3006.0f, -26415.0f);
         {
             Vec v;
@@ -299,7 +298,7 @@ void R317EventS00()
         pPL->setWound();
         ScfFlagOn(pG, SCF_R317_KNIFE_BATTLE);
         OpeSetOpenTerm(0x14, 0.0f, 0.0f, 0.0f, 0.0f);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM01, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
     }
 }
 

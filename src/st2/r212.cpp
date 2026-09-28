@@ -635,14 +635,14 @@ static void r212_DrillAppearCheck()
     CamCtrl.CutCall(9);
     pG->Room_flg[0] &= ~0x40000000;
     SceSetEventCancel(1, (TaskFunc) r212_DrillAppearCheckEndProc, 0, 1, 1);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0xD, 0, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0xD, 0, ESP_CORE_KIND_NONE, (void*) zero, 0);
     r212_work->door[2].setClose();
     while ((st = r212_work->door[2].getStatus()) != 0) {
         SceSleep(1);
     }
     SceSleep(30);
     r212_work->se = RoomSeCall(0, &SmdGetObjPtr(0x2C)->pos, 0, 0x80000000, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 9, 1, ESP_CORE_KIND_ROOM00, (void*) st, (void*) st);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 9, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     SmdGetObjPtr(0x32)->be_flag &= ~2;
     CamCtrl.CutCall(4);
     SceSleep(10);

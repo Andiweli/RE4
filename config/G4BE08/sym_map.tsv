@@ -4238,8 +4238,8 @@ address	size	section	unit	scope	name	demangled
 0x8012BCE4	0x18	.text	game/espgen45.cpp	global	Estgen45SetSize__Ff	Estgen45SetSize
 0x8012BCFC	0x34	.text	game/espgen45.cpp	global	Estgen45SetColor__FUcUcUcUcffff	Estgen45SetColor
 0x8012BD30	0x70	.text	game/espgen45.cpp	global	Estgen45SetParam__FP9Esp4cWork	Estgen45SetParam
-0x8012BDA0	0x84	.text	game/est.cpp	global	EstSet__FP6cModeliP3VecT2iUcUsUcPvT8	EstSet
-0x8012BE24	0x25C	.text	game/est.cpp	global	EstSet__FP6cModeliP3VecT2P11cEspSeqHeadUsUcPvUlT7	EstSet
+0x8012BDA0	0x84	.text	game/est.cpp	global	EstSet__FP6cModeliP3VecT2iUcUsUcPvP14ESPSEQ_CONTROL	EstSet
+0x8012BE24	0x25C	.text	game/est.cpp	global	EstSet__FP6cModeliP3VecT2P11cEspSeqHeadUsUcPvUlP14ESPSEQ_CONTROL	EstSet
 0x8012C080	0x108	.text	game/est.cpp	global	AreaSstSet__Fi	AreaSstSet
 0x8012C188	0x6C	.text	game/est.cpp	global	GetSstDispFlag__FUl	GetSstDispFlag
 0x8012C1F4	0xC4	.text	game/est.cpp	global	SetSstDispFlag__FUli	SetSstDispFlag

@@ -103,8 +103,6 @@ void st3_endCountDown();
 // the jet ski key, and JumpPoint 2 skips to the escape event. The shake and wind tasks are empty.
 void R333Init()
 {
-    int zero;
-
 #line 103 "D:/Bio4/Prog/r333.cpp"
     r333_work = (R333Work*) MEM_CALLOC(sizeof(R333Work), 1, 0xd);
     read_id_data();
@@ -119,9 +117,8 @@ void R333Init()
     if (pG->JumpPoint == 2) {
         SceExec(0x12, (TaskFunc) R333EventS10, 0, 0, 2, 0);
     }
-    zero = 0;
     SysFlagOff(pG, SYS_SCREEN_STOP);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_ROOM00, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     EvtMgr.SetFunc("evt_r333s00_func", (void*) Evt_R333S00_Func);
     EvtMgr.SetFunc("evt_r333s10_func", (void*) Evt_R333S10_Func);
     SceAtDataSet_exec(0xE, 0x12, 0, (TaskFunc) r333_useMes, 0, 1);
@@ -139,9 +136,8 @@ void R333Init()
     if (RsfCheck(G_ROOM_ID, 3) == 0) {
         SceAtDataSet_exec(4, 0x12, 0, (TaskFunc) exec_no_ret, 0, 1);
     } else {
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_ROOM03, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_ROOM03, 0, 0);
     }
-    zero = 0;
     if (RsfCheck(G_ROOM_ID, 2) == 0) {
         SceAtDataSet_exec(0x11, 0x12, 0, (TaskFunc) exec_continue, 0, 1);
     }
@@ -165,7 +161,7 @@ void R333Init()
     }
     ((cPl0e*) r333_work->em.getPtr())->setRail(ROOM_ARC_PTR(pG->pRoom, 0x1F));
     setTexRender();
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 0x801, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 0x801, ESP_CORE_KIND_ROOM01, 0, 0);
     SpfFlagOn(pG, SPF_WATER);
     DpfFlagOn(pG, DPF_WATER);
     SceAtDataSet_exec(0, 0x12, 0, (TaskFunc) fall_eff, 0, 1);
@@ -460,7 +456,7 @@ static void exec_no_ret()
     RsfSet(G_ROOM_ID, 3);
     SceEventStart(1);
     SndStrReq(1, 0x3A, 0x80000003, 0, 0, 0.0f);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_ROOM03, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_ROOM03, (void*) zero, 0);
     CamCtrl.CutCall(0xA);
     SceSetEventCancel(1, (TaskFunc) exec_no_ret_exit, 0, -1, 1);
     while (!CamCtrl.IsMotionEnd()) {
@@ -726,7 +722,7 @@ static void exec_die()
     SpfFlagOff(pG, SPF_WATER);
     DpfFlagOff(pG, DPF_WATER);
     SmdSetTrans(3, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x14, 1, ESP_CORE_KIND_ROOM02, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x14, 1, ESP_CORE_KIND_ROOM02, (void*) zero, 0);
     CamCtrl.CutCall(0xD);
     while (!CamCtrl.IsMotionEnd()) {
         SceSleep(1);

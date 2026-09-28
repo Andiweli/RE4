@@ -330,11 +330,11 @@ static void em2a_R0_Init(cEm2a* em)
         }
         break;
     case 1:
-        EstSet(em, -1, 0, 0, EFF_EM2A, 3, 0x800, (u8) w->espKind, em, (void*) zero);
+        EstSet(em, -1, 0, 0, EFF_EM2A, 3, 0x800, (u8) w->espKind, em, 0);
         em->setRno(1, 6, zero, zero);
         break;
     case 2:
-        EstSet(em, -1, 0, 0, EFF_EM2A, 5, 0x800, (u8) w->espKind, em, (void*) zero);
+        EstSet(em, -1, 0, 0, EFF_EM2A, 5, 0x800, (u8) w->espKind, em, 0);
         em->setRno(1, 6, zero, zero);
         break;
     }

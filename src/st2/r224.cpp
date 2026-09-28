@@ -429,7 +429,6 @@ static void futa_move()
 {
     cEm2b* em0;
     cEm2b* em1;
-    void* zero;
 
     SceSleep(15);
     pG->Room_flg[0] |= 0x80000000;
@@ -456,10 +455,9 @@ static void futa_move()
         RsfSet(G_ROOM_ID, 0);
         em1->setNoSuspend(1);
     }
-    zero = 0;
     CamCtrl.CutCall(5);
     SceEventStart(1);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x40, 1, ESP_CORE_KIND_ROOM00, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x40, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     gnd_open();
     SceSleep(60);
     CamCtrl.Comeback(0);
@@ -475,7 +473,7 @@ static void futa_move()
     SceSleep(15);
     pG->Room_flg[0] &= 0x7FFFFFFF;
     SceSleep(135);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x3F, 1, ESP_CORE_KIND_ROOM00, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x3F, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     gnd_close();
     if (RsfCheck(G_ROOM_ID, 0)) {
         pG->Room_flg[0] |= 0x10000000;

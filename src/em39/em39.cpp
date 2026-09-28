@@ -5302,9 +5302,9 @@ static void em39_R1_T_LowKick(cEm39* em)
     case 0:
         MotionSetCore(em, MOTION(em), ARC(EM39_MOT_T_LOW_KICK), ARC(EM39_SEQ_T_LOW_KICK), 3, 1, 0);
         if (pG->pl_type == 2) {
-            EstSet(em, -1, 0, 0, EFF_EM39, 0x48, 0, w->EffKindId, em, (void*) st);
+            EstSet(em, -1, 0, 0, EFF_EM39, 0x48, 0, w->EffKindId, em, 0);
         } else {
-            EstSet(em, -1, 0, 0, EFF_EM39, 0x35, 0, w->EffKindId, em, (void*) st);
+            EstSet(em, -1, 0, 0, EFF_EM39, 0x35, 0, w->EffKindId, em, 0);
         }
         w->Arm_rno = 0;
         w->Atk_ck = 0;
@@ -6150,7 +6150,7 @@ static void em39_R1_Dm_T_DownHead(cEm39* em)
     case 0:
         MotionSetCore(em, MOTION(em), ARC(EM39_MOT_DM_T_DOWN_HEAD), ARC(EM39_SEQ_DM_T_DOWN_HEAD), 3, 1, 0);
         EM39_K4_EFF_DELETE(em, w);
-        EstSet(em, -1, 0, 0, EFF_EM39, 0x42, 0, ESP_CORE_KIND_NONE, em, (void*) st);
+        EstSet(em, -1, 0, 0, EFF_EM39, 0x42, 0, ESP_CORE_KIND_NONE, em, 0);
         em39SetVoice(em, 9);
         w->Timer = 10;
         w->Arm_rno = st;
@@ -6216,7 +6216,7 @@ static void em39_R1_Die_Normal(cEm39* em)
         em->ang.y = 1.57f;
         MotionSetCore(em, MOTION(em), ARC(EM39_MOT_DIE_NORMAL), 0, 0, 0x201, 0);
         EM39_K4_EFF_DELETE(em, w);
-        EstSet(em, -1, 0, 0, EFF_EM39, 0x3F, 0, w->EffKindId, em, (void*) st);
+        EstSet(em, -1, 0, 0, EFF_EM39, 0x3F, 0, w->EffKindId, em, 0);
         w->Arm_rno = 0x10;
         em39DieModelSet(em);
         w->Str_seid = SndStrReq(1, 0xE7, 0x80000003, 0, 0, 0.0f);
@@ -6565,7 +6565,7 @@ int em39GunHitCk(cEm39* em)
     rot.z = 0.0f;
     PSVECScale(&nrm, &a, 30.0f);
     PSVECAdd(&hit, &a, &hit);
-    EstSet(0, -1, &hit, &rot, EFF_EM39, 4, 0, ESP_CORE_KIND_NONE, part, (void*) part);
+    EstSet(0, -1, &hit, &rot, EFF_EM39, 4, 0, ESP_CORE_KIND_NONE, part, 0);
     PSVECSubtract(&hit, &from, &b);
     EspSetGatling(from, b);
     SndCall(6, 0xA, &hit, 0, 0, 0);

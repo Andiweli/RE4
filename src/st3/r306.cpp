@@ -78,15 +78,14 @@ void R306Init()
         SceAtSetEnable(6, 0);
     }
     SceExec(0x12, (TaskFunc) r306_checkDoor308KeyUse, 0, 0, 2, 0);
-    void* zero = 0;
     if (!KyfFlagChk(pG, KYF_R306_TO_R30B_DOOR)) {
         SceAtDataSet_exec(5, 0x12, 0, (TaskFunc) r306_checkDoor30b, 0, 1);
         SceExec(0x12, (TaskFunc) r306_checkDoor30bKeyUse, 0, 0, 2, 0);
     }
     if (ItfFlagChk(pG, ITF_R308_THERMO_RIFLE)) {
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_NONE, 0, 0);
     } else {
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, 0, 0);
     }
     if (ScfFlagChk(pG, SCF_R307_REGENERATER_APPEAR)) {
         r306_work->em[0].setEm(0x30, 6, 0, 1, 1);

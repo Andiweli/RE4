@@ -1519,7 +1519,7 @@ int em3aGunHitCk(cEm3a* em)
         rot.z = 0.0f;
         PSVECScale(&nrm, &s, 30.0f);
         PSVECAdd(&hit, &s, &hit);
-        EstSet(0, -1, &hit, &rot, EFF_EM3A, 4, 0, ESP_CORE_KIND_NONE, part, part);
+        EstSet(0, -1, &hit, &rot, EFF_EM3A, 4, 0, ESP_CORE_KIND_NONE, part, 0);
         PSVECSubtract(&hit, &a, &d);
         EspSetGatling(a, d);
         SndCall(6, 0xA, &hit, 0, 0, 0);

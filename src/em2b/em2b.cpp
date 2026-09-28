@@ -1099,7 +1099,7 @@ static void em2b_R1_R11E_Appear(cEm2b* em)
     switch (step) {
     case 0:
         MotionSetCore(em, &em->Motion, ARC(EM2B_MOT_059), 0, 0, 1, 0);
-        EstSet(em, -1, 0, 0, w->Eff, 0x1C, 1, ESP_CORE_KIND_NONE, em, (void*) step);
+        EstSet(em, -1, 0, 0, w->Eff, 0x1C, 1, ESP_CORE_KIND_NONE, em, 0);
         em->r_no_2++;
     case 1:
         MotionMove(em, 0);

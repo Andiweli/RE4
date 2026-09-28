@@ -442,7 +442,6 @@ static void dragon_down_exit()
 // The main dragon falls into the pit.
 static void dragon_down()
 {
-    int zero = 0;
     cObj* obj;
     cObj* o14;
     cObj* o15;
@@ -465,14 +464,14 @@ static void dragon_down()
     o14->ang.y = 1.5708f;
     o15->ang.y = 1.5708f;
     r222_work->dragon.setNoSuspend(1);
-    EstSet(o14, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(o14, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_NONE, 0, 0);
     CamCtrl.CutCall(3);
     MotionSetCore(o14, &o14->Motion, ROOM_ARC_PTR(pG->pRoom, 0x1F), 0, 0, 1, 0);
     MotionSetCore(o15, &o15->Motion, ROOM_ARC_PTR(pG->pRoom, 0x1F), 0, 0, 1, 0);
     SndStrReq(1, 5, 0x80000003, 0, 0, 0.0f);
     SceSleep(15);
-    EstSet(0, -1, &SmdGetObjPtr(0x16)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
-    EstSet(0, -1, &SmdGetObjPtr(0x17)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, &SmdGetObjPtr(0x16)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(0, -1, &SmdGetObjPtr(0x17)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, 0, 0);
     SmdGetObjPtr(0x16)->be_flag &= ~2;
     SmdGetObjPtr(0x17)->be_flag &= ~2;
     SndCall(6, 0xD, &SmdGetObjPtr(0x16)->pos, 0, 0, 0);
@@ -574,8 +573,8 @@ static void dragon_down2()
     RsfSet(G_ROOM_ID, 1);
     oA = SmdGetObjPtr(0xA);
     oB = SmdGetObjPtr(0xB);
-    EstSet(0, -1, &SmdGetObjPtr(0xD)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
-    EstSet(0, -1, &SmdGetObjPtr(0xE)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, &SmdGetObjPtr(0xD)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(0, -1, &SmdGetObjPtr(0xE)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, 0, 0);
     SmdGetObjPtr(0xD)->be_flag &= ~2;
     SmdGetObjPtr(0xE)->be_flag &= ~2;
     SndCall(6, 0xD, &SmdGetObjPtr(0xD)->pos, 0, 0, 0);
@@ -597,7 +596,7 @@ static void dragon_down2()
         if (hit == 0 && oA->pos.y < -3500.0f) {
             pos = oA->pos;
             pos.y = -10000.0f;
-            EstSet(0, -1, &pos, 0, EFF_ROOM, 0xC, 1, ESP_CORE_KIND_NONE, (void*) zero2, (void*) zero2);
+            EstSet(0, -1, &pos, 0, EFF_ROOM, 0xC, 1, ESP_CORE_KIND_NONE, (void*) zero2, (ESPSEQ_CONTROL*) zero2);
             hit = 1;
             SndCall(6, 0xE, &pos, 0, 0, 0);
         }
@@ -670,8 +669,8 @@ static void dragon_down3()
     oB = SmdGetObjPtr(0x10);
     MotionSetCore(oA, &oA->Motion, ROOM_ARC_PTR(pG->pRoom, 0x1F), 0, 0, 1, 0);
     MotionSetCore(oB, &oB->Motion, ROOM_ARC_PTR(pG->pRoom, 0x1F), 0, 0, 1, 0);
-    EstSet(0, -1, &SmdGetObjPtr(0x12)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
-    EstSet(0, -1, &SmdGetObjPtr(0x13)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, &SmdGetObjPtr(0x12)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(0, -1, &SmdGetObjPtr(0x13)->pos, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_NONE, 0, 0);
     SmdGetObjPtr(0x12)->be_flag &= ~2;
     SmdGetObjPtr(0x13)->be_flag &= ~2;
     SndCall(6, 0xD, &SmdGetObjPtr(0x12)->pos, 0, 0, 0);
@@ -691,7 +690,7 @@ static void dragon_down3()
         if (hit == 0 && oA->pos.y < -3500.0f) {
             pos = oA->pos;
             pos.y = -10000.0f;
-            EstSet(0, -1, &pos, 0, EFF_ROOM, 0xC, 1, ESP_CORE_KIND_NONE, (void*) zero2, (void*) zero2);
+            EstSet(0, -1, &pos, 0, EFF_ROOM, 0xC, 1, ESP_CORE_KIND_NONE, (void*) zero2, (ESPSEQ_CONTROL*) zero2);
             hit = 1;
             SndCall(6, 0xE, &pos, 0, 0, 0);
         }

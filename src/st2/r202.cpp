@@ -411,7 +411,6 @@ static void r202_operateCannon()
 {
     Vec v;
     cEmTorch* torch;
-    void* zero;
 
     SceEventStart(0);
     RsfSet(G_ROOM_ID, 1);
@@ -433,13 +432,12 @@ static void r202_operateCannon()
             }
         }
     }
-    zero = NULL;
     CamCtrl.CutCall(5);
     SceSleep(20);
     SceAtSetEnable(0x11, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, 0, 0);
     SndCall(6, 9, 0, 0, 0, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_NONE, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_NONE, 0, 0);
     SceSleep(35);
     SndCall(6, 0xA, 0, 0, 0, 0);
     SmdGetObjPtr(0x25)->be_flag &= ~2;
@@ -750,7 +748,7 @@ static void r202_CatapultGo()
     r202_work->cat[2].fire = 1;
     pG->Room_flg[0] |= 0x80000000;
     rock = r202_work->cat[2].rock;
-    EstSet(rock, -1, 0, 0, EFF_ROOM, 0, 1, EMROCK_WK(rock)->EffKindId, rock, zero);
+    EstSet(rock, -1, 0, 0, EFF_ROOM, 0, 1, EMROCK_WK(rock)->EffKindId, rock, (ESPSEQ_CONTROL*) zero);
     SceSleep(60);
     pG->Room_flg[0] |= 0x02000000;
     r202_work->em180.setFlag(1);

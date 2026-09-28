@@ -215,7 +215,7 @@ void R30fInit()
         AreaSet(2);
         r30f_work->truckNo = 2;
         SceExec(0x12, (TaskFunc) R30f_ride, 0, 0, 2, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x801, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x801, ESP_CORE_KIND_ROOM01, (void*) zero, 0);
         SceAtSetEnable(0x18, 0);
         SceAtSetEnable(0x19, 0);
     } else {
@@ -775,7 +775,7 @@ static void track_move()
 
                 if (no == 0) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3C), 0, 0, 1, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0x18, 0, ESP_CORE_KIND_NONE, (void*) no, (void*) no);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0x18, 0, ESP_CORE_KIND_NONE, 0, 0);
                 }
                 if (r30f_work->truckNo == 1) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3F), 0, 0, 1, 0);
@@ -807,17 +807,17 @@ static void track_move()
                 RmfFlagOn(pG, RMF_TRACK_DIE);
                 if (r30f_work->truckNo == 0) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3D), 0, 0, 1, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0, ESP_CORE_KIND_NONE, (void*) hitT, (void*) hitT);
-                    EstSet(r30f_work->lift, -1, 0, 0, EFF_ROOM, 9, 0, ESP_CORE_KIND_NONE, r30f_work->lift, (void*) hitT);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0, ESP_CORE_KIND_NONE, 0, 0);
+                    EstSet(r30f_work->lift, -1, 0, 0, EFF_ROOM, 9, 0, ESP_CORE_KIND_NONE, r30f_work->lift, 0);
                 }
                 if (r30f_work->truckNo == 1) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x40), 0, 0, 1, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, (void*) hitT, (void*) hitT);
-                    EstSet(r30f_work->lift, -1, 0, 0, EFF_ROOM, 0xB, 0, ESP_CORE_KIND_NONE, r30f_work->lift, (void*) hitT);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
+                    EstSet(r30f_work->lift, -1, 0, 0, EFF_ROOM, 0xB, 0, ESP_CORE_KIND_NONE, r30f_work->lift, 0);
                 }
                 if (r30f_work->truckNo == 2) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x37), 0, 0, 1, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, (void*) hitT, (void*) hitT);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, 0, 0);
                 }
                 SndCall(6, 0x15, &r30f_work->lift->pList->pList->world, 0, 0x80000000, 0);
             }
@@ -825,7 +825,6 @@ static void track_move()
         }
         t++;
         hitT++;
-        life = 0;   // the zero register of the pl_life store and the EstSet arguments below
         if (RmfFlagChk(pG, RMF_TRACK_DIE) && hitT == 0x1E) {
             PlWepHitCheck2(0, &pPL->pos, &pPL->pos, 0x12, 2, 6000.0f);
             pG->pl_life = 0;

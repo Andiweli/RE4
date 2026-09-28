@@ -1547,7 +1547,7 @@ static void em3c_R1_Die_Normal(cEm3c* em)
     case 0:
         w->Timer = 60;
         if (em->r_no_3) {
-            EstSet(em, -1, 0, 0, EFF_EM3C, 5, 0, ESP_CORE_KIND_NONE, em, (void*) zero);
+            EstSet(em, -1, 0, 0, EFF_EM3C, 5, 0, ESP_CORE_KIND_NONE, em, (ESPSEQ_CONTROL*) zero);
         } else {
             EstSet(em, -1, 0, 0, EFF_EM3C, 0, 0, ESP_CORE_KIND_NONE, em, 0);
             EstSet(em, -1, 0, 0, EFF_EM3C, 3, 0, ESP_CORE_KIND_NONE, em, 0);

@@ -1082,7 +1082,7 @@ extern "C" void Evt_R213S00_Func(Event* e)
                 StaFlagOff(pG, STA_EVENT);
                 SstSet(EFF_ROOM, 0xFFFF, ESP_CORE_KIND_SST, 0, 0x2F, 0);
                 if (r213_work->tex) {
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0, r213_work->tex->GetCoreFlg() | 1, ESP_CORE_KIND_ROOM00, (void*) frame, (void*) frame);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0, r213_work->tex->GetCoreFlg() | 1, ESP_CORE_KIND_ROOM00, 0, 0);
                 }
                 StaFlagOn(pG, STA_EVENT);
                 SpfFlagOff(pG, SPF_ESP_AREA);
@@ -1112,7 +1112,7 @@ extern "C" void Evt_R213S00_Func(Event* e)
         StaFlagOff(pG, STA_EVENT);
         SstSet(EFF_ROOM, 0xFFFF, ESP_CORE_KIND_SST, 0, 0x2F, 0);
         if (r213_work->tex) {
-            EstSet(0, -1, 0, 0, EFF_ROOM, 0, r213_work->tex->GetCoreFlg() | 1, ESP_CORE_KIND_ROOM00, (void*) frame, (void*) frame);
+            EstSet(0, -1, 0, 0, EFF_ROOM, 0, r213_work->tex->GetCoreFlg() | 1, ESP_CORE_KIND_ROOM00, (void*) frame, 0);
         }
         StaFlagOn(pG, STA_EVENT);
         SpfFlagOff(pG, SPF_ESP_AREA);

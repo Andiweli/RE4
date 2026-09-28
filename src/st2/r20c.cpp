@@ -537,13 +537,11 @@ static void R20cExecShootKaigaOpenEnd()
 // behind the painting (objects 7 and the second target) for the door puzzle.
 void R20cExecShootInit()
 {
-    void* zero = 0;
-
     if (RsfCheck(G_ROOM_ID, 0)) {
         R20cDoorOpenCancel(0);
         R20cKaigaMoved(1);
         SmdSetTrans(9, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_NONE, 0, 0);
     } else {
         cEmBarred* barred;
         cObj* obj;

@@ -620,7 +620,7 @@ static void r11c_EventBesiegedStart()
     }
     {
         // The zero for EstSet's two stack arguments is born at the top of the block (it crosses the
-        // calls below, so sched1 may hoist it): a block-local, as in r111.
+        // calls below, so sched1 may hoist it): a block-local.
         void* zero = 0;
 
         ScfFlagOn(pG, SCF_R11C_BESIEGED_END_EVENT);
@@ -629,7 +629,7 @@ static void r11c_EventBesiegedStart()
         SceAtSetEnable(8, 0);
         SceAtSetEnable(9, 0);
         SmdGetObjPtr(0x3F)->be_flag &= ~2;
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_NONE, zero, 0);
     }
     RmfFlagOff(pG, RMF_BESIEGEDING);
     SceSetChapterEnd(CHAPTER_2_2, -1);
@@ -1146,7 +1146,7 @@ extern "C" void Evt_R11CS00_Func(Event* e)
                 EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
                 EffectEspgenDelete(0x2001, ESP_CORE_KIND_ROOM01, 0);
                 EffectEfmDelete(0x2001, ESP_CORE_KIND_ROOM01, 0);
-                EstSet(0, -1, 0, 0, EFF_ROOM, 0xD, 0x2001, ESP_CORE_KIND_ROOM01, (void*) frame, (void*) frame);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 0xD, 0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
                 o = SmdGetObjPtr(0x3F);
                 if (o) {
                     e->SetMod("scr0000", o, 5, 0, 2, 0);

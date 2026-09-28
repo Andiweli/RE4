@@ -270,7 +270,7 @@ static void r118_ThunderMove()
                     void* zero;
                     do { } while (0);
                     zero = 0;
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, zero, zero);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, 0, 0);
                 } else {
                     EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_NONE, 0, 0);
                 }

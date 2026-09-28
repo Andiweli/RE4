@@ -160,8 +160,8 @@ static void door_down()
     SmdGetObjPtr(0xB)->type = zero;
     em = setEm(0x24, -1, 1, 1, 1);
     em->flag |= 1;
-    EstSet(em, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, em, (void*) zero);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(em, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, em, 0);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0, ESP_CORE_KIND_NONE, 0, 0);
     t = 0.01f;
     cnt = 0;
     SndCall(6, 2, &SmdGetObjPtr(0xB)->pos, 0, 0, 0);

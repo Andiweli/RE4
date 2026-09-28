@@ -675,7 +675,7 @@ static void chkSwitchA()
         EffectEspDelete(0, ESP_CORE_KIND_ROOM_AREA01, 0, 0);
         EffectEspgenDelete(0, ESP_CORE_KIND_ROOM_AREA01, 0);
         EffectEfmDelete(0, ESP_CORE_KIND_ROOM_AREA01, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0x2001, ESP_CORE_KIND_ROOM04, z, z); // COMPILER-DIFF: candidate #17 (both 0, see `z`)
+        EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0x2001, ESP_CORE_KIND_ROOM04, z, 0); // COMPILER-DIFF: candidate #17 (both 0, see `z`)
         CamCtrl.CutCall(0x19);
         while (CamCtrl.IsMotionEnd() == 0) {
             SceSleep(1);

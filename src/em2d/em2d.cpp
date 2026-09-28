@@ -838,7 +838,7 @@ void cEm2d::move()
             w->effTimer--;
         } else {
             w->effTimer = Rnd() % 3 + 5;
-            EstSet(this, -1, 0, 0, EFF_EM2D, 5, 0, ESP_CORE_KIND_NONE, this, (void*) n);
+            EstSet(this, -1, 0, 0, EFF_EM2D, 5, 0, ESP_CORE_KIND_NONE, this, 0);
         }
     }
     em2dEyeMove(this);
@@ -1819,7 +1819,7 @@ static void em2d_R1_JumpAtkHit(cEm2d* em)
         EmCatchPLSet(em, 0.0f, 2, -48.1500015f, 0.0f, 921.190002f, plem2d_JumpAtkHit);
         GameAddPoint(LVADD_PL_DAMAGE);
         PlGachaInit();
-        EstSet(em, -1, 0, 0, EFF_EM2D, 1, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
+        EstSet(em, -1, 0, 0, EFF_EM2D, 1, 0, ESP_CORE_KIND_NONE, em, 0);
         SndCall(8, 0x1C, &em->pos, em->id, 0, em);
         w->timer = 10;
         em->r_no_2++;
@@ -1955,7 +1955,7 @@ static void plem2d_JumpAtkHit(cPlayer* pl)
         PlSetFace(1);
         pl->atari.set(480.000031f, 400.0f, 10);
         pl->m_Work0 = 127;
-        EstSet(pl, -1, 0, 0, EFF_EM2D, 0x13, 0, ESP_CORE_KIND_NONE, pl, (void*) fe);
+        EstSet(pl, -1, 0, 0, EFF_EM2D, 0x13, 0, ESP_CORE_KIND_NONE, pl, 0);
         pl->r_no_3 = Rnd() & 1;
         pl->m_Work0 = 10;
         pl->r_no_2++;
@@ -2208,7 +2208,7 @@ static void plem2d_JumpKickHit(cPlayer* pl)
             pl->m_Work0 = t - 1;
         } else {
             PlSetDamage(PL_DM_AUTO, 0, 0);
-            EstSet(pl, -1, 0, 0, EFF_EM2D, 0x1A, 0, ESP_CORE_KIND_NONE, pl, (void*) t);
+            EstSet(pl, -1, 0, 0, EFF_EM2D, 0x1A, 0, ESP_CORE_KIND_NONE, pl, 0);
         }
         break;
     }
@@ -2903,7 +2903,7 @@ static void em2d_R1_W_AtkPoison(cEm2d* em)
     switch (fe) {
     case 0:
         MotionSetCore(em, &em->Motion, ARC(EM2D_MOT_046), 0, 10, 5, 0);
-        EstSet(em, -1, 0, 0, EFF_EM2D, 7, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
+        EstSet(em, -1, 0, 0, EFF_EM2D, 7, 0, ESP_CORE_KIND_NONE, em, 0);
         w->sndId = SndCall(8, 0x16, &em->pos, em->id, 0, em);
         w->timer = 30;
         em->r_no_2++;
@@ -2934,7 +2934,7 @@ static void em2d_R1_W_AtkPoison(cEm2d* em)
             em2dSetAtkWaitR(w, 100, 75, 60, 45, 30);
             em->setRno(1, 0x14, 0, 0);
         } else if (em->Motion.Seq_frame > 22.7000008f && em->Motion.Seq_frame < 23.2999992f) {
-            EstSet(em, -1, 0, 0, EFF_EM2D, 9, 0, ESP_CORE_KIND_NONE, em, (void*) end);
+            EstSet(em, -1, 0, 0, EFF_EM2D, 9, 0, ESP_CORE_KIND_NONE, em, 0);
             em2dSetPoison(em, 1);
         }
         break;
@@ -3668,7 +3668,7 @@ static void em2d_R1_A_CatchHit(cEm2d* em)
         pPL->r_no_3 = 1;
         GameAddPoint(LVADD_PL_DAMAGE);
         PlGachaInit();
-        EstSet(em, -1, 0, 0, EFF_EM2D, 1, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
+        EstSet(em, -1, 0, 0, EFF_EM2D, 1, 0, ESP_CORE_KIND_NONE, em, 0);
         SndCall(8, 0x1C, &em->pos, em->id, 0, em);
         em->r_no_2++;
     case 1:
@@ -3789,7 +3789,7 @@ static void plem2d_A_CatchHit(cPlayer* pl)
         PlSetFace(1);
         pl->atari.set(480.000031f, 400.0f, 10);
         pl->m_Work0 = 127;
-        EstSet(pl, -1, 0, 0, EFF_EM2D, 0x13, 0, ESP_CORE_KIND_NONE, pl, (void*) fe);
+        EstSet(pl, -1, 0, 0, EFF_EM2D, 0x13, 0, ESP_CORE_KIND_NONE, pl, 0);
         pl->r_no_3 = Rnd() & 1;
         pl->m_Work0 = 10;
         pl->r_no_2++;
@@ -4393,7 +4393,7 @@ static void em2d_R1_Die_Lost(cEm2d* em)
         EffectEfmDelete(0, w->espKind, em);
         SndCall(8, 0xE, &em->pos, em->id, 0, em);
         if (ChkWaterEffectEnable(&em->pos)) {
-            EstSet(em, -1, 0, 0, EFF_EM2D, 0x21, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
+            EstSet(em, -1, 0, 0, EFF_EM2D, 0x21, 0, ESP_CORE_KIND_NONE, em, 0);
         } else {
             EstSet(em, -1, 0, 0, EFF_EM2D, 0x2A, 0, ESP_CORE_KIND_NONE, em, 0);
         }
@@ -5562,7 +5562,7 @@ void em2dPlHeadLost()
     }
     zero = 0;
     SndCall(1, 0x3E, &pPL->pos, 0, 0, pPL);
-    EstSet(pPL, -1, 0, 0, EFF_EM2D, 0x2D, 0, ESP_CORE_KIND_NONE, pPL, (void*) zero);
+    EstSet(pPL, -1, 0, 0, EFF_EM2D, 0x2D, 0, ESP_CORE_KIND_NONE, pPL, 0);
     pPL->setHead(0);
     p3 = pPL->getPartsPtr(3);
     ofs.x = 0.0f;
@@ -5581,7 +5581,7 @@ void em2dPlHeadLost()
         obj->LightInfo.EnableMask = 1;
         Obj01SetEst(obj, 0, -1, 4, 0, -1, 0, -1, (int) zero, -1);
     }
-    EstSet(obj, -1, 0, 0, EFF_EM2D, 0x2E, 0, ESP_CORE_KIND_NONE, obj, (void*) zero);
+    EstSet(obj, -1, 0, 0, EFF_EM2D, 0x2E, 0, ESP_CORE_KIND_NONE, obj, 0);
 }
 
 // Swaps the player's head for the acid-melted skull (player archive 0x6D / 0x6E) after the face grab kill.

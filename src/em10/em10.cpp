@@ -10587,7 +10587,7 @@ static void em10_R1_SukiAtk(cEm10* em)
                 EM10_SUKI_SWEEP_CK(300.0f);
                 EM10_SUKI_SWEEP_CK(600.0f);
                 if (w->Atk_ck) {
-                    EstSet(w->pWeapon, -1, 0, 0, EFF_EM10, 0x44, 0, ESP_CORE_KIND_NONE, w->pWeapon, (void*) hit);
+                    EstSet(w->pWeapon, -1, 0, 0, EFF_EM10, 0x44, 0, ESP_CORE_KIND_NONE, w->pWeapon, 0);
                 }
             }
         }
@@ -17588,9 +17588,9 @@ int em10LostHead(cEm10* em, int a, int b)
         SndStop(w->Seid_breath, 0);
         SndCall(8, 7, &em->pos, em->id, 0, em);
         if (a == 3) {
-            EstSet(em, -1, 0, 0, EFF_EM10, 0x78, 0, ESP_CORE_KIND_NONE, em, (void*) hit);
+            EstSet(em, -1, 0, 0, EFF_EM10, 0x78, 0, ESP_CORE_KIND_NONE, em, 0);
         } else {
-            EstSet(em, -1, 0, 0, EFF_EM10, 0xA0, 0, ESP_CORE_KIND_NONE, em, (void*) hit);
+            EstSet(em, -1, 0, 0, EFF_EM10, 0xA0, 0, ESP_CORE_KIND_NONE, em, 0);
         }
         return 0;
     }
@@ -17677,7 +17677,7 @@ int em10LostHead(cEm10* em, int a, int b)
             EstSet(em, -1, 0, 0, EFF_EM10, 0x34, 0, ESP_CORE_KIND_NONE, em, 0);
         } else {
             Ctrl12Set(w->pCtrlGroup, CTRL12_ID_BIGEFF, 0x2D);
-            EstSet(em, -1, 0, 0, EFF_EM10, 3, 0, ESP_CORE_KIND_NONE, em, (void*) hit);
+            EstSet(em, -1, 0, 0, EFF_EM10, 3, 0, ESP_CORE_KIND_NONE, em, 0);
         }
     }
     EstSet(em, -1, 0, 0, EFF_EM10, 6, 0, ESP_CORE_KIND_NONE, em, 0);
@@ -23562,7 +23562,7 @@ extern "C" int em10TorchFrameAtkCkSub(cEm10* em)
     w->Atk_ck2 = 1;
     SndCall(8, 0x8F, &pSUB->pos, em->id, 0, pSUB);
     Ctrl12Set(w->pCtrlGroup, CTRL12_ID_EM10_NOT_NEAR, 0x1E);
-    EstSet(pSUB, -1, 0, 0, EFF_EM10, 0x28, 0, ESP_CORE_KIND_NONE, pSUB, (void*) old);
+    EstSet(pSUB, -1, 0, 0, EFF_EM10, 0x28, 0, ESP_CORE_KIND_NONE, pSUB, 0);
     v = pSUB->pos;
     cDmgInfo* dmg = &pSUB->dmg; // held across the call (r31)
     v.y += 1300.0f;
@@ -27194,9 +27194,9 @@ void em10CoreBreak(cEm10* em, int a)
     w->Seid_voice = Ctrl11SetSe2(w->pCtrlSe, em, Rnd() % 20 + 20, 0x89, 6, 8);
     w->Breath_se_wait = Rnd() % 120 + 120;
     if (w->Ganado == 1) {
-        EstSet(0, -1, &w->pCore->getPartsPtr(9)->world, 0, EFF_EM10, 0x80, 0, ESP_CORE_KIND_NONE, (void*) a, (void*) a);
+        EstSet(0, -1, &w->pCore->getPartsPtr(9)->world, 0, EFF_EM10, 0x80, 0, ESP_CORE_KIND_NONE, 0, 0);
     } else {
-        EstSet(0, -1, &em->getPartsPtr(3)->world, 0, EFF_EM10, 0x27, 0, ESP_CORE_KIND_NONE, (void*) a, (void*) a);
+        EstSet(0, -1, &em->getPartsPtr(3)->world, 0, EFF_EM10, 0x27, 0, ESP_CORE_KIND_NONE, 0, 0);
     }
     w->pCore->clearLostWait();
     w->pCore = 0;

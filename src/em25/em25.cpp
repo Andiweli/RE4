@@ -649,7 +649,7 @@ static void em25_R1_Bite(cEm25* em)
     switch (fe) {
     case 0:
         MotionSetCore(em, &em->Motion, ARC(EM25_MOT_BITE_027), 0, 0, 1, 0);
-        EstSet(em, -1, 0, 0, EFF_EM25, 3, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
+        EstSet(em, -1, 0, 0, EFF_EM25, 3, 0, ESP_CORE_KIND_NONE, em, 0);
         EmCatchPLSet(em, 0.0f, 2, -150.0f, 0.0f, 628.0f, plem25_Bite);
         PlGachaInit();
         SndCall(8, 0x12, &em->pos, em->id, 0, em);
@@ -774,7 +774,7 @@ static void em25_R1_P_Appear(cEm25* em)
         MotionSetCore(em, &em->Motion, ARC(EM25_MOT_P_APPEAR), ARC(EM25_SEQ_P_APPEAR), 0, 1, 0);
         w->Se_breath_wait = 0;
         em->setStatus(EM_STATUS_ACTIVE);
-        EstSet(em, -1, 0, 0, EFF_EM25, 2, 0, w->EffKindId, em, (void*) fe);
+        EstSet(em, -1, 0, 0, EFF_EM25, 2, 0, w->EffKindId, em, 0);
         w->Atk_enable = 0;
         w->Compress_y = 1.0f;
         em->invisible_factor = 0.0f;
@@ -900,7 +900,7 @@ static void em25_R1_P_Atk(cEm25* em)
     switch (fe) {
     case 0:
         MotionSetCore(em, &em->Motion, ARC(EM25_MOT_P_ATK), ARC(EM25_SEQ_P_ATK), 5, 1, 0);
-        EstSet(em, -1, 0, 0, EFF_EM25, 0xC, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
+        EstSet(em, -1, 0, 0, EFF_EM25, 0xC, 0, ESP_CORE_KIND_NONE, em, 0);
         w->Atk_ck = 0;
         em->r_no_2++;
     case 1:
@@ -1173,7 +1173,7 @@ static void em25_R1_Die_Normal(cEm25* em)
     case 0:
         MotionSetCore(em, &em->Motion, ARC(EM25_MOT_DIE_NORMAL), 0, 5, 1, 0);
         em25ClearParasite(em);
-        EstSet(em, -1, 0, 0, EFF_EM25, 4, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
+        EstSet(em, -1, 0, 0, EFF_EM25, 4, 0, ESP_CORE_KIND_NONE, em, 0);
         EffectEspDelete(0, w->EffKindId, em, 0);
         EffectEspgenDelete(0, w->EffKindId, em);
         EffectEfmDelete(0, w->EffKindId, em);
@@ -1216,7 +1216,7 @@ static void em25_R1_Die_Big(cEm25* em)
         MotionSetCore(em, &em->Motion, ARC(EM25_MOT_DIE_BIG), ARC(EM25_SEQ_DIE_BIG), 5, 1, 0);
         em->clearStatus(EM_STATUS_ACTIVE);
         em25ClearParasite(em);
-        EstSet(em, -1, 0, 0, EFF_EM25, 4, 0, ESP_CORE_KIND_NONE, em, (void*) fe);
+        EstSet(em, -1, 0, 0, EFF_EM25, 4, 0, ESP_CORE_KIND_NONE, em, 0);
         SndCall(8, 0xD, &em->pos, em->id, 0, em);
         EffectEspDelete(0, w->EffKindId, em, 0);
         EffectEspgenDelete(0, w->EffKindId, em);
@@ -1756,7 +1756,7 @@ void em25PlHeadLost()
     }
     zero = 0;
     SndCall(1, 0x3E, &pPL->pos, 0, 0, pPL);
-    EstSet(pPL, -1, 0, 0, EFF_EM10, 0x45, 0, ESP_CORE_KIND_NONE, pPL, (void*) zero);
+    EstSet(pPL, -1, 0, 0, EFF_EM10, 0x45, 0, ESP_CORE_KIND_NONE, pPL, 0);
     pPL->setHead(0);
     p = pPL->getPartsPtr(3);
     ofs.x = 0.0f;
@@ -1772,7 +1772,7 @@ void em25PlHeadLost()
         obj->LightInfo.EnableMask = 1;
         Obj01SetEst(obj, 0, -1, 4, 0, -1, 0, -1, (int) zero, -1);
     }
-    EstSet(obj, -1, 0, 0, EFF_EM10, 0x46, 0, ESP_CORE_KIND_NONE, obj, (void*) zero);
+    EstSet(obj, -1, 0, 0, EFF_EM10, 0x46, 0, ESP_CORE_KIND_NONE, obj, 0);
 }
 
 // Spits the poison projectile (SetObj08 from the head part 0) aimed at the player's or the partner's

@@ -318,10 +318,8 @@ void r40d_setDoorEff(int no, int on)
     if (on == 1) {
         EstSet(0, -1, 0, 0, EFF_ROOM, a, 1, (u8) eff, 0, 0);
     } else {
-        void* zero = 0;
-
-        EstSet(0, -1, 0, 0, EFF_ROOM, b, 1, (u8) eff, zero, zero);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, (u8) r40d_work->eff[2], zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, b, 1, (u8) eff, 0, 0);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, (u8) r40d_work->eff[2], 0, 0);
     }
 }
 

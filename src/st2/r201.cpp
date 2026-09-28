@@ -1033,7 +1033,7 @@ void r201_setSwitchEnv(int on)
         RsfSet(G_ROOM_ID, 5);
         r201_work->barred->setOpen(0);
         EffectEspgenDelete(0, r201_work->effKind, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, 0, 0);
         SceAtSetEnable(0, 0);
         SceAtSetEnable(1, 0);
         SceAtSetEnable(3, 0);
@@ -1043,7 +1043,7 @@ void r201_setSwitchEnv(int on)
         zero = 0;
         RsfClear(G_ROOM_ID, 5);
         r201_work->barred->setClose(0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, r201_work->effKind, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, r201_work->effKind, 0, 0);
         SceAtSetEnable(3, 1);
         SceAtSetEnable(0x28, 1);
         SceAtSetEnable(5, 1);

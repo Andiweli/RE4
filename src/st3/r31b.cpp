@@ -340,7 +340,7 @@ void R31bInit()
         SceAtDataSet_exec(0x25, 0x12, 0, (TaskFunc) R31bStartCameraMain, 0, 1);
     }
     r31b_work->switchCount = 0;
-    EstSet(0, -1, 0, 0, EFF_ROOM, 3, 0x2001, ESP_CORE_KIND_ROOM01, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 3, 0x2001, ESP_CORE_KIND_ROOM01, zero, 0);
     r31b_work->str = 0;
     Vec pos;
     Vec rot;
@@ -1410,9 +1410,9 @@ static void R31bExecRoom03U3Main()
     if (RsfCheck(G_ROOM_ID, 0x1C) == 0) {
         cEm32* em;
         cObj* obj;
-        // The player EstSet's two zero words come from `zero` in its own callee-saved register, as in
-        // the target. The dead `zero = em` below keeps cse from merging `zero` into the known-zero
-        // `andi.` result, and flow deletes it before local-alloc.
+        // No EstSet argument reads `zero`, but dropping it (or the dead `zero = em` below) changes the
+        // registers of the player EstSet's zero stores. The dead assignment keeps cse from merging `zero`
+        // into the known-zero `andi.` result, and flow deletes it before local-alloc.
         void* zero = 0;
 
         RsfSet(G_ROOM_ID, 0x1C);
@@ -1436,7 +1436,7 @@ static void R31bExecRoom03U3Main()
         r31b_work->em.setFlag(1);
         r31b_work->em.setNoSuspend(1);
         if (pPL) {
-            EstSet(pPL, -1, 0, 0, EFF_ROOM, 0xB, 0x2001, ESP_CORE_KIND_ROOM06, zero, zero);
+            EstSet(pPL, -1, 0, 0, EFF_ROOM, 0xB, 0x2001, ESP_CORE_KIND_ROOM06, 0, 0);
         }
         if (em) {
             EstSet(em, -1, 0, 0, EFF_ROOM, 0xC, 0x2001, ESP_CORE_KIND_ROOM06, 0, 0);

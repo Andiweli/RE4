@@ -2511,7 +2511,7 @@ static void plboat_R2_Swim(cPlayer* pl)
         } else {
             pl00SetChaseCam(pl);
             pl->m_Work3 = 90;
-            EstSet(0, -1, 0, 0, 0xF, 0xE, 0, 0x34, pl, (void*) first);
+            EstSet(0, -1, 0, 0, 0xF, 0xE, 0, 0x34, pl, 0);
             StaFlagOn(pG, STA_WATER_CAMERA);
         }
         MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_SWIM), EM_ARC(pl, PL0F_SEQ_PL_SWIM_015), 5, 5, 0);

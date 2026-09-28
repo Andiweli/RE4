@@ -607,7 +607,7 @@ int obj1bHitCk(cObjSpear* pObj)
             memclr_asm(&opt, sizeof(SpearEstOpt));
             opt.flag = 1;
             opt.spd = d;
-            EstSet(pObj, -1, 0, 0, EFF_EM2F, 0, 0, ESP_CORE_KIND_NONE, pObj, &opt);
+            EstSet(pObj, -1, 0, 0, EFF_EM2F, 0, 0, ESP_CORE_KIND_NONE, pObj, (ESPSEQ_CONTROL*) &opt);
             EstSet(pObj, -1, 0, 0, EFF_EM2F, 5, 0, ESP_CORE_KIND_NONE, pObj, 0);
             SndCall(8, 4, &pObj->pos_old, em->id, 0, 0);
             w->Eff_timer = 600;

@@ -159,7 +159,7 @@ static void r316_checkHeatEffect()
     for (;;) {
         if (on == 0) {
             if (SceAtHitCheck(6) == 1) {
-                EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, (u8) kind, zero, zero);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, (u8) kind, zero, (ESPSEQ_CONTROL*) zero);
                 on = 1;
                 SceSleep(30);
             }

@@ -207,7 +207,7 @@ void objPillar_R0_Throw(cObjPillar* pObj)
         MotionSetCore(pObj, &pObj->Motion, w->Mot_catch, 0, 0, 0x8001, 0x1F);
         w->TmpU32 = Rnd() & 1;
         w->Act_ck = 1;
-        EstSet(pObj, -1, 0, 0, EFF_EM31, 0x22, 0, ESP_CORE_KIND_NONE, pObj, (void*) step);
+        EstSet(pObj, -1, 0, 0, EFF_EM31, 0x22, 0, ESP_CORE_KIND_NONE, pObj, 0);
         w->Seid = step;
         pObj->r_no_2++;
     case 1:
@@ -653,7 +653,7 @@ void plemEscape2(cPlayer* pEm)
     case 0:
         em->ang.y = GetXZAngle(&em->pos, &w->St_pos);
         MotionSetCore(em, &em->Motion, w->Mot_pl_escape, w->Seq_pl_escape, 0, 1, 0);
-        EstSet(em, -1, 0, 0, EFF_EM31, 0x39, 0, ESP_CORE_KIND_NONE, em, (void*) step);
+        EstSet(em, -1, 0, 0, EFF_EM31, 0x39, 0, ESP_CORE_KIND_NONE, em, 0);
         SndCall(1, 0x48, &em->pos, 0, 0, em);
         SndCall(1, 0x11, &em->getPartsPtr(4)->world, 0, 0, em);
         em->r_no_2++;

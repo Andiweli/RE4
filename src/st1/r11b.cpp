@@ -104,8 +104,8 @@ void R11bInit()
     EatMgr.registEffInfo(EAT_ET_WATER, (AtEffInfo*) &r11b_eff_info);
     SceExec(0x12, (TaskFunc) r11b_ThunderMove, 0, 0, SCE_PRIO_DEF_2, 0);
     EvtMgr.SetFunc("evt_r11bs00_func", (void*) Evt_R11BS00_Func);
-    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, 0, obj);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 2, 0x800, ESP_CORE_KIND_NONE, 0, obj);
+    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 2, 0x800, ESP_CORE_KIND_NONE, 0, (ESPSEQ_CONTROL*) obj);
     StaFlagOn(pG, STA_ROOM_RAIN);
     if (RsfCheck(G_ROOM_ID, 0)) {
         SceExec(0x12, (TaskFunc) R11b_bgm_ck, 0, 0, SCE_PRIO_DEF_2, 0);

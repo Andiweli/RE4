@@ -61,9 +61,9 @@ void cEsp0c::move()
     est.col[3] = m_Col_start_a;
     est.spd = m_Speed;
     if (w->onWater == 1) {
-        EstSet(0, -1, &m_Pos, &m_Ang, w->EstNo_wt, w->estPrm2, info.Core_flg, info.Core_kind, info.Core_pEm, &est);
+        EstSet(0, -1, &m_Pos, &m_Ang, w->EstNo_wt, w->estPrm2, info.Core_flg, info.Core_kind, info.Core_pEm, (ESPSEQ_CONTROL*) &est);
     } else {
-        EstSet(0, -1, &m_Pos, &m_Ang, w->EstNo, w->EstOwner_wt, info.Core_flg, info.Core_kind, info.Core_pEm, &est);
+        EstSet(0, -1, &m_Pos, &m_Ang, w->EstNo, w->EstOwner_wt, info.Core_flg, info.Core_kind, info.Core_pEm, (ESPSEQ_CONTROL*) &est);
     }
     PushEsp(this);
 }
