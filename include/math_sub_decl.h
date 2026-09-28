@@ -21,8 +21,7 @@ void RotMatrix(Mtx m, Vec* vec);
 void TransMatrix(Mtx m, Vec* pos);
 void ScaleMatrix(Mtx m, Vec* scale);
 
-extern "C" {
-// game/math_sub.cpp (C linkage)
+// game/math_sub.cpp
 void SetOrientationZX(Vec* z, Vec* x, Mtx m);
 void SetOrientationZY(Vec* z, Vec* y, Mtx m);
 void low_RotMatrix(Mtx m, Vec* vec);
@@ -88,9 +87,8 @@ void CalcParabolaVector(Vec* spd, Vec* src, Vec* dst, f32 height);
 f32 CalcStopDist(f32 v0, f32 a);
 // Move `pos` `dist` towards `target`; 1 when it arrived.
 int CalcMovePosDist(Vec* pPos, Vec* pTar, f32 dist);
-}
 
-// game/sub2.cpp (C++ linkage)
+// game/sub2.cpp
 f32 GetDistance(Vec& v0, Vec& v1);
 class cModel;
 int Front_check(cModel* a, cModel* b, f32 ang);   // b within +-ang of a's heading

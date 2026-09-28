@@ -8,7 +8,6 @@ class cModel;
 
 // game/em_cloth.cpp: cloth / hair chain set-up of the enemy costume models (obj18 selects them
 // by type) and the em2b short rope chain object.
-extern "C" {
 void Em34ClothSet1(cModel* pEm, PlCloth* pCloth);
 void Em34ClothMove1(cModel* pEm, PlCloth* pCloth);
 void Em34ClothReset(cModel* pEm);
@@ -32,6 +31,5 @@ void Em30ClothMove1(cModel* pEm, PlCloth* pCloth);
 void Em30ClothSet2(cModel* pEm, PlCloth* pCloth);
 void Em30ClothMove2(cModel* pEm, PlCloth* pCloth);
 void Em30ClothReset(cModel* pEm);
-}
 
 #endif

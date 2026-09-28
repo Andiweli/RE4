@@ -244,7 +244,6 @@ struct SceAtWork {
     };
 };
 
-extern "C" {
 void SceAtInit(void* pHeader, void* pHeader_i);
 SceAtWork* sceAtSetOtStart();
 SceAtWork* sceAtGetOtAddr(SceAtWork* p);
@@ -346,9 +345,8 @@ void SceAtItemAutoArea(AREA_HIT_DATA* area, Vec* pos, f32 radius);
 void sceAtItemEffDelete(SceAtItem* it);
 void sceAtItemEffSet(SceAtWork* w, cModel* pModel);
 void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel);
-}
 
-// C++ overloads of the C entry points above.
+// Overloads of the functions above.
 // Area `no` follows parts `parts` of `obj`; 0 when the area does not exist.
 int SceAtSetParent(int no, cObj* obj, int parts);
 int SceAtItemFlgCk(int at_no);

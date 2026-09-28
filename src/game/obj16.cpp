@@ -29,7 +29,6 @@ void obj16_R1_CoreMove(cObj16* obj);
 void obj16_R1_Atk(cObj16* obj);
 void obj16_R1_Critical(cObj16* obj);
 void obj16_R1_Damage(cObj16* obj);
-void MotSetObj16(cObj* obj, void* mot, int a, int b);
 void obj16MatCalc(cObj16* obj);
 int obj16AtkCk(cObj16* obj, u32 kind, int partsNo);
 void obj16PlHeadLost(cObj16* obj);

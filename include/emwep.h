@@ -108,7 +108,6 @@ public:
 
 extern ATK_INFO emWepAtk;
 
-extern "C" {
 cEmWep* SetWeapon(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type);
 void emWepDmCk(cEmWep* pEm);
 void emWep_R0_Init(cEmWep* pEm);
@@ -134,6 +133,5 @@ void emWepEscapeCamMove(cEmWep* pEm);
 void emWepPlHeadLost();
 int emWepShotHitVaseCk(Vec* pPos, Vec* pPos2);
 int emWepShotHitWindowCk(Vec* pPos, Vec* pPos2);
-}
 
 #endif

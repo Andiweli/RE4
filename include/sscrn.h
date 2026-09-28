@@ -158,7 +158,6 @@ struct ItemScreenWork {
 
 extern SubScreenWork SubScreenWk;
 
-extern "C" {
 int SscrnDataSize();
 void SscrnDataSave(u32* dst);
 void SscrnDataLoad(u32* pData);
@@ -202,7 +201,5 @@ void OpeOwTypeSet(u8 owType);
 void OpeSetOpenTerm(int no, f32 x, f32 y, f32 z, f32 ang);
 void OpeSetOpenTermCancel();
 void OpeSetOpenTermEnd();
-}
-
 
 #endif

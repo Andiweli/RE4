@@ -88,7 +88,6 @@ public:
 
 cEmRock* SetRock(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type);
 
-extern "C" {
 void emRockDmCk(cEmRock* pEm);
 void emRock_R0_Init(cEmRock* pEm);
 void emRock_R1_Set(cEmRock* pEm);
@@ -127,6 +126,5 @@ void plemDropDie(cPlayer* pEm);
 void subemDropDie();
 void emRockSatClear(cEmRock* pEm);
 void emRockSatSet(cEmRock* pEm);
-}
 
 #endif

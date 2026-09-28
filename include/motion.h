@@ -30,7 +30,6 @@ struct HermitePrm {
     u8* key;       // 0x10
 };
 
-extern "C" {
 void PartsWorldPosCalc(cModel* pMod);
 void MotionBlendOff(cModel* pEm);
 void MotionPause(cModel* pEm);
@@ -52,7 +51,6 @@ int HermiteInterpolation(HermitePrm* prm, Vec* out, u16* hist);
 int Fcc_next_axis_addr(int fmt, int n);
 void IKInit(cModel* pEm, MOTION_INFO* pInfo);
 void InverseKinematics(cModel* pEm, int arm_flag);
-}
 void MotionSetCore(cModel* m, void* w, void* data, void* seq, int hokan, int flags, int frame);
 
 #endif

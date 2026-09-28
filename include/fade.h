@@ -91,7 +91,7 @@ static inline void FadeSetRGBA(u32 mode, u32 rgba0, u32 rgba1)
 }
 
 // Wait for fade `no` to finish: the index stays a separate `addi` on the array base (r316, r31c).
-extern "C" void SceSleep(int frames);
+void SceSleep(int frames);
 static inline void FadeWait(int no)
 {
     while (Fade[no].flags & 1) {

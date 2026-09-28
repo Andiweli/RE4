@@ -39,7 +39,7 @@
 asm(".comm common_" T_ID_STR(REL_MODULE) ",52,4");
 
 // COMPILER-DIFF #4: the original passes the (u32) converted height without the u16 truncation.
-void ScreenReSizeI(int w, u32 h) asm("ScreenReSize");
+void ScreenReSizeI(int w, u32 h) asm("ScreenReSize__FUsUs");
 
 // TexAnm header as read by the id editor (texture.h keeps the first 8 bytes opaque)
 struct TexAnmSize {

@@ -6,9 +6,8 @@
 
 class cPlayer;
 
-// game/pl_sub.cpp: player / partner helpers called from the rest of the game (C linkage; the joy*
-// helpers, PlSetCostume and PlChangeData are C++ and declared in player.h).
-extern "C" {
+// game/pl_sub.cpp: player / partner helpers called from the rest of the game (the joy* helpers,
+// PlSetCostume and PlChangeData are declared in player.h).
 void PlSelect(int type);
 void PlGachaInit();
 void PlGachaMove();
@@ -60,7 +59,6 @@ int PlGetWeaponNo();
 void PlSetFace(int type);
 void SubCharSetFace(int type);
 void PlDataRelease();
-}
 void SetSubDamage(cEm* em, void (*ft)());
 
 int PlSetCostume();

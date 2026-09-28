@@ -20,7 +20,6 @@ struct WepTarget {
 extern u32 No_drop_cnt;
 extern u32 No_drop_cnt2;
 
-extern "C" {
 void Em_R0_Scenario(cEm* pEm);
 void EmDmBloodSet(cEm* pEm);
 void EmDmBloodSet3(cEm* pEm, u32 est_id, u32 est_no, u32 mode, u16 esp_core_flg, u32 core_kind);
@@ -65,7 +64,6 @@ int HandgunCk(int wep_no);
 int TrolleyItemSetCk(Vec* pPos, ITEM_ID item_id, int item_num);
 int BullItemSetCk(Vec* pPos, ITEM_ID item_id, int item_num);
 void adjust_add_set(Vec add);
-}
 
 // Position of `em` (the player when NULL) plus `t` of its parts 0 movement this frame (C++ linkage;
 // Bio4.sym marks it local but the em3c module calls it).

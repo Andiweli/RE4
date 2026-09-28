@@ -8,8 +8,7 @@
 class cObj;
 struct JOY;
 
-// game/dbmodule.cpp: debug primitive drawing (C linkage).
-extern "C" {
+// game/dbmodule.cpp: debug primitive drawing.
 void init_dbmodule();
 void Render_tile(void* pTile);
 void Draw_tile(int x, int y, int w, int h, GXColor* col);
@@ -38,7 +37,6 @@ void init_corn();
 void DrawObjWireframe(cObj* pObj, int col);
 void DrawRoomWireframe();
 void DispTime(s16 x, int y, int col, int time, int flag);
-}
 
 JOY* GetBugCheckController();
 

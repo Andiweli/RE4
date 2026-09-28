@@ -1233,7 +1233,7 @@ void OpenBoxMain(int type, int mode, int se, u32 id1, u32 id2, int itemNo)
     }
 }
 
-extern "C" void SceElevator(SceElevatorData* d);
+void SceElevator(SceElevatorData* d);
 
 
 // Shape from r225.cpp's SceElevator_r225. Global alloc alone gives gcse's `&d->pos` copy r25 and

@@ -78,7 +78,6 @@ public:
     void setSeCancel();
 };
 
-extern "C" {
 cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo);
 void emDoorDmCkWood(cEmDoor* pEm);
 void emDoorDmCkIron(cEmDoor* pEm);
@@ -117,6 +116,5 @@ cEmDoor* DoorOpenCk(cModel* m);
 void SubOpenDoorSet(cEmDoor* pDoor);
 void subDoorKick();
 void emDoorDropWeapon(cEmDoor* pEm);
-}
 
 #endif

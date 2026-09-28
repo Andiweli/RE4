@@ -225,7 +225,6 @@ public:
 u32 PlWepHitCheck2(cModel* pl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, f32 radius);
 void PlWepLockCtrl(cModel* pl);
 
-extern "C" {
 u32 PlWepHitCheck3(Vec* pos, int type, u32 prio, f32 len);
 void PlWepAutoTrack(cModel* pl, int mode, f32 rate);
 void PlWepLockRandInit();
@@ -235,7 +234,6 @@ int GetWepSizeGroup(int wepId);
 int PlCornerCheck();
 cEm* SearchLockEm(Vec* pPos, cEm* pEm_now);
 cEm* SearchTargetEm(Vec* pPos, cEm* pEm_now, f32 range_limit);
-}
 
 extern u8 lockCtr;
 extern void (*WeaponInitFunc)(cModel*);

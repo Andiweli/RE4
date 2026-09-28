@@ -5,10 +5,8 @@
 #include "vec.h"
 #include "obj.h"
 
-extern "C" {
-cObj* SetObj16(void* bin, void* tpl, cModel* target, cModel* body, int partsNo, u8 type, Vec* pos, Vec* rot);
+extern "C" cObj* SetObj16(void* bin, void* tpl, cModel* target, cModel* body, int partsNo, u8 type, Vec* pos, Vec* rot);
 void MotSetObj16(cObj* obj, void* mot, int a, int b);
-}
 
 // Enemy head work (game/obj16.cpp `cObj16`): a head model hung on parts `partsNo` of `body` that
 // looks at the player (obj16NeckMove), bites (R1_Atk / R1_Critical) and fades out when its

@@ -7,8 +7,7 @@
 
 class cEm;
 
-// Scenario helpers (game/sce_com.cpp / sce_sys.cpp), C linkage.
-extern "C" {
+// Scenario helpers (game/sce_com.cpp / sce_sys.cpp).
 void SceEventStart(int mode);
 void SceEventEnd(int mode);
 void SceSleep(int ctr);
@@ -103,7 +102,6 @@ void SceDebugDisp(const char* fmt, ...);
 // sce_com.cpp: the elevator task; every room that has one defines its own SceElevatorData copy.
 struct SceElevatorData;
 void SceElevator(SceElevatorData* d);
-}
 
 // sce_com.cpp: debug trigger check, always 0 (title's mercenaries unlock-all). C++ linkage.
 int DebugTrg(int no);

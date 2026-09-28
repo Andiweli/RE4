@@ -21,17 +21,9 @@
 #include "game.h"
 #include "est.h"
 #include "read.h"
-
-// GetWepTargetList entry (em_sub.cpp).
-struct WepTarget {
-    cEm* em;
-    YARARE_INFO* part;
-};
+#include "em_sub.h"
 
 extern "C" {
-u32 GetWepTargetListBomb(Vec* pos, WepTarget* list, u32 prio, int type, int flag, f32 len);  // game/em_sub.cpp (defined with another parameter list; this unit's prototype stays)
-u32 GetWepTargetList2(Vec* p0, Vec* p1, WepTarget* list, u32 prio, Vec* hit, Vec* nrm, u32* attr, int type,
-                      int flag, f32 len);
 f32 rangeDist(Vec* pos, cEm* em, f32 range);
 int lockEmCk(cEm* em, Vec* pos);
 cEm* searchLockEm(Vec* pos, cEm* skip, f32 range);
@@ -331,10 +323,10 @@ u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, 
     case 0x17:
     case 0x29:
     case 0x2D:
-        n = GetWepTargetListBomb(pPos, list, prio, weapon_no, f4, radius);
+        n = GetWepTargetListBomb(pPos, radius, list, prio, weapon_no, f4);
         break;
     default:
-        n = GetWepTargetList2(pPos, pPos2, list, prio, &hit, &nrm, &attr, weapon_no, f4, radius);
+        n = GetWepTargetList2(pPos, pPos2, list, prio, &hit, &nrm, &attr, weapon_no, f4);
         break;
     }
     for (i = 0; i < n; i++) {
@@ -481,7 +473,7 @@ u32 PlWepHitCheck3(Vec* pos, int type, u32 prio, f32 len)
     if (prio > 0x14) {
         prio = 0x14;
     }
-    n = GetWepTargetListBomb(pos, list, prio, type, 0, len);
+    n = GetWepTargetListBomb(pos, len, list, prio, type, 0);
     for (i = 0; i < n; i++) {
         cEm* em = list[i].em;
         cDmgInfo* dmg = &em->dmg;

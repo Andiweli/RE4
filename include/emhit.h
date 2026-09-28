@@ -38,7 +38,6 @@ public:
     void setBeetle(void* mot0, void* mot1, void* mot2);
 };
 
-extern "C" {
 cEmHit* SetEmHit(void* bin, void* tpl, Vec* pos, Vec* rot, int type);
 void emHitDmCk(cEmHit* pEm);
 void emHit_R0_Init(cEmHit* pEm);
@@ -58,7 +57,6 @@ void YarareAddCube(cEm* em, YARARE_INFO* box, f32 x, f32 y, f32 z, f32 w, f32 h,
 int EmGetDmPos(cEm* pEm, Vec* pPos, Vec* pAng);                                     // em_sub.cpp
 void EmDmBloodSet2(cEm* pEm, u32 est_id, u32 type, u32 mode, u16 esp_core_flg, u32 core_kind);               // em_sub.cpp
 int VehicleAdjust(Vec* pPos);                                                     // em_sub.cpp: rides `pos` along the trolley (room 21B)
-}
 
 // Player damage motion kind (PS2 PL_DM_TYPE): ATK_INFO::dm_type, PlSetDamage `type`. Bit0 back, +2 middle,
 // +4 down (EmAtkSetDamagePL computes it from the hit height); AUTO picks from the hit direction.
@@ -86,13 +84,11 @@ struct ATK_INFO {
     u8 padding;   // 0x0F
 };
 
-extern "C" {
 void EmPlBloodSet2(cModel* pEm, Vec* pos, u32 a, u8 eff_id, u8 type);                 // em_sub.cpp
 // Line `a`-`b` against the player's hit boxes: the hit box or NULL; hit point / normal and the
 // scenario attribute out.
 YARARE_INFO* EmAtkLineHitCk(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm, u32* pAttr);              // em_sub.cpp
 void EmAtkSetDamagePL(YARARE_INFO* pAt, ATK_INFO* pAtk, Vec* pPos, Vec* pPos2);                 // em_sub.cpp
-}
 
 void PlSetDamage(int damage_type, int damage_val, int flag);                                   // em_sub.cpp (C++ linkage; obj10 hitCkPl)
 

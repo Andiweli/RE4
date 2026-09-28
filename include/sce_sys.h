@@ -92,7 +92,6 @@ public:
 
 extern cSceSys SceSys;
 
-extern "C" {
 void ScenarioInit();
 void ScenarioRoomInit();
 void ScenarioTaskAllOff();
@@ -143,7 +142,6 @@ int EmMoveActiveCheck(cEm* pEm);
 void SceExecEventCancel();
 void SceSetEventCancel(int on, TaskFunc func, int arg, int flagNo, int sndFlag);
 int scenarioCheckEventCancel();
-}
 
 void SceKill(u32 level);
 void SceKill(SCE_TASK* p);
