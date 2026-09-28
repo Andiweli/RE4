@@ -584,14 +584,14 @@ int debugCamera::menuCamera(JOY* pJoy)
             break;
         case 3: {
             int max = -1;
-            CameraDataHeader* data = CamCtrl.pCamData;
-            CameraAreaRec* rec = (CameraAreaRec*) (data + 1);
-            CameraAreaInfo* area = (CameraAreaInfo*) (rec + data->numArea);
-            CameraCut* cut = (CameraCut*) (area + data->numArea);
+            CAM_FILE_HEADER* data = CamCtrl.pCamData;
+            CUT_INFO* rec = (CUT_INFO*) (data + 1);
+            AREA_DATA* area = (AREA_DATA*) (rec + data->nAdat);
+            CAMERA_DATA* cut = (CAMERA_DATA*) (area + data->nAdat);
             int n;
-            for (n = 0; n < data->numCut; n++, cut++) {
-                if (cut->camera_no > max) {
-                    max = cut->camera_no;
+            for (n = 0; n < data->nCdat; n++, cut++) {
+                if (cut->No > max) {
+                    max = cut->No;
                 }
             }
             m_cam_no += d;
@@ -604,7 +604,7 @@ int debugCamera::menuCamera(JOY* pJoy)
         switch (m_cam_play) {
         case 0:
             if (pJoy->trg & JOY_A) {
-                if (CamCtrl.DataSearch(m_cam_no)->type == 6) {
+                if (CamCtrl.DataSearch(m_cam_no)->Id == 6) {
                     CamCtrl.CutCall(m_cam_no);
                     pG->debug_mode = m_printNo_bak;
                     m_cam_play++;

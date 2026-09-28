@@ -5,7 +5,10 @@
 #include "vec.h"
 #include "camera.h"
 
-struct CameraAreaRec;
+struct _CUT_INFO;
+typedef _CUT_INFO CUT_INFO;
+struct _CAMERA_DATA;
+typedef _CAMERA_DATA CAMERA_DATA;
 
 // Shoulder camera offsets in player space (0x2C bytes), one per [left/right][up/mid/down] site.
 // g_readyOfs[16]/g_transOfs[7] are the per-area tables (game/cam_qfps.cpp); db_cam edits a copy.
@@ -109,10 +112,10 @@ public:
     void setBlendData(void* src, void* dst);
     void getAreaData(CAMERA_POINT (*ready)[3], CAMERA_POINT (*trans)[3]);
     void setAreaData(CAMERA_POINT (*ready)[3], CAMERA_POINT (*trans)[3]);
-    void setAreaData(struct CameraCut* pCdat);
+    void setAreaData(CAMERA_DATA* pCdat);
     void offsetCorrection();
     void bindDefaultCamera();
-    void bindAreaCamera(CameraAreaRec* pCut);
+    void bindAreaCamera(CUT_INFO* pCut);
     void init();
     void move();
     void resetDepressionRatio();

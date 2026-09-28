@@ -495,11 +495,11 @@ void gameRoomInit()
     CameraRoomInit();
     p = GetDataExt(pG->pRoom, "CAM", 0);
     if (p != 0) {
-        CamCtrl.RoomDataRead((CameraDataHeader*) p);
+        CamCtrl.RoomDataRead((CAM_FILE_HEADER*) p);
     } else {
         pG->pCamRoom = p;
     }
-    CamCtrl.CoreDataRead((CameraDataHeader*) (pG->pCore->ofs_30 + (u32) pG->pCore));
+    CamCtrl.CoreDataRead((CAM_FILE_HEADER*) (pG->pCore->ofs_30 + (u32) pG->pCore));
     CamCtrl.roomInit();
     View.roomInit();
     p = GetDataExt(pG->pRoom, "BLK", 0);

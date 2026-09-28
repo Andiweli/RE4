@@ -9,7 +9,7 @@
 #include "db_light.h"
 
 // game/cam_ctrl.cpp (declared here, not in cam_ctrl.h: a header extern would reorder cam_ctrl's .bss)
-extern CameraBSpline CamBSpline;
+extern CAM_B_SPLINE CamBSpline;
 
 // Camera tool (t_camera REL: t_camera.cpp, t_camera_data.cpp, t_camera_draw.cpp).
 
@@ -54,7 +54,7 @@ struct TcCdat {                  // camera cut, 0x394
     Vec aim_ofs;                 // 0x04
     s16 frame[26];               // 0x10  rail key frames (type 6/7)
     union {
-        f32 floor;               // 0x44  shoulder camera floor ratio (type 8: CameraCut::floor_ratio)
+        f32 floor;               // 0x44  shoulder camera floor ratio (type 8: CAMERA_DATA::floor_ratio)
         Vec dir;                 // 0x44  type 4
     } u44;
     s32 num;                     // 0x50  key count
@@ -64,7 +64,7 @@ struct TcCdat {                  // camera cut, 0x394
     f32 fovy[26];                // 0x32C
 };
 
-struct TcLdat {                  // camera lerp, 0x10 (CameraLerp)
+struct TcLdat {                  // camera lerp, 0x10 (LERP_DATA)
     u8 enable;                   // 0x00  0xFF = free
     s8 area_from;                // 0x01
     s8 cam_from;                 // 0x02

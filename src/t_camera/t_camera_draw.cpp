@@ -127,31 +127,31 @@ static Vec tcCurveOld;
 // Draws the current CamBSpline as 128 segments (position curve red, target curve blue).
 void tcDrawParametricCurve()
 {
-    CameraBSpline* bs = &CamBSpline;
+    CAM_B_SPLINE* bs = &CamBSpline;
     Vec p;
     int i;
     int j;
 
     for (i = 0; i < 128; i++) {
-        f32 t = (f32) ((bs->num - 1) * i) * (1.0f / 128.0f) + 0.0f;
-        de_Boor_Cox(bs->num, NULL, t, bs->k, bs->basis);
+        f32 t = (f32) ((bs->p_num - 1) * i) * (1.0f / 128.0f) + 0.0f;
+        de_Boor_Cox(bs->p_num, NULL, t, bs->order, bs->B);
         p.x = p.y = p.z = 0.0f;
-        for (j = 0; j < bs->num; j++) {
-            p.x += bs->basis[j] * bs->px[j];
-            p.y += bs->basis[j] * bs->py[j];
-            p.z += bs->basis[j] * bs->pz[j];
+        for (j = 0; j < bs->p_num; j++) {
+            p.x += bs->B[j] * bs->c_alpha[j];
+            p.y += bs->B[j] * bs->c_beta[j];
+            p.z += bs->B[j] * bs->c_gamma[j];
         }
         if (i > 0) tcDrawLine3D(&tcCurveOld, &p, 0xFF0000FE);
         tcCurveOld = p;
     }
     for (i = 0; i < 128; i++) {
-        f32 t = (f32) ((bs->num - 1) * i) * (1.0f / 128.0f) + 0.0f;
-        de_Boor_Cox(bs->num, NULL, t, bs->k, bs->basis);
+        f32 t = (f32) ((bs->p_num - 1) * i) * (1.0f / 128.0f) + 0.0f;
+        de_Boor_Cox(bs->p_num, NULL, t, bs->order, bs->B);
         p.x = p.y = p.z = 0.0f;
-        for (j = 0; j < bs->num; j++) {
-            p.x += bs->basis[j] * bs->ax[j];
-            p.y += bs->basis[j] * bs->ay[j];
-            p.z += bs->basis[j] * bs->az[j];
+        for (j = 0; j < bs->p_num; j++) {
+            p.x += bs->B[j] * bs->t_alpha[j];
+            p.y += bs->B[j] * bs->t_beta[j];
+            p.z += bs->B[j] * bs->t_gamma[j];
         }
         if (i > 0) tcDrawLine3D(&tcCurveOld, &p, 0x0000FFFE);
         tcCurveOld = p;

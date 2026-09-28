@@ -8,73 +8,78 @@
 
 class cCamera;
 class cModel;
-struct CameraCut;
 
 // ---------------------------------------------------------------------------
 // Room camera data ("B40x" file). Layout after the 0x10 header:
-//   CameraAreaRec[numArea]   0x10 each
-//   CameraAreaInfo[numArea]  0x30 each
-//   CameraCut[numCut]        0x34 each
-//   CameraLerp[numLerp]      0x10 each
+//   CUT_INFO[numArea]   0x10 each
+//   AREA_DATA[numArea]  0x30 each
+//   CAMERA_DATA[numCut]        0x34 each
+//   LERP_DATA[numLerp]      0x10 each
 // File offsets are relocated to pointers by CameraControl::calcAddr.
 // ---------------------------------------------------------------------------
 
-struct CameraAreaInfo {  // hit area
-    u8 enable;    // 0x00
-    s8 area_no;   // 0x01
-    s8 camera_no; // 0x02
-    u8 attr;      // 0x03  bit 4 = ?, bit 8 = ?, 0x20 set from 8 by calcAddr, 0x40 = check dir, 0x80 = no light update
-    f32 dir;      // 0x04  facing angle the player must have (attr & 0x40)
-    u8 attr2;     // 0x08  matched against battle/state attribute
-    u8 attr3;     // 0x09  third attribute byte (t_camera TcAdat::attr3; 0xFF = none)
-    u8 pad_A[0x20 - 0x0A];
-    f32 height;   // 0x20
-    f32 base_y;   // 0x24
-    s32 num;      // 0x28  polygon vertex count
-    Vec* points;  // 0x2C
+struct _AREA_DATA {  // hit area
+    u8 Be_flag;    // 0x00
+    s8 No;         // 0x01
+    s8 Suffix;     // 0x02
+    u8 Attr;       // 0x03  bit 4 = ?, bit 8 = ?, 0x20 set from 8 by calcAddr, 0x40 = check dir, 0x80 = no light update
+    f32 Dir;       // 0x04  facing angle the player must have (Attr & 0x40)
+    u8 Type_char;  // 0x08  matched against battle/state attribute
+    u8 Type_addr;  // 0x09  t_camera TcAdat::attr3; 0xFF = none
+    u8 dummy[0x20 - 0x0A];
+    f32 Height;    // 0x20
+    f32 Y;         // 0x24
+    s32 nVer;      // 0x28  polygon vertex count
+    Vec* pVer;     // 0x2C
 };
+typedef _AREA_DATA AREA_DATA;
 
-struct CameraAreaRec {  // area -> cut link
-    u8 type;              // 0x00  camera type of the linked cut (t_camera tcTypeTbl)
-    u8 pad_1[7];
-    CameraAreaInfo* area; // 0x08
-    CameraCut* cut;       // 0x0C
+struct _CUT_INFO {  // area -> cut link
+    u8 Attr;              // 0x00  camera type of the linked cut (t_camera tcTypeTbl)
+    u8 dummy[7];
+    AREA_DATA* pAdat;     // 0x08
+    CAMERA_DATA* pCdat;   // 0x0C
 };
+typedef _CUT_INFO CUT_INFO;
 
-struct CameraCut {
-    u8 x0;          // 0x00
-    s8 camera_no;   // 0x01
-    s8 type;        // 0x02  CameraControl state selector
-    u8 flags;       // 0x03  bit 0: aim_ofs valid
-    Vec aim_ofs;    // 0x04  added to the player position to get the aim point
-    u16* frames;    // 0x10  key frame times
+struct _CAMERA_DATA {
+    u8 Be_flag;      // 0x00
+    s8 No;           // 0x01
+    s8 Id;           // 0x02  CameraControl state selector
+    u8 Attr;         // 0x03  bit 0: offset valid
+    Vec offset;      // 0x04  added to the player position to get the aim point
+    u16* pFrame;     // 0x10  key frame times
     f32 floor_ratio; // 0x14  shoulder camera floor ratio (cam_qfps setAreaData)
-    u8 pad_18[0x20 - 0x18];
-    s32 num;        // 0x20  key count
-    Vec* pos;       // 0x24
-    Vec* at;        // 0x28
-    f32* roll;      // 0x2C
-    f32* fovy;      // 0x30
+    u8 dummy[0x20 - 0x18];
+    s32 nPoint;      // 0x20  key count
+    Vec* pCampos;    // 0x24
+    Vec* pTarget;    // 0x28
+    f32* pRoll;      // 0x2C
+    f32* pFovy;      // 0x30
 };
+typedef _CAMERA_DATA CAMERA_DATA;
 
-struct CameraLerp {
-    u8 enable;     // 0x00
-    s8 area_from;  // 0x01
-    s8 cam_from;   // 0x02
-    s8 area_to;    // 0x03
-    s8 cam_to;     // 0x04
-    u8 pad_5[3];
-    s32 frame;     // 0x08
+struct _LERP_DATA {
+    u8 Be_flag;    // 0x00
+    s8 SrcNo;      // 0x01
+    s8 SrcSuffix;  // 0x02
+    s8 DstNo;      // 0x03
+    s8 DstSuffix;  // 0x04
+    u8 Attr;       // 0x05
+    u8 dummy[2];
+    s32 InterFrame; // 0x08
     u8 pad_C[4];
 };
+typedef _LERP_DATA LERP_DATA;
 
-struct CameraDataHeader {
-    char version[4]; // 0x00  "B400".."B404"
-    u8 numCut;       // 0x04
-    u8 numArea;      // 0x05
-    u8 numLerp;      // 0x06
-    u8 pad_7[0x10 - 0x07];
+struct _CAM_FILE_HEADER {
+    char Version[4]; // 0x00  "B400".."B404"
+    u8 nCdat;        // 0x04
+    u8 nAdat;        // 0x05
+    u8 nLdat;        // 0x06
+    u8 dummy[0x10 - 0x07];
 };
+typedef _CAM_FILE_HEADER CAM_FILE_HEADER;
 
 // Per-attach-camera record registered by other units (only the frame count is used here).
 struct ATTACH_CAMERA {
@@ -91,23 +96,24 @@ struct ATTACH_CAMERA {
 // B-spline rail work used by the Track/RailPan/RailBehind cameras (static CamBSpline, 0x3B8).
 // Parametrize() fits the cut's key positions with de_Boor_Cox basis functions (up to 26 keys),
 // searchRail() picks the segment/parameter nearest the aim point, BSpline() evaluates the curve.
-struct CameraBSpline {
-    s32 k;          // 0x000  spline degree (min(2, num - 1))
-    f32 t;          // 0x004  curve parameter
-    s32 seg;        // 0x008  key index the parameter was searched from
-    s32 num;        // 0x00C  key count
-    f32 px[26];     // 0x010  control points
-    f32 py[26];     // 0x078
-    f32 pz[26];     // 0x0E0
-    f32 ax[26];     // 0x148
-    f32 ay[26];     // 0x1B0
-    f32 az[26];     // 0x218
-    f32 roll[26];   // 0x280
-    f32 fovy[26];   // 0x2E8
-    f32 basis[26];  // 0x350  de_Boor_Cox output
+struct _CAM_B_SPLINE {
+    s32 order;        // 0x000  spline degree (min(2, num - 1))
+    f32 cand_t;       // 0x004  curve parameter
+    s32 history_i;    // 0x008  key index the parameter was searched from
+    s32 p_num;        // 0x00C  key count
+    f32 c_alpha[26];  // 0x010  control point x
+    f32 c_beta[26];   // 0x078  control point y
+    f32 c_gamma[26];  // 0x0E0  control point z
+    f32 t_alpha[26];  // 0x148  angle x
+    f32 t_beta[26];   // 0x1B0  angle y
+    f32 t_gamma[26];  // 0x218  angle z
+    f32 r_alpha[26];  // 0x280  roll
+    f32 f_alpha[26];  // 0x2E8  fovy
+    f32 B[26];        // 0x350  de_Boor_Cox basis output
 
-    CameraBSpline() {}  // empty: makes CamBSpline emit at its definition (cam_ctrl .bss order)
+    _CAM_B_SPLINE() {}  // empty: makes CamBSpline emit at its definition (cam_ctrl .bss order)
 };
+typedef _CAM_B_SPLINE CAM_B_SPLINE;
 
 // ---------------------------------------------------------------------------
 
@@ -161,7 +167,7 @@ public:
     u8 r0_old;                // 0x37
     CameraParam cur;              // 0x38
     u32 counter_58;               // 0x58
-    CameraDataHeader* pCamData;       // 0x5C
+    CAM_FILE_HEADER* pCamData;       // 0x5C
     CAMERA camera;                // 0x60
     Mtx prev_mat;                 // 0x158  camera matrix CamStick2World keeps while the cut changes
     u8 pad_188[0x250 - 0x188];
@@ -174,7 +180,7 @@ public:
     s8 areaSuffix;                      // 0x691
     s8 cameraNo;                 // 0x692
     u8 m_cut_attr;                 // 0x693
-    CameraAreaRec* area_rec;      // 0x694
+    CUT_INFO* area_rec;      // 0x694
     s32 Battle_delay;             // 0x698
     Vec Aim;                      // 0x69C
     Vec upcut_pos;                   // 0x6A8
@@ -191,7 +197,7 @@ public:
     Vec campos_ofs;                  // 0x6EC
     Vec target_ofs;                   // 0x6F8
 
-    int HermiteExport(CameraCut* pCdat, u8* buf);
+    int HermiteExport(CAMERA_DATA* pCdat, u8* buf);
     int IsChangeCamera();
     void Comeback(int);
     void Disable();
@@ -200,25 +206,25 @@ public:
     u8 AreaNum();
     int CurrentAreaNo();
     int CurrentCameraNo();
-    CameraCut* DataSearch(int cameraNo);
+    CAMERA_DATA* DataSearch(int cameraNo);
 private:
-    CameraLerp* LerpDataSearch(int srcNo, int srcSuf, int dstNo, int dstSuf);
-    CameraDataHeader* calcAddr(CameraDataHeader* head);
+    LERP_DATA* LerpDataSearch(int srcNo, int srcSuf, int dstNo, int dstSuf);
+    CAM_FILE_HEADER* calcAddr(CAM_FILE_HEADER* head);
 public:
-    void RoomDataRead(CameraDataHeader* pBuff);
-    void CoreDataRead(CameraDataHeader* data);
+    void RoomDataRead(CAM_FILE_HEADER* pBuff);
+    void CoreDataRead(CAM_FILE_HEADER* data);
     void AreaOnOff(int No, int Suffix, int OnOff);
     void SetAreaAttr(int No, int Suffix, u8 attr);
     void UnsetAreaAttr(int No, int Suffix, u8 attr);
     void CutCall(int cutNo);
 private:
-    void switchCamera(CameraAreaRec* rec);
+    void switchCamera(CUT_INFO* rec);
     void areaHitCheck();
 public:
     void roomInit();
     void Check();
     void Move();
-    void CalcAim(CameraCut* pCdat);
+    void CalcAim(CAMERA_DATA* pCdat);
     f32 getCameraPitch();
 private:
     void r0_Wait();
@@ -234,7 +240,7 @@ public:
     void resetCameraAngle();
     f32 getCameraDirection();
 private:
-    void debugDrawRail(CameraCut* pCdat);
+    void debugDrawRail(CAMERA_DATA* pCdat);
 public:
     void UpCutCall(int cutNo, Vec* pos, Vec* ang, Vec* scale, int data_sel);
     void startPushObject();
@@ -275,16 +281,16 @@ extern void* g_pToolCamData;
 
 int cameraDataVersion(char* verStr);
 int cameraHitCheck(Vec* pos, Vec* nrm, Vec* from, Vec* to);
-void CameraSetCutData(CAMERA* pCam, CameraCut* pData);
-int areaAttr(CameraAreaInfo* p_area, u8 cut_attr, u8 char_type);
-int areaHit(Vec* pPos, CameraAreaInfo* pArea, f32 dir_y);
-int area_hit_p3(Vec* pPos, CameraAreaInfo* pArea);
-int area_hit_pN(Vec* pPos, CameraAreaInfo* pArea);
+void CameraSetCutData(CAMERA* pCam, CAMERA_DATA* pData);
+int areaAttr(AREA_DATA* p_area, u8 cut_attr, u8 char_type);
+int areaHit(Vec* pPos, AREA_DATA* pArea, f32 dir_y);
+int area_hit_p3(Vec* pPos, AREA_DATA* pArea);
+int area_hit_pN(Vec* pPos, AREA_DATA* pArea);
 void CamCtrlShoulderSetSearchFrame(s16 frame);
 void CamCtrlShoulderSetAim(Vec* pos);
-void Parametrize(CameraCut* pCdat, CameraBSpline* pB);
-void BSpline(CameraBSpline* bs, CAMERA* cam, int mode);
-void searchRail(CameraBSpline* bs, CameraCut* cut, Vec* aim, int mode);
+void Parametrize(CAMERA_DATA* pCdat, CAM_B_SPLINE* pB);
+void BSpline(CAM_B_SPLINE* bs, CAMERA* cam, int mode);
+void searchRail(CAM_B_SPLINE* bs, CAMERA_DATA* cut, Vec* aim, int mode);
 
 
 #endif

@@ -949,7 +949,7 @@ void CameraQuasiFPS::setAreaData(CAMERA_POINT (*ready)[3], CAMERA_POINT (*trans)
 // Loads a camera area cut's shoulder offsets into the override tables: starts from the defaults,
 // takes the cut's floor ratio, then per left / right x up / mid / down entry the ready (flags
 // 0x30) and transition (not 0x20) camera / target / roll / fov and close points.
-void CameraQuasiFPS::setAreaData(CameraCut* pCdat)
+void CameraQuasiFPS::setAreaData(CAMERA_DATA* pCdat)
 {
     int i;
     int j;
@@ -962,26 +962,26 @@ void CameraQuasiFPS::setAreaData(CameraCut* pCdat)
     OFS_COPY(g_readyOfs[0], g_readyOfs[14]);
     OFS_COPY(g_transOfs[TRANS_DATA_LEON], g_transOfs[TRANS_DATA_AREA]);
     m_floor_ratio = pCdat->floor_ratio;
-    if (pCdat->num == 0) {
+    if (pCdat->nPoint == 0) {
         return;
     }
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 3; j++, k++) {
             if (i <= 1) {
                 p = &g_readyOfs[14][i][j];
-                if (pCdat->flags & 0x30) {
-                    p->Campos = pCdat->pos[k];
-                    p->Target = pCdat->at[k];
-                    p->Roll = pCdat->roll[k];
-                    p->Fovy = pCdat->fovy[k];
+                if (pCdat->Attr & 0x30) {
+                    p->Campos = pCdat->pCampos[k];
+                    p->Target = pCdat->pTarget[k];
+                    p->Roll = pCdat->pRoll[k];
+                    p->Fovy = pCdat->pFovy[k];
                 }
             } else {
                 p = &g_transOfs[TRANS_DATA_AREA][i - 2][j];
-                if (!(pCdat->flags & 0x20)) {
-                    p->Campos = pCdat->pos[k];
-                    p->Target = pCdat->at[k];
-                    p->Roll = pCdat->roll[k];
-                    p->Fovy = pCdat->fovy[k];
+                if (!(pCdat->Attr & 0x20)) {
+                    p->Campos = pCdat->pCampos[k];
+                    p->Target = pCdat->pTarget[k];
+                    p->Roll = pCdat->pRoll[k];
+                    p->Fovy = pCdat->pFovy[k];
                 }
             }
         }
@@ -990,13 +990,13 @@ void CameraQuasiFPS::setAreaData(CameraCut* pCdat)
         for (j = 0; j < 3; j++, k++) {
             if (i <= 1) {
                 p = &g_readyOfs[14][i][j];
-                if (pCdat->flags & 0x30) {
-                    p->campos2 = pCdat->pos[k];
+                if (pCdat->Attr & 0x30) {
+                    p->campos2 = pCdat->pCampos[k];
                 }
             } else {
                 p = &g_transOfs[TRANS_DATA_AREA][i - 2][j];
-                if (!(pCdat->flags & 0x20)) {
-                    p->campos2 = pCdat->pos[k];
+                if (!(pCdat->Attr & 0x20)) {
+                    p->campos2 = pCdat->pCampos[k];
                 }
             }
         }
@@ -1074,22 +1074,22 @@ void CameraQuasiFPS::bindDefaultCamera()
 // Points the type slots at the area override table (g_readyOfs[14]) for the types the area cut
 // overrides (its flags decide the normal and the partner-carry type separately), the defaults
 // for the rest.
-void CameraQuasiFPS::bindAreaCamera(CameraAreaRec* pCut)
+void CameraQuasiFPS::bindAreaCamera(CUT_INFO* pCut)
 {
-    CameraCut* cut;
-    CameraAreaInfo* area;
+    CAMERA_DATA* cut;
+    AREA_DATA* area;
 
     if (pCut == NULL) {
         return;
     }
-    cut = pCut->cut;
-    if (cut != NULL && cut->num == 0) {
+    cut = pCut->pCdat;
+    if (cut != NULL && cut->nPoint == 0) {
         return;
     }
-    area = pCut->area;
-    if (cut->flags & 0x30) {
+    area = pCut->pAdat;
+    if (cut->Attr & 0x30) {
         offsetArrayCorrection(g_readyOfs[14]);
-        if (area->attr2 & 0x5D) {
+        if (area->Type_char & 0x5D) {
             ready_tbl[0] = g_readyOfs[14];
             ready_tbl[1] = g_readyOfs[14];
             ready_tbl[2] = g_readyOfs[14];
@@ -1118,15 +1118,15 @@ void CameraQuasiFPS::bindAreaCamera(CameraAreaRec* pCut)
             ready_tbl[12] = g_readyOfs[12];
             ready_tbl[13] = g_readyOfs[13];
         }
-        if (area->attr2 & 2) {
+        if (area->Type_char & 2) {
             ready_tbl[4] = g_readyOfs[14];
         } else {
             ready_tbl[4] = g_readyOfs[4];
         }
     }
-    if (!(cut->flags & 0x20)) {
+    if (!(cut->Attr & 0x20)) {
         offsetArrayCorrection(g_transOfs[TRANS_DATA_AREA]);
-        if (area->attr2 & 0x5D) {
+        if (area->Type_char & 0x5D) {
             trans_tbl[TRANS_CAM_LEON] = g_transOfs[TRANS_DATA_AREA];
             trans_tbl[TRANS_CAM_ASHLEY] = g_transOfs[TRANS_DATA_AREA];
             trans_tbl[TRANS_CAM_ADA] = g_transOfs[TRANS_DATA_AREA];
@@ -1139,7 +1139,7 @@ void CameraQuasiFPS::bindAreaCamera(CameraAreaRec* pCut)
             trans_tbl[TRANS_CAM_KLAUSER] = g_transOfs[TRANS_DATA_KLAUSER];
             trans_tbl[TRANS_CAM_WESKER] = g_transOfs[TRANS_DATA_WESKER];
         }
-        if (area->attr2 & 2) {
+        if (area->Type_char & 2) {
             trans_tbl[TRANS_CAM_LEON_ASHLEY] = g_transOfs[TRANS_DATA_AREA];
         } else {
             trans_tbl[TRANS_CAM_LEON_ASHLEY] = g_transOfs[TRANS_DATA_LEON_ASHLEY];
