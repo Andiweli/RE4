@@ -33,8 +33,8 @@ struct Em30Work {
     Vec targetPos;        // 0x248 (0x628)  chosen target position (em30_R1_Walk turns to it)
     cEm* pTarget;         // 0x254 (0x634)  pPL or pSUB
     f32 neckAng;          // 0x258 (0x638)  smoothed neck yaw (em30NeckMove)
-    PlCloth cloth1;       // 0x25C (0x63C)  Em30ClothSet1 / Em30ClothMove1
-    PlCloth cloth2;       // 0x2BC (0x69C)  Em30ClothSet2 / Em30ClothMove2
+    CLOTH_INFO cloth1;       // 0x25C (0x63C)  Em30ClothSet1 / Em30ClothMove1
+    CLOTH_INFO cloth2;       // 0x2BC (0x69C)  Em30ClothSet2 / Em30ClothMove2
     u8 pad_31C[0x37C - 0x31C];
     cModelInfo* pInfo0;   // 0x37C (0x75C)  extra model infos (be_flag bit3 cleared when flags_3C8 bit31)
     cModelInfo* pInfo1;   // 0x380 (0x760)

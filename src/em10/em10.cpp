@@ -349,7 +349,7 @@ int em10ChgParasiteCk(cEm10* em);
 int em10LostHeadCk(cEm10* em);
 int em10ModelInit(cEm10* em);
 void em10InitRtnSet(cEm10* em);
-void Em1fClothSet(cModel* m, PlCloth* c);
+void Em1fClothSet(cModel* m, CLOTH_INFO* c);
 void em10SetWaitMotion(cEm10* em, int a);
 void em10SetWalkMotion(cEm10* em, int a);
 void em10BeltSet(cEm10* em);
@@ -381,7 +381,7 @@ void em10SlopeMove(cEm10* em);
 void em10ScaleCompress(cEm10* em);
 void em10BombNeckMove(cEm10* em);
 void em10ChainSawMove(cEm10* em);
-void Em1fClothMove(cModel* m, PlCloth* c);
+void Em1fClothMove(cModel* m, CLOTH_INFO* c);
 void em10BowgunMove(cEm10* em);
 void em10SetParasite(cEm10* em);
 void em10SetWaterEff(cEm10* em);
@@ -2641,10 +2641,10 @@ void cEm10::move()
     }
     em10ChainSawMove(this);
     if (type == 6) {
-        Em18ClothMove(this, (PlCloth*) &w->Cloth);
+        Em18ClothMove(this, &w->Cloth);
     }
     if (type == 0x16) {
-        Em1fClothMove(this, (PlCloth*) &w->Cloth);
+        Em1fClothMove(this, &w->Cloth);
     }
     if (w->pWeapon && w->Wep_type == 4 && (w->Be_flg & 0x80000000) && hp > 0 && (s16) pG->pl_life > 0) {
         if (w->Csaw_se_wait) {
@@ -3312,10 +3312,10 @@ static void em10_R0_Init(cEm10* em)
     em->Motion.flip = em10_xflip_tbl;
     switch (em->type) {
     case 6:
-        Em18ClothSet(em, (PlCloth*) &w->Cloth, 0);
+        Em18ClothSet(em, &w->Cloth, 0);
         break;
     case 0x16:
-        Em1fClothSet(em, (PlCloth*) &w->Cloth);
+        Em1fClothSet(em, &w->Cloth);
         break;
     case 3:
     case 5:
@@ -27383,7 +27383,7 @@ CLOTH_AT_SET em1f_cloth_at[1] = {
 };
 
 // Type 0x16 (em1f): sets up the 6-link pendulum cloth (PenClothSet) of the hanging cloth parts 0x22..0x27.
-void Em1fClothSet(cModel* m, PlCloth* c)
+void Em1fClothSet(cModel* m, CLOTH_INFO* c)
 {
     c->Num = 6;
     c->pCloth = em1f_cloth_parts;
@@ -27403,19 +27403,19 @@ void Em1fClothSet(cModel* m, PlCloth* c)
     c->Gravity = 20.0f;
     c->Rate = 0.1f;
     c->Bundle_num = 4;
-    c->pModel = m; // between the two 0.0f stores: weight-0 stores (x48's 0.0 is not the constant's last use) go in LUID order
+    c->pEm_at = m; // between the two 0.0f stores: weight-0 stores (x48's 0.0 is not the constant's last use) go in LUID order
     c->WindSin = 0.0f;
     c->Stretchy = 0.05f;
     c->Move_rate = 0.0f;
     c->Flag = 0x100;
     c->pPtbl = 0;
-    PenClothSet(m, (CLOTH_INFO*) c, 100.0f);
+    PenClothSet(m, c, 100.0f);
 }
 
 // Type 0x16: per-frame pendulum cloth update (PenClothMove), then clears the model's be_flag 0xE00000.
-void Em1fClothMove(cModel* m, PlCloth* c)
+void Em1fClothMove(cModel* m, CLOTH_INFO* c)
 {
-    PenClothMove(m, (CLOTH_INFO*) c);
+    PenClothMove(m, c);
     m->be_flag &= ~0xE00000;
 }
 

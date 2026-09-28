@@ -72,13 +72,13 @@ public:
     virtual void moveCloth();
 };
 
-void testHairMoveAda2(cModel* pl, PlCloth* c);
-void testHolsterSetAda2(cModel* pl, PlCloth* c);
-void testHolsterMoveAda2(cModel* pl, PlCloth* c);
-void PlClothSetAda2(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair, int evt);
-void PlClothMoveAda2(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair);
-void PlClothSetAda3(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair, int evt);
-void PlClothMoveAda3(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair);
+void testHairMoveAda2(cModel* pl, CLOTH_INFO* c);
+void testHolsterSetAda2(cModel* pl, CLOTH_INFO* c);
+void testHolsterMoveAda2(cModel* pl, CLOTH_INFO* c);
+void PlClothSetAda2(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair, int evt);
+void PlClothMoveAda2(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair);
+void PlClothSetAda3(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair, int evt);
+void PlClothMoveAda3(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair);
 
 // pl0a (D:/Bio4/Prog/pl_klauser.cpp): Krauser, the Leon model set plus the fading mutation models
 // (krModel[3], em.h) and the X-button attack (pl_R1_KlauserAttack through cPlayer::pAuxFunc).
@@ -121,9 +121,9 @@ public:
     virtual void moveCloth();
 };
 
-void testJacketSetWesker(cModel* pl, PlCloth* c);
-void testJacketMoveWesker(cModel* pl, PlCloth* c);
-void PlClothSetWesker(cModel* pl, PlCloth* jacket);
-void PlClothMoveWesker(cModel* pl, PlCloth* jacket);
+void testJacketSetWesker(cModel* pl, CLOTH_INFO* c);
+void testJacketMoveWesker(cModel* pl, CLOTH_INFO* c);
+void PlClothSetWesker(cModel* pl, CLOTH_INFO* jacket);
+void PlClothMoveWesker(cModel* pl, CLOTH_INFO* jacket);
 
 #endif

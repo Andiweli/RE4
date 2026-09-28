@@ -372,8 +372,8 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00042D48	0x104	em10/em10.cpp	global	em10FallWaterCk	em10FallWaterCk
 .text	0x00042E4C	0xF8	em10/em10.cpp	global	em10GetPower	em10GetPower
 .text	0x00042F44	0xD0	em10/em10.cpp	global	em10GatlingRollMove__FP5cEm10	em10GatlingRollMove
-.text	0x00043014	0xF4	em10/em10.cpp	global	Em1fClothSet__FP6cModelP7PlCloth	Em1fClothSet
-.text	0x00043108	0x38	em10/em10.cpp	global	Em1fClothMove__FP6cModelP7PlCloth	Em1fClothMove
+.text	0x00043014	0xF4	em10/em10.cpp	global	Em1fClothSet__FP6cModelP10CLOTH_INFO	Em1fClothSet
+.text	0x00043108	0x38	em10/em10.cpp	global	Em1fClothMove__FP6cModelP10CLOTH_INFO	Em1fClothMove
 .text	0x00043140	0x170	em10/em10.cpp	global	em10SetPoint__FP5cEm10	em10SetPoint
 .text	0x000432B0	0xBC	em10/em10.cpp	global	countActiveWork__t8cManager1Z6cLight	cManager<cLight>::countActiveWork
 .text	0x0004336C	0x158	em10/em10.cpp	global	create__t8cManager1Z6cLighti	cManager<cLight>::create

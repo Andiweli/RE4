@@ -3724,7 +3724,7 @@ void em32ClothSet(cEm32* em)
     w->cloth.Move_rate = 0.0f;
     w->cloth.Flag = 0;
     w->cloth.pPtbl = 0;
-    PenClothSet(em, (CLOTH_INFO*) &w->cloth, 100.0f);
+    PenClothSet(em, &w->cloth, 100.0f);
 }
 
 // The last form's tail follows the cloth chain; the two tail tips copy their parents' matrices.
@@ -3740,7 +3740,7 @@ void em32ClothMove(cEm32* em)
     if (w->flags & 0x8000) {
         return;
     }
-    PenClothMove2(em, (CLOTH_INFO*) &w->cloth);
+    PenClothMove2(em, &w->cloth);
     p = em->getPartsPtr(0x16);
     p2 = em->getPartsPtr(0x51);
     PSMTXCopy(p->mat, p2->mat);

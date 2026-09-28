@@ -75,7 +75,7 @@ struct Em32Work {
     int blendA;           // 0x8B4 (0xC94)
     int blendB;           // 0x8B8 (0xC98)
     int blendC;           // 0x8BC (0xC9C)
-    PlCloth cloth;        // 0x8C0 (0xCA0)  tail cloth chain (em32ClothSet)
+    CLOTH_INFO cloth;        // 0x8C0 (0xCA0)  tail cloth chain (em32ClothSet)
     MOTION_INFO* pMot;  // 0x920 (0xD00)  mem_alloc'd second motion work (em32_R0_Init)
     cModelInfo* pTexModel;  // 0x924 (0xD04)  the texture-blended model info (ARC(7))
     u8 pad_928[4];

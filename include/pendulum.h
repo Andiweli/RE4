@@ -8,9 +8,10 @@ class cModel;
 class cParts;
 struct CLOTH_AT_SET;
 
-// Pendulum / cloth chain work (game/pendulum.cpp), 0x60 bytes (same object as pl_cloth.h's
-// PlCloth). Field meanings from obj14ClothSet; the rest is zeroed there. Every link is one
-// model parts; the u8 tables give the parts index per link and its neighbours (0xFF = none).
+// Pendulum / cloth chain work (game/pendulum.cpp, game/pl_cloth.cpp), 0x60 bytes: the player and
+// enemy cloth accessories (pl_cloth.h's globals, the em*.h Cloth members) are this same struct.
+// Field meanings from obj14ClothSet; the rest is zeroed there. Every link is one model parts; the
+// u8 tables give the parts index per link and its neighbours (0xFF = none).
 struct CLOTH_INFO {
     int Num;             // 0x00  number of chain links
     const u8* pCloth;    // 0x04  parts index per link

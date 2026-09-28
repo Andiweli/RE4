@@ -32,13 +32,13 @@ CLOTH_AT_SET weskerJacketAt[6] = {
     {0x0000, 0x16, 0x16, 1.0f, 120.0f, {-30.0f, -50.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
 };
 
-static PlCloth* weskerJacket;
+static CLOTH_INFO* weskerJacket;
 
 // Sets up Wesker's jacket as a pendulum cloth chain: 24 parts (weskerJacketP) in 4 bundles,
 // linked parent/child (weskerJacketUp/Dp) and sideways (weskerJacketLp), sway limits 0.2 / 0.3,
 // per-part wind phase / rate, 6 collision spheres on the hips / legs (weskerJacketAt), gravity
 // 25, damping 0.5, stretch 0.1, flags 0x100; PenClothSet initialises the chain 100 units long.
-void testJacketSetWesker(cModel* pl, PlCloth* c)
+void testJacketSetWesker(cModel* pl, CLOTH_INFO* c)
 {
     f32 rate;
 
@@ -62,29 +62,29 @@ void testJacketSetWesker(cModel* pl, PlCloth* c)
     c->Bundle_num = 4;
     c->WindSin = 0.0f;
     c->Stretchy = 0.1f;
-    c->pModel = 0;
+    c->pEm_at = 0;
     c->Rate = rate;
     c->Move_rate = rate;
     c->Flag = 0x100;
     c->pPtbl = 0;
-    PenClothSet(pl, (CLOTH_INFO*) c, 100.0f);
+    PenClothSet(pl, c, 100.0f);
 }
 
 // Per-frame update of the jacket chain (the sideways-linked pendulum variant).
-void testJacketMoveWesker(cModel* pl, PlCloth* c)
+void testJacketMoveWesker(cModel* pl, CLOTH_INFO* c)
 {
-    PenClothMove3(pl, (CLOTH_INFO*) c);
+    PenClothMove3(pl, c);
 }
 
 // Cloth set-up (cPlWesker::initCloth): the jacket chain.
-void PlClothSetWesker(cModel* pl, PlCloth* jacket)
+void PlClothSetWesker(cModel* pl, CLOTH_INFO* jacket)
 {
     testJacketSetWesker(pl, jacket);
 }
 
 // Cloth update (cPlWesker::moveCloth): the jacket, then the model's be_flag bits 21..23 (the
 // cloth "just set" flags) are cleared.
-void PlClothMoveWesker(cModel* pl, PlCloth* jacket)
+void PlClothMoveWesker(cModel* pl, CLOTH_INFO* jacket)
 {
     testJacketMoveWesker(pl, jacket);
     pl->be_flag &= ~0x00E00000;
@@ -321,10 +321,10 @@ void cPlWesker::setHead(void* bin, void* tpl)
     }
 }
 
-// Cloth set-up (cPlayer::startUp): allocates the jacket's PlCloth work and initialises the chain.
+// Cloth set-up (cPlayer::startUp): allocates the jacket's CLOTH_INFO work and initialises the chain.
 void cPlWesker::initCloth()
 {
-    weskerJacket = (PlCloth*) MemAlloc(sizeof(PlCloth), 1);
+    weskerJacket = (CLOTH_INFO*) MemAlloc(sizeof(CLOTH_INFO), 1);
     if (weskerJacket) {
         PlClothSetWesker(this, weskerJacket);
     }

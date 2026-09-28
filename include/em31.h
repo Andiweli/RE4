@@ -59,8 +59,8 @@ struct FREE_EM31 {
     cObj* pWeak;          // 0x698 (0xA78)  tentacle weak point object (em31WeakInit)
     f32 Neck_dir_y;             // 0x69C (0xA7C)
     u8 pad_6A0[0x700 - 0x6A0];
-    PlCloth Cloth2;       // 0x700 (0xAE0)  Em31ClothSet2 / Em31ClothMove2 (the hanging chains)
-    PlCloth Cloth3;       // 0x760 (0xB40)  Em31ClothSet3 / Em31ClothMove3
+    CLOTH_INFO Cloth2;       // 0x700 (0xAE0)  Em31ClothSet2 / Em31ClothMove2 (the hanging chains)
+    CLOTH_INFO Cloth3;       // 0x760 (0xB40)  Em31ClothSet3 / Em31ClothMove3
     cModelInfo* pHead;    // 0x7C0 (0xBA0)  extra body model
     int pHair;             // 0x7C4 (0xBA4)
     CAMERA Cam;           // 0x7C8 (0xBA8)  event camera (em31EscapeCamMove / em31StampCamMove)
@@ -140,10 +140,10 @@ void em31DmCk(cEm31* em);
 void em31DmCkT(cEm31* em);
 void em31EscapeCamMove(cEm31* em);
 void em31RouteCk(cEm31* em);
-void Em31ClothSet2(cEm31* em, PlCloth* c);
-void Em31ClothMove2(cEm31* em, PlCloth* c);
-void Em31ClothSet3(cEm31* em, PlCloth* c);
-void Em31ClothMove3(cEm31* em, PlCloth* c);
+void Em31ClothSet2(cEm31* em, CLOTH_INFO* c);
+void Em31ClothMove2(cEm31* em, CLOTH_INFO* c);
+void Em31ClothSet3(cEm31* em, CLOTH_INFO* c);
+void Em31ClothMove3(cEm31* em, CLOTH_INFO* c);
 int em31AtkCk(cEm31* em, Vec* pos, Vec* oldPos, int no);
 void em31StampCamMove(cEm31* em);
 void em31SearchBody(cEm31* em);

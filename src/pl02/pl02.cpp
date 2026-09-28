@@ -29,7 +29,7 @@ CLOTH_AT_SET adaHolsterAt[1] = {
 // Sets up Ada's costume-2 hair as a pendulum cloth chain: 14 parts (adaHair2P) in 4 bundles
 // linked parent/child by adaHair2Up/Dp, gravity 15, damping 0.75, the DOL's adaHair wind / max
 // / collision tables, flags 0x302; PenClothSet initialises the chain 100 units long.
-static void testHairSetAda2(cModel* pl, PlCloth* c)
+static void testHairSetAda2(cModel* pl, CLOTH_INFO* c)
 {
     c->Num = 14;
     c->pCloth = adaHair2P;
@@ -52,22 +52,22 @@ static void testHairSetAda2(cModel* pl, PlCloth* c)
     c->WindSin = 0.0f;
     c->Stretchy = 1.0f;
     c->Move_rate = 0.5f;
-    c->pModel = 0;
+    c->pEm_at = 0;
     c->Flag = 0x302;
     c->pPtbl = 0;
-    PenClothSet(pl, (CLOTH_INFO*) c, 100.0f);
+    PenClothSet(pl, c, 100.0f);
 }
 
 // Per-frame update of the hair chain (pendulum simulation).
-void testHairMoveAda2(cModel* pl, PlCloth* c)
+void testHairMoveAda2(cModel* pl, CLOTH_INFO* c)
 {
-    PenClothMove(pl, (CLOTH_INFO*) c);
+    PenClothMove(pl, c);
 }
 
 // Sets up the costume-2 holster strap as a pendulum chain: 5 parts (adaHolsterP: two anchors 26 /
 // 31 and the strap 78..80, max sway 0.2 / 1.0), gravity 15, damping 0.7, no wind, one collision
 // sphere (adaHolsterAt) on parts 0x11.
-void testHolsterSetAda2(cModel* pl, PlCloth* c)
+void testHolsterSetAda2(cModel* pl, CLOTH_INFO* c)
 {
     c->Num = 5;
     c->pCloth = adaHolsterP;
@@ -89,22 +89,22 @@ void testHolsterSetAda2(cModel* pl, PlCloth* c)
     c->WindSin = 0.0f;
     c->Stretchy = 1.0f;
     c->Move_rate = 0.3f;
-    c->pModel = 0;
+    c->pEm_at = 0;
     c->Bundle_num = 0;
     c->Flag = 0x302;
     c->pPtbl = 0;
-    PenClothSet(pl, (CLOTH_INFO*) c, 100.0f);
+    PenClothSet(pl, c, 100.0f);
 }
 
 // Per-frame update of the holster chain.
-void testHolsterMoveAda2(cModel* pl, PlCloth* c)
+void testHolsterMoveAda2(cModel* pl, CLOTH_INFO* c)
 {
-    PenClothMove(pl, (CLOTH_INFO*) c);
+    PenClothMove(pl, c);
 }
 
 // Costume 2 cloth set-up (cPlAda::initCloth): the hair goes into the `hair` work, the holster
 // strap into the `dress` work; the ribbon work and `evt` are unused.
-void PlClothSetAda2(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair, int evt)
+void PlClothSetAda2(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair, int evt)
 {
     testHairSetAda2(pl, hair);
     testHolsterSetAda2(pl, dress);
@@ -112,7 +112,7 @@ void PlClothSetAda2(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair, 
 
 // Costume 2 cloth update (cPlAda::moveCloth): both chains, then the model's be_flag bits 21..23
 // (the cloth "just set" flags) are cleared.
-void PlClothMoveAda2(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair)
+void PlClothMoveAda2(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair)
 {
     testHairMoveAda2(pl, hair);
     testHolsterMoveAda2(pl, dress);
@@ -120,12 +120,12 @@ void PlClothMoveAda2(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair)
 }
 
 // Costume 1 (the red dress) has no simulated cloth.
-void PlClothSetAda3(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair, int evt)
+void PlClothSetAda3(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair, int evt)
 {
 }
 
 // Costume 1: nothing to update.
-void PlClothMoveAda3(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair)
+void PlClothMoveAda3(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair)
 {
 }
 

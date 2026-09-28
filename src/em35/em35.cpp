@@ -4229,7 +4229,7 @@ void em35ClothSet(cEm35* em)
         w->cloth1.Move_rate = 0.0f;
         w->cloth1.Flag = 0;
         w->cloth1.pPtbl = 0;
-        PenClothSet(em, (CLOTH_INFO*) &w->cloth1, 100.0f);
+        PenClothSet(em, &w->cloth1, 100.0f);
     }
 }
 
@@ -4242,7 +4242,7 @@ void em35ClothMove(cEm35* em)
     if (em->type == 1 && !(w->flags & 0x40)) {
         u32 i;
 
-        PenClothMove2(em, (CLOTH_INFO*) &w->cloth1);
+        PenClothMove2(em, &w->cloth1);
         for (i = 0x35; i <= 0x41; i++) {
             cParts* p = (cParts*) em->getPartsPtr(i);
 
@@ -4279,13 +4279,13 @@ void em35ClothSet2(cEm35* em)
         w->cloth2.Gravity = 15.0f;
         w->cloth2.Rate = 0.8f;
         w->cloth2.Bundle_num = 4;
-        w->cloth2.pModel = em;
+        w->cloth2.pEm_at = em;
         w->cloth2.WindSin = 0.0f;
         w->cloth2.Stretchy = 1.0f;
         w->cloth2.Move_rate = 0.0f;
         w->cloth2.Flag = 0x100;
         w->cloth2.pPtbl = 0;
-        PenClothSet(em, (CLOTH_INFO*) &w->cloth2, 100.0f);
+        PenClothSet(em, &w->cloth2, 100.0f);
     }
 }
 
@@ -4293,7 +4293,7 @@ void em35ClothSet2(cEm35* em)
 void em35ClothMove2(cEm35* em)
 {
     if (em->type == 1) {
-        PenClothMove3(em, (CLOTH_INFO*) &EM35_WK(em)->cloth2);
+        PenClothMove3(em, &EM35_WK(em)->cloth2);
     }
 }
 
@@ -4322,13 +4322,13 @@ void em35ClothSet3(cEm35* em)
         w->cloth2.Gravity = 15.0f;
         w->cloth2.Rate = 0.8f;
         w->cloth2.Bundle_num = 4;
-        w->cloth2.pModel = em;
+        w->cloth2.pEm_at = em;
         w->cloth2.WindSin = 0.0f;
         w->cloth2.Stretchy = 1.0f;
         w->cloth2.Move_rate = 0.0f;
         w->cloth2.Flag = 0x100;
         w->cloth2.pPtbl = 0;
-        PenClothSet(em, (CLOTH_INFO*) &w->cloth2, 100.0f);
+        PenClothSet(em, &w->cloth2, 100.0f);
     }
 }
 
@@ -4336,7 +4336,7 @@ void em35ClothSet3(cEm35* em)
 void em35ClothMove3(cEm35* em)
 {
     if (em->type == 0) {
-        PenClothMove3(em, (CLOTH_INFO*) &EM35_WK(em)->cloth2);
+        PenClothMove3(em, &EM35_WK(em)->cloth2);
     }
 }
 

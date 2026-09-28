@@ -3227,7 +3227,7 @@ void em31RouteCk(cEm31* em)
 
 // The single-link cloth of the first build: never called, the original link dropped the body and kept
 // the constant pool (STRIP_UNUSED).
-static void Em31ClothSet(cEm31* em, PlCloth* c)
+static void Em31ClothSet(cEm31* em, CLOTH_INFO* c)
 {
     c->Num = 1;
     c->pCloth = em31ClothP;
@@ -3246,19 +3246,19 @@ static void Em31ClothSet(cEm31* em, PlCloth* c)
     c->At_num = 0;
     c->Gravity = 30.0f;
     c->Rate = 0.5f;
-    c->pModel = em;
+    c->pEm_at = em;
     c->Bundle_num = 0;
     c->WindSin = 0.0f;
     c->Stretchy = 1.0f;
     c->Move_rate = 0.0f;
     c->Flag = 0x40;
     c->pPtbl = 0;
-    PenClothSet(em, (CLOTH_INFO*) c, 1000.0f);
+    PenClothSet(em, c, 1000.0f);
 }
 
 // Sets up the 15-node hanging chain (parts em31ClothP2) as a stiff pendulum cloth (gravity 30,
 // 100 mm segments, no bundles).
-void Em31ClothSet2(cEm31* em, PlCloth* c)
+void Em31ClothSet2(cEm31* em, CLOTH_INFO* c)
 {
     c->Num = 15;
     c->pCloth = em31ClothP2;
@@ -3277,19 +3277,19 @@ void Em31ClothSet2(cEm31* em, PlCloth* c)
     c->At_num = 0;
     c->Gravity = 30.0f;
     c->Rate = 0.5f;
-    c->pModel = em;
+    c->pEm_at = em;
     c->Bundle_num = 0;
     c->WindSin = 0.0f;
     c->Stretchy = 1.0f;
     c->Move_rate = 0.0f;
     c->Flag = 0x40;
     c->pPtbl = 0;
-    PenClothSet(em, (CLOTH_INFO*) c, 100.0f);
+    PenClothSet(em, c, 100.0f);
 }
 
 // Per frame (not during the entrance, Be_flg 0x200): simulates the first chain and rebuilds the
 // world matrices of the parts 0x38..0x49 hanging off it.
-void Em31ClothMove2(cEm31* em, PlCloth* c)
+void Em31ClothMove2(cEm31* em, CLOTH_INFO* c)
 {
     FREE_EM31* w = EM31_WK(em);
     u32 i;
@@ -3297,7 +3297,7 @@ void Em31ClothMove2(cEm31* em, PlCloth* c)
     if (w->Be_flg & 0x200) {
         return;
     }
-    PenClothMove3(em, (CLOTH_INFO*) c);
+    PenClothMove3(em, c);
     for (i = 0x38; i <= 0x49; i++) {
         cParts* p = (cParts*) em->getPartsPtr(i);
 
@@ -3309,7 +3309,7 @@ void Em31ClothMove2(cEm31* em, PlCloth* c)
 }
 
 // Sets up the 18-node second chain (parts em31ClothP3) with the same pendulum parameters.
-void Em31ClothSet3(cEm31* em, PlCloth* c)
+void Em31ClothSet3(cEm31* em, CLOTH_INFO* c)
 {
     c->Num = 18;
     c->pCloth = em31ClothP3;
@@ -3328,21 +3328,21 @@ void Em31ClothSet3(cEm31* em, PlCloth* c)
     c->At_num = 0;
     c->Gravity = 30.0f;
     c->Rate = 0.5f;
-    c->pModel = em;
+    c->pEm_at = em;
     c->Bundle_num = 0;
     c->WindSin = 0.0f;
     c->Stretchy = 1.0f;
     c->Move_rate = 0.0f;
     c->Flag = 0x40;
     c->pPtbl = 0;
-    PenClothSet(em, (CLOTH_INFO*) c, 100.0f);
+    PenClothSet(em, c, 100.0f);
 }
 
 // Per frame (not during the entrance): simulates the second chain.
-void Em31ClothMove3(cEm31* em, PlCloth* c)
+void Em31ClothMove3(cEm31* em, CLOTH_INFO* c)
 {
     if (!(EM31_WK(em)->Be_flg & 0x200)) {
-        PenClothMove3(em, (CLOTH_INFO*) c);
+        PenClothMove3(em, c);
     }
 }
 

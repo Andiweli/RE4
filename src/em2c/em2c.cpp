@@ -5525,12 +5525,12 @@ void em2cClothSet(cEm2c* em)
     w->cloth.pLeft = (u8*) zero;
     w->cloth.pRight = (u8*) zero;
     w->cloth.pUpLeft = (u8*) zero;
-    w->cloth.pUpRight = zero;
+    w->cloth.pUpRight = (const u8*) zero;
     w->cloth.pParent = em2c_cloth_up;
     w->cloth.pChild = em2c_cloth_down;
     w->cloth.pWindSin = (f32*) zero;
     w->cloth.pWindRate = (f32*) zero;
-    w->cloth.pGravity = zero;
+    w->cloth.pGravity = (const f32*) zero;
     w->cloth.pRate = (f32*) zero;
     w->cloth.pMax = em2c_cloth_max;
     w->cloth.pAtset = (CLOTH_AT_SET*) zero;
@@ -5542,13 +5542,13 @@ void em2cClothSet(cEm2c* em)
         const f32 z = 0.0f;  // pool order: 0.0 before 0.05
 
         w->cloth.Stretchy = 0.05f;
-        w->cloth.pModel = (cModel*) zero;
+        w->cloth.pEm_at = (cModel*) zero;
         w->cloth.WindSin = z;
         w->cloth.Move_rate = z;
     }
     w->cloth.Flag = zero;
-    w->cloth.pPtbl = zero;
-    PenClothSet(em, (CLOTH_INFO*) &w->cloth, 100.0f);
+    w->cloth.pPtbl = (cParts**) zero;
+    PenClothSet(em, &w->cloth, 100.0f);
 }
 
 // Per frame: the tendril cloth update (PenClothMove) with the hide bits of the parts handled.
@@ -5565,7 +5565,7 @@ void em2cClothMove(cEm2c* em)
         em->be_flag |= 0x200000;
         return;
     }
-    PenClothMove2(em, (CLOTH_INFO*) &w->cloth);
+    PenClothMove2(em, &w->cloth);
     for (i = 0x4B; i <= 0x4C; i++) {
         p = em->getPartsPtr(i);
         PSMTXConcat(p->pParent->mat, p->l_mat, p->mat);

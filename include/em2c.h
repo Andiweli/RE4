@@ -46,7 +46,7 @@ struct Em2cWork {
     Vec startPos;         // 0x38C (0x76C)  pos at init
     Vec startRot;         // 0x398 (0x778)  rot at init
     u8 pad_3A4[8];
-    PlCloth cloth;        // 0x3AC (0x78C)  tail cloth chain (em2cClothSet)
+    CLOTH_INFO cloth;        // 0x3AC (0x78C)  tail cloth chain (em2cClothSet)
     f32 plDir;            // 0x40C (0x7EC)  em2cGetPlDir towards the player's head
     f32 plDirAbs;         // 0x410 (0x7F0)
     CAMERA cam;           // 0x414 (0x7F4)  escape camera (em2cEscapeCamMove)
