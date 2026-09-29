@@ -640,7 +640,7 @@ static void em36_R0_Init(cEm36* em)
     em36PartsSet(em, 4, 0);
     em36PartsSet(em, 5, 0);
     em36PartsSet(em, 6, 0);
-    em->Motion.flip = em36_flip;
+    em->pXFlip = em36_flip;
     EspDataLoad((u32) ARC(EM36_EFF_025), EFF_EM36, 0);
 #line 966 "D:/Bio4/Prog/em36.cpp"
     em->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xD);

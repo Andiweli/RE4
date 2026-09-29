@@ -60,7 +60,7 @@ struct FREE_EM2B {
     f32 Blend;         // 0x2A8 (0x688)
     int Hokan;         // 0x2AC (0x68C)
     int Frame;         // 0x2B0 (0x690)
-    MOTION_INFO Sub_mot;  // 0x2B4 (0x694)  second motion work (cModel::Motion.blend)
+    MOTION_INFO Sub_mot;  // 0x2B4 (0x694)  second motion work (cModel::pMotionB)
     void* blendM0;        // 0x384 (0x764)
     void* blendM1;        // 0x388 (0x768)
     void* blendM2;        // 0x38C (0x76C)
@@ -108,7 +108,6 @@ struct FREE_EM2B {
 
 
 #define EM2B_WK(em) ((FREE_EM2B*) (((cEm2b*) (em))->free))
-#define EM2B_BLEND_MOT(w) ((MotionWork*) &(w)->Sub_mot)
 
 class cEm2b : public cEm {
 public:

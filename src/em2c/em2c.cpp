@@ -1099,7 +1099,7 @@ static void em2c_R0_Init(cEm2c* em)
     EspDataLoad((u32) ARC(EM2C_EFF_004), EFF_EM2C, 0);
     w->pCtrl12 = GetCtrlCtrl12();
     em2cTexrenderInit(em);
-    em->Motion.flip = em2c_xflip_tbl;
+    em->pXFlip = em2c_xflip_tbl;
 #line 1623 "D:/Bio4/Prog/em2c.cpp"
     em->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 13);
     {
@@ -6110,7 +6110,7 @@ static void plemBackjump2(cPlayer* pl)
 void em2cBlendMotSet(cEm2c* em, void* m0, void* m1, void* m2, int a, int b, int c, int d)
 {
     Em2cWork* w = EM2C_WK(em);
-    MotionWork* bm;
+    MOTION_INFO* bm;
     f32 val = fabsf(w->blendVal);
     void* m;
     int arg;
@@ -6123,9 +6123,9 @@ void em2cBlendMotSet(cEm2c* em, void* m0, void* m1, void* m2, int a, int b, int 
         m = m2;
         arg = c;
     }
-    bm = EM2C_BLEND_MOT(w);
+    bm = &w->blendMot;
     MotionSetCore(em, bm, m, (void*) arg, (u8) w->blendCnt, (u16) d, (u16) w->blendSeq);
-    em->Motion.blend = bm;
+    em->pMotionB = bm;
     bm->Brate = val * 0.00390625f;
     if (w->blendCnt) {
         w->blendCnt--;
@@ -6141,15 +6141,15 @@ void em2cBlendMotSet(cEm2c* em, void* m0, void* m1, void* m2, int a, int b, int 
 void em2cBlendMotSet2(cEm2c* em, void* m0, void* m1, int a, int b, int d)
 {
     Em2cWork* w = EM2C_WK(em);
-    MotionWork* bm;
+    MOTION_INFO* bm;
     int dd;
     dd = (int) d;
     f32 val = fabsf(w->blendVal);
 
     MotionSetCore(em, &em->Motion, m0, (void*) a, (u8) w->blendCnt, (u16) dd, (u16) w->blendSeq);
-    bm = EM2C_BLEND_MOT(w);
+    bm = &w->blendMot;
     MotionSetCore(em, bm, m1, (void*) b, (u8) w->blendCnt, (u16) dd, (u16) w->blendSeq);
-    em->Motion.blend = bm;
+    em->pMotionB = bm;
     bm->Brate = val * 0.00390625f;
     if (w->blendCnt) {
         w->blendCnt--;

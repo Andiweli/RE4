@@ -86,7 +86,7 @@ struct Em38Work {
     void* mot[4];         // 0x64C (0xA2C)  motions blended by em38BlendMotSet
     u8 pad_65C[8];
     int blendKind;        // 0x664 (0xA44)  MotionSetCore flags of the blend
-    MOTION_INFO blendMot;  // 0x668 (0xA48)  the blend motion work (cModel::Motion.blend)
+    MOTION_INFO blendMot;  // 0x668 (0xA48)  the blend motion work (cModel::pMotionB)
     MOTION_INFO shellMot;  // 0x738 (0xB18)  the shell motion work (em38ShellControl)
     CAMERA cam;           // 0x808 (0xBE8)  event camera of the escape scenes (em38EscapeCamMove)
 };

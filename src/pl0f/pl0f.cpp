@@ -3204,7 +3204,7 @@ void plboatBlendMotSet(cPlayer* pl, void* m0, void* m1, void* m2, int a, int b, 
     }
     bm = &pl->m_SubMot;
     MotionSetCore(pl, bm, m, (void*) f, pl->m_Hokan, 4, pl->m_Frame);
-    pl->Motion.blend = bm;
+    pl->pMotionB = bm;
     bm->Brate = rate * (1.0f / 256.0f);
     if (pl->m_Hokan) {
         pl->m_Hokan--;
@@ -3233,7 +3233,7 @@ void subBlendMotSet(cSubChar* sub, void* m0, void* m1, void* m2, int a, int b, i
     }
     bm = &sub->subMot;
     MotionSetCore(sub, bm, m, (void*) f, sub->m_Hokan, 4, sub->m_Frame);
-    sub->Motion.blend = bm;
+    sub->pMotionB = bm;
     bm->Brate = rate * (1.0f / 256.0f);
     if (sub->m_Hokan) {
         sub->m_Hokan--;

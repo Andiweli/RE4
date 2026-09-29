@@ -65,7 +65,7 @@ struct Em35Work {
     f32 blendRate;        // 0x86C (0xC4C)  em35BlendMotSet weight (-255..255)
     int blendA;           // 0x870 (0xC50)  interpolation frames left
     u32 blendB;           // 0x874 (0xC54)  frame counter of the blended motion
-    MOTION_INFO blendMot;  // 0x878 (0xC58)  the blend motion work (cModel::Motion.blend)
+    MOTION_INFO blendMot;  // 0x878 (0xC58)  the blend motion work (cModel::pMotionB)
     s16 effTimer;         // 0x948 (0xD28)  frames until the next upper body effect
     u16 seTimer;          // 0x94A (0xD2A)  frames until the next voice
     u8 atkHit;            // 0x94C (0xD2C)  the attack hit the player

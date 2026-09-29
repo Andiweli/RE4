@@ -852,7 +852,7 @@ static void em2b_R0_Init(cEm2b* em)
 {
     FREE_EM2B* w = EM2B_WK(em);
     cAtariInfo* at;
-    MotionWork* mot;
+    MOTION_INFO* mot;
     int zero;
     int t35;
     f32 one;
@@ -915,7 +915,7 @@ static void em2b_R0_Init(cEm2b* em)
     at = &em->atari;
     em2bTexrenderInit(em);
     em->pFsdTbl = &Em2b_fs_tbl;
-    em->Motion.flip = em2b_xflip_tbl;
+    em->pXFlip = em2b_xflip_tbl;
     ((cParts*) em->getPartsPtr(0x12))->motParts.flags |= 0x1000;
     ((cParts*) em->getPartsPtr(0x16))->motParts.flags |= 0x1000;
     em2bClothSet(em);
@@ -4080,7 +4080,7 @@ void em2bNeckMove(cEm2b* em)
 void em2bBlendMotSet(cEm2b* em, void* m0, void* m1, void* m2, int a, int b, int c, int d)
 {
     FREE_EM2B* w = EM2B_WK(em);
-    MotionWork* bm;
+    MOTION_INFO* bm;
     f32 val = fabsf(w->Blend);
     void* m;
     int arg;
@@ -4093,9 +4093,9 @@ void em2bBlendMotSet(cEm2b* em, void* m0, void* m1, void* m2, int a, int b, int 
         m = m2;
         arg = c;
     }
-    bm = EM2B_BLEND_MOT(w);
+    bm = &w->Sub_mot;
     MotionSetCore(em, bm, m, (void*) arg, (u8) w->Hokan, (u16) d, (u16) w->Frame);
-    em->Motion.blend = bm;
+    em->pMotionB = bm;
     bm->Brate = val * 0.00390625f;
     if (w->Hokan) {
         w->Hokan--;
@@ -5386,13 +5386,13 @@ void cEm2b::setPos(Vec* p, f32 ang)
 // Player blend motion (the strangle): the neck work is the second motion, the rate from 0x500.
 void plBlendMotSet(cPlayer* pl, void* m0, void* m1, int a, int b)
 {
-    MotionWork* bm;
+    MOTION_INFO* bm;
     f32 val = fabsf(pl->m_Blend);
 
     MotionSetCore(pl, &pl->Motion, m0, (void*) a, pl->m_Hokan, 1, pl->m_Frame);
-    bm = (MotionWork*) &pl->m_SubMot;
+    bm = &pl->m_SubMot;
     MotionSetCore(pl, bm, m1, (void*) b, pl->m_Hokan, 1, pl->m_Frame);
-    pl->Motion.blend = bm;
+    pl->pMotionB = bm;
     bm->Brate = val * 0.00390625f;
     if (pl->m_Hokan) {
         pl->m_Hokan--;

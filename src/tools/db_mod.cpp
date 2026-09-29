@@ -33,7 +33,7 @@
 // wrap / clamp helpers (the option pages)
 #define LOOP(x, lo, hi) (((x) < (lo)) ? (hi) : ((x) > (hi)) ? (lo) : (x))
 
-// The motion work of this build: model.h's MotionWork without the trailing blend/flip/blendTbl pointers
+// The motion work of this build: model.h's MOTION_INFO
 // (0xD0 bytes; em.h MOTION_INFO is the same block).
 struct DbMotWork {
     MotionData* data;     // 0x00
@@ -2183,17 +2183,17 @@ static int dbmod_blend()
                 switch (pDbModState->blendMode) {
                 case 0:
                     MotionSetCore(em->pEm, &em->pEm->Motion, em->pMotBuff[0], 0, 0, em->motInfo[0].flags | 0x200, 0);
-                    em->pEm->Motion.blend = (MotionWork*) &em->motInfo[1];
-                    em->pEm->Motion.blend->Mot_flag &= 0x7FFFFFFF;
+                    em->pEm->pMotionB = (MOTION_INFO*) &em->motInfo[1];
+                    em->pEm->pMotionB->Mot_flag &= 0x7FFFFFFF;
                     break;
                 case 1:
                     MotionSetCore(em->pEm, &em->pEm->Motion, em->pMotBuff[0], 0, 0, em->motInfo[0].flags | 0x200, 0);
-                    em->pEm->Motion.blend = (MotionWork*) &em->motInfo[1];
-                    em->pEm->Motion.blend->Mot_flag |= 0x80000000;
+                    em->pEm->pMotionB = (MOTION_INFO*) &em->motInfo[1];
+                    em->pEm->pMotionB->Mot_flag |= 0x80000000;
                     break;
                 default:
                     em->motInfo[1].blendRate = 0.0f;
-                    em->pEm->Motion.blend = 0;
+                    em->pEm->pMotionB = 0;
                     break;
                 }
             }
@@ -2201,8 +2201,8 @@ static int dbmod_blend()
         }
         break;
     }
-    if (em->pEm->Motion.blend) {
-        em->pEm->Motion.blend->Brate = pDbModState->blendRate;
+    if (em->pEm->pMotionB) {
+        em->pEm->pMotionB->Brate = pDbModState->blendRate;
     }
     eprintf(5 * 8, 3 * 14, 5, 0, "---- BLEND ----");
     x = 6;
@@ -2228,7 +2228,7 @@ static int dbmod_blend()
             eprintf((x + 10) * 8, row, color, 0, "%.2f", rate);
             break;
         case 1:
-            if (em->pEm->Motion.blend == 0) {
+            if (em->pEm->pMotionB == 0) {
                 color = 7;
             }
             eprintf((x + 10) * 8, (x - 1) * 14, color, 0, "%.2f", pDbModState->blendRate);
@@ -2692,7 +2692,7 @@ static int dbmod_p_info()
     u32 em2 = (u32) em; // COMPILER-DIFF: the p-info zero colour (see the j-loop below)
     cEm* model = em->pEm;
     JOY* joy = &Joy[0];
-    MotionWork* mw;
+    MOTION_INFO* mw;
     cParts* p;
     int n = 0;
     int i, j, k;
@@ -3036,7 +3036,7 @@ void dbModMotionMove()
         if (noMotion == 0 && !SpfFlagChk(pG, SPF_OBJ)) {
             model->Motion.Mot_attr = em->motInfo[0].flags;
             MotionMove(model, 0);
-            if (model->Motion.blend == 0 && em->mot_num > 1 && model->Motion.Mot_state != 0) {
+            if (model->pMotionB == 0 && em->mot_num > 1 && model->Motion.Mot_state != 0) {
                 em->mot_cnt++;
                 if (em->mot_cnt > em->mot_num - 1) {
                     em->mot_cnt = 0;
@@ -3749,7 +3749,7 @@ static int dbmodIkUnused = 0;
 // Prints the model's IK joint table (joint kind / parts number per joint) at dbmodIkX/Y.
 void DB_EM::IKreport()
 {
-    MotionWork* mw;
+    MOTION_INFO* mw;
     int i;
     int type;
 

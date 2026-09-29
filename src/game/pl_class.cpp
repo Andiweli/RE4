@@ -805,7 +805,7 @@ void cPlayer::setFootwork()
         hokan = 5;
     }
     motionSet(m_MotTbl[0], m_MotTbl[1], PL_ARC_PTR(pG->pPlayer, 0x32), PL_ARC_PTR(pG->pPlayer, 0x33), hokan, frame);
-    Motion.blend = 0;
+    pMotionB = 0;
 }
 
 // Motion sequence sound (seNo, set by the motion key): foot sounds by parts / kind, sand splash.
@@ -1592,12 +1592,12 @@ void cPlNeck::move()
             }
         }
     }
-    if (pPL->Motion.blend) {
+    if (pPL->pMotionB) {
         f32 rate = m_NeckY / 0.7853981852531433f;
         if (!(m_Flag & 1)) {
             rate = -rate;
         }
-        pPL->Motion.blend->Brate = rate;
+        pPL->pMotionB->Brate = rate;
     }
 }
 
@@ -1613,9 +1613,9 @@ void cPlNeck::motSet(void* data, int frame)
     p->m_SubMot.Mot_flag |= 0x10000000;
     MotionSetCore(p, &p->m_SubMot, data, 0, 8, 5, frame);
     p->m_SubMot.Mot_flag &= ~0x10000000;
-    p->Motion.blend = &p->m_SubMot;
-    p->Motion.blend->Brate = 1.0f;
-    p->Motion.blend->Mot_flag |= 0x80000000;
+    p->pMotionB = &p->m_SubMot;
+    p->pMotionB->Brate = 1.0f;
+    p->pMotionB->Mot_flag |= 0x80000000;
 }
 
 // Nearest alive enemy (not in battle) within 5000 of parts 3, seen from there; enemies with status
@@ -1705,7 +1705,7 @@ void cMot3::set(cModel* m, void* m0, void* m1, void* m2, void* seq, u8 b, int c,
     m_Mode = c;
     MotionSetCore(m, MOTION(m), m0, seq, mode, d, e);
     set0(m1, e, mode);
-    ((cEm*) m)->Motion.blend->Brate = 0.0f;
+    ((cEm*) m)->pMotionB->Brate = 0.0f;
 }
 
 // Blend motion `m` (frame a, hokan b) into the model's motion.
@@ -1719,7 +1719,7 @@ void cMot3::set0(void* m, u8 a, int b)
         work.Mot_flag |= 0x80000000;
         break;
     }
-    ((cEm*) m_pEm)->Motion.blend = &work;
+    ((cEm*) m_pEm)->pMotionB = &work;
 }
 
 // Blend rate -1..1: crossing 0 switches the blended motion (mot1 below, mot2 above) at the current
@@ -1729,7 +1729,7 @@ void cMot3::move(f32 r0)
     if (m_pEm == 0) {
         return;
     }
-    if (((cEm*) m_pEm)->Motion.blend == 0) {
+    if (((cEm*) m_pEm)->pMotionB == 0) {
         return;
     }
     if (r0 > 1.0f) {
@@ -1747,7 +1747,7 @@ void cMot3::move(f32 r0)
     if (r0 < 0.0f) {
         r0 = -r0;
     }
-    ((cEm*) m_pEm)->Motion.blend->Brate = r0;
+    ((cEm*) m_pEm)->pMotionB->Brate = r0;
 }
 
 const f32 cPlayer::SPEED_WALK_TURN = 0.0418879f;

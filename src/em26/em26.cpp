@@ -271,7 +271,7 @@ static void em26_R0_Init(cEm26* em)
         break;
     }
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
-    em->Motion.flip = em26_flip_tbl;
+    em->pXFlip = em26_flip_tbl;
     if (Rnd() & 1) {
         w->flags |= 0x10;
     } else {

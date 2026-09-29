@@ -86,8 +86,8 @@ cModel::cModel()
     Fix_pos.z = 0.0f;
     invisible_factor = 0.0f;
     memclr_asm(&Motion, 0xD0);
-    Motion.blend = 0;
-    Motion.flip = 0;
+    pMotionB = 0;
+    pXFlip = 0;
     inscreen_pos = 0;
     pPath = 0;
     pTexChg = 0;
@@ -1110,25 +1110,25 @@ int cModel::makePartsList(int n)
     return 1;
 }
 
-// Binds the motion blend table and flip table of a version 0x20030818 model file to the MotionWork.
+// Binds the motion blend table and flip table of a version 0x20030818 model file to the motion work.
 void cModel::setJointInfo(void* pHead)
 {
     cModelData* d = (cModelData*) pHead;
 
     if (d->version == 0x20030818) {
         if (d->blendTbl != 0) {
-            Motion.blendTbl = (u16*) d->blendTbl;
+            pDblJnt = (u16*) d->blendTbl;
         } else {
-            Motion.blendTbl = 0;
+            pDblJnt = 0;
         }
         if (d->flipTbl != 0) {
-            Motion.flip = (u16*) (d->flipTbl + 4);
+            pXFlip = (u16*) (d->flipTbl + 4);
         } else {
-            Motion.flip = 0;
+            pXFlip = 0;
         }
     } else {
-        Motion.blendTbl = 0;
-        Motion.flip = 0;
+        pDblJnt = 0;
+        pXFlip = 0;
     }
 }
 

@@ -311,7 +311,7 @@ static void em2f_R0_Init(cEm2f* em)
     YarareAdd(em, &w->hit[5], 0.0f, 0.0f, 0.0f, 700.0f, 600.0f, 0x1C, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[6], 0.0f, 0.0f, -600.0f, 500.0f, 600.0f, 0x1D, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     em->hp = 1000;
-    em->Motion.flip = em2f_flip_tbl;
+    em->pXFlip = em2f_flip_tbl;
     em->setTarget(0, 0.0f, 0.0f, 0.0f);
     EspDataLoad((u32) ARC(EM2F_EFF_008), EFF_EM2F, 0);
     w->flags = 0;

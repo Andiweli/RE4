@@ -774,7 +774,7 @@ static void em39_R0_Init(cEm39* em)
     z0 = 0;
     w->pArrow = (cEmWep*) z0;
     em->pFsdTbl = &Em39_fs_tbl;
-    em->Motion.flip = em39_flip_tbl;
+    em->pXFlip = em39_flip_tbl;
 #line 1268 "D:/Bio4/Prog/em39.cpp"
     em->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xD);
     // GNU constructor expressions: emitted at the statement like strings, and shared through the
@@ -7207,7 +7207,7 @@ void em39BlendMotSet(cEm39* em, void* m0, void* m1, void* m2, void* seq0, void* 
     }
     bm = &w->Sub_mot;
     MotionSetCore(em, bm, m, seq, (u8) w->Hokan, (u16) dd, (u16) w->Frame);
-    em->Motion.blend = bm;
+    em->pMotionB = bm;
     bm->Brate = rate * 0.00390625f;
     if (w->Hokan) {
         w->Hokan--;
@@ -7906,7 +7906,6 @@ int em39DoorOpenCk(cEm39* em)
 }
 
 // Tower form left arm: its own motion work (armMot) by the arm state x8BB / x8BC.
-#define EM39_ARM_MOT(w)  ((MotionWork*) &(w)->Arm_mot)
 
 // Final form only: the mutated left arm runs its own motion work (Arm_mot) as a state machine that
 // the routines set through Arm_rno. Pose changes play the arm's flesh sound.
@@ -7937,12 +7936,12 @@ void em39ArmControl(cEm39* em)
             se = 1;
             break;
         }
-        MotionSetCore(em, EM39_ARM_MOT(w), mot, 0, 0, 4, 0);
+        MotionSetCore(em, &w->Arm_mot, mot, 0, 0, 4, 0);
         w->Arm_type = 0;
         w->Arm_rno++;
         goto STEP;
     case 2:
-        MotionSetCore(em, EM39_ARM_MOT(w), ARC(EM39_MOT_ARM_CONTROL_0FF), 0, 0, 4, 0);
+        MotionSetCore(em, &w->Arm_mot, ARC(EM39_MOT_ARM_CONTROL_0FF), 0, 0, 4, 0);
         w->Arm_rno++;
         goto MOVE;
     case 4:
@@ -7960,12 +7959,12 @@ void em39ArmControl(cEm39* em)
             se = 1;
             break;
         }
-        MotionSetCore(em, EM39_ARM_MOT(w), mot, 0, 0, 4, 0);
+        MotionSetCore(em, &w->Arm_mot, mot, 0, 0, 4, 0);
         w->Arm_type = 1;
         w->Arm_rno++;
         goto STEP;
     case 6:
-        MotionSetCore(em, EM39_ARM_MOT(w), ARC(EM39_MOT_ARM_CONTROL_100), 0, 0, 4, 0);
+        MotionSetCore(em, &w->Arm_mot, ARC(EM39_MOT_ARM_CONTROL_100), 0, 0, 4, 0);
         w->Arm_rno++;
         goto MOVE;
     case 8:
@@ -7983,26 +7982,26 @@ void em39ArmControl(cEm39* em)
             mot = ARC(EM39_MOT_ARM_CONTROL_101);
             break;
         }
-        MotionSetCore(em, EM39_ARM_MOT(w), mot, 0, 0, 4, 0);
+        MotionSetCore(em, &w->Arm_mot, mot, 0, 0, 4, 0);
         w->Arm_type = 2;
         w->Arm_rno++;
     case 1:
     case 5:
     case 9:
     STEP:
-        MotionMoveCore(em, EM39_ARM_MOT(w), 0);
-        if (MotionSequenceCtrl(EM39_ARM_MOT(w))) {
+        MotionMoveCore(em, &w->Arm_mot, 0);
+        if (MotionSequenceCtrl(&w->Arm_mot)) {
             w->Arm_rno++;
         }
         break;
     case 0xA:
-        MotionSetCore(em, EM39_ARM_MOT(w), ARC(EM39_MOT_ARM_CONTROL_101), 0, 0, 4, 0);
+        MotionSetCore(em, &w->Arm_mot, ARC(EM39_MOT_ARM_CONTROL_101), 0, 0, 4, 0);
         w->Arm_rno++;
         goto MOVE;
     case 0xC:
         w->Arm_mot.Seq_speed = 1.0f;
         w->Arm_mot.Mot_flag |= 0x10000000;
-        MotionSetCore(em, EM39_ARM_MOT(w), ARC(EM39_MOT_ARM_CONTROL_108), 0, 0, 1, 0);
+        MotionSetCore(em, &w->Arm_mot, ARC(EM39_MOT_ARM_CONTROL_108), 0, 0, 1, 0);
         w->Arm_type = 1;
         se = 1;
         w->Arm_rno++;
@@ -8010,7 +8009,7 @@ void em39ArmControl(cEm39* em)
     case 0xE:
         w->Arm_mot.Seq_speed = 1.0f;
         w->Arm_mot.Mot_flag |= 0x10000000;
-        MotionSetCore(em, EM39_ARM_MOT(w), ARC(EM39_MOT_ARM_CONTROL_109), 0, 0, 1, 0);
+        MotionSetCore(em, &w->Arm_mot, ARC(EM39_MOT_ARM_CONTROL_109), 0, 0, 1, 0);
         w->Arm_type = 1;
         se = 1;
         w->Arm_rno++;
@@ -8018,7 +8017,7 @@ void em39ArmControl(cEm39* em)
     case 0x10:
         w->Arm_mot.Seq_speed = 1.0f;
         w->Arm_mot.Mot_flag |= 0x10000000;
-        MotionSetCore(em, EM39_ARM_MOT(w), ARC(EM39_MOT_ARM_CONTROL_10A), 0, 0, 1, 0);
+        MotionSetCore(em, &w->Arm_mot, ARC(EM39_MOT_ARM_CONTROL_10A), 0, 0, 1, 0);
         w->Arm_type = se;
         w->Arm_rno++;
     case 3:
@@ -8028,21 +8027,21 @@ void em39ArmControl(cEm39* em)
     case 0xF:
     case 0x11:
     MOVE:
-        MotionMoveCore(em, EM39_ARM_MOT(w), 0);
-        MotionSequenceCtrl(EM39_ARM_MOT(w));
+        MotionMoveCore(em, &w->Arm_mot, 0);
+        MotionSequenceCtrl(&w->Arm_mot);
         break;
     case 0x12: {
         int mf = ((MotionData*) ARC(EM39_MOT_ARM_CONTROL_10A))->maxFrame;
 
         w->Arm_mot.Seq_speed = 1.0f;
         w->Arm_mot.Mot_flag |= 0x10000000;
-        MotionSetCore(em, EM39_ARM_MOT(w), ARC(EM39_MOT_ARM_CONTROL_10A), 0, 0, 0, (u16) ((mf & 0x3FFF) - 1));
+        MotionSetCore(em, &w->Arm_mot, ARC(EM39_MOT_ARM_CONTROL_10A), 0, 0, 0, (u16) ((mf & 0x3FFF) - 1));
         w->Arm_type = se;
         w->Arm_rno++;
     }
     case 0x13:
-        MotionMoveCore(em, EM39_ARM_MOT(w), 0);
-        MotionSequenceCtrl(EM39_ARM_MOT(w));
+        MotionMoveCore(em, &w->Arm_mot, 0);
+        MotionSequenceCtrl(&w->Arm_mot);
         break;
     }
     if (se) {

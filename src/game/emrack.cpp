@@ -333,7 +333,7 @@ void emRack_R1_Set(cEmRack* pEm)
 {
     FREE_EMRACK* w = EMRACK_WK(pEm);
 
-    if (MotionCheckCrossFrame((MotionWork*) &pEm->Motion, 2.0f)) {
+    if (MotionCheckCrossFrame(&pEm->Motion, 2.0f)) {
         if (w->Eff_id != 0xFF) {
             if (pEm->type == 1) {
                 EstSet(pEm, -1, 0, 0, w->Eff_id, 7, 0, ESP_CORE_KIND_NONE, pEm, 0);

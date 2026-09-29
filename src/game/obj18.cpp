@@ -288,7 +288,7 @@ void cObj18::move()
         }
     }
     obj18SetOya(this);
-    if (Motion.blendTbl == 0) {
+    if (pDblJnt == 0) {
         partsMatCalc();
         partsWorldCalc();
     }

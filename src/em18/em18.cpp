@@ -250,7 +250,7 @@ static void em18_R0_Init(cEm18* em)
     em18ClothPartsSet(em, 0);
     em18GoodsPartsSet(em, 0);
     em->pFsdTbl = &Em10_fs_tbl;
-    em->Motion.flip = em18_flip_tbl;
+    em->pXFlip = em18_flip_tbl;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
         static const Vec size = { 10000.0f, 10000.0f, 10000.0f };

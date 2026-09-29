@@ -311,7 +311,7 @@ static void em25_R0_Init(cEm25* em)
         return;
     }
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
-    em->Motion.flip = em25_flip_tbl;
+    em->pXFlip = em25_flip_tbl;
     EspDataLoad((u32) ARC(EM25_EFF_007), EFF_EM25, 0);
     {
         static const Vec ofs = {0.0f, 0.0f, 0.0f};

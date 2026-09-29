@@ -357,7 +357,7 @@ static void em29_R0_Init(cEm29* em)
         return;
     }
     em->be_flag &= ~0x10;
-    em->Motion.flip = em29_flip_tbl;
+    em->pXFlip = em29_flip_tbl;
     em->hp = 1000;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };

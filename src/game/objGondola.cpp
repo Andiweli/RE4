@@ -20,15 +20,7 @@
 #include "motion.h"
 #include "game.h"
 
-// motion.h declares MotionMove with one argument; the object units call it with two. Only the
-// two blend fields of MotionWork are touched here.
-struct GondolaMotWork {
-    u8 pad_0[0x44];
-    u32 flags2;           // 0x44
-    u8 pad_48[0xC8 - 0x48];
-    f32 blendRate;        // 0xC8
-};
-
+// motion.h declares MotionMove with one argument; the object units call it with two.
 void objGondola_R0_Set(cObjGondola* obj);
 void objGondola_R0_Move(cObjGondola* obj);
 void objGondola_R0_Down(cObjGondola* obj);
@@ -289,12 +281,12 @@ void objGondola_R0_Break(cObjGondola* pObj)
             w->Timer--;
             if (w->Timer == 0) {
                 if (w->pMot_info && w->Sub_mot2) {
-                    ((GondolaMotWork*) w->pMot_info)->flags2 |= 0x10000000;
+                    w->pMot_info->Mot_flag |= 0x10000000;
                     MotionSetCore(pObj, w->pMot_info, w->Sub_mot2, 0, 0, 0, 0);
-                    ((GondolaMotWork*) w->pMot_info)->flags2 &= ~0x10000000;
-                    pObj->Motion.blend = w->pMot_info;
-                    ((GondolaMotWork*) pObj->Motion.blend)->blendRate = 1.0f;
-                    ((GondolaMotWork*) pObj->Motion.blend)->flags2 |= 0x80000000;
+                    w->pMot_info->Mot_flag &= ~0x10000000;
+                    pObj->pMotionB = w->pMot_info;
+                    pObj->pMotionB->Brate = 1.0f;
+                    pObj->pMotionB->Mot_flag |= 0x80000000;
                 }
             }
         }
@@ -630,8 +622,8 @@ void cObjGondola::setGetOffPL()
     r_no_3 = 0;
 }
 
-// Installs the secondary MotionWork with the shake and break motions blended over the travel motion.
-void cObjGondola::setSubMotion(MotionWork* work, void* mot, void* breakMot)
+// Installs the secondary motion work with the shake and break motions blended over the travel motion.
+void cObjGondola::setSubMotion(MOTION_INFO* work, void* mot, void* breakMot)
 {
     FREE_GONDOLA* w = GONDOLA_WK(this);
 
@@ -646,12 +638,12 @@ void cObjGondola::setVib()
     FREE_GONDOLA* w = GONDOLA_WK(this);
 
     if (w->pMot_info && w->Sub_mot1) {
-        ((GondolaMotWork*) w->pMot_info)->flags2 |= 0x10000000;
+        w->pMot_info->Mot_flag |= 0x10000000;
         MotionSetCore(this, w->pMot_info, w->Sub_mot1, 0, 0, 0, 0);
-        ((GondolaMotWork*) w->pMot_info)->flags2 &= ~0x10000000;
-        Motion.blend = w->pMot_info;
-        ((GondolaMotWork*) Motion.blend)->blendRate = 1.0f;
-        ((GondolaMotWork*) Motion.blend)->flags2 |= 0x80000000;
+        w->pMot_info->Mot_flag &= ~0x10000000;
+        pMotionB = w->pMot_info;
+        pMotionB->Brate = 1.0f;
+        pMotionB->Mot_flag |= 0x80000000;
         QuakeExec(0, 0, 10, 30.0f, 2);
         VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
     }

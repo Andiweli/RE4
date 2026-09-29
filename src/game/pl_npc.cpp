@@ -2170,7 +2170,7 @@ void cSubChar::neckCtrl()
     if (!(pPL->stat.check(cPlayer::F_EVENT))) {
         on = 0;
     }
-    if (m_NeckTimer == 0 || (Motion.blend != 0 && Motion.blend->Brate != 0.0f) || on) {
+    if (m_NeckTimer == 0 || (pMotionB != 0 && pMotionB->Brate != 0.0f) || on) {
         m_NeckVec.y += Muku2(m_NeckVec.y, 0.0f, 0.15707964f);
     } else {
         if (m_NeckTimer > 0) {
@@ -2625,10 +2625,10 @@ void cSubChar::backCheckSet(void* mot)
 
         MOT_SET(this, &subMot, mot, 0, 3, 4, 0);
         subMot.Brate = rate;
-        Motion.blend = &subMot;
+        pMotionB = &subMot;
         subMot.Mot_flag |= 0x80000000;
     } else {
-        Motion.blend = 0;
+        pMotionB = 0;
         subMot.Brate = 0.0f;
     }
 }
@@ -2636,7 +2636,7 @@ void cSubChar::backCheckSet(void* mot)
 // Fade the look-back blend in (sub404 == 2) or out (1).
 void cSubChar::backCheckMove()
 {
-    MOTION_INFO* w = pEm->Motion.blend;
+    MOTION_INFO* w = pEm->pMotionB;
     const f32 d = 0.14f;
 
     if (w == 0) {
@@ -2648,17 +2648,17 @@ void cSubChar::backCheckMove()
     case 1:
         if (w->Brate > 0.0f) {
             w->Brate -= d;
-            if (pEm->Motion.blend->Brate < 0.0f) {
-                pEm->Motion.blend->Brate = 0.0f;
+            if (pEm->pMotionB->Brate < 0.0f) {
+                pEm->pMotionB->Brate = 0.0f;
                 m_BackRno = 0;
             }
         }
         break;
     case 2:
-        if (Motion.blend->Brate < 1.0f) {
-            Motion.blend->Brate += d;
-            if (Motion.blend->Brate > 1.0f) {
-                Motion.blend->Brate = 1.0f;
+        if (pMotionB->Brate < 1.0f) {
+            pMotionB->Brate += d;
+            if (pMotionB->Brate > 1.0f) {
+                pMotionB->Brate = 1.0f;
                 m_BackRno = 0;
             }
         }

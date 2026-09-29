@@ -3751,12 +3751,12 @@ void em32ClothMove(cEm32* em)
 
 // The two-motion turn blend of the walk / dash / attack walk: m0 (sequence m3) is the straight
 // motion, blended with m1 (sequence a) when blendVal is positive or m2 (b) when negative, at weight
-// |blendVal| / 256 through the second motion work (Motion.blend). blendCnt is the MotionSetCore
+// |blendVal| / 256 through the second motion work (pMotionB). blendCnt is the MotionSetCore
 // interpolation count and blendSeq the frame, both kept in step by this call; `d` the motion flags.
 void em32BlendMotSet(cEm32* em, void* m0, void* m1, void* m2, void* m3, int a, int b, int d)
 {
     Em32Work* w = EM32_WK(em);
-    MotionWork* bm;
+    MOTION_INFO* bm;
     f32 val = fabsf(w->blendVal);
     void* m;
     int arg;
@@ -3769,9 +3769,9 @@ void em32BlendMotSet(cEm32* em, void* m0, void* m1, void* m2, void* m3, int a, i
         m = m2;
         arg = b;
     }
-    bm = EM32_BLEND_MOT(w);
+    bm = &w->blendMot;
     MotionSetCore(em, bm, m, (void*) arg, (u8) w->blendCnt, (u16) d, (u16) w->blendSeq);
-    em->Motion.blend = bm;
+    em->pMotionB = bm;
     bm->Brate = val * 0.00390625f;
     if (w->blendCnt) {
         w->blendCnt--;
@@ -4906,8 +4906,8 @@ void em32BodyMove(cEm32* em)
     Em32Work* w = EM32_WK(em);
 
     if (w->pMot && !(w->flags & 0x4000)) {
-        MotionMoveCore(em, (MotionWork*) w->pMot, 0);
-        MotionSequenceCtrl((MotionWork*) w->pMot);
+        MotionMoveCore(em, w->pMot, 0);
+        MotionSequenceCtrl(w->pMot);
     }
 }
 

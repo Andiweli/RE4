@@ -179,7 +179,7 @@ static int mvMain()
         cModel* m = dbModSlot[pMv->model].pModel;
 
         if (m) {
-            MotionWork* Motion = &m->Motion;
+            MOTION_INFO* Motion = &m->Motion;
 
             eprintf(0xD8, 0x1A4, 0, 0, "[%3d/%3d]", (int) Motion->Seq_frame - 1, Motion->Seq_frame_num);
         }

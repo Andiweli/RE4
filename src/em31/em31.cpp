@@ -560,7 +560,7 @@ static void em31_R0_Init(cEm31* em)
         if (w->pHead) {
             em->addModel(w->pHead);
         }
-        em->Motion.flip = em31_flip0;
+        em->pXFlip = em31_flip0;
         for (p = em->pList; p; p = p->pList) {
             p->motParts.flags |= 0x440;
         }
@@ -571,7 +571,7 @@ static void em31_R0_Init(cEm31* em)
             em->r_no_0 = 0xFF;
             return;
         }
-        em->Motion.flip = em31_flip1;
+        em->pXFlip = em31_flip1;
         break;
     }
     em->setStatus(EM_STATUS_IK_OFF);

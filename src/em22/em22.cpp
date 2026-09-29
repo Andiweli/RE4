@@ -377,7 +377,7 @@ static void em22_R0_Init(cEm22* em)
     }
     mot = MOTION(em);
     EspDataLoad((u32) ARC(EM22_EFF_006), EFF_EM22, 0);
-    em->Motion.flip = em22_flip;
+    em->pXFlip = em22_flip;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
         static const Vec size = { 2000.0f, 2000.0f, 2000.0f };
@@ -2424,7 +2424,7 @@ void em22SetParasiteAtk(cEm22* em)
             sc.y = 1.0f;
             sc.z = 1.0f;
             w->pParaAtk[i]->setScale(&sc);
-            w->pParaAtk[i]->Motion.flip = em22_para_flip;
+            w->pParaAtk[i]->pXFlip = em22_para_flip;
         }
     }
 }

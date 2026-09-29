@@ -238,7 +238,7 @@ static void em21_R0_Init(cEm21* em)
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     at = &em->atari;
     em->hp = 1000;
-    em->Motion.flip = em21_flip_tbl;
+    em->pXFlip = em21_flip_tbl;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
         static const Vec size = { 1000.0f, 1000.0f, 0.0f };

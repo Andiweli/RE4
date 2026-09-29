@@ -253,7 +253,7 @@ void cPlayer::init1()
     YarareAdd(this, &m_Yarare[1], 0.0f, 0.0f, 0.0f, 120.0f, 80.0f, 5, YAT_FLAG_ON);
     YarareAdd(this, &m_Yarare[2], -20.0f, -300.0f, 0.0f, 170.0f, 300.0f, 0x13, YAT_FLAG_ON);
     YarareAdd(this, &m_Yarare[3], 20.0f, -300.0f, 0.0f, 170.0f, 300.0f, 0x17, YAT_FLAG_ON);
-    MOTION(this)->flip = pl00_mirror;
+    this->pXFlip = pl00_mirror;
     m_BbtnCnt = 0;
     invisible_factor = 1.0f;
     m_Flag = 0;

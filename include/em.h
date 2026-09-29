@@ -66,8 +66,8 @@ struct PlRoomEff {
     u8 type;
 };
 
-// Blend motion work (0xD0 bytes): a MotionWork (model.h) without the trailing blend/flip/blendTbl
-// pointers. cEm::m_SubMot (0x42C) and cMot3::work are one; MotionWork::blend points at it.
+// Blend motion work: MOTION_INFO (model.h), the same struct cModel::Motion uses
+// (cModel::pMotionB points a model's own Motion at it). cEm::m_SubMot (0x42C) and cMot3::work are one.
 struct PlArc;      // global.h
 struct EmiEntry;   // embarrel.h
 class cSubChar;    // pl_npc.h

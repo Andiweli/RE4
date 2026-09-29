@@ -312,7 +312,7 @@ static void em3a_R0_Init(cEm3a* em)
         break;
     }
     if (em->type == 2) {
-        em->Motion.flip = em3a_flip_tbl;
+        em->pXFlip = em3a_flip_tbl;
     }
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };

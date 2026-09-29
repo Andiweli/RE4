@@ -35,7 +35,7 @@ typedef void (*EmDoorFunc)(cEmDoor*);
 
 static void emDoor_R1_Open2(cEmDoor* em);
 
-// Parts index remap for the flipped motions (MotionWork::flip): identity.
+// Parts index remap for the flipped motions (cModel::pXFlip): identity.
 static u16 emDoor_xflip_tbl[20] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
 };
@@ -114,7 +114,7 @@ cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo)
         w->Width = 650.0f;
         em->type = 1;
     }
-    em->Motion.flip = emDoor_xflip_tbl;
+    em->pXFlip = emDoor_xflip_tbl;
     EtcSetAddAmb(em, ETC_AMB_DOOR);
     w->Eff_id = 0xFF;
     AtariInit(&em->atari, -w->Width, w->Height * 0.5f, 0.0f, w->Width + 50.0f, 150.0f, 150.0f, w->Height * 0.5f + 50.0f, 0, 2, 0);

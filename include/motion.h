@@ -8,7 +8,7 @@
 #include "model.h"
 #include "cam_ctrl.h"
 
-// MotionSeqKey / MotionData / MotionWork are defined in model.h (cModel::Motion at 0x1D8).
+// MotionSeqKey / MotionData / MOTION_INFO are defined in model.h (cModel::Motion at 0x1D8).
 
 // The motion-driven model view (cMotBase::set(cMotModel*), MOTION(m)): cModel carries the work
 // itself now, so this adds nothing.

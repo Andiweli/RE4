@@ -1017,7 +1017,7 @@ static void em2d_R0_Init(cEm2d* em)
         em->r_no_0 = 0xFF;
         return;
     }
-    em->Motion.flip = em2d_xflip_tbl;
+    em->pXFlip = em2d_xflip_tbl;
     {
         static const Vec ofs = {0.0f, 0.0f, 0.0f};
         static const Vec size = {2000.0f, 2000.0f, 2000.0f};

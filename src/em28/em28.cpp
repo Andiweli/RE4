@@ -272,7 +272,7 @@ static void em28_R0_Init(cEm28* em)
     em->be_flag &= ~0x10;
     em->setStatus(EM_STATUS_IK_OFF);
     em->setStatus(EM_STATUS_LOCKOFF);
-    em->Motion.flip = em28_flip_tbl;
+    em->pXFlip = em28_flip_tbl;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
         static const Vec size = { 500.0f, 500.0f, 0.0f };

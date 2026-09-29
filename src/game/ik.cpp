@@ -300,7 +300,7 @@ static void heel2toe(Mtx m, cParts* p, Vec* pos)
 void InverseKinematics(cModel* pEm, int arm_flag)
 {
     cEm* em = (cEm*) pEm;
-    MOTION_INFO* blend = MOTION(pEm)->blend;
+    MOTION_INFO* blend = pEm->pMotionB;
     Mtx inv;
     Vec target;
     Vec a;

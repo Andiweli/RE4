@@ -61,7 +61,7 @@ public:
 };
 
 // Three-way motion blend (game/pl_class.cpp), 0xE8 bytes; `mot3` in player.cpp: the model's own
-// motion (mot0) blended with mot1 (rate < 0) or mot2 (rate > 0) through MotionWork::blend.
+// motion (mot0) blended with mot1 (rate < 0) or mot2 (rate > 0) through cModel::pMotionB.
 class cMot3 {
 private:
     cModel* m_pEm;       // 0x00

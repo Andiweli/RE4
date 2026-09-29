@@ -865,9 +865,9 @@ static void em35_R0_Init(cEm35* em)
     em35ClothSet2(em);
     em35ClothSet3(em);
     if (em->type == 1) {
-        em->Motion.flip = em35_flip1;
+        em->pXFlip = em35_flip1;
     } else {
-        em->Motion.flip = em35_flip0;
+        em->pXFlip = em35_flip0;
     }
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
@@ -4976,7 +4976,7 @@ void em35BlendMotSet(cEm35* em, void* m0, void* m1, void* m2, void* m3, int a, i
     }
     bm = &w->blendMot;
     MotionSetCore(em, bm, m, (void*) seq, (u8) w->blendA, (u16) kind, (u16) w->blendB);
-    em->Motion.blend = bm;
+    em->pMotionB = bm;
     bm->Brate = rate * (1.0f / 256.0f);
     if (w->blendA) {
         w->blendA--;

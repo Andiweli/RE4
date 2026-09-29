@@ -769,7 +769,7 @@ address	size	section	unit	scope	name	demangled
 0x80039B00	0xF4	.text	game/objGondola.cpp	global	objGondolaRideEmAdjust__FP11cObjGondolaP3Vec	objGondolaRideEmAdjust
 0x80039BF4	0x130	.text	game/objGondola.cpp	global	setRidePL__11cObjGondola	cObjGondola::setRidePL
 0x80039D24	0x2C	.text	game/objGondola.cpp	global	setGetOffPL__11cObjGondola	cObjGondola::setGetOffPL
-0x80039D50	0x14	.text	game/objGondola.cpp	global	setSubMotion__11cObjGondolaP10MotionWorkPvT2	cObjGondola::setSubMotion
+0x80039D50	0x14	.text	game/objGondola.cpp	global	setSubMotion__11cObjGondolaP11MOTION_INFOPvT2	cObjGondola::setSubMotion
 0x80039D64	0xD8	.text	game/objGondola.cpp	global	setVib__11cObjGondola	cObjGondola::setVib
 0x80039E3C	0x20	.text	game/objGondola.cpp	global	_._11cObjGondola	cObjGondola::~cObjGondola
 0x80039E5C	0x26C	.text	game/objMissile.cpp	global	SetHeliMissile__FPvT0P3VecT2Uc	SetHeliMissile

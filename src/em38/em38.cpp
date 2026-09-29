@@ -86,8 +86,6 @@ static void em38SitAction(cEm38* em);
 static void plemSit(cPlayer* pl);
 
 
-// The shell motion work as the MotionWork the motion library takes.
-#define SHELL_MOT(w) ((MotionWork*) &(w)->shellMot)
 
 
 
@@ -387,7 +385,7 @@ static void em38_R0_Init(cEm38* em)
         break;
     }
     em->be_flag |= 0x1000;
-    em->Motion.flip = em38_flip;
+    em->pXFlip = em38_flip;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
         static const Vec size = { 10000.0f, 10000.0f, 10000.0f };
@@ -1852,8 +1850,8 @@ void em38ShellControl(cEm38* em)
         MotionSetCore(em, &w->shellMot, ARC(EM38_MOT_SHELL_CONTROL_041), 0, 0, 4, 0);
         w->mode++;
     case 1:
-        MotionMoveCore(em, SHELL_MOT(w), 0);
-        MotionSequenceCtrl(SHELL_MOT(w));
+        MotionMoveCore(em, &w->shellMot, 0);
+        MotionSequenceCtrl(&w->shellMot);
         if (em->hp <= 0) {
             w->mode = 2;
         }
@@ -1865,8 +1863,8 @@ void em38ShellControl(cEm38* em)
         SndCall(8, 0x12, &em->pos, em->id, 0, em);
         EstSet(em, -1, 0, 0, EFF_EM38, 5, 0, ESP_CORE_KIND_NONE, em, 0);
     case 3:
-        MotionMoveCore(em, SHELL_MOT(w), 0);
-        if (MotionSequenceCtrl(SHELL_MOT(w))) {
+        MotionMoveCore(em, &w->shellMot, 0);
+        if (MotionSequenceCtrl(&w->shellMot)) {
             w->mode++;
         }
         break;
@@ -1875,8 +1873,8 @@ void em38ShellControl(cEm38* em)
         MotionSetCore(em, &w->shellMot, ARC(EM38_MOT_SHELL_CONTROL_040), 0, 0, 4, 0);
         w->mode++;
     case 5:
-        MotionMoveCore(em, SHELL_MOT(w), 0);
-        MotionSequenceCtrl(SHELL_MOT(w));
+        MotionMoveCore(em, &w->shellMot, 0);
+        MotionSequenceCtrl(&w->shellMot);
         if (em->hp > 0) {
             if (w->shellTimer) {
                 w->shellTimer--;
@@ -1891,8 +1889,8 @@ void em38ShellControl(cEm38* em)
         SndCall(8, 0x13, &em->pos, em->id, 0, em);
         w->mode++;
     case 7:
-        MotionMoveCore(em, SHELL_MOT(w), 0);
-        if (MotionSequenceCtrl(SHELL_MOT(w))) {
+        MotionMoveCore(em, &w->shellMot, 0);
+        if (MotionSequenceCtrl(&w->shellMot)) {
             w->mode = 0;
         } else if (em->hp <= 0) {
             w->mode = 2;
@@ -1903,8 +1901,8 @@ void em38ShellControl(cEm38* em)
         MotionSetCore(em, &w->shellMot, ARC(EM38_MOT_SHELL_CONTROL_044), 0, 0, 0, 0);
         w->mode++;
     case 9:
-        MotionMoveCore(em, SHELL_MOT(w), 0);
-        MotionSequenceCtrl(SHELL_MOT(w));
+        MotionMoveCore(em, &w->shellMot, 0);
+        MotionSequenceCtrl(&w->shellMot);
         break;
     case 0xA:
         w->shellMot.Seq_speed = 1.0f;
@@ -1913,8 +1911,8 @@ void em38ShellControl(cEm38* em)
         SndCall(8, 0x12, &em->pos, em->id, 0, em);
         EstSet(em, -1, 0, 0, EFF_EM38, 0x24, 0, ESP_CORE_KIND_NONE, em, 0);
     case 0xB:
-        MotionMoveCore(em, SHELL_MOT(w), 0);
-        if (MotionSequenceCtrl(SHELL_MOT(w))) {
+        MotionMoveCore(em, &w->shellMot, 0);
+        if (MotionSequenceCtrl(&w->shellMot)) {
             w->mode = 4;
         }
         break;
@@ -1940,7 +1938,7 @@ void em38BlendMotSet(cEm38* em, void* m0, void* m1, void* m2, void* m3, int a, i
     }
     bm = &w->blendMot;
     MotionSetCore(em, bm, m, (void*) seq, (u8) w->blendA, (u16) kind, (u16) w->blendB);
-    em->Motion.blend = bm;
+    em->pMotionB = bm;
     bm->Brate = rate * (1.0f / 256.0f);
     if (w->blendA) {
         w->blendA--;

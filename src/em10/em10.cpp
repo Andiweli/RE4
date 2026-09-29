@@ -3240,7 +3240,7 @@ void em10InitRtnSet(cEm10* em)
     }
 }
 
-// Motion parts flip table (MotionWork::flip): left / right parts swapped.
+// Motion parts flip table (cModel::pXFlip): left / right parts swapped.
 static u16 em10_xflip_tbl[80] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x05, 0x06, 0x07, 0x08, 0x09,
     0x0A, 0x11, 0x16, 0x17, 0x18, 0x19, 0x12, 0x13, 0x14, 0x15, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
@@ -3309,7 +3309,7 @@ static void em10_R0_Init(cEm10* em)
     em->scale.y = sc;
     em->scale.x = sc;
     w->Scale = em->scale;
-    em->Motion.flip = em10_xflip_tbl;
+    em->pXFlip = em10_xflip_tbl;
     switch (em->type) {
     case 6:
         Em18ClothSet(em, &w->Cloth, 0);
@@ -25489,7 +25489,7 @@ extern "C" void em10BlendMotSet(cEm10* em, void* m0, void* m1, void* m2, int a, 
     }
     bm = &w->Sub_mot;
     MotionSetCore(em, bm, m, (void*) seq, (u8) w->Hokan, (u16) d, (u16) w->Frame);
-    em->Motion.blend = bm;
+    em->pMotionB = bm;
     bm->Brate = rate * 0.00390625f;
     if (w->Hokan) {
         w->Hokan--;
