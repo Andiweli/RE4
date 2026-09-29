@@ -310,7 +310,7 @@ private:
     int saveLit(cLightWork* pLw);
     cLit** getLitPPtr();
     int initPath(LightPathHeader* p);
-    cLightPathData* getPathPtr(u8 id);
+    u8* getPathPtr(u8 id);
     LightPathHeader* getPathHeader();
     void setItemLight();
     void beginEvent();

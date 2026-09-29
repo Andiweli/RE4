@@ -456,7 +456,7 @@ void SubScreenExec()
                 cMes.Clear();
             }
             if (pSys->language == 0) {
-                cMes.setupFont(28, 28, (TEXPalette*) SS_ARC_PTR(wk->pCmmn, 4), 3);
+                cMes.setupFont(28, 28, (u8*) SS_ARC_PTR(wk->pCmmn, 4), 3);
             }
             cMes.setLayout(1, LAYOUT_SUBSCRN);
             cMes.setLayout(7, LAYOUT_SUBSCRN);

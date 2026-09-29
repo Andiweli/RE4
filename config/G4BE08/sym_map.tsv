@@ -359,7 +359,7 @@ address	size	section	unit	scope	name	demangled
 0x800211D8	0x4C	.text	game/lightPath.cpp	global	getSize__16cLightPathHeader	cLightPathHeader::getSize
 0x80021224	0x64	.text	game/lightPath.cpp	global	getPathData__16cLightPathHeaderUl	cLightPathHeader::getPathData
 0x80021288	0x28	.text	game/lightPath.cpp	global	getSize__14cLightPathData	cLightPathData::getSize
-0x800212B0	0x70	.text	game/lightPath.cpp	global	setPath__10cLightPathP14cLightPathDataUc	cLightPath::setPath
+0x800212B0	0x70	.text	game/lightPath.cpp	global	setPath__10cLightPathPUcUc	cLightPath::setPath
 0x80021320	0xCC	.text	game/lightPath.cpp	global	movePath__10cLightPath	cLightPath::movePath
 0x800213EC	0x54	.text	game/map_obj.cpp	global	__7cMapMgr	cMapMgr::cMapMgr
 0x80021440	0xA8	.text	game/map_obj.cpp	global	construct__7cMapMgrP4cMapUl	cMapMgr::construct
@@ -486,7 +486,7 @@ address	size	section	unit	scope	name	demangled
 0x80027C0C	0x18	.text	game/mes.cpp	global	getSpaceWidth__11MessageData	MessageData::getSpaceWidth
 0x80027C24	0x94	.text	game/mes.cpp	global	setLayout__14MessageControlii	MessageControl::setLayout
 0x80027CB8	0xBC	.text	game/mes.cpp	global	setLanguage__14MessageControli	MessageControl::setLanguage
-0x80027D74	0x54	.text	game/mes.cpp	global	setupFont__14MessageControliiP10TEXPalettei	MessageControl::setupFont
+0x80027D74	0x54	.text	game/mes.cpp	global	setupFont__14MessageControliiPUci	MessageControl::setupFont
 0x80027DC8	0x30	.text	game/mes.cpp	global	releaseFont__14MessageControli	MessageControl::releaseFont
 0x80027DF8	0xC8	.text	game/mes.cpp	global	loadFont__14MessageControliiPCci	MessageControl::loadFont
 0x80027EC0	0x174	.text	game/mes.cpp	global	init__14MessageControl	MessageControl::init
@@ -4948,7 +4948,7 @@ address	size	section	unit	scope	name	demangled
 0x8015717C	0x270	.text	game/math_sub.cpp	global	SetOrientationZX__FP3VecT0PA3_f	SetOrientationZX
 0x801573EC	0x278	.text	game/math_sub.cpp	global	SetOrientationZY__FP3VecT0PA3_f	SetOrientationZY
 0x80157664	0x164	.text	game/math_sub.cpp	global	Matrix2AxisAngle__FPA3_fP3Vec	Matrix2AxisAngle
-0x801577C8	0x9C	.text	game/math_sub.cpp	global	VecRadLimit__FP3Vec	VecRadLimit
+0x801577C8	0x9C	.text	game/math_sub.cpp	global	VecRadLimit__FPf	VecRadLimit
 0x80157864	0x8C	.text	game/math_sub.cpp	global	VecAngle__FP3VecT0	VecAngle
 0x801578F0	0x48	.text	game/math_sub.cpp	global	VecElevation__FP3Vec	VecElevation
 0x80157938	0x114	.text	game/math_sub.cpp	global	MtxRotAxisPosRad__FPA3_fP3VecT1f	MtxRotAxisPosRad
@@ -5960,7 +5960,7 @@ address	size	section	unit	scope	name	demangled
 0x8019E52C	0x3C	.text	game/t_page.cpp	global	t_page_init__Fv	t_page_init
 0x8019E568	0x140	.text	game/t_page.cpp	global	t_page_main__Fv	t_page_main
 0x8019E6A8	0x24	.text	game/t_page.cpp	global	t_page_exit__Fv	t_page_exit
-0x8019E6CC	0x84	.text	game/t_prim.cpp	global	TprimInitEnv2D3D__FP9TprimViewPA3_fT1	TprimInitEnv2D3D
+0x8019E6CC	0x84	.text	game/t_prim.cpp	global	TprimInitEnv2D3D__FPfPA3_fT1	TprimInitEnv2D3D
 0x8019E750	0x4C	.text	game/t_prim.cpp	global	TprimDraw3D__FUl	TprimDraw3D
 0x8019E79C	0x58	.text	game/t_prim.cpp	global	TprimSetBlend__FUl	TprimSetBlend
 0x8019E7F4	0xBC	.text	game/t_prim.cpp	global	set_attr_common__Fv	set_attr_common

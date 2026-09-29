@@ -30,9 +30,9 @@ void funcDelCtrl(cCtrl* pCtr);
 
 // Light control work (cCtrl::work): the electric power path
 struct LightCtrlWork {
-    cLightPathData* pPath;   // 0x00
-    cLightPathData* pPath2;  // 0x04
-    u8 idx;                  // 0x08
+    u8* pPath;   // 0x00
+    u8* pPath2;  // 0x04
+    u8 idx;      // 0x08
 };
 
 static FOG fogNew;
@@ -312,7 +312,7 @@ int cLightMgr::setElecPower2(u8 id, u8 flag)
 {
     cCtrl* c;
     LightCtrlWork* w;
-    cLightPathData* path;
+    u8* path;
 
     CtrlMgr.applyFuncAll(funcDelCtrl);
     c = CtrlMgr.createBack(0);
@@ -1083,7 +1083,7 @@ int cLightMgr::initPath(LightPathHeader* p)
 }
 
 // Light path `no` (0 with an error when missing).
-cLightPathData* cLightMgr::getPathPtr(u8 id)
+u8* cLightMgr::getPathPtr(u8 id)
 {
     u32 ofs;
 
@@ -1099,7 +1099,7 @@ cLightPathData* cLightMgr::getPathPtr(u8 id)
     if (ofs == 0) {
         return 0;
     }
-    return (cLightPathData*) ((u8*) pLitPath + ofs);
+    return (u8*) pLitPath + ofs;
 }
 
 // The light path block.

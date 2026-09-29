@@ -1936,7 +1936,7 @@ void CameraControl::r0_Free()
                 d.x = 0.0f - ang.x;
                 d.y = pPL->ang.y - ang.y;
                 d.z = 0.0f;
-                VecRadLimit(&d);
+                VecRadLimit((f32*) &d);
                 ang.y += d.y * 0.1f;
                 ang.x += d.x * 0.1f;
                 if (!JoyOn(joy, 0x200) && !JoyOn(joy, 0x20)) {

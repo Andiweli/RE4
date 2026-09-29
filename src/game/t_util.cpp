@@ -27,16 +27,16 @@ static u32 system_flg_bak;  // pG->flags_54
 // (Stop_flg 0x200 | 0x80) and turns the tool display bits on.
 void TutilInitDefault()
 {
-    TprimView view;
+    f32 view[6];
 
     GameStopModeEnd();
-    view.rect.x = Screen.x;
-    view.rect.y = Screen.y;
-    view.rect.w = Screen.width;
-    view.rect.h = Screen.height;
-    view.nearz = 0.0f;
-    view.farz = 1.0f;
-    TprimInitEnv2D3D(&view, pG->Camera.ProjMat, pG->Camera.v_mat);
+    view[0] = Screen.x;
+    view[1] = Screen.y;
+    view[2] = Screen.width;
+    view[3] = Screen.height;
+    view[4] = 0.0f;
+    view[5] = 1.0f;
+    TprimInitEnv2D3D(view, pG->Camera.ProjMat, pG->Camera.v_mat);
     globalCamera = pG->Camera;
     system_flg_bak = pG->System_flg;
     stop_flg_bak = pG->Stop_flg;

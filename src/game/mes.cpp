@@ -53,12 +53,6 @@ struct OSFontHeader {
     u32 sheetFullSize;  // 0x28
 };
 
-// Font file: offsets to the TPL and to the width table.
-struct MesFontFile {
-    u32 tplOfs;    // 0x00
-    u32 widthOfs;  // 0x04
-};
-
 u32 mes_col_tbl[10] = {
     0xE5D9CFF0, 0x87CFA5FF, 0xCD7D5FFF, 0x87AFFFFF, 0xA55FFFFF,
     0x707070FF, 0x707070FF, 0x52DF73FF, 0x00000000, 0x00000000,
@@ -339,13 +333,12 @@ void MessageControl::setLanguage(int lang)
     }
 }
 
-// Creates font slot `no` from a loaded .fnt buffer (TPL and width table offsets).
-void MessageControl::setupFont(int char_w, int char_h, TEXPalette* addr, int no)
+// Creates font slot `no` from a loaded .fnt buffer: a 4-byte offset to the TPL followed by a
+// 4-byte offset to the width table, both relative to `addr`.
+void MessageControl::setupFont(int char_w, int char_h, u8* addr, int no)
 {
-    MesFontFile* f = (MesFontFile*) addr;
-
     m_font_addr[no] = addr;
-    MesFont[no].create(char_w, char_h, (TEXPalette*) ((u8*) f + f->tplOfs), (u8*) f + f->widthOfs);
+    MesFont[no].create(char_w, char_h, (TEXPalette*) (addr + *(u32*) addr), addr + *(u32*) (addr + 4));
 }
 
 // Destroys font slot `no`.
@@ -364,7 +357,7 @@ int MessageControl::loadFont(int w, int h, const char* name, int no)
         pLog->err(0, 0, "MesCtrl::fontLoad() Font load failed");
         return 0;
     }
-    setupFont(w, h, (TEXPalette*) m_font_addr[no], no);
+    setupFont(w, h, (u8*) m_font_addr[no], no);
     return 1;
 }
 
@@ -452,7 +445,7 @@ void MessageControl::loadSystemFont()
     if (pSys->language == 0) {
         loadFont(0x14, 0x14, "Font/system_j.fnt", 1);
     } else {
-        setupFont(0x20, 0x20, (TEXPalette*) m_font_addr[0], 1);
+        setupFont(0x20, 0x20, (u8*) m_font_addr[0], 1);
     }
 }
 

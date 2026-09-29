@@ -27,7 +27,7 @@ void SetOrientationZY(Vec* z, Vec* y, Mtx m);
 void low_RotMatrix(Mtx m, Vec* vec);
 void RotMatrixZXY(Mtx m, Vec* vec);
 void Matrix2AxisAngle(Mtx m, Vec* ang);
-void VecRadLimit(Vec* v);
+void VecRadLimit(f32* v);
 f32 VecElevation(Vec* v);
 void MtxRotAxisPosRad(Mtx m, Vec* axis, Vec* pos, f32 rad);
 void VecLinearCombination(Vec* a, f32 c0, Vec* b, f32 c1, Vec* vec);

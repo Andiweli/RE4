@@ -1710,7 +1710,7 @@ static int dbmod_locate()
                 deg -= speed;
             }
             axis[pDbModState->x7] = deg * DEG2RAD;
-            VecRadLimit((Vec*) axis);
+            VecRadLimit(axis);
             break;
         }
         break;

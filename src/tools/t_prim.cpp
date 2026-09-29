@@ -21,8 +21,8 @@ void set_attr_s16();
 void set_vtx_flat_s16(S16Vec* v, GXColor* col, u16 n);
 #endif
 
-static TprimView Vrect = {{0.0f, 0.0f, 512.0f, 448.0f}, 0.0f, 1.0f};
-static TprimRect Orect;
+static f32 Vrect[6] = {0.0f, 0.0f, 512.0f, 448.0f, 0.0f, 1.0f};
+static f32 Orect[4];
 static MtxPtr ProjMtx;
 static MtxPtr ViewMtx;
 static int FlipMode = 0;
@@ -30,10 +30,10 @@ u8 ToolBuffer[0x100] __attribute__((aligned(32)));
 
 // Sets the primitive drawing environment: the 2D ortho rect and viewport, the 3D projection and
 // view matrices (normally the game camera's), z test off.
-void TprimInitEnv2D3D(TprimView* view, MtxPtr proj, MtxPtr view_mtx)
+void TprimInitEnv2D3D(f32* view, MtxPtr proj, MtxPtr view_mtx)
 {
-    Orect = view->rect;
-    Vrect = *view;
+    memcpy(Orect, view, sizeof(Orect));
+    memcpy(Vrect, view, sizeof(Vrect));
     ProjMtx = proj;
     ViewMtx = view_mtx;
     FlipMode = 0;
@@ -41,9 +41,9 @@ void TprimInitEnv2D3D(TprimView* view, MtxPtr proj, MtxPtr view_mtx)
 
 #ifdef TPRIM_FULL
 // Changes the 2D ortho rectangle only.
-void TprimInitEnv2D(TprimRect* rect)
+void TprimInitEnv2D(f32* rect)
 {
-    Orect = *rect;
+    memcpy(Orect, rect, sizeof(Orect));
 }
 #endif
 
@@ -54,7 +54,7 @@ void TprimDraw2D(u32 mode)
     Mtx44 proj;
     Mtx pos;
 
-    C_MTXOrtho(proj, Orect.y, Orect.h, Orect.x, Orect.w, 0.0f, -100.0f);
+    C_MTXOrtho(proj, Orect[1], Orect[3], Orect[0], Orect[2], 0.0f, -100.0f);
     GXSetProjection(proj, 1);
     PSMTXIdentity(pos);
     GXSetCurrentMtx(0);
@@ -147,16 +147,16 @@ void TprimDrawPolyFn(Vec* v, GXColor* c, u16 n)
 
 #ifdef TPRIM_FULL
 // Filled 2D rectangle at depth z.
-void TprimDrawTile2D(TprimRect* v, f32 z, GXColor* c)
+void TprimDrawTile2D(f32* v, f32 z, GXColor* c)
 {
     GXBegin(0x80, 0, 4);
-    GXPosition3f32(v->x, v->y, z);
+    GXPosition3f32(v[0], v[1], z);
     GXColor4u8(c->r, c->g, c->b, c->a);
-    GXPosition3f32(v->x + v->w, v->y, z);
+    GXPosition3f32(v[0] + v[2], v[1], z);
     GXColor4u8(c->r, c->g, c->b, c->a);
-    GXPosition3f32(v->x + v->w, v->y + v->h, z);
+    GXPosition3f32(v[0] + v[2], v[1] + v[3], z);
     GXColor4u8(c->r, c->g, c->b, c->a);
-    GXPosition3f32(v->x, v->y + v->h, z);
+    GXPosition3f32(v[0], v[1] + v[3], z);
     GXColor4u8(c->r, c->g, c->b, c->a);
 }
 #endif
@@ -308,18 +308,18 @@ void TprimDrawHtrCone(Vec* pos, GXColor* col)
 // guess that reproduces them.
 // Likewise the 0x20 bytes of .bss behind ToolBuffer (unreferenced, so the DOL link dropped them).
 #ifndef TPRIM_FULL
-static TprimView default_view;
+static f32 default_view[6];
 static f32 default_clip[2];
 
 // Never called: keeps the default view / clip / x-axis constants of the original object.
 static inline void tprim_default_view(Vec* axis)
 {
-    TprimView v = {{10.0f, 300.0f, 1200.0f, 300.0f}, 1.0f, 0.0f};
+    f32 v[6] = {10.0f, 300.0f, 1200.0f, 300.0f, 1.0f, 0.0f};
     Vec x = {1.0f, 0.0f, 0.0f};
 
-    default_view = v;
-    default_clip[0] = v.nearz;
-    default_clip[1] = v.farz;
+    memcpy(default_view, v, sizeof(v));
+    default_clip[0] = v[4];
+    default_clip[1] = v[5];
     *axis = x;
 }
 #else

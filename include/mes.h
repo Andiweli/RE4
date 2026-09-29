@@ -240,7 +240,7 @@ public:
 
     void setLayout(int no, int type);
     void setLanguage(int lang);
-    void setupFont(int char_w, int char_h, TEXPalette* addr, int no);
+    void setupFont(int char_w, int char_h, u8* addr, int no);
     void releaseFont(int no);
     int loadFont(int w, int h, const char* name, int no);
     void init();

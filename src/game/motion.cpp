@@ -379,7 +379,7 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
         pp->Attr |= 2;
         HermiteInterpolation(pp, &v1, hist1);
         PSVECSubtract(&v1, &v0, &w->Ang_dist);
-        VecRadLimit(&w->Ang_dist);
+        VecRadLimit((f32*) &w->Ang_dist);
     }
     cam = w->pAttachCam;
     if (cam != 0) {
@@ -750,7 +750,7 @@ void MotionMoveCore(cModel* pEm, MOTION_INFO* w, CAMERA* pCamera)
         }
         if (kind & 2) {
             HermiteInterpolation(pp, &p->ang, p->getKeyHist()[flip ? 3 : 0]);
-            VecRadLimit(&p->ang);
+            VecRadLimit((f32*) &p->ang);
             if (w->Mot_attr & 0x40) {
                 p->ang.y = -p->ang.y;
                 p->ang.z = -p->ang.z;
@@ -764,7 +764,7 @@ void MotionMoveCore(cModel* pEm, MOTION_INFO* w, CAMERA* pCamera)
             HermiteInterpolation(pp, &p->scale, p->getKeyHist()[flip ? 5 : 2]);
         } else if (kind & 0x30) {
             HermiteInterpolation(pp, &p->ang, p->getKeyHist()[flip ? 3 : 0]);
-            VecRadLimit(&p->ang);
+            VecRadLimit((f32*) &p->ang);
             if (w->Mot_attr & 0x40) {
                 p->ang.y = -p->ang.y;
                 p->ang.z = -p->ang.z;

@@ -161,7 +161,7 @@ void msqToolInit()
     int i;
     MsqWork* w;
     CAMERA* cam;
-    TprimRect rect;
+    f32 rect[4];
     MsqWork*& wp = msqWork;
     f32 zero;
 
@@ -210,11 +210,11 @@ void msqToolInit()
     cam->param.Campos.z = 3000.0f;
     cam->param.Roll = 0.0f;
     CameraSetOrientationRoll(cam);
-    rect.x = 0.0f;
-    rect.y = 0.0f;
-    rect.w = 512.0f;
-    rect.h = 448.0f;
-    TprimInitEnv2D(&rect);
+    rect[0] = 0.0f;
+    rect[1] = 0.0f;
+    rect[2] = 512.0f;
+    rect[3] = 448.0f;
+    TprimInitEnv2D(rect);
     SetToolLight(2);
     dbModelInit();
     pG->Stop_flg |= 0x40000000;
@@ -1009,7 +1009,7 @@ void msqDisp()
 {
     MsqWork* w = MSQ;
     cModel* m = dbModSlot[0].pModel;
-    TprimRect rc;
+    f32 rc[4];
     GXColor col;
     int i;
     int c;
@@ -1177,28 +1177,28 @@ void msqDisp()
 
         TprimDraw2D(0);
         tx = 248.0f;
-        rc.x = tx;
-        rc.y = 362.0f;
-        rc.w = 17.0f;
-        rc.h = 73.0f;
-        TprimDrawTile2D(&rc, 0.0f, &c1);
+        rc[0] = tx;
+        rc[1] = 362.0f;
+        rc[2] = 17.0f;
+        rc[3] = 73.0f;
+        TprimDrawTile2D(rc, 0.0f, &c1);
         if (w->seq[0].cursor != 0) {
-            rc.x = tx;
-            rc.y = (f32) (w->seq[0].cursor * 5 + 362);
-            rc.w = 17.0f;
+            rc[0] = tx;
+            rc[1] = (f32) (w->seq[0].cursor * 5 + 362);
+            rc[2] = 17.0f;
             if (w->seq[0].cursor == 9) {
-                rc.h = 28.0f;
+                rc[3] = 28.0f;
             } else {
-                rc.h = 8.0f;
+                rc[3] = 8.0f;
             }
             col.r = 0x20;
             col.g = 0x20;
             col.b = 0x80;
             col.a = 0x40;
-            TprimDrawTile2D(&rc, 0.0f, &col);
+            TprimDrawTile2D(rc, 0.0f, &col);
         }
         x = 40.0f;
-        rc.w = 13.0f;
+        rc[2] = 13.0f;
         y0 = (s16) m->Motion.Seq_frame - 14;
         f32 rowStep = 5.0f;  // a variable set before the loop: its load precedes every loop.c hoist (369.0 after it)
         const f32 rowH = 4.0f;
@@ -1209,9 +1209,9 @@ void msqDisp()
             u8 bit = 1;
             f32 rowY = 369.0f;
 
-            rc.x = x;
-            rc.h = rowH;
-            rc.y = rowY;
+            rc[0] = x;
+            rc[3] = rowH;
+            rc[1] = rowY;
             for (r = 0; r < 8; r++) {
                 if (y0 < 0 || y0 >= m->Motion.Seq_frame_num) {
                     col = c3;
@@ -1223,11 +1223,11 @@ void msqDisp()
                 } else {
                     col = c2;
                 }
-                TprimDrawTile2D(&rc, 0.0f, &col);
+                TprimDrawTile2D(rc, 0.0f, &col);
                 bit <<= 1;
-                rc.y += rowStep;
+                rc[1] += rowStep;
             }
-            rc.h = seH;
+            rc[3] = seH;
             if (y0 < 0 || y0 >= m->Motion.Seq_frame_num) {
                 col = c3;
             } else if (w->seq[0].key[y0].Se != 0) {
@@ -1238,9 +1238,9 @@ void msqDisp()
             } else {
                 col = c2;
             }
-            TprimDrawTile2D(&rc, 0.0f, &col);
+            TprimDrawTile2D(rc, 0.0f, &col);
             y0++;
-            rc.y += colStep;
+            rc[1] += colStep;
             x += xStep;
         }
     }

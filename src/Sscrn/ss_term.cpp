@@ -846,7 +846,7 @@ void SsTermMain::init(SUB_SCREEN* wk)
     sscrnMainMenuInit(wk, 0);
     x10 = 0;
     if (pSys->language == 0) {
-        cMes.setupFont(0x1C, 0x1C, (TEXPalette*) SS_ARC_PTR(wk->pTermDat, 4), 3);
+        cMes.setupFont(0x1C, 0x1C, (u8*) SS_ARC_PTR(wk->pTermDat, 4), 3);
     }
     cMes.setLayout(0, LAYOUT_OPERATOR);
     memset(&ope, 0, sizeof(ope));

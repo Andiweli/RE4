@@ -12,13 +12,13 @@ void set_attr_f32();
 // in inline functions at parse time, and the original t_prim.o carries exactly these 0x60 bytes
 // of anonymous .rodata in front of everything else. The values are the original's; the grouping
 // and the body are a guess that reproduces them.
-static inline void tprim_default_env(TprimView* view, Vec* pos, Vec* at)
+static inline void tprim_default_env(f32* view, Vec* pos, Vec* at)
 {
     f32 param[8] = {0.0f, -100.0f, 2.0f, 4.0f, 8.0f, 0.0f, 10.0f, 300.0f};
-    TprimView v = {{1200.0f, 300.0f, 1.0f, 0.0f}, 1.0f, 0.0f};
+    f32 v[6] = {1200.0f, 300.0f, 1.0f, 0.0f, 1.0f, 0.0f};
     f32 look[10] = {0.0f, 0.0f, 0.0f, 900.0f, 300.0f, 0.0f, -300.0f, -300.0f, 0.0f, -300.0f};
 
-    *view = v;
+    memcpy(view, v, sizeof(v));
     pos->x = param[0];
     pos->y = look[3];
     pos->z = look[4];
@@ -27,9 +27,9 @@ static inline void tprim_default_env(TprimView* view, Vec* pos, Vec* at)
     at->z = look[9];
 }
 
-TprimView Vrect = {{0.0f, 0.0f, 512.0f, 448.0f}, 0.0f, 1.0f};
+f32 Vrect[6] = {0.0f, 0.0f, 512.0f, 448.0f, 0.0f, 1.0f};
 // .bss order follows the first declaration of each object.
-TprimRect Orect;
+f32 Orect[4];
 u8 ToolBuffer[0x100] __attribute__((aligned(32)));
 int FlipMode = 0;
 static MtxPtr ProjMtx;
@@ -37,10 +37,10 @@ MtxPtr ViewMtx;
 
 // Debug primitive environment: the view rectangle and the projection / view matrices the tool
 // draws with (from TutilInitDefault).
-void TprimInitEnv2D3D(TprimView* view, MtxPtr proj, MtxPtr view_mtx)
+void TprimInitEnv2D3D(f32* view, MtxPtr proj, MtxPtr view_mtx)
 {
-    Orect = view->rect;
-    Vrect = *view;
+    memcpy(Orect, view, sizeof(Orect));
+    memcpy(Vrect, view, sizeof(Vrect));
     ProjMtx = proj;
     ViewMtx = view_mtx;
     FlipMode = 0;

@@ -125,9 +125,8 @@ void Matrix2AxisAngle(Mtx m, Vec* ang)
 }
 
 // Wraps each component into [-PI, PI).
-void VecRadLimit(Vec* v)
+void VecRadLimit(f32* p)
 {
-    f32* p = (f32*) v;
     int i;
 
     for (i = 0; i < 3; i++) {

@@ -421,7 +421,7 @@ void SsFileMain::init(SUB_SCREEN* wk)
         ItemMgr.get(wk->get_item_id, 0);
         wk->model_flag = 1;
         if (pSys->language == 0) {
-            cMes.setupFont(0x1C, 0x1C, (TEXPalette*) SS_ARC_PTR(wk->pFileDat, 4), 3);
+            cMes.setupFont(0x1C, 0x1C, (u8*) SS_ARC_PTR(wk->pFileDat, 4), 3);
         }
         {
             u8* p = fileInfo[no - 1];
@@ -773,7 +773,7 @@ void MessageDisplay::init(SUB_SCREEN* wk)
     x = (int) ((pos->pos0.x + 320.0f) * 0.8f);
     y = (int) ((240.0f - pos->pos0.y) * 0.8f);
     if (pSys->language == 0) {
-        cMes.setupFont(0x1C, 0x1C, (TEXPalette*) SS_ARC_PTR(wk->pFileDat, 4), 3);
+        cMes.setupFont(0x1C, 0x1C, (u8*) SS_ARC_PTR(wk->pFileDat, 4), 3);
     }
     switch (wk->file->layout) {
     case 0:
@@ -976,7 +976,7 @@ void MessageDisplay::quit(SUB_SCREEN* wk)
 {
     cMes.Clear();
     if (pSys->language == 0) {
-        cMes.setupFont(0x1C, 0x1C, (TEXPalette*) SS_ARC_PTR(wk->pCmmn, 4), 3);
+        cMes.setupFont(0x1C, 0x1C, (u8*) SS_ARC_PTR(wk->pCmmn, 4), 3);
     }
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_1)->be_flag &= ~8;
 }

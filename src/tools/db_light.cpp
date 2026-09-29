@@ -1333,9 +1333,9 @@ struct Light04Work {
     u8 range;       // 0x18
 };
 struct Light05Work {
-    cLightPathData* pStart;  // 0x00
-    cLightPathData* pCur;    // 0x04
-    u8 flag;                 // 0x08  bit0 loop, bit1 inverse
+    u8* pStart;  // 0x00
+    u8* pCur;    // 0x04
+    u8 flag;     // 0x08  bit0 loop, bit1 inverse
     u8 pad_9[3];
     u8 pathNo;               // 0x0C
     u8 pathIdx;              // 0x0D
@@ -1723,7 +1723,7 @@ static void edit_light_id_path()
         eprintf(0x40, 0xC4, 0, pTool->PageNo, "INVERSE %s", (w->flag & 2) ? "ON" : "OFF");
         drawLightInfo(cur, 0xFFFFFFFF);
         if (VALID_PTR(w->pStart)) {
-            drawPath(0xC8, 0x64, w->pStart, w->flag, 0xFFFFFFFF);
+            drawPath(0xC8, 0x64, (cLightPathData*) w->pStart, w->flag, 0xFFFFFFFF);
         } else {
             eprintf(0xC8, 0xA8, 0, pTool->PageNo, "NO DATA");
         }
@@ -4602,7 +4602,7 @@ static void option()
                     pTool->rno1 = 1;
                 }
             }
-            q = LightMgr.getPathPtr(pTool->rno3);
+            q = (cLightPathData*) LightMgr.getPathPtr(pTool->rno3);
             if (VALID_PTR(q)) {
                 drawPath(0x32, 0xFA, q, 0, 0xFFFFFFFF);
             } else {
