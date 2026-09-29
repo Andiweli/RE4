@@ -5772,7 +5772,7 @@ address	size	section	unit	scope	name	demangled
 0x8019082C	0x8	.text	game/scheduler.cpp	global	iTaskStatus__Fv	iTaskStatus
 0x80190834	0x24	.text	game/scheduler.cpp	local	__static_initialization_and_destruction_0_80190834	__static_initialization_and_destruction_0
 0x80190858	0x2C	.text	game/scheduler.cpp	global	global_constructors_keyed_to_CTASK_MAIN	global constructors keyed to CTASK_MAIN
-0x80190884	0xB8	.text	game/scroll.cpp	global	SmdInit__FP4cSmdP4cSmxT0	SmdInit
+0x80190884	0xB8	.text	game/scroll.cpp	global	SmdInit__FP4cSmdP8cSmxDataT0	SmdInit
 0x8019093C	0x88	.text	game/scroll.cpp	global	SmdClear__Fi	SmdClear
 0x801909C4	0x64	.text	game/scroll.cpp	global	workInit__FP4cObj	workInit
 0x80190A28	0x68	.text	game/scroll.cpp	global	SmdSetup__Fi	SmdSetup
@@ -5781,7 +5781,7 @@ address	size	section	unit	scope	name	demangled
 0x80190F14	0x70	.text	game/scroll.cpp	global	SmxSetFlag__FP4cObjUl	SmxSetFlag
 0x80190F84	0x6C	.text	game/scroll.cpp	global	SmxGetFlag__FP4cObj	SmxGetFlag
 0x80190FF0	0x64	.text	game/scroll.cpp	global	smxInit__FP4cObjUc	smxInit
-0x80191054	0x1E4	.text	game/scroll.cpp	global	smxInit__FP4cObjP7SmxWork	smxInit
+0x80191054	0x1E4	.text	game/scroll.cpp	global	smxInit__FP4cObjP8cSmxWork	smxInit
 0x80191238	0x1C	.text	game/scroll.cpp	global	SmdGetTplPtr__Fi	SmdGetTplPtr
 0x80191254	0xF8	.text	game/scroll.cpp	global	SmdGetObjPtr__FUl	SmdGetObjPtr
 0x8019134C	0x8	.text	game/scroll.cpp	global	SmdGetObjNum__Fv	SmdGetObjNum

@@ -204,7 +204,7 @@ public:
     u8 Flag;         // 0x51  bits 0-1: 2 = follow the model matrix (obj04: updateMatrix each frame); hit check shape (0 cylinder, 1/3 sphere, 2 box)
     s8 PartsNo;      // 0x52  parts index + 1 the light origin follows (getPos), 0 = model
     u8 x53;          // 0x53
-    u32 SelectMask;  // 0x54  bit i: light i never applies (setModel2; scroll: SmxWork.x4)
+    u32 SelectMask;  // 0x54  bit i: light i never applies (setModel2; scroll: cSmxWork.LitSelectMask)
     Vec Offset;         // 0x58  light origin offset in the space of the coord x52 selects (shadow.cpp)
     Vec Size;        // 0x64  hit check size: x radius, y half height (cylinder), xyz box half size
     f32 Radius;      // 0x70  bounding radius from size (init2: cylinder x + y, box length, sphere x)
@@ -480,10 +480,10 @@ public:
     u8 z_mode;         // 0x12C  (TexRenderModSet sets 2)
     u8 TevScaleGroup;         // 0x12D  (pl_leon setModel sets 1)
     u8 kindid;         // 0x12E  2 = scroll (Smd) object
-    u8 ot_type;         // 0x12F  scroll: SmxWork.type2 (3 by default)
+    u8 ot_type;         // 0x12F  scroll: cSmxWork.OtType (3 by default)
     void* pCldShMd;  // 0x130  child shadow model (db_work prints it as "pCldShMd": GC vendor name; PS2 pChildShadowModel)
     u8 Shd_color;       // 0x134  (db_work "SHD COL")
-    u8 CullMode;         // 0x135  scroll: SmxWork.x3, db_work "CullMode"
+    u8 CullMode;         // 0x135  scroll: cSmxWork.CullMode, db_work "CullMode"
     u8 Shader_type;         // 0x136  TexRender: 2 while rendered to texture, 0 after
     u8 Refract_pow;         // 0x137  TexRender: 0x10
     u8 Refract_ratio;         // 0x138  TexRender: 0x90

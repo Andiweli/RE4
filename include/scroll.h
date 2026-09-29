@@ -49,26 +49,41 @@ public:
 };
 
 // Scroll extra data `SMX`: per-id object parameters.
-struct SmxWork {
-    u8 id;         // 0x00
-    u8 type;       // 0x01  -> cModel::type
-    u8 type2;      // 0x02  -> cModel::x12F
-    u8 CullMode;   // 0x03  -> cModel::CullMode
-    u32 SelectMask;  // 0x04  -> cLightInfo::SelectMask
-    u32 flags;     // 0x08  SmxSetFlag bits
-    u32 color;     // 0x0C  -> cModelInfo::color
-    u8 work[0x74]; // 0x10  copied to cObj::work (0x78 bytes including color2)
-    u32 color2;    // 0x84
-    f32 uvScrollU; // 0x88
-    f32 uvScrollV; // 0x8C
+struct cSmxWork {
+    u8 ModelNo;         // 0x00
+    u8 Id;              // 0x01  -> cModel::type
+    u8 OtType;          // 0x02  -> cModel::x12F
+    u8 CullMode;        // 0x03  -> cModel::CullMode
+    u32 LitSelectMask;  // 0x04  -> cLightInfo::SelectMask
+    u32 Flag;           // 0x08  SmxSetFlag bits
+    u32 MaterialColor;  // 0x0C  -> cModelInfo::color
+    u8 Free[116];       // 0x10  copied to cObj::work (0x78 bytes including SpecularColor)
+    u32 SpecularColor;  // 0x84
+    f32 TexU;           // 0x88
+    f32 TexV;           // 0x8C
 };
 
+// 0x10 bytes: the entries (cSmxWork) directly follow, reached only through at().
+class cSmxData {
+public:
+    u8 Version;    // 0x00
+    u8 nData;      // 0x01
+    u8 Dummy02;    // 0x02
+    u8 Dummy03;    // 0x03
+    u32 Dummy10;   // 0x04
+    u32 Dummy20;   // 0x08
+    u32 Dummy30;   // 0x0C
+
+    cSmxWork* at(u32 i) { return (cSmxWork*) ((u8*) this + sizeof(*this) + sizeof(cSmxWork) * i); }
+};
+
+// Pointer wrapper (0x4 bytes) around a loaded SMX file's cSmxData; PS2 evidence only (its own
+// init()/m_pSmx use isn't in any file this tree captured), kept for reference, not used here.
 class cSmx {
 public:
-    u8 x0;         // 0x00
-    u8 nWork;      // 0x01
-    u8 pad_2[0x10 - 0x02];
-    SmxWork work[1];   // 0x10
+    cSmxData* m_pSmx;
+
+    void init(cSmxData* p) { m_pSmx = p; }
 };
 
 // nScrWork is not declared here on purpose: the .sbss order of scroll.cpp follows the first
@@ -76,7 +91,7 @@ public:
 extern cSmd* pSmd;
 extern cSmd* pSmdComn;
 
-int SmdInit(cSmd* pSh, cSmx* pSmxh, cSmd* pShCmn);
+int SmdInit(cSmd* pSh, cSmxData* pSmxh, cSmd* pShCmn);
 void SmdClear(int mode);
 void workInit(cObj* pObj);
 void SmdSetup(int blockNo);
@@ -85,7 +100,7 @@ int SmdSetParam(cObj* pObj, SmdWork* pSw);
 void SmxSetFlag(cObj* pObj, u32 flag);
 int SmxGetFlag(cObj* pObj);
 void smxInit(cObj* obj, u8 id);
-void smxInit(cObj* obj, SmxWork* w);
+void smxInit(cObj* obj, cSmxWork* w);
 void* SmdGetTplPtr(int idx);
 cObj* SmdGetObjPtr(u32 idx);
 int SmdGetObjNum();

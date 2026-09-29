@@ -58,7 +58,7 @@ struct ScrSwingWork {
     f32 ini3;    // 0x30
 };
 
-// one saved record of the .smx file (scroll.h SmxWork with the colour bytes split)
+// one saved record of the .smx file (scroll.h cSmxWork with the colour bytes split)
 struct ScrSmxRec {
     u8 id;         // 0x00
     u8 type;       // 0x01

@@ -32,7 +32,7 @@ static SCR_ID_REF ScrIdRefTbl[16] = {
 
 cSmd* pSmd;
 cSmd* pSmdComn;
-static cSmx* pSmx;
+static cSmxData* pSmx;
 static cObj** scrObjTbl;   // 250 entries, indexed by scroll object id
 static cObj** scrTbl;      // one entry per SMD work
 int nScrWork;
@@ -49,7 +49,7 @@ const u8* SmdGetIdNumPtr()
 
 // Room start: takes the room's SMD / SMX and the common SMD, allocates the id and work tables.
 // Returns the number of works (0 on failure).
-int SmdInit(cSmd* pSh, cSmx* pSmxh, cSmd* pShCmn)
+int SmdInit(cSmd* pSh, cSmxData* pSmxh, cSmd* pShCmn)
 {
     if (pSh == NULL) {
         pLog->err(0, 0, "ERROR: SMdInit() COMN DATA was NULL");
@@ -277,14 +277,14 @@ int SmxGetFlag(cObj* pObj)
 }
 
 // `pSmx` read directly in the loop test: gcse PRE re-loads it for the loop block and cse2 turns
-// that into the `mr r10,r9` copy the loop uses; a `cSmx* smx = pSmx` local merges both reads.
+// that into the `mr r10,r9` copy the loop uses; a `cSmxData* smx = pSmx` local merges both reads.
 void smxInit(cObj* obj, u8 id)
 {
-    SmxWork* w = pSmx->work;
+    cSmxWork* w = pSmx->at(0);
     int i;
 
-    for (i = 0; i < pSmx->nWork; i++, w++) {
-        if (w->id == id) {
+    for (i = 0; i < pSmx->nData; i++, w++) {
+        if (w->ModelNo == id) {
             smxInit(obj, w);
             return;
         }
@@ -294,34 +294,34 @@ void smxInit(cObj* obj, u8 id)
 // Applies an SMX record: type / ot_type / cull mode / light mask / flags, the model colours
 // (colour 0 alpha = blend mode), UV scroll, and the 0x78-byte work copied into the object; a
 // non-zero type makes the object a moving one (be_flag 0x20).
-void smxInit(cObj* obj, SmxWork* w)
+void smxInit(cObj* obj, cSmxWork* w)
 {
     cModelInfo* mi;
     u32 col;
 
-    if (w->id > 0xF9) {
-        pLog->err(0, 0, "SmdInit() SMX WORK NUM ERR %d", w->id);
+    if (w->ModelNo > 0xF9) {
+        pLog->err(0, 0, "SmdInit() SMX WORK NUM ERR %d", w->ModelNo);
         return;
     }
     if ((u32) obj < 0x80000000 || (u32) obj > 0x82FFFFFF || !obj->isAlive()) {
-        pLog->err(0, 0, "SmdInit() SMX UNUSED cObj SELECT %d", w->id);
+        pLog->err(0, 0, "SmdInit() SMX UNUSED cObj SELECT %d", w->ModelNo);
         return;
     }
-    obj->type = w->type;
-    obj->LightInfo.SelectMask = w->SelectMask;
-    obj->ot_type = w->type2;
-    SmxSetFlag(obj, w->flags);
+    obj->type = w->Id;
+    obj->LightInfo.SelectMask = w->LitSelectMask;
+    obj->ot_type = w->OtType;
+    SmxSetFlag(obj, w->Flag);
     obj->CullMode = w->CullMode;
     mi = obj->pModelInfo;
     if (mi != NULL) {
-        col = w->color;
+        col = w->MaterialColor;
         *(u32*) mi->color = col;
         if ((col & ~0xFF) == 0) {
             mi->color[0] = 0xFF;
             mi->color[1] = 0xFF;
             mi->color[2] = 0xFF;
         }
-        col = w->color2;
+        col = w->SpecularColor;
         *(u32*) mi->color2 = col;
         if ((col & ~0xFF) == 0) {
             mi->color2[3] = 0;
@@ -330,13 +330,13 @@ void smxInit(cObj* obj, SmxWork* w)
         }
         mi->blend_mode = mi->color[3];
         mi->color[3] = 0xFF;
-        mi->uvScrollU = w->uvScrollU;
-        mi->uvScrollV = w->uvScrollV;
-        if (w->uvScrollU != 0.0f || w->uvScrollV != 0.0f) {
+        mi->uvScrollU = w->TexU;
+        mi->uvScrollV = w->TexV;
+        if (w->TexU != 0.0f || w->TexV != 0.0f) {
             mi->flagsDC |= 1;
         }
     }
-    memcpy(((cObjScr*) obj)->free, w->work, 0x78);
+    memcpy(((cObjScr*) obj)->free, w->Free, 0x78);
     if (obj->type == 0xF) {
         pLog->err(0, 0, "smxInit() : mirror model used.");
     }

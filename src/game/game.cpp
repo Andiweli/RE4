@@ -376,7 +376,7 @@ void gameRoomInit()
     ConsInitRoom((ConsRoom*) GetDataExt(pG->pRoom, "CNS", 0));
     {
         cSmd* smd = (cSmd*) GetDataExt(pG->pRoom, "SMD", 0);
-        cSmx* smx = (cSmx*) GetDataExt(pG->pRoom, "SMX", 0);
+        cSmxData* smx = (cSmxData*) GetDataExt(pG->pRoom, "SMX", 0);
         SmdInit(smd, smx, (cSmd*) GetDataExt(pG->pRoom, "SMD", 1));
     }
     ModInfoMgr.roomInit();
