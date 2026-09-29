@@ -1151,7 +1151,7 @@ int EspSeqSet(cEspSeqTbl* pSeq, cEffectCore* pCore, u32* pRand_seed, cModel* pMo
     cParts* parts;
 
     if ((u8) (pSeq->Id + 4) <= 3) {
-        EfmSeqSet(pSeq, (EfmCore*) pCore, pRand_seed, pMod, *pMat, 0, 0.0f, pOffset);
+        EfmSeqSet(pSeq, pCore, pRand_seed, pMod, *pMat, 0, 0.0f, pOffset);
         *ppEsp = EspGetDmyPtr();
         return 1;
     }

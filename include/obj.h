@@ -10,18 +10,9 @@
 
 class cModel;
 struct ATK_INFO;
+struct cEffectCore;
 
 class cObj;
-
-// Effect owner info at the head of every Efm work (esp_efm.cpp copies the caller's cEffectCore,
-// esp.h, into it; EfmDeleteSub matches flg / kind / pEm against g_Core_*).
-struct EfmCore {
-    u16 flg;              // 0x00
-    u8 kind;              // 0x02
-    u8 x3;                // 0x03
-    u32 x4;               // 0x04
-    cModel* pEm;          // 0x08
-};
 
 // Event object model type (PS2 OBJ18_TYPE): SetObj18 `type` / FREE_OBJ18::type, from the model name prefix
 // (event.cpp ExePacket_SetOm OmTbl).
@@ -168,7 +159,7 @@ extern cObjMgr ObjMgr;
 struct cEspSeqTbl;
 // game/esp_efm.cpp: creates the obj04 / obj05 / obj09 effect model of a sequence record
 // (`info` is the caller's cEffectCore, esp.h). esp_sub.cpp EspSeqSet is the only caller.
-cObj* EfmSeqSet(cEspSeqTbl* gen, EfmCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs);
+cObj* EfmSeqSet(cEspSeqTbl* gen, cEffectCore* info, u32* seed, cModel* parent, Mtx m, int x, f32 rate, Vec* ofs);
 // game/obj04.cpp / game/obj05.cpp: orient the model along `m`
 void Efm04RotMatrix(cObj* pObj, Mtx pMat);
 void Efm05RotMatrix(cObj* pObj, Mtx pMat);
