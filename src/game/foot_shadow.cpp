@@ -70,10 +70,10 @@ void DrawFootShadow(cModel* pMod)
         if ((l->be_flag & 3) != 3) {
             continue;
         }
-        if (l->Type != 4) {
+        if (l->Id != 4) {
             continue;
         }
-        if (!(l->xF & pMod->LightInfo.EnableMask)) {
+        if (!(l->EnableMask & pMod->LightInfo.EnableMask)) {
             continue;
         }
         if (StaFlagChk(pG, STA_BLACKOUT)) {
@@ -98,7 +98,7 @@ void DrawFootShadow(cModel* pMod)
         if (PSVECSquareDistance(&pos, &lpos) > range) {
             continue;
         }
-        if (l->xD == 1 || l->xD == 2) {
+        if (l->Type == 1 || l->Type == 2) {
             Vec rot;
             Vec axis = {0.0f, 1.0f, 0.0f};
             Mtx m1;
@@ -114,12 +114,12 @@ void DrawFootShadow(cModel* pMod)
             PSMTXRotAxisRad(m2, &axis, rot.y);
             PSMTXConcat(m2, m1, m1);
             PSMTXMultVecSR(m1, &dir, &dir);
-        } else if (l->xD == 0) {
+        } else if (l->Type == 0) {
             PSVECSubtract(&pMod->pList->world, &lpos, &dir);
 #line 152 "D:/Bio4/Prog/foot_shadow.cpp"
             VECNormalize(&dir, &dir);
         }
-        if (l->xD == 2) {
+        if (l->Type == 2) {
             Vec tmp;
             f32 dot;
             f32 dist;

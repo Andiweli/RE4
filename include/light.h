@@ -13,19 +13,31 @@ class cModel;
 class cEm;
 class cCoord;
 
-// Spot block of a light (0x40 bytes, cLight+0x38 / cLightWork+0x2C). Only the direction is known.
-struct LIT_TYPE04_FREE {
-    Vec Normal;        // 0x00 direction
-    union {
-        f32 A0;    // 0x0C  spot cutoff angle (GXInitLightSpot); custom: a0
-        u32 flags;     // 0x0C  parallel: bit0 = direction is in view space
-    };
-    f32 A1;          // 0x10  distance fade width (trans_lit); custom: a1
-    f32 A2;            // 0x14  custom attenuation
-    f32 K0;            // 0x18
-    f32 K1;            // 0x1C
-    f32 K2;            // 0x20
+// cLight::normal reinterpreted per Type (trans_lit.cpp's LightSet dispatch), matching PS2's TypeFree
+// union at cLight+0x38. Type 0/1/2/7 (constant/linear/quadratic/local ambient) only ever read
+// Normal.x as a smooth-edge distance and stay a plain Vec; 3 and 6 (spot / spot-quad) share
+// LIT_TYPE03_FREE; 4 (custom attenuation) is this struct; 5 (parallel) is LIT_TYPE05_FREE.
+struct LIT_TYPE03_FREE { // 0x14, cLight+0x38 / cLightWork+0x2C
+    Vec Normal;   // 0x00  spot direction
+    f32 CutOff;   // 0x0C  cone half-angle, degrees (GXInitLightSpot)
+    f32 Edge;     // 0x10  distance fade width (trans_lit)
+};
+
+struct LIT_TYPE04_FREE { // 0x40, cLight+0x38 / cLightWork+0x2C
+    Vec Normal;   // 0x00  direction
+    f32 A0;       // 0x0C  raw GX attenuation coefficients (GXInitLightAttn)
+    f32 A1;       // 0x10
+    f32 A2;       // 0x14
+    f32 K0;       // 0x18
+    f32 K1;       // 0x1C
+    f32 K2;       // 0x20
     u8 pad_24[0x40 - 0x24];
+};
+
+struct LIT_TYPE05_FREE { // 0x14, cLight+0x38 / cLightWork+0x2C
+    Vec Pos;    // 0x00  direction, scaled by 1e6; camera-multiplied unless Flag bit0 (already local)
+    u32 Flag;   // 0x0C
+    f32 Edge;   // 0x10  distance fade width (trans_lit)
 };
 
 // Per-type work block (0x80 bytes, cLight+0x78 / cLightWork+0x6C). The first word is a colour
@@ -40,7 +52,7 @@ struct LightPath {
     u8 pad_0[0x40];
 };
 
-// cLight::work (cLight+0x78), reinterpreted per Type by each light0X.cpp's own LightFuncTbl entry.
+// cLight::work (cLight+0x78), reinterpreted per Id by each light0X.cpp's own LightFuncTbl entry.
 struct LIT01_MOVE_FREE {
     GXColor Col;     // 0x0  (unused)
     s8 ColFlick;     // 0x4  random brightness range (+-)
@@ -103,9 +115,9 @@ class cLight;
 class cLightWork {
 public:
     u8 BeFlag;           // 0x00  -> cLight::be_flag
-    u8 xD;             // 0x01  -> cLight::xD (spot type: 3 / 6 have a direction)
-    u8 Type;           // 0x02  -> cLight::type (per-type move handler, construct id)
-    u8 xF;             // 0x03  -> cLight::xF (screen kind mask; 0x10 cloth, 0x40 set by versionUp)
+    u8 Type;           // 0x01  -> cLight::Type (GX light-set index: spot type 3 / 6 have a direction)
+    u8 Id;             // 0x02  -> cLight::Id (LightFuncTbl move handler index)
+    u8 EnableMask;     // 0x03  -> cLight::EnableMask (screen kind mask; 0x10 cloth, 0x40 set by versionUp)
     Vec Pos;           // 0x04
     f32 Radius;        // 0x10  -> cLight::Radius
     GXColor Col;     // 0x14
@@ -128,10 +140,10 @@ public:
 // One light work (sizeof 0x1D4). Per-type modules (light01..light10) keep their state in `work`.
 class cLight : public cUnit {
 public:
-    u8 xC;             // 0x0C
-    u8 xD;             // 0x0D  spot type (setSpotNormal accepts 3 and 6)
-    u8 Type;           // 0x0E  per-type move handler index
-    u8 xF;             // 0x0F  screen kind mask
+    u8 enable;         // 0x0C
+    u8 Type;           // 0x0D  GX light-set index (trans_lit's funcLightParam; setSpotNormal accepts 3 and 6)
+    u8 Id;             // 0x0E  LightFuncTbl move handler index
+    u8 EnableMask;     // 0x0F  screen kind mask
     Vec Pos;           // 0x10
     f32 Radius;        // 0x1C  attenuation range (trans_lit: intensity * (Radius - d) / Radius; esp11: sizeX * scale * 10)
     GXColor Col;     // 0x20 base color
@@ -152,7 +164,9 @@ public:
     u32 Dummy9;        // 0x34  (PS2 cLight Dummy9)
     union {
         Vec normal;        // 0x38 direction
-        LIT_TYPE04_FREE spot;    // 0x38 .. 0x78
+        LIT_TYPE03_FREE cone;    // 0x38 .. 0x4C, Type 3/6 (spot / spot-quad)
+        LIT_TYPE04_FREE spot;    // 0x38 .. 0x78, Type 4 (custom attenuation)
+        LIT_TYPE05_FREE dir;     // 0x38 .. 0x4C, Type 5 (parallel)
     };
     union {
         u8 work[0x40];     // 0x78 per-light-type work area
@@ -165,7 +179,7 @@ public:
     u8 Rno3;           // 0x13B  (PS2 Rno3)
     GXColor DispCol;  // 0x13C color actually applied
     u16 LitIndex;      // 0x140  index in the cut (0xFFFF = none; trans_lit compares it zero-extended)
-    u8 pad_142[2];
+    u16 Dummy102;      // 0x142  (PS2 cLight Dummy102)
     Vec World;        // 0x144  position actually applied (db_work draws a sphere of radius x1C here)
     cModel* pParent;   // 0x150
 #ifndef LIGHT_H_CLIGHT_154

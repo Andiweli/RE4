@@ -149,7 +149,7 @@ int cLightMgr::construct(cLight* p, u32 id)
 // Creates a light from a cLightWork record (front of the pool), copies it and runs its first move.
 cLight* cLightMgr::create(cLightWork* pLw)
 {
-    cLight* l = cManager<cLight>::create(pLw->Type);
+    cLight* l = cManager<cLight>::create(pLw->Id);
     if (l == 0) {
         return 0;
     }
@@ -164,7 +164,7 @@ cLight* cLightMgr::create(cLightWork* pLw)
 // Same as create(cLightWork*) but allocated from the back of the pool.
 cLight* cLightMgr::createBack(cLightWork* pLw)
 {
-    cLight* l = cManager<cLight>::createBack(pLw->Type);
+    cLight* l = cManager<cLight>::createBack(pLw->Id);
     if (l == 0) {
         return 0;
     }
@@ -476,8 +476,8 @@ void Light00_Move(cLight* pLi)
     pLi->DispCol = pLi->Col;
 }
 
-// Picks the lights for a model: every alive, enabled light (xF mask vs EnableMask, kind on, not a
-// foot-shadow type 4, SelectMask bit, non-black colour, volume hit test) up to 8, stored in
+// Picks the lights for a model: every alive, enabled light (EnableMask vs LightInfo.EnableMask, kind
+// on, not a foot-shadow type 4, SelectMask bit, non-black colour, volume hit test) up to 8, stored in
 // LightInfo.pLight; during an event only lights on event-flagged parents.
 void cLightMgr::setModel2(cModel* pMod)
 {
@@ -494,7 +494,7 @@ void cLightMgr::setModel2(cModel* pMod)
         if ((l->be_flag & 3) != 3) {
             continue;
         }
-        if (l->xF & pMod->LightInfo.EnableMask) {
+        if (l->EnableMask & pMod->LightInfo.EnableMask) {
             hit = 1;
         } else if (!(pMod->LightInfo.EnableMask & 0x41) && l->isParent(pMod)) {
             hit = 1;
@@ -504,7 +504,7 @@ void cLightMgr::setModel2(cModel* pMod)
         if (hit == 0) {
             continue;
         }
-        if (l->Type == 4) {
+        if (l->Id == 4) {
             continue;
         }
         if (!checkKind(l->Kind)) {
@@ -541,7 +541,7 @@ void cLightMgr::setModel2(cModel* pMod)
     }
 }
 
-// Picks up to 8 cloth lights (xF bit 0x10) hitting the model for the cloth renderer.
+// Picks up to 8 cloth lights (EnableMask bit 0x10) hitting the model for the cloth renderer.
 void cLightMgr::setCloth(cModel* pMod, u32 lightNum)
 {
     cLight* l;
@@ -558,10 +558,10 @@ void cLightMgr::setCloth(cModel* pMod, u32 lightNum)
         if ((l->be_flag & 3) != 3) {
             continue;
         }
-        if (l->Type == 4) {
+        if (l->Id == 4) {
             continue;
         }
-        if (!(l->xF & 0x10)) {
+        if (!(l->EnableMask & 0x10)) {
             continue;
         }
         if ((*(u32*) &l->DispCol & 0xFFFFFF00) == 0) {
@@ -582,7 +582,7 @@ void cLightMgr::setCloth(cModel* pMod, u32 lightNum)
     }
 }
 
-// Fills the effect light list with every alive light whose xF matches `mask` (max 8).
+// Fills the effect light list with every alive light whose EnableMask matches `mask` (max 8).
 void cLightMgr::setEsp(ESP_LIGHT_ENV* pEnv, u8 enableMask)
 {
     cLight* l;
@@ -594,7 +594,7 @@ void cLightMgr::setEsp(ESP_LIGHT_ENV* pEnv, u8 enableMask)
         if ((l->be_flag & 3) != 3) {
             continue;
         }
-        if (!(l->xF & enableMask)) {
+        if (!(l->EnableMask & enableMask)) {
             continue;
         }
         if (pEnv->Light_num == 8) {
@@ -894,7 +894,7 @@ void cLightMgr::deleteScr()
     }
 }
 
-// Clears mask bits from every room light's xF (light class mask).
+// Clears mask bits from every room light's EnableMask (light class mask).
 void cLightMgr::offScr(u8 enable)
 {
     cLight* l;
@@ -903,7 +903,7 @@ void cLightMgr::offScr(u8 enable)
     for (i = 0; i < nArray; i++) {
         l = fastAt(i);
         if (l->checkScr()) {
-            l->xF &= ~enable;
+            l->EnableMask &= ~enable;
         }
     }
 }
@@ -1115,19 +1115,19 @@ cLight::cLight()
     LitIndex = -1;
 }
 
-// Runs the light type function (LightFuncTbl[Type]).
+// Runs the light type function (LightFuncTbl[Id]).
 void cLight::move()
 {
-    LightMgr.funcTbl[Type](this);
+    LightMgr.funcTbl[Id](this);
 }
 
 // Copies a data record into the live light and resolves its parent.
 cLight& cLight::operator=(cLightWork& w)
 {
     be_flag = w.BeFlag;
-    xD = w.xD;
     Type = w.Type;
-    xF = w.xF;
+    Id = w.Id;
+    EnableMask = w.EnableMask;
     Pos = w.Pos;
     Radius = w.Radius;
     Col = w.Col;
@@ -1151,9 +1151,9 @@ cLight& cLight::operator=(cLightWork& w)
 cLightWork& cLightWork::operator=(cLight& l)
 {
     BeFlag = l.be_flag;
-    xD = l.xD;
     Type = l.Type;
-    xF = l.xF;
+    Id = l.Id;
+    EnableMask = l.EnableMask;
     Pos = l.Pos;
     Radius = l.Radius;
     Col = l.Col;
@@ -1452,10 +1452,10 @@ void cLight::hitAdjust()
     }
 }
 
-// Sets the spot direction (only for spot types xD 3 / 6).
+// Sets the spot direction (only for spot types Type 3 / 6).
 void cLight::setSpotNormal(Vec* norm)
 {
-    if (xD != 3 && xD != 6) {
+    if (Type != 3 && Type != 6) {
         pLog->err(0, 0, "lit.setSpot() TYPE ERROR");
         return;
     }
@@ -1565,7 +1565,7 @@ int cLit::versionUp()
             if (VALID_PTR(cut = getCut(i))) {
                 for (j = 0; j < cut->nLight; j++) {
                     w = cut->getLightWork(j);
-                    if (w->Type == 1) {
+                    if (w->Id == 1) {
                         changed = 1;
                         w->Col = w->sub.color;
                     }
@@ -1625,8 +1625,8 @@ int cLit::versionUp()
             if (VALID_PTR(cut = getCut(i))) {
                 for (j = 0; j < cut->nLight; j++) {
                     w = cut->getLightWork(j);
-                    if (w->xF & 1) {
-                        w->xF |= 0x40;
+                    if (w->EnableMask & 1) {
+                        w->EnableMask |= 0x40;
                         changed = 1;
                     }
                 }

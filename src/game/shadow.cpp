@@ -299,7 +299,7 @@ void ShadowTrans()
         if ((l->be_flag & 3) != 3) {
             continue;
         }
-        if (l->Type != 4) {
+        if (l->Id != 4) {
             continue;
         }
         if (StaFlagChk(pG, STA_BLACKOUT)) {
@@ -315,7 +315,7 @@ void ShadowTrans()
         if (w->Kind >= 1 && w->Kind <= 4) {
             continue;
         }
-        if (l->xD != 2) {
+        if (l->Type != 2) {
             continue;
         }
         if (LightMgr.checkKind(l->Kind) == 0) {
@@ -449,7 +449,7 @@ int Fit_ParallelShadowModelSet(cModel* m, int self)
         if ((l->be_flag & 3) != 3) {
             continue;
         }
-        if (l->Type != 4) {
+        if (l->Id != 4) {
             continue;
         }
         if (StaFlagChk(pG, STA_BLACKOUT)) {
@@ -461,10 +461,10 @@ int Fit_ParallelShadowModelSet(cModel* m, int self)
         if (w->Kind == 5) {
             continue;
         }
-        if (l->xD > 1) {
+        if (l->Type > 1) {
             continue;
         }
-        if (!(l->xF & m->LightInfo.EnableMask)) {
+        if (!(l->EnableMask & m->LightInfo.EnableMask)) {
             continue;
         }
         if (self) {
@@ -513,7 +513,7 @@ void Fit_ParallelShadowModelAddOt(cLight* l, cModel* m, int self)
     }
     mng->pLight = l;
     mng->pModel[mng->num++] = m;
-    if (l->xD == 0) {
+    if (l->Type == 0) {
         make_comn_fit_light(mng, mng->pModel[0]);
     } else {
         make_comn_parallel_light(mng, mng->pModel[0]);
@@ -571,7 +571,7 @@ void FixShadowLightSet(cLight* l)
                 continue;
             }
         }
-        if (!(l->xF & em->LightInfo.EnableMask)) {
+        if (!(l->EnableMask & em->LightInfo.EnableMask)) {
             continue;
         }
         if (shadowChkInFrustum(&tmp, em) == 0) {
@@ -620,7 +620,7 @@ void FixShadowLightSet(cLight* l)
         if (shadowChkInFrustum(&tmp, obj) == 0) {
             continue;
         }
-        if (!(l->xF & obj->LightInfo.EnableMask)) {
+        if (!(l->EnableMask & obj->LightInfo.EnableMask)) {
             continue;
         }
         if (mng == 0) {
@@ -1120,7 +1120,7 @@ void make_shadow_texture(ShadowMng* mng)
                 RoomGetTlutObj(w->Tex_no, &tlut);
                 TransLightTexture(tex, tlut, 0, 0, 1, g_Shd_render_size, g_Shd_render_size, mng, flag2, 1);
             }
-        } else if (mng->pLight->xD == 2 && w->Tex_no != 0xFF) {
+        } else if (mng->pLight->Type == 2 && w->Tex_no != 0xFF) {
             GXTexObj* tex;
             GXTlutObj* tlut;
             if (RoomGetTexObj(0, 0, &tex)) {
@@ -1239,7 +1239,7 @@ void ProcShadowScrModel(cModel* m, ShadowMng* mngs)
     u32 shdNum = g_Shd_num;
 
     for (i = 0; i < shdNum; i++, mngs++) {
-        if (mngs->pLight->xD > 2) {
+        if (mngs->pLight->Type > 2) {
             continue;
         }
         if (((LIT04_MOVE_FREE*) mngs->pLight->work)->Kind != 0) {
@@ -1781,14 +1781,14 @@ ShadowMng* GetCastShadowMngPtr(cModel* m)
         if ((l->be_flag & 3) != 3) {
             continue;
         }
-        if (l->Type != 4) {
+        if (l->Id != 4) {
             continue;
         }
         w = (LIT04_MOVE_FREE*) l->work;
         if (w->Kind == 5) {
             continue;
         }
-        if (!(l->xF & m->LightInfo.EnableMask)) {
+        if (!(l->EnableMask & m->LightInfo.EnableMask)) {
             continue;
         }
         if (i <= 0x1F) {
@@ -1799,7 +1799,7 @@ ShadowMng* GetCastShadowMngPtr(cModel* m)
         if (w->Kind < 1 || w->Kind > 4) {
             continue;
         }
-        if (l->xD != 2) {
+        if (l->Type != 2) {
             continue;
         }
         if (LightMgr.checkKind(l->Kind) == 0) {
