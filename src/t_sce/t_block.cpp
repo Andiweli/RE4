@@ -1184,7 +1184,7 @@ void tBlockArea_dispBlockBox(u8 no, u32 col)
             box[7].y = hy;
             box[7].z = hz;
             PSMTXMultVecArray(m, box, box, 8);
-            PSMTXMultVec(m, &info->bound.center, &c);
+            PSMTXMultVec(m, &info->bound.offset, &c);
             for (j = 0; j < 8; j++) {
                 box[j].x += obj->pos.x + c.x;
                 box[j].y += obj->pos.y + c.y;

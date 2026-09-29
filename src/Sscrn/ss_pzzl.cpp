@@ -842,7 +842,7 @@ void pieceFrameDisp(cModel* m, u32 color, int type)
         return;
     }
     {
-        ModelBound* bd = &m->pModelInfo->bound;
+        cBoundingBox* bd = &m->pModelInfo->bound;
 
         size.x = bd->size.x;
         size.y = bd->size.y;
@@ -934,7 +934,7 @@ void pieceFrameDisp(cModel* m, u32 color, int type)
 void getPieceVertex(pzlPiece* p, Vec* out, int corner)
 {
     cModel* m = p->model;
-    ModelBound* bd = &m->pModelInfo->bound;
+    cBoundingBox* bd = &m->pModelInfo->bound;
     Vec c;
 
     out->x = bd->size.x;

@@ -11,37 +11,39 @@
 #include <string.h>
 #include "math_sub_decl.h"
 
+#define CAM_HIST(w, i) ((w)->Key_hist[i])
+
 // Binds the motion file: frame count, parts (track) table, key offsets relocated to pointers,
 // key history cleared; blend frames `hokan`, flags (bit2 loop, bit3 pause) and the start frame.
 CameraMotion::CameraMotion(void* data, int hokan, int flags, f32 frame)
 {
-    CameraMotionWork* w = &m_info;
+    MOTION_INFO* w = &m_info;
     u32* tbl;
     int i;
 
-    memclr_asm(w, sizeof(CameraMotionWork));
-    w->data = (MotionData*) data;
-    w->maxFrame = (f32) (((MotionData*) data)->maxFrame & 0x3FFF);
-    w->maxFrame += 1.0f;
-    w->nParts = w->data->nParts;
-    w->partsInfo = (u16*) ((u8*) w->data + 3);
-    w->partsNo = (u8*) w->data + (w->nParts * 2 + 3);
-    tbl = (u32*) ((u32) w->partsNo + w->nParts);
+    memclr_asm(w, sizeof(MOTION_INFO));
+    w->pMot = (MotionData*) data;
+    w->Mot_frame_max = (f32) (((MotionData*) data)->maxFrame & 0x3FFF);
+    w->Mot_frame_max += 1.0f;
+    w->Joint_num = w->pMot->nParts;
+    w->pJoint_kind = (u16*) ((u8*) w->pMot + 3);
+    w->pJoint_no = (u8*) w->pMot + (w->Joint_num * 2 + 3);
+    tbl = (u32*) ((u32) w->pJoint_no + w->Joint_num);
     tbl = (u32*) (((u32) tbl + 3) & ~3);
     tbl++;
     if ((s32) tbl[0] >= 0) {
-        for (i = 0; i < w->nParts; i++) {
-            tbl[i] += (u32) w->data;
+        for (i = 0; i < w->Joint_num; i++) {
+            tbl[i] += (u32) w->pMot;
         }
     }
-    w->keyTbl = tbl;
-    for (i = 0; i < w->nParts; i++) {
-        w->hist[i][0] = w->hist[i][1] = w->hist[i][2] = 0;
+    w->pHermite_data = tbl;
+    for (i = 0; i < w->Joint_num; i++) {
+        CAM_HIST(w, i)[0] = CAM_HIST(w, i)[1] = CAM_HIST(w, i)[2] = 0;
     }
-    w->hokan = hokan;
-    w->flags = flags;
-    w->frame = frame;
-    w->state = 0;
+    w->Hokan_frame = hokan;
+    w->Mot_attr = flags;
+    w->Mot_frame = frame;
+    w->Mot_flag = 0;
     m_p_base_mat = NULL;
     m_state = 0;
 }
@@ -63,27 +65,27 @@ void CameraMotion::move()
     Vec roll = {0.0f, 0.0f, 0.0f};
     Vec fov;
     HERMITE_SET* pp = &prm;
-    CameraMotionWork* w = &m_info;
+    MOTION_INFO* w = &m_info;
     int i;
 
-    pp->Frame = w->frame;
-    pp->Frame_max = w->maxFrame;
+    pp->Frame = w->Mot_frame;
+    pp->Frame_max = w->Mot_frame_max;
     pp->Attr = 2;
-    for (i = 0; i < w->nParts; i++) {
-        pp->Data_fmt = w->partsInfo[i] >> 12;
-        pp->pData = (u8*) w->keyTbl[i];
-        switch (w->partsNo[i]) {
+    for (i = 0; i < w->Joint_num; i++) {
+        pp->Data_fmt = w->pJoint_kind[i] >> 12;
+        pp->pData = (u8*) w->pHermite_data[i];
+        switch (w->pJoint_no[i]) {
         case 0:
-            HermiteInterpolation(pp, &pos, w->hist[i]);
+            HermiteInterpolation(pp, &pos, CAM_HIST(w, i));
             break;
         case 1:
-            HermiteInterpolation(pp, &at, w->hist[i]);
+            HermiteInterpolation(pp, &at, CAM_HIST(w, i));
             break;
         case 2:
-            HermiteInterpolation(pp, &roll, w->hist[i]);
+            HermiteInterpolation(pp, &roll, CAM_HIST(w, i));
             break;
         case 3:
-            HermiteInterpolation(pp, &fov, w->hist[i]);
+            HermiteInterpolation(pp, &fov, CAM_HIST(w, i));
             break;
         }
     }
@@ -112,19 +114,19 @@ static f32 rad2deg(f32 r)
 
 // Advances the frame unless paused (flags bit3); past the last frame either loops (flags bit2,
 // state 1) or ends (state 4). Returns the state.
-u32 CameraSequenceCtrl(CameraMotionWork* pInfo)
+u32 CameraSequenceCtrl(MOTION_INFO* pInfo)
 {
-    if (!(pInfo->flags & 8)) {
-        if (pInfo->frame >= pInfo->maxFrame) {
-            if (pInfo->flags & 4) {
-                pInfo->state = 1;
-                pInfo->frame = 0.0f;
+    if (!(pInfo->Mot_attr & 8)) {
+        if (pInfo->Mot_frame >= pInfo->Mot_frame_max) {
+            if (pInfo->Mot_attr & 4) {
+                pInfo->Mot_flag = 1;
+                pInfo->Mot_frame = 0.0f;
             } else {
-                pInfo->state = 4;
+                pInfo->Mot_flag = 4;
             }
         } else {
-            pInfo->frame += 1.0f;
+            pInfo->Mot_frame += 1.0f;
         }
     }
-    return pInfo->state;
+    return pInfo->Mot_flag;
 }

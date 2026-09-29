@@ -28,14 +28,14 @@ public:
 
 // One queued glyph (MsgQueue entries, 0x10 bytes).
 class MessageFont;
-struct MesQue {
-    u16 x;              // 0x00
-    u16 y;              // 0x02
-    u16 code;           // 0x04
-    u8 w;               // 0x06
-    u8 h;               // 0x07
-    u32 color;          // 0x08
-    MessageFont* font;  // 0x0C
+struct MSG_QUE {
+    s16 px;               // 0x00
+    s16 py;               // 0x02
+    u16 mes;             // 0x04
+    u8 width;            // 0x06
+    u8 height;           // 0x07
+    u32 col;             // 0x08
+    MessageFont* m_p_font;  // 0x0C
 };
 
 // One texture sheet of a font (0x64 bytes).
@@ -132,9 +132,9 @@ private:
     u32 numberSave;     // 0xAC
     u16 digitSave;      // 0xB0
     u8 pad_B2[6];
-    MesQue* m_queue;    // 0xB8
-    MesQue* m_pMque;    // 0xBC
-    MesQue* m_selTbl[8];  // 0xC0  glyphs of the selection cursors
+    MSG_QUE* m_queue;    // 0xB8
+    MSG_QUE* m_pMque;    // 0xBC
+    MSG_QUE* m_selTbl[8];  // 0xC0  glyphs of the selection cursors
     s8 m_selTbl_size;          // 0xE0
     s8 m_sel;          // 0xE1  menu selection (0 = none yet)
     s8 m_cur;          // 0xE2
@@ -165,7 +165,7 @@ public:
     void setColor(u32 col) { m_col = col; }
     void setCursor(int cur) { m_cur = cur; }
     void setBttnWait(s16 wait) { m_bttn_wait = wait; }
-    void registQueue(MesQue* q) { m_queue = q; }
+    void registQueue(MSG_QUE* q) { m_queue = q; }
     void init(int no, int px, int py, u32 attr, int col, MessageFont* font);
     void move();
 private:
@@ -285,7 +285,7 @@ public:
     void SetCursor(int no, s8 cur) { m_Msg[no].setCursor(cur); }
     void SetItemName(int no, u16 id) { m_Msg[no].m_item_no = id; }
     void SetBttnWait(int no, s16 wait) { m_Msg[no].setBttnWait(wait); }
-    void MesRegistQueue(int no, MesQue* q) { m_Msg[no].registQueue(q); }
+    void MesRegistQueue(int no, MSG_QUE* q) { m_Msg[no].registQueue(q); }
     void MesReleaseQueue(int no) { m_Msg[no].registQueue(0); }
 };
 

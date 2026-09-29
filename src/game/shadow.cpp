@@ -145,12 +145,12 @@ int ShdInit(ShdHeader* data)
         obj->scale = e->scale;
         e++;
         {
-            ModelBound* bound = &obj->pModelInfo->bound;
+            cBoundingBox* bound = &obj->pModelInfo->bound;
             Vec size;
             size.x = bound->size.x;
             size.y = bound->size.y;
             size.z = bound->size.z;
-            obj->LightInfo.init2(2, 1, &bound->center, &size, 0x10);
+            obj->LightInfo.init2(2, 1, &bound->offset, &size, 0x10);
         }
         obj->matUpdate();
         obj->LightInfo.updateMatrix(obj);

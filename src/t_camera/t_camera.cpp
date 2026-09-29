@@ -87,7 +87,7 @@ void ToolCamera()
                     tcCameraDebugMove();
                 } else {
                     tcDataExport((u8*) g_pToolCamData);
-                    CamCtrl.RoomDataRead((CAM_FILE_HEADER*) g_pToolCamData);
+                    CamCtrl.RoomDataRead((u8*) g_pToolCamData);
                     CamCtrl.Check();
                     tcPlayerMove();
                     CameraMove();
@@ -1858,9 +1858,9 @@ void tcEdit_camera_rail()
         if (pTc->selMode != 0) {
             tcDataExport((u8*) g_pToolCamData);
             if (pTc->coreData != 0) {
-                CamCtrl.CoreDataRead((CAM_FILE_HEADER*) g_pToolCamData);
+                CamCtrl.CoreDataRead((u8*) g_pToolCamData);
             } else {
-                CamCtrl.RoomDataRead((CAM_FILE_HEADER*) g_pToolCamData);
+                CamCtrl.RoomDataRead((u8*) g_pToolCamData);
             }
             CameraMove();
             LightMgr.move();
@@ -1906,7 +1906,7 @@ void tcEdit_camera_rail()
                                           "Edit-->"};
     static const char* railAttrName[8] = {"OFFSET", "????", "RAIL_EDGE", "RAIL_1WAY", "BESIDE_FWD", "????", "????",
                                           "????"};
-    CamCtrl.RoomDataRead((CAM_FILE_HEADER*) g_pToolCamData);
+    CamCtrl.RoomDataRead((u8*) g_pToolCamData);
     Parametrize(CamCtrl.DataSearch(pTc->cdatNo), &CamBSpline);
     x = tcMenuPos[0];
     y = tcMenuPos[1];
@@ -2806,9 +2806,9 @@ static void tcLoad()
         if (HDRead(path, g_pToolCamData) != 0) {
             if (cameraDataVersion((char*) g_pToolCamData) > 1) {
                 if (pTc->coreData != 0) {
-                    CamCtrl.CoreDataRead((CAM_FILE_HEADER*) g_pToolCamData);
+                    CamCtrl.CoreDataRead((u8*) g_pToolCamData);
                 } else {
-                    CamCtrl.RoomDataRead((CAM_FILE_HEADER*) g_pToolCamData);
+                    CamCtrl.RoomDataRead((u8*) g_pToolCamData);
                 }
                 tcDataInitialize();
                 tcDataImport((u8*) g_pToolCamData);
@@ -2913,9 +2913,9 @@ static void tcSave()
         size = tcDataExport((u8*) g_pToolCamData);
         ret = HDWrite(path, g_pToolCamData, size);
         if (pTc->coreData != 0) {
-            CamCtrl.CoreDataRead((CAM_FILE_HEADER*) g_pToolCamData);
+            CamCtrl.CoreDataRead((u8*) g_pToolCamData);
         } else {
-            CamCtrl.RoomDataRead((CAM_FILE_HEADER*) g_pToolCamData);
+            CamCtrl.RoomDataRead((u8*) g_pToolCamData);
         }
         if (ret != size) {
             pTc->selMode = 3;
@@ -2950,7 +2950,7 @@ static void tcQuit()
 {
     if (*(u16*) &pTc->cdatNum != 0) {
         tcDataExport((u8*) g_pToolCamData);
-        CamCtrl.RoomDataRead((CAM_FILE_HEADER*) g_pToolCamData);
+        CamCtrl.RoomDataRead((u8*) g_pToolCamData);
         CamCtrl.m_system_flag = (CamCtrl.m_system_flag & ~1) | 0x10;
     }
     DbgFlagOff(pG, DBG_TEST_MODE);

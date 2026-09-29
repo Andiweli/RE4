@@ -279,8 +279,9 @@ LERP_DATA* CameraControl::LerpDataSearch(int srcNo, int srcSuf, int dstNo, int d
 // Relocates a camera data file in place ("B400".."B404": file offsets -> pointers for the area
 // polygons and the cut key arrays); older versions get their attr 8 promoted to 0x20. Returns
 // the buffer, or unchanged when already relocated / unknown.
-CAM_FILE_HEADER* CameraControl::calcAddr(CAM_FILE_HEADER* pBuff)
+CAM_FILE_HEADER* CameraControl::calcAddr(u8* head)
 {
+    CAM_FILE_HEADER* pBuff = (CAM_FILE_HEADER*) head;
     int ver2;
     int i;
     CUT_INFO* rec;
@@ -336,14 +337,14 @@ CAM_FILE_HEADER* CameraControl::calcAddr(CAM_FILE_HEADER* pBuff)
 }
 
 // Installs the room's camera data (relocated).
-void CameraControl::RoomDataRead(CAM_FILE_HEADER* pBuff)
+void CameraControl::RoomDataRead(u8* pBuff)
 {
     pG->pCamRoom = calcAddr(pBuff);
     pCamData = (CAM_FILE_HEADER*) pG->pCamRoom;
 }
 
 // Installs the core (shared) camera data.
-void CameraControl::CoreDataRead(CAM_FILE_HEADER* pBuff)
+void CameraControl::CoreDataRead(u8* pBuff)
 {
     pG->pCamCore = calcAddr(pBuff);
 }

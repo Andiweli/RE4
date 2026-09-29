@@ -866,7 +866,7 @@ void EspToolInit(bool& out, u8& stage, u8& cut)
                 Vec center;
                 cModel* p;
                 cModelInfo* info;
-                ModelBound* b;
+                cBoundingBox* b;
                 u8 lit;
 
                 em->setNoSuspend(1);
@@ -885,7 +885,7 @@ void EspToolInit(bool& out, u8& stage, u8& cut)
                 size.x = b->size.x;
                 size.y = b->size.y;
                 size.z = b->size.z;
-                PSVECSubtract(&b->center, &em->pList->pos, &center);
+                PSVECSubtract(&b->offset, &em->pList->pos, &center);
                 em->LightInfo.init2(2, 1, &center, &size, lit);
             }
             EvtDebug.GetNameMot(i, name);

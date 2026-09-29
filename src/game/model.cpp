@@ -20,8 +20,8 @@
 void calcModelAddr(cModelData* data);
 void calcModelOffset(cModelData* data);
 void calcTplOffset(TEXPalette* tpl);
-void getBoundingBox(cModelData* data, ModelBound* bound);
-void drawBoundingBox(Mtx m, ModelBound* bound);
+void getBoundingBox(cModelData* data, cBoundingBox* bound);
+void drawBoundingBox(Mtx m, cBoundingBox* bound);
 int GetModelInfoNum(cModelInfo* info);
 cModelInfo* GetModelInfoAddr(cModelInfo* info, int no);
 
@@ -1194,7 +1194,7 @@ cParts::cParts()
 }
 
 // Bounding box of the original vertices (s16 * 2^-shift, 8 bytes each): centre and half size.
-void getBoundingBox(cModelData* d, ModelBound* pBox)
+void getBoundingBox(cModelData* d, cBoundingBox* pBox)
 {
     f32 maxZ = -65536.0f;
     f32 maxY = -65536.0f;
@@ -1238,9 +1238,9 @@ void getBoundingBox(cModelData* d, ModelBound* pBox)
     pBox->size.x = (maxX - minX) * 0.5f;
     pBox->size.y = (maxY - minY) * 0.5f;
     pBox->size.z = (maxZ - minZ) * 0.5f;
-    pBox->center.x = maxX - pBox->size.x;
-    pBox->center.y = maxY - pBox->size.y;
-    pBox->center.z = maxZ - pBox->size.z;
+    pBox->offset.x = maxX - pBox->size.x;
+    pBox->offset.y = maxY - pBox->size.y;
+    pBox->offset.z = maxZ - pBox->size.z;
 }
 
 // Manager of the cParts pool.
@@ -1479,7 +1479,7 @@ void ModelInfoSetTrans(cModel* pMod, int modelInfoNo, int flag)
 }
 
 // Debug: draws a bounding box transformed by m as 12 lines.
-void drawBoundingBox(Mtx m, ModelBound* pBox)
+void drawBoundingBox(Mtx m, cBoundingBox* pBox)
 {
     static u8 ptbl[6][4] = {
         {0, 1, 3, 2}, {4, 5, 7, 6}, {0, 1, 5, 4}, {3, 2, 6, 7}, {1, 3, 7, 5}, {2, 0, 4, 6},
@@ -1514,7 +1514,7 @@ void drawBoundingBox(Mtx m, ModelBound* pBox)
     // compares the stepped pointer against `&v[7]` (`cmplw; ble`), which the do-while form with an
     // explicit end pointer gave as well but with the copy issued before the addis.
     for (j = 0; j < 8; j++) {
-        PSVECAdd(&v[j], &pBox->center, &v[j]);
+        PSVECAdd(&v[j], &pBox->offset, &v[j]);
     }
     PSMTXMultVecArray(m, v, v, 8);
     for (i = 0; i < 6; i++) {

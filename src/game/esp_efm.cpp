@@ -216,11 +216,11 @@ cObj* EfmSeqSet(cEspSeqTbl* gen, cEffectCore* info, u32* seed, cModel* parent, M
             light = 8;
         }
         if (moveId == 3) {
-            ModelBound* bound = &obj->pModelInfo->bound;
+            cBoundingBox* bound = &obj->pModelInfo->bound;
             size.x = bound->size.x;
             size.y = bound->size.y;
             size.z = bound->size.z;
-            PSVECSubtract(&bound->center, &obj->pList->pos, &center);
+            PSVECSubtract(&bound->offset, &obj->pList->pos, &center);
             obj->LightInfo.init2(2, 1, &center, &size, light);
             obj->alpha_omit = 0x80;
         } else {

@@ -209,10 +209,10 @@ public:
     CAMERA_DATA* DataSearch(int cameraNo);
 private:
     LERP_DATA* LerpDataSearch(int srcNo, int srcSuf, int dstNo, int dstSuf);
-    CAM_FILE_HEADER* calcAddr(CAM_FILE_HEADER* head);
+    CAM_FILE_HEADER* calcAddr(u8* head);
 public:
-    void RoomDataRead(CAM_FILE_HEADER* pBuff);
-    void CoreDataRead(CAM_FILE_HEADER* data);
+    void RoomDataRead(u8* pBuff);
+    void CoreDataRead(u8* data);
     void AreaOnOff(int No, int Suffix, int OnOff);
     void SetAreaAttr(int No, int Suffix, u8 attr);
     void UnsetAreaAttr(int No, int Suffix, u8 attr);

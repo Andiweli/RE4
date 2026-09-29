@@ -134,11 +134,15 @@ struct ShapeKey {
     ShapeData* data; // 0x04
 };
 
-// Bounding volume of a model (cModelInfo+0x38).
-struct ModelBound {
-    Vec min;             // 0x00
-    Vec center;          // 0x0C  light info origin (cLightInfo::init2 p0)
-    Vec size;            // 0x18  (cLightInfo::init2 p1, copied field by field to the stack)
+// Bounding volume of a model (cModelInfo+0x38). PS2's cBoundingBox has offset at 0x00 and the
+// half-extents as 3 separate scalars w/h/d, not a Vec; reproducing either change here moves
+// offset/size off the byte positions this compiler needs to keep generating the same code at
+// several call sites (db_port.cpp, ss_pzzl.cpp, t_block.cpp), so the leading 0xC stays unnamed
+// padding instead of becoming a real field.
+struct cBoundingBox {
+    u8 pad_0[0xC];
+    Vec offset;          // 0x0C  light info origin (cLightInfo::init2 p0)
+    Vec size;            // 0x18  half-extents (PS2: w/h/d, copied field by field to the stack)
 };
 
 // Per-model info block (game/model.cpp `cModelInfo`, at cModel+0x15C), a cUnit managed by
@@ -150,7 +154,7 @@ public:
     void* tpl_addr;          // 0x10  texture palette of the model (eff_sys RoomEfmRegist)
     cModelInfo* pList;   // 0x14  next parts info
     u8 pad_18[0x38 - 0x18];
-    ModelBound bound;    // 0x38
+    cBoundingBox bound;  // 0x38
     Mtx mat;             // 0x5C .. 0x8C  (cModelInfo::cModelInfo: identity; cPlBody::setKnife scales the diagonal to 0 / 1)
     union {
         u8 color[4];     // 0x8C  RGBA (word store; 0xFF fill when the RGB part is 0)
@@ -232,10 +236,12 @@ struct ATTACH_CAMERA;   // cam_ctrl.h
 
 // Per-model motion work (game/motion.cpp), 0xD0 bytes: what cModel::cModel clears, what
 // a blend motion (MotionWork::blend, the enemy works' blendMot) is, and the prefix of cModel::Motion.
+// A cutscene camera's keyframe playback (CameraMotion::m_info, game/cam_motion.cpp) reuses the
+// same struct for its own, simpler set of tracks; see Mot_flag below.
 struct MOTION_INFO {
     MotionData* pMot;     // 0x00  NULL = no motion
     u32* pHermite_data;          // 0x04  per parts key data
-    u16 Key_hist[2][2][3];    // 0x08  root key history [flip][rot/pos][axis]
+    u16 Key_hist[4][3];       // 0x08  key history per motion parts
     f32 Mot_frame_max;         // 0x20
     f32 Mot_frame;            // 0x24
     f32 Mot_frame_sav;        // 0x28
@@ -248,7 +254,9 @@ struct MOTION_INFO {
     u16 Null_rot;       // 0x3E  motion parts index of the root rotation
     u16 Mot_attr;            // 0x40  bit0: move the model by the root speed, bit1: reverse, bit2: loop, bit3: pause, bit6: flip, bit8, bit10: hokan speed blend, bit12: sequence reverse, bit13: blend parts, bit15: frame from seqFrame
     u16 Mot_state;            // 0x42  MotionSequenceCtrl result: 1 looped, 2 looped (reverse), 4 end, 8 end (reverse)
-    u32 Mot_flag;           // 0x44  bit26: cross frame disabled, bit27: flip hist, bit28: no IK, bit29: keep blend, bit30: no matrix, bit31
+    u32 Mot_flag;           // 0x44  bit26: cross frame disabled, bit27: flip hist, bit28: no IK, bit29: keep blend, bit30: no matrix, bit31;
+                            // a camera motion (CameraSequenceCtrl) reuses this word for its own
+                            // small return code instead (1 looped, 4 end), not these bits
     Vec Pos;              // 0x48  root position (current)
     Vec Pos_old;          // 0x54
     Vec Pos_dist;         // 0x60  root position change over the whole motion

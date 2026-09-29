@@ -291,10 +291,10 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
         memclr_asm(p->getKeyHist()[4], 6);
         memclr_asm(p->getKeyHist()[5], 6);
     }
-    w->Key_hist[0][0][0] = w->Key_hist[0][0][1] = w->Key_hist[0][0][2] = 0;
-    w->Key_hist[0][1][0] = w->Key_hist[0][1][1] = w->Key_hist[0][1][2] = 0;
-    w->Key_hist[1][0][0] = w->Key_hist[1][0][1] = w->Key_hist[1][0][2] = 0;
-    w->Key_hist[1][1][0] = w->Key_hist[1][1][1] = w->Key_hist[1][1][2] = 0;
+    w->Key_hist[0][0] = w->Key_hist[0][1] = w->Key_hist[0][2] = 0;
+    w->Key_hist[1][0] = w->Key_hist[1][1] = w->Key_hist[1][2] = 0;
+    w->Key_hist[2][0] = w->Key_hist[2][1] = w->Key_hist[2][2] = 0;
+    w->Key_hist[3][0] = w->Key_hist[3][1] = w->Key_hist[3][2] = 0;
     if (w->pAttachCam != 0) {
         memclr_asm(w->pAttachCam->history[0], 6);
         memclr_asm(w->pAttachCam->history[1], 6);

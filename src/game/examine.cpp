@@ -813,7 +813,7 @@ void ItemExamine::move()
         itemCamera.param.Fovy = _fovy;
         CameraSetOrientationRoll(&itemCamera);
     } else {
-        ModelBound* b = &m_pModel->pModelInfo->bound;
+        cBoundingBox* b = &m_pModel->pModelInfo->bound;
         Vec a;
         Vec c;
         Vec e;

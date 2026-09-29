@@ -314,7 +314,7 @@ void setShopMsgQueue(int on)
 
     for (i = 0; i < 5; i++, buf++) {
         if (on) {
-            cMes.MesRegistQueue(8 + i, (MesQue*) *buf);
+            cMes.MesRegistQueue(8 + i, (MSG_QUE*) *buf);
         } else {
             cMes.MesReleaseQueue(8 + i);
         }

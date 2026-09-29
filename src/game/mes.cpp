@@ -26,9 +26,9 @@ extern MessageFont MesFont[4];
 u16 getCharCode(u16 code);
 int isCtrlCode(u16 code);
 void setAttribute(FONT_TEX* t);
-void draw(MesQue* q);
+void draw(MSG_QUE* q);
 void messageCamera();
-void messageTrans(MesQue* q);
+void messageTrans(MSG_QUE* q);
 
 // Dolphin OS ROM font header (only the fields RomFont reads).
 struct OSFontHeader {
@@ -67,7 +67,7 @@ u32 mes_col_tbl[10] = {
 MessageControl cMes;
 MessageFont MesFont[4];
 MessageData MesData;
-static MesQue MsgQueue[3][0x100];
+static MSG_QUE MsgQueue[3][0x100];
 
 // Message text word -> font glyph index (codes 0x80.. are glyphs).
 u16 getCharCode(u16 data)
@@ -900,23 +900,23 @@ void Message::QueSet(int code, MessageFont* p_font)
     h = (s16) ((f32) (int) p_font->m_char_h * m_scale_h);
     if (!(m_state & 8)) {
         if (m_pMque != NULL) {
-            m_pMque->x = m_pos_x;
-            m_pMque->y = m_pos_y;
-            m_pMque->color = m_col;
-            m_pMque->code = code;
-            m_pMque->w = w;
-            m_pMque->h = h;
-            m_pMque->font = p_font;
+            m_pMque->px = m_pos_x;
+            m_pMque->py = m_pos_y;
+            m_pMque->col = m_col;
+            m_pMque->mes = code;
+            m_pMque->width = w;
+            m_pMque->height = h;
+            m_pMque->m_p_font = p_font;
             m_pMque++;
         } else {
-            MesQue q;
-            q.x = m_pos_x;
-            q.y = m_pos_y;
-            q.color = m_col;
-            q.code = code;
-            q.h = h;
-            q.font = p_font;
-            q.w = w;
+            MSG_QUE q;
+            q.px = m_pos_x;
+            q.py = m_pos_y;
+            q.col = m_col;
+            q.mes = code;
+            q.height = h;
+            q.m_p_font = p_font;
+            q.width = w;
             messageTrans(&q);
         }
     }
@@ -958,7 +958,7 @@ void Message::putSelCursol()
     int i;
 
     for (i = 0; i < m_selTbl_size; i++) {
-        m_selTbl[i]->code = (m_cur == i);
+        m_selTbl[i]->mes = (m_cur == i);
     }
 }
 
@@ -1014,22 +1014,22 @@ void setAttribute(FONT_TEX* t)
 
 // Draws one queued glyph: cell (code % cols, code / cols) of the font sheet, colour from the queue,
 // at (x, y) with size w x h, then restores the fog.
-void draw(MesQue* q)
+void draw(MSG_QUE* q)
 {
-    MessageFont* font = q->font;
+    MessageFont* font = q->m_p_font;
     s8 l, r;
     GXColor fog;
     f32 texH = (f32) font->m_tex_h;
     f32 texW = (f32) font->m_tex_w;
-    u32 col = q->color;
+    u32 col = q->col;
     u8 ca = col & 0xFF;
     u8 cb = (col >> 8) & 0xFF;
     u8 cg = (col >> 16) & 0xFF;
     u8 cr = col >> 24;
-    s16 x = q->x;
-    s16 y = q->y;
-    u8 w = q->w;
-    u8 h = q->h;
+    s16 x = q->px;
+    s16 y = q->py;
+    u8 w = q->width;
+    u8 h = q->height;
     FONT_TEX* t = &font->m_mTex[0];
     s16 cw;
     int cols, rows;
@@ -1037,14 +1037,14 @@ void draw(MesQue* q)
     s16 x1, y1;
     u8 cellW, cellH;
 
-    font->getSize(q->code, &l, &r);
+    font->getSize(q->mes, &l, &r);
     cellW = font->m_char_w;
     cols = font->m_tex_w / cellW;
     cw = r - l;
     cellH = font->m_char_h;
     rows = font->m_tex_h / cellH;
-    u = (q->code % cols) * cellW;
-    v = (q->code / cols) * cellH;
+    u = (q->mes % cols) * cellW;
+    v = (q->mes / cols) * cellH;
     while (v >= rows * cellW) {
         v -= rows * cellH;
     }
@@ -1088,7 +1088,7 @@ void messageCamera()
 }
 
 // OT callback / direct draw of one glyph.
-void messageTrans(MesQue* p_que)
+void messageTrans(MSG_QUE* p_que)
 {
     messageCamera();
     draw(p_que);
@@ -1097,7 +1097,7 @@ void messageTrans(MesQue* p_que)
 // Draws the slot's glyph queue, through the OT (attr 0x20) or directly.
 void Message::trans()
 {
-    MesQue* q;
+    MSG_QUE* q;
 
     for (q = m_queue; q < m_pMque; q++) {
         if (attrCk(0x20)) {

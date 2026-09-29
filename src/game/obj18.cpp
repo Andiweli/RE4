@@ -50,7 +50,7 @@ cObj* SetObj18(void* bin, void* tpl, Vec* pos, Vec* rot, int type)
     void* cbin;
     void* ctpl;
     cModelInfo* info;
-    ModelBound* b;
+    cBoundingBox* b;
 
     obj = ObjMgr.createBack(cObjMgr::ID_EVENT);
     if (obj == 0) {
@@ -157,7 +157,7 @@ cObj* SetObj18(void* bin, void* tpl, Vec* pos, Vec* rot, int type)
     sz.x = b->size.x;
     sz.y = b->size.y;
     sz.z = b->size.z;
-    PSVECSubtract(&info->bound.center, &obj->pList->pos, &ofs);
+    PSVECSubtract(&info->bound.offset, &obj->pList->pos, &ofs);
     obj->LightInfo.init2(2, 1, &ofs, &sz, lightFlag);
     if (pos) {
         obj->pos = *pos;

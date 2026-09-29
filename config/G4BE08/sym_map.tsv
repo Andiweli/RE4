@@ -9,9 +9,9 @@ address	size	section	unit	scope	name	demangled
 0x80003970	0xC	.text	game/cam_ctrl.cpp	global	CurrentCameraNo__13CameraControl	CameraControl::CurrentCameraNo
 0x8000397C	0x64	.text	game/cam_ctrl.cpp	global	DataSearch__13CameraControli	CameraControl::DataSearch
 0x800039E0	0x94	.text	game/cam_ctrl.cpp	global	LerpDataSearch__13CameraControliiii	CameraControl::LerpDataSearch
-0x80003A74	0x1E4	.text	game/cam_ctrl.cpp	global	calcAddr__13CameraControlP16_CAM_FILE_HEADER	CameraControl::calcAddr
-0x80003C58	0x40	.text	game/cam_ctrl.cpp	global	RoomDataRead__13CameraControlP16_CAM_FILE_HEADER	CameraControl::RoomDataRead
-0x80003C98	0x28	.text	game/cam_ctrl.cpp	global	CoreDataRead__13CameraControlP16_CAM_FILE_HEADER	CameraControl::CoreDataRead
+0x80003A74	0x1E4	.text	game/cam_ctrl.cpp	global	calcAddr__13CameraControlPUc	CameraControl::calcAddr
+0x80003C58	0x40	.text	game/cam_ctrl.cpp	global	RoomDataRead__13CameraControlPUc	CameraControl::RoomDataRead
+0x80003C98	0x28	.text	game/cam_ctrl.cpp	global	CoreDataRead__13CameraControlPUc	CameraControl::CoreDataRead
 0x80003CC0	0x3F4	.text	game/cam_ctrl.cpp	global	cameraHitCheck__FP3VecN30	cameraHitCheck
 0x800040B4	0x7C	.text	game/cam_ctrl.cpp	global	CameraSetCutData__FP6CAMERAP12_CAMERA_DATA	CameraSetCutData
 0x80004130	0x5C	.text	game/cam_ctrl.cpp	global	AreaOnOff__13CameraControliii	CameraControl::AreaOnOff
@@ -515,9 +515,9 @@ address	size	section	unit	scope	name	demangled
 0x80029218	0x34	.text	game/mes.cpp	global	putNextCursol__7Messagei	Message::putNextCursol
 0x8002924C	0x64	.text	game/mes.cpp	global	setJump__7MessageUs	Message::setJump
 0x800292B0	0x174	.text	game/mes.cpp	global	setAttribute__FP8FONT_TEX	setAttribute
-0x80029424	0x278	.text	game/mes.cpp	global	draw__FP6MesQue	draw
+0x80029424	0x278	.text	game/mes.cpp	global	draw__FP7MSG_QUE	draw
 0x8002969C	0x80	.text	game/mes.cpp	global	messageCamera__Fv	messageCamera
-0x8002971C	0x34	.text	game/mes.cpp	global	messageTrans__FP6MesQue	messageTrans
+0x8002971C	0x34	.text	game/mes.cpp	global	messageTrans__FP7MSG_QUE	messageTrans
 0x80029750	0x88	.text	game/mes.cpp	global	trans__7Message	Message::trans
 0x800297D8	0x170	.text	game/mes.cpp	global	CommandExec__7Message	Message::CommandExec
 0x80029948	0x1C	.text	game/mes.cpp	global	CommandArg__7Message	Message::CommandArg
@@ -3189,7 +3189,7 @@ address	size	section	unit	scope	name	demangled
 0x800D2FCC	0x174	.text	game/cam_motion.cpp	global	__12CameraMotionPviif	CameraMotion::CameraMotion
 0x800D3140	0x4C	.text	game/cam_motion.cpp	global	_._12CameraMotion	CameraMotion::~CameraMotion
 0x800D318C	0x218	.text	game/cam_motion.cpp	global	move__12CameraMotion	CameraMotion::move
-0x800D33A4	0x60	.text	game/cam_motion.cpp	global	CameraSequenceCtrl__FP16CameraMotionWork	CameraSequenceCtrl
+0x800D33A4	0x60	.text	game/cam_motion.cpp	global	CameraSequenceCtrl__FP11MOTION_INFO	CameraSequenceCtrl
 0x800D3404	0x8	.text	game/cam_qfps.cpp	global	LRinfo__14CameraQuasiFPSPv	CameraQuasiFPS::LRinfo
 0x800D340C	0x8	.text	game/cam_qfps.cpp	global	LRcheck__14CameraQuasiFPS	CameraQuasiFPS::LRcheck
 0x800D3414	0x168	.text	game/cam_qfps.cpp	global	calcDepressionRatio__14CameraQuasiFPS	CameraQuasiFPS::calcDepressionRatio
@@ -5025,7 +5025,7 @@ address	size	section	unit	scope	name	demangled
 0x8015B260	0x20	.text	game/model.cpp	global	motionPause__6cModel	cModel::motionPause
 0x8015B280	0x84	.text	game/model.cpp	global	matUpdate__6cModel	cModel::matUpdate
 0x8015B304	0x84	.text	game/model.cpp	global	__6cParts	cParts::cParts
-0x8015B388	0x13C	.text	game/model.cpp	global	getBoundingBox__FP10cModelDataP10ModelBound	getBoundingBox
+0x8015B388	0x13C	.text	game/model.cpp	global	getBoundingBox__FP10cModelDataP12cBoundingBox	getBoundingBox
 0x8015B4C4	0x54	.text	game/model.cpp	global	__9cPartsMgr	cPartsMgr::cPartsMgr
 0x8015B518	0xA4	.text	game/model.cpp	global	log__9cPartsMgrPCce	cPartsMgr::log
 0x8015B5BC	0x28	.text	game/model.cpp	global	construct__9cPartsMgrP6cPartsUl	cPartsMgr::construct
@@ -5040,7 +5040,7 @@ address	size	section	unit	scope	name	demangled
 0x8015BB38	0x90	.text	game/model.cpp	global	ModelInfoRefrectOffAll__FP6cModel	ModelInfoRefrectOffAll
 0x8015BBC8	0x60	.text	game/model.cpp	global	ModelInfoRefrectOn__FP6cModeli	ModelInfoRefrectOn
 0x8015BC28	0x58	.text	game/model.cpp	global	ModelInfoSetTrans__FP6cModelii	ModelInfoSetTrans
-0x8015BC80	0x23C	.text	game/model.cpp	global	drawBoundingBox__FPA3_fP10ModelBound	drawBoundingBox
+0x8015BC80	0x23C	.text	game/model.cpp	global	drawBoundingBox__FPA3_fP12cBoundingBox	drawBoundingBox
 0x8015BEBC	0xAC	.text	game/model.cpp	global	error__6cModel	cModel::error
 0x8015BF68	0x48	.text	game/model.cpp	global	log__t8cManager1Z6cPartsPCce	cManager<cParts>::log
 0x8015BFB0	0xBC	.text	game/model.cpp	global	countActiveWork__t8cManager1Z6cParts	cManager<cParts>::countActiveWork

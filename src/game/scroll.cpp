@@ -163,7 +163,7 @@ int SmdSetParam(cObj* pObj, SmdWork* pSw)
     void* bin;
     void* tpl;
     void* mot;
-    ModelBound* b;
+    cBoundingBox* b;
     Vec size;
 
     pObj->be_flag |= 4;
@@ -220,7 +220,7 @@ int SmdSetParam(cObj* pObj, SmdWork* pSw)
     size.x = b->size.x;
     size.y = b->size.y;
     size.z = b->size.z;
-    pObj->LightInfo.init2(2, 1, &pObj->pModelInfo->bound.center, &size, 0x10);
+    pObj->LightInfo.init2(2, 1, &pObj->pModelInfo->bound.offset, &size, 0x10);
     pObj->matUpdate();
     pObj->LightInfo.updateMatrix(pObj);
     return 1;
@@ -629,7 +629,7 @@ cObj* SetObjSmd(void* bin, void* tpl, Vec* pos, Vec* rot, int lightFlag, int fro
 {
     cObj* obj;
     cModelInfo* mi;
-    ModelBound* b;
+    cBoundingBox* b;
     Vec size;
     Vec d;
 
@@ -655,7 +655,7 @@ cObj* SetObjSmd(void* bin, void* tpl, Vec* pos, Vec* rot, int lightFlag, int fro
     size.x = b->size.x;
     size.y = b->size.y;
     size.z = b->size.z;
-    PSVECSubtract(&mi->bound.center, &obj->pList->pos, &d);
+    PSVECSubtract(&mi->bound.offset, &obj->pList->pos, &d);
     obj->LightInfo.init2(2, 1, &d, &size, lightFlag);
     return obj;
 }
