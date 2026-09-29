@@ -37,7 +37,7 @@ int Espgen01_SetFreeWork(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel*
 int Espgen02_SetFreeWork(cEspgen* w, cEspSeqTbl* rec, cEspSeqHead* head, cModel* model, u16 parts, Mtx* mtx,
                          Vec* pos, Vec* rot, ESPSEQ_CONTROL* pSct, int flag);
 // game/espgen40.cpp (declared with the record type in the original)
-void Espgen40_Move(cEspSeqTbl* gen);
+void Espgen40_Move(cEspgen* gen);
 
 cEspgen* EspgenArray = NULL;
 cEspgen* pEspgenArrayBack = NULL;

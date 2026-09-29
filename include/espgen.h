@@ -271,7 +271,7 @@ extern cEspEventModelList EspEvModList;
 // game/espgen10.cpp
 BOOL EspgenDataSet(cEspSeqHead* pSeqHed, u32 seq_ptr, cEffectCore* pCore, u32* pRand_seed, cModel* pMod, u16 Null_Parts_no, Mtx* pMat,
                    Vec* pOffset, Vec* pAng, ESPSEQ_CONTROL* pSct, BOOL bUseOffset);
-void SetEspCore(cEspgen* pCore, int Core_flg, u32 Call_no, u8 Core_kind, void* Core_pEm, int owner);
+void SetEspCore(cEffectCore* pCore, int Core_flg, u32 Call_no, u8 Core_kind, void* Core_pEm, int owner);
 int PullEspEspgen(cEspgen** ppEspgen, int Core_flg, int Core_kind, u32 Call_no, void* Core_pEm, int owner, int type);
 void Espgen10_Move(cEspgen* pEspgen);
 
