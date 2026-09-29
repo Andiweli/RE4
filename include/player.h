@@ -190,7 +190,7 @@ public:
     YARARE_INFO m_Yarare[10];   // 0x530 .. 0x738  the player's hit boxes (YarareAdd)
     int m_pSatMask;       // 0x738  SatMgr.check flag (player.cpp startUp / move)
     void (*pFuncAux)(class cPlayer*);  // 0x73C  routine 1/0xA (pl_R1_Aux) handler
-    struct PlRoomEff* m_pEffRoom;  // 0x740  room water effect table (pl_sub PlRegistRoomEff/PlWaterProc)
+    struct PlEffRoom* m_pEffRoom;  // 0x740  room water effect table (pl_sub PlRegistRoomEff/PlWaterProc)
     void* m_pBoss;        // 0x744  (pl_sub PlRegistBoss)
     void* m_pBossRmf;     // 0x748
     Vec m_FallVec;        // 0x74C  -wallNrm of the ledge to drop from (pl_class fallCheck)

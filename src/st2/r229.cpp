@@ -39,8 +39,10 @@ static u8 r229_texTbl0[0x20];
 static u8 r229_texTbl1[0x20];
 static R229Work* r229_work;
 
-// Water effect table (PlRegistRoomEff): {id, type} pairs, zero terminated.
-static const u32 r229_roomEff[] = {1, 0x21, 1, 0x22, 1, 0x23, 1, 0xA, 1, 0xB, 1, 0xC, 0};
+// Water effect table for PlRegistRoomEff.
+static const PlEffRoom r229_roomEff[6] = {
+    {1, 0x21}, {1, 0x22}, {1, 0x23}, {1, 0xA}, {1, 0xB}, {1, 0xC},
+};
 
 static void r229_openTerm();
 static void r221_execEmCamera1_end();
@@ -64,7 +66,7 @@ void R229Init()
         SceExec(0x12, (TaskFunc) r229_openTerm, 0, 0, SCE_PRIO_DEF_2, 0);
     }
     setTexRender();
-    PlRegistRoomEff((PlRoomEff*) r229_roomEff);
+    PlRegistRoomEff((PlEffRoom*) r229_roomEff);
     pPL->ot_type = 5;
     ScfFlagOn(pG, SCF_R229_IN);
 }

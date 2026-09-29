@@ -58,12 +58,11 @@ public:
     int isDamage() { return m_Flag || m_Timer; }
 };
 
-// Room water effect table registered at cEm::pRoomEff (pl_sub PlRegistRoomEff): 3 entries of
-// {u32 id; u8 pad[3]; u8 type;} used as EstSet(..., id, type, ...) for the ripple / splash effects.
-struct PlRoomEff {
+// Room water effect table registered at cEm::m_pEffRoom (pl_sub PlRegistRoomEff/PlWaterProc): 6
+// entries fed to EstSet(..., type, id, ...) for the ripple / splash effects.
+struct PlEffRoom {
+    u32 type;
     u32 id;
-    u8 pad_4[3];
-    u8 type;
 };
 
 // Blend motion work: MOTION_INFO (model.h), the same struct cModel::Motion uses

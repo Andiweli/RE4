@@ -5382,7 +5382,7 @@ address	size	section	unit	scope	name	demangled
 0x8017812C	0x6C	.text	game/pl_sub.cpp	global	PlEndCamera__Fv	PlEndCamera
 0x80178198	0x138	.text	game/pl_sub.cpp	global	PlRegistMotion__FPvN11_0	PlRegistMotion
 0x801782D0	0x60	.text	game/pl_sub.cpp	global	SubCharRegistMotion__FPvT0	SubCharRegistMotion
-0x80178330	0xC	.text	game/pl_sub.cpp	global	PlRegistRoomEff__FP9PlRoomEff	PlRegistRoomEff
+0x80178330	0xC	.text	game/pl_sub.cpp	global	PlRegistRoomEff__FP9PlEffRoom	PlRegistRoomEff
 0x8017833C	0x70	.text	game/pl_sub.cpp	global	PlReloadBullet__Fv	PlReloadBullet
 0x801783AC	0x8C	.text	game/pl_sub.cpp	global	joyFireOn__Fv	joyFireOn
 0x80178438	0x5C	.text	game/pl_sub.cpp	global	joyFireTrg__Fv	joyFireTrg

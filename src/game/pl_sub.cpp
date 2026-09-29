@@ -734,7 +734,7 @@ void SubCharRegistMotion(void* m0, void* m1)
 }
 
 // Room water effect table for the player (ripple, walk splash, run splash).
-void PlRegistRoomEff(PlRoomEff* er)
+void PlRegistRoomEff(PlEffRoom* er)
 {
     pPL->m_pEffRoom = er;
 }
@@ -897,17 +897,17 @@ void PlWaterProc(cPlayer* pEm)
         u8 t = hamonTimer % 13;
 
         if (t == 0) {
-            EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[0].id, pEm->m_pEffRoom[0].type, 0, ESP_CORE_KIND_NONE, pEm, 0);
+            EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[0].type, pEm->m_pEffRoom[0].id, 0, ESP_CORE_KIND_NONE, pEm, 0);
         }
     }
     dist = GetDistance(&m_PosOldWater, &pEm->pos);
     if (sibukiTimer) {
         sibukiTimer--;
     } else if (dist > spd1) {
-        EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[2].id, pEm->m_pEffRoom[2].type, 0, ESP_CORE_KIND_NONE, pEm, 0);
+        EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[2].type, pEm->m_pEffRoom[2].id, 0, ESP_CORE_KIND_NONE, pEm, 0);
         sibukiTimer = 10;
     } else if (dist > spd0) {
-        EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[1].id, pEm->m_pEffRoom[1].type, 0, ESP_CORE_KIND_NONE, pEm, 0);
+        EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[1].type, pEm->m_pEffRoom[1].id, 0, ESP_CORE_KIND_NONE, pEm, 0);
         sibukiTimer = 0x10;
     }
     if (dist > spd0) {

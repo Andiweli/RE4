@@ -44,7 +44,7 @@ void PlEndCamera();
 void PlRegistMotion(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7,
                     void* m8, void* m9, void* m10, void* m11);
 void SubCharRegistMotion(void* m0, void* m1);
-void PlRegistRoomEff(struct PlRoomEff* er);
+void PlRegistRoomEff(struct PlEffRoom* er);
 void PlReloadBullet();
 void PlWaterProc(cPlayer* pEm);
 void PlMotionReset();

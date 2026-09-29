@@ -184,9 +184,9 @@ static const AtEffInfo effInfoNormal = {
     0, {0xD2, 0}, {0, 0xD}, {0, 0xB}, {0, 0xC}, {0, 0x1F}, {0, 0x1F}, {0, 0x36}, {0, 0xD},
 };
 // Room water effect table of the player (PlRegistRoomEff).
-static const PlRoomEff effRoom[6] = {
-    {1, {0, 0, 0}, 0x21}, {1, {0, 0, 0}, 0x22}, {1, {0, 0, 0}, 0x23},
-    {1, {0, 0, 0}, 0x21}, {1, {0, 0, 0}, 0x22}, {1, {0, 0, 0}, 0x23},
+static const PlEffRoom effRoom[6] = {
+    {1, 0x21}, {1, 0x22}, {1, 0x23},
+    {1, 0x21}, {1, 0x22}, {1, 0x23},
 };
 
 // New game: presets the door state flags (Scenario_flg[3]/51CC/51D0) of the doors that start
@@ -463,7 +463,7 @@ void gameRoomInit()
     EvtDebug.myRoomInit();
     if (!SysFlagChk(pG, SYS_DOORDEMO)) {
         EmMgr.create(0, 0);
-        PlRegistRoomEff((PlRoomEff*) effRoom);
+        PlRegistRoomEff((PlEffRoom*) effRoom);
     }
     SmdSetup(-1);
     ShdInit((ShdHeader*) GetDataExt(pG->pRoom, "SHD", 0));

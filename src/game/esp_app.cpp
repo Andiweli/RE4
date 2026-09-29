@@ -225,7 +225,7 @@ void EspFootCall(int type, int no, Vec* pPos)
             fpos.x = pl->pos.x;
             fpos.y = h;
             fpos.z = pl->pos.z;
-            EstSet(0, -1, &fpos, NULL, pl->m_pEffRoom[4].id, pl->m_pEffRoom[4].type, 0, ESP_CORE_KIND_NONE, 0, NULL);
+            EstSet(0, -1, &fpos, NULL, pl->m_pEffRoom[4].type, pl->m_pEffRoom[4].id, 0, ESP_CORE_KIND_NONE, 0, NULL);
             break;
         default:
             pLog->err(0, 0, "EspFootCall() : FootSeNo[%d] invalid.", no);
@@ -250,7 +250,7 @@ void EspFootCall(int type, int no, Vec* pPos)
             fpos.x = pl->pos.x;
             fpos.y = h;
             fpos.z = pl->pos.z;
-            EstSet(0, -1, &fpos, NULL, pl->m_pEffRoom[5].id, pl->m_pEffRoom[5].type, 0, ESP_CORE_KIND_NONE, 0, NULL);
+            EstSet(0, -1, &fpos, NULL, pl->m_pEffRoom[5].type, pl->m_pEffRoom[5].id, 0, ESP_CORE_KIND_NONE, 0, NULL);
             break;
         default:
             pLog->err(0, 0, "EspFootCall() : FootSeNo[%d] invalid.", no);
