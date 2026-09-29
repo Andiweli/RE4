@@ -2286,7 +2286,7 @@ int EventMgr::EvtReadSub(char* pNameEvt, int loadType, int emId, int* pPtr, int 
     u32 size;
     void* r;
     void* addr;
-    ReadModule* mod;
+    MODULE_DAT* mod;
 
     if (pPtr != 0) {
         *pPtr = 0;
@@ -2343,14 +2343,14 @@ int EventMgr::EvtReadSub(char* pNameEvt, int loadType, int emId, int* pPtr, int 
                 pLog->err(0, 0, "EventMgr::EvtRead : no id SearchEmModule [%x]", emId);
                 return 0;
             }
-            if (unit->getSize() > mod->size) {
+            if (unit->getSize() > mod->DataSize) {
                 DelRead(pNameEvt);
-                pLog->err(0, 0, "EventMgr::EvtRead : event size too large!![%d]>[%d]", unit->getSize(), mod->size);
+                pLog->err(0, 0, "EventMgr::EvtRead : event size too large!![%d]>[%d]", unit->getSize(), mod->DataSize);
                 return 0;
             }
-            MemorySwap(mod->pArc, unit->getAddr(), unit->getSize());
+            MemorySwap(mod->pData, unit->getAddr(), unit->getSize());
             ReadWkTbl[no].swapped = 1;
-            r = mod->pArc;
+            r = mod->pData;
             if (pPtr != 0) {
                 *pPtr = (int) r;
             }
@@ -2471,7 +2471,7 @@ int EventMgr::EvtFree(char* pNameEvt)
     cDataUnit* unit = 0;
     u32 no = 0;
     int em;
-    ReadModule* mod;
+    MODULE_DAT* mod;
 
     if (GetRead((void**) &unit, (int*) &no, pNameEvt) == 0) {
         pLog->err(0, 0, "EventMgr::EvtFree : NameEvt failed [%s]", pNameEvt);
@@ -2489,7 +2489,7 @@ int EventMgr::EvtFree(char* pNameEvt)
         }
         if (em != 0 && ReadWkTbl[no].swapped == 1) {
             mod = SearchEmModule(em);
-            MemorySwap(mod->pArc, unit->getAddr(), unit->getSize());
+            MemorySwap(mod->pData, unit->getAddr(), unit->getSize());
             ReadWkTbl[no].swapped = 0;
             EspEmDataSwapPop(em);
         }

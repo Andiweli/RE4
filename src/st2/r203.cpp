@@ -231,18 +231,18 @@ static void r203_EventMeetAgain()
     Vec pos = {-27823.0f, 4155.0f, -7863.0f};
     Vec ang;
     Vec* pa = &ang;
-    ReadModule* m;
+    MODULE_DAT* m;
 
     RsfSet(G_ROOM_ID, 3);
     m = SearchEmModule(0x11);
     SceEventStart(0);
     if (r203_work->data->waitLoadOk() == 1) {
-        MemorySwap(m->pArc, r203_work->data->getAddr(), r203_work->data->getSize());
-        EvtMgr.SetEvt(m->pArc, 0);
+        MemorySwap(m->pData, r203_work->data->getAddr(), r203_work->data->getSize());
+        EvtMgr.SetEvt(m->pData, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, r203_work->data->getAddr(), r203_work->data->getSize());
+        MemorySwap(m->pData, r203_work->data->getAddr(), r203_work->data->getSize());
         r203_work->data->setCommand(CMND_DEL_DATA, 0, 0);
     }
     {

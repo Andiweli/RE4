@@ -5,21 +5,21 @@
 #include "gx.h"
 
 // game/tv_mode.cpp: progressive-scan prompt task run at boot.
-struct TvModeWork {
-    u8 state;                // 0x00  index into tvModeFuncTbl
-    u8 sub;                  // 0x01
-    u8 active;               // 0x02
-    u8 pad_3;
-    GXRenderModeObj* rmode;  // 0x04
+struct TV_MODE {
+    u8 Rno0;                 // 0x00  index into tvModeFuncTbl
+    u8 Rno1;                 // 0x01
+    u8 Status;               // 0x02
+    s8 Cursor;               // 0x03  unused by this build's task
+    GXRenderModeObj* pRmode; // 0x04
 };
 
-extern TvModeWork* pTv;
+extern TV_MODE* pTv;
 extern u8 tv_mode_cnt;
 
 void SetTvMode(GXRenderModeObj* pRmode);
 void tvModeCheckTask();
-void tvModeTrigger(TvModeWork* pTv);
-void tvModeMenu_progressive(TvModeWork* pTv);
-void tvModeExit(TvModeWork* pTv);
+void tvModeTrigger(TV_MODE* pTv);
+void tvModeMenu_progressive(TV_MODE* pTv);
+void tvModeExit(TV_MODE* pTv);
 
 #endif

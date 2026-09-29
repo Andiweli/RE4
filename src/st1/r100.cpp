@@ -136,13 +136,13 @@ void R100Init()
     } else {
         Vec pos = {45442.0f, -430.0f, -8800.0f};
         Vec rot = {0.0f, 0.0f, 0.0f};
-        ReadModule* m = SearchEmModule(0x12);
+        MODULE_DAT* m = SearchEmModule(0x12);
 
         if (m) {
             cEm em;
             cEm* pe = &em;
 
-            em.subArc = (PlArc*) m->pArc;
+            em.subArc = (PlArc*) m->pData;
             W->smd = SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x31), ROOM_ARC_PTR(pG->pRoom, 0x32), &pos, &rot, 0x10, 1);
             W->smd->be_flag |= 0x1000;
             SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x33), PL_ARC_PTR(pe->subArc, 0x255), &pos, &rot, 0x10, 1)->be_flag |= 0x1000;
@@ -427,12 +427,12 @@ extern "C" int readEvent(int no, int wait, void** out)
     }
     if (wait != 0) {
         if (no == 0 || no == 4 || no == 9) {
-            ReadModule* m;
+            MODULE_DAT* m;
 
             EspEmDataSwapPush(0x12);
             m = SearchEmModule(0x12);
-            if (W->evt[no]->getSize() > m->size) {
-                pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", W->evt[no]->getSize(), m->size);
+            if (W->evt[no]->getSize() > m->DataSize) {
+                pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", W->evt[no]->getSize(), m->DataSize);
                 goto fail;
             }
             if (W->evt[no]->waitLoadOk() == 0) {
@@ -440,9 +440,9 @@ extern "C" int readEvent(int no, int wait, void** out)
                 pLog->err(0, 0, "r100::readEvent() : out of memory");
                 goto fail;
             }
-            MemorySwap(m->pArc, W->evt[no]->getAddr(), W->evt[no]->getSize());
+            MemorySwap(m->pData, W->evt[no]->getAddr(), W->evt[no]->getSize());
             {
-                void* arc = m->pArc;
+                void* arc = m->pData;
 
                 if (out != 0) {
                     *out = arc;
@@ -482,10 +482,10 @@ extern "C" void freeEvent(int no, int swap)
 {
     if (W->evt[no] != 0) {
         if (swap != 0 && (no == 0 || no == 4 || no == 9)) {
-            ReadModule* m;
+            MODULE_DAT* m;
 
             m = SearchEmModule(0x12);
-            MemorySwap(m->pArc, W->evt[no]->getAddr(), W->evt[no]->getSize());
+            MemorySwap(m->pData, W->evt[no]->getAddr(), W->evt[no]->getSize());
             EspEmDataSwapPop(0x12);
         }
         W->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);

@@ -1083,7 +1083,7 @@ static void r201_checkSwitch(int on)
 // The entrance event: plays the evd once its data is loaded.
 static void r201_execEvent00()
 {
-    ReadModule* m;
+    MODULE_DAT* m;
     Event* evt;
 
     ScfFlagOn(pG, SCF_R201_EVENT00);
@@ -1092,13 +1092,13 @@ static void r201_execEvent00()
         SysFlagOn(pG, SYS_SCREEN_STOP);
         SceSleep(2);
         m = SearchEmModule(0x1B);
-        MemorySwap(m->pArc, r201_work->evd->getAddr(), r201_work->evd->getSize());
-        EvtMgr.SetEvt(m->pArc, &evt);
+        MemorySwap(m->pData, r201_work->evd->getAddr(), r201_work->evd->getSize());
+        EvtMgr.SetEvt(m->pData, &evt);
         evt->FlgOnStatus(EvtStfPlPosNoSet);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, r201_work->evd->getAddr(), r201_work->evd->getSize());
+        MemorySwap(m->pData, r201_work->evd->getAddr(), r201_work->evd->getSize());
     }
     r201_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     SceEventEnd(0);

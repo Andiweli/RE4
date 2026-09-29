@@ -217,7 +217,7 @@ extern "C" int readEvent(int no, int wait, void** out)
         }
     }
     if (wait != 0) {
-        ReadModule* m;
+        MODULE_DAT* m;
         u32 max;
 
         if (r10b_work->evt[no]->waitLoadOk() == 0) {
@@ -227,7 +227,7 @@ extern "C" int readEvent(int no, int wait, void** out)
         }
         EspEmDataSwapPush(0x2F);
         m = SearchEmModule(0x2F);
-        max = m->size;
+        max = m->DataSize;
         if (r10b_work->evt[no]->getSize() > max) {
             // `return 0` (not `goto fail`): at sched2 the block continues past the err call with
             // `li r3,0`, whose output dependence on the pLog load and the block-end jump rank the
@@ -235,8 +235,8 @@ extern "C" int readEvent(int no, int wait, void** out)
             pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", r10b_work->evt[no]->getSize(), max);
             return 0;
         }
-        MemorySwap(m->pArc, r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
-        *out = m->pArc;
+        MemorySwap(m->pData, r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
+        *out = m->pData;
     } else {
         r10b_work->evt[no]->setCommand(CMND_ARAM_LOAD, 0, 0);
     }
@@ -250,10 +250,10 @@ fail:
 extern "C" void freeEvent(int no)
 {
     if (r10b_work->evt[no] != 0) {
-        ReadModule* m;
+        MODULE_DAT* m;
 
         m = SearchEmModule(0x2F);
-        MemorySwap(m->pArc, r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
+        MemorySwap(m->pData, r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
         EspEmDataSwapPop(0x2F);
         r10b_work->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);
     }

@@ -91,7 +91,7 @@ void EspEmDataSwapPop(int em_id)
         pLog->err(0, 0, "EspEmDataSwapPop(): ID[%x] invalid.", em_id);
         return;
     }
-    data = GetDataExt(SearchEmModule(em_id)->pArc, "EFF", 0);
+    data = GetDataExt(SearchEmModule(em_id)->pData, "EFF", 0);
     if (data == 0) {
         pLog->err(0, 0, "EspEmDataSwapPop(): ID[%x] '.EFF' not found.", em_id);
         return;

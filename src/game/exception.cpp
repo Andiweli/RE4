@@ -237,7 +237,7 @@ void excepLoadSymbol()
 
     symbol_err = excepLoadSymbolSub("bio4.sym", 0);
     for (i = 0; i < 4; i++) {
-        if (EmReadModule[i].pModule) {
+        if (EmReadModule[i].pDll) {
             switch (EmReadModule[i].id) {
             case 2:
                 sprintf(tmp_str, "Bio4.pl10.sym");
@@ -262,10 +262,10 @@ void excepLoadSymbol()
                 sprintf(tmp_str, "Bio4.em%02x.sym", (u8) EmReadModule[i].id);
                 break;
             }
-            symbol_err = excepLoadSymbolSub(tmp_str, EmReadModule[i].pModule);
+            symbol_err = excepLoadSymbolSub(tmp_str, EmReadModule[i].pDll);
         }
     }
-    if (PlReadModule.pModule) {
+    if (PlReadModule.pDll) {
         switch (PlReadModule.id) {
         default:
         case 0:
@@ -281,11 +281,11 @@ void excepLoadSymbol()
             sprintf(tmp_str, "Bio4.pl0d.sym");
             break;
         }
-        symbol_err = excepLoadSymbolSub(tmp_str, PlReadModule.pModule);
+        symbol_err = excepLoadSymbolSub(tmp_str, PlReadModule.pDll);
     }
-    if (WepReadModule.pModule) {
+    if (WepReadModule.pDll) {
         sprintf(tmp_str, "Bio4.wep%02x.sym", (u8) WepReadModule.id);
-        symbol_err = excepLoadSymbolSub(tmp_str, WepReadModule.pModule);
+        symbol_err = excepLoadSymbolSub(tmp_str, WepReadModule.pDll);
     }
     if (SubScreenWk.p_module) {
         OSModuleHeader* mod = SubScreenWk.p_module;

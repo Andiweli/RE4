@@ -434,7 +434,7 @@ static void r101_Event30()
 {
     int fail = 0;
     u32 unused[2];   // an 8-byte aggregate slot precedes `win`/`ladder` in the original's frame (0x30)
-    ReadModule* m;
+    MODULE_DAT* m;
     cEmWindow* win;
     cObjLadder* ladder;
 
@@ -465,7 +465,7 @@ static void r101_Event30()
     SceSleep(2);
     m = SearchEmModule(0x15);
     if (fail != 1) {
-        if (r101_work->evt30->getSize() > m->size) {
+        if (r101_work->evt30->getSize() > m->DataSize) {
             // COMPILER-DIFF: frame layout -- codeless use that keeps the 8-byte slot allocated
             // (an unreferenced aggregate gets no slot; the original's use is not in the bytes).
             asm("" : "=m"(unused));
@@ -599,7 +599,7 @@ static void r101_Event20()
     Vec ang;
     int diff;
     int fail = 0;
-    ReadModule* m;
+    MODULE_DAT* m;
     cEmRack* rack;
     cEm* r;
     cEmWindow* win;
@@ -632,11 +632,11 @@ static void r101_Event20()
     SceSleep(2);
     m = SearchEmModule(0x15);
     if (fail != 1) {
-        if (r101_work->evt21->getSize() > m->size) {
+        if (r101_work->evt21->getSize() > m->DataSize) {
             pLog->err(0, 0, "r101_Event20 exec error");
         } else {
-            MemorySwap(m->pArc, r101_work->evt21->getAddr(), r101_work->evt21->getSize());
-            EvtMgr.SetEvt(m->pArc, 0);
+            MemorySwap(m->pData, r101_work->evt21->getAddr(), r101_work->evt21->getSize());
+            EvtMgr.SetEvt(m->pData, 0);
             SceSleep(3);
             for (;;) {
                 EventMgr* em = &EvtMgr;
@@ -654,7 +654,7 @@ static void r101_Event20()
                 SceSleep(1);
             }
             SysFlagOff(pG, SYS_SCREEN_STOP);
-            MemorySwap(m->pArc, r101_work->evt21->getAddr(), r101_work->evt21->getSize());
+            MemorySwap(m->pData, r101_work->evt21->getAddr(), r101_work->evt21->getSize());
         }
     }
     r101_work->evt21->setCommand(CMND_DEL_DATA, 0, 0);
@@ -956,17 +956,17 @@ static void r101_Event00()
         SceEventStart(0);
         r101_setEmSuspend(1);
         if (r101_work->evt00->waitLoadOk() == 1) {
-            ReadModule* m;
+            MODULE_DAT* m;
 
             SysFlagOn(pG, SYS_SCREEN_STOP);
             SceSleep(2);
             m = SearchEmModule(0x26);
-            MemorySwap(m->pArc, r101_work->evt00->getAddr(), r101_work->evt00->getSize());
-            EvtMgr.SetEvt(m->pArc, 0);
+            MemorySwap(m->pData, r101_work->evt00->getAddr(), r101_work->evt00->getSize());
+            EvtMgr.SetEvt(m->pData, 0);
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
                 SceSleep(1);
             }
-            MemorySwap(m->pArc, r101_work->evt00->getAddr(), r101_work->evt00->getSize());
+            MemorySwap(m->pData, r101_work->evt00->getAddr(), r101_work->evt00->getSize());
         }
         r101_work->evt00->setCommand(CMND_DEL_DATA, 0, 0);
         r101_setEmSuspend(0);

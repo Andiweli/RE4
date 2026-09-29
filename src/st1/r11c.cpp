@@ -52,8 +52,8 @@ void Obj18CmfOn(cObj* o, u32 n);   // game/obj18.cpp
 
 
 struct R11cWork {
-    ReadModule* mod3;        // 0x00  enemy module 3 (Luis; the s00 event data is swapped into its archive)
-    ReadModule* mod4;        // 0x04  enemy module 4 (Ashley; the s10 event data)
+    MODULE_DAT* mod3;        // 0x00  enemy module 3 (Luis; the s00 event data is swapped into its archive)
+    MODULE_DAT* mod4;        // 0x04  enemy module 4 (Ashley; the s10 event data)
     u8 pad_8[0x30 - 0x08];
     cDataUnit* evd0;         // 0x30  evd/r11cs00.evd
     cDataUnit* evd1;         // 0x34  evd/r11cs10.evd
@@ -287,7 +287,7 @@ extern "C" void r11c_eventInit()
 static void r11c_EventBesiegedStart()
 {
     cEmDoor* door;
-    ReadModule* mod;
+    MODULE_DAT* mod;
     int err;
 
     ScfFlagOn(pG, SCF_R11C_BESIEGED_EVENT);
@@ -325,7 +325,7 @@ static void r11c_EventBesiegedStart()
             ang.z = 0.0f;
             pl->setAng(&ang);
         }
-    } else if (W->evd0->getSize() > mod->size) {
+    } else if (W->evd0->getSize() > mod->DataSize) {
         pLog->err(0, 0, "r11c_Event00 data size over");
         {
             Vec pos = {109264.0f, 4.0f, -50575.0f};
@@ -341,14 +341,14 @@ static void r11c_EventBesiegedStart()
             pl->setAng(&ang);
         }
     } else {
-        MemorySwap(mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
-        EvtMgr.SetEvt(mod->pArc, 0);
+        MemorySwap(mod->pData, W->evd0->getAddr(), W->evd0->getSize());
+        EvtMgr.SetEvt(mod->pData, 0);
         SceSleep(2);
         SceSleep(2);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
+        MemorySwap(mod->pData, W->evd0->getAddr(), W->evd0->getSize());
     }
     W->evd0->setCommand(CMND_DEL_DATA, 0, 0);
     SysFlagOn(pG, SYS_SCREEN_STOP);
@@ -396,7 +396,7 @@ static void r11c_EventBesiegedStart()
     int i;
     int kill;
     int t;
-    ReadModule* mod2;
+    MODULE_DAT* mod2;
     int err2;
 
     W->evd1->setCommand(CMND_ARAM_LOAD, 0, 0);
@@ -557,17 +557,17 @@ static void r11c_EventBesiegedStart()
     InitModule(W->mod4);
     mod2 = SearchEmModule(0x13);
     if (err2 != 1) {
-        if (W->evd1->getSize() > mod2->size) {
+        if (W->evd1->getSize() > mod2->DataSize) {
             pLog->err(0, 0, "r11c_Event10 exec error");
         } else {
-            MemorySwap(mod2->pArc, W->evd1->getAddr(), W->evd1->getSize());
-            if (EvtMgr.SetEvt(mod2->pArc, &ev)) {
+            MemorySwap(mod2->pData, W->evd1->getAddr(), W->evd1->getSize());
+            if (EvtMgr.SetEvt(mod2->pData, &ev)) {
                 ev->FlgOnStatus(EvtStfFadeOut);
             }
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
                 SceSleep(1);
             }
-            MemorySwap(mod2->pArc, W->evd1->getAddr(), W->evd1->getSize());
+            MemorySwap(mod2->pData, W->evd1->getAddr(), W->evd1->getSize());
         }
     }
     W->evd1->setCommand(CMND_DEL_DATA, 0, 0);

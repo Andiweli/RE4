@@ -67,7 +67,7 @@ struct R117Work {
     void* evTpl;          // 0x30  ev0101's texture palette saved by the s10 event
     cDataUnit* evd0;      // 0x34  evd/r117s00.evd
     cDataUnit* evd1;      // 0x38  evd/r117s10.evd
-    ReadModule* mod;      // 0x3C  enemy module 3 (the event data is swapped into its archive)
+    MODULE_DAT* mod;      // 0x3C  enemy module 3 (the event data is swapped into its archive)
 };
 
 static R117Work* r117_work;
@@ -359,13 +359,13 @@ static void r117_EventAshleyFind()
     ScfFlagOn(pG, SCF_R117_FIND_ASHLEY);
     ScfFlagOff(pG, SCF_90);
     if (W->evd0->waitLoadOk() == 1) {
-        MemorySwap(W->mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
-        EvtMgr.SetEvt(W->mod->pArc, 0);
+        MemorySwap(W->mod->pData, W->evd0->getAddr(), W->evd0->getSize());
+        EvtMgr.SetEvt(W->mod->pData, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
         SysFlagOn(pG, SYS_SCREEN_STOP);
-        MemorySwap(W->mod->pArc, W->evd0->getAddr(), W->evd0->getSize());
+        MemorySwap(W->mod->pData, W->evd0->getAddr(), W->evd0->getSize());
         W->evd0->setCommand(CMND_DEL_DATA, 0, 0);
     }
     StaFlagOn(pG, STA_SUB_ASHLEY);
@@ -400,14 +400,14 @@ static void r117_EventSaddlerAppear()
     StaFlagOff(pG, STA_SUB_ASHLEY);
     SceSleep(3);
     if (W->evd1->waitLoadOk() == 1) {
-        MemorySwap(W->mod->pArc, W->evd1->getAddr(), W->evd1->getSize());
-        if (EvtMgr.SetEvt(W->mod->pArc, &ev)) {
+        MemorySwap(W->mod->pData, W->evd1->getAddr(), W->evd1->getSize());
+        if (EvtMgr.SetEvt(W->mod->pData, &ev)) {
             ev->FlgOnStatus(EvtStfFadeOut);
         }
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(W->mod->pArc, W->evd1->getAddr(), W->evd1->getSize());
+        MemorySwap(W->mod->pData, W->evd1->getAddr(), W->evd1->getSize());
         W->evd1->setCommand(CMND_DEL_DATA, 0, 0);
     }
     EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM01, 0, 0);

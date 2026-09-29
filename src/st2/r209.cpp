@@ -1002,7 +1002,7 @@ static void r209_GatlingEndCheckEndProc()
 // data unit, then the bowgun battle is set up (r209_2ndBattleEmSet).
 static void r209_2ndBattle()
 {
-    ReadModule* m = SearchEmModule(0x1A);
+    MODULE_DAT* m = SearchEmModule(0x1A);
 
     while ((r209_work->door4->flag & 0x10000000) == 0) {
         SceSleep(1);
@@ -1015,12 +1015,12 @@ static void r209_2ndBattle()
     SysFlagOn(pG, SYS_SCREEN_STOP);
     SubScreenWait(60);
     if (r209_work->evd->waitLoadOk() == 1) {
-        MemorySwap(m->pArc, r209_work->evd->getAddr(), r209_work->evd->getSize());
-        EvtMgr.SetEvt(m->pArc, 0);
+        MemorySwap(m->pData, r209_work->evd->getAddr(), r209_work->evd->getSize());
+        EvtMgr.SetEvt(m->pData, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, r209_work->evd->getAddr(), r209_work->evd->getSize());
+        MemorySwap(m->pData, r209_work->evd->getAddr(), r209_work->evd->getSize());
         r209_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     }
     SceAtSetEnable(0, 0);

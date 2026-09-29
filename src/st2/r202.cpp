@@ -471,7 +471,7 @@ static void r202_operateCannon()
     SceSleep(60);
     SceDestroyEm(0x10, 0x20);
     {
-        ReadModule* m = SearchEmModule(0x11);
+        MODULE_DAT* m = SearchEmModule(0x11);
 
         if (m) {
             EspDataRelease(EFF_EM10, 0, 1);
