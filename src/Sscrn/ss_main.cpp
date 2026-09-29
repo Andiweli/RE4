@@ -109,20 +109,20 @@ void sscrnCameraInit(SUB_SCREEN* wk, CAMERA* cam)
     // Store order (sched1 weight rule): up.z is the last zero store in the source, so it carries the
     // zero register's death and is issued before the other zero stores; fovy is written last and
     // its late pool load lets up.z slip in front of it.
-    cam->param.pos.z = 5000.0f;
+    cam->param.Campos.z = 5000.0f;
     cam->Up.y = 1.0f;
-    cam->param.at.x = 0.0f;
-    cam->param.at.y = 0.0f;
-    cam->param.at.z = 0.0f;
-    cam->param.pos.x = 0.0f;
-    cam->param.pos.y = 0.0f;
+    cam->param.Target.x = 0.0f;
+    cam->param.Target.y = 0.0f;
+    cam->param.Target.z = 0.0f;
+    cam->param.Campos.x = 0.0f;
+    cam->param.Campos.y = 0.0f;
     cam->Up.x = 0.0f;
     cam->Up.z = 0.0f;
-    cam->param.fovy = 20.0f;
+    cam->param.Fovy = 20.0f;
     CameraSetOrientationUp(cam);
-    C_MTXPerspective(cam->ProjMat, cam->param.fovy, 1.3333334f, ZNEAR, ZFAR);
-    cam->Distance = PSVECDistance(&cam->param.pos, &cam->param.at);
-    C_MTXLookAt(cam->v_mat, &cam->param.pos, &cam->Up, &cam->param.at);
+    C_MTXPerspective(cam->ProjMat, cam->param.Fovy, 1.3333334f, ZNEAR, ZFAR);
+    cam->Distance = PSVECDistance(&cam->param.Campos, &cam->param.Target);
+    C_MTXLookAt(cam->v_mat, &cam->param.Campos, &cam->Up, &cam->param.Target);
 }
 
 // 1 when the player asks to return to the game: Y (Key bit 20) on a type 1 (inventory) screen, Y or B

@@ -409,9 +409,9 @@ void em2dDmCk(cEm2d* em)
     LifeDownSet2(em, dmg, 0, 0);
     w->dmgTotal += dmg;
     p = em->getPartsPtr(0);
-    dist = (cam->param.pos.x - p->world.x) * (cam->param.pos.x - p->world.x) +
-           (cam->param.pos.y - p->world.y) * (cam->param.pos.y - p->world.y) +
-           (cam->param.pos.z - p->world.z) * (cam->param.pos.z - p->world.z);
+    dist = (cam->param.Campos.x - p->world.x) * (cam->param.Campos.x - p->world.x) +
+           (cam->param.Campos.y - p->world.y) * (cam->param.Campos.y - p->world.y) +
+           (cam->param.Campos.z - p->world.z) * (cam->param.Campos.z - p->world.z);
     switch (em->dmg.m_Wep) {
     case 0:
     case 1:
@@ -5435,22 +5435,22 @@ int em2dCamMove(cEm2d* em, int mode, f32 rate)
     }
     PSMTXMultVec(pPL->mat, &pos, &pos);
     PSMTXMultVec(pPL->mat, &at, &at);
-    PosToPos(&cam->param.at, &at, &w->cam.param.at, rate);
-    PosToPos(&cam->param.pos, &pos, &w->cam.param.pos, rate);
-    if (EatMgr.hitCheck(&w->cam.param.at, &w->cam.param.pos, &hit, 0, 0, 0)) {
-        PSVECSubtract(&hit, &w->cam.param.at, &d);
+    PosToPos(&cam->param.Target, &at, &w->cam.param.Target, rate);
+    PosToPos(&cam->param.Campos, &pos, &w->cam.param.Campos, rate);
+    if (EatMgr.hitCheck(&w->cam.param.Target, &w->cam.param.Campos, &hit, 0, 0, 0)) {
+        PSVECSubtract(&hit, &w->cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 8382 "D:/Bio4/Prog/em2d.cpp"
         VECNormalize(&d, &d);
         blocked = 1;
         PSVECScale(&d, &d, len);
-        PSVECAdd(&w->cam.param.at, &d, &w->cam.param.pos);
+        PSVECAdd(&w->cam.param.Target, &d, &w->cam.param.Campos);
     }
     w->cam.Up.x = 0.0f;
     w->cam.Up.y = 1.0f;
     w->cam.Up.z = 0.0f;
-    w->cam.Distance = VEC_DIST(&w->cam.param.pos, &w->cam.param.at);
-    w->cam.param.fovy = 50.0f;
+    w->cam.Distance = VEC_DIST(&w->cam.param.Campos, &w->cam.param.Target);
+    w->cam.param.Fovy = 50.0f;
     CameraSetOrientationUp(&w->cam);
     CamCtrl.SetExtraCamera(&w->cam);
     return blocked ^ 1;
@@ -5469,13 +5469,13 @@ void em2dDieCamMove(cEm2d* em)
     pos.z = -670.0f;
     PSMTXMultVec(pPL->mat, &pos, &pos);
     at = pPL->getPartsPtr(4)->world;
-    PosToPos(&g->Camera.param.at, &at, &w->cam.param.at, 0.300000012f);
-    PosToPos(&g->Camera.param.pos, &pos, &w->cam.param.pos, 0.300000012f);
+    PosToPos(&g->Camera.param.Target, &at, &w->cam.param.Target, 0.300000012f);
+    PosToPos(&g->Camera.param.Campos, &pos, &w->cam.param.Campos, 0.300000012f);
     w->cam.Up.x = 0.0f;
     w->cam.Up.y = 1.0f;
     w->cam.Up.z = 0.0f;
-    w->cam.Distance = VEC_DIST(&w->cam.param.pos, &w->cam.param.at);
-    w->cam.param.fovy = 50.0f;
+    w->cam.Distance = VEC_DIST(&w->cam.param.Campos, &w->cam.param.Target);
+    w->cam.param.Fovy = 50.0f;
     CameraSetOrientationUp(&w->cam);
     CamCtrl.SetExtraCamera(&w->cam);
 }
@@ -6472,18 +6472,18 @@ void em2dHumSeMove(cEm2d* em)
         return;
     }
     cam = &pG->Camera;
-    d = (cam->param.pos.x - em->pos.x) * (cam->param.pos.x - em->pos.x) +
-        (cam->param.pos.y - em->pos.y) * (cam->param.pos.y - em->pos.y) +
-        (cam->param.pos.z - em->pos.z) * (cam->param.pos.z - em->pos.z);
+    d = (cam->param.Campos.x - em->pos.x) * (cam->param.Campos.x - em->pos.x) +
+        (cam->param.Campos.y - em->pos.y) * (cam->param.Campos.y - em->pos.y) +
+        (cam->param.Campos.z - em->pos.z) * (cam->param.Campos.z - em->pos.z);
     cnt = 0;
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEm* e = EmMgr.fastAt(i);
 
         if (e->isAlive() && e->id == 0x2D && e->hp > 0 && e != em && e->checkStatus(EM_STATUS_ACTIVE) &&
             (EM2D_WK(e)->flags & 0x40000) &&
-            (cam->param.pos.x - e->pos.x) * (cam->param.pos.x - e->pos.x) +
-                    (cam->param.pos.y - e->pos.y) * (cam->param.pos.y - e->pos.y) +
-                    (cam->param.pos.z - e->pos.z) * (cam->param.pos.z - e->pos.z) <
+            (cam->param.Campos.x - e->pos.x) * (cam->param.Campos.x - e->pos.x) +
+                    (cam->param.Campos.y - e->pos.y) * (cam->param.Campos.y - e->pos.y) +
+                    (cam->param.Campos.z - e->pos.z) * (cam->param.Campos.z - e->pos.z) <
                 d) {
             cnt++;
         }

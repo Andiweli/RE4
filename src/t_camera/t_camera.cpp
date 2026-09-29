@@ -978,10 +978,10 @@ void tcCdatInit(TcCdat* c, int cam_no)
     c->aim_ofs.z = 0.0f;
     c->num = 1;
     for (i = 0; i < 2; i++) {
-        c->at[i] = cam->param.at;
-        c->pos[i] = cam->param.pos;
-        c->roll[i] = cam->param.roll;
-        c->fovy[i] = cam->param.fovy;
+        c->at[i] = cam->param.Target;
+        c->pos[i] = cam->param.Campos;
+        c->roll[i] = cam->param.Roll;
+        c->fovy[i] = cam->param.Fovy;
     }
     for (i = 25; i >= 0; i--) {
         c->frame[i] = 0;
@@ -2289,8 +2289,8 @@ void tcMoveOffsetPoint()
             TcWork* w = pTc;
             CAMERA* cam = &w->cam;
             cPlayer* pl = pPL;
-            PSMTXMultVec(pl->mat, &tcCdatPtr(pTc->cdatNo)->aim_ofs, &cam->param.pos);
-            PSMTXMultVec(pl->mat, &tcCdatPtr(pTc->cdatNo)->u44.dir, &cam->param.at);
+            PSMTXMultVec(pl->mat, &tcCdatPtr(pTc->cdatNo)->aim_ofs, &cam->param.Campos);
+            PSMTXMultVec(pl->mat, &tcCdatPtr(pTc->cdatNo)->u44.dir, &cam->param.Target);
             CameraSetOrientationUp(cam);
         }
     } else {
@@ -2344,13 +2344,13 @@ void tcCameraSetPoint(TcCdat* c)
         return;
     }
     if ((pTc->editCursor == 1 || pTc->editCursor == 2) && (TC_TRG & 0x100)) {
-        c->pos[pTc->curKey] = pTc->cam.param.pos;
-        c->at[pTc->curKey] = pTc->cam.param.at;
+        c->pos[pTc->curKey] = pTc->cam.param.Campos;
+        c->at[pTc->curKey] = pTc->cam.param.Target;
         tcCdatFixPan(c);
     }
     if ((pTc->editCursor == 3 || pTc->editCursor == 4) && (TC_ON & 0x500)) {
-        pTc->cam.param.roll = c->roll[pTc->curKey];
-        pTc->cam.param.fovy = c->fovy[pTc->curKey];
+        pTc->cam.param.Roll = c->roll[pTc->curKey];
+        pTc->cam.param.Fovy = c->fovy[pTc->curKey];
     }
     CameraSetOrientationRoll(&pTc->cam);
     if ((c->type == 6 || c->type == 7) && (TC_TRG & 0x100)) {
@@ -2477,10 +2477,10 @@ void tcCameraPullPoint(TcCdat* c)
     }
     if (c->type != 8) {
         pTc->curKey = pTc->curKey < 0 ? c->num - 1 : (pTc->curKey > c->num - 1 ? 0 : pTc->curKey);
-        pTc->cam.param.pos = c->pos[pTc->curKey];
-        pTc->cam.param.at = c->at[pTc->curKey];
-        pTc->cam.param.roll = c->roll[pTc->curKey];
-        pTc->cam.param.fovy = c->fovy[pTc->curKey];
+        pTc->cam.param.Campos = c->pos[pTc->curKey];
+        pTc->cam.param.Target = c->at[pTc->curKey];
+        pTc->cam.param.Roll = c->roll[pTc->curKey];
+        pTc->cam.param.Fovy = c->fovy[pTc->curKey];
     }
     CameraSetOrientationRoll(&pTc->cam);
 }
@@ -3020,9 +3020,9 @@ void tcToolCameraMove(CAMERA* cam)
     if (pTc->joy.stickX) {
         Vec axis = {0.0f, 1.0f, 0.0f};
         if (pTc->distTarget) {
-            CameraRotAxisPosRad(cam, &axis, &cam->param.pos, (f32) pTc->joy.stickX / 20.0f * 0.017453292f);
+            CameraRotAxisPosRad(cam, &axis, &cam->param.Campos, (f32) pTc->joy.stickX / 20.0f * 0.017453292f);
         } else {
-            CameraRotAxisPosRad(cam, &axis, &cam->param.at, (f32) pTc->joy.stickX / 20.0f * 0.017453292f);
+            CameraRotAxisPosRad(cam, &axis, &cam->param.Target, (f32) pTc->joy.stickX / 20.0f * 0.017453292f);
         }
     }
     if (pTc->joy.stickY) {

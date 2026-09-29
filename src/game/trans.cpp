@@ -2690,7 +2690,7 @@ void RefractShaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv)
         Mtx m2;
         Mtx proj;
         mtx = getTexMtx();
-        C_MTXLightPerspective(proj, pG->Camera.param.fovy, 1.33333333f, 0.5f, -0.66666667f, 0.5f, 0.5f);
+        C_MTXLightPerspective(proj, pG->Camera.param.Fovy, 1.33333333f, 0.5f, -0.66666667f, 0.5f, 0.5f);
         PSMTXConcat(proj, mv, m2);
         GXLoadTexMtxImm(m2, mtx, 0);
     }

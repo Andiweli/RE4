@@ -134,7 +134,7 @@ void Esp12_Trans(cEsp12* esp)
     GXSetVtxAttrFmt(0, 0xA, 0, 1, 0);
     GXSetVtxAttrFmt(0, 0xD, 1, 4, 0);
     tstep = tstep / (f32)w->Num;
-    camPos = pG->Camera.param.pos;
+    camPos = pG->Camera.param.Campos;
     nrm.x = 0.0f;
     nrm.y = 0.0f;
     nrm.z = 0.0f;

@@ -2405,7 +2405,7 @@ void em38EscapeCamMove(cEm38* em)
 
     // volatile store: keeps the w-relative address (a reference setter folds it to em+0xCA8) and
     // orders every later memory op behind it, which issues the store before the pool loads
-    *(volatile f32*) &w->cam.param.fovy = g->Camera.param.fovy;
+    *(volatile f32*) &w->cam.param.Fovy = g->Camera.param.Fovy;
     a.x = -376.0f;
     a.y = 575.0f;
     a.z = -1831.0f;
@@ -2414,23 +2414,23 @@ void em38EscapeCamMove(cEm38* em)
     b.z = 52.6f;
     PSMTXMultVec(pPL->mat, &a, &a);
     PSMTXMultVec(pPL->mat, &b, &b);
-    PosToPos(&g->Camera.param.at, &b, &w->cam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &a, &w->cam.param.pos, 1.0f);
-    if (EatMgr.hitCheck(&w->cam.param.at, &w->cam.param.pos, &c, 0, 0x8000, 0)) {
+    PosToPos(&g->Camera.param.Target, &b, &w->cam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &a, &w->cam.param.Campos, 1.0f);
+    if (EatMgr.hitCheck(&w->cam.param.Target, &w->cam.param.Campos, &c, 0, 0x8000, 0)) {
         Vec d;
         f32 len;
 
-        PSVECSubtract(&c, &w->cam.param.at, &d);
+        PSVECSubtract(&c, &w->cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 3806 "D:/Bio4/Prog/em38.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&w->cam.param.at, &d, &w->cam.param.pos);
+        PSVECAdd(&w->cam.param.Target, &d, &w->cam.param.Campos);
     }
     w->cam.Up.x = 0.0f;
     w->cam.Up.y = 1.0f;
     w->cam.Up.z = 0.0f;
-    w->cam.Distance = VEC_DIST(&w->cam.param.pos, &w->cam.param.at);
+    w->cam.Distance = VEC_DIST(&w->cam.param.Campos, &w->cam.param.Target);
     CameraSetOrientationUp(&w->cam);
     CamCtrl.SetExtraCamera(&w->cam);
 }

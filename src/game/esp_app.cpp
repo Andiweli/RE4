@@ -347,7 +347,7 @@ void EffAreaUpdate()
         pos = pPL->pos;
         pos.y += 100.0f;
     } else {
-        pos = pG->Camera.param.pos;
+        pos = pG->Camera.param.Campos;
     }
     flag = 0;
     ent = sys->Area_addr->ent;

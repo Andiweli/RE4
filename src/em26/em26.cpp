@@ -145,9 +145,9 @@ void em26DmCk(cEm26* em)
             CAMERA* cam = &pG->Camera;
             cParts* p = em->getPartsPtr(0);
 
-            if ((cam->param.pos.x - p->world.x) * (cam->param.pos.x - p->world.x)
-                    + (cam->param.pos.y - p->world.y) * (cam->param.pos.y - p->world.y)
-                    + (cam->param.pos.z - p->world.z) * (cam->param.pos.z - p->world.z) < 4000000.0f) {
+            if ((cam->param.Campos.x - p->world.x) * (cam->param.Campos.x - p->world.x)
+                    + (cam->param.Campos.y - p->world.y) * (cam->param.Campos.y - p->world.y)
+                    + (cam->param.Campos.z - p->world.z) * (cam->param.Campos.z - p->world.z) < 4000000.0f) {
                 EmDmBloodSet2(em, 0x1E, 7, 0, 0, 0);
             } else {
                 EmDmBloodSet2(em, 0x1E, 1, 0, 0, 0);

@@ -444,9 +444,9 @@ void rckPointAdd()
     }
     p = &w->pt[n];
     gy = RCK_GRID_Y(pPL->pos.y);
-    c.x = pG->Camera.param.pos.x;
+    c.x = pG->Camera.param.Campos.x;
     c.y = gy;
-    c.z = pG->Camera.param.pos.z;
+    c.z = pG->Camera.param.Campos.z;
     TutilGet3DPosXZ_All((Vec*) &w->curX, &c, &out);
     memclr_asm(p, sizeof(RckPoint));
     gy = RCK_GRID_Y(out.y);
@@ -601,13 +601,13 @@ void rckPointCameraMove()
     RckPoint* p = &RCK->pt[RCK->cur];
     Vec d;
 
-    PSVECSubtract(&cam->param.pos, &cam->param.at, &d);
+    PSVECSubtract(&cam->param.Campos, &cam->param.Target, &d);
 #line 711 "D:/Bio4/Prog/t_rck.cpp"
     VECNormalize(&d, &d);
     PSVECScale(&d, &d, 15000.0f);
     d.y = 10000.0f;
-    cam->param.at = p->pos;
-    PSVECAdd(&cam->param.at, &d, &cam->param.pos);
+    cam->param.Target = p->pos;
+    PSVECAdd(&cam->param.Target, &d, &cam->param.Campos);
     RCK->x290 = RCK->x298 = RCK->curX = (Screen.x + Screen.width) * 0.5f;
     RCK->x294 = RCK->x29C = RCK->curY = (Screen.y + Screen.height) * 0.5f;
 }

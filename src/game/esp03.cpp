@@ -124,7 +124,7 @@ void Esp03_Trans(cEsp03* esp)
 #line 187 "D:/Bio4/Prog/esp03.cpp"
         VECNormalize(&pG->Camera.Up, &up);
         PSVECScale(&up, &up, esp->m_Size_base_x * 0.5f);
-        PSVECSubtract(p, &pG->Camera.param.pos, &d);
+        PSVECSubtract(p, &pG->Camera.param.Campos, &d);
         PSVECCrossProduct(&up, &d, &d);
 #line 193 "D:/Bio4/Prog/esp03.cpp"
         VECNormalize(&d, &d);

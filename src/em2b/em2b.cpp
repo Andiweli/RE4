@@ -3658,7 +3658,7 @@ void em2bParasiteAtkCamMove(cEm2b* em)
     Vec pos;
     Vec at;
 
-    w->Cam.param.fovy = 50.0f;
+    w->Cam.param.Fovy = 50.0f;
     p = pPL->getPartsPtr(0);
     at.x = 0.0f;
     at.y = 0.0f;
@@ -3670,12 +3670,12 @@ void em2bParasiteAtkCamMove(cEm2b* em)
     PSMTXMultVec(pPL->mat, &at, &at);
     pos.y += p->world.y - pPL->pos.y;
     at.y += p->world.y - pPL->pos.y;
-    w->Cam.param.pos = pos;
-    w->Cam.param.at = at;
+    w->Cam.param.Campos = pos;
+    w->Cam.param.Target = at;
     w->Cam.Up.x = 0.0f;
     w->Cam.Up.y = 1.0f;
     w->Cam.Up.z = 0.0f;
-    w->Cam.Distance = VEC_DIST(&w->Cam.param.pos, &w->Cam.param.at);
+    w->Cam.Distance = VEC_DIST(&w->Cam.param.Campos, &w->Cam.param.Target);
     CameraSetOrientationUp(&w->Cam);
     CamCtrl.SetExtraCamera(&w->Cam);
 }
@@ -4387,7 +4387,7 @@ void em2bEscapeCamMove(cEm2b* em)
     Vec b;
     Vec c;
 
-    w->Cam.param.fovy = g->Camera.param.fovy;
+    w->Cam.param.Fovy = g->Camera.param.Fovy;
     a.x = -376.0f;
     a.y = 575.0f;
     a.z = -1831.0f;
@@ -4396,23 +4396,23 @@ void em2bEscapeCamMove(cEm2b* em)
     b.z = 52.5999985f;
     PSMTXMultVec(pPL->mat, &a, &a);
     PSMTXMultVec(pPL->mat, &b, &b);
-    PosToPos(&g->Camera.param.at, &b, &w->Cam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &a, &w->Cam.param.pos, 1.0f);
-    if (EatMgr.hitCheck(&w->Cam.param.at, &w->Cam.param.pos, &c, 0, 0x8000, 0)) {
+    PosToPos(&g->Camera.param.Target, &b, &w->Cam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &a, &w->Cam.param.Campos, 1.0f);
+    if (EatMgr.hitCheck(&w->Cam.param.Target, &w->Cam.param.Campos, &c, 0, 0x8000, 0)) {
         Vec d;
         f32 len;
 
-        PSVECSubtract(&c, &w->Cam.param.at, &d);
+        PSVECSubtract(&c, &w->Cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 6834 "D:/Bio4/Prog/em2b.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&w->Cam.param.at, &d, &w->Cam.param.pos);
+        PSVECAdd(&w->Cam.param.Target, &d, &w->Cam.param.Campos);
     }
     w->Cam.Up.x = 0.0f;
     w->Cam.Up.y = 1.0f;
     w->Cam.Up.z = 0.0f;
-    w->Cam.Distance = VEC_DIST(&w->Cam.param.pos, &w->Cam.param.at);
+    w->Cam.Distance = VEC_DIST(&w->Cam.param.Campos, &w->Cam.param.Target);
     CameraSetOrientationUp(&w->Cam);
     CamCtrl.SetExtraCamera(&w->Cam);
 }
@@ -4484,8 +4484,8 @@ void em2bFtChgCk(cEm2b* em)
 void em2bQuakeSet(Vec* pos)
 {
     CAMERA* cam = &pG->Camera;
-    f32 d = (pos->x - cam->param.pos.x) * (pos->x - cam->param.pos.x) + (pos->y - cam->param.pos.y) * (pos->y - cam->param.pos.y) +
-            (pos->z - cam->param.pos.z) * (pos->z - cam->param.pos.z);
+    f32 d = (pos->x - cam->param.Campos.x) * (pos->x - cam->param.Campos.x) + (pos->y - cam->param.Campos.y) * (pos->y - cam->param.Campos.y) +
+            (pos->z - cam->param.Campos.z) * (pos->z - cam->param.Campos.z);
 
     if (d < 400000000.0f) {
         f32 power = 10.0f;
@@ -5324,14 +5324,14 @@ void em2bBlowCamMove(cEm2b* em, f32 rate)
 
     cParts* p;
 
-    w->Cam.param.fovy = g->Camera.param.fovy;
-    w->Cam.param.pos = g->Camera.param.pos;
+    w->Cam.param.Fovy = g->Camera.param.Fovy;
+    w->Cam.param.Campos = g->Camera.param.Campos;
     p = pPL->getPartsPtr(0);
-    PosToPos(&g->Camera.param.at, &p->world, &w->Cam.param.at, rate);
+    PosToPos(&g->Camera.param.Target, &p->world, &w->Cam.param.Target, rate);
     w->Cam.Up.x = 0.0f;
     w->Cam.Up.y = 1.0f;
     w->Cam.Up.z = 0.0f;
-    w->Cam.Distance = VEC_DIST(&w->Cam.param.pos, &w->Cam.param.at);
+    w->Cam.Distance = VEC_DIST(&w->Cam.param.Campos, &w->Cam.param.Target);
     CameraSetOrientationUp(&w->Cam);
     CamCtrl.SetExtraCamera(&w->Cam);
 }
@@ -5344,18 +5344,18 @@ void em2bStampCamMove(cEm2b* em)
     Vec v;
     cParts* p;
 
-    w->Cam.param.fovy = g->Camera.param.fovy;
+    w->Cam.param.Fovy = g->Camera.param.Fovy;
     v.x = 0.0f;
     v.y = 3000.0f;
     v.z = -3000.0f;
     PSMTXMultVec(pPL->mat, &v, &v);
-    PosToPos(&g->Camera.param.pos, &v, &w->Cam.param.pos, 0.100000001f);
+    PosToPos(&g->Camera.param.Campos, &v, &w->Cam.param.Campos, 0.100000001f);
     p = pPL->getPartsPtr(0);
-    PosToPos(&g->Camera.param.at, &p->world, &w->Cam.param.at, 0.300000012f);
+    PosToPos(&g->Camera.param.Target, &p->world, &w->Cam.param.Target, 0.300000012f);
     w->Cam.Up.x = 0.0f;
     w->Cam.Up.y = 1.0f;
     w->Cam.Up.z = 0.0f;
-    w->Cam.Distance = VEC_DIST(&w->Cam.param.pos, &w->Cam.param.at);
+    w->Cam.Distance = VEC_DIST(&w->Cam.param.Campos, &w->Cam.param.Target);
     CameraSetOrientationUp(&w->Cam);
     CamCtrl.SetExtraCamera(&w->Cam);
 }

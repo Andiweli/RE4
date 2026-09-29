@@ -1804,28 +1804,28 @@ void plemRockEscapeCamMove(cPlayer* pEm, f32 rate)
     GLOBAL_WK* g = pG;
     CAMERA* cam = &emRockCam;
 
-    cam->param.fovy = 27.0f;
+    cam->param.Fovy = 27.0f;
     PSMTXMultVec(pEm->mat, &emRock_campos, &p0);
     PSMTXMultVec(pEm->mat, &emRock_target, &p1);
-    PosToPos(&g->Camera.param.at, &p1, &emRockCam.param.at, rate);
-    PosToPos(&g->Camera.param.pos, &p0, &emRockCam.param.pos, rate);
+    PosToPos(&g->Camera.param.Target, &p1, &emRockCam.param.Target, rate);
+    PosToPos(&g->Camera.param.Campos, &p0, &emRockCam.param.Campos, rate);
     r.x = fRand1_1() * 10.0f;
     r.y = fRand1_1() * 10.0f;
     r.z = fRand1_1() * 10.0f;
-    PSVECAdd(&emRockCam.param.pos, &r, &emRockCam.param.pos);
-    PSVECAdd(&emRockCam.param.at, &r, &emRockCam.param.at);
-    if (EatMgr.hitCheck(&emRockCam.param.at, &emRockCam.param.pos, &hit, 0, 0x8000, 0)) {
-        PSVECSubtract(&hit, &emRockCam.param.at, &d);
+    PSVECAdd(&emRockCam.param.Campos, &r, &emRockCam.param.Campos);
+    PSVECAdd(&emRockCam.param.Target, &r, &emRockCam.param.Target);
+    if (EatMgr.hitCheck(&emRockCam.param.Target, &emRockCam.param.Campos, &hit, 0, 0x8000, 0)) {
+        PSVECSubtract(&hit, &emRockCam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 2738 "D:/Bio4/Prog/emrock.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&emRockCam.param.at, &d, &emRockCam.param.pos);
+        PSVECAdd(&emRockCam.param.Target, &d, &emRockCam.param.Campos);
     }
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &cam->param.pos;
-        Vec* ca = &cam->param.at;
+        Vec* cp = &cam->param.Campos;
+        Vec* ca = &cam->param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -1848,7 +1848,7 @@ void plemRockEscapeCamMove2(cPlayer* pEm, int mode)
     f32 len;
     CAMERA* gcam = &pG->Camera;
 
-    emRockCam.param.fovy = 50.0f;
+    emRockCam.param.Fovy = 50.0f;
     if (mode) {
         emRock_campos.x = 30.0f;
         emRock_target.x = -397.0f;
@@ -1863,17 +1863,17 @@ void plemRockEscapeCamMove2(cPlayer* pEm, int mode)
     }
     PSMTXMultVec(pEm->mat, &emRock_campos, &p0);
     PSMTXMultVec(pEm->mat, &emRock_target, &p1);
-    PosToPos(&gcam->param.at, &p1, &emRockCam.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &p0, &emRockCam.param.pos, 1.0f);
+    PosToPos(&gcam->param.Target, &p1, &emRockCam.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &p0, &emRockCam.param.Campos, 1.0f);
     r.x = fRand1_1() * 10.0f;
     r.y = fRand1_1() * 10.0f;
     r.z = fRand1_1() * 10.0f;
-    PSVECAdd(&emRockCam.param.pos, &r, &emRockCam.param.pos);
-    PSVECAdd(&emRockCam.param.at, &r, &emRockCam.param.at);
+    PSVECAdd(&emRockCam.param.Campos, &r, &emRockCam.param.Campos);
+    PSVECAdd(&emRockCam.param.Target, &r, &emRockCam.param.Target);
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &emRockCam.param.pos;
-        Vec* ca = &emRockCam.param.at;
+        Vec* cp = &emRockCam.param.Campos;
+        Vec* ca = &emRockCam.param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -1893,7 +1893,7 @@ void plemRockDropDieCamMove(cEmRock* pEm)
     cParts* parts;
     CAMERA* gcam = &pG->Camera;
 
-    emRockCam.param.fovy = 50.0f;
+    emRockCam.param.Fovy = 50.0f;
     if (Muku(&pEm->pos, &pPL->pos, pEm->ang.y, 3.1415927f) < 0.0f) {
         p.x = -10000.0f;
         p.y = 5000.0f;
@@ -1905,12 +1905,12 @@ void plemRockDropDieCamMove(cEmRock* pEm)
     }
     PSMTXMultVec(pEm->mat, &p, &p);
     parts = pPL->getPartsPtr(0);
-    PosToPos(&gcam->param.at, &parts->world, &emRockCam.param.at, 0.1f);
-    PosToPos(&gcam->param.pos, &p, &emRockCam.param.pos, 0.1f);
+    PosToPos(&gcam->param.Target, &parts->world, &emRockCam.param.Target, 0.1f);
+    PosToPos(&gcam->param.Campos, &p, &emRockCam.param.Campos, 0.1f);
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &emRockCam.param.pos;
-        Vec* ca = &emRockCam.param.at;
+        Vec* cp = &emRockCam.param.Campos;
+        Vec* ca = &emRockCam.param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -1930,7 +1930,7 @@ void emRockPushCamMove(cEmRock* pEm)
     cParts* parts;
     CAMERA* gcam = &pG->Camera;
 
-    emRockCam.param.fovy = 50.0f;
+    emRockCam.param.Fovy = 50.0f;
     switch (pG->room_no) {
     case 4:
     default:
@@ -1955,12 +1955,12 @@ void emRockPushCamMove(cEmRock* pEm)
         break;
     }
     parts = pEm->getPartsPtr(0);
-    PosToPos(&gcam->param.at, &parts->world, &emRockCam.param.at, 1.0f);
-    emRockCam.param.pos = p;
+    PosToPos(&gcam->param.Target, &parts->world, &emRockCam.param.Target, 1.0f);
+    emRockCam.param.Campos = p;
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &emRockCam.param.pos;
-        Vec* ca = &emRockCam.param.at;
+        Vec* cp = &emRockCam.param.Campos;
+        Vec* ca = &emRockCam.param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -1979,7 +1979,7 @@ void emRockPushCamMove2(cEmRock* pEm)
     Vec p1;
     f32 len;
 
-    emRockCam.param.fovy = 27.0f;
+    emRockCam.param.Fovy = 27.0f;
     switch (pG->room_no) {
     case 4:
     default:
@@ -2007,12 +2007,12 @@ void emRockPushCamMove2(cEmRock* pEm)
         p1.z = 69202.0f;
         break;
     }
-    emRockCam.param.pos = p0;
-    emRockCam.param.at = p1;
+    emRockCam.param.Campos = p0;
+    emRockCam.param.Target = p1;
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &cam->param.pos;
-        Vec* ca = &cam->param.at;
+        Vec* cp = &cam->param.Campos;
+        Vec* ca = &cam->param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -2031,18 +2031,18 @@ void emRockDropCamMove(cEmRock* em)
     Vec p1;
     f32 len;
     CAMERA* cam = &emRockCam;
-    Vec* cp = &cam->param.pos;
-    Vec* ca = &cam->param.at;
+    Vec* cp = &cam->param.Campos;
+    Vec* ca = &cam->param.Target;
 
-    cam->param.fovy = 50.0f;
+    cam->param.Fovy = 50.0f;
     p0.x = -5217.81f;
     p0.y = -12316.48f;
     p0.z = -16037.2f;
     p1.x = -5256.36f;
     p1.y = -10495.61f;
     p1.z = -15051.18f;
-    cam->param.pos = p0;
-    cam->param.at = p1;
+    cam->param.Campos = p0;
+    cam->param.Target = p1;
     // `up` is set BEFORE `len`: with the up stores after the six len loads, the up.x store is the
     // 34th memory insn of the block and sched1 flushes its pending lists there (haifa's 32-entry
     // limit), which pins the 1.0/0.0 stores behind it and swaps the three pool highs (r27..r29).

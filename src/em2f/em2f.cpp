@@ -1160,13 +1160,13 @@ void em2fCriCamMove(cEm2f* em)
     CAMERA* cam;
     Vec v;
 
-    PosToPos(&c->param.pos, &w->camPos, &em2f_cri_cam.param.pos, 0.1f);
-    PosToPos(&c->param.at, &w->camAt, &em2f_cri_cam.param.at, 0.1f);
+    PosToPos(&c->param.Campos, &w->camPos, &em2f_cri_cam.param.Campos, 0.1f);
+    PosToPos(&c->param.Target, &w->camAt, &em2f_cri_cam.param.Target, 0.1f);
     v.x = fRand1_1() * 50.0f;
     v.y = fRand1_1() * 50.0f;
     v.z = fRand1_1() * 50.0f;
-    PSVECAdd(&em2f_cri_cam.param.pos, &v, &em2f_cri_cam.param.pos);
-    PSVECAdd(&em2f_cri_cam.param.at, &v, &em2f_cri_cam.param.at);
+    PSVECAdd(&em2f_cri_cam.param.Campos, &v, &em2f_cri_cam.param.Campos);
+    PSVECAdd(&em2f_cri_cam.param.Target, &v, &em2f_cri_cam.param.Target);
     {
         // cam BEFORE the pos/at pointers: its lo_sum finds no register for em2f_cri_cam+N (the call
         // arguments were hard regs) and stays a fresh lis/addi; the pointers then reuse the call
@@ -1175,12 +1175,12 @@ void em2fCriCamMove(cEm2f* em)
         Vec* at;
         f32 dx, dy, dz;
         cam = &em2f_cri_cam;
-        pos = &em2f_cri_cam.param.pos;
-        at = &em2f_cri_cam.param.at;
+        pos = &em2f_cri_cam.param.Campos;
+        at = &em2f_cri_cam.param.Target;
         dx = pos->x - at->x;
         dy = pos->y - at->y;
         dz = pos->z - at->z;
-        cam->param.fovy = c->param.fovy;
+        cam->param.Fovy = c->param.Fovy;
         cam->Up.x = 0.0f;
         cam->Up.y = 1.0f;
         cam->Up.z = 0.0f;

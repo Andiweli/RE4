@@ -165,7 +165,7 @@ static u16 em21_flip_tbl[50] = {
 // The camera plemTrapCancel installs (the trap release cut): explicitly zero-initialised so it
 // stays in .data.
 static CAMERA em21_trap_cam = { 0 };
-// COMPILER-DIFF: candidate #12 (cse related-value): `cam = &em21_trap_cam` after the `&em21_trap_cam.param.pos/at`
+// COMPILER-DIFF: candidate #12 (cse related-value): `cam = &em21_trap_cam` after the `&em21_trap_cam.param.Campos/at`
 // pointers are known is a fresh `lis/addi` pair in the original; our cse rewrites it as `at - 0xB0`.
 // An asm-labelled alias declaration gives cse a distinct SYMBOL_REF and keeps the fresh pair.
 extern CAMERA em21_trap_cam_v asm("em21_trap_cam");
@@ -971,11 +971,11 @@ void plem21TrapCamMove(cModel* m)
     a.y = 1000.0f;
     a.z = 1000.0f;
     PSMTXMultVec(m->mat, &a, &a);
-    PosToPos(&c->param.at, &a, &em21_trap_cam.param.at, 1.0f);
-    PosToPos(&c->param.pos, &v, &em21_trap_cam.param.pos, 1.0f);
+    PosToPos(&c->param.Target, &a, &em21_trap_cam.param.Target, 1.0f);
+    PosToPos(&c->param.Campos, &v, &em21_trap_cam.param.Campos, 1.0f);
     {
-        Vec* pos = &em21_trap_cam.param.pos;
-        Vec* at = &em21_trap_cam.param.at;
+        Vec* pos = &em21_trap_cam.param.Campos;
+        Vec* at = &em21_trap_cam.param.Target;
         f32 dx = pos->x - at->x;
         f32 dy = pos->y - at->y;
         f32 dz = pos->z - at->z;
@@ -986,7 +986,7 @@ void plem21TrapCamMove(cModel* m)
         cam->Up.z = 0.0f;
         cam->Distance = SQRTF(dx * dx + dy * dy + dz * dz);
     }
-    cam->param.fovy = 55.0f;
+    cam->param.Fovy = 55.0f;
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }

@@ -641,8 +641,8 @@ void ItemExamine::init(u16 id, cModel* p_model, u8 scrn_flag)
         VecLinearCombination(p0, c, &m_pModel->getPartsPtr(1)->world, 1.0f - c0, &mid);
         PSVECScale(&mid, &mid, 0.5f);
         PSVECAdd(&mid, &p, &at);
-        itemCamera.param.at = mid;
-        itemCamera.param.pos = at;
+        itemCamera.param.Target = mid;
+        itemCamera.param.Campos = at;
         itemCamera.Distance = cap_dist_max;
         g_rad_x = 0.0f;
     } else {
@@ -809,8 +809,8 @@ void ItemExamine::move()
             }
             CameraCamposRot(&itemCamera, 'X', r);
         }
-        itemCamera.param.roll = 0.0f;
-        itemCamera.param.fovy = _fovy;
+        itemCamera.param.Roll = 0.0f;
+        itemCamera.param.Fovy = _fovy;
         CameraSetOrientationRoll(&itemCamera);
     } else {
         ModelBound* b = &m_pModel->pModelInfo->bound;
@@ -848,13 +848,13 @@ void ItemExamine::move()
         _target.y = -y;
         _campos.y = -y;
         _campos.z = z;
-        itemCamera.param.pos = _campos;
-        itemCamera.param.at = _target;
+        itemCamera.param.Campos = _campos;
+        itemCamera.param.Target = _target;
         itemCamera.Up = _up;
-        itemCamera.param.fovy = _fovy;
+        itemCamera.param.Fovy = _fovy;
     }
-    C_MTXPerspective(itemCamera.ProjMat, itemCamera.param.fovy, 1.3333334f, ZNEAR, ZFAR);
-    C_MTXLookAt(itemCamera.v_mat, &itemCamera.param.pos, &itemCamera.Up, &itemCamera.param.at);
+    C_MTXPerspective(itemCamera.ProjMat, itemCamera.param.Fovy, 1.3333334f, ZNEAR, ZFAR);
+    C_MTXLookAt(itemCamera.v_mat, &itemCamera.param.Campos, &itemCamera.Up, &itemCamera.param.Target);
     LightMgr.setModel2(m_pModel);
     if (!StaFlagChk(pG, STA_SUB_SCRN)) {
         AddOtDirect(ot_type, (void*) 0xCDCDCDCD, render, ot_no, ot_kind, 0, 0.0f);

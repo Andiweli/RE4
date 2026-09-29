@@ -89,20 +89,20 @@ void CameraMove()
         }
     }
     CamDbg.move(cam, &Joy[1], 0);
-    if (cam->param.fovy == 0.0f) {
+    if (cam->param.Fovy == 0.0f) {
         pLog->err(0, 0, "CameraMove(): Fovy = 0.0f");
-        cam->param.fovy = 50.0f;
+        cam->param.Fovy = 50.0f;
     }
     switch (ProjType) {
     case 1:
-        C_MTXPerspective(cam->ProjMat, cam->param.fovy, 1.3333334f, ZNEAR, ZFAR);
+        C_MTXPerspective(cam->ProjMat, cam->param.Fovy, 1.3333334f, ZNEAR, ZFAR);
         break;
     case 2:
         C_MTXOrtho(cam->ProjMat, ORTHO_T, ORTHO_B, ORTHO_L, ORTHO_R, 0.0f, ZFAR);
         break;
     }
-    cam->Distance = PSVECDistance(&cam->param.pos, &cam->param.at);
-    C_MTXLookAt(cam->v_mat, &cam->param.pos, &cam->Up, &cam->param.at);
+    cam->Distance = PSVECDistance(&cam->param.Campos, &cam->param.Target);
+    C_MTXLookAt(cam->v_mat, &cam->param.Campos, &cam->Up, &cam->param.Target);
     View.move();
     CameraDebugInformation();
 }
@@ -178,7 +178,7 @@ static f32 ScrnY2Ratio(int y)
 // picking).
 void CamPos2ScrnVec(f32 sX, f32 sY, Vec* vec)
 {
-    f32 ang = pG->Camera.param.fovy;
+    f32 ang = pG->Camera.param.Fovy;
     f32 h = 480.0f;  // first constant of the pool
 
     vec->x = sX - Screen.width * 0.5f;

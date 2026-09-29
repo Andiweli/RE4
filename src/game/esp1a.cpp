@@ -53,7 +53,7 @@ void cEsp1a::move()
             } else {
                 wpos = m_Pos;
             }
-            PSVECSubtract(&wpos, &cam->param.pos, &look);
+            PSVECSubtract(&wpos, &cam->param.Campos, &look);
 #line 84 "D:/Bio4/Prog/esp1a.cpp"
             VECNormalize(&look, &look);
             CameraGetUpVec(cam, &up);

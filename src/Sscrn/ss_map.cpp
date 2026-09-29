@@ -74,8 +74,8 @@ struct SsMapWork {
     s8 nCoin;            // 0xFB5
     s8 nSave;            // 0xFB6
     u8 pad_FB7;
-    CameraParam from;    // 0xFB8  zoom start
-    CameraParam to;      // 0xFD8  zoom end
+    CAMERA_POINT from;    // 0xFB8  zoom start
+    CAMERA_POINT to;      // 0xFD8  zoom end
     s8 area;             // 0xFF8  getAreaNo
     s8 roomIdx;          // 0xFF9  map_room index of the current room (-1 none)
     s8 modeCursor;       // 0xFFA  mark mode menu cursor
@@ -241,9 +241,9 @@ void doorModelDisp(SUB_SCREEN* wk);
 void mapCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 void mapCameraMove(SUB_SCREEN* wk);
 f32 zoomOutLimit();
-void mapCameraEntire(SUB_SCREEN* wk, CameraParam* out);
+void mapCameraEntire(SUB_SCREEN* wk, CAMERA_POINT* out);
 f32 zoomInLimit();
-void mapCameraZoomIn(SUB_SCREEN* wk, CameraParam* out);
+void mapCameraZoomIn(SUB_SCREEN* wk, CAMERA_POINT* out);
 int zoomMove(SsMapWork* m, int max, int cnt);
 void mapAreaFilename(int area, char* name);
 int scf_check_merchant();
@@ -348,7 +348,7 @@ cModel* ssPlMotion = 0;
 cModel* ssWepModel2 = 0;
 
 // Whole-map camera per stage.
-static const CameraParam map_cam_entire[4] = {
+static const CAMERA_POINT map_cam_entire[4] = {
     {{0.0f, 10000.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, 0.0f, 55.0f},
     {{21000.0f, 82850.0f, 12650.0f}, {21000.0f, 0.0f, 12650.0f}, 0.0f, 55.0f},
     {{-425.0f, 104000.0f, -3210.0f}, {-425.0f, 0.0f, -3210.0f}, 0.0f, 55.0f},
@@ -1211,7 +1211,7 @@ int mapPos2screenPos(Vec* pos, Vec* out)
     if (out->z > -fabsf(ZNEAR)) {
         return 0;
     }
-    f32 ang = pG->Camera.param.fovy * 0.5f * 0.017453292f;
+    f32 ang = pG->Camera.param.Fovy * 0.5f * 0.017453292f;
     f32 kx;
     f32 ky;
 
@@ -2197,14 +2197,14 @@ void mapCameraMove(SUB_SCREEN* wk)
         }
     }
     if (d.x != 0.0f || d.y != 0.0f || d.z != 0.0f) {
-        PSVECAdd(&pG->Camera.param.pos, &d, &pG->Camera.param.pos);
+        PSVECAdd(&pG->Camera.param.Campos, &d, &pG->Camera.param.Campos);
         d.y = 0.0f;
-        PSVECAdd(&pG->Camera.param.at, &d, &pG->Camera.param.at);
-        if (pG->Camera.param.pos.y <= zoomInLimit()) {
-            pG->Camera.param.pos.y = zoomInLimit();
+        PSVECAdd(&pG->Camera.param.Target, &d, &pG->Camera.param.Target);
+        if (pG->Camera.param.Campos.y <= zoomInLimit()) {
+            pG->Camera.param.Campos.y = zoomInLimit();
         }
-        if (pG->Camera.param.pos.y >= zoomOutLimit()) {
-            pG->Camera.param.pos.y = zoomOutLimit();
+        if (pG->Camera.param.Campos.y >= zoomOutLimit()) {
+            pG->Camera.param.Campos.y = zoomOutLimit();
         }
         CameraSetOrientationUp(&pG->Camera);
     }
@@ -2213,11 +2213,11 @@ void mapCameraMove(SUB_SCREEN* wk)
 // Camera height of the whole-stage view (map_cam_entire of the stage).
 f32 zoomOutLimit()
 {
-    return map_cam_entire[(s8) SubScreenWk.stage_no].pos.y;
+    return map_cam_entire[(s8) SubScreenWk.stage_no].Campos.y;
 }
 
 // Whole-stage camera of the stage into `out`; swaps the "zoom in" / "zoom out" button hints.
-void mapCameraEntire(SUB_SCREEN* wk, CameraParam* out)
+void mapCameraEntire(SUB_SCREEN* wk, CAMERA_POINT* out)
 {
     *out = map_cam_entire[(s8) wk->stage_no];
     IdSub.unitPtr(1, IDC_SSCRN_CKPT_1)->be_flag |= 8;
@@ -2228,12 +2228,12 @@ void mapCameraEntire(SUB_SCREEN* wk, CameraParam* out)
 // Closest camera height: 4000 units of half-width at the current fov.
 f32 zoomInLimit()
 {
-    return 4000.0f / tanf(pG->Camera.param.fovy * 0.5f * 3.1415927f / 180.0f);
+    return 4000.0f / tanf(pG->Camera.param.Fovy * 0.5f * 3.1415927f / 180.0f);
 }
 
 // Zoomed camera into `out`: centred between the player and the goal, high enough to frame both
 // (4:3), clamped to the zoom limits; swaps the button hints.
-void mapCameraZoomIn(SUB_SCREEN* wk, CameraParam* out)
+void mapCameraZoomIn(SUB_SCREEN* wk, CAMERA_POINT* out)
 {
     Vec pl;
     Vec goal;
@@ -2254,16 +2254,16 @@ void mapCameraZoomIn(SUB_SCREEN* wk, CameraParam* out)
     if (!(d.z / d.x >= 0.75f)) {
         d.z = d.x * 0.75f;
     }
-    h = d.z / tanf(pG->Camera.param.fovy * 0.5f * 3.1415927f / 180.0f);
+    h = d.z / tanf(pG->Camera.param.Fovy * 0.5f * 3.1415927f / 180.0f);
     if (h <= zoomInLimit()) {
         h = zoomInLimit();
     }
     if (h >= zoomOutLimit()) {
         h = zoomOutLimit();
     }
-    out->pos = mid;
-    out->at = mid;
-    out->pos.y += h;
+    out->Campos = mid;
+    out->Target = mid;
+    out->Campos.y += h;
     IdSub.unitPtr(1, IDC_SSCRN_CKPT_1)->rev_flag |= 0xF;
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_1)->rev_flag &= 0xF0;
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_1)->be_flag |= 8;
@@ -2278,16 +2278,16 @@ int zoomMove(SsMapWork* m, int max, int cnt)
     Vec b;
     f32 s;
 
-    CameraParam* from = &m->from;
-    CameraParam* to = &m->to;
+    CAMERA_POINT* from = &m->from;
+    CAMERA_POINT* to = &m->to;
 
-    PSVECScale(&to->pos, &a, t);
+    PSVECScale(&to->Campos, &a, t);
     s = 1.0f - t;
-    PSVECScale(&from->pos, &b, s);
-    PSVECAdd(&a, &b, &pG->Camera.param.pos);
-    PSVECScale(&to->at, &a, t);
-    PSVECScale(&from->at, &b, s);
-    PSVECAdd(&a, &b, &pG->Camera.param.at);
+    PSVECScale(&from->Campos, &b, s);
+    PSVECAdd(&a, &b, &pG->Camera.param.Campos);
+    PSVECScale(&to->Target, &a, t);
+    PSVECScale(&from->Target, &b, s);
+    PSVECAdd(&a, &b, &pG->Camera.param.Target);
     // pG loads pG separately from the earlier pG loads, so pG is reloaded for the call after the copy
     pG->Camera.Up = up;
     CameraSetOrientationUp(&pG->Camera);

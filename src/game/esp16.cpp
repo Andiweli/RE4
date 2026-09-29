@@ -205,7 +205,7 @@ void Esp16_Trans(cEsp16* esp)
     GXSetVtxAttrFmt(0, 0xA, 0, 1, 0);
     GXSetVtxAttrFmt(0, 0xD, 1, 4, 0);
     p1 = NULL;
-    cam = pG->Camera.param.pos;
+    cam = pG->Camera.param.Campos;
     if (esp->m_Tool_flg & 4) {
         t = tw;
         tw = -1.0f / (f32)w->Num;

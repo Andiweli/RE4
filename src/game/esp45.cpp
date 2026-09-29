@@ -141,9 +141,9 @@ static f32 GetDistAlpha(cEsp45* esp)
     if (w->del_dist != 0.0f) {
         CAMERA* cam = &pG->Camera;
 
-        d.x = w->wld_pos.x - cam->param.pos.x;
-        d.y = w->wld_pos.y - cam->param.pos.y;
-        d.z = w->wld_pos.z - cam->param.pos.z;
+        d.x = w->wld_pos.x - cam->param.Campos.x;
+        d.y = w->wld_pos.y - cam->param.Campos.y;
+        d.z = w->wld_pos.z - cam->param.Campos.z;
         a = PSVECMag(&d) / w->del_dist;
         if (a > 1.0f) {
             a = 1.0f;

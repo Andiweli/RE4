@@ -157,8 +157,8 @@ void Espgen45_Move00(cEspgen* pGen)
     frame = pG->Frame_cnt % 60;
     StaFlagOn(pG, STA_WATER_ALIVE);
     if (g_bTargetCamera == 1) {
-        g_Target_x = pG->Camera.param.at.x;
-        g_Target_z = pG->Camera.param.at.z;
+        g_Target_x = pG->Camera.param.Target.x;
+        g_Target_z = pG->Camera.param.Target.z;
     }
     p->pos0.x = g_Target_x;
     p->pos0.z = g_Target_z;
@@ -530,7 +530,7 @@ void Espgen45_TransSub(cEspgen* w)
             Mtx pm;
             GXInitTexObj(&tex, buf, (u32) Screen.width / 2, (u32) ((f32) ((u32) Screen.height / 2) - ofs), 6, 0, 0, 0);
             GXLoadTexObj(&tex, st->texMap);
-            C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
+            C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
             PSMTXConcat(pm, mv, tm);
             GXLoadTexMtxImm(tm, 0x1E, 0);
             GXSetTexCoordGen(st->texCoord, 0, 0, 0x1E);

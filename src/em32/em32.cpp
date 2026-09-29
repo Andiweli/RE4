@@ -2276,7 +2276,7 @@ void em32EscapeCamMove(cEm32* em)
     Vec d;
     f32 len;
 
-    w->cam.param.fovy = cam->param.fovy;
+    w->cam.param.Fovy = cam->param.Fovy;
     pos.x = -376.0f;
     pos.y = 575.0f;
     pos.z = -1831.0f;
@@ -2285,20 +2285,20 @@ void em32EscapeCamMove(cEm32* em)
     at.z = 52.5999985f;
     PSMTXMultVec(pPL->mat, &pos, &pos);
     PSMTXMultVec(pPL->mat, &at, &at);
-    PosToPos(&cam->param.at, &at, &w->cam.param.at, 1.0f);
-    PosToPos(&cam->param.pos, &pos, &w->cam.param.pos, 1.0f);
-    if (EatMgr.hitCheck(&w->cam.param.at, &w->cam.param.pos, &hit, 0, 0x8000, 0)) {
-        PSVECSubtract(&hit, &w->cam.param.at, &d);
+    PosToPos(&cam->param.Target, &at, &w->cam.param.Target, 1.0f);
+    PosToPos(&cam->param.Campos, &pos, &w->cam.param.Campos, 1.0f);
+    if (EatMgr.hitCheck(&w->cam.param.Target, &w->cam.param.Campos, &hit, 0, 0x8000, 0)) {
+        PSVECSubtract(&hit, &w->cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 3617 "D:/Bio4/Prog/em32.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&w->cam.param.at, &d, &w->cam.param.pos);
+        PSVECAdd(&w->cam.param.Target, &d, &w->cam.param.Campos);
     }
     w->cam.Up.x = 0.0f;
     w->cam.Up.y = 1.0f;
     w->cam.Up.z = 0.0f;
-    w->cam.Distance = VEC_DIST(&w->cam.param.pos, &w->cam.param.at);
+    w->cam.Distance = VEC_DIST(&w->cam.param.Campos, &w->cam.param.Target);
     CameraSetOrientationUp(&w->cam);
     CamCtrl.SetExtraCamera(&w->cam);
 }

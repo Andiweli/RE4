@@ -87,14 +87,14 @@ void CameraMotion::move()
             break;
         }
     }
-    param.pos = pos;
-    param.at = at;
-    param.roll = roll.y;
-    param.fovy = fov.y * 180.0f / PI;
+    param.Campos = pos;
+    param.Target = at;
+    param.Roll = roll.y;
+    param.Fovy = fov.y * 180.0f / PI;
     CameraSetOrientationRoll(this);
     if (m_p_base_mat) {
-        PSMTXMultVec(*m_p_base_mat, &param.pos, &param.pos);
-        PSMTXMultVec(*m_p_base_mat, &param.at, &param.at);
+        PSMTXMultVec(*m_p_base_mat, &param.Campos, &param.Campos);
+        PSMTXMultVec(*m_p_base_mat, &param.Target, &param.Target);
         PSMTXMultVec(*m_p_base_mat, &Up, &Up);
         CameraSetOrientationUp(this);
     }

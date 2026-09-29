@@ -787,20 +787,20 @@ void terminalCameraInit(SUB_SCREEN* wk, CAMERA* cam)
 {
     const f32 zero = 0.0f;
 
-    cam->param.pos.z = 2000.0f;
+    cam->param.Campos.z = 2000.0f;
     cam->Up.y = 1.0f;
-    cam->param.at.x = 0.0f;
-    cam->param.at.y = 0.0f;
-    cam->param.at.z = 0.0f;
-    cam->param.pos.x = 0.0f;
-    cam->param.pos.y = 0.0f;
+    cam->param.Target.x = 0.0f;
+    cam->param.Target.y = 0.0f;
+    cam->param.Target.z = 0.0f;
+    cam->param.Campos.x = 0.0f;
+    cam->param.Campos.y = 0.0f;
     cam->Up.x = 0.0f;
     cam->Up.z = 0.0f;
-    cam->param.fovy = 50.0f;
+    cam->param.Fovy = 50.0f;
     CameraSetOrientationUp(cam);
-    C_MTXPerspective(cam->ProjMat, cam->param.fovy, 1.3333334f, ZNEAR, ZFAR);
-    cam->Distance = PSVECDistance(&cam->param.pos, &cam->param.at);
-    C_MTXLookAt(cam->v_mat, &cam->param.pos, &cam->Up, &cam->param.at);
+    C_MTXPerspective(cam->ProjMat, cam->param.Fovy, 1.3333334f, ZNEAR, ZFAR);
+    cam->Distance = PSVECDistance(&cam->param.Campos, &cam->param.Target);
+    C_MTXLookAt(cam->v_mat, &cam->param.Campos, &cam->Up, &cam->param.Target);
 }
 
 
@@ -810,8 +810,8 @@ void terminalCameraInit(SUB_SCREEN* wk, CAMERA* cam)
 static void screenPos2terminalPos(Vec* pos, Vec* out)
 {
     CAMERA* cam = &pG->Camera;
-    f32 pz = cam->param.pos.z;
-    f32 h = fabsf((f32) (pz * tan(cam->param.fovy * 0.5f * 3.1415927f / 180.0f)));
+    f32 pz = cam->param.Campos.z;
+    f32 h = fabsf((f32) (pz * tan(cam->param.Fovy * 0.5f * 3.1415927f / 180.0f)));
 
     out->x = pos->x * h / 240.0f;
     out->y = pos->y * h / 240.0f;
@@ -877,7 +877,7 @@ void SsTermMain::init(SUB_SCREEN* wk)
             Vec d;
             Vec ang2;
             pos = term_cam_pos;
-            PSVECSubtract(&pG->Camera.param.pos, &pos, &d);
+            PSVECSubtract(&pG->Camera.param.Campos, &pos, &d);
             ang2.x = 0.0f;
             ang2.y = atan2f(d.x, d.z);
             ang2.z = 0.0f;

@@ -790,9 +790,9 @@ void emBarrelSetBomb(cEmBarrel* pEm)
     w->Bomb_r = 6000.0f;
     cam = &pG->Camera;
     p = pEm->getPartsPtr(1);
-    d2 = (p->world.x - cam->param.pos.x) * (p->world.x - cam->param.pos.x) +
-         (p->world.y - cam->param.pos.y) * (p->world.y - cam->param.pos.y) +
-         (p->world.z - cam->param.pos.z) * (p->world.z - cam->param.pos.z);
+    d2 = (p->world.x - cam->param.Campos.x) * (p->world.x - cam->param.Campos.x) +
+         (p->world.y - cam->param.Campos.y) * (p->world.y - cam->param.Campos.y) +
+         (p->world.z - cam->param.Campos.z) * (p->world.z - cam->param.Campos.z);
     if (d2 < 400000000.0f) {
         power = 10.0f;
         if (d2 > 25000000.0f) {
@@ -840,9 +840,9 @@ void emBarrelSetBomb2(cEmBarrel* pEm)
     w->Bomb_r = 4000.0f;
     cam = &pG->Camera;
     p = pEm->getPartsPtr(1);
-    d2 = (p->world.x - cam->param.pos.x) * (p->world.x - cam->param.pos.x) +
-         (p->world.y - cam->param.pos.y) * (p->world.y - cam->param.pos.y) +
-         (p->world.z - cam->param.pos.z) * (p->world.z - cam->param.pos.z);
+    d2 = (p->world.x - cam->param.Campos.x) * (p->world.x - cam->param.Campos.x) +
+         (p->world.y - cam->param.Campos.y) * (p->world.y - cam->param.Campos.y) +
+         (p->world.z - cam->param.Campos.z) * (p->world.z - cam->param.Campos.z);
     if (d2 < 400000000.0f) {
         power = 10.0f;
         if (d2 > 25000000.0f) {

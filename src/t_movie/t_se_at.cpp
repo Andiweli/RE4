@@ -177,8 +177,8 @@ void seAtInit()
         seAtSaveList = list;
         asm("" : "=m"(seAtWk) : "m"(Snd.pSeAtHeader), "m"(Snd.pSeAtData)); // COMPILER-DIFF: #13 (memory anchor)
     }
-    pW->camPos = g->Camera.param.pos;
-    pW->camAt = g->Camera.param.at;
+    pW->camPos = g->Camera.param.Campos;
+    pW->camAt = g->Camera.param.Target;
     pW->mode = 2;
     pW->sub = 0;
     pW->step = 0;
@@ -257,7 +257,7 @@ static void seAtAreaEdit()
         f32 dist;
         CAMERA* cam = &pG->Camera;
         dist = cam->Distance;
-        cam->param.at = pCur->pos;
+        cam->param.Target = pCur->pos;
         CameraSetOrientationRoll(cam);
         CameraCamposDistance(cam, dist);
         eprintf(pW->x + 0x58, pW->y, 0, 0, "POS( %f, %f, %f )", pCur->pos.x, pCur->pos.y, pCur->pos.z);
@@ -278,8 +278,8 @@ static void seAtAreaEdit()
         Draw_line3d(&v[0], &v[1], 0xFF00FFFF, 0);
     } else {
         CAMERA* cam = &pG->Camera;
-        cam->param.pos = pW->camPos;
-        cam->param.at = pW->camAt;
+        cam->param.Campos = pW->camPos;
+        cam->param.Target = pW->camAt;
         CameraSetOrientationRoll(cam);
         CameraCamposDistance(cam, 2500.0f);
         eprintf(pW->x + 0x58, pW->y, 2, 0, "NO DATA:");
@@ -403,12 +403,12 @@ static void seAtAreaEdit_AreaMove()
     }
     if (joy->substickX) {
         Vec axis = {0.0f, 1.0f, 0.0f};
-        CameraRotAxisPosRad(cam, &axis, &cam->param.at, (f32) joy->substickX * 0.05f * 0.017453292f);
+        CameraRotAxisPosRad(cam, &axis, &cam->param.Target, (f32) joy->substickX * 0.05f * 0.017453292f);
     }
     if (joy->substickY) {
         CameraCamposRot(cam, 'x', (f32) joy->substickY * -0.05f * 0.017453292f);
     }
-    pCur->pos = cam->param.at;
+    pCur->pos = cam->param.Target;
     if (Joy[0].trg & JOY_B) {
         pW->sub = 0;
         pW->step = 0;
@@ -721,7 +721,7 @@ static void seAtAreaEdit_AreaDelete()
 // Creates the record at the camera target with default values.
 static void seAtAreaEdit_AreaCreate()
 {
-    pCur->pos = pG->Camera.param.at;
+    pCur->pos = pG->Camera.param.Target;
     pCur->flags |= 3;
     pW->editCursor = 0;
     pW->sub = 0;

@@ -297,7 +297,7 @@ void Esp18_Trans(cEsp18* esp)
             GXSetTexCoordGen(texGens, 1, 0, 0x1E);
             texGens++;
         } else {
-            C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.6666667f, rx * (1.0f / 512.0f) * e18mx + 0.5f,
+            C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.6666667f, rx * (1.0f / 512.0f) * e18mx + 0.5f,
                                   ry / 392.0f * e18my + 0.5f);
             PSMTXConcat(pm, esp->m_Mat, tm);
             GXLoadTexMtxImm(tm, 0x1E, 0);

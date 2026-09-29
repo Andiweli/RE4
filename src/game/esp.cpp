@@ -316,9 +316,9 @@ int EspTrans()
     }
     LightMgr.setEsp(&sys->EspLightEnv, 8);
     cam = &pG->Camera;
-    dir.x = cam->param.at.x - cam->param.pos.x;
-    dir.y = cam->param.at.y - cam->param.pos.y;
-    dir.z = cam->param.at.z - cam->param.pos.z;
+    dir.x = cam->param.Target.x - cam->param.Campos.x;
+    dir.y = cam->param.Target.y - cam->param.Campos.y;
+    dir.z = cam->param.Target.z - cam->param.Campos.z;
     if (dir.x == 0.0f && dir.y == 0.0f && dir.z == 0.0f) {
         dir.y = 1.0f;
     }

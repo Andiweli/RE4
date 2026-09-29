@@ -891,13 +891,13 @@ void objLadderClimbCamMove(cEm* pEm)
     camAt.z = 0.0f;
     PSMTXMultVec(parts->mat, &camPos, &camPos);
     PSMTXMultVec(parts->mat, &camAt, &camAt);
-    PosToPos(&g->Camera.param.at, &camAt, &objLadderClimbCam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &camPos, &objLadderClimbCam.param.pos, 1.0f);
+    PosToPos(&g->Camera.param.Target, &camAt, &objLadderClimbCam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &camPos, &objLadderClimbCam.param.Campos, 1.0f);
     objLadderClimbCam.Up.x = 0.0f;
     objLadderClimbCam.Up.y = 1.0f;
     objLadderClimbCam.Up.z = 0.0f;
-    objLadderClimbCam.Distance = LadderCamDist(&objLadderClimbCam.param.pos, &objLadderClimbCam.param.at);
-    objLadderClimbCam.param.fovy = 55.0f;
+    objLadderClimbCam.Distance = LadderCamDist(&objLadderClimbCam.param.Campos, &objLadderClimbCam.param.Target);
+    objLadderClimbCam.param.Fovy = 55.0f;
     CameraSetOrientationUp(&objLadderClimbCam);
     CamCtrl.SetExtraCamera(&objLadderClimbCam);
 }
@@ -1043,13 +1043,13 @@ void objLadderDownCamMove(cEm* pEm)
     camAt.z = 500.0f;
     PSMTXMultVec(pEm->mat, &camPos, &camPos);
     PSMTXMultVec(pEm->mat, &camAt, &camAt);
-    PosToPos(&g->Camera.param.at, &camAt, &objLadderDownCam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &camPos, &objLadderDownCam.param.pos, 1.0f);
+    PosToPos(&g->Camera.param.Target, &camAt, &objLadderDownCam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &camPos, &objLadderDownCam.param.Campos, 1.0f);
     objLadderDownCam.Up.x = 0.0f;
     objLadderDownCam.Up.y = 1.0f;
     objLadderDownCam.Up.z = 0.0f;
-    objLadderDownCam.Distance = LadderCamDist(&objLadderDownCam.param.pos, &objLadderDownCam.param.at);
-    objLadderDownCam.param.fovy = 55.0f;
+    objLadderDownCam.Distance = LadderCamDist(&objLadderDownCam.param.Campos, &objLadderDownCam.param.Target);
+    objLadderDownCam.param.Fovy = 55.0f;
     CameraSetOrientationUp(&objLadderDownCam);
     CamCtrl.SetExtraCamera(&objLadderDownCam);
 }
@@ -1148,13 +1148,13 @@ void objLadderResetCamMove(cEm* pEm)
     camAt.z = 0.0f;
     PSMTXMultVec(pEm->mat, &camPos, &camPos);
     PSMTXMultVec(pEm->mat, &camAt, &camAt);
-    PosToPos(&g->Camera.param.at, &camAt, &objLadderResetCam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &camPos, &objLadderResetCam.param.pos, 1.0f);
+    PosToPos(&g->Camera.param.Target, &camAt, &objLadderResetCam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &camPos, &objLadderResetCam.param.Campos, 1.0f);
     objLadderResetCam.Up.x = 0.0f;
     objLadderResetCam.Up.y = 1.0f;
     objLadderResetCam.Up.z = 0.0f;
-    objLadderResetCam.Distance = LadderCamDist(&objLadderResetCam.param.pos, &objLadderResetCam.param.at);
-    objLadderResetCam.param.fovy = 55.0f;
+    objLadderResetCam.Distance = LadderCamDist(&objLadderResetCam.param.Campos, &objLadderResetCam.param.Target);
+    objLadderResetCam.param.Fovy = 55.0f;
     CameraSetOrientationUp(&objLadderResetCam);
     CamCtrl.SetExtraCamera(&objLadderResetCam);
 }

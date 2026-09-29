@@ -877,13 +877,13 @@ void SceSetChapterEnd(int ChapterNo, int door_at_no)
 // camera (CamCtrl.m_pExtraCamera).
 void SceCamMove(Vec* pCamPos, Vec* pTarget, f32 fovy)
 {
-    SceCam.param.pos = *pCamPos;
-    SceCam.param.at = *pTarget;
-    SceCam.param.fovy = fovy;
+    SceCam.param.Campos = *pCamPos;
+    SceCam.param.Target = *pTarget;
+    SceCam.param.Fovy = fovy;
     SceCam.Up.x = 0.0f;
     SceCam.Up.y = 1.0f;
     SceCam.Up.z = 0.0f;
-    SceCam.Distance = VEC_DIST(&SceCam.param.pos, &SceCam.param.at);
+    SceCam.Distance = VEC_DIST(&SceCam.param.Campos, &SceCam.param.Target);
     CameraSetOrientationUp(&SceCam);
     CamCtrl.SetExtraCamera(&SceCam);
 }

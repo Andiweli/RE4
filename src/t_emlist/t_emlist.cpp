@@ -1062,13 +1062,13 @@ static void emlist_r0_target()
                 p->flags |= 1;
                 *(u16*) ((u8*) p + 0x18) = (pG->stage_no << 8) | pG->room_no;
                 p->emset_no = 0;
-                PSVECSubtract(&pG->Camera.param.at, &pG->Camera.param.pos, &v);
+                PSVECSubtract(&pG->Camera.param.Target, &pG->Camera.param.Campos, &v);
                 {
                     f32 vy = v.y;
                     v.y = 0.0f;
-                    PSVECScale(&v, &v, (pPLem->pos.y - pG->Camera.param.pos.y) / vy);
+                    PSVECScale(&v, &v, (pPLem->pos.y - pG->Camera.param.Campos.y) / vy);
                 }
-                PSVECAdd(&pG->Camera.param.pos, &v, &v);
+                PSVECAdd(&pG->Camera.param.Campos, &v, &v);
                 ((s16*) p->pos)[0] = (s16) (v.x * 0.1f);
                 ((s16*) p->pos)[1] = (s16) (pPLem->pos.y * 0.1f);
                 ((s16*) p->pos)[2] = (s16) (v.z * 0.1f);
@@ -2780,19 +2780,19 @@ void emlistCamToPoin()
         if (GetScreenPos(&tmp, &scr) != 0 && scr.x > 50.0f && scr.x < 462.0f && scr.y > 100.0f && scr.y < 348.0f) {
             return;
         }
-        PSVECSubtract(&cam->param.pos, &cam->param.at, &d);
-        EmList.wk->cam.param.at = pos;
-        PSVECAdd(&EmList.wk->cam.param.at, &d, &EmList.wk->cam.param.pos);
+        PSVECSubtract(&cam->param.Campos, &cam->param.Target, &d);
+        EmList.wk->cam.param.Target = pos;
+        PSVECAdd(&EmList.wk->cam.param.Target, &d, &EmList.wk->cam.param.Campos);
         EmList.wk->cam.Up.x = 0.0f;
         EmList.wk->cam.Up.y = 1.0f;
         EmList.wk->cam.Up.z = 0.0f;
         EmList.wk->cam.Distance =
-            VEC_DIST(&EmList.wk->cam.param.pos, &EmList.wk->cam.param.at);
-        EmList.wk->cam.param.fovy = cam->param.fovy;
+            VEC_DIST(&EmList.wk->cam.param.Campos, &EmList.wk->cam.param.Target);
+        EmList.wk->cam.param.Fovy = cam->param.Fovy;
         CameraSetOrientationUp(&EmList.wk->cam);
         CamCtrl.SetExtraCamera(&EmList.wk->cam);
-        cam->param.at = EmList.wk->cam.param.at;
-        cam->param.pos = EmList.wk->cam.param.pos;
+        cam->param.Target = EmList.wk->cam.param.Target;
+        cam->param.Campos = EmList.wk->cam.param.Campos;
         EmList.wk->cursorX = (Screen.x + Screen.width) * 0.5f;
         EmList.wk->cursorY = (Screen.y + Screen.height) * 0.5f;
     }

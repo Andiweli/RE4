@@ -631,7 +631,7 @@ int puzzlePos2screenPos(Vec* pos, Vec* out)
     if (out->z > -fabsf(ZNEAR)) {
         return 0;
     }
-    ang = pG->Camera.param.fovy * 0.5f * 0.017453292f;
+    ang = pG->Camera.param.Fovy * 0.5f * 0.017453292f;
     az = fabsf(out->z);
     h = az * tanf(ang);
     w = h * 1.3333334f;
@@ -646,8 +646,8 @@ int puzzlePos2screenPos(Vec* pos, Vec* out)
 void screenPos2puzzlePos(Vec* pos, Vec* out)
 {
     CAMERA* cam = &pG->Camera;
-    f32 pz = cam->param.pos.z;
-    f32 h = fabsf((f32) (pz * tan(cam->param.fovy * 0.5f * 3.1415927f / 180.0f)));
+    f32 pz = cam->param.Campos.z;
+    f32 h = fabsf((f32) (pz * tan(cam->param.Fovy * 0.5f * 3.1415927f / 180.0f)));
 
     out->x = pos->x * h / 240.0f;
     out->y = pos->y * h / 240.0f;

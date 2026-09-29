@@ -274,7 +274,7 @@ void emWepDmCk(cEmWep* pEm)
         StaFlagOn(pG, STA_CRITICAL);
         GameAddPoint(9);
         r.x = 0.0f;
-        r.y = GetXZAngle(&pEm->pos, &pG->Camera.param.pos);
+        r.y = GetXZAngle(&pEm->pos, &pG->Camera.param.Campos);
         r.z = 0.0f;
         EstSet(0, -1, &pEm->pos, &r, EFF_EM10, 0x42, 0, ESP_CORE_KIND_NONE, 0, 0);
         if (w->pEm_old) {
@@ -1236,11 +1236,11 @@ void emWepRocketBobm(cEmWep* pEm)
     EffectEspgenDelete(0, w->EffKindId, pEm);
     EffectEfmDelete(0, w->EffKindId, pEm);
     p = pEm->getPartsPtr(0);
-    len = (cam->param.pos.x - p->world.x) * (cam->param.pos.x - p->world.x)
-        + (cam->param.pos.y - p->world.y) * (cam->param.pos.y - p->world.y)
-        + (cam->param.pos.z - p->world.z) * (cam->param.pos.z - p->world.z);
+    len = (cam->param.Campos.x - p->world.x) * (cam->param.Campos.x - p->world.x)
+        + (cam->param.Campos.y - p->world.y) * (cam->param.Campos.y - p->world.y)
+        + (cam->param.Campos.z - p->world.z) * (cam->param.Campos.z - p->world.z);
     r.x = 0.0f;
-    r.y = GetXZAngle(&p->world, &cam->param.pos);
+    r.y = GetXZAngle(&p->world, &cam->param.Campos);
     r.z = 0.0f;
     if (len < 16000000.0f) {
         EstSet(0, -1, &pEm->pos, &r, EFF_EM10, 0x48, 0, ESP_CORE_KIND_NONE, 0, 0);
@@ -1323,11 +1323,11 @@ void emWep_R1_BombThrow(cEmWep* pEm)
         f32 dist;
 
         p = pEm->getPartsPtr(0);
-        dist = (cam->param.pos.x - p->world.x) * (cam->param.pos.x - p->world.x)
-            + (cam->param.pos.y - p->world.y) * (cam->param.pos.y - p->world.y)
-            + (cam->param.pos.z - p->world.z) * (cam->param.pos.z - p->world.z);
+        dist = (cam->param.Campos.x - p->world.x) * (cam->param.Campos.x - p->world.x)
+            + (cam->param.Campos.y - p->world.y) * (cam->param.Campos.y - p->world.y)
+            + (cam->param.Campos.z - p->world.z) * (cam->param.Campos.z - p->world.z);
         r.x = 0.0f;
-        r.y = GetXZAngle(&p->world, &cam->param.pos);
+        r.y = GetXZAngle(&p->world, &cam->param.Campos);
         r.z = 0.0f;
         if (dist < 16000000.0f) {
             EstSet(0, -1, &pEm->pos, &r, EFF_EM10, 0x48, 0, ESP_CORE_KIND_NONE, 0, 0);
@@ -1761,7 +1761,7 @@ void emWepEscapeCamMove(cEmWep* pEm)
 
     // Store through a cast pointer (no MEM_IN_STRUCT_P): the store may alias the `pPL` load below,
     // which keeps `lwz pPL` after it and ranks the `w` chain above the constant-pool `lis`es.
-    *(f32*) (u8*) &w->Cam.param.fovy = g->Camera.param.fovy;
+    *(f32*) (u8*) &w->Cam.param.Fovy = g->Camera.param.Fovy;
     p0.x = -376.0f;
     p0.y = 575.0f;
     p0.z = -1831.0f;
@@ -1770,19 +1770,19 @@ void emWepEscapeCamMove(cEmWep* pEm)
     p1.z = 52.6f;
     PSMTXMultVec(pPL->mat, &p0, &p0);
     PSMTXMultVec(pPL->mat, &p1, &p1);
-    PosToPos(&g->Camera.param.at, &p1, &w->Cam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &p0, &w->Cam.param.pos, 1.0f);
-    if (EatMgr.hitCheck(&w->Cam.param.at, &w->Cam.param.pos, &hit, 0, 0x8000, 0)) {
-        PSVECSubtract(&hit, &w->Cam.param.at, &d);
+    PosToPos(&g->Camera.param.Target, &p1, &w->Cam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &p0, &w->Cam.param.Campos, 1.0f);
+    if (EatMgr.hitCheck(&w->Cam.param.Target, &w->Cam.param.Campos, &hit, 0, 0x8000, 0)) {
+        PSVECSubtract(&hit, &w->Cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 2682 "D:/Bio4/Prog/emwep.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&w->Cam.param.at, &d, &w->Cam.param.pos);
+        PSVECAdd(&w->Cam.param.Target, &d, &w->Cam.param.Campos);
     }
-    len = (w->Cam.param.pos.x - w->Cam.param.at.x) * (w->Cam.param.pos.x - w->Cam.param.at.x)
-        + (w->Cam.param.pos.y - w->Cam.param.at.y) * (w->Cam.param.pos.y - w->Cam.param.at.y)
-        + (w->Cam.param.pos.z - w->Cam.param.at.z) * (w->Cam.param.pos.z - w->Cam.param.at.z);
+    len = (w->Cam.param.Campos.x - w->Cam.param.Target.x) * (w->Cam.param.Campos.x - w->Cam.param.Target.x)
+        + (w->Cam.param.Campos.y - w->Cam.param.Target.y) * (w->Cam.param.Campos.y - w->Cam.param.Target.y)
+        + (w->Cam.param.Campos.z - w->Cam.param.Target.z) * (w->Cam.param.Campos.z - w->Cam.param.Target.z);
     w->Cam.Up.x = 0.0f;
     w->Cam.Up.y = 1.0f;
     w->Cam.Up.z = 0.0f;

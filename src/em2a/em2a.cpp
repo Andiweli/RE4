@@ -176,7 +176,7 @@ static Em2aFunc Em2a_R1_move_tbl[16] = {
 // The camera plemResuceAshley installs (the partner rescue cut): explicitly zero-initialised so it
 // stays in .data.
 static CAMERA em2a_rescue_cam = { 0 };
-// COMPILER-DIFF: candidate #12 (cse related-value): `cam = &em2a_rescue_cam` after the `&em2a_rescue_cam.param.pos/at`
+// COMPILER-DIFF: candidate #12 (cse related-value): `cam = &em2a_rescue_cam` after the `&em2a_rescue_cam.param.Campos/at`
 // pointers are known is a fresh `lis/addi` pair in the original; our cse rewrites it as `at - 0xB0`.
 // An asm-labelled alias declaration gives cse a distinct SYMBOL_REF and keeps the fresh pair.
 extern CAMERA em2a_rescue_cam_v asm("em2a_rescue_cam");
@@ -624,11 +624,11 @@ void plem2aTrapCamMove(cModel* m)
     a.y = 1000.0f;
     a.z = 1000.0f;
     PSMTXMultVec(m->mat, &a, &a);
-    PosToPos(&c->param.at, &a, &em2a_rescue_cam.param.at, 1.0f);
-    PosToPos(&c->param.pos, &v, &em2a_rescue_cam.param.pos, 1.0f);
+    PosToPos(&c->param.Target, &a, &em2a_rescue_cam.param.Target, 1.0f);
+    PosToPos(&c->param.Campos, &v, &em2a_rescue_cam.param.Campos, 1.0f);
     {
-        Vec* pos = &em2a_rescue_cam.param.pos;
-        Vec* at = &em2a_rescue_cam.param.at;
+        Vec* pos = &em2a_rescue_cam.param.Campos;
+        Vec* at = &em2a_rescue_cam.param.Target;
         f32 dx = pos->x - at->x;
         f32 dy = pos->y - at->y;
         f32 dz = pos->z - at->z;
@@ -639,7 +639,7 @@ void plem2aTrapCamMove(cModel* m)
         cam->Up.z = 0.0f;
         cam->Distance = SQRTF(dx * dx + dy * dy + dz * dz);
     }
-    cam->param.fovy = 55.0f;
+    cam->param.Fovy = 55.0f;
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }
@@ -911,9 +911,9 @@ void em2aTrap2Bomb(cEm2a* em)
         f32 dist;
 
         p = em->getPartsPtr(1);
-        dist = (p->world.x - c->param.pos.x) * (p->world.x - c->param.pos.x)
-               + (p->world.y - c->param.pos.y) * (p->world.y - c->param.pos.y)
-               + (p->world.z - c->param.pos.z) * (p->world.z - c->param.pos.z);
+        dist = (p->world.x - c->param.Campos.x) * (p->world.x - c->param.Campos.x)
+               + (p->world.y - c->param.Campos.y) * (p->world.y - c->param.Campos.y)
+               + (p->world.z - c->param.Campos.z) * (p->world.z - c->param.Campos.z);
         if (dist < 400000000.0f) {
             f32 power = 10.0f;
 
@@ -946,22 +946,22 @@ void em2aTrap1CamMove(cEm2a* em)
     v.y = 1300.0f;
     v.z = -1000.0f;
     PSMTXMultVec(m, &v, &v);
-    PosToPos(&c->param.pos, &v, &w->cam.param.pos, 0.1f);
+    PosToPos(&c->param.Campos, &v, &w->cam.param.Campos, 0.1f);
     v.x = 0.0f;
     v.y = 500.0f;
     v.z = -300.0f;
     PSMTXMultVec(m, &v, &v);
-    PosToPos(&c->param.at, &v, &w->cam.param.at, 0.1f);
+    PosToPos(&c->param.Target, &v, &w->cam.param.Target, 0.1f);
     w->cam.Up.x = 0.0f;
     w->cam.Up.y = 1.0f;
     w->cam.Up.z = 0.0f;
     {
-        f32 dx = w->cam.param.pos.x - w->cam.param.at.x;
-        f32 dy = w->cam.param.pos.y - w->cam.param.at.y;
-        f32 dz = w->cam.param.pos.z - w->cam.param.at.z;
+        f32 dx = w->cam.param.Campos.x - w->cam.param.Target.x;
+        f32 dy = w->cam.param.Campos.y - w->cam.param.Target.y;
+        f32 dz = w->cam.param.Campos.z - w->cam.param.Target.z;
         w->cam.Distance = SQRTF(dx * dx + dy * dy + dz * dz);
     }
-    w->cam.param.fovy = 55.0f;
+    w->cam.param.Fovy = 55.0f;
     CameraSetOrientationUp(&w->cam);
     CamCtrl.SetExtraCamera(&w->cam);
 }

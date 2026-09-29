@@ -158,7 +158,7 @@ void Esp0f_Trans(cEsp0f* esp)
         Mtx tm;
         Mtx pm;
 
-        C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
+        C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
         PSMTXConcat(pm, esp->m_Mat, tm);
         GXLoadTexMtxImm(tm, 0x1E, 0);
         GXSetTexCoordGen(0, 0, 0, 0x1E);

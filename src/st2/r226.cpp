@@ -1378,15 +1378,15 @@ void playerRunCamMovePassage(cPlayer* pl, f32 t)
     Vec pos;
     Vec at;
 
-    cam->param.fovy = r226_fovyPassage;
+    cam->param.Fovy = r226_fovyPassage;
     PSMTXMultVec(pl->mat, &r226_camOfsPos, &pos);
     PSMTXMultVec(pl->mat, &r226_camOfsAt, &at);
-    PosToPos(&g->Camera.param.at, &at, &r226_cam.param.at, t);
-    PosToPos(&g->Camera.param.pos, &pos, &r226_cam.param.pos, t);
+    PosToPos(&g->Camera.param.Target, &at, &r226_cam.param.Target, t);
+    PosToPos(&g->Camera.param.Campos, &pos, &r226_cam.param.Campos, t);
     cam->Up.x = 0.0f;
     cam->Up.y = 1.0f;
     cam->Up.z = 0.0f;
-    cam->Distance = VEC_DIST(&r226_cam.param.pos, &r226_cam.param.at);
+    cam->Distance = VEC_DIST(&r226_cam.param.Campos, &r226_cam.param.Target);
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }
@@ -1399,7 +1399,7 @@ void playerRunCamMoveBridge(cPlayer* pl, f32 t)
     Vec pos;
     Vec at;
 
-    cam->param.fovy = r226_fovyBridge;
+    cam->param.Fovy = r226_fovyBridge;
     if (RmfFlagChk(g, RMF_BRIDGE_ST_00)) {
         r226_work->camPos.x += r226_camSpdPos.x;
         r226_work->camPos.y += r226_camSpdPos.y;
@@ -1410,12 +1410,12 @@ void playerRunCamMoveBridge(cPlayer* pl, f32 t)
     }
     PSMTXMultVec(pl->mat, &r226_work->camPos, &pos);
     PSMTXMultVec(pl->mat, &r226_work->camAt, &at);
-    PosToPos(&g->Camera.param.at, &at, &r226_cam.param.at, t);
-    PosToPos(&g->Camera.param.pos, &pos, &r226_cam.param.pos, t);
+    PosToPos(&g->Camera.param.Target, &at, &r226_cam.param.Target, t);
+    PosToPos(&g->Camera.param.Campos, &pos, &r226_cam.param.Campos, t);
     cam->Up.x = 0.0f;
     cam->Up.y = 1.0f;
     cam->Up.z = 0.0f;
-    cam->Distance = VEC_DIST(&r226_cam.param.pos, &r226_cam.param.at);
+    cam->Distance = VEC_DIST(&r226_cam.param.Campos, &r226_cam.param.Target);
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }
@@ -1427,14 +1427,14 @@ void playerRunCamDiePassage(cPlayer* pl)
     GLOBAL_WK* g = pG;
     cParts* parts;
 
-    cam->param.fovy = r226_fovyDie;
+    cam->param.Fovy = r226_fovyDie;
     parts = pl->getPartsPtr(0);
-    PosToPos(&g->Camera.param.at, &parts->world, &r226_cam.param.at, 1.0f);
-    cam->param.pos = g->Camera.param.pos;
+    PosToPos(&g->Camera.param.Target, &parts->world, &r226_cam.param.Target, 1.0f);
+    cam->param.Campos = g->Camera.param.Campos;
     cam->Up.x = 0.0f;
     cam->Up.y = 1.0f;
     cam->Up.z = 0.0f;
-    cam->Distance = VEC_DIST(&r226_cam.param.pos, &r226_cam.param.at);
+    cam->Distance = VEC_DIST(&r226_cam.param.Campos, &r226_cam.param.Target);
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }

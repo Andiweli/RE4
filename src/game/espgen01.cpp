@@ -223,9 +223,9 @@ static f32 GetDistAlpha(cEspgen* w)
 
     if (p->del_dist != 0.0f) {
         cam = &pG->Camera;
-        d.x = p->pos.x - cam->param.pos.x;
-        d.y = p->pos.y - cam->param.pos.y;
-        d.z = p->pos.z - cam->param.pos.z;
+        d.x = p->pos.x - cam->param.Campos.x;
+        d.y = p->pos.y - cam->param.Campos.y;
+        d.z = p->pos.z - cam->param.Campos.z;
         a = PSVECMag(&d) / p->del_dist;
         if (a > 1.0f) {
             a = 1.0f;
@@ -251,9 +251,9 @@ static f32 GetDirAlpha(cEspgen* w, Vec* dir)
 
     ang = LIMIT_ANGLE(p->dir_ang);
     cam = &pG->Camera;
-    d.x = p->pos.x - cam->param.pos.x;
-    d.y = p->pos.y - cam->param.pos.y;
-    d.z = p->pos.z - cam->param.pos.z;
+    d.x = p->pos.x - cam->param.Campos.x;
+    d.y = p->pos.y - cam->param.Campos.y;
+    d.z = p->pos.z - cam->param.Campos.z;
 #line 339 "D:/Bio4/Prog/espgen01.cpp"
     VECNormalize(&d, &d);
     a = -PSVECDotProduct(&d, dir);

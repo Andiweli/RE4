@@ -2107,7 +2107,7 @@ static void edit_light_pos()
         cur->Pos = vecZero;
     }
     if (pTool->Pad1.trg & JOY_Y) {
-        cur->Pos = pG->Camera.param.at;
+        cur->Pos = pG->Camera.param.Target;
     }
     drawLightInfo(cur, 0x80808080);
     if (pTool->Pad1.rep & JOY_B) {
@@ -3923,8 +3923,8 @@ static void edit_wind()
     }
     env->wind.set();
     pPL->moveCloth();
-    a = pG->Camera.param.pos;
-    b = pG->Camera.param.at;
+    a = pG->Camera.param.Campos;
+    b = pG->Camera.param.Target;
     PSVECSubtract(&b, &a, &b);
 #line 4082 "D:/Bio4/Prog/db_light.cpp"
     VECNormalize(&b, &b);

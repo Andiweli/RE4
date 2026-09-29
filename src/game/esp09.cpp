@@ -66,7 +66,7 @@ void Esp09_ClearPrevPos(cEsp09* pEsp)
         } else {
             PSMTXMultVec(pEsp->parent->mat, &pEsp->m_Pos, p);
         }
-        len = GetVecLen(p, &cam->param.pos);
+        len = GetVecLen(p, &cam->param.Campos);
         if (w->flg & 1) {
             tmp = *p;
             GetScreenPos(&tmp, p);
@@ -121,7 +121,7 @@ void cEsp09::move()
         } else {
             PSMTXMultVec(parent->mat, &m_Pos, p);
         }
-        len = GetVecLen(p, &cam->param.pos);
+        len = GetVecLen(p, &cam->param.Campos);
         if (w->flg & 1) {
             tmp = *p;
             GetScreenPos(&tmp, p);
@@ -319,7 +319,7 @@ void Esp09_PolyTrans(cEsp09* esp, u8 r, u8 g, u8 b, u8 a)
             up.z = 1.0f;
             half *= 500.0f / p0->z;
         } else {
-            PSVECSubtract(&pG->Camera.param.pos, p0, &up);
+            PSVECSubtract(&pG->Camera.param.Campos, p0, &up);
         }
         PSVECCrossProduct(&d, &up, &up);
         if (up.x == 0.0f && up.y == 0.0f && up.z == 0.0f) {

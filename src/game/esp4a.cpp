@@ -40,7 +40,7 @@ void cEsp4a::move()
     if (CommonMove()) {
         power = m_Col_a + m_Col_a;
         if (w->range != 0.0f) {
-            f32 dist = PSVECDistance(&pG->Camera.param.pos, &m_Pos);
+            f32 dist = PSVECDistance(&pG->Camera.param.Campos, &m_Pos);
             if (dist < w->range) {
                 power *= (w->range - dist) / w->range;
             } else {

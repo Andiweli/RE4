@@ -1498,14 +1498,14 @@ extern "C" void DB_GetCamFrontPos(f32 dist, f32* x, f32* y, f32* z)
     Vec pos;
     CAMERA* cam = &pG->Camera;
 
-    dir.x = cam->param.at.x - cam->param.pos.x;
-    dir.y = cam->param.at.y - cam->param.pos.y;
-    dir.z = cam->param.at.z - cam->param.pos.z;
+    dir.x = cam->param.Target.x - cam->param.Campos.x;
+    dir.y = cam->param.Target.y - cam->param.Campos.y;
+    dir.z = cam->param.Target.z - cam->param.Campos.z;
 #line 2047 "D:/Bio4/Prog/db_port.cpp"
     VECNormalize(&dir, &dir);
-    pos.x = cam->param.pos.x;
-    pos.y = cam->param.pos.y;
-    pos.z = cam->param.pos.z;
+    pos.x = cam->param.Campos.x;
+    pos.y = cam->param.Campos.y;
+    pos.z = cam->param.Campos.z;
     PSVECScale(&dir, &dir, dist);
     PSVECAdd(&dir, &pos, &pos);
     *x = pos.x;

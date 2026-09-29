@@ -1306,9 +1306,9 @@ static void R332ExecCrane(int no)
             ActBtn.set(ACT_OPERATION, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, 0);
             CAMERA* cam = &r332_work->cam;
             f32 roll = 0.0f;
-            dir.x = cam->param.at.x - cam->param.pos.x;
-            dir.y = cam->param.at.y - cam->param.pos.y;
-            dir.z = cam->param.at.z - cam->param.pos.z;
+            dir.x = cam->param.Target.x - cam->param.Campos.x;
+            dir.y = cam->param.Target.y - cam->param.Campos.y;
+            dir.z = cam->param.Target.z - cam->param.Campos.z;
             ang = atan2f(dir.x, dir.z) * (180.0f / 3.14159265f);
             eprintf(0x14C, 0xC8, 0, 0, "%f", ang);
             if (no == 0) {
@@ -1328,8 +1328,8 @@ static void R332ExecCrane(int no)
             }
             PSMTXRotRad(m, 'y', roll * (3.14159265f / 180.0f));
             PSMTXMultVecSR(m, &dir, &dir);
-            PSVECAdd(&dir, &cam->param.pos, &cam->param.at);
-            cam->param.roll = 0.0f;
+            PSVECAdd(&dir, &cam->param.Campos, &cam->param.Target);
+            cam->param.Roll = 0.0f;
             CameraSetOrientationRoll(cam);
             CamCtrlSetCam(&CamCtrl, cam);
             if (Key.trg & 0x00080000) {

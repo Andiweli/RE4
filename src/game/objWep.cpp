@@ -306,7 +306,7 @@ void drawPoint(Vec& lpos, Vec& lcross)
     if (EspEstSetSelect(EFF_CORE, 0x50, 0, &esp, 1) != 1) {
         return;
     }
-    PSVECSubtract(&pG->Camera.param.pos, &lcross, &d);
+    PSVECSubtract(&pG->Camera.param.Campos, &lcross, &d);
     dist = PSVECMag(&d);
     if (StaFlagChk(pG, STA_BIG_MARKER) || pG->stage_no == 2 && pG->room_no == 0x2C ||
         pG->stage_no == 2 && pG->room_no == 0x28) {

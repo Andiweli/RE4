@@ -3828,10 +3828,10 @@ void toolIdSetCamera(IdTool* w)
     w->scrH = 480;
     t = tanf(fovy * 0.5f * PI / 180.0f);
     pos.z = (f32) w->scrH * 0.5f / t;
-    pG->Camera.param.pos = pos;
-    pG->Camera.param.at = at;
-    pG->Camera.param.roll = roll;
-    pG->Camera.param.fovy = fovy;
+    pG->Camera.param.Campos = pos;
+    pG->Camera.param.Target = at;
+    pG->Camera.param.Roll = roll;
+    pG->Camera.param.Fovy = fovy;
     CameraSetOrientationRoll(&pG->Camera);
 }
 

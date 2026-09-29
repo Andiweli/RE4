@@ -85,7 +85,7 @@ static void mirrorModelTrans2(cModel* m, cModelInfo* info, Mtx viewMat)
         }
         GXSetCullMode(1);
         GXLoadTexObj(GetTexRenderMgrAddr(0)->GetTexObj(), st->texMap);
-        C_MTXLightPerspective(proj, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
+        C_MTXLightPerspective(proj, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
         PSMTXConcat(proj, mv, tex);
         GXLoadTexMtxImm(tex, 0x1E, 0);
         GXSetTexCoordGen2(st->texCoord, 0, 0, 0x1E, 0, 0x7D);

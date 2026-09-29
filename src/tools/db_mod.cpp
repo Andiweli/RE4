@@ -1581,7 +1581,7 @@ static int dbmod_locate()
                 ax.y = pG->Camera.mat[1][2];
                 ax.z = pG->Camera.mat[2][2];
                 PSVECScale(&ax, &ax, -1000.0f);
-                PSVECAdd(&pG->Camera.param.pos, &ax, &ax);
+                PSVECAdd(&pG->Camera.param.Campos, &ax, &ax);
                 em->pos0 = ax;
             }
             break;
@@ -3973,9 +3973,9 @@ void dbModelSetCamera(int no, CAMERA* cam)
 {
     ATTACH_CAMERA* ac = dbModSlot[no].motInfo[0].cam;
 
-    ac->camera_data[0] = cam->param.pos;
-    ac->camera_data[1] = cam->param.at;
-    ac->camera_data[2].y = cam->param.roll;
-    ac->camera_data[3].y = cam->param.fovy;
+    ac->camera_data[0] = cam->param.Campos;
+    ac->camera_data[1] = cam->param.Target;
+    ac->camera_data[2].y = cam->param.Roll;
+    ac->camera_data[3].y = cam->param.Fovy;
     ac->camera_data[4].y = 0.0f;
 }

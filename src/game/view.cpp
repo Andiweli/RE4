@@ -28,20 +28,20 @@ void VIEW::roomInit()
 // Builds the frustum for the camera's fovy with the default near / far planes and orients it.
 void VIEW::init()
 {
-    initPerspective(_p_camera->param.fovy, VIEW_ASPECT, ZNEAR, ZFAR);
+    initPerspective(_p_camera->param.Fovy, VIEW_ASPECT, ZNEAR, ZFAR);
     orientation();
-    _old_fovy = _p_camera->param.fovy;
+    _old_fovy = _p_camera->param.Fovy;
     _old_zfar = _zfar;
 }
 
 // Per frame: rebuilds the frustum when the fovy or far plane changed, then orients it to the camera.
 void VIEW::move()
 {
-    if (_old_fovy != _p_camera->param.fovy || _old_zfar != _zfar) {
-        initPerspective(_p_camera->param.fovy, VIEW_ASPECT, ZNEAR, _zfar);
+    if (_old_fovy != _p_camera->param.Fovy || _old_zfar != _zfar) {
+        initPerspective(_p_camera->param.Fovy, VIEW_ASPECT, ZNEAR, _zfar);
     }
     orientation();
-    _old_fovy = _p_camera->param.fovy;
+    _old_fovy = _p_camera->param.Fovy;
     _old_zfar = _zfar;
 }
 

@@ -34,8 +34,8 @@
 
 
 debugCamera CamDbg;
-CAMERA_POINT g_local_ready[2][3];
-CAMERA_POINT g_local_trans[2][3];
+QFPS_OFFSET g_local_ready[2][3];
+QFPS_OFFSET g_local_trans[2][3];
 f32 g_local_floor_ratio;
 f32 g_local_fovy[2];
 
@@ -45,7 +45,7 @@ static inline void Dec(int& v) { v--; }
 
 // adjust_qFPS keeps the edited shoulder offset record as a byte pointer (the original copies it
 // with memcpy and steps through it by byte offset).
-#define QOFS(p) ((CAMERA_POINT*) (p))
+#define QOFS(p) ((QFPS_OFFSET*) (p))
 #define QOFS_CAMPOS2 0xC
 
 // Per-frame update. Z toggles the menu, otherwise any input takes the camera from the game and A
@@ -135,14 +135,14 @@ void debugCamera::move(CAMERA* pCam, JOY* pJoy, int attr)
             if (EmMgr.at(numEm)->be_flag & 1) {
                 cParts* parts = EmMgr.at(numEm)->getPartsPtr(0);
                 if (parts == NULL) {
-                    pCam->param.at = EmMgr.at(numEm)->pos;
+                    pCam->param.Target = EmMgr.at(numEm)->pos;
                 } else {
-                    pCam->param.at = parts->world;
+                    pCam->param.Target = parts->world;
                 }
             } else {
-                pCam->param.at.x = 0.0f;
-                pCam->param.at.y = 0.0f;
-                pCam->param.at.z = 0.0f;
+                pCam->param.Target.x = 0.0f;
+                pCam->param.Target.y = 0.0f;
+                pCam->param.Target.z = 0.0f;
             }
             CameraSetOrientationZeroRoll(pCam);
         }
@@ -200,14 +200,14 @@ void debugCamera::move(CAMERA* pCam, JOY* pJoy, int attr)
             if (ObjMgr.at(numObj)->be_flag & 1) {
                 cParts* parts = ObjMgr.at(numObj)->getPartsPtr(0);
                 if (parts == NULL) {
-                    pCam->param.at = ObjMgr.at(numObj)->pos;
+                    pCam->param.Target = ObjMgr.at(numObj)->pos;
                 } else {
-                    pCam->param.at = parts->world;
+                    pCam->param.Target = parts->world;
                 }
             } else {
-                pCam->param.at.x = 0.0f;
-                pCam->param.at.y = 0.0f;
-                pCam->param.at.z = 0.0f;
+                pCam->param.Target.x = 0.0f;
+                pCam->param.Target.y = 0.0f;
+                pCam->param.Target.z = 0.0f;
             }
             CameraSetOrientationZeroRoll(pCam);
         }
@@ -218,23 +218,23 @@ void debugCamera::move(CAMERA* pCam, JOY* pJoy, int attr)
             if (pPL->be_flag & 1) {
                 cParts* parts = pPL->getPartsPtr(0);
                 if (parts == NULL) {
-                    pCam->param.at = pPL->pos;
+                    pCam->param.Target = pPL->pos;
                 } else {
-                    pCam->param.at = parts->world;
+                    pCam->param.Target = parts->world;
                 }
             } else {
-                pCam->param.at.x = 0.0f;
-                pCam->param.at.y = 0.0f;
-                pCam->param.at.z = 0.0f;
+                pCam->param.Target.x = 0.0f;
+                pCam->param.Target.y = 0.0f;
+                pCam->param.Target.z = 0.0f;
             }
             CameraSetOrientationZeroRoll(pCam);
         }
         break;
     case 3:
         if (pJoy->on & JOY_A) {
-            pCam->param.at.x = 0.0f;
-            pCam->param.at.y = 0.0f;
-            pCam->param.at.z = 0.0f;
+            pCam->param.Target.x = 0.0f;
+            pCam->param.Target.y = 0.0f;
+            pCam->param.Target.z = 0.0f;
             CameraSetOrientationZeroRoll(pCam);
         }
         break;
@@ -244,7 +244,7 @@ void debugCamera::move(CAMERA* pCam, JOY* pJoy, int attr)
     if (m_cam_mode == 5) {
         (this->*camera_type_tbl[1])(pCam, pJoy);
     } else {
-        pCam->Distance = PSVECDistance(&pCam->param.pos, &pCam->param.at);
+        pCam->Distance = PSVECDistance(&pCam->param.Campos, &pCam->param.Target);
         (this->*camera_type_tbl[m_key_type])(pCam, pJoy);
     }
     if (DbgFlagChk(pG, DBG_DBG_CAM) && info_disp) {
@@ -252,8 +252,8 @@ void debugCamera::move(CAMERA* pCam, JOY* pJoy, int attr)
         Vec pos;
         Vec at;
         PSMTXInverse(pPL->mat, inv);
-        PSMTXMultVec(inv, &pG->Camera.param.pos, &pos);
-        PSMTXMultVec(inv, &pG->Camera.param.at, &at);
+        PSMTXMultVec(inv, &pG->Camera.param.Campos, &pos);
+        PSMTXMultVec(inv, &pG->Camera.param.Target, &at);
         eprintf(72, 420, 5, 0, "CAMPOS @pPl->mat: (%5.1f, %5.1f, %5.1f)", pos.x, pos.y, pos.z);
         eprintf(72, 434, 5, 0, "TARGET @pPl->mat: (%5.1f, %5.1f, %5.1f)", at.x, at.y, at.z);
     }
@@ -297,7 +297,7 @@ void debugCamera::camera_type_00(CAMERA* pCam, JOY* pJoy)
     }
     if (pJoy->stickX) {
         Vec axis = {0.0f, 1.0f, 0.0f};
-        CameraRotAxisPosRad(pCam, &axis, &pCam->param.at, m_move_gain * (f32) pJoy->stickX * 0.05f * DEG2RAD);
+        CameraRotAxisPosRad(pCam, &axis, &pCam->param.Target, m_move_gain * (f32) pJoy->stickX * 0.05f * DEG2RAD);
     }
     if (pJoy->stickY) {
         CameraCamposRot(pCam, 'x', m_move_gain * (f32) pJoy->stickY * -0.05f * DEG2RAD);
@@ -350,7 +350,7 @@ void debugCamera::camera_type_00(CAMERA* pCam, JOY* pJoy)
     }
     if (pJoy->substickX) {
         Vec axis = {0.0f, 1.0f, 0.0f};
-        CameraRotAxisPosRad(pCam, &axis, &pCam->param.pos, m_move_gain * (f32) -pJoy->substickX * 0.05f * DEG2RAD);
+        CameraRotAxisPosRad(pCam, &axis, &pCam->param.Campos, m_move_gain * (f32) -pJoy->substickX * 0.05f * DEG2RAD);
     }
     if (pJoy->substickY) {
         CameraTargetRot(pCam, 'x', m_move_gain * (f32) -pJoy->substickY * -0.05f * DEG2RAD);
@@ -408,7 +408,7 @@ void debugCamera::camera_type_01(CAMERA* pCam, JOY* pJoy)
     }
     if (pJoy->stickX) {
         Vec axis = {0.0f, 1.0f, 0.0f};
-        CameraRotAxisPosRad(pCam, &axis, &pCam->param.at, (f32) pJoy->stickX * 0.05f * m_move_gain * DEG2RAD);
+        CameraRotAxisPosRad(pCam, &axis, &pCam->param.Target, (f32) pJoy->stickX * 0.05f * m_move_gain * DEG2RAD);
     }
     if (pJoy->stickY) {
         CameraCamposRot(pCam, 'x', -(f32) pJoy->stickY * 0.05f * m_move_gain * DEG2RAD);
@@ -427,7 +427,7 @@ void debugCamera::menu(CAMERA* pCam, JOY* pJoy)
         &debugCamera::menuAdjust,
     };
     static int old_cam_mode = 0;
-    static CameraParam cameraBak;
+    static CAMERA_POINT cameraBak;
     // Word view of campos: the copy below names its y word (see the anchors there).
     static union { Vec v; u32 w[3]; } campos = {{0.0f, 10000.0f, 0.0f}};
     static Vec target = {0.0f, 0.0f, 0.0f};
@@ -494,7 +494,7 @@ void debugCamera::menu(CAMERA* pCam, JOY* pJoy)
                 // The campos copy as three named words: `campos.w[k]` loads are `mem/s` and the
                 // `*(u32*)((u32)d0 + k)` stores are flagless MEMs, the same RTL as memcpy's
                 // move_by_pieces (a `*(u32*)(d0 + k)` store would be `mem/s`, `((u32*)d0)[k]` too).
-                u8* d0 = (u8*) &pG->Camera.param.pos;
+                u8* d0 = (u8*) &pG->Camera.param.Campos;
                 u32 wx = campos.w[0];
                 u32 wy = campos.w[1];
                 u32 wz = campos.w[2];
@@ -503,14 +503,14 @@ void debugCamera::menu(CAMERA* pCam, JOY* pJoy)
                 *(u32*) ((u32) d0 + 8) = wz;
             }
             {
-                u8* d1 = (u8*) &pG->Camera.param.at;
+                u8* d1 = (u8*) &pG->Camera.param.Target;
                 memcpy(d1, &target, sizeof(Vec));
             }
             {
                 u8* d2 = (u8*) &pG->Camera.Up;
                 memcpy(d2, &up, sizeof(Vec));
             }
-            pG->Camera.param.roll = 0.0f;
+            pG->Camera.param.Roll = 0.0f;
             CameraSetOrientationUp(&pG->Camera);
             DbgFlagOn(pG, DBG_DBG_CAM);
         }
@@ -559,24 +559,24 @@ int debugCamera::menuCamera(JOY* pJoy)
     if (d) {
         switch (m_sel1) {
         case 0:
-            pCam->param.roll += (f32) d * DEG2RAD;
-            if (pCam->param.roll < -PI) {
-                pCam->param.roll = -PI;
+            pCam->param.Roll += (f32) d * DEG2RAD;
+            if (pCam->param.Roll < -PI) {
+                pCam->param.Roll = -PI;
             }
-            if (pCam->param.roll > PI) {
-                pCam->param.roll = PI;
+            if (pCam->param.Roll > PI) {
+                pCam->param.Roll = PI;
             }
             CameraSetOrientationRoll(pCam);
             break;
         case 1:
-            pCam->param.fovy += (f32) d * 0.5f;
-            if (pCam->param.fovy < 1.0f) {
-                pCam->param.fovy = 1.0f;
+            pCam->param.Fovy += (f32) d * 0.5f;
+            if (pCam->param.Fovy < 1.0f) {
+                pCam->param.Fovy = 1.0f;
             }
-            if (pCam->param.fovy > 179.0f) {
-                pCam->param.fovy = 179.0f;
+            if (pCam->param.Fovy > 179.0f) {
+                pCam->param.Fovy = 179.0f;
             }
-            CamCtrl.camera.param.fovy = pCam->param.fovy;
+            CamCtrl.camera.param.Fovy = pCam->param.Fovy;
             break;
         case 2:
             m_move_gain += (f32) d * 0.1f;
@@ -629,10 +629,10 @@ int debugCamera::menuCamera(JOY* pJoy)
         eprintf(pos[0], pos[1] + i * 14, col, 0, "%s", str[i]);
         switch (i) {
         case 0:
-            eprintf(pos[0] + 40, pos[1], col, 0, "%f", pCam->param.roll);
+            eprintf(pos[0] + 40, pos[1], col, 0, "%f", pCam->param.Roll);
             break;
         case 1:
-            eprintf(pos[0] + 40, pos[1] + 14, col, 0, "%f", pCam->param.fovy);
+            eprintf(pos[0] + 40, pos[1] + 14, col, 0, "%f", pCam->param.Fovy);
             break;
         case 2:
             eprintf(pos[0] + 40, pos[1] + 28, col, 0, "%f", m_move_gain);
@@ -902,17 +902,17 @@ int debugCamera::menuAdjust(JOY* pJoy)
         pG->Camera = CamCtrl.camera;
     }
     old_ret = ret;
-    cam->Distance = PSVECDistance(&cam->param.pos, &cam->param.at);
+    cam->Distance = PSVECDistance(&cam->param.Campos, &cam->param.Target);
     switch (ret) {
     case -1:
         return -1;
     case 1:
         (this->*camera_type_tbl[m_key_type])(cam, &Joy[1]);
-        target_bak = cam->param.at;
+        target_bak = cam->param.Target;
         break;
     case 2:
         (this->*camera_type_tbl[m_key_type])(cam, &Joy[1]);
-        cam->param.at = target_bak;
+        cam->param.Target = target_bak;
         break;
     }
     eprintf(240, 280, 5, 0, "----- ADJUST -----");
@@ -937,8 +937,8 @@ void CameraDrawTarget(CAMERA* pCam, int attr)
             attr &= ~1;
         }
     }
-    a = pCam->param.at;
-    b = pCam->param.at;
+    a = pCam->param.Target;
+    b = pCam->param.Target;
     a.x += 300.0f;
     b.x -= 300.0f;
     Draw_line3d(&a, &b, 0xFFFF0000, 0);
@@ -951,8 +951,8 @@ void CameraDrawTarget(CAMERA* pCam, int attr)
     b.z -= 60.0f;
     Draw_line3d(&a, &b, 0xFFFF0000, 0);
 
-    a = pCam->param.at;
-    b = pCam->param.at;
+    a = pCam->param.Target;
+    b = pCam->param.Target;
     a.y += 300.0f;
     b.y -= 300.0f;
     Draw_line3d(&a, &b, 0xFF00FF00, 0);
@@ -965,8 +965,8 @@ void CameraDrawTarget(CAMERA* pCam, int attr)
     b.x -= 60.0f;
     Draw_line3d(&a, &b, 0xFF00FF00, 0);
 
-    a = pCam->param.at;
-    b = pCam->param.at;
+    a = pCam->param.Target;
+    b = pCam->param.Target;
     a.z += 300.0f;
     b.z -= 300.0f;
     Draw_line3d(&a, &b, 0xFF2020FF, 0);
@@ -980,20 +980,20 @@ void CameraDrawTarget(CAMERA* pCam, int attr)
     Draw_line3d(&a, &b, 0xFF2020FF, 0);
 
     if (attr & 1) {
-        a = pCam->param.at;
-        b = pCam->param.at;
+        a = pCam->param.Target;
+        b = pCam->param.Target;
         a.y = 50.0f;
         b.y -= 300.0f;
         Draw_line3d(&a, &b, 0xFFFFFFFF, 0);
-        a = pCam->param.at;
-        b = pCam->param.at;
+        a = pCam->param.Target;
+        b = pCam->param.Target;
         b.y = 50.0f;
         a.y = 50.0f;
         a.x += 300.0f;
         b.x -= 300.0f;
         Draw_line3d(&a, &b, 0xFFFF8080, 0);
-        a = pCam->param.at;
-        b = pCam->param.at;
+        a = pCam->param.Target;
+        b = pCam->param.Target;
         b.y = 50.0f;
         a.y = 50.0f;
         a.z += 300.0f;
@@ -1011,16 +1011,16 @@ void CameraDebugInformation()
     CameraControl* cc = &CamCtrl;
     CAMERA* cam = &cc->camera;
     eprintf(56, 266, 0, 15, "----- GAME CAMERA -----");
-    eprintf(56, 280, 0, 15, "Cpos : (%.2f, %.2f, %.2f)", cam->param.pos.x, cam->param.pos.y, cam->param.pos.z);
-    eprintf(56, 294, 0, 15, "Trgt : (%.2f, %.2f, %.2f)", cam->param.at.x, cam->param.at.y, cam->param.at.z);
-    eprintf(56, 308, 0, 15, "Roll : %.2f", cam->param.roll);
-    eprintf(176, 308, 0, 15, "FOVy : %.2f", cam->param.fovy);
+    eprintf(56, 280, 0, 15, "Cpos : (%.2f, %.2f, %.2f)", cam->param.Campos.x, cam->param.Campos.y, cam->param.Campos.z);
+    eprintf(56, 294, 0, 15, "Trgt : (%.2f, %.2f, %.2f)", cam->param.Target.x, cam->param.Target.y, cam->param.Target.z);
+    eprintf(56, 308, 0, 15, "Roll : %.2f", cam->param.Roll);
+    eprintf(176, 308, 0, 15, "FOVy : %.2f", cam->param.Fovy);
     cam = &pG->Camera;
     eprintf(56, 336, 0, 15, "----- DEBUG CAMERA ----");
-    eprintf(56, 350, 0, 15, "Cpos : (%.2f, %.2f, %.2f)", cam->param.pos.x, cam->param.pos.y, cam->param.pos.z);
-    eprintf(56, 364, 0, 15, "Trgt : (%.2f, %.2f, %.2f)", cam->param.at.x, cam->param.at.y, cam->param.at.z);
-    eprintf(56, 378, 0, 15, "Roll : %.2f", cam->param.roll);
-    eprintf(176, 378, 0, 15, "FOVy : %.2f", cam->param.fovy);
+    eprintf(56, 350, 0, 15, "Cpos : (%.2f, %.2f, %.2f)", cam->param.Campos.x, cam->param.Campos.y, cam->param.Campos.z);
+    eprintf(56, 364, 0, 15, "Trgt : (%.2f, %.2f, %.2f)", cam->param.Target.x, cam->param.Target.y, cam->param.Target.z);
+    eprintf(56, 378, 0, 15, "Roll : %.2f", cam->param.Roll);
+    eprintf(176, 378, 0, 15, "FOVy : %.2f", cam->param.Fovy);
 }
 
 // Maps a stick / dolly vector given in camera axes onto the world XZ plane (camera right and the
@@ -1046,7 +1046,7 @@ void moveOnPlaneXZ(Vec* src, Vec* dst)
         Vec zero1 = {0.0f, 0.0f, 0.0f};
         Vec plane_p = {0.0f, 0.0f, 0.0f};
         Vec plane_n = {0.0f, 1.0f, 0.0f};
-        Vec campos = cam->param.pos;
+        Vec campos = cam->param.Campos;
         Vec q;
         Vec s;
         Vec r;
@@ -1236,8 +1236,8 @@ int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
         case 3:
             if (pJoy->trg & JOY_A) {
                 q->getAreaData(g_local_ready, g_local_trans);
-                g_local_fovy[0] = g_local_ready[0][1].Fovy;
-                g_local_fovy[1] = g_local_trans[0][1].Fovy;
+                g_local_fovy[0] = g_local_ready[0][1].m_fovy;
+                g_local_fovy[1] = g_local_trans[0][1].m_fovy;
                 menu_level = 5;
             }
             break;
@@ -1364,15 +1364,15 @@ int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
             SpfFlagOff(pG, SPF_CAMERA);
             menu_level = 1;
         } else if (pJoy->trg & JOY_A) {
-            PSMTXMultVec(inv, &g->Camera.param.pos, &QOFS(p_offset)->Campos);
-            PSMTXMultVec(inv, &g->Camera.param.at, &QOFS(p_offset)->Target);
+            PSMTXMultVec(inv, &g->Camera.param.Campos, &QOFS(p_offset)->m_campos[0]);
+            PSMTXMultVec(inv, &g->Camera.param.Target, &QOFS(p_offset)->m_target);
             if (symmetry_flag) {
-                memcpy(p_counter, p_offset, sizeof(CAMERA_POINT));
-                QOFS(p_counter)->Campos.x = -QOFS(p_counter)->Campos.x;
-                QOFS(p_counter)->Target.x = -QOFS(p_counter)->Target.x;
+                memcpy(p_counter, p_offset, sizeof(QFPS_OFFSET));
+                QOFS(p_counter)->m_campos[0].x = -QOFS(p_counter)->m_campos[0].x;
+                QOFS(p_counter)->m_target.x = -QOFS(p_counter)->m_target.x;
             }
             q->setAreaData(g_local_ready, g_local_trans);
-            PSMTXMultVec(pPL->mat, &QOFS(p_offset)->campos2, &CamCtrl.camera.param.pos);
+            PSMTXMultVec(pPL->mat, &QOFS(p_offset)->m_campos[1], &CamCtrl.camera.param.Campos);
             CameraSetOrientationRoll(&CamCtrl.camera);
             menu_level = 3;
             ret = 3;
@@ -1383,14 +1383,14 @@ int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
     case 3:
         MotionMove(pPL, 0);
         if (pJoy->trg & JOY_B) {
-            PSMTXMultVec(pPL->mat, &QOFS(p_offset)->Campos, &CamCtrl.camera.param.pos);
+            PSMTXMultVec(pPL->mat, &QOFS(p_offset)->m_campos[0], &CamCtrl.camera.param.Campos);
             CameraSetOrientationRoll(&CamCtrl.camera);
             menu_level = 2;
         } else if (pJoy->trg & JOY_A) {
-            PSMTXMultVec(inv, &g->Camera.param.pos, &QOFS(p_offset)->campos2);
+            PSMTXMultVec(inv, &g->Camera.param.Campos, &QOFS(p_offset)->m_campos[1]);
             if (symmetry_flag) {
                 memcpy(p_counter + QOFS_CAMPOS2, p_offset + QOFS_CAMPOS2, sizeof(Vec));
-                QOFS(p_counter)->campos2.x = -QOFS(p_counter)->campos2.x;
+                QOFS(p_counter)->m_campos[1].x = -QOFS(p_counter)->m_campos[1].x;
             }
             q->setAreaData(g_local_ready, g_local_trans);
             ret = 3;
@@ -1457,8 +1457,8 @@ int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
         }
         for (i = 0; i < 2; i++) {
             for (j = 0; j < 3; j++) {
-                g_local_ready[i][j].Fovy = g_local_fovy[0];
-                g_local_trans[i][j].Fovy = g_local_fovy[1];
+                g_local_ready[i][j].m_fovy = g_local_fovy[0];
+                g_local_trans[i][j].m_fovy = g_local_fovy[1];
             }
         }
         q->setAreaData(g_local_ready, g_local_trans);
@@ -1520,8 +1520,8 @@ int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
         }
     }
     if (menu_level == 2) {
-        PSMTXMultVec(inv, &cam->param.at, &target);
-        PSMTXMultVec(inv, &cam->param.pos, &campos);
+        PSMTXMultVec(inv, &cam->param.Target, &target);
+        PSMTXMultVec(inv, &cam->param.Campos, &campos);
         if (pG->Frame_cnt & 0x18) {
             eprintf(120, 14, 5, 0, "--- CAMERA OFFSET ---");
         }
@@ -1529,8 +1529,8 @@ int adjust_qFPS(JOY* pJoy, int x, int y, int flag, int* out)
         eprintf(120, 42, 4, 0, "Campos: (%f, %f, %f)", campos.x, campos.y, campos.z);
     }
     if (menu_level == 3) {
-        PSMTXMultVec(inv, &cam->param.at, &target);
-        PSMTXMultVec(inv, &cam->param.pos, &close);
+        PSMTXMultVec(inv, &cam->param.Target, &target);
+        PSMTXMultVec(inv, &cam->param.Campos, &close);
         if (pG->Frame_cnt & 0x18) {
             eprintf(120, 14, 5, 0, "---- CLOSE POINT ----");
         }

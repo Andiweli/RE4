@@ -585,9 +585,9 @@ static void reva_move()
             ActBtn.set(ACT_OPERATION, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, 0);
             cam = &r224_work->cam;
             add = 0.0f;
-            d.x = cam->param.at.x - cam->param.pos.x;
-            d.y = cam->param.at.y - cam->param.pos.y;
-            d.z = cam->param.at.z - cam->param.pos.z;
+            d.x = cam->param.Target.x - cam->param.Campos.x;
+            d.y = cam->param.Target.y - cam->param.Campos.y;
+            d.z = cam->param.Target.z - cam->param.Campos.z;
             ang = atan2f(d.x, d.z) * 57.295776f;
             if (ang < 90.0f) {
                 if (Key.on & 0x8) {
@@ -601,7 +601,7 @@ static void reva_move()
             }
             PSMTXRotRad(mtx, 'y', add * 0.017453292f);
             PSMTXMultVecSR(mtx, &d, &d);
-            PSVECAdd(&d, &cam->param.pos, &cam->param.at);
+            PSVECAdd(&d, &cam->param.Campos, &cam->param.Target);
             CameraSetOrientationUp(&r224_work->cam);
             CamCtrl.SetExtraCamera(&r224_work->cam);
             if (Key.trg & 0x00080000) {

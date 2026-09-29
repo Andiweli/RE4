@@ -3665,7 +3665,7 @@ void cSubChar::shadowCtrl()
     if (flg.check(F_SHADOW_OFF)) {
         fade = 1;
     }
-    if (pG->Camera.param.pos.y < pEm->pos.y) {
+    if (pG->Camera.param.Campos.y < pEm->pos.y) {
         fade = 1;
     }
     if (pEm->pFloor_norm && pEm->pFloor_norm->y < 0.8f) {

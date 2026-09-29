@@ -526,7 +526,7 @@ void IDSystem::move()
         return;
     }
     Vec v = { 0.0f, 0.0f, 1.0f };
-    f32 dist = 240.0 / tan(pG->Camera.param.fovy * 0.5f * (PI / 180.0f));
+    f32 dist = 240.0 / tan(pG->Camera.param.Fovy * 0.5f * (PI / 180.0f));
     PSMTXIdentity(m_scrn_mat);
     PSVECScale(&v, &v, -dist);
     m_scrn_mat[0][3] = v.x;
@@ -1213,7 +1213,7 @@ void IdNegativeTrans(ID_UNIT* u, u32 pow)
     Mtx tm2;
     Mtx pm;
     Mtx tm;
-    C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
+    C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
     PSMTXConcat(IDSystem::m_scrn_mat, u->mat, tm);
     PSMTXConcat(pm, tm, tm2);
     GXLoadTexMtxImm(tm2, 0x1E, 0);
@@ -1323,7 +1323,7 @@ void IdShimmerTrans(ID_UNIT* u, int u_pow, int Refract_type)
     Mtx tm2;
     Mtx pm;
     Mtx tm;
-    C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
+    C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
     PSMTXConcat(IDSystem::m_scrn_mat, u->mat, tm);
     PSMTXConcat(pm, tm, tm2);
     GXLoadTexMtxImm(tm2, 0x1E, 0);

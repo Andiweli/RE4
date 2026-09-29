@@ -675,17 +675,17 @@ void pl0eCamMove(cPl0e* em)
     at.x = at.x * 0.5f + dir.x * 0.5f;
     at.z = at.z * 0.5f + dir.z * 0.5f;
     at.y = at.y + pl0e_cam_up;
-    PosToPos(&gcam->param.at, &target, &pl0e_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl0e_camera.param.pos, 1.0f);
-    pl0e_camera.param.fovy = pl0e_camera.param.fovy * 0.9f + 4.0f;
+    PosToPos(&gcam->param.Target, &target, &pl0e_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl0e_camera.param.Campos, 1.0f);
+    pl0e_camera.param.Fovy = pl0e_camera.param.Fovy * 0.9f + 4.0f;
     PSMTXRotRad(m, 'z', -Muku2(w->rotY, em->ang.y, PI) * 3.0f);
     dir.y = 1.0f;
     dir.x = 0.0f;
     dir.z = 0.0f;
     PSMTXMultVecSR(m, &dir, &pl0e_camera.Up);
     {
-        Vec* cp = &pl0e_camera.param.pos;
-        Vec* ca = &pl0e_camera.param.at;
+        Vec* cp = &pl0e_camera.param.Campos;
+        Vec* ca = &pl0e_camera.param.Target;
 
         pl0e_camera.Distance = VEC_DIST(cp, ca);
     }

@@ -2319,27 +2319,27 @@ void em22CamMove(cEm22* em, int type)
     }
     PSMTXMultVec(pPL->mat, &a, &a);
     PSMTXMultVec(pPL->mat, &b, &b);
-    PosToPos(&gcam->param.pos, &a, &w->cam.param.pos, 0.2f);
-    PosToPos(&gcam->param.at, &b, &w->cam.param.at, 0.2f);
-    if ((w->cam.param.pos.x - w->cam.param.at.x) * (w->cam.param.pos.x - w->cam.param.at.x) +
-            (w->cam.param.pos.y - w->cam.param.at.y) * (w->cam.param.pos.y - w->cam.param.at.y) +
-            (w->cam.param.pos.z - w->cam.param.at.z) * (w->cam.param.pos.z - w->cam.param.at.z) >
+    PosToPos(&gcam->param.Campos, &a, &w->cam.param.Campos, 0.2f);
+    PosToPos(&gcam->param.Target, &b, &w->cam.param.Target, 0.2f);
+    if ((w->cam.param.Campos.x - w->cam.param.Target.x) * (w->cam.param.Campos.x - w->cam.param.Target.x) +
+            (w->cam.param.Campos.y - w->cam.param.Target.y) * (w->cam.param.Campos.y - w->cam.param.Target.y) +
+            (w->cam.param.Campos.z - w->cam.param.Target.z) * (w->cam.param.Campos.z - w->cam.param.Target.z) >
         100.0f) {
-        PSVECSubtract(&w->cam.param.pos, &w->cam.param.at, &d);
+        PSVECSubtract(&w->cam.param.Campos, &w->cam.param.Target, &d);
 #line 3428 "D:/Bio4/Prog/em22.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, 250.0f);
-        PSVECAdd(&w->cam.param.pos, &d, &w->cam.param.pos);
-        if (EatMgr.hitCheck(&w->cam.param.at, &w->cam.param.pos, &hit, 0, 0x8000, 0)) {
-            w->cam.param.pos = hit;
+        PSVECAdd(&w->cam.param.Campos, &d, &w->cam.param.Campos);
+        if (EatMgr.hitCheck(&w->cam.param.Target, &w->cam.param.Campos, &hit, 0, 0x8000, 0)) {
+            w->cam.param.Campos = hit;
         }
-        PSVECSubtract(&w->cam.param.pos, &d, &w->cam.param.pos);
+        PSVECSubtract(&w->cam.param.Campos, &d, &w->cam.param.Campos);
     }
     w->cam.Up.x = 0.0f;
     w->cam.Up.y = 1.0f;
     w->cam.Up.z = 0.0f;
-    w->cam.Distance = VEC_DIST(&w->cam.param.pos, &w->cam.param.at);
-    w->cam.param.fovy = 50.0f;
+    w->cam.Distance = VEC_DIST(&w->cam.param.Campos, &w->cam.param.Target);
+    w->cam.param.Fovy = 50.0f;
     CameraSetOrientationUp(&w->cam);
     CamCtrl.SetExtraCamera(&w->cam);
 }

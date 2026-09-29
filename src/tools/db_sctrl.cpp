@@ -157,7 +157,7 @@ int DbSctrl(DbSctrlWork* w, int x, int y)
     // struct-view read: the pG load then depends on the three member stores above (sched1 true
     // dependence), so `stw r4,x` loses the anti-dependence bonus of the later `lwz r4,pG` and the
     // stores come out in RTL order (y, x)
-    dbSctrlScreenOrientation(w, &pG->Camera, pG->Camera.param.fovy);
+    dbSctrlScreenOrientation(w, &pG->Camera, pG->Camera.param.Fovy);
     drawAxis(w);
     drawScurve(w);
     if (w->routine == 0) {

@@ -1174,8 +1174,8 @@ void pl0fBoatChaseBoss(cPl0f* em)
 // Camera distance from the position / target pair, then the orientation.
 #define CAM_SET(cam)                                                                                              \
     {                                                                                                             \
-        Vec* cp = &(cam).param.pos;                                                                               \
-        Vec* ca = &(cam).param.at;                                                                                \
+        Vec* cp = &(cam).param.Campos;                                                                            \
+        Vec* ca = &(cam).param.Target;                                                                            \
                                                                                                                   \
         (cam).Distance = VEC_DIST(cp, ca); \
     }                                                                                                             \
@@ -1196,9 +1196,9 @@ void pl0fRideCamMove(cPl0f* em, f32 rate)
     TransMatrix(m, &em->pos);
     PSMTXMultVec(m, &pl0f_ride_cam_ofs, &pos);
     at = pPL->getPartsPtr(0)->world;
-    pl0f_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &at, &pl0f_camera.param.at, rate);
-    PosToPos(&gcam->param.pos, &pos, &pl0f_camera.param.pos, rate);
+    pl0f_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &at, &pl0f_camera.param.Target, rate);
+    PosToPos(&gcam->param.Campos, &pos, &pl0f_camera.param.Campos, rate);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1220,9 +1220,9 @@ void pl0fGetoffCamMove(cPl0f* em)
     TransMatrix(m, &em->pos);
     PSMTXMultVec(m, &pl0f_getoff_cam_ofs, &pos);
     at = pPL->getPartsPtr(0)->world;
-    pl0f_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &at, &pl0f_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &pos, &pl0f_camera.param.pos, 1.0f);
+    pl0f_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &at, &pl0f_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &pos, &pl0f_camera.param.Campos, 1.0f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1318,7 +1318,7 @@ void pl0fBossCamMove(cPl0f* em, int hide)
             d.y = 0.0f;
             d.z = len;
             PSMTXMultVec(m, &d, &cat);
-            pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 3.0f;
+            pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 3.0f;
         } else {
             PSMTXRotRad(m, 'y', em->ang.y);
             TransMatrix(m, &em->pos);
@@ -1337,7 +1337,7 @@ void pl0fBossCamMove(cPl0f* em, int hide)
             PSVECAdd(&em->pos, &bpos, &d);
             PSVECScale(&d, &d, 0.5f);
             cat = d;
-            pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
+            pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
             PSVECSubtract(&cat, &cpos, &d);
             len = SQRTF(d.x * d.x + d.z * d.z);
             ang.x = -atan2f(d.y, len);
@@ -1357,8 +1357,8 @@ void pl0fBossCamMove(cPl0f* em, int hide)
             d.z = len;
             PSMTXMultVec(m, &d, &cat);
         }
-        PosToPos(&gcam->param.at, &cat, &pl0f_camera.param.at, 0.1f);
-        PosToPos(&gcam->param.pos, &cpos, &pl0f_camera.param.pos, 0.5f);
+        PosToPos(&gcam->param.Target, &cat, &pl0f_camera.param.Target, 0.1f);
+        PosToPos(&gcam->param.Campos, &cpos, &pl0f_camera.param.Campos, 0.5f);
     } else {
         PSMTXRotRad(m, 'y', em->ang.y);
         TransMatrix(m, &em->pos);
@@ -1369,15 +1369,15 @@ void pl0fBossCamMove(cPl0f* em, int hide)
             PSMTXMultVec(m, &pl0f_boss_cam_pos0, &cpos);
             PSMTXMultVec(m, &pl0f_boss_cam_at0, &cat);
         }
-        pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
-        PosToPos(&gcam->param.at, &cat, &pl0f_camera.param.at, 0.3f);
-        PosToPos(&gcam->param.pos, &cpos, &pl0f_camera.param.pos, 0.5f);
-        PSVECSubtract(&pl0f_camera.param.at, &pl0f_camera.param.pos, &d2);
+        pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
+        PosToPos(&gcam->param.Target, &cat, &pl0f_camera.param.Target, 0.3f);
+        PosToPos(&gcam->param.Campos, &cpos, &pl0f_camera.param.Campos, 0.5f);
+        PSVECSubtract(&pl0f_camera.param.Target, &pl0f_camera.param.Campos, &d2);
 #line 1929
         VECNormalize(&d2, &d2);
         PSVECScale(&d2, &d2, 1500.0f);
-        PSVECAdd(&pl0f_camera.param.pos, &d2, &d2);
-        EatMgr.adjust(0, &d2, &pl0f_camera.param.pos, 500.0f, 0x2001, 0);
+        PSVECAdd(&pl0f_camera.param.Campos, &d2, &d2);
+        EatMgr.adjust(0, &d2, &pl0f_camera.param.Campos, 500.0f, 0x2001, 0);
     }
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
@@ -1402,9 +1402,9 @@ void pl0fHideModeCamSet(cPlayer* pl)
     TransMatrix(m, &pl->pos);
     PSMTXMultVec(m, &pl0f_hide_cam_at, &at);
     PSMTXMultVec(m, &pl0f_hide_cam_pos, &pos);
-    pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
-    PosToPos(&gcam->param.at, &pos, &pl0f_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl0f_camera.param.pos, 1.0f);
+    pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl0f_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl0f_camera.param.Campos, 1.0f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1423,9 +1423,9 @@ void pl0fHideModeCamMove(cPlayer* pl)
     TransMatrix(m, &pl->pos);
     PSMTXMultVec(m, &pl0f_hide_cam_at, &at);
     PSMTXMultVec(m, &pl0f_hide_cam_pos, &pos);
-    pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
-    PosToPos(&gcam->param.at, &pos, &pl0f_camera.param.at, 0.1f);
-    PosToPos(&gcam->param.pos, &at, &pl0f_camera.param.pos, 0.1f);
+    pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl0f_camera.param.Target, 0.1f);
+    PosToPos(&gcam->param.Campos, &at, &pl0f_camera.param.Campos, 0.1f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1449,9 +1449,9 @@ void pl0fBossDieCamSet(cPlayer* pl)
     TransMatrix(m, &pl->pos);
     PSMTXMultVec(m, &pl0f_die_cam_at, &at);
     PSMTXMultVec(m, &pl0f_die_cam_pos, &pos);
-    pl0f_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &pos, &pl0f_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl0f_camera.param.pos, 1.0f);
+    pl0f_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl0f_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl0f_camera.param.Campos, 1.0f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1470,9 +1470,9 @@ void pl0fBossDieCamMove(cPlayer* pl)
     TransMatrix(m, &pl->pos);
     PSMTXMultVec(m, &pl0f_die_cam_at, &at);
     PSMTXMultVec(m, &pl0f_die_cam_pos, &pos);
-    pl0f_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &pos, &pl0f_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl0f_camera.param.pos, 1.0f);
+    pl0f_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl0f_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl0f_camera.param.Campos, 1.0f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -2953,9 +2953,9 @@ void pl00SetSwimCam(cPlayer* pl)
 
     PSMTXRotRad(m, 'y', pl->m_pBoat->ang.y);
     TransMatrix(m, &pl->m_pBoat->pos);
-    PSMTXMultVec(m, &pl00_swim_cam_pos, &pl0f_camera.param.pos);
-    PSMTXMultVec(m, &pl00_swim_cam_at, &pl0f_camera.param.at);
-    pl0f_camera.param.fovy = 40.0f;
+    PSMTXMultVec(m, &pl00_swim_cam_pos, &pl0f_camera.param.Campos);
+    PSMTXMultVec(m, &pl00_swim_cam_at, &pl0f_camera.param.Target);
+    pl0f_camera.param.Fovy = 40.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -2984,13 +2984,13 @@ void pl00SwimCamMove(cPlayer* pl)
         if (boss) {
             at = boss->getPartsPtr(7)->world;
         } else {
-            at = gcam->param.at;
+            at = gcam->param.Target;
         }
-        pos = gcam->param.pos;
-        PosToPos(&gcam->param.at, &at, &pl0f_camera.param.at, 1.0f);
-        PosToPos(&gcam->param.pos, &pos, &pl0f_camera.param.pos, 1.0f);
+        pos = gcam->param.Campos;
+        PosToPos(&gcam->param.Target, &at, &pl0f_camera.param.Target, 1.0f);
+        PosToPos(&gcam->param.Campos, &pos, &pl0f_camera.param.Campos, 1.0f);
     }
-    pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
+    pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -3004,11 +3004,11 @@ void pl00SetChaseCam(cPlayer* pl)
 {
     Mtx m;
 
-    pl0f_camera.param.at = pl->pos;
+    pl0f_camera.param.Target = pl->pos;
     PSMTXRotRad(m, 'y', pl->ang.y);
     TransMatrix(m, &pl->pos);
-    PSMTXMultVec(m, &pl00_chase_cam_ofs, &pl0f_camera.param.pos);
-    pl0f_camera.param.fovy = 40.0f;
+    PSMTXMultVec(m, &pl00_chase_cam_ofs, &pl0f_camera.param.Campos);
+    pl0f_camera.param.Fovy = 40.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -3022,14 +3022,14 @@ void pl00ChaseCamMove(cPlayer* pl)
     Vec d;
 
     StaFlagOn(pG, STA_PL_SWIM_CAMERA);
-    pl0f_camera.param.at = pl->pos;
-    PSVECSubtract(&pl0f_camera.param.at, &pl0f_camera.param.pos, &d);
+    pl0f_camera.param.Target = pl->pos;
+    PSVECSubtract(&pl0f_camera.param.Target, &pl0f_camera.param.Campos, &d);
     d.y = 0.0f;
 #line 4642
     VECNormalize(&d, &d);
     PSVECScale(&d, &d, 260.0f);
-    PSVECAdd(&pl0f_camera.param.pos, &d, &pl0f_camera.param.pos);
-    pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
+    PSVECAdd(&pl0f_camera.param.Campos, &d, &pl0f_camera.param.Campos);
+    pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -3044,10 +3044,10 @@ void pl00SetDieCam(cPlayer* pl)
     Mtx m;
     Vec v;
 
-    pl0f_camera.param.pos = pPL->pos;
-    pl0f_camera.param.at = pPL->pos;
-    pl0f_camera.param.pos.y = 23000.0f;
-    pl0f_camera.param.fovy = 40.0f;
+    pl0f_camera.param.Campos = pPL->pos;
+    pl0f_camera.param.Target = pPL->pos;
+    pl0f_camera.param.Campos.y = 23000.0f;
+    pl0f_camera.param.Fovy = 40.0f;
     v.x = 0.0f;
     v.y = 0.0f;
     v.z = 1.0f;
@@ -3065,10 +3065,10 @@ void pl00DieCamMove(cPlayer* pl)
 
     StaFlagOn(pG, STA_PL_SWIM_CAMERA);   // reference store: the pPL load stays below it
     p = pPL->getPartsPtr(0);
-    pl0f_camera.param.pos = p->world;
-    pl0f_camera.param.at = p->world;
-    pl0f_camera.param.pos.y = 14000.0f;
-    pl0f_camera.param.fovy = 40.0f;
+    pl0f_camera.param.Campos = p->world;
+    pl0f_camera.param.Target = p->world;
+    pl0f_camera.param.Campos.y = 14000.0f;
+    pl0f_camera.param.Fovy = 40.0f;
     v.x = 0.0f;
     v.y = 0.0f;
     v.z = 1.0f;
@@ -3096,9 +3096,9 @@ void pl00SetDropCam(cPlayer* pl)
         v.y = 0.0f;
         v.z = -4000.0f;
     }
-    PSMTXMultVec(m, &v, &pl0f_camera.param.pos);
-    pl0f_camera.param.at = pl->pos;
-    pl0f_camera.param.fovy = 40.0f;
+    PSMTXMultVec(m, &v, &pl0f_camera.param.Campos);
+    pl0f_camera.param.Target = pl->pos;
+    pl0f_camera.param.Fovy = 40.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -3116,12 +3116,12 @@ void pl00DropCamMove(cPlayer* pl)
     Vec pos;
     f32 h;
 
-    at = pl0f_camera.param.pos;
+    at = pl0f_camera.param.Campos;
     at.y = pl->pos.y + 1000.0f;
     pos = pl->pos;
-    pl00_drop_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &pos, &pl00_drop_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl00_drop_camera.param.pos, 1.0f);
+    pl00_drop_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl00_drop_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl00_drop_camera.param.Campos, 1.0f);
     pl00_drop_camera.Up.x = 0.0f;
     pl00_drop_camera.Up.y = 1.0f;
     pl00_drop_camera.Up.z = 0.0f;
@@ -3352,7 +3352,7 @@ void plboatSpearThrow(cPlayer* pl)
 #line 5166
     VECNormalize(&dir, &dir);
     PSVECScale(&dir, &dir, 25000.0f);
-    PSVECAdd(&gcam->param.pos, &dir, &target);
+    PSVECAdd(&gcam->param.Campos, &dir, &target);
     hand.x = -70.0f;
     hand.y = -30.0f;
     hand.z = -500.0f;

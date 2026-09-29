@@ -1207,7 +1207,7 @@ void cSat::disp(int poly_num, u32 col, int mode)
     PSVECScale(&n, &p[1], 100.0f);
     PSVECAdd(&p[0], &p[1], &p[1]);
     PSMTXMultVec(mat, &p[0], &w);
-    PSVECSubtract(&w, &pG->Camera.param.pos, &w);
+    PSVECSubtract(&w, &pG->Camera.param.Campos, &w);
     PSMTXMultVecSR(mat, &n, &n);
     if (PSVECDotProduct(&n, &w) > 0.0f) {
         col = 0xFFFFFFFF;

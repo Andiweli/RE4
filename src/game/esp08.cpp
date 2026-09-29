@@ -682,7 +682,7 @@ void Esp08_TransShimmer(cEsp08* esp, int u_pow)
         GXLoadTexMtxImm(tm, 0x1E, 1);
         GXSetTexCoordGen(0, 1, 0, 0x1E);
     } else {
-        f32 fovy = pG->Camera.param.fovy;
+        f32 fovy = pG->Camera.param.Fovy;
         if (SysFlagChk(pG, SYS_SCISSOR_ON)) {
             C_MTXLightPerspective(pm, fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
         } else {

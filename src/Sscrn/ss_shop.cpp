@@ -2963,8 +2963,8 @@ void dispItem(int id, int sw)
 void screenPos2worldPos(Vec* scr, Vec* out)
 {
     CAMERA* cam = &pG->Camera;
-    f32 z = cam->param.pos.z;
-    f32 h = fabsf((f32) (z * tan(cam->param.fovy * 0.5f * 3.1415927f / 180.0f)));
+    f32 z = cam->param.Campos.z;
+    f32 h = fabsf((f32) (z * tan(cam->param.Fovy * 0.5f * 3.1415927f / 180.0f)));
 
     out->x = scr->x * h / 240.0f;
     out->y = scr->y * h / 240.0f;

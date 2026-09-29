@@ -2085,9 +2085,9 @@ void getCam2SndAngle(f32* h_angle, f32* v_angle, f32* dist, Vec* pos)
         *v_angle = atan2f(out.y, -out.z);
     }
     if (dist != NULL) {
-        f32 dx = pos->x - cam->param.pos.x;
-        f32 dy = pos->y - cam->param.pos.y;
-        f32 dz = pos->z - cam->param.pos.z;
+        f32 dx = pos->x - cam->param.Campos.x;
+        f32 dy = pos->y - cam->param.Campos.y;
+        f32 dz = pos->z - cam->param.Campos.z;
         *dist = SQRTF(dx * dx + dy * dy + dz * dz);
     }
 }

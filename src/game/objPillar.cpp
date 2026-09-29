@@ -589,7 +589,7 @@ void EscapeCamMove()
     f32 len;
     GLOBAL_WK* g = pG;
 
-    Cam.param.fovy = g->Camera.param.fovy;
+    Cam.param.Fovy = g->Camera.param.Fovy;
     p0.x = -376.0f;
     p0.y = 575.0f;
     p0.z = -1831.0f;
@@ -598,20 +598,20 @@ void EscapeCamMove()
     p1.z = 52.6f;
     PSMTXMultVec(pPL->mat, &p0, &p0);
     PSMTXMultVec(pPL->mat, &p1, &p1);
-    PosToPos(&g->Camera.param.at, &p1, &Cam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &p0, &Cam.param.pos, 1.0f);
-    if (EatMgr.hitCheck(&Cam.param.at, &Cam.param.pos, &hit, 0, 0x8000, 0)) {
-        PSVECSubtract(&hit, &Cam.param.at, &d);
+    PosToPos(&g->Camera.param.Target, &p1, &Cam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &p0, &Cam.param.Campos, 1.0f);
+    if (EatMgr.hitCheck(&Cam.param.Target, &Cam.param.Campos, &hit, 0, 0x8000, 0)) {
+        PSVECSubtract(&hit, &Cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 875 "D:/Bio4/Prog/objPillar.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&Cam.param.at, &d, &Cam.param.pos);
+        PSVECAdd(&Cam.param.Target, &d, &Cam.param.Campos);
     }
     {
         CAMERA* cam = &Cam;
-        Vec* cp = &cam->param.pos;
-        Vec* ca = &cam->param.at;
+        Vec* cp = &cam->param.Campos;
+        Vec* ca = &cam->param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;

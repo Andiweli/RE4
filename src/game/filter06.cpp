@@ -56,9 +56,9 @@ static Vec cam_vec_LR;
 // Places particle `no` randomly around the camera within `spread` * 10 units (plus a per-particle offset).
 void cParticle06::init(u32 i)
 {
-    m_Pos.x = pG->Camera.param.pos.x;
-    m_Pos.y = pG->Camera.param.pos.y;
-    m_Pos.z = pG->Camera.param.pos.z;
+    m_Pos.x = pG->Camera.param.Campos.x;
+    m_Pos.y = pG->Camera.param.Campos.y;
+    m_Pos.z = pG->Camera.param.Campos.z;
     m_Pos.x += flt06.spread * 10.0f * fRand1_1() + (f32) i * 500.0f;
     m_Pos.y += flt06.spread * 10.0f * fRand1_1() + (f32) i * 500.0f;
     m_Pos.z += flt06.spread * 10.0f * fRand1_1() + (f32) i * 500.0f;
@@ -81,7 +81,7 @@ void cParticle06::move()
     int v;
 
     PSVECAdd(&m_Pos, &m_Spd, &m_Pos);
-    PSVECSubtract(&m_Pos, &pG->Camera.param.pos, &d);
+    PSVECSubtract(&m_Pos, &pG->Camera.param.Campos, &d);
     dot = PSVECDotProduct(&d, &cam_vec_LR);
     if (dot >= 0.0f) {
         n = (int) ((dot + flt06.rangeLR) / (flt06.rangeLR + flt06.rangeLR));
@@ -94,7 +94,7 @@ void cParticle06::move()
     }
 #line 133 "D:/Bio4/Prog/filter06.cpp"
     VECNormalize(&pG->Camera.Up, &up);
-    PSVECSubtract(&m_Pos, &pG->Camera.param.pos, &d);
+    PSVECSubtract(&m_Pos, &pG->Camera.param.Campos, &d);
     dot = PSVECDotProduct(&d, &up);
     if (dot >= 0.0f) {
         n = (int) ((dot + flt06.rangeUp) / (flt06.rangeUp + flt06.rangeUp));
@@ -105,10 +105,10 @@ void cParticle06::move()
         PSVECScale(&up, &tmp, -(flt06.rangeUp * (f32) n + flt06.rangeUp * (f32) n));
         PSVECAdd(&m_Pos, &tmp, &m_Pos);
     }
-    PSVECSubtract(&pG->Camera.param.at, &pG->Camera.param.pos, &dir);
+    PSVECSubtract(&pG->Camera.param.Target, &pG->Camera.param.Campos, &dir);
 #line 154
     VECNormalize(&dir, &dir);
-    PSVECSubtract(&m_Pos, &pG->Camera.param.pos, &d);
+    PSVECSubtract(&m_Pos, &pG->Camera.param.Campos, &d);
     dot = PSVECDotProduct(&d, &dir);
     if (dot >= 0.0f) {
         n = (int) (dot / flt06.rangeDepth);
@@ -118,7 +118,7 @@ void cParticle06::move()
     if (n != 0) {
         PSVECScale(&dir, &up, -(flt06.rangeDepth * (f32) n));
         PSVECAdd(&m_Pos, &up, &m_Pos);
-        PSVECSubtract(&m_Pos, &pG->Camera.param.pos, &d);
+        PSVECSubtract(&m_Pos, &pG->Camera.param.Campos, &d);
         dot = PSVECDotProduct(&d, &dir);
     }
     a = 255.0f / (dot / 800.0f);
@@ -190,7 +190,7 @@ void Filter06Trans()
     if (StaFlagChk(pG, STA_CAMERA_IN_ROOM)) {
         return;
     }
-    PSVECSubtract(&pG->Camera.param.at, &pG->Camera.param.pos, &cam_vec_LR);
+    PSVECSubtract(&pG->Camera.param.Target, &pG->Camera.param.Campos, &cam_vec_LR);
     PSVECCrossProduct(&cam_vec_LR, &pG->Camera.Up, &cam_vec_LR);
 #line 246
     VECNormalize(&cam_vec_LR, &cam_vec_LR);

@@ -1520,7 +1520,7 @@ void em31EscapeCamMove(cEm31* em)
     Vec b;
     Vec c;
 
-    w->Cam.param.fovy = g->Camera.param.fovy;
+    w->Cam.param.Fovy = g->Camera.param.Fovy;
     a.x = -376.0f;
     a.y = 575.0f;
     a.z = -1831.0f;
@@ -1529,23 +1529,23 @@ void em31EscapeCamMove(cEm31* em)
     b.z = 52.6f;
     PSMTXMultVec(pPL->mat, &a, &a);
     PSMTXMultVec(pPL->mat, &b, &b);
-    PosToPos(&g->Camera.param.at, &b, &w->Cam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &a, &w->Cam.param.pos, 1.0f);
-    if (EatMgr.hitCheck(&w->Cam.param.at, &w->Cam.param.pos, &c, 0, 0x8000, 0)) {
+    PosToPos(&g->Camera.param.Target, &b, &w->Cam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &a, &w->Cam.param.Campos, 1.0f);
+    if (EatMgr.hitCheck(&w->Cam.param.Target, &w->Cam.param.Campos, &c, 0, 0x8000, 0)) {
         Vec d;
         f32 len;
 
-        PSVECSubtract(&c, &w->Cam.param.at, &d);
+        PSVECSubtract(&c, &w->Cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 2400 "D:/Bio4/Prog/em31.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&w->Cam.param.at, &d, &w->Cam.param.pos);
+        PSVECAdd(&w->Cam.param.Target, &d, &w->Cam.param.Campos);
     }
     w->Cam.Up.x = 0.0f;
     w->Cam.Up.y = 1.0f;
     w->Cam.Up.z = 0.0f;
-    w->Cam.Distance = VEC_DIST(&w->Cam.param.pos, &w->Cam.param.at);
+    w->Cam.Distance = VEC_DIST(&w->Cam.param.Campos, &w->Cam.param.Target);
     CameraSetOrientationUp(&w->Cam);
     CamCtrl.SetExtraCamera(&w->Cam);
 }
@@ -3489,18 +3489,18 @@ void em31StampCamMove(cEm31* em)
     Vec a;
     cParts* p;
 
-    w->Cam.param.fovy = g->Camera.param.fovy;
+    w->Cam.param.Fovy = g->Camera.param.Fovy;
     a.x = 0.0f;
     a.y = 3000.0f;
     a.z = -3000.0f;
     PSMTXMultVec(pPL->mat, &a, &a);
-    PosToPos(&g->Camera.param.pos, &a, &w->Cam.param.pos, 0.1f);
+    PosToPos(&g->Camera.param.Campos, &a, &w->Cam.param.Campos, 0.1f);
     p = pPL->getPartsPtr(0);
-    PosToPos(&g->Camera.param.at, &p->world, &w->Cam.param.at, 0.3f);
+    PosToPos(&g->Camera.param.Target, &p->world, &w->Cam.param.Target, 0.3f);
     w->Cam.Up.x = 0.0f;
     w->Cam.Up.y = 1.0f;
     w->Cam.Up.z = 0.0f;
-    w->Cam.Distance = VEC_DIST(&w->Cam.param.pos, &w->Cam.param.at);
+    w->Cam.Distance = VEC_DIST(&w->Cam.param.Campos, &w->Cam.param.Target);
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }

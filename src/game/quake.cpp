@@ -132,7 +132,7 @@ void QuakeMain()
         ofs.z = (f32) rnd_tbl[Quake.rnd_idx] * Quake.power;
     }
     PSMTXMultVecSR(cam->mat, &ofs, &ofs);
-    PSVECAdd(&g->Camera.param.pos, &ofs, &g->Camera.param.pos);
-    PSVECAdd(&g->Camera.param.at, &ofs, &g->Camera.param.at);
+    PSVECAdd(&g->Camera.param.Campos, &ofs, &g->Camera.param.Campos);
+    PSVECAdd(&g->Camera.param.Target, &ofs, &g->Camera.param.Target);
     CameraSetOrientationUp(cam);
 }

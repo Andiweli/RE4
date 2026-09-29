@@ -165,7 +165,7 @@ void tcDrawLine3D(Vec* a, Vec* b, u32 color);
 void tcDrawSphere(Vec* pos, u32 color, f32 r);
 void tcDrawPoly(Vec* p, u32 color);
 void tcSetBesideFloor(f32 ratio);
-void tcSetBesideOffset(CAMERA_POINT (*ready)[3], CAMERA_POINT (*trans)[3]);
+void tcSetBesideOffset(QFPS_OFFSET (*ready)[3], QFPS_OFFSET (*trans)[3]);
 void tcSetBesideCamera();
 extern CAMERA tcGameCamera;      // game camera saved while the tool runs
 

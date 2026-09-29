@@ -113,9 +113,9 @@ int AddOtWorldPos(void* data, void (*func)(void*), Vec* pos, u16 kind, f32 zlimi
         z = 0.0f;
     } else {
         CameraGetLookVecInverse(cam, &look);
-        d.x = pos->x - cam->param.pos.x;
-        d.y = pos->y - cam->param.pos.y;
-        d.z = pos->z - cam->param.pos.z;
+        d.x = pos->x - cam->param.Campos.x;
+        d.y = pos->y - cam->param.Campos.y;
+        d.z = pos->z - cam->param.Campos.z;
         z = PSVECDotProduct(&look, &d);
     }
     if (z >= zlimit) {
@@ -162,9 +162,9 @@ int AddOtWorldPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
         return 0xFFFF;
     }
     CameraGetLookVecInverse(cam, &look);
-    d.x = pos->x - cam->param.pos.x;
-    d.y = pos->y - cam->param.pos.y;
-    d.z = pos->z - cam->param.pos.z;
+    d.x = pos->x - cam->param.Campos.x;
+    d.y = pos->y - cam->param.Campos.y;
+    d.z = pos->z - cam->param.Campos.z;
     z = PSVECDotProduct(&look, &d);
     if (z + radius < zlimit) {
         if (zlimit != 0.0f) {
@@ -212,9 +212,9 @@ int AddOtModelPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
         return 0xFFFF;
     }
     CameraGetLookVecInverse(cam, &look);
-    d.x = pos->x - cam->param.pos.x;
-    d.y = pos->y - cam->param.pos.y;
-    d.z = pos->z - cam->param.pos.z;
+    d.x = pos->x - cam->param.Campos.x;
+    d.y = pos->y - cam->param.Campos.y;
+    d.z = pos->z - cam->param.Campos.z;
     z = PSVECDotProduct(&look, &d);
     if (z + radius < zlimit) {
         if (zlimit != 0.0f) {

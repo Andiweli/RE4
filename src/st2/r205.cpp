@@ -451,7 +451,7 @@ static void r205_ExecDieDemo(R205Pend* p)
             if (i == 2) {
                 EstSet(pPL, -1, &pPL->getPartsPtr(2)->world, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, pPL, 0);
             }
-            cam.param.at = parts->world;
+            cam.param.Target = parts->world;
             i++;
             CameraSetOrientationUp(&cam);
             CamCtrl.SetExtraCamera(&cam);

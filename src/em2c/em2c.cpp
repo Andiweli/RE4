@@ -428,9 +428,9 @@ void em2cDmCk(cEm2c* em)
         }
     }
     p = em->getPartsPtr(0);
-    dist = (cam->param.pos.x - p->world.x) * (cam->param.pos.x - p->world.x) +
-           (cam->param.pos.y - p->world.y) * (cam->param.pos.y - p->world.y) +
-           (cam->param.pos.z - p->world.z) * (cam->param.pos.z - p->world.z);
+    dist = (cam->param.Campos.x - p->world.x) * (cam->param.Campos.x - p->world.x) +
+           (cam->param.Campos.y - p->world.y) * (cam->param.Campos.y - p->world.y) +
+           (cam->param.Campos.z - p->world.z) * (cam->param.Campos.z - p->world.z);
     switch (em->dmg.m_Wep) {
     case 0:
     case 1:
@@ -795,9 +795,9 @@ void em2cTailDmCk(cEm2c* em)
     LifeDownSet2(em, dmg, 0, 1);
     w->dmgTotal += dmg;
     p = em->getPartsPtr(0);
-    dist = (cam->param.pos.x - p->world.x) * (cam->param.pos.x - p->world.x) +
-           (cam->param.pos.y - p->world.y) * (cam->param.pos.y - p->world.y) +
-           (cam->param.pos.z - p->world.z) * (cam->param.pos.z - p->world.z);
+    dist = (cam->param.Campos.x - p->world.x) * (cam->param.Campos.x - p->world.x) +
+           (cam->param.Campos.y - p->world.y) * (cam->param.Campos.y - p->world.y) +
+           (cam->param.Campos.z - p->world.z) * (cam->param.Campos.z - p->world.z);
     switch (em->dmg.m_Wep) {
     case 0:
     case 1:
@@ -4771,7 +4771,7 @@ static void em2c_R1_Die_Freeze(cEm2c* em)
                 CAMERA* cam = &pG->Camera;
                 em2cDieEffDelete(em, w);
                 rot.x = 0.0f;
-                rot.y = GetXZAngle(&em->pos, &cam->param.pos);
+                rot.y = GetXZAngle(&em->pos, &cam->param.Campos);
                 rot.z = 0.0f;
                 EstSet(em, -1, 0, 0, EFF_EM2C, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
                 EstSet(0, -1, &em->pos, &rot, EFF_EM2C, 0x32, 0, ESP_CORE_KIND_NONE, 0, 0);
@@ -5980,7 +5980,7 @@ void em2cEscapeCamMove(cEm2c* em)
     Vec d;
     f32 len;
 
-    w->cam.param.fovy = cam->param.fovy;
+    w->cam.param.Fovy = cam->param.Fovy;
     pos.x = -376.0f;
     pos.y = 575.0f;
     pos.z = -1831.0f;
@@ -5989,20 +5989,20 @@ void em2cEscapeCamMove(cEm2c* em)
     at.z = 52.5999985f;
     PSMTXMultVec(pPL->mat, &pos, &pos);
     PSMTXMultVec(pPL->mat, &at, &at);
-    PosToPos(&cam->param.at, &at, &w->cam.param.at, 1.0f);
-    PosToPos(&cam->param.pos, &pos, &w->cam.param.pos, 1.0f);
-    if (EatMgr.hitCheck(&w->cam.param.at, &w->cam.param.pos, &hit, 0, 0x8000, 0)) {
-        PSVECSubtract(&hit, &w->cam.param.at, &d);
+    PosToPos(&cam->param.Target, &at, &w->cam.param.Target, 1.0f);
+    PosToPos(&cam->param.Campos, &pos, &w->cam.param.Campos, 1.0f);
+    if (EatMgr.hitCheck(&w->cam.param.Target, &w->cam.param.Campos, &hit, 0, 0x8000, 0)) {
+        PSVECSubtract(&hit, &w->cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 9125 "D:/Bio4/Prog/em2c.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&w->cam.param.at, &d, &w->cam.param.pos);
+        PSVECAdd(&w->cam.param.Target, &d, &w->cam.param.Campos);
     }
     w->cam.Up.x = 0.0f;
     w->cam.Up.y = 1.0f;
     w->cam.Up.z = 0.0f;
-    w->cam.Distance = VEC_DIST(&w->cam.param.pos, &w->cam.param.at);
+    w->cam.Distance = VEC_DIST(&w->cam.param.Campos, &w->cam.param.Target);
     CameraSetOrientationUp(&w->cam);
     CamCtrl.SetExtraCamera(&w->cam);
 }

@@ -787,7 +787,7 @@ void Espgen42_TransSub(cEspgen* pGen)
             Mtx pm;
             GXInitTexObj(&tex, buf, (u32) Screen.width / 2, (u32) ((f32) ((u32) Screen.height / 2) - ofs), 6, 0, 0, 0);
             GXLoadTexObj(&tex, st->texMap);
-            C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
+            C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
             PSMTXConcat(pm, mv, tm);
             GXLoadTexMtxImm(tm, 0x1E, 0);
             GXSetTexCoordGen(st->texCoord, 0, 0, 0x1E);

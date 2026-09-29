@@ -613,7 +613,7 @@ void cEm39::move()
         if (nrm == 0 || nrm->y < 0.8f) {
             hide = 1;
         }
-        if (cam->param.pos.y < pos.y) {
+        if (cam->param.Campos.y < pos.y) {
             hide = 1;
         }
         if ((w->Be_flg & 0x01000000) || hide) {

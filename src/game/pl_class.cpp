@@ -1433,7 +1433,7 @@ void cPlayer::shadowCtrl()
 {
     int on;
 
-    if (!(stat.check(F_SHADOW)) || pG->Camera.param.pos.y < pos.y || !pFloor_norm || pFloor_norm->y < 0.8f) {
+    if (!(stat.check(F_SHADOW)) || pG->Camera.param.Campos.y < pos.y || !pFloor_norm || pFloor_norm->y < 0.8f) {
         on = 0;
     } else {
         on = 1;

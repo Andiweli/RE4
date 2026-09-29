@@ -96,13 +96,13 @@ static int mvInit()
     {
         CAMERA* cam = &pG->Camera;
 
-        cam->param.at.x = 0.0f;
-        cam->param.at.y = 1000.0f;
-        cam->param.at.z = 0.0f;
-        cam->param.pos.x = 0.0f;
-        cam->param.pos.y = 1000.0f;
-        cam->param.pos.z = 3000.0f;
-        cam->param.roll = 0.0f;
+        cam->param.Target.x = 0.0f;
+        cam->param.Target.y = 1000.0f;
+        cam->param.Target.z = 0.0f;
+        cam->param.Campos.x = 0.0f;
+        cam->param.Campos.y = 1000.0f;
+        cam->param.Campos.z = 3000.0f;
+        cam->param.Roll = 0.0f;
         CameraSetOrientationRoll(cam);
     }
     TutilInitDefault();

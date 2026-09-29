@@ -1115,9 +1115,9 @@ static void r300_mira_exec()
             Mtx m;
             Vec dir;
             CAMERA* cam = &r300_work->cam;
-            dir.x = cam->param.at.x - pos.x;
+            dir.x = cam->param.Target.x - pos.x;
             dir.y = 0.0f;
-            dir.z = cam->param.at.z - pos.z;
+            dir.z = cam->param.Target.z - pos.z;
             dir.z = PSVECMag(&dir);
             dir.x = 0.0f;
             dir.y = 0.0f;
@@ -1127,11 +1127,11 @@ static void r300_mira_exec()
                 PSMTXRotRad(m, 'y', SmdGetObjPtr(0x3C)->ang.y);
             }
             PSMTXMultVecSR(m, &dir, &dir);
-            dir.y = cam->param.at.y - pos.y;
-            PSVECAdd(&dir, &pos, &cam->param.at);
-            dir.x = cam->param.pos.x - pos.x;
+            dir.y = cam->param.Target.y - pos.y;
+            PSVECAdd(&dir, &pos, &cam->param.Target);
+            dir.x = cam->param.Campos.x - pos.x;
             dir.y = 0.0f;
-            dir.z = cam->param.pos.z - pos.z;
+            dir.z = cam->param.Campos.z - pos.z;
             dir.z = PSVECMag(&dir);
             dir.x = 0.0f;
             dir.y = 0.0f;
@@ -1142,10 +1142,10 @@ static void r300_mira_exec()
             }
             PSMTXMultVecSR(m, &dir, &dir);
             dir.x = -dir.x;
-            dir.y = cam->param.pos.y - pos.y;
+            dir.y = cam->param.Campos.y - pos.y;
             dir.z = -dir.z;
-            PSVECAdd(&dir, &pos, &cam->param.pos);
-            r300_work->cam.param.roll = 0.0f;
+            PSVECAdd(&dir, &pos, &cam->param.Campos);
+            r300_work->cam.param.Roll = 0.0f;
             CameraSetOrientationRoll(&r300_work->cam);
             cc->SetExtraCamera(&r300_work->cam);
             SceSleep(1);
@@ -1201,9 +1201,9 @@ static void r300_mirb_exec()
             Mtx m;
             Vec dir;
             CAMERA* cam = &r300_work->cam;
-            dir.x = cam->param.at.x - pos.x;
+            dir.x = cam->param.Target.x - pos.x;
             dir.y = 0.0f;
-            dir.z = cam->param.at.z - pos.z;
+            dir.z = cam->param.Target.z - pos.z;
             dir.z = PSVECMag(&dir);
             dir.x = 0.0f;
             dir.y = 0.0f;
@@ -1213,11 +1213,11 @@ static void r300_mirb_exec()
                 PSMTXRotRad(m, 'y', SmdGetObjPtr(0x3D)->ang.y);
             }
             PSMTXMultVecSR(m, &dir, &dir);
-            dir.y = cam->param.at.y - pos.y;
-            PSVECAdd(&dir, &pos, &cam->param.at);
-            dir.x = cam->param.pos.x - pos.x;
+            dir.y = cam->param.Target.y - pos.y;
+            PSVECAdd(&dir, &pos, &cam->param.Target);
+            dir.x = cam->param.Campos.x - pos.x;
             dir.y = 0.0f;
-            dir.z = cam->param.pos.z - pos.z;
+            dir.z = cam->param.Campos.z - pos.z;
             dir.z = PSVECMag(&dir);
             dir.x = 0.0f;
             dir.y = 0.0f;
@@ -1228,10 +1228,10 @@ static void r300_mirb_exec()
             }
             PSMTXMultVecSR(m, &dir, &dir);
             dir.x = -dir.x;
-            dir.y = cam->param.pos.y - pos.y;
+            dir.y = cam->param.Campos.y - pos.y;
             dir.z = -dir.z;
-            PSVECAdd(&dir, &pos, &cam->param.pos);
-            r300_work->cam.param.roll = 0.0f;
+            PSVECAdd(&dir, &pos, &cam->param.Campos);
+            r300_work->cam.param.Roll = 0.0f;
             CameraSetOrientationRoll(&r300_work->cam);
             cc->SetExtraCamera(&r300_work->cam);
             SceSleep(1);

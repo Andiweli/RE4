@@ -58,7 +58,7 @@ void Esp07_ChkGnd(cEsp07* pEsp, f32 height)
             Vec d;
             f32 dist;
 
-            PSVECSubtract(&pG->Camera.param.pos, &pEsp->m_Pos, &d);
+            PSVECSubtract(&pG->Camera.param.Campos, &pEsp->m_Pos, &d);
             dist = PSVECMag(&d);
             if (w->SeType == 3 || dist < 8000.0f) {
                 EspCallSeType(w->SeType, &pEsp->m_Pos);

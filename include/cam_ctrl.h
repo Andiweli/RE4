@@ -119,26 +119,26 @@ typedef _CAM_B_SPLINE CAM_B_SPLINE;
 
 class CameraInterpolation {
 public:
-    CameraParam param; // 0x00
+    CAMERA_POINT param; // 0x00
     s32 frame;         // 0x20
 
-    void set(int frame, CameraParam* p);
-    void move(CameraParam* arg);
-    CameraParam* getCamPtr() { return &param; }
+    void set(int frame, CAMERA_POINT* p);
+    void move(CAMERA_POINT* arg);
+    CAMERA_POINT* getCamPtr() { return &param; }
 };
 
 class CameraSmooth : public CAMERA {
 private:
     u32 m_flag;         // 0xF8  bit 0 = reinit on next move
     f32 m_ratio;         // 0xFC
-    CameraParam m_effect; // 0x100
+    CAMERA_POINT m_effect; // 0x100
 public:
     u8 pad_120[0x12C - 0x120];
 
-    void init(CameraParam* p);
-    void move(CameraParam* arg);
+    void init(CAMERA_POINT* p);
+    void move(CAMERA_POINT* arg);
     void setRatio(f32 ratio) { m_ratio = ratio; }
-    CameraParam* getCamPtr() { return &m_effect; }
+    CAMERA_POINT* getCamPtr() { return &m_effect; }
     void setFlag() { m_flag |= 1; }
     void unsetFlag() { m_flag &= ~1; }
 };
@@ -165,7 +165,7 @@ public:
     u8 r1;                 // 0x35
     u8 r2;                       // 0x36
     u8 r0_old;                // 0x37
-    CameraParam cur;              // 0x38
+    CAMERA_POINT cur;              // 0x38
     u32 counter_58;               // 0x58
     CAM_FILE_HEADER* pCamData;       // 0x5C
     CAMERA camera;                // 0x60

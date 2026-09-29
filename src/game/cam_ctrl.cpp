@@ -473,10 +473,10 @@ int cameraHitCheck(Vec* pos, Vec* nrm, Vec* from, Vec* to)
 // Copies the cut's first key (pos / at / roll / fov) into a Camera and rebuilds its orientation.
 void CameraSetCutData(CAMERA* pCam, CAMERA_DATA* pData)
 {
-    pCam->param.pos = *pData->pCampos;
-    pCam->param.at = *pData->pTarget;
-    pCam->param.roll = *pData->pRoll;
-    pCam->param.fovy = *pData->pFovy;
+    pCam->param.Campos = *pData->pCampos;
+    pCam->param.Target = *pData->pTarget;
+    pCam->param.Roll = *pData->pRoll;
+    pCam->param.Fovy = *pData->pFovy;
     CameraSetOrientationRoll(pCam);
 }
 
@@ -1233,11 +1233,11 @@ void CameraControl::Move()
     }
 
     if (!StaFlagChk(pG, STA_EVENT)) {
-        if (GetWaterHeight(&cur.pos, &water_y)) {
-            t = sinf(cur.fovy * PI / 360.0f) / cosf(cur.fovy * PI / 360.0f);
+        if (GetWaterHeight(&cur.Campos, &water_y)) {
+            t = sinf(cur.Fovy * PI / 360.0f) / cosf(cur.Fovy * PI / 360.0f);
             lim = gain * (ZNEAR * t * 1.3333334f) + water_y;
-            if (cur.pos.y < lim) {
-                cur.pos.y = lim;
+            if (cur.Campos.y < lim) {
+                cur.Campos.y = lim;
             }
         }
     }
@@ -1281,7 +1281,7 @@ f32 CameraControl::getCameraPitch()
 }
 
 // Starts an interpolation of `f` frames from camera parameters `p`.
-void CameraInterpolation::set(int inter_frame, CameraParam* p)
+void CameraInterpolation::set(int inter_frame, CAMERA_POINT* p)
 {
     frame = inter_frame;
     param = *p;
@@ -1289,27 +1289,27 @@ void CameraInterpolation::set(int inter_frame, CameraParam* p)
 
 // One step toward the target parameters `p`: param moves 1 / frame of the remaining distance
 // each frame; when frame reaches 0 it snaps to `p`.
-void CameraInterpolation::move(CameraParam* p)
+void CameraInterpolation::move(CAMERA_POINT* p)
 {
-    CameraParam tmp;
+    CAMERA_POINT tmp;
     f32 r, s;
 
     if (frame != 0) {
         r = 1.0f / (f32) frame;
         s = 1.0f - r;
         tmp = *p;
-        PSVECScale(&param.pos, &param.pos, s);
-        PSVECScale(&param.at, &param.at, s);
-        param.roll *= s;
-        param.fovy *= s;
-        PSVECScale(&p->pos, &p->pos, r);
-        PSVECScale(&p->at, &p->at, r);
-        p->roll *= r;
-        p->fovy *= r;
-        PSVECAdd(&p->pos, &param.pos, &param.pos);
-        PSVECAdd(&p->at, &param.at, &param.at);
-        param.roll += p->roll;
-        param.fovy += p->fovy;
+        PSVECScale(&param.Campos, &param.Campos, s);
+        PSVECScale(&param.Target, &param.Target, s);
+        param.Roll *= s;
+        param.Fovy *= s;
+        PSVECScale(&p->Campos, &p->Campos, r);
+        PSVECScale(&p->Target, &p->Target, r);
+        p->Roll *= r;
+        p->Fovy *= r;
+        PSVECAdd(&p->Campos, &param.Campos, &param.Campos);
+        PSVECAdd(&p->Target, &param.Target, &param.Target);
+        param.Roll += p->Roll;
+        param.Fovy += p->Fovy;
         frame--;
     } else {
         frame = 0;
@@ -1318,14 +1318,14 @@ void CameraInterpolation::move(CameraParam* p)
 }
 
 // Resets the smoothing state to `p`.
-void CameraSmooth::init(CameraParam* p)
+void CameraSmooth::init(CAMERA_POINT* p)
 {
     m_effect = *p;
 }
 
 // Exponential smoothing: m_effect = m_ratio * old + (1 - m_ratio) * p (the quake offset is removed
 // from the old value first); a set reinit flag snaps to `p`.
-void CameraSmooth::move(CameraParam* p)
+void CameraSmooth::move(CAMERA_POINT* p)
 {
     Vec tmp;
 
@@ -1334,18 +1334,18 @@ void CameraSmooth::move(CameraParam* p)
         init(p);
         return;
     }
-    PSVECAdd(&m_effect.pos, &pG->quake_ofs, &m_effect.pos);
-    PSVECAdd(&m_effect.at, &pG->quake_ofs, &m_effect.at);
-    PSVECScale(&m_effect.pos, &m_effect.pos, m_ratio);
-    PSVECScale(&p->pos, &tmp, 1.0f - m_ratio);
-    PSVECAdd(&m_effect.pos, &tmp, &m_effect.pos);
-    PSVECScale(&m_effect.at, &m_effect.at, m_ratio);
-    PSVECScale(&p->at, &tmp, 1.0f - m_ratio);
-    PSVECAdd(&m_effect.at, &tmp, &m_effect.at);
-    m_effect.roll *= m_ratio;
-    m_effect.roll = p->roll * (1.0f - m_ratio) + m_effect.roll;
-    m_effect.fovy *= m_ratio;
-    m_effect.fovy = p->fovy * (1.0f - m_ratio) + m_effect.fovy;
+    PSVECAdd(&m_effect.Campos, &pG->quake_ofs, &m_effect.Campos);
+    PSVECAdd(&m_effect.Target, &pG->quake_ofs, &m_effect.Target);
+    PSVECScale(&m_effect.Campos, &m_effect.Campos, m_ratio);
+    PSVECScale(&p->Campos, &tmp, 1.0f - m_ratio);
+    PSVECAdd(&m_effect.Campos, &tmp, &m_effect.Campos);
+    PSVECScale(&m_effect.Target, &m_effect.Target, m_ratio);
+    PSVECScale(&p->Target, &tmp, 1.0f - m_ratio);
+    PSVECAdd(&m_effect.Target, &tmp, &m_effect.Target);
+    m_effect.Roll *= m_ratio;
+    m_effect.Roll = p->Roll * (1.0f - m_ratio) + m_effect.Roll;
+    m_effect.Fovy *= m_ratio;
+    m_effect.Fovy = p->Fovy * (1.0f - m_ratio) + m_effect.Fovy;
 }
 
 // r0 == 0: idle (an event / room owns pG->Camera).
@@ -1362,7 +1362,7 @@ void CameraControl::r0_Debug()
     Vec c;
     Vec unused[2];  // 0x18-byte frame slot between c and m in the original
     Mtx m;
-    CameraParam p;
+    CAMERA_POINT p;
     Vec hit;
     const Vec campos_ofs = {0.0f, 1900.0f, -2000.0f};
     const Vec target_ofs = {0.0f, 1000.0f, 0.0f};
@@ -1373,10 +1373,10 @@ void CameraControl::r0_Debug()
     case 0:
         this->campos_ofs = campos_ofs;
         this->target_ofs = target_ofs;
-        PSMTXMultVec(pPL->mat, &this->campos_ofs, &p.pos);
-        PSVECAdd(&pPL->pos, &this->target_ofs, &p.at);
-        p.roll = 0.0f;
-        p.fovy = 55.0f;
+        PSMTXMultVec(pPL->mat, &this->campos_ofs, &p.Campos);
+        PSVECAdd(&pPL->pos, &this->target_ofs, &p.Target);
+        p.Roll = 0.0f;
+        p.Fovy = 55.0f;
         cur = p;
         CamSmth.setFlag();
         r1++;
@@ -1409,14 +1409,14 @@ void CameraControl::r0_Debug()
         }
         PSVECAdd(&pPL->pos, dp, &a);
         PSVECAdd(&pPL->pos, da, &b);
-        PSVECScale(&cam->param.pos, &cam->param.pos, rate);
+        PSVECScale(&cam->param.Campos, &cam->param.Campos, rate);
         PSVECScale(&a, &c, 1.0f - rate);
-        PSVECAdd(&cam->param.pos, &c, &cam->param.pos);
-        PSVECScale(&cam->param.at, &cam->param.at, rate);
+        PSVECAdd(&cam->param.Campos, &c, &cam->param.Campos);
+        PSVECScale(&cam->param.Target, &cam->param.Target, rate);
         PSVECScale(&b, &c, 1.0f - rate);
-        PSVECAdd(&cam->param.at, &c, &cam->param.at);
-        if (SatMgr.hitCheck(&cam->param.at, &cam->param.pos, &hit, NULL, 0x8000, 0)) {
-            cam->param.pos = hit;
+        PSVECAdd(&cam->param.Target, &c, &cam->param.Target);
+        if (SatMgr.hitCheck(&cam->param.Target, &cam->param.Campos, &hit, NULL, 0x8000, 0)) {
+            cam->param.Campos = hit;
         }
         cur = cam->param;
         break;
@@ -1440,24 +1440,24 @@ void CameraControl::r0_Fix()
 // (Parametrize + searchRail + BSpline).
 void CameraControl::r0_Pan()
 {
-    CameraParam p;
+    CAMERA_POINT p;
     CAMERA_DATA* cut = area_rec->pCdat;
 
     switch (r1) {
     case 0:
-        p.pos = *cut->pCampos;
-        p.roll = *cut->pRoll;
-        p.fovy = *cut->pFovy;
-        p.at = Aim;
+        p.Campos = *cut->pCampos;
+        p.Roll = *cut->pRoll;
+        p.Fovy = *cut->pFovy;
+        p.Target = Aim;
         cur = p;
         CamSmth.setRatio(smooth_ratio[1]);
         CamSmth.setFlag();
         r1++;
     case 1:
-        p.pos = camera.param.pos;
-        p.roll = camera.param.roll;
-        p.fovy = camera.param.fovy;
-        p.at = Aim;
+        p.Campos = camera.param.Campos;
+        p.Roll = camera.param.Roll;
+        p.Fovy = camera.param.Fovy;
+        p.Target = Aim;
         cur = p;
         break;
     }
@@ -1504,7 +1504,7 @@ void CameraControl::r0_RailPan()
         Parametrize(cut, bs);
         searchRail(bs, cut, &Aim, 0);
         BSpline(bs, &cam, 0);
-        cam.param.at = Aim;
+        cam.param.Target = Aim;
         cur = cam.param;
         CamSmth.setRatio(smooth_ratio[2]);
         CamSmth.setFlag();
@@ -1513,7 +1513,7 @@ void CameraControl::r0_RailPan()
     case 1:
         searchRail(bs, cut, &Aim, 0);
         BSpline(bs, &cam, 0);
-        cam.param.at = Aim;
+        cam.param.Target = Aim;
         cur = cam.param;
         if (pG->debug_mode == 0xF) {  // struct view: the pG load stays below the copy's stores
             debugDrawRail(cut);
@@ -1698,19 +1698,19 @@ void CameraControl::r0_RailBehind()
         }
         t = bs->cand_t;
         BSpline(bs, &cam, 0);
-        p0 = cam.param.at;
+        p0 = cam.param.Target;
         bs->cand_t = t - 0.1f;
         if (bs->cand_t < 0.0f) {
             bs->cand_t = 0.0f;
         }
         BSpline(bs, &cam, 0);
-        p1 = cam.param.at;
+        p1 = cam.param.Target;
         bs->cand_t = t + 0.1f;
         if (bs->cand_t > (f32) (cut->nPoint - 1)) {
             bs->cand_t = (f32) (cut->nPoint - 1);
         }
         BSpline(bs, &cam, 0);
-        p2 = cam.param.at;
+        p2 = cam.param.Target;
         PSVECSubtract(&p1, &p2, &dir);
         dir.y = 0.0f;
         switch (r2) {
@@ -1731,7 +1731,7 @@ void CameraControl::r0_RailBehind()
             r2++;
             break;
         case 1:
-            PSVECSubtract(&pPL->pos, &c->param.pos, &v);
+            PSVECSubtract(&pPL->pos, &c->param.Campos, &v);
             if (PSVECDotProduct(&v, &dir) < 0.0f) {
                 PSVECScale(&dir, &dir, -1.0f);
             }
@@ -1758,22 +1758,22 @@ void CameraControl::r0_RailBehind()
         } else {
             floor = pPL->pos;
         }
-        PSMTXMultVecSR(m, &this->campos_ofs, &cam.param.pos);
-        PSVECAdd(&cam.param.pos, &floor, &cam.param.pos);
-        PSMTXMultVecSR(m, &this->target_ofs, &cam.param.at);
-        PSVECAdd(&cam.param.at, &floor, &cam.param.at);
+        PSMTXMultVecSR(m, &this->campos_ofs, &cam.param.Campos);
+        PSVECAdd(&cam.param.Campos, &floor, &cam.param.Campos);
+        PSMTXMultVecSR(m, &this->target_ofs, &cam.param.Target);
+        PSVECAdd(&cam.param.Target, &floor, &cam.param.Target);
         if (!(cut->Attr & 1)) {
-            cam.param.fovy = m_behind_fovy;
-            cam.param.roll = 0.0f;
+            cam.param.Fovy = m_behind_fovy;
+            cam.param.Roll = 0.0f;
         } else {
-            cam.param.roll = 0.0f;
+            cam.param.Roll = 0.0f;
         }
         PSMTXInverse(m, inv);
-        PSMTXMultVec(inv, &cam.param.pos, &q);
+        PSMTXMultVec(inv, &cam.param.Campos, &q);
         if (moved) {
-            PSMTXMultVec(inv, &cam.param.at, &q2);
+            PSMTXMultVec(inv, &cam.param.Target, &q2);
             q2.x = q.x;
-            PSMTXMultVec(m, &q2, &cam.param.at);
+            PSMTXMultVec(m, &q2, &cam.param.Target);
         }
         if (CfgFlagChk(pSys, CFG_AIM_REVERSE)) {
             PSVECScale(&ang, &a, -1.0f);
@@ -1789,16 +1789,16 @@ void CameraControl::r0_RailBehind()
         // `&x` arguments of a plain call are precomputed into pseudos and gcse PRE turns them into
         // copies of the reaching registers; through the inline wrapper integrate substitutes the
         // addresses straight into the hard-register argument sets, which PRE never touches.
-        VecLinComb(&cam.param.at, &cam.param.pos, mm * k, n * k, &floor);
-        PSVECSubtract(&cam.param.at, &cam.param.pos, &dir);
+        VecLinComb(&cam.param.Target, &cam.param.Campos, mm * k, n * k, &floor);
+        PSVECSubtract(&cam.param.Target, &cam.param.Campos, &dir);
         dir.y = 0.0f;
         PSVECCrossProduct(&yaxis, &dir, &xaxis);
         MtxRotAxisPosRad(m, &xaxis, &floor, a.x);
-        PSMTXMultVec(m, &cam.param.at, &cam.param.at);
-        PSMTXMultVec(m, &cam.param.pos, &cam.param.pos);
+        PSMTXMultVec(m, &cam.param.Target, &cam.param.Target);
+        PSMTXMultVec(m, &cam.param.Campos, &cam.param.Campos);
         MtxRotAxisPosRad(m, &yaxis, &floor, a.y);
-        PSMTXMultVec(m, &cam.param.at, &cam.param.at);
-        PSMTXMultVec(m, &cam.param.pos, &cam.param.pos);
+        PSMTXMultVec(m, &cam.param.Target, &cam.param.Target);
+        PSMTXMultVec(m, &cam.param.Campos, &cam.param.Campos);
         PSMTXRotRad(m, 'y', pPL->ang.y);
         PSMTXMultVecSR(m, &zaxis, &v);
         if (PSVECDotProduct(&v, &dir) < 0.0f) {
@@ -1814,13 +1814,13 @@ void CameraControl::r0_RailBehind()
         } else {
             move_z = 0.0f;
         }
-        if (SatMgr.hitCheck(&cam.param.at, &cam.param.pos, &hit, NULL, 0x8000, 0)) {
-            cam.param.pos = hit;
+        if (SatMgr.hitCheck(&cam.param.Target, &cam.param.Campos, &hit, NULL, 0x8000, 0)) {
+            cam.param.Campos = hit;
         }
         if (edge_camera) {
             CamSmth.setRatio(rate);
-            cam.param.at = pPL->pos;
-            cam.param.at.y += 1550.0f;
+            cam.param.Target = pPL->pos;
+            cam.param.Target.y += 1550.0f;
         } else {
             CamSmth.setRatio(m_behind_A_ratio);
         }
@@ -1885,10 +1885,10 @@ void CameraControl::r0_Free()
         MtxRotAxisPosRad(m, &yaxis, &tofs, a.y);
         PSMTXMultVec(m, &this->campos_ofs, &this->campos_ofs);
         PSMTXMultVec(m, &this->target_ofs, &this->target_ofs);
-        PSMTXMultVec(cam_mat, &this->campos_ofs, &cam.param.pos);
-        PSMTXMultVec(cam_mat, &this->target_ofs, &cam.param.at);
-        cam.param.roll = 0.0f;
-        cam.param.fovy = m_behind_fovy;
+        PSMTXMultVec(cam_mat, &this->campos_ofs, &cam.param.Campos);
+        PSMTXMultVec(cam_mat, &this->target_ofs, &cam.param.Target);
+        cam.param.Roll = 0.0f;
+        cam.param.Fovy = m_behind_fovy;
         cur = cam.param;
         CamSmth.setFlag();
         r2 = 0;
@@ -1949,23 +1949,23 @@ void CameraControl::r0_Free()
             }
             }
         }
-        PSMTXMultVec(cam_mat, &this->campos_ofs, &cam.param.pos);
-        PSMTXMultVec(cam_mat, &this->target_ofs, &cam.param.at);
-        cam.param.roll = 0.0f;
-        cam.param.fovy = m_behind_fovy;
+        PSMTXMultVec(cam_mat, &this->campos_ofs, &cam.param.Campos);
+        PSMTXMultVec(cam_mat, &this->target_ofs, &cam.param.Target);
+        cam.param.Roll = 0.0f;
+        cam.param.Fovy = m_behind_fovy;
         rate = 0.8f;
-        PSVECScale(&cam.param.pos, &cam.param.pos, rate);
-        PSVECScale(&cur.pos, &tmp, 1.0f - rate);
-        PSVECAdd(&cam.param.pos, &tmp, &cam.param.pos);
-        PSVECScale(&cam.param.at, &cam.param.at, rate);
-        PSVECScale(&cur.at, &tmp, 1.0f - rate);
-        PSVECAdd(&cam.param.at, &tmp, &cam.param.at);
+        PSVECScale(&cam.param.Campos, &cam.param.Campos, rate);
+        PSVECScale(&cur.Campos, &tmp, 1.0f - rate);
+        PSVECAdd(&cam.param.Campos, &tmp, &cam.param.Campos);
+        PSVECScale(&cam.param.Target, &cam.param.Target, rate);
+        PSVECScale(&cur.Target, &tmp, 1.0f - rate);
+        PSVECAdd(&cam.param.Target, &tmp, &cam.param.Target);
         {
-            Vec from = cam.param.at;
-            Vec to = cam.param.pos;
+            Vec from = cam.param.Target;
+            Vec to = cam.param.Campos;
 
             if (cameraHitCheck(&hit, &nrm, &from, &to)) {
-                cam.param.pos = hit;
+                cam.param.Campos = hit;
             }
         }
         cur = cam.param;
@@ -2092,14 +2092,14 @@ void BSpline(CAM_B_SPLINE* bs, CAMERA* cam, int)
     memclr_asm(cam, sizeof(CAMERA));
     de_Boor_Cox(bs->p_num, NULL, bs->cand_t, bs->order, bs->B);
     for (i = 0; i < bs->p_num; i++) {
-        cam->param.at.x += bs->B[i] * bs->t_alpha[i];
-        cam->param.at.y += bs->B[i] * bs->t_beta[i];
-        cam->param.at.z += bs->B[i] * bs->t_gamma[i];
-        cam->param.pos.x += bs->B[i] * bs->c_alpha[i];
-        cam->param.pos.y += bs->B[i] * bs->c_beta[i];
-        cam->param.pos.z += bs->B[i] * bs->c_gamma[i];
-        cam->param.roll += bs->B[i] * bs->r_alpha[i];
-        cam->param.fovy += bs->B[i] * bs->f_alpha[i];
+        cam->param.Target.x += bs->B[i] * bs->t_alpha[i];
+        cam->param.Target.y += bs->B[i] * bs->t_beta[i];
+        cam->param.Target.z += bs->B[i] * bs->t_gamma[i];
+        cam->param.Campos.x += bs->B[i] * bs->c_alpha[i];
+        cam->param.Campos.y += bs->B[i] * bs->c_beta[i];
+        cam->param.Campos.z += bs->B[i] * bs->c_gamma[i];
+        cam->param.Roll += bs->B[i] * bs->r_alpha[i];
+        cam->param.Fovy += bs->B[i] * bs->f_alpha[i];
     }
 }
 
@@ -2547,10 +2547,10 @@ void CameraControl::checkAttachCamera()
                 delete m_pProc;
             }
             m_pProc = new (m_Free) CameraAttachedToMotion(model);
-            m_pProc->param.pos = pG->Camera.param.pos;
-            m_pProc->param.at = pG->Camera.param.at;
-            m_pProc->param.roll = pG->Camera.param.roll;
-            m_pProc->param.fovy = pG->Camera.param.fovy;
+            m_pProc->param.Campos = pG->Camera.param.Campos;
+            m_pProc->param.Target = pG->Camera.param.Target;
+            m_pProc->param.Roll = pG->Camera.param.Roll;
+            m_pProc->param.Fovy = pG->Camera.param.Fovy;
         }
         inter_frame = ac->frame;
     } else if (m_p_attach_model_old) {
