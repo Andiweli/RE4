@@ -6,25 +6,10 @@
 #include "esp.h"
 #include "espgen.h"
 
-// Est generator 45 parameter block filled from this effect (game/espgen45.cpp).
-struct Esp4cWork {
-    u8 Type;      // 0x00
-    u8 Refrect_type;        // 0x01
-    u8 Spec_Tex;        // 0x02
-    u8 wave_ratio_base;        // 0x03
-    u16 Shimmer_pow1;       // 0x04
-    u16 Shimmer_pow2;       // 0x06
-    f32 Prm_a;   // 0x08
-    f32 Prm_dmp;     // 0x0C
-    Vec ang;      // 0x10
-    u8 flag;      // 0x1C
-    u8 MaskTex_id; // 0x1D  gen->MaskTex_id (unused after set-up)
-};
-
 // Weather (est generator 45) controller: pushes its color/size into the generator every frame.
 class cEsp4c : public cEsp {
 public:
-    Esp4cWork m_Free;  // 0xF8
+    ESP4C_WK m_Free;  // 0xF8
 
     virtual void move();
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
@@ -39,10 +24,10 @@ cEsp* Esp4c_Create()
 
 // Runs the base update but restores the colour (the generator does its own fading), then pushes
 // target position (m_Pos x/z; y only with Tool_flg bit1), size, colour + fade steps and, with
-// Tool_flg bit0, the Esp4cWork parameter block into Espgen45.
+// Tool_flg bit0, the ESP4C_WK parameter block into Espgen45.
 void cEsp4c::move()
 {
-    Esp4cWork* w = &m_Free;
+    ESP4C_WK* w = &m_Free;
     f32 r = m_Col_r;
     f32 g = m_Col_g;
     f32 b = m_Col_b;
@@ -86,12 +71,12 @@ void Esp4c_Trans()
 {
 }
 
-// Fills Esp4cWork from the record: Type Work8[0] (2 = spread/damp from Work8[1..2]), specular
+// Fills ESP4C_WK from the record: Type Work8[0] (2 = spread/damp from Work8[1..2]), specular
 // texture Tex_id, shimmer powers prm 0xCE/0xD2, reflection type Work8[3], angles (degrees ->
 // radians), mask texture when Tool_flg 0x4000; then applies the first frame at once.
 int cEsp4c::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
-    Esp4cWork* w = &m_Free;
+    ESP4C_WK* w = &m_Free;
 
     w->wave_ratio_base = pSeq->WorkSp8[2];
     w->Type = pSeq->Work8[0];
@@ -113,7 +98,7 @@ int cEsp4c::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
     PSVECScale(&w->ang, &w->ang, 3.14 / 180);
     if (pSeq->Tool_flg & 0x4000) {
         w->flag |= 2;
-        w->MaskTex_id = pSeq->MaskTex_id;
+        w->Mask_Tex = pSeq->MaskTex_id;
         w->flag |= 1;
     }
     move();

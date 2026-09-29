@@ -4198,7 +4198,7 @@ address	size	section	unit	scope	name	demangled
 0x80124C88	0x86C	.text	game/Espgen42.cpp	global	Espgen42_Move00__FP7cEspgen	Espgen42_Move00
 0x801254F4	0x44	.text	game/Espgen42.cpp	global	Espgen42_Move__FP7cEspgen	Espgen42_Move
 0x80125538	0x58	.text	game/Espgen42.cpp	global	Espgen42_Trans__FP7cEspgen	Espgen42_Trans
-0x80125590	0x98	.text	game/Espgen42.cpp	global	SetIndMtx__FP12Espgen42Work	SetIndMtx
+0x80125590	0x98	.text	game/Espgen42.cpp	global	SetIndMtx__FP14tagESPGEN45_WK	SetIndMtx
 0x80125628	0xAD4	.text	game/Espgen42.cpp	global	Espgen42_TransSub__FP7cEspgen	Espgen42_TransSub
 0x801260FC	0x910	.text	game/Espgen42.cpp	global	SetWaterWork__FP7cEspgenP3VecT1UlUlff	SetWaterWork
 0x80126A0C	0xC0	.text	game/Espgen42.cpp	global	Espgen42_Destruct__FP7cEspgen	Espgen42_Destruct
@@ -4222,7 +4222,7 @@ address	size	section	unit	scope	name	demangled
 0x801286F4	0xA54	.text	game/espgen45.cpp	global	Espgen45_Move00__FP7cEspgen	Espgen45_Move00
 0x80129148	0x44	.text	game/espgen45.cpp	global	Espgen45_Move__FP7cEspgen	Espgen45_Move
 0x8012918C	0x68	.text	game/espgen45.cpp	global	Espgen45_Trans__FP7cEspgen	Espgen45_Trans
-0x801291F4	0xC0	.text	game/espgen45.cpp	global	SetIndMtx_801291F4	SetIndMtx
+0x801291F4	0xC0	.text	game/espgen45.cpp	local	SetIndMtx__FP14tagESPGEN45_WK	SetIndMtx
 0x801292B4	0x1B40	.text	game/espgen45.cpp	global	Espgen45_TransSub__FP7cEspgen	Espgen45_TransSub
 0x8012ADF4	0xA5C	.text	game/espgen45.cpp	global	SetWaterWork45__FP7cEspgenP3VecT1UlUlff	SetWaterWork45
 0x8012B850	0xC0	.text	game/espgen45.cpp	global	Espgen45_Destruct__FP7cEspgen	Espgen45_Destruct
@@ -4237,7 +4237,7 @@ address	size	section	unit	scope	name	demangled
 0x8012BCCC	0x18	.text	game/espgen45.cpp	global	Estgen45SetHeight__Ff	Estgen45SetHeight
 0x8012BCE4	0x18	.text	game/espgen45.cpp	global	Estgen45SetSize__Ff	Estgen45SetSize
 0x8012BCFC	0x34	.text	game/espgen45.cpp	global	Estgen45SetColor__FUcUcUcUcffff	Estgen45SetColor
-0x8012BD30	0x70	.text	game/espgen45.cpp	global	Estgen45SetParam__FP9Esp4cWork	Estgen45SetParam
+0x8012BD30	0x70	.text	game/espgen45.cpp	global	Estgen45SetParam__FP11tagESP4C_WK	Estgen45SetParam
 0x8012BDA0	0x84	.text	game/est.cpp	global	EstSet__FP6cModeliP3VecT2iUcUsUcPvP14ESPSEQ_CONTROL	EstSet
 0x8012BE24	0x25C	.text	game/est.cpp	global	EstSet__FP6cModeliP3VecT2P11cEspSeqHeadUsUcPvUlP14ESPSEQ_CONTROL	EstSet
 0x8012C080	0x108	.text	game/est.cpp	global	AreaSstSet__Fi	AreaSstSet

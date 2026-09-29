@@ -174,37 +174,38 @@ typedef struct tagESPGEN10_WK {
 } ESPGEN10_WK;
 
 // Water surface work shared by generators 42 (room water, game/Espgen42.cpp) and 45 (weather water,
-// game/espgen45.cpp): a (nx+1) x (ny+1) height field with two ping-pong height buffers, drawn through
-// a prebuilt display list with an indirect bump texture.
-struct Espgen42Work {
-    Vec pos0;          // 0x14 surface centre (espgen45 SetWaterWork45; .y -> Base_y) (PS2 Pos)
-    Mtx mat;           // 0x20 grid -> world
-    Mtx inv;           // 0x50 world -> grid
-    u16 nx;            // 0x80 grid cells along x
-    u16 ny;            // 0x82 grid cells along z
-    u8 pad_84[4];
-    f32 size;          // 0x88 cell size
-    f32* hA;           // 0x8C height buffers (pG->flags_51E4 bit 0 selects the current one)
-    f32* hB;           // 0x90
-    Vec* nrm;          // 0x94
-    Vec* pos;          // 0x98
-    u8* dl;            // 0x9C display list
-    u32 dlSize;        // 0xA0
-    u8* bump;          // 0xA4 I8 bump texture (nx x ny)
-    GXColor col;       // 0xA8 tev colour
-    GXColor amb;       // 0xAC ambient colour (amb.a: light alpha)
-    u8 mode;           // 0xB0 wave model (1: second variant)
-    s8 stages;         // 0xB1 number of extra tev stages
-    u8 texId;          // 0xB2
-    u8 rotY;           // 0xB3 (espgen45) cEspSeqTbl xFE
-    u16 indS;          // 0xB4 indirect matrix parameters
-    u16 indT;          // 0xB6
+// game/espgen45.cpp): a (nx+1) x (ny+1) height field, its per-point height and speed ping-ponged
+// each frame between pPosBuf/pSpdBuf, drawn through a prebuilt display list with an indirect bump
+// texture.
+typedef struct tagESPGEN45_WK {
+    Vec Pos;           // 0x14 surface centre (espgen45 SetWaterWork45; .y -> Base_y)
+    Mtx Wld_mat;       // 0x20 grid -> world
+    Mtx Inv_mat;       // 0x50 world -> grid
+    u16 Width;         // 0x80 grid cells along x
+    u16 Height;        // 0x82 grid cells along z
+    u32 Tex_no;        // 0x84 unused by this code path on either platform
+    f32 Size;          // 0x88 cell size
+    f32* pPosBuf;      // 0x8C per-point height (pG->flags_51E4 bit 0 selects the current one)
+    f32* pSpdBuf;      // 0x90 per-point speed
+    Vec* pNorBuf;      // 0x94 per-point normal
+    Vec* pHeightBuf;   // 0x98 rendered position (x/z grid-fixed, y from pPosBuf/pSpdBuf)
+    u8* pDisplayList;  // 0x9C
+    u32 Dpl_size;      // 0xA0
+    u8* pTexBuf;       // 0xA4 I8 bump texture (Width x Height)
+    GXColor Color;     // 0xA8 tev colour
+    GXColor Amb;       // 0xAC ambient colour (Amb.a: light alpha)
+    u8 Type;           // 0xB0 wave model (1: second variant)
+    s8 Refrect_type;   // 0xB1 number of extra tev stages
+    u8 Spec_Tex;       // 0xB2
+    u8 wave_ratio_base; // 0xB3 (espgen45) cEspSeqTbl xFE
+    s16 Shimmer_pow1;  // 0xB4 indirect matrix parameters
+    s16 Shimmer_pow2;  // 0xB6
     f32 Prm_a;         // 0xB8  wave coefficient (PS2 ESPGEN45_WK Prm_a; was `damp`)
     f32 Prm_dmp;       // 0xBC  decay per frame (PS2 Prm_dmp; was `spread`)
-    f32 Base_y;           // 0xC0 (espgen45)  espgen45: pos0.y at set-up (PS2 Base_y)
+    f32 Base_y;           // 0xC0 (espgen45)  espgen45: Pos.y at set-up (PS2 Base_y)
     u8 flag;           // 0xC4 (espgen45) bit0: bounded grid (cEspSeqTbl flags bit0), bit1: cEspSeqTbl flags 0x4000
     u8 Mask_Tex;            // 0xC5 (espgen45) cEspSeqTbl xC5  espgen45: cEspSeqTbl MaskTex_id (PS2 Mask_Tex)
-};
+} ESPGEN45_WK;
 
 typedef void (*EspgenMoveFunc)(cEspgen* w);
 typedef void (*EspgenTransFunc)(cEspgen* w);
@@ -323,8 +324,23 @@ void Estgen45SetTargetPos(f32 x, f32 z);
 void Estgen45SetHeight(f32 y);
 void Estgen45SetSize(f32 size);
 void Estgen45SetColor(u8 r, u8 g, u8 b, u8 a, f32 sr, f32 sg, f32 sb, f32 sa);
-struct Esp4cWork;
-void Estgen45SetParam(Esp4cWork* pFree);
+// Parameter block handed over by esp4c (game/esp4c.cpp) to est generator 45 (game/espgen45.cpp).
+typedef struct tagESP4C_WK {
+    u8 Type;      // 0x00
+    u8 Refrect_type;        // 0x01
+    u8 Spec_Tex;        // 0x02
+    u8 wave_ratio_base;        // 0x03
+    s16 Shimmer_pow1;     // 0x04 indirect matrix parameters (SetIndMtx)
+    s16 Shimmer_pow2;     // 0x06
+    f32 Prm_a;       // 0x08  wave coefficient (PS2 Prm_a; was `damp`)
+    f32 Prm_dmp;     // 0x0C  decay per frame (PS2 Prm_dmp; was `spread`)
+    Vec ang;      // 0x10 surface rotation (SetWaterWork45)
+    u8 flag;      // 0x1C
+    u8 Mask_Tex;       // 0x1D
+    u8 x1E;       // 0x1E
+    u8 x1F;       // 0x1F
+} ESP4C_WK;
+void Estgen45SetParam(ESP4C_WK* pFree);
 void Espgen45_Move(cEspgen* pGen);
 void Espgen45_Trans(cEspgen* pGen);
 void Espgen45_Destruct(cEspgen* pGen);
