@@ -4106,10 +4106,10 @@ address	size	section	unit	scope	name	demangled
 0x8011A104	0x6C	.text	game/esp_efm.cpp	global	EfmDeleteEvent__Fv	EfmDeleteEvent
 0x8011A170	0xC4	.text	game/esp_efm.cpp	global	EfmDeleteEventSub__FP4cObj	EfmDeleteEventSub
 0x8011A234	0x68	.text	game/esp_efm.cpp	global	EfmArrayClear__Fv	EfmArrayClear
-0x8011A29C	0x538	.text	game/esp_efm.cpp	global	EfmSeqSet__FP10cEspSeqTblP7EfmCorePUlP6cModelPA3_fifP3Vec	EfmSeqSet
-0x8011A7D4	0x880	.text	game/esp_efm.cpp	global	EfmSetObj04__FP4cObjP10cEspSeqTblP7EfmCorePUlP6cModelPA3_fifP3Vec	EfmSetObj04
-0x8011B054	0x748	.text	game/esp_efm.cpp	global	EfmSetObj05__FP4cObjP10cEspSeqTblP7EfmCorePUlP6cModelPA3_fif	EfmSetObj05
-0x8011B79C	0x38C	.text	game/esp_efm.cpp	global	EfmSetObj09__FP4cObjP10cEspSeqTblP7EfmCorePUlP6cModelPA3_fif	EfmSetObj09
+0x8011A29C	0x538	.text	game/esp_efm.cpp	global	EfmSeqSet__FP10cEspSeqTblP11cEffectCorePUlP6cModelPA3_fifP3Vec	EfmSeqSet
+0x8011A7D4	0x880	.text	game/esp_efm.cpp	global	EfmSetObj04__FP4cObjP10cEspSeqTblP11cEffectCorePUlP6cModelPA3_fifP3Vec	EfmSetObj04
+0x8011B054	0x748	.text	game/esp_efm.cpp	global	EfmSetObj05__FP4cObjP10cEspSeqTblP11cEffectCorePUlP6cModelPA3_fif	EfmSetObj05
+0x8011B79C	0x38C	.text	game/esp_efm.cpp	global	EfmSetObj09__FP4cObjP10cEspSeqTblP11cEffectCorePUlP6cModelPA3_fif	EfmSetObj09
 0x8011BB28	0x26C	.text	game/esp_efm.cpp	global	SetEffModel__FPvT0P3VecT2	SetEffModel
 0x8011BD94	0x90	.text	game/esp_efm.cpp	global	setModTexRender__FP4cObji	setModTexRender
 0x8011BE24	0xA18	.text	game/esp_sub.cpp	global	EspCommonTrans__FP4cEsp	EspCommonTrans
