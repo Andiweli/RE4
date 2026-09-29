@@ -238,8 +238,8 @@ s8 sndSpanCalc(f32 h_angle)
     return (s8) (127.0f - fabsf(h_angle) * 40.743664f);
 }
 
-s8 sndVolCalcSub(f32 dist, SndCurveTbl* t, f32 vol);
-s16 sndPitchCalcSub(f32 dist, SndCurveTbl* t);
+s8 sndVolCalcSub(f32 dist, SND_TBL_INFO* t, f32 vol);
+s16 sndPitchCalcSub(f32 dist, SND_TBL_INFO* t);
 
 // .text order of the original: the callers precede their curve helpers.
 // Volume through the room's distance curve `no` (SndRoomHdr vol_ofs); `vol` unchanged when the
@@ -260,14 +260,14 @@ int sndVolCalc(int iss_vol, int tbl_no, f32 dist)
     if (ofs == 0) {
         return iss_vol;
     }
-    return sndVolCalcSub(dist, (SndCurveTbl*) ((u8*) h + ofs), (s8) iss_vol);
+    return sndVolCalcSub(dist, (SND_TBL_INFO*) ((u8*) h + ofs), (s8) iss_vol);
 }
 
 // Interpolates the curve's value at `dist` (clamped to the ends) and scales `vol` by it / 128.
-s8 sndVolCalcSub(f32 dist, SndCurveTbl* t, f32 vol)
+s8 sndVolCalcSub(f32 dist, SND_TBL_INFO* t, f32 vol)
 {
     u32 i;
-    SndCurveEnt* e = t->e;
+    SndCurveEnt* e = t->data;
     f32 r;
 
     for (i = 0; i < t->num; i++, e++) {
@@ -309,14 +309,14 @@ s16 sndPitchCalc(int tbl_no, f32 dist)
     if (ofs == 0) {
         return 0;
     }
-    return sndPitchCalcSub(dist, (SndCurveTbl*) ((u8*) h + ofs));
+    return sndPitchCalcSub(dist, (SND_TBL_INFO*) ((u8*) h + ofs));
 }
 
 // Interpolated curve value at `dist`.
-s16 sndPitchCalcSub(f32 dist, SndCurveTbl* t)
+s16 sndPitchCalcSub(f32 dist, SND_TBL_INFO* t)
 {
     u32 i;
-    SndCurveEnt* e = t->e;
+    SndCurveEnt* e = t->data;
     f32 r;
 
     for (i = 0; i < t->num; i++, e++) {
@@ -342,7 +342,7 @@ static int sndFilterCalc(int no, f32 dist)
 {
     int ret = 0;
     SndRoomHdr* h;
-    SndCurveTbl* t;
+    SND_TBL_INFO* t;
     SndCurveEnt* e;
     u32 i;
     u32 num;
@@ -354,8 +354,8 @@ static int sndFilterCalc(int no, f32 dist)
         if (h != NULL) {
             no = h->filter_ofs[no];   // the offset reuses the parameter (r3 -> `num` lands in r0)
             if (no != 0) {
-                t = (SndCurveTbl*) ((u8*) h + no);
-                e = t->e;
+                t = (SND_TBL_INFO*) ((u8*) h + no);
+                e = t->data;
                 num = t->num;
                 for (i = 0; i < num; i++, e++) {
                     if (dist < e->dist) {
@@ -1606,12 +1606,12 @@ int SndRoomStartInit()
         SndSetReverb();
         for (i = 0; i < 32; i++) {
             u32 ofs = pSnd->hdr->vol_ofs[i];
-            SndCurveTbl* t;
+            SND_TBL_INFO* t;
             if (ofs != 0) {
                 u32 j;
                 SndCurveEnt* ce;
-                t = (SndCurveTbl*) ((u8*) pSnd->hdr + ofs);
-                ce = t->e;
+                t = (SND_TBL_INFO*) ((u8*) pSnd->hdr + ofs);
+                ce = t->data;
                 for (j = 0; j < t->num; j++, ce++) {
                     ce->dist *= t->scale;
                 }
@@ -1620,8 +1620,8 @@ int SndRoomStartInit()
             if (ofs != 0) {
                 u32 j;
                 SndCurveEntS* ce;
-                t = (SndCurveTbl*) ((u8*) pSnd->hdr + ofs);
-                ce = (SndCurveEntS*) t->e;
+                t = (SND_TBL_INFO*) ((u8*) pSnd->hdr + ofs);
+                ce = (SndCurveEntS*) t->data;
                 for (j = 0; j < t->num; j++, ce++) {
                     ce->dist *= t->scale;
                     ce->val *= 100;
@@ -1631,8 +1631,8 @@ int SndRoomStartInit()
             if (ofs != 0) {
                 u32 j;
                 SndCurveEnt* ce;
-                t = (SndCurveTbl*) ((u8*) pSnd->hdr + ofs);
-                ce = t->e;
+                t = (SND_TBL_INFO*) ((u8*) pSnd->hdr + ofs);
+                ce = t->data;
                 for (j = 0; j < t->num; j++, ce++) {
                     ce->dist *= t->scale;
                 }

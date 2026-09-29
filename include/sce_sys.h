@@ -29,15 +29,15 @@ public:
 };
 
 // Deferred scenario execution condition (0x14 bytes, SceExecOt list)
-struct SceCond {
-    u32 next;             // 0x00
-    TaskFunc func;        // 0x04
-    void* arg;            // 0x08
-    u8 prio;              // 0x0C
-    u8 flag;              // 0x0D
-    u8 type;              // 0x0E  0 em dead flag, 1 camera area, 2 enemy life, 3 callback, 4 etc break, 5 item flag
+struct SCE_EXEC_PRIM {
+    u32 tag;               // 0x00
+    TaskFunc func;         // 0x04
+    void* param;           // 0x08
+    u8 level;              // 0x0C
+    u8 kind;               // 0x0D
+    u8 cond;               // 0x0E  0 em dead flag, 1 camera area, 2 enemy life, 3 callback, 4 etc break, 5 item flag
     u8 pad_F;
-    void* param;          // 0x10
+    void* value;           // 0x10
 };
 
 class cSceSys {
@@ -134,7 +134,7 @@ void SceSleep(int ctr);
 void SceExit();
 SCE_TASK* SceCTask();
 void SceExecInitCondition();
-int SceExecCheckCondition_sub(SceCond* pP);
+int SceExecCheckCondition_sub(SCE_EXEC_PRIM* pP);
 void SceExecCheckCondition();
 void SceExecLinkCondition(int type, void* param, u8 prio, TaskFunc func, void* arg, u8 flag);
 void SceExecLinkEmDead(void* param, u8 prio, TaskFunc func, void* arg, u8 flag);

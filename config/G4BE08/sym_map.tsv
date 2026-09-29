@@ -383,14 +383,14 @@ address	size	section	unit	scope	name	demangled
 0x80021BDC	0x2C	.text	game/map_obj.cpp	global	global_constructors_keyed_to_cMapMgr_cMapMgr	global constructors keyed to cMapMgr::cMapMgr
 0x80021C08	0x2C	.text	game/map_obj.cpp	global	global_destructors_keyed_to_cMapMgr_cMapMgr	global destructors keyed to cMapMgr::cMapMgr
 0x80021C34	0x60	.text	game/mercenaries.cpp	global	MercSysInitStage__Fv	MercSysInitStage
-0x80021C94	0x398	.text	game/mercenaries.cpp	global	MercSysInitRoom__FP8MercInit	MercSysInitRoom
+0x80021C94	0x398	.text	game/mercenaries.cpp	global	MercSysInitRoom__FP15MercSysInitWork	MercSysInitRoom
 0x8002202C	0x368	.text	game/mercenaries.cpp	global	MercSysMoveStart__FP11MercSysWork	MercSysMoveStart
 0x80022394	0x768	.text	game/mercenaries.cpp	global	MercSysMoveScore__FP11MercSysWork	MercSysMoveScore
 0x80022AFC	0x1EC	.text	game/mercenaries.cpp	global	MercSysMoveMain__FP11MercSysWork	MercSysMoveMain
 0x80022CE8	0x2D0	.text	game/mercenaries.cpp	global	MercSysResultInit__FP11MercSysWork	MercSysResultInit
 0x80022FB8	0x390	.text	game/mercenaries.cpp	global	MercSysResultMove__FP11MercSysWork	MercSysResultMove
-0x80023348	0x104	.text	game/mercenaries.cpp	global	MercSysGetSaveWork__FP12MercSaveWork	MercSysGetSaveWork
-0x8002344C	0x12C	.text	game/mercenaries.cpp	global	MercSysSetSaveWork__FP12MercSaveWork	MercSysSetSaveWork
+0x80023348	0x104	.text	game/mercenaries.cpp	global	MercSysGetSaveWork__FP15MercSysSaveWork	MercSysGetSaveWork
+0x8002344C	0x12C	.text	game/mercenaries.cpp	global	MercSysSetSaveWork__FP15MercSysSaveWork	MercSysSetSaveWork
 0x80023578	0x184	.text	game/mercenaries.cpp	global	MercSysSetPoint__Fii	MercSysSetPoint
 0x800236FC	0x80	.text	game/mercenaries.cpp	global	MercSysSetAddTime__Fi	MercSysSetAddTime
 0x8002377C	0xA4	.text	game/mercenaries.cpp	global	MercSysSetBonusTime__Fi	MercSysSetBonusTime
@@ -1179,9 +1179,9 @@ address	size	section	unit	scope	name	demangled
 0x8005B8E0	0x8C	.text	game/snd.cpp	global	sndPanCalc__Ff	sndPanCalc
 0x8005B96C	0x34	.text	game/snd.cpp	global	sndSpanCalc__Ff	sndSpanCalc
 0x8005B9A0	0x64	.text	game/snd.cpp	global	sndVolCalc__Fiif	sndVolCalc
-0x8005BA04	0xEC	.text	game/snd.cpp	global	sndVolCalcSub__FfP11SndCurveTblf	sndVolCalcSub
+0x8005BA04	0xEC	.text	game/snd.cpp	global	sndVolCalcSub__FfP12SND_TBL_INFOf	sndVolCalcSub
 0x8005BAF0	0x5C	.text	game/snd.cpp	global	sndPitchCalc__Fif	sndPitchCalc
-0x8005BB4C	0xD8	.text	game/snd.cpp	global	sndPitchCalcSub__FfP11SndCurveTbl	sndPitchCalcSub
+0x8005BB4C	0xD8	.text	game/snd.cpp	global	sndPitchCalcSub__FfP12SND_TBL_INFO	sndPitchCalcSub
 0x8005BC24	0x98	.text	game/snd.cpp	local	sndFilterCalc__Fif	sndFilterCalc
 0x8005BCBC	0x88	.text	game/snd.cpp	global	sndExistCheck__FiUl	sndExistCheck
 0x8005BD44	0x100	.text	game/snd.cpp	global	sndWallCheck__FP7SND_SITPUcT1P3Vec	sndWallCheck
@@ -3502,8 +3502,8 @@ address	size	section	unit	scope	name	demangled
 0x800E9CE8	0x80	.text	game/dvd.cpp	global	ReadCancelAll__4cDvd	cDvd::ReadCancelAll
 0x800E9D68	0xAC	.text	game/dvd.cpp	global	pullReadQueue__4cDvd	cDvd::pullReadQueue
 0x800E9E14	0x70	.text	game/dvd.cpp	global	ReadCheck__4cDvdiPiT2PPv	cDvd::ReadCheck
-0x800E9E84	0x20	.text	game/dvd.cpp	global	ReadCheck__4cDvdiP11DvdReadInfo	cDvd::ReadCheck
-0x800E9EA4	0x1FC	.text	game/dvd.cpp	global	readCheckMain__4cDvdiP11DvdReadInfo	cDvd::readCheckMain
+0x800E9E84	0x20	.text	game/dvd.cpp	global	ReadCheck__4cDvdiP12DVD_READINFO	cDvd::ReadCheck
+0x800E9EA4	0x1FC	.text	game/dvd.cpp	global	readCheckMain__4cDvdiP12DVD_READINFO	cDvd::readCheckMain
 0x800EA0A0	0x30	.text	game/dvd.cpp	global	getQueuePtr__4cDvdUc	cDvd::getQueuePtr
 0x800EA0D0	0x398	.text	game/dvd.cpp	global	ErrCheck__4cDvdii	cDvd::ErrCheck
 0x800EA468	0x134	.text	game/dvd.cpp	global	MesSysMessage__Fii	MesSysMessage
@@ -4775,7 +4775,7 @@ address	size	section	unit	scope	name	demangled
 0x8014EFD4	0xC	.text	game/light.cpp	global	Light00_Move__FP6cLight	Light00_Move
 0x8014EFE0	0x1EC	.text	game/light.cpp	global	setModel2__9cLightMgrP6cModel	cLightMgr::setModel2
 0x8014F1CC	0x134	.text	game/light.cpp	global	setCloth__9cLightMgrP6cModelUl	cLightMgr::setCloth
-0x8014F300	0xB4	.text	game/light.cpp	global	setEsp__9cLightMgrP12EspLightListUc	cLightMgr::setEsp
+0x8014F300	0xB4	.text	game/light.cpp	global	setEsp__9cLightMgrP13ESP_LIGHT_ENVUc	cLightMgr::setEsp
 0x8014F3B4	0x38	.text	game/light.cpp	global	lightHitCheck__FP6cModelP6cLight	lightHitCheck
 0x8014F3EC	0x94	.text	game/light.cpp	global	lightHitCheckSphere__FP6cModelP6cLight	lightHitCheckSphere
 0x8014F480	0x130	.text	game/light.cpp	global	lightHitCheckCylinder__FP6cModelP6cLight	lightHitCheckCylinder
@@ -5430,8 +5430,8 @@ address	size	section	unit	scope	name	demangled
 0x8017AC74	0x58	.text	game/pl_wep.cpp	global	setWaterShot__FP3Vec	setWaterShot
 0x8017ACCC	0xCC	.text	game/pl_wep.cpp	global	PlSetLockPitch__FP6cModel	PlSetLockPitch
 0x8017AD98	0xE8	.text	game/pl_wep.cpp	global	GetWepSizeGroup__Fi	GetWepSizeGroup
-0x8017AE80	0x3C	.text	game/puzzle.cpp	global	searchItemPieceData__FiP9PieceInfo	searchItemPieceData
-0x8017AEBC	0x3C	.text	game/puzzle.cpp	global	searchItemModelData__FiP9PieceInfo	searchItemModelData
+0x8017AE80	0x3C	.text	game/puzzle.cpp	global	searchItemPieceData__FiP15ITEM_PIECE_INFO	searchItemPieceData
+0x8017AEBC	0x3C	.text	game/puzzle.cpp	global	searchItemModelData__FiP15ITEM_PIECE_INFO	searchItemModelData
 0x8017AEF8	0xD0	.text	game/puzzle.cpp	global	orientation__8pzlPiecei	pzlPiece::orientation
 0x8017AFC8	0xE4	.text	game/puzzle.cpp	global	rotate__8pzlPiecei	pzlPiece::rotate
 0x8017B0AC	0x14C	.text	game/puzzle.cpp	global	mirror__8pzlPiecei	pzlPiece::mirror
@@ -5701,14 +5701,14 @@ address	size	section	unit	scope	name	demangled
 0x8018CBEC	0xA4	.text	game/sce_com.cpp	global	SceCountEmAlive__Fii	SceCountEmAlive
 0x8018CC90	0xC4	.text	game/sce_com.cpp	global	SceDestroyEm__Fii	SceDestroyEm
 0x8018CD54	0x24	.text	game/sce_com.cpp	global	SceInitItemEvent__Fv	SceInitItemEvent
-0x8018CD78	0x1C4	.text	game/sce_com.cpp	global	SceExecItemEvent__FP12SceItemEvent	SceExecItemEvent
+0x8018CD78	0x1C4	.text	game/sce_com.cpp	global	SceExecItemEvent__FP10cItemEvent	SceExecItemEvent
 0x8018CF3C	0x2D8	.text	game/sce_com.cpp	global	SceSetItemEvent__FiiiiPvN24i	SceSetItemEvent
 0x8018D214	0x184	.text	game/sce_com.cpp	global	getChapterSection__FiPiT1	getChapterSection
 0x8018D398	0x638	.text	game/sce_com.cpp	global	SceChapterEnd__Fv	SceChapterEnd
 0x8018D9D0	0xE4	.text	game/sce_com.cpp	global	SceSetChapterEnd__Fii	SceSetChapterEnd
 0x8018DAB4	0xCC	.text	game/sce_com.cpp	global	SceCamMove__FP3VecT0f	SceCamMove
 0x8018DB80	0x958	.text	game/sce_com.cpp	global	OpenBoxMain__FiiiUlUli	OpenBoxMain
-0x8018E4D8	0x6DC	.text	game/sce_com.cpp	global	SceElevator__FP15SceElevatorData	SceElevator
+0x8018E4D8	0x6DC	.text	game/sce_com.cpp	global	SceElevator__FP13ElevatorParam	SceElevator
 0x8018EBB4	0xE4	.text	game/sce_com.cpp	global	SceDebugDisp__FPCce	SceDebugDisp
 0x8018EC98	0x8	.text	game/sce_com.cpp	global	DebugTrg__Fi	DebugTrg
 0x8018ECA0	0x88	.text	game/sce_com.cpp	global	beginEvent__t8cManager1Z3cEmi	cManager<cEm>::beginEvent
@@ -5736,7 +5736,7 @@ address	size	section	unit	scope	name	demangled
 0x8018F7A4	0x40	.text	game/sce_sys.cpp	global	checkCTaskRange__7cSceSys	cSceSys::checkCTaskRange
 0x8018F7E4	0x8	.text	game/sce_sys.cpp	global	SceCTask__Fv	SceCTask
 0x8018F7EC	0x28	.text	game/sce_sys.cpp	global	SceExecInitCondition__Fv	SceExecInitCondition
-0x8018F814	0x164	.text	game/sce_sys.cpp	global	SceExecCheckCondition_sub__FP7SceCond	SceExecCheckCondition_sub
+0x8018F814	0x164	.text	game/sce_sys.cpp	global	SceExecCheckCondition_sub__FP13SCE_EXEC_PRIM	SceExecCheckCondition_sub
 0x8018F978	0x90	.text	game/sce_sys.cpp	global	SceExecCheckCondition__Fv	SceExecCheckCondition
 0x8018FA08	0x80	.text	game/sce_sys.cpp	global	SceExecLinkCondition__FiPvUcT1T1Uc	SceExecLinkCondition
 0x8018FA88	0x44	.text	game/sce_sys.cpp	global	SceExecLinkEmDead__FPvUcT0T0Uc	SceExecLinkEmDead

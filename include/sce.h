@@ -99,9 +99,9 @@ enum OpenBoxType {
 
 void OpenBoxMain(int type, int mode, int se, u32 id1, u32 id2, int itemNo);
 void SceDebugDisp(const char* fmt, ...);
-// sce_com.cpp: the elevator task; every room that has one defines its own SceElevatorData copy.
-struct SceElevatorData;
-void SceElevator(SceElevatorData* d);
+// sce_com.cpp: the elevator task; every room that has one defines its own ElevatorParam copy.
+struct ElevatorParam;
+void SceElevator(ElevatorParam* d);
 
 // sce_com.cpp: debug trigger check, always 0 (title's mercenaries unlock-all). C++ linkage.
 int DebugTrg(int no);

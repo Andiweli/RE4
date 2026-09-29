@@ -1189,7 +1189,7 @@ void stageSelectInit(TITLE_WORK* w)
 int stageSelect(TITLE_WORK* w)
 {
     int ret = 0;
-    MercSaveWork save;
+    MercSysSaveWork save;
     int mode;
 
     if (Key.trg & KEY_A) {

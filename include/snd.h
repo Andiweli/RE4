@@ -31,9 +31,9 @@ struct REVERB_INFO {
 struct SndRoomHdr {
     REVERB_INFO efx[2];   // 0x00
     u32 curve_sel[32];    // 0x40   offsets to SND_TBL_DATA, indexed by SND_SIT::curve_no
-    u32 vol_ofs[32];      // 0xC0   offsets to SndCurveTbl (volume by distance)
-    u32 pitch_ofs[32];    // 0x140  offsets to SndCurveTbl (pitch by distance)
-    u32 filter_ofs[32];   // 0x1C0  offsets to SndCurveTbl (filter by distance)
+    u32 vol_ofs[32];      // 0xC0   offsets to SND_TBL_INFO (volume by distance)
+    u32 pitch_ofs[32];    // 0x140  offsets to SND_TBL_INFO (pitch by distance)
+    u32 filter_ofs[32];   // 0x1C0  offsets to SND_TBL_INFO (filter by distance)
 };
 
 // Which distance curves a SIT uses (SndRoomHdr::curve_sel target).
@@ -50,10 +50,10 @@ struct SndCurveEnt {
     u16 val;         // 0x06  read as s16 (pitch), s8 at 0x07 (filter), u8 at 0x07 (volume)
 };
 
-struct SndCurveTbl {
+struct SND_TBL_INFO {
     u32 num;         // 0x00
     f32 scale;       // 0x04  applied to every entry's dist at room start
-    SndCurveEnt e[1];// 0x08
+    SndCurveEnt data[1]; // 0x08
 };
 
 // Stream block file (SndMem.str_file[]).

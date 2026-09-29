@@ -64,7 +64,7 @@ int r402_boatNum = 2;
 
 // The room's MercSysInitRoom parameters are 0x6C bytes (the DOL reads the first 0x5C).
 struct R402MercInit {
-    MercInit m;
+    MercSysInitWork m;
     u32 x5C[4];
 };
 

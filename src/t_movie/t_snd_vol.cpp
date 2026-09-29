@@ -25,7 +25,7 @@ struct TblEnt {
     s16 val;   // 0x6
 };
 
-// Editable copy of a SndCurveTbl: 100 points + one spare.
+// Editable copy of a SND_TBL_INFO: 100 points + one spare.
 struct EditTbl {
     u32 num;         // 0x000
     f32 scale;       // 0x004
@@ -120,7 +120,7 @@ void getInfoData(SndRoomHdr* hdr)
     int i;
     u32 ofs;
     u32 size;
-    SndCurveTbl* t;
+    SND_TBL_INFO* t;
 
     work->efx[0] = hdr->efx[0];
     work->efx[1] = hdr->efx[1];
@@ -132,19 +132,19 @@ void getInfoData(SndRoomHdr* hdr)
         }
         ofs = hdr->vol_ofs[i];
         if (ofs != 0) {
-            t = (SndCurveTbl*) ((u8*) hdr + ofs);
+            t = (SND_TBL_INFO*) ((u8*) hdr + ofs);
             size = t->num * 8 + 8;
             memcpy(&work->vol[i], t, size);
         }
         ofs = hdr->pitch_ofs[i];
         if (ofs != 0) {
-            t = (SndCurveTbl*) ((u8*) hdr + ofs);
+            t = (SND_TBL_INFO*) ((u8*) hdr + ofs);
             size = t->num * 8 + 8;
             memcpy(&work->pitch[i], t, size);
         }
         ofs = hdr->filter_ofs[i];
         if (ofs != 0) {
-            t = (SndCurveTbl*) ((u8*) hdr + ofs);
+            t = (SND_TBL_INFO*) ((u8*) hdr + ofs);
             size = t->num * 8 + 8;
             memcpy(&work->filter[i], t, size);
         }

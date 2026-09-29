@@ -677,7 +677,7 @@ static void gameResult()
     ExtFlagOn(pSys, EXT_HARD_MODE);
     ExtFlagOn(pSys, EXT_GET_OMAKE_ADA_GAME);
     if (ExtFlagChk(pSys, EXT_GET_OMAKE_ETC_GAME) == 0) {
-        MercSaveWork save;
+        MercSysSaveWork save;
         int i;
 
         ExtFlagOn(pSys, EXT_GET_OMAKE_ETC_GAME);

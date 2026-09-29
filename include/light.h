@@ -228,10 +228,10 @@ public:
     u32 getMaxLight();
 };
 
-// Light list a model / effect draws with (cModel::lightInfo.pLight, EspLightList).
-struct EspLightList {
-    cLight* p[8];      // 0x00
-    u8 num;            // 0x20
+// Light list a model / effect draws with (cModel::lightInfo.pLight, ESP_LIGHT_ENV).
+struct ESP_LIGHT_ENV {
+    cLight* LightData[8]; // 0x00
+    u8 Light_num;         // 0x20
 };
 
 #line 463 "D:/Bio4/Prog/light.h"
@@ -289,7 +289,7 @@ private:
     public: cLightEnv* getEnvPtr();  // 0x8014EFCC: &this->env (at +0x38)
     void setModel2(cModel* pMod);
     void setCloth(cModel* pMod, u32 lightNum);
-    void setEsp(EspLightList* pEnv, u8 enableMask);
+    void setEsp(ESP_LIGHT_ENV* pEnv, u8 enableMask);
     int update(int area_no, int camera_no);
     int setThermo();
     int registCut(cLightEnv* pLe, int hokan);

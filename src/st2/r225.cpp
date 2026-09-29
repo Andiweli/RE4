@@ -40,29 +40,29 @@ struct R225Work {
     cObj* door;    // 0x04  the SetObjSmd dummy that rides along with the door
 };
 
-// sce_com.cpp SceElevatorData
-struct SceElevatorData {
-    s32 dir;
-    u32 objId;
-    Vec pos;
+// sce_com.cpp ElevatorParam
+struct ElevatorParam {
+    s32 mode;
+    u32 smdId;
+    Vec elPos;
     Vec plPos;
-    Vec plRot;
-    s32 cut;
+    Vec plAng;
+    s32 camNo;
     u16 pad_30;
-    u16 seStart;
+    u16 sndNo;
     u16 pad_34;
-    u16 seStop;
+    u16 sndStop;
     Vec jumpPos;
-    Vec jumpRot;
-    u16 room;
+    Vec jumpAng;
+    u16 roomNo;
 };
 
 static R225Work* r225_work;
 
 // Stores through references (not MEM_IN_STRUCT_P): the static pointer / pPL reload after each one.
 
-static SceElevatorData r225_elvArrive = {2, 0x15, {0.0f, 0.0f, 0.0f}, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, -1, 0, 0xE, 0, 0xF, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0x226};
-static SceElevatorData r225_elvLeave = {3, 0x15, {0.0f, 0.0f, 0.0f}, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 8, 0, 0xD, 0, 0xF, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0x226};
+static ElevatorParam r225_elvArrive = {2, 0x15, {0.0f, 0.0f, 0.0f}, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, -1, 0, 0xE, 0, 0xF, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0x226};
+static ElevatorParam r225_elvLeave = {3, 0x15, {0.0f, 0.0f, 0.0f}, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 8, 0, 0xD, 0, 0xF, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0x226};
 
 static void gnd_open();
 static void r225_operateCrank();
@@ -73,7 +73,7 @@ static void r225_moveGrave(int dir);
 static void r225_checkGrave();
 static void first_cut_exit();
 static void first_cut();
-extern "C" void SceElevator_r225(SceElevatorData* d);
+extern "C" void SceElevator_r225(ElevatorParam* d);
 
 // Room init: until the crank was turned (Room_flg bit 0) area 4 = the crank with areas 5/6 off and 0xA
 // on, else the raised layout (plate object 0x27 moved); until the key door is open (bit 1) area 0xC =
@@ -493,7 +493,7 @@ static void first_cut()
 
 // sce_com's SceElevator without the flags_5014 bit and with the chapter end when leaving the
 // first time (room save flag 4).
-void SceElevator_r225(SceElevatorData* d)
+void SceElevator_r225(ElevatorParam* d)
 {
     cPlayer* pl = pPL;
     cObj* obj;
@@ -513,7 +513,7 @@ void SceElevator_r225(SceElevatorData* d)
     int j;
     u32 hSnd;
 
-    obj = SmdGetObjPtr(d->objId);
+    obj = SmdGetObjPtr(d->smdId);
     if (obj == 0) {
         return;
     }
@@ -526,26 +526,26 @@ void SceElevator_r225(SceElevatorData* d)
     faded = 0;
     done = 0;
     obj->setNoSuspend(1);
-    obj->setPos(&d->pos);
+    obj->setPos(&d->elPos);
     pPL->setNoSuspend(1);
     pPL->beginEvent(0);
     pPL->setPos(&d->plPos);
-    pPL->setAng(&d->plRot);
+    pPL->setAng(&d->plAng);
     pPL->be_flag &= ~0x10;
-    if (d->cut != -1) {
-        CamCtrl.CutCall((s8) d->cut);
+    if (d->camNo != -1) {
+        CamCtrl.CutCall((s8) d->camNo);
     }
-    if (d->dir == 1 || d->dir == 3) {
-        SndCall(6, d->seStart, &obj->pos, 0, 0, 0);
+    if (d->mode == 1 || d->mode == 3) {
+        SndCall(6, d->sndNo, &obj->pos, 0, 0, 0);
         spd = accel;
         for (i = 0; i < 10; i++) {
-            obj->setPos(&d->pos);
+            obj->setPos(&d->elPos);
             pPL->setPos(&d->plPos);
             obj->setPos(obj->pos.x, fRand1_1() * 10.0f + obj->pos.y, obj->pos.z);
             pPL->setPos(pPL->pos.x, fRand1_1() * 10.0f + pPL->pos.y, pPL->pos.z);
             SceSleep(1);
         }
-        obj->setPos(&d->pos);
+        obj->setPos(&d->elPos);
         pPL->setPos(&d->plPos);
         // Up loop, entered by the goto below so loop.c skips it as having multiple entry points. Its
         // loop notes give the target's register weights, and loop.c must stay out or it costs a 14th
@@ -569,7 +569,7 @@ void SceElevator_r225(SceElevatorData* d)
                 spd = maxSpd;
             }
             step = spd;
-            if (d->dir == 1) {
+            if (d->mode == 1) {
                 step = -spd;
             }
             obj->setPos(obj->pos.x, obj->pos.y + step, obj->pos.z);
@@ -593,36 +593,36 @@ void SceElevator_r225(SceElevatorData* d)
                         SceSleep(1);
                     }
                 }
-                SceAtExecRoomJump(d->room, &d->jumpPos, &d->jumpRot, 0);
+                SceAtExecRoomJump(d->roomNo, &d->jumpPos, &d->jumpAng, 0);
                 break;
             }
         }
     }
-    if (d->dir == 0 || d->dir == 2) {
+    if (d->mode == 0 || d->mode == 2) {
         StaFlagOff(pG, STA_SUSPEND);
         spd = maxSpd;
         move = stopDist2;
-        if (d->dir == 0) {
+        if (d->mode == 0) {
             move = -move;
         }
         obj->setPos(obj->pos.x, obj->pos.y + move, obj->pos.z);
         pPL->setPos(pl->pos.x, pPL->pos.y + move, pl->pos.z);
         CamCtrl.Comeback(0);
         FadeSetRGBA(0x80000002, 0xFF, 0);
-        hSnd = SndCall(6, d->seStart, &obj->pos, 0, 0, 0);
+        hSnd = SndCall(6, d->sndNo, &obj->pos, 0, 0, 0);
         // Down loop with the tail inside it, so expand_end_loop rotates it and the gcse insertions
         // and LOOP_END land where the target has them. `y` feeds __builtin_fabsf because the volatile
         // asm would block a copy, and `move` is a second step variable so `step` dies in the up loop.
         for (;;) {
             f32 y = obj->pos.y;
-            if (__builtin_fabsf(d->pos.y - y) < stopDist) {
+            if (__builtin_fabsf(d->elPos.y - y) < stopDist) {
                 spd -= accel;
                 if (spd < minSpd) {
                     spd = minSpd;
                 }
             }
             move = spd;
-            if (d->dir != 0) {
+            if (d->mode != 0) {
                 move = -move;
             }
             obj->setPos(obj->pos.x, obj->pos.y + move, obj->pos.z);
@@ -633,13 +633,13 @@ void SceElevator_r225(SceElevatorData* d)
                 pG->quake_ofs = q;
             }
             done = 0;
-            if (d->dir == 0) {
-                if (obj->pos.y >= d->pos.y) {
+            if (d->mode == 0) {
+                if (obj->pos.y >= d->elPos.y) {
                     done = 1;
                 }
             }
-            if (d->dir == 2) {
-                if (obj->pos.y <= d->pos.y) {
+            if (d->mode == 2) {
+                if (obj->pos.y <= d->elPos.y) {
                     done = 1;
                 }
             }
@@ -647,22 +647,22 @@ void SceElevator_r225(SceElevatorData* d)
                 if (hSnd) {
                     SndStop(hSnd, 0);
                 }
-                SndCall(6, d->seStop, &obj->pos, 0, 0, 0);
-                obj->setPos(&d->pos);
+                SndCall(6, d->sndStop, &obj->pos, 0, 0, 0);
+                obj->setPos(&d->elPos);
                 pPL->setPos(&d->plPos);
-                pPL->setAng(&d->plRot);
+                pPL->setAng(&d->plAng);
                 break;
             }
             SceSleep(1);
         }
         for (j = 0; j < 10; j++) {
-            obj->setPos(&d->pos);
+            obj->setPos(&d->elPos);
             pPL->setPos(&d->plPos);
             obj->setPos(obj->pos.x, fRand1_1() * 10.0f + obj->pos.y, obj->pos.z);
             pPL->setPos(pPL->pos.x, fRand1_1() * 10.0f + pPL->pos.y, pPL->pos.z);
             SceSleep(1);
         }
-        obj->setPos(&d->pos);
+        obj->setPos(&d->elPos);
         pPL->setPos(&d->plPos);
     }
     pPL->be_flag |= 0x10;

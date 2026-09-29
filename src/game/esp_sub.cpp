@@ -980,7 +980,7 @@ int cEsp::ChannelSet()
         GXSetTevOp(0, 0);
         GXSetTevColorIn(0, 0xF, 8, 0xA, 0xF);
         GXSetTevColorOp(0, 0, 0, 2, 1, 0);
-        commonEspLightSet(sys->EspLightEnv.p, sys->EspLightEnv.num);
+        commonEspLightSet(sys->EspLightEnv.LightData, sys->EspLightEnv.Light_num);
     } else {
         GXSetTevOp(0, 0);
         if (m_Tool_flg & 0x80) {

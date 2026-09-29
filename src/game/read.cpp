@@ -191,7 +191,7 @@ void ReadAreaData()
 // specular / illumination textures from it.
 void CoreDataRead()
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     int req;
 
     pG->pCore = (ArcFile*) CORE_DATA_ADDR;
@@ -201,7 +201,7 @@ void CoreDataRead()
     SpecularInit((TEXPalette*) ARC_PTR(ofs_10), (TEXPalette*) ARC_PTR(ofs_44), (TEXPalette*) ARC_PTR(ofs_48),
                  (TEXPalette*) ARC_PTR(ofs_4C));
     GlobalIlmTexInit((TEXPalette*) ARC_PTR(ofs_40));
-    if (info.size[0][0] > CORE_DATA_MAX) {
+    if (info.read_size[0][0] > CORE_DATA_MAX) {
         pLog->err(0, 0, "CORE_DATA IS TOO LARGE(%d/%d)", 0, CORE_DATA_MAX);
         TaskSleep(60);
     }
@@ -211,7 +211,7 @@ void CoreDataRead()
 // OPTION_DATA_ADDR (pG->pOption).
 void OptionDataRead()
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     char name[64];
     const char* lang[12] = { "jpn", "eng", "eng", "ger", "fra", "esp", "ita", "eng" };
     int req;
@@ -221,7 +221,7 @@ void OptionDataRead()
 #line 262 "D:/Bio4/Prog/read.cpp"
     req = DVD_READ_N(name, OPTION_DATA_ADDR, 0, 0, 0, 0x11);
     Dvd.ReadCheck(req, &info);
-    if (info.size[0][0] > OPTION_DATA_MAX) {
+    if (info.read_size[0][0] > OPTION_DATA_MAX) {
         pLog->err(0, 0, "OPTION_DAT IS TOO LARGE(%d/%d)", 0, OPTION_DATA_MAX);
         TaskSleep(60);
     }
@@ -348,7 +348,7 @@ ReadFile EmFileTbl_Klauser[64] = {
 // scenario task if inside it. Fills `m`; returns 1 on success.
 int readEmData(MODULE_DAT* m, int id, void* addr, u32 size)
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     u32 len;
     ReadFile* e;
     char* name;
@@ -414,10 +414,10 @@ int readEmData(MODULE_DAT* m, int id, void* addr, u32 size)
             TaskSleep(1);
         }
     }
-    len = info.size[0][0];
+    len = info.read_size[0][0];
     if (addr == NULL) {
         m->ctrl_flag.on(MODULE_CTRL_DATA_MALLOC);
-        pArc = (void*) info.addr[0][0];
+        pArc = (void*) info.start_addr[0][0];
         if (len < size) {
             void* old = pArc;
             newSize = size;
@@ -577,7 +577,7 @@ MODULE_DAT* pullEmModule()
 // 0xB4 + DLL; HUNK / Krauser / Wesker with their DLLs), links the character REL when there is one.
 void ReadPlayerData(int type, int costume)
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     int req;
     int ret;
     int file;
@@ -660,7 +660,7 @@ void ReadPlayerData(int type, int costume)
         }
         TaskSleep(1);
     }
-    total = info.size[0][0] + info.size[0][1];
+    total = info.read_size[0][0] + info.read_size[0][1];
     if (type == 0) {
         max = 0x118000;
     } else {
@@ -801,7 +801,7 @@ ReadFile wep_data_klauser[46] = {
 // Krauser), links the REL and runs its prolog (which registers WeaponInitFunc). pG->pWep = data.
 void ReadWepData(u32 no, u32 type)
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     int req;
     int ret;
     u8* data;
@@ -931,13 +931,13 @@ void ReadWepData(u32 no, u32 type)
         }
         TaskSleep(1);
     }
-    total = info.size[0][0] + info.size[0][1];
+    total = info.read_size[0][0] + info.read_size[0][1];
     if (total > WEP_DATA_MAX) {
         pLog->err(0, 0, "WEAPON_DATA IS TOO LARGE (DATA)");
 #line 1560 "D:/Bio4/Prog/read.cpp"
         HALT();
     }
-    pG->pWep = (PlArc*) info.addr[0][0];
+    pG->pWep = (PlArc*) info.start_addr[0][0];
     pModule = (OSModuleHeader*) (*(u32*) (data + 4) + (u32) data);
     size = (u32) pModule - (u32) data;
     bssSize = total - size;

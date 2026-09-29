@@ -46,7 +46,7 @@ static Vec r400_rot[3] = {{0.0f, 2.486f, 0.0f}, {0.0f, 0.63f, 0.0f}, {0.0f, -1.6
 
 // The room's MercSysInitRoom parameters are 0x6C bytes (the DOL reads the first 0x5C).
 struct R400MercInit {
-    MercInit m;
+    MercSysInitWork m;
     u32 x5C[4];
 };
 

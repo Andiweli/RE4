@@ -62,21 +62,21 @@ struct R318Work {
     u32 laserSnd;            // 0xF8  laser hum SndCall handle
 };
 
-// sce_com.cpp SceElevatorData
-struct SceElevatorData {
-    s32 dir;
-    u32 objId;
-    Vec pos;
+// sce_com.cpp ElevatorParam
+struct ElevatorParam {
+    s32 mode;
+    u32 smdId;
+    Vec elPos;
     Vec plPos;
-    Vec plRot;
-    s32 cut;
+    Vec plAng;
+    s32 camNo;
     u16 pad_30;
-    u16 seStart;
+    u16 sndNo;
     u16 pad_34;
-    u16 seStop;
+    u16 sndStop;
     Vec jumpPos;
-    Vec jumpRot;
-    u16 room;
+    Vec jumpAng;
+    u16 roomNo;
 };
 
 
@@ -89,8 +89,8 @@ struct R318EspView {
 
 static R318Work* r318_work;
 
-static SceElevatorData r318_elvArrive = {0, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 2, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
-static SceElevatorData r318_elvLeave = {1, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 0, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
+static ElevatorParam r318_elvArrive = {0, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 2, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
+static ElevatorParam r318_elvLeave = {1, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 0, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
 
 // cObjScr (game/obj02.cpp) is not in a header: the callback setter of a scripted map object.
 void cObjScrSetCallBack(cObj* o, void (*func)(cObj*)) asm("SetCallBack__7cObjScrPFP4cObj_v");

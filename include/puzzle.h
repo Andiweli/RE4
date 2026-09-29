@@ -20,7 +20,7 @@ struct pieceData {
 };
 
 // One piece_info entry (0x78 bytes; the table ends with id 0xFFFF).
-struct PieceInfo {
+struct ITEM_PIECE_INFO {
     u16 id;           // 0x00  item id
     u16 pad_2;
     pieceData data;   // 0x04
@@ -166,10 +166,10 @@ public:
     int relPiece() { return relPiece(m_p_active_board); }
 };
 
-extern PieceInfo piece_info[];
+extern ITEM_PIECE_INFO piece_info[];
 
-pieceData* searchItemPieceData(int item_id, PieceInfo* p_info);
-u8* searchItemModelData(int item_id, PieceInfo* p_info);
+pieceData* searchItemPieceData(int item_id, ITEM_PIECE_INFO* p_info);
+u8* searchItemModelData(int item_id, ITEM_PIECE_INFO* p_info);
 int PutInCase(ITEM_ID item_id, u16 item_num, int size);
 
 #endif

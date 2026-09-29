@@ -53,11 +53,11 @@ struct DvdReq {
 };
 
 // Result block filled by cDvd::readCheckMain for a finished request (0x208 bytes).
-struct DvdReadInfo {
-    u32 addr[2][32];  // 0x000  destination of every part, per header level
-    u32 size[2][32];  // 0x100
-    u32 mramSize;     // 0x200
-    u32 aramSize;     // 0x204
+struct DVD_READINFO {
+    u32 start_addr[2][32];  // 0x000  destination of every part, per header level
+    u32 read_size[2][32];   // 0x100
+    u32 mram_readsize;      // 0x200
+    u32 aram_readsize;      // 0x204
 };
 
 // One read queue slot (16 in cDvd, 0x310 bytes each).
@@ -209,10 +209,10 @@ private:
     // the destination address through the non-NULL pointers; < 0 on failure.
 public:
     int ReadCheck(int id, int* mram_size, int* aram_size, void** addr);
-    // Same poll, filling the caller's DvdReadInfo (read.cpp).
-    int ReadCheck(int id, DvdReadInfo* pInfo);
+    // Same poll, filling the caller's DVD_READINFO (read.cpp).
+    int ReadCheck(int id, DVD_READINFO* pInfo);
 private:
-    int readCheckMain(int id, DvdReadInfo* pInfo);
+    int readCheckMain(int id, DVD_READINFO* pInfo);
     cDvdQueue* getQueuePtr(u8 id);
 public:
     int ErrCheck(int disc_new, int proc);

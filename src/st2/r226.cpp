@@ -65,29 +65,29 @@ struct R226Work {
 };
 
 
-// sce_com.cpp SceElevatorData
-struct SceElevatorData {
-    s32 dir;
-    u32 objId;
-    Vec pos;
+// sce_com.cpp ElevatorParam
+struct ElevatorParam {
+    s32 mode;
+    u32 smdId;
+    Vec elPos;
     Vec plPos;
-    Vec plRot;
-    s32 cut;
+    Vec plAng;
+    s32 camNo;
     u16 pad_30;
-    u16 seStart;
+    u16 sndNo;
     u16 pad_34;
-    u16 seStop;
+    u16 sndStop;
     Vec jumpPos;
-    Vec jumpRot;
-    u16 room;
+    Vec jumpAng;
+    u16 roomNo;
 };
 
 
 static R226Work* r226_work;
 static CAMERA r226_cam;
 
-static SceElevatorData r226_elvArrive = {0, 0, {0.0f, 0.0f, 0.0f}, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, -1, 0, 0xE, 0, 0xF, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 0x225};
-static SceElevatorData r226_elvLeave = {1, 0, {0.0f, 0.0f, 0.0f}, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0xE, 0, 0xD, 0, 0xF, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 0x225};
+static ElevatorParam r226_elvArrive = {0, 0, {0.0f, 0.0f, 0.0f}, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, -1, 0, 0xE, 0, 0xF, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 0x225};
+static ElevatorParam r226_elvLeave = {1, 0, {0.0f, 0.0f, 0.0f}, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0xE, 0, 0xD, 0, 0xF, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 0x225};
 
 int R226EmNo[13] = {0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBF, 0xC0};
 int R226EmIdx[14] = {3, 4, 5, 6, 7, 8, 9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 0x3C};

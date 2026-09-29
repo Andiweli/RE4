@@ -663,15 +663,15 @@ void pieceTblInit(SUB_SCREEN* wk)
     // is the cheaper form, so it is kept as written), gcse's cprop only propagates sets that reach
     // the block entry (`z = 0` is in the same block), and combine folds the single-use `z = 0` into
     // `(mem (reg tbl))` after both cse passes. COMPILER-DIFF: 13.
-    PieceInfo* tbl;
-    PieceInfo* base;
+    ITEM_PIECE_INFO* tbl;
+    ITEM_PIECE_INFO* base;
     void** mp;
     u32 ofs;
 
     tbl = piece_info;
     {
         u32 z = 0;
-        if (((PieceInfo*) (z + (u32) tbl))->id == 0xFFFF) {
+        if (((ITEM_PIECE_INFO*) (z + (u32) tbl))->id == 0xFFFF) {
             return;
         }
     }
@@ -689,7 +689,7 @@ void pieceTblInit(SUB_SCREEN* wk)
         int mdl;
         int tex;
 
-        switch (((PieceInfo*) (ofs + (u32) base))->id) {
+        switch (((ITEM_PIECE_INFO*) (ofs + (u32) base))->id) {
         case 0x40:
             mdl = 0x21;
             break;
@@ -753,7 +753,7 @@ void pieceTblInit(SUB_SCREEN* wk)
         }
         mp += 30;
         ofs += 120;
-    } while (((PieceInfo*) (ofs + (u32) base))->id != 0xFFFF);
+    } while (((ITEM_PIECE_INFO*) (ofs + (u32) base))->id != 0xFFFF);
 }
 
 // Sets the piece model's rotation and cell position from pzlPiece::m_orientation (0..3 quarter

@@ -39,7 +39,7 @@ struct R317Work {
     int hardMode;   // 0x04  1 above the easy difficulty: the button prompts come earlier
 };
 
-// Two-gear elevator (sce_com's SceElevatorData with a second stop, the gear objects and a second cut).
+// Two-gear elevator (sce_com's ElevatorParam with a second stop, the gear objects and a second cut).
 struct SceElevator2Data {
     s32 dir;        // 0x00  3 up / 1 down
     u32 objId;      // 0x04  cage

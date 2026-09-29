@@ -583,12 +583,12 @@ void cLightMgr::setCloth(cModel* pMod, u32 lightNum)
 }
 
 // Fills the effect light list with every alive light whose xF matches `mask` (max 8).
-void cLightMgr::setEsp(EspLightList* pEnv, u8 enableMask)
+void cLightMgr::setEsp(ESP_LIGHT_ENV* pEnv, u8 enableMask)
 {
     cLight* l;
     u32 i;
 
-    pEnv->num = 0;
+    pEnv->Light_num = 0;
     for (i = 0; i < nArray; i++) {
         l = fastAt(i);
         if ((l->be_flag & 3) != 3) {
@@ -597,12 +597,12 @@ void cLightMgr::setEsp(EspLightList* pEnv, u8 enableMask)
         if (!(l->xF & enableMask)) {
             continue;
         }
-        if (pEnv->num == 8) {
+        if (pEnv->Light_num == 8) {
             pLog->warn(0, 0, "cLightMgr::setEsp():ESP LIGHT MAX(%d)", 8);
             return;
         }
-        pEnv->p[pEnv->num] = l;
-        pEnv->num++;
+        pEnv->LightData[pEnv->Light_num] = l;
+        pEnv->Light_num++;
     }
 }
 

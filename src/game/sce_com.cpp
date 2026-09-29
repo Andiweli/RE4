@@ -64,31 +64,31 @@ void __builtin_delete(void* p);
 #define DVD_READ_N(name, dst, a, b, c, mode) DvdReadN(name, dst, a, b, c, mode, __FILE__, __LINE__)
 
 // One pending item event (SceSetItemEvent), 0x20 bytes, new'd.
-struct SceItemEvent {
-    u8 flag;              // 0x00  room save flag set when the event ran
+struct cItemEvent {
+    u8 open_flag;         // 0x00  room save flag set when the event ran
     u8 pad_1;
-    s16 atNo;             // 0x02  trigger area
-    s16 cut;              // 0x04  camera cut (-1 = none)
-    s16 item[8];          // 0x06  item areas enabled by the event (-1 = none)
+    s16 sce_at;           // 0x02  trigger area
+    s16 cam_no;           // 0x04  camera cut (-1 = none)
+    s16 item_at[8];       // 0x06  item areas enabled by the event (-1 = none)
     void (*func)(int);    // 0x18
-    int arg;              // 0x1C
+    int param;            // 0x1C
 };
 
 // Elevator script data (SceElevator task argument).
-struct SceElevatorData {
-    s32 dir;              // 0x00  0/2: arrive, 1/3: leave (1/0 move down)
-    u32 objId;            // 0x04  scroll object of the cage
-    Vec pos;              // 0x08  cage rest position
-    Vec plPos;            // 0x14  player position on the cage
-    Vec plRot;            // 0x20
-    s32 cut;              // 0x2C  camera cut (-1 = none)
+struct ElevatorParam {
+    s32 mode;              // 0x00  0/2: arrive, 1/3: leave (1/0 move down)
+    u32 smdId;             // 0x04  scroll object of the cage
+    Vec elPos;             // 0x08  cage rest position
+    Vec plPos;             // 0x14  player position on the cage
+    Vec plAng;             // 0x20
+    s32 camNo;             // 0x2C  camera cut (-1 = none)
     u16 pad_30;
-    u16 seStart;          // 0x32
+    u16 sndNo;             // 0x32
     u16 pad_34;
-    u16 seStop;           // 0x36
-    Vec jumpPos;          // 0x38  room jump destination
-    Vec jumpRot;          // 0x44
-    u16 room;             // 0x50
+    u16 sndStop;           // 0x36
+    Vec jumpPos;           // 0x38  room jump destination
+    Vec jumpAng;           // 0x44
+    u16 roomNo;            // 0x50
 };
 
 static void* ItemEventTbl[16];
@@ -480,47 +480,47 @@ void SceInitItemEvent()
 #include <stdio.h>
 #include <string.h>
 
-void SceExecItemEvent(SceItemEvent* e);
+void SceExecItemEvent(cItemEvent* e);
 
 // Task of an item event (the action button on its area): disables the area, enables the linked
 // item areas, sets the room save flag, plays the camera cut while `func(arg)` runs, then forgets
 // the event.
-void SceExecItemEvent(SceItemEvent* data)
+void SceExecItemEvent(cItemEvent* data)
 {
     u32 i;
     int flag;  // `lbz` straight into the callee-saved register (a u8 local adds an `mr` copy)
     u16 room;
 
-    SceAtSetEnable(data->atNo, 0);
+    SceAtSetEnable(data->sce_at, 0);
     for (i = 0; i <= 7; i++) {
-        if (data->item[i] >= 0) {
+        if (data->item_at[i] >= 0) {
             cModel* m;
-            SceAtSetEnable(data->item[i], 1);
-            m = SceAtItemModelPtr(data->item[i]);
+            SceAtSetEnable(data->item_at[i], 1);
+            m = SceAtItemModelPtr(data->item_at[i]);
             if (m) {
                 m->setNoSuspend(1);
             }
         }
     }
-    flag = data->flag;
+    flag = data->open_flag;
     room = pG->room_id;
     RsfSet(room, flag);
     SceUpCutStart();
-    if (data->cut >= 0) {
-        CamCtrl.CutCall((s8) data->cut);
-        data->func(data->arg);
+    if (data->cam_no >= 0) {
+        CamCtrl.CutCall((s8) data->cam_no);
+        data->func(data->param);
         while (CamCtrl.IsMotionEnd() == 0) {
             SceSleep(1);
         }
         SceSleep(0xF);
         CamCtrl.Comeback(0);
     } else {
-        data->func(data->arg);
+        data->func(data->param);
     }
     SceUpCutEnd();
     for (i = 0; i < 16; i++) {
-        SceItemEvent* p = (SceItemEvent*) ItemEventTbl[i];
-        if (p && p->atNo == data->atNo) {
+        cItemEvent* p = (cItemEvent*) ItemEventTbl[i];
+        if (p && p->sce_at == data->sce_at) {
             ItemEventTbl[i] = 0;
         }
     }
@@ -534,9 +534,9 @@ void SceExecItemEvent(SceItemEvent* data)
 void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, TaskFunc func, TaskFunc doneFunc, void* arg, int enable)
 {
     u16 room = pG->room_id;
-    SceItemEvent* e;   // the searched entry; the new'd one is a second variable (one pseudo for both
+    cItemEvent* e;   // the searched entry; the new'd one is a second variable (one pseudo for both
                        // is live across the search loop's j / e+6 / j*2 temps and takes r8 there)
-    SceItemEvent* ne;
+    cItemEvent* ne;
     u32 i;
     u32 j;
     u32 k;
@@ -565,8 +565,8 @@ void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, TaskFunc func, T
         }
     }
     for (i = 0; i < 16; i++) {
-        e = (SceItemEvent*) ItemEventTbl[i];
-        if (e && e->atNo == atNo) {
+        e = (cItemEvent*) ItemEventTbl[i];
+        if (e && e->sce_at == atNo) {
             // The slot search: item[0] tested and stored with the folded offset, then a loop entered
             // by a `goto` INTO its body (a jump into the loop invalidates it for loop.c: no giv for
             // j*2, `e + 6` recomputed per iteration, and the exit block's guard targets a label of
@@ -580,10 +580,10 @@ void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, TaskFunc func, T
             // pseudo: a hard-reg pin makes combine fold expand_mult's `copy + j` into `slwi` where
             // the target has `add`.
             j = ((u32) e >> 16) & 0xFFFF0000;
-            if (e->item[0] >= 0) {
+            if (e->item_at[0] >= 0) {
                 goto next;
             }
-            e->item[0] = itemNo;
+            e->item_at[0] = itemNo;
             return;
             do {
             next:
@@ -591,8 +591,8 @@ void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, TaskFunc func, T
                 if (j > 7) {
                     return;
                 }
-            } while (e->item[j] >= 0);
-            e->item[j] = itemNo;
+            } while (e->item_at[j] >= 0);
+            e->item_at[j] = itemNo;
             return;
         }
     }
@@ -610,17 +610,17 @@ void SceSetItemEvent(int atNo, int itemNo, int flagNo, int cut, TaskFunc func, T
         SceAtPtr(atNo)->act_type = 0x10;
         SceAtPtr(atNo)->priority = 5;
     }
-    ne = (SceItemEvent*) __builtin_new(sizeof(SceItemEvent));
+    ne = (cItemEvent*) __builtin_new(sizeof(cItemEvent));
     for (k = 0; k < 8; k++) {
-        ne->item[k] = -1;
+        ne->item_at[k] = -1;
     }
-    ne->item[0] = itemNo;
+    ne->item_at[0] = itemNo;
     ItemEventTbl[i] = ne;
-    ne->cut = cut;
+    ne->cam_no = cut;
     ne->func = (void (*)(int)) func;
-    ne->arg = (int) arg;
-    ne->flag = flagNo;
-    ne->atNo = atNo;
+    ne->param = (int) arg;
+    ne->open_flag = flagNo;
+    ne->sce_at = atNo;
     SceAtDataSet_exec(atNo, SCE_LEVEL10, 0, (TaskFunc) SceExecItemEvent, ne, 1);
 }
 
@@ -1233,12 +1233,12 @@ void OpenBoxMain(int type, int mode, int se, u32 id1, u32 id2, int itemNo)
     }
 }
 
-void SceElevator(SceElevatorData* d);
+void SceElevator(ElevatorParam* d);
 
 
-// Shape from r225.cpp's SceElevator_r225. Global alloc alone gives gcse's `&d->pos` copy r25 and
+// Shape from r225.cpp's SceElevator_r225. Global alloc alone gives gcse's `&d->elPos` copy r25 and
 // `done` r24, the reverse of the target. Holding `&d->jumpPos` in r25 (the `jp` pin) swaps them.
-void SceElevator(SceElevatorData* d)
+void SceElevator(ElevatorParam* d)
 {
     cPlayer* pl = pPL;
     cObj* obj;
@@ -1259,7 +1259,7 @@ void SceElevator(SceElevatorData* d)
     u32 hSnd;
     register Vec* jp asm("r25");  // COMPILER-DIFF: register pin (see the comment above the function)
 
-    obj = SmdGetObjPtr(d->objId);
+    obj = SmdGetObjPtr(d->smdId);
     if (obj == 0) {
         return;
     }
@@ -1273,28 +1273,28 @@ void SceElevator(SceElevatorData* d)
     done = 0;
     StaFlagOn(pG, STA_TIMER_NO_PAUSE);
     obj->setNoSuspend(1);
-    obj->setPos(&d->pos);
+    obj->setPos(&d->elPos);
     pPL->setNoSuspend(1);
     pPL->beginEvent(0);
     pPL->setPos(&d->plPos);
-    pPL->setAng(&d->plRot);
+    pPL->setAng(&d->plAng);
     pPL->be_flag &= ~0x10;
     CamCtrl.Comeback(0);
-    if (d->cut != -1) {
-        CamCtrl.CutCall((s8) d->cut);
+    if (d->camNo != -1) {
+        CamCtrl.CutCall((s8) d->camNo);
     }
-    if (d->dir == 1 || d->dir == 3) {
-        SndCall(6, d->seStart, &obj->pos, 0, 0, 0);
+    if (d->mode == 1 || d->mode == 3) {
+        SndCall(6, d->sndNo, &obj->pos, 0, 0, 0);
         spd = accel;
         jp = &d->jumpPos;
         for (i = 0; i < 10; i++) {
-            obj->setPos(&d->pos);
+            obj->setPos(&d->elPos);
             pPL->setPos(&d->plPos);
             obj->setPos(obj->pos.x, fRand1_1() * 10.0f + obj->pos.y, obj->pos.z);
             pPL->setPos(pPL->pos.x, fRand1_1() * 10.0f + pPL->pos.y, pPL->pos.z);
             SceSleep(1);
         }
-        obj->setPos(&d->pos);
+        obj->setPos(&d->elPos);
         pPL->setPos(&d->plPos);
         // Up loop: a noted loop that loop.c does not process (entered by the goto below = "multiple
         // entry points"), laid out `b TOP; SLEEP: SceSleep; spd += accel; TOP: ...` (r225.cpp).
@@ -1312,7 +1312,7 @@ void SceElevator(SceElevatorData* d)
                 spd = maxSpd;
             }
             step = spd;
-            if (d->dir == 1) {
+            if (d->mode == 1) {
                 step = -spd;
             }
             obj->setPos(obj->pos.x, obj->pos.y + step, obj->pos.z);
@@ -1324,36 +1324,36 @@ void SceElevator(SceElevatorData* d)
                 }
             } else if ((fade->flags & 1) == 0) {
                 StaFlagOff(pG, STA_TIMER_NO_PAUSE);
-                SceAtExecRoomJump(d->room, jp, &d->jumpRot, 0);
+                SceAtExecRoomJump(d->roomNo, jp, &d->jumpAng, 0);
                 break;
             }
         }
     }
-    if (d->dir == 0 || d->dir == 2) {
+    if (d->mode == 0 || d->mode == 2) {
         StaFlagOff(pG, STA_SUSPEND);
         spd = maxSpd;
         move = stopDist2;
-        if (d->dir == 0) {
+        if (d->mode == 0) {
             move = -move;
         }
         obj->setPos(obj->pos.x, obj->pos.y + move, obj->pos.z);
         pPL->setPos(pl->pos.x, pPL->pos.y + move, pl->pos.z);
         CamCtrl.Comeback(0);
         FadeSetRGBA(0x80000002, 0xFF, 0);
-        hSnd = SndCall(6, d->seStart, &obj->pos, 0, 0, 0);
+        hSnd = SndCall(6, d->sndNo, &obj->pos, 0, 0, 0);
         // Down loop: `for (;;) { body; if (done) { tail; break; } SceSleep(1); }` (r225.cpp): the
         // rotated loop with the tail inside it; `y` is only the fabs operand, `move` is a second
         // step variable so `step` dies in the up loop.
         for (;;) {
             f32 y = obj->pos.y;
-            if (__builtin_fabsf(d->pos.y - y) < stopDist) {
+            if (__builtin_fabsf(d->elPos.y - y) < stopDist) {
                 spd -= accel;
                 if (spd < minSpd) {
                     spd = minSpd;
                 }
             }
             move = spd;
-            if (d->dir != 0) {
+            if (d->mode != 0) {
                 move = -move;
             }
             obj->setPos(obj->pos.x, obj->pos.y + move, obj->pos.z);
@@ -1364,13 +1364,13 @@ void SceElevator(SceElevatorData* d)
                 pG->quake_ofs = q;
             }
             done = 0;
-            if (d->dir == 0) {
-                if (obj->pos.y >= d->pos.y) {
+            if (d->mode == 0) {
+                if (obj->pos.y >= d->elPos.y) {
                     done = 1;
                 }
             }
-            if (d->dir == 2) {
-                if (obj->pos.y <= d->pos.y) {
+            if (d->mode == 2) {
+                if (obj->pos.y <= d->elPos.y) {
                     done = 1;
                 }
             }
@@ -1378,22 +1378,22 @@ void SceElevator(SceElevatorData* d)
                 if (hSnd) {
                     SndStop(hSnd, 0);
                 }
-                SndCall(6, d->seStop, &obj->pos, 0, 0, 0);
-                obj->setPos(&d->pos);
+                SndCall(6, d->sndStop, &obj->pos, 0, 0, 0);
+                obj->setPos(&d->elPos);
                 pPL->setPos(&d->plPos);
-                pPL->setAng(&d->plRot);
+                pPL->setAng(&d->plAng);
                 break;
             }
             SceSleep(1);
         }
         for (j = 0; j < 10; j++) {
-            obj->setPos(&d->pos);
+            obj->setPos(&d->elPos);
             pPL->setPos(&d->plPos);
             obj->setPos(obj->pos.x, fRand1_1() * 10.0f + obj->pos.y, obj->pos.z);
             pPL->setPos(pPL->pos.x, fRand1_1() * 10.0f + pPL->pos.y, pPL->pos.z);
             SceSleep(1);
         }
-        obj->setPos(&d->pos);
+        obj->setPos(&d->elPos);
         pPL->setPos(&d->plPos);
     }
     StaFlagOff(pG, STA_TIMER_NO_PAUSE);

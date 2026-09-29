@@ -389,16 +389,16 @@ void SceExecInitCondition()
 // Is the condition met? type 0 enemy list entry dead (Em_flg bit), 1 camera area == param, 2
 // enemy `param` dead and in its die routine, 3 callback returns 1, 4 etc model `param` broken, 5
 // item area `param` taken.
-int SceExecCheckCondition_sub(SceCond* pP)
+int SceExecCheckCondition_sub(SCE_EXEC_PRIM* pP)
 {
     cEm* em;
     u32* row;
     u32 no;
     u32 bit;
 
-    switch (pP->type) {
+    switch (pP->cond) {
     case 0:
-        no = (u32) pP->param;
+        no = (u32) pP->value;
         if (pG->em_list_no >= 0) {
             // Row address as integer arithmetic (index first, the list offset added last), like sce_at.
             bit = *(u32*) (((no >> 5) << 2) + emDeadRow(pG->em_list_no)) & (0x80000000 >> (no & 31));
@@ -410,29 +410,29 @@ int SceExecCheckCondition_sub(SceCond* pP)
         }
         break;
     case 1:
-        if (CamCtrl.CurrentAreaNo() == (int) pP->param) {
+        if (CamCtrl.CurrentAreaNo() == (int) pP->value) {
             return 1;
         }
         break;
     case 2:
-        em = (cEm*) pP->param;
+        em = (cEm*) pP->value;
         // Raw (non-struct) read: keeps the load behind the store of `em` to its stack slot.
         if (*(s16*) ((u32) em + 0x320) <= 0 && em->r_no_0 == 3) {
             return 1;
         }
         break;
     case 3:
-        if (((int (*)()) pP->param)() == 1) {
+        if (((int (*)()) pP->value)() == 1) {
             return 1;
         }
         break;
     case 4:
-        if (getRoomEtcBreak((int) pP->param, &em, 1) == 1 && em->hp <= 0) {
+        if (getRoomEtcBreak((int) pP->value, &em, 1) == 1 && em->hp <= 0) {
             return 1;
         }
         break;
     case 5:
-        if (SceAtPtr((int) pP->param) != 0 && SceAtItemFlgCk((int) pP->param) == 1) {
+        if (SceAtPtr((int) pP->value) != 0 && SceAtItemFlgCk((int) pP->value) == 1) {
             return 1;
         }
         break;
@@ -444,23 +444,23 @@ int SceExecCheckCondition_sub(SceCond* pP)
 void SceExecCheckCondition()
 {
     u32 v = SceExecOt;
-    SceCond* c;
+    SCE_EXEC_PRIM* c;
 
     if (v == 0xFFFFFFFF) {
         return;
     }
     do {
-        c = (SceCond*) (v | 0x80000000);
+        c = (SCE_EXEC_PRIM*) (v | 0x80000000);
         if ((s32) v < 0) {
             if (SceExecCheckCondition_sub(c) == 1) {
                 if (c->func != 0) {
-                    SceExec(c->prio, c->func, c->arg, c->flag, SCE_PRIO_DEF_2, 0);
+                    SceExec(c->level, c->func, c->param, c->kind, SCE_PRIO_DEF_2, 0);
                 }
                 DelPrim(&SceExecOt, (u32*) c);
                 Mem_free(c);
             }
         }
-        v = c->next;
+        v = c->tag;
     } while (v != 0xFFFFFFFF);
 }
 
@@ -468,14 +468,14 @@ void SceExecCheckCondition()
 void SceExecLinkCondition(int type, void* param, u8 prio, TaskFunc func, void* arg, u8 flag)
 {
 #line 608
-    SceCond* c = (SceCond*) MEM_ALLOC(sizeof(SceCond), 1, 13);
+    SCE_EXEC_PRIM* c = (SCE_EXEC_PRIM*) MEM_ALLOC(sizeof(SCE_EXEC_PRIM), 1, 13);
 
-    c->type = type;
-    c->param = param;
-    c->prio = prio;
+    c->cond = type;
+    c->value = param;
+    c->level = prio;
     c->func = func;
-    c->arg = arg;
-    c->flag = flag;
+    c->param = arg;
+    c->kind = flag;
     AddPrim(&SceExecOt, (u32*) c);
 }
 

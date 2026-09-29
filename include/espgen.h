@@ -118,7 +118,7 @@ struct cEspSystem {
     u8 ToolState;      // 0xC561
     u8 pad_C562[2];
     u32 RstAreaState;     // 0xC564 bit per area (GetAreaState)
-    EspLightList EspLightEnv;  // 0xC568 lights the effects draw with (esp.cpp EspTrans -> cLightMgr::setEsp)
+    ESP_LIGHT_ENV EspLightEnv;  // 0xC568 lights the effects draw with (esp.cpp EspTrans -> cLightMgr::setEsp)
     u8 pad_C58C[4];
     int finalColSet;   // 0xC590 1 while finalCol.r == 0xFF (EffSetFinalCol)
     GXColor Final_col;  // 0xC594

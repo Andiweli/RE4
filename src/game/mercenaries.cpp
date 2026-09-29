@@ -128,7 +128,7 @@ static inline u32 MercStrReq(int no)
 // Krauser 3, Wesker 4), copies the room's message/motion parameters, creates the intro dummy model
 // (SetObjSmd) at the start position, puts the player there, starts the MercSysMoveMain scenario
 // task, the mode's BGM stream and the id graphics (id400.dat).
-int MercSysInitRoom(MercInit* pMInit)
+int MercSysInitRoom(MercSysInitWork* pMInit)
 {
     MercSysWork* wk = &MercSysWk;
     cObj* smd;
@@ -257,7 +257,7 @@ int MercSysMoveStart(MercSysWork* wk)
             if (!FlagChkVar(EXT_FLAG_TBL, extFlagTbl[wk->stage])) {
                 SceMesSet(wk->mesA8, 0x20, 1, 100, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
             } else {
-                MercSaveWork save;
+                MercSysSaveWork save;
 
                 MercSysGetSaveWork(&save);
                 if (save.rank[wk->mode][wk->stage] <= 4) {
@@ -503,7 +503,7 @@ int MercSysMoveMain(MercSysWork* pWk)
 // the unlock_flg bit), and the all-5-stars unlock (20 ranks of 5 -> unlock_flg 0x20000000).
 int MercSysResultInit(MercSysWork* pWk)
 {
-    MercSaveWork save;
+    MercSysSaveWork save;
     int min;
     int sec;
     int cs;
@@ -673,7 +673,7 @@ int MercSysResultMove(MercSysWork* pWk)
 
 // Unpacks the Mercenaries records from the system save: per stage the high score (x10, 28 bits),
 // mode (3 bits) and new flag, and the 3-bit rank per (character, stage) from merc_rank.
-void MercSysGetSaveWork(MercSaveWork* pSaveWk)
+void MercSysGetSaveWork(MercSysSaveWork* pSaveWk)
 {
     int i;
     int j;
@@ -709,7 +709,7 @@ void MercSysGetSaveWork(MercSaveWork* pSaveWk)
 }
 
 // Packs the records back into the system save words.
-void MercSysSetSaveWork(MercSaveWork* pSaveWk)
+void MercSysSetSaveWork(MercSysSaveWork* pSaveWk)
 {
     int i;
     int j;

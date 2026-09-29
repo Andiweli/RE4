@@ -60,7 +60,7 @@ asm(".section .data\n\t.balign 8\n\t.text");
 
 // The room's MercSysInitRoom parameters are 0x6C bytes (the DOL reads the first 0x5C).
 struct R404MercInit {
-    MercInit m;
+    MercSysInitWork m;
     u32 x5C[4];
 };
 

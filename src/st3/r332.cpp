@@ -54,21 +54,21 @@
 cObj* SetPillar(void* bin, void* tpl, Vec* pos, Vec* rot);
 void Obj18CmfOn(cObj* o, u32 n);   // game/obj18.cpp
 
-// sce_com.cpp SceElevatorData
-struct SceElevatorData {
-    s32 dir;
-    u32 objId;
-    Vec pos;
+// sce_com.cpp ElevatorParam
+struct ElevatorParam {
+    s32 mode;
+    u32 smdId;
+    Vec elPos;
     Vec plPos;
-    Vec plRot;
-    s32 cut;
+    Vec plAng;
+    s32 camNo;
     u16 pad_30;
-    u16 seStart;
+    u16 sndNo;
     u16 pad_34;
-    u16 seStop;
+    u16 sndStop;
     Vec jumpPos;
-    Vec jumpRot;
-    u16 room;
+    Vec jumpAng;
+    u16 roomNo;
 };
 
 
@@ -102,7 +102,7 @@ struct R332Work {
 
 // The original object's .data is 8-aligned (0x260 in the REL after r330's 12-byte table).
 asm(".section .data; .balign 8");
-static SceElevatorData r332_elv = {1, 0x24, {-45093.0f, 15811.0f, 47400.0f}, {-45120.0f, 15800.0f, 47200.0f}, {0.0f, 1.54f, 0.0f}, 7, 0, 5, 0, 7, {-44950.0f, 1745.0f, 47280.0f}, {0.0f, 1.49f, 0.0f}, 0x331};
+static ElevatorParam r332_elv = {1, 0x24, {-45093.0f, 15811.0f, 47400.0f}, {-45120.0f, 15800.0f, 47200.0f}, {0.0f, 1.54f, 0.0f}, 7, 0, 5, 0, 7, {-44950.0f, 1745.0f, 47280.0f}, {0.0f, 1.49f, 0.0f}, 0x331};
 static f32 r332_craneUpY[2] = {21180.0f, 19670.0f};
 static f32 r332_craneDownY[2] = {20910.0f, 19400.0f};
 Vec r332_satPos[4] = {{-49272.0f, 17311.0f, 59394.0f}, {-38880.0f, 15811.0f, 59394.0f}, {-49272.0f, 17311.0f, 83192.0f}, {-38880.0f, 15811.0f, 83192.0f}};

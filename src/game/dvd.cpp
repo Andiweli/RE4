@@ -1456,30 +1456,30 @@ cDvdQueue* cDvd::pullReadQueue()
 // pointers, the slot released unless kept), 0 while reading, negative on cancel / error.
 int cDvd::ReadCheck(int id, int* mram_size, int* aram_size, void** addr)
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
 
     if (readCheckMain(id, &info) == 1) {
         if (mram_size) {
-            *mram_size = info.mramSize;
+            *mram_size = info.mram_readsize;
         }
         if (aram_size) {
-            *aram_size = info.aramSize;
+            *aram_size = info.aram_readsize;
         }
         if (addr) {
-            *addr = (void*) info.addr[0][0];
+            *addr = (void*) info.start_addr[0][0];
         }
     }
 }
 
-// Poll variant used by read.cpp that also fills a DvdReadInfo.
-int cDvd::ReadCheck(int id, DvdReadInfo* pInfo)
+// Poll variant used by read.cpp that also fills a DVD_READINFO.
+int cDvd::ReadCheck(int id, DVD_READINFO* pInfo)
 {
     return readCheckMain(id, pInfo);
 }
 
 // The poll: by slot status (READ pending, COMPLETE copies the part address / size tables and
 // releases, CANCEL / ERROR release with a negative result).
-int cDvd::readCheckMain(int id, DvdReadInfo* pInfo)
+int cDvd::readCheckMain(int id, DVD_READINFO* pInfo)
 {
     cDvdQueue* q;
     int ret = 0;
@@ -1493,10 +1493,10 @@ int cDvd::readCheckMain(int id, DvdReadInfo* pInfo)
             case ST_COMPLETE:
                 if (q->CkFlag(0x800) == 1) {
                     if (pInfo) {
-                        memcpy(pInfo->addr, q->addrTbl, sizeof(pInfo->addr));
-                        memcpy(pInfo->size, q->sizeTbl, sizeof(pInfo->size));
-                        pInfo->mramSize = q->mramSize;
-                        pInfo->aramSize = q->aramSize;
+                        memcpy(pInfo->start_addr, q->addrTbl, sizeof(pInfo->start_addr));
+                        memcpy(pInfo->read_size, q->sizeTbl, sizeof(pInfo->read_size));
+                        pInfo->mram_readsize = q->mramSize;
+                        pInfo->aram_readsize = q->aramSize;
                     }
                     ret = 1;
                     q->PushQueue();
