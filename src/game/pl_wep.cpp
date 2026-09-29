@@ -197,7 +197,7 @@ static f32 wepRate(cPlWep* w)
 u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, f32 radius)
 {
     cPlayer* pl = (cPlayer*) pPl;
-    WepTarget list[20];
+    TARGET_WK list[20];
     Vec hit;
     Vec nrm;
     u32 attr;
@@ -328,8 +328,8 @@ u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, 
         break;
     }
     for (i = 0; i < n; i++) {
-        cEm* em = list[i].em;
-        YARARE_INFO* part = list[i].part;
+        cEm* em = list[i].pEm;
+        YARARE_INFO* part = list[i].pAt;
         cDmgInfo* dmg = &em->dmg;
 
         switch (weapon_no) {
@@ -351,7 +351,7 @@ u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, 
                 dmg->m_Flag |= 0x20;
             }
         }
-        if (list[i].em->id == 0x38) {
+        if (list[i].pEm->id == 0x38) {
             break;
         }
     }
@@ -464,7 +464,7 @@ u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, 
 // given priority (max 0x14). Ashley is spared by 0x14, Ashley / Luis by the bow types unless first.
 u32 PlWepHitCheck3(Vec* pos, int type, f32 len, u32 prio)
 {
-    WepTarget list[20];
+    TARGET_WK list[20];
     u32 n;
     u32 i;
 
@@ -473,7 +473,7 @@ u32 PlWepHitCheck3(Vec* pos, int type, f32 len, u32 prio)
     }
     n = GetWepTargetListBomb(pos, len, list, prio, type, 0);
     for (i = 0; i < n; i++) {
-        cEm* em = list[i].em;
+        cEm* em = list[i].pEm;
         cDmgInfo* dmg = &em->dmg;
 
         switch (type) {
@@ -489,7 +489,7 @@ u32 PlWepHitCheck3(Vec* pos, int type, f32 len, u32 prio)
             }
             break;
         }
-        YARARE_INFO* part = list[i].part;
+        YARARE_INFO* part = list[i].pAt;
         if (!(dmg->m_Flag & 1)) {
             dmg->set(0, 10, type, pos, part->len, part);
         }

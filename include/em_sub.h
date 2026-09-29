@@ -12,10 +12,10 @@
 // EmAtkLineHitCk, EmAtkSetDamagePL, VehicleAdjust and PlSetDamage are declared in emhit.h.
 
 // GetWepTargetList* entry: the enemy and the hit box that was hit.
-struct WepTarget {
-    cEm* em;
-    YARARE_INFO* part;
-};
+typedef struct tagTARGET_WK {
+    cEm* pEm;
+    YARARE_INFO* pAt;
+} TARGET_WK;
 
 extern u32 No_drop_cnt;
 extern u32 No_drop_cnt2;
@@ -33,10 +33,10 @@ int emLineCapsuleCrossCk(Vec* a, Vec* b, Vec* pTop, Vec* pBtm, Vec* pCross, f32 
 int emLineCubeCrossCk(Vec* a, Vec* b, Mtx m, Vec* ofs, Vec* hit, f32 sx, f32 sy, f32 sz);
 int emLinePolyCrossCk(Vec* pPos, Vec* pPos2, Vec* pRect, Vec* pCross);
 YARARE_INFO* emSphereAtCk(cEm* em, Vec* pos, Vec* pos2, f32 r, f32 r2, int flag);
-u32 GetWepTargetList(Vec* box, Vec* pos, WepTarget* list, u32 max, int flag);
-u32 GetWepTargetList2(Vec* pPos, Vec* pPos2, WepTarget* list, u32 max, Vec* hit, Vec* nrm, u32* attr, int type,
+u32 GetWepTargetList(Vec* box, Vec* pos, TARGET_WK* list, u32 max, int flag);
+u32 GetWepTargetList2(Vec* pPos, Vec* pPos2, TARGET_WK* list, u32 max, Vec* hit, Vec* nrm, u32* attr, int type,
                       int flag);
-int GetWepTargetListBomb(Vec* pPos, f32 radius, WepTarget* list, int num, int wep_no, int flag);
+int GetWepTargetListBomb(Vec* pPos, f32 radius, TARGET_WK* list, int num, int wep_no, int flag);
 int PlBombHitCk(Vec* pPos, f32 radius);
 int GetWepTargetPos(Vec* pPos, Vec* pPos2, int mode, int wep_no, cEm** ppEm, u32* pAttr);
 YARARE_INFO* EmYarareContactCk(cEm* em, Vec* pos, f32 r, Vec* out);

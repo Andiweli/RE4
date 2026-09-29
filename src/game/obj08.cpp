@@ -252,7 +252,7 @@ int obj08ToEmHitCk(cObj08* pObj)
 {
     FREE_OBJ08* w = OBJ08_WK(pObj);
     Vec box[8];
-    WepTarget list[10];
+    TARGET_WK list[10];
     Vec ang;
     f32 len;
     u32 n;
@@ -308,8 +308,8 @@ int obj08ToEmHitCk(cObj08* pObj)
         return 0;
     }
     for (i = 0; i < n; i++) {
-        YARARE_INFO* part = list[i].part;
-        list[i].em->dmg.set(0, 10, (u8) w->wep_id, &pObj->pos, part->len, part);
+        YARARE_INFO* part = list[i].pAt;
+        list[i].pEm->dmg.set(0, 10, (u8) w->wep_id, &pObj->pos, part->len, part);
         if (w->eff4 && w->est4) {
             obj08DmEstSet(pObj, pPL, &pObj->pos_old, part);
         }

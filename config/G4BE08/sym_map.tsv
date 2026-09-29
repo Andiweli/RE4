@@ -2975,9 +2975,9 @@ address	size	section	unit	scope	name	demangled
 0x800C3114	0x20	.text	lib/adx_fcch.c	global	ADXF_Ocbi	ADXF_Ocbi
 0x800C3134	0x74	.text	game/act_btn.cpp	global	init__13cActionButton	cActionButton::init
 0x800C31A8	0x1AC	.text	game/act_btn.cpp	global	move__13cActionButton	cActionButton::move
-0x800C3354	0x228	.text	game/act_btn.cpp	global	disp__13cActionButtonP10ActBtnWork	cActionButton::disp
-0x800C357C	0x26C	.text	game/act_btn.cpp	global	checkButton__13cActionButtonP10ActBtnWork	cActionButton::checkButton
-0x800C37E8	0xB8	.text	game/act_btn.cpp	global	checkPLStatus__13cActionButtonP10ActBtnWork	cActionButton::checkPLStatus
+0x800C3354	0x228	.text	game/act_btn.cpp	global	disp__13cActionButtonPQ213cActionButton8ACT_WORK	cActionButton::disp
+0x800C357C	0x26C	.text	game/act_btn.cpp	global	checkButton__13cActionButtonPQ213cActionButton8ACT_WORK	cActionButton::checkButton
+0x800C37E8	0xB8	.text	game/act_btn.cpp	global	checkPLStatus__13cActionButtonPQ213cActionButton8ACT_WORK	cActionButton::checkPLStatus
 0x800C38A0	0x34	.text	game/act_btn.cpp	global	pullWork__13cActionButton	cActionButton::pullWork
 0x800C38D4	0xD8	.text	game/act_btn.cpp	global	set__13cActionButtoniiPvT3iiiT3	cActionButton::set
 0x800C39AC	0x4	.text	game/act_btn.cpp	local	__static_initialization_and_destruction_0_800C39AC	__static_initialization_and_destruction_0
@@ -3662,9 +3662,9 @@ address	size	section	unit	scope	name	demangled
 0x800F1E9C	0x49C	.text	game/em_sub.cpp	global	emLineCubeCrossCk__FP3VecT0PA3_fT0T0fff	emLineCubeCrossCk
 0x800F2338	0x314	.text	game/em_sub.cpp	global	emLinePolyCrossCk__FP3VecN30	emLinePolyCrossCk
 0x800F264C	0x624	.text	game/em_sub.cpp	global	emSphereAtCk__FP3cEmP3VecT1ffi	emSphereAtCk
-0x800F2C70	0x254	.text	game/em_sub.cpp	global	GetWepTargetList__FP3VecT0P9WepTargetUli	GetWepTargetList
-0x800F2EC4	0x6CC	.text	game/em_sub.cpp	global	GetWepTargetList2__FP3VecT0P9WepTargetUlT0T0PUlii	GetWepTargetList2
-0x800F3590	0x53C	.text	game/em_sub.cpp	global	GetWepTargetListBomb__FP3VecfP9WepTargetiii	GetWepTargetListBomb
+0x800F2C70	0x254	.text	game/em_sub.cpp	global	GetWepTargetList__FP3VecT0P12tagTARGET_WKUli	GetWepTargetList
+0x800F2EC4	0x6CC	.text	game/em_sub.cpp	global	GetWepTargetList2__FP3VecT0P12tagTARGET_WKUlT0T0PUlii	GetWepTargetList2
+0x800F3590	0x53C	.text	game/em_sub.cpp	global	GetWepTargetListBomb__FP3VecfP12tagTARGET_WKiii	GetWepTargetListBomb
 0x800F3ACC	0x1AC	.text	game/em_sub.cpp	global	PlBombHitCk__FP3Vecf	PlBombHitCk
 0x800F3C78	0x34C	.text	game/em_sub.cpp	global	GetWepTargetPos__FP3VecT0iiPP3cEmPUl	GetWepTargetPos
 0x800F3FC4	0x3D0	.text	game/em_sub.cpp	global	EmYarareContactCk__FP3cEmP3VecfT1	EmYarareContactCk

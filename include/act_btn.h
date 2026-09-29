@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// Action prompt kind (PS2 ACTION_TYPE): cActionButton::set `act_type` / ActBtnWork::kind, the message is
+// Action prompt kind (PS2 ACTION_TYPE): cActionButton::set `act_type` / cActionButton::ACT_WORK::kind, the message is
 // kind + 0x16. ACT_WIRE is the PS2 grapple gun; the padding entries size the table.
 enum ACTION_TYPE {
     ACT_TALK = 0,
@@ -90,7 +90,7 @@ enum ACTION_TYPE {
     ACTION_TYPE_MAX = 81
 };
 
-// Prompt control bits (PS2 ACTCTR_FLAG): set `ctrl_flag` / ActBtnWork::flags.
+// Prompt control bits (PS2 ACTCTR_FLAG): set `ctrl_flag` / cActionButton::ACT_WORK::flags.
 enum ACTCTR_FLAG {
     ACTCTR_NONE = 0,
     ACTCTR_WEP_SET_IGNORE = 1,
@@ -104,7 +104,7 @@ enum ACTCTR_FLAG {
     ACTCTR_HOOKSHOT_COLOR = 256
 };
 
-// Button shown by the prompt (PS2 DISP_FLAG): set `button_type` / ActBtnWork::btn (checkButton).
+// Button shown by the prompt (PS2 DISP_FLAG): set `button_type` / cActionButton::ACT_WORK::btn (checkButton).
 enum DISP_FLAG {
     DISP_OFF = 0,
     DISP_A_NORMAL = 1,
@@ -125,42 +125,42 @@ enum DISP_FLAG {
     DISP_STICK_UP = 16
 };
 
-// How the prompt runs its function (PS2 ACTION_FUNC_TYPE): set `func_type` / ActBtnWork::type.
+// How the prompt runs its function (PS2 ACTION_FUNC_TYPE): set `func_type` / cActionButton::ACT_WORK::type.
 enum ACTION_FUNC_TYPE {
     ACT_FUNC_NORMAL = 0,
     ACT_FUNC_SCE = 1,
     ACT_FUNC_SCE_AT = 2
 };
 
-// One action button prompt (0x18 bytes), linked into cActionButton::ot by slot.
-struct ActBtnWork {
-    u32 tag;       // 0x00  OTag link
-    void* func;    // 0x04  void (*)(int arg, int d): the action (NULL = none)
-    void* arg;     // 0x08  first argument (type 2: the SCE_AT_DATA*)
-    u8 kind;       // 0x0C  ACTION_TYPE: prompt message kind + 0x16 (clamped to 0x41)
-    u8 slot;       // 0x0D  ot slot / SceExec priority
-    u8 type;       // 0x0E  ACTION_FUNC_TYPE: 0 call func, 1 SceExec(0x12, func...), 2 SceAt area action
-    u8 btn;        // 0x0F  DISP_FLAG: button kind (checkButton)
-    int d;         // 0x10  second argument
-    u32 flags;     // 0x14  ACTCTR_FLAG bits: WEP_SET_IGNORE sets pG->flags_500C 0x200000, ENFORCE_EXEC no actCheck /
-                   //       trigger, NO_SUSPEND exec flag 2, NO_DISP no prompt, NO_TRG hold, NO_EXEC skip,
-                   //       EXACT_KEY exclusive, DOOR_COLOR message colour 7
-};
-
 // Action button prompt manager (game/act_btn.cpp `ActBtn`, 0x104 bytes).
 class cActionButton {
 private:
+    // One action button prompt (0x18 bytes), linked into cActionButton::ot by slot.
+    struct ACT_WORK {
+        u32 tag;       // 0x00  OTag link
+        void* func;    // 0x04  void (*)(int arg, int d): the action (NULL = none)
+        void* arg;     // 0x08  first argument (type 2: the SCE_AT_DATA*)
+        u8 kind;       // 0x0C  ACTION_TYPE: prompt message kind + 0x16 (clamped to 0x41)
+        u8 slot;       // 0x0D  ot slot / SceExec priority
+        u8 type;       // 0x0E  ACTION_FUNC_TYPE: 0 call func, 1 SceExec(0x12, func...), 2 SceAt area action
+        u8 btn;        // 0x0F  DISP_FLAG: button kind (checkButton)
+        int d;         // 0x10  second argument
+        u32 flags;     // 0x14  ACTCTR_FLAG bits: WEP_SET_IGNORE sets pG->flags_500C 0x200000, ENFORCE_EXEC no actCheck /
+                       //       trigger, NO_SUSPEND exec flag 2, NO_DISP no prompt, NO_TRG hold, NO_EXEC skip,
+                       //       EXACT_KEY exclusive, DOOR_COLOR message colour 7
+    };
+
     u32 m_ot[16];          // 0x00
     u8 m_num;              // 0x40  works pulled this frame
     u8 m_stop_flag_old;             // 0x41  pG->flags_170 bit8 at init: prompts disabled
     u8 m_active_flag;           // 0x42  a prompt was shown this frame
     u8 pad_43;
-    ActBtnWork m_task[8];  // 0x44
+    ACT_WORK m_task[8];  // 0x44
 
-    void disp(ActBtnWork* work);
-    int checkButton(ActBtnWork* work);
-    int checkPLStatus(ActBtnWork* work);
-    ActBtnWork* pullWork();
+    void disp(ACT_WORK* work);
+    int checkButton(ACT_WORK* work);
+    int checkPLStatus(ACT_WORK* work);
+    ACT_WORK* pullWork();
 
 public:
     cActionButton() {}

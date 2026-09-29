@@ -1225,7 +1225,7 @@ int emMineHitCk(cEmMine* pEm)
     Vec dir;
     Vec a;
     Vec b;
-    WepTarget list;
+    TARGET_WK list;
     u32 attr;
     cEm* hitEm;
     YARARE_INFO* part;
@@ -1238,8 +1238,8 @@ int emMineHitCk(cEmMine* pEm)
         type = 0x1C;
     }
     if (GetWepTargetList2(&pEm->pos_old, &pEm->pos, &list, 1, &hit, &nrm, &attr, type, 0) != 0) {
-        hitEm = list.em;
-        part = list.part;
+        hitEm = list.pEm;
+        part = list.pAt;
         hitEm->dmg.set(0, 2, type, &pEm->pos_old, part->len, part);
         if (part->flag & YAT_FLAG_DMPOS) {
             partsNo = 0;

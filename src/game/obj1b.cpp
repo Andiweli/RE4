@@ -557,7 +557,7 @@ int obj1bHitCk(cObjSpear* pObj)
     FREE_OBJ1B* w = SPEAR_WK(pObj);
     Vec hit;
     Vec nrm;
-    WepTarget target;
+    TARGET_WK target;
     u32 attr;
     cEm* em;
     YARARE_INFO* part;
@@ -565,8 +565,8 @@ int obj1bHitCk(cObjSpear* pObj)
     f32 len;
 
     if (GetWepTargetList2(&pObj->pos_old, &pObj->pos, &target, 1, &hit, &nrm, &attr, 0x15, 0)) {
-        part = target.part;
-        em = target.em;
+        part = target.pAt;
+        em = target.pEm;
         em->dmg.set(0, 10, 0x15, &em->pos_old, part->len, part);
         if (part->flag & YAT_FLAG_DMPOS) {
             Mtx inv;
