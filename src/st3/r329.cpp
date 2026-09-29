@@ -154,7 +154,7 @@ extern "C" void Evt_R329S00_Func(Event* e)
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -284,23 +284,23 @@ extern "C" void Evt_R329S00_Func(Event* e)
         StaFlagOff(pG, STA_CAMERA_SET_ROOM);
         w = SmdGetWorkPtr(0x29);
         if ((obj = SmdGetObjPtr(0x29)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x2A);
         if ((obj = SmdGetObjPtr(0x2A)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x2B);
         if ((obj = SmdGetObjPtr(0x2B)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x2C);
         if ((obj = SmdGetObjPtr(0x2C)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0x30, 0);
         SmdSetTrans(0x31, 0);

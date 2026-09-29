@@ -1729,11 +1729,11 @@ void Evt_R332S00_Func(Event* e)
         break;
     }
     case 2: {
-        SmdWork* w = SmdGetWorkPtr(0x24);
+        cSmdWork* w = SmdGetWorkPtr(0x24);
 
         if ((obj = SmdGetObjPtr(0x24)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0xA, 1);
         break;

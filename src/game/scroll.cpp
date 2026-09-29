@@ -113,17 +113,17 @@ void SmdSetup(int blockNo)
     setObj(blockNo);
 }
 
-// Creates a cObj (createBack 2) for every used SmdWork (id != 0xFF), registers it by id (0xFE = not
+// Creates a cObj (createBack 2) for every used cSmdWork (id != 0xFF), registers it by id (0xFE = not
 // registered) and work index, gives it its model / motion / placement (SmdSetParam) and its SMX
 // parameters; a work already owned by another block is an error. Returns -1 on a model failure.
 int setObj(int blkNo)
 {
-    SmdWork* w = pSmd->getWorkPtr(0);
+    cSmdWork* w = pSmd->getWorkPtr(0);
     cObj* obj;
     int i;
 
     for (i = 0; i < pSmd->nModel; i++, w++) {
-        if (w->id == 0xFF) {
+        if (w->WorkNo == 0xFF) {
             continue;
         }
         obj = ObjMgr.createBack(cObjMgr::ID_SCROLL);
@@ -132,20 +132,20 @@ int setObj(int blkNo)
             continue;
         }
         workInit(obj);
-        if (scrObjTbl[w->id] == NULL && w->id != 0xFE) {
-            scrObjTbl[w->id] = obj;
+        if (scrObjTbl[w->WorkNo] == NULL && w->WorkNo != 0xFE) {
+            scrObjTbl[w->WorkNo] = obj;
         }
         scrTbl[i] = obj;
         if (obj->blk != -2 && obj->blk != blkNo) {
-            pLog->err(0, 0, "Smd::setObj() REDECLARATION WORK %d. BLK %d and %d", w->id, obj->blk, blkNo);
+            pLog->err(0, 0, "Smd::setObj() REDECLARATION WORK %d. BLK %d and %d", w->WorkNo, obj->blk, blkNo);
             continue;
         }
         obj->blk = blkNo;
         if (SmdSetParam(obj, w) == 0) {
             return -1;
         }
-        if (pSmx != NULL && w->id != 0xFE) {
-            smxInit(obj, w->id);
+        if (pSmx != NULL && w->WorkNo != 0xFE) {
+            smxInit(obj, w->WorkNo);
         }
         if (obj->type == 0) {
             obj->be_flag &= ~0x20;
@@ -158,7 +158,7 @@ int setObj(int blkNo)
 // Model (bin / tpl from the room or the common SMD by flags bit4, with the common TPL table
 // added), motion (bit6 = common), position / rotation / scale and a bounding-box light for one
 // scroll object. Returns 0 when the model failed (object destroyed).
-int SmdSetParam(cObj* pObj, SmdWork* pSw)
+int SmdSetParam(cObj* pObj, cSmdWork* pSw)
 {
     void* bin;
     void* tpl;
@@ -168,28 +168,28 @@ int SmdSetParam(cObj* pObj, SmdWork* pSw)
 
     pObj->be_flag |= 4;
     pObj->be_flag &= ~0x20;
-    ((cObjScr*) pObj)->Attribute = pSw->b.attr;
-    if (pSmd->Version <= 0x1F && pSw->motNo == 0) {
-        pSw->motNo = 0xFF;
+    ((cObjScr*) pObj)->Attribute = (u8) pSw->flags;
+    if (pSmd->Version <= 0x1F && pSw->MotId == 0) {
+        pSw->MotId = 0xFF;
     }
-    if (pSw->binNo == 0xFF) {
-        pSw->binNo = 0;
+    if (pSw->BinId == 0xFF) {
+        pSw->BinId = 0;
         pLog->err(0, 0, "SmdInit() NULL BIN USED");
     }
-    if (pSw->tplNo == 0xFF) {
-        pSw->tplNo = 0;
+    if (pSw->TplId == 0xFF) {
+        pSw->TplId = 0;
         pLog->err(0, 0, "SmdInit() NULL TPL USED");
     }
     if (pSw->flags & 0x10) {
-        bin = pSmdComn->getBinPtr(pSw->binNo);
+        bin = pSmdComn->getBinPtr(pSw->BinId);
         pObj->be_flag |= 0x80000;
     } else {
-        bin = pSmd->getBinPtr(pSw->binNo);
+        bin = pSmd->getBinPtr(pSw->BinId);
     }
     if (pSw->flags & 0x10) {
         tpl = DmyZeroTpl;
     } else {
-        tpl = pSmd->getTplPtr(pSw->tplNo);
+        tpl = pSmd->getTplPtr(pSw->TplId);
     }
     if (pObj->modelInit(bin, tpl) == 0) {
         pLog->err(0, 0, "setObj() failed.");
@@ -200,19 +200,19 @@ int SmdSetParam(cObj* pObj, SmdWork* pSw)
         u8* tbl = (u8*) pSmdComn + pSmdComn->TplTblOfs;
         pObj->pModelInfo->addTplAddr(tbl + *(u32*) tbl);
     }
-    if (pSw->motNo != 0xFF) {
+    if (pSw->MotId != 0xFF) {
         if (pSw->flags & 0x40) {
-            mot = pSmdComn->getMotPtr(pSw->motNo);
+            mot = pSmdComn->getMotPtr(pSw->MotId);
         } else {
-            mot = pSmd->getMotPtr(pSw->motNo);
+            mot = pSmd->getMotPtr(pSw->MotId);
         }
         if (mot != NULL) {
             MotionSetCore(pObj, &pObj->Motion, mot, 0, 0, 5, 0);
         }
     }
-    pObj->pos = pSw->pos;
-    pObj->ang = pSw->rot;
-    pObj->scale = pSw->scale;
+    pObj->pos = pSw->Pos;
+    pObj->ang = pSw->Ang;
+    pObj->scale = pSw->Scale;
     if (pObj->scale.x == 0.0f || pObj->scale.y == 0.0f || pObj->scale.z == 0.0f) {
         pLog->warn(0, 0, "SmdInit() cObj SCALE SET 0.0");
     }
@@ -444,7 +444,7 @@ void BlockDestroy(int blkNo)
 // The SMD moved in memory by `ofs`: relocates the pointers inside every used bin and tpl.
 void cSmd::slide(int offset)
 {
-    SmdWork* w = getWorkPtr(0);
+    cSmdWork* w = getWorkPtr(0);
     int nBin = 0;
     int nTpl;
     u32* tbl;
@@ -456,8 +456,8 @@ void cSmd::slide(int offset)
         return;
     }
     for (i = 0; i < nModel; i++, w++) {
-        if (w->id != 0xFF && !(w->flags & 0x10) && w->binNo + 1 > nBin) {
-            nBin = w->binNo + 1;
+        if (w->WorkNo != 0xFF && !(w->flags & 0x10) && w->BinId + 1 > nBin) {
+            nBin = w->BinId + 1;
         }
     }
     {
@@ -476,8 +476,8 @@ void cSmd::slide(int offset)
     nTpl = 0;   // set before the call: the pseudo crosses it and takes a callee-saved register
     w = getWorkPtr(0);
     for (i = 0; i < nModel; i++, w++) {
-        if (w->id != 0xFF && !(w->flags & 0x10) && w->tplNo + 1 > nTpl) {
-            nTpl = w->tplNo + 1;
+        if (w->WorkNo != 0xFF && !(w->flags & 0x10) && w->TplId + 1 > nTpl) {
+            nTpl = w->TplId + 1;
         }
     }
     tbl = (u32*) ((u8*) this + TplTblOfs);
@@ -487,9 +487,9 @@ void cSmd::slide(int offset)
 }
 
 // Work `no` (the works follow the group count table when Flag bit0).
-SmdWork* cSmd::getWorkPtr(int id)
+cSmdWork* cSmd::getWorkPtr(int id)
 {
-    return (Flag & 1) ? (SmdWork*) ((u8*) this + grp.nGroup * 4 + 0x14) : &work[id];
+    return (Flag & 1) ? (cSmdWork*) ((u8*) this + grp.nGroup * 4 + 0x14) : &work[id];
 }
 
 // Model bin `no`.
@@ -533,15 +533,15 @@ int cSmd::getWorkNum()
     return n;
 }
 
-// The SmdWork with scroll id `id`, or NULL.
-SmdWork* SmdGetWorkPtr(int idx)
+// The cSmdWork with scroll id `id`, or NULL.
+cSmdWork* SmdGetWorkPtr(int idx)
 {
-    SmdWork* w;
+    cSmdWork* w;
     u32 i;
 
     for (i = 0; i < pSmd->getWorkNum(); i++) {
         w = pSmd->getWorkPtr(i);
-        if (w->id == idx) {
+        if (w->WorkNo == idx) {
             return w;
         }
     }

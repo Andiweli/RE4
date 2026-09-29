@@ -216,7 +216,7 @@ extern "C" void Evt_R330S00_Func(Event* e)
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -385,13 +385,13 @@ extern "C" void Evt_R330S00_Func(Event* e)
         EffectEfmDelete(0x2001, ESP_CORE_KIND_ROOM00, 0);
         w = SmdGetWorkPtr(0x28);
         if ((obj = SmdGetObjPtr(0x28)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x29);
         if ((obj = SmdGetObjPtr(0x29)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0x28, 0);
         SmdSetTrans(0x29, 0);

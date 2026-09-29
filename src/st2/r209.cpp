@@ -1821,21 +1821,21 @@ static void Evt_R209S00_Func(Event* e)
         }
         break;
     case 2: {
-        SmdWork* w;
+        cSmdWork* w;
 
         SmdGetObjPtr(2)->be_flag |= 2;
         SmdGetObjPtr(3)->be_flag |= 2;
         w = SmdGetWorkPtr(2);
         o = SmdGetObjPtr(2);
         if (o && w) {
-            o->setPos(&w->pos);
-            o->setAng(&w->rot);
+            o->setPos(&w->Pos);
+            o->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(3);
         o = SmdGetObjPtr(3);
         if (o && w) {
-            o->setPos(&w->pos);
-            o->setAng(&w->rot);
+            o->setPos(&w->Pos);
+            o->setAng(&w->Ang);
         }
         break;
     }

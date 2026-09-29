@@ -5777,7 +5777,7 @@ address	size	section	unit	scope	name	demangled
 0x801909C4	0x64	.text	game/scroll.cpp	global	workInit__FP4cObj	workInit
 0x80190A28	0x68	.text	game/scroll.cpp	global	SmdSetup__Fi	SmdSetup
 0x80190A90	0x18C	.text	game/scroll.cpp	global	setObj__Fi	setObj
-0x80190C1C	0x2F8	.text	game/scroll.cpp	global	SmdSetParam__FP4cObjP7SmdWork	SmdSetParam
+0x80190C1C	0x2F8	.text	game/scroll.cpp	global	SmdSetParam__FP4cObjP8cSmdWork	SmdSetParam
 0x80190F14	0x70	.text	game/scroll.cpp	global	SmxSetFlag__FP4cObjUl	SmxSetFlag
 0x80190F84	0x6C	.text	game/scroll.cpp	global	SmxGetFlag__FP4cObj	SmxGetFlag
 0x80190FF0	0x64	.text	game/scroll.cpp	global	smxInit__FP4cObjUc	smxInit

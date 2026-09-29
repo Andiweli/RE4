@@ -550,13 +550,13 @@ extern "C" void Evt_R228S02_Func(Event* e)
         }
         break;
     case 2: {
-        SmdWork* w = SmdGetWorkPtr(1);
+        cSmdWork* w = SmdGetWorkPtr(1);
 
         o = SmdGetObjPtr(1);
 
         if (o && w) {
-            o->setPos(&w->pos);
-            o->setAng(&w->rot);
+            o->setPos(&w->Pos);
+            o->setAng(&w->Ang);
         }
         SmdSetTrans(1, 1);
         break;

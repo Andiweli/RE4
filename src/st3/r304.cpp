@@ -150,7 +150,7 @@ extern "C" void Evt_R304S00_Func(Event* e)
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec ang = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -215,20 +215,20 @@ extern "C" void Evt_R304S00_Func(Event* e)
         w = SmdGetWorkPtr(0x10);
         obj = SmdGetObjPtr(0x10);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x11);
         obj = SmdGetObjPtr(0x11);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x11);
         obj = SmdGetObjPtr(0x11);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         break;
     }

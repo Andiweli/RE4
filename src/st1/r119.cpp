@@ -665,7 +665,7 @@ extern "C" void Evt_R119S00_Func(Event* e)
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -776,23 +776,23 @@ extern "C" void Evt_R119S00_Func(Event* e)
         }
         w = SmdGetWorkPtr(0x21);
         if ((obj = SmdGetObjPtr(0x21)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x22);
         if ((obj = SmdGetObjPtr(0x22)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x24);
         if ((obj = SmdGetObjPtr(0x24)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x25);
         if ((obj = SmdGetObjPtr(0x25)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         break;
     }
@@ -812,7 +812,7 @@ extern "C" void Evt_R119S20_Func(Event* e)
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -853,23 +853,23 @@ extern "C" void Evt_R119S20_Func(Event* e)
     case 2:
         w = SmdGetWorkPtr(0x21);
         if ((obj = SmdGetObjPtr(0x21)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x22);
         if ((obj = SmdGetObjPtr(0x22)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x24);
         if ((obj = SmdGetObjPtr(0x24)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x25);
         if ((obj = SmdGetObjPtr(0x25)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         {
             cObj* o;

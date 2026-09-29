@@ -5,23 +5,21 @@
 #include "vec.h"
 #include "obj.h"
 
-// Scroll (room model) data file `SMD` (game/scroll.cpp). One SmdWork per placed model.
-struct SmdWork {
-    Vec pos;       // 0x00
-    Vec rot;       // 0x0C
-    Vec scale;     // 0x18
-    u8 binNo;      // 0x24  bin table index (0xFF: none)
-    u8 tplNo;      // 0x25  tpl table index (0xFF: none)
-    u8 motNo;      // 0x26  motion table index (0xFF: none)
-    u8 id;         // 0x27  scroll object id (0xFF: unused, 0xFE: not registered)
-    u8 pad_28[0x44 - 0x28];
-    union {
-        u32 flags;   // 0x44  bit4: bin/tpl come from the common SMD, bit6: motion too
-        struct {
-            u8 pad_44[3];
-            u8 attr;  // 0x47  low byte of flags -> cObj::attr
-        } b;
-    };
+// Scroll (room model) data file `SMD` (game/scroll.cpp). One cSmdWork per placed model. PS2's
+// cSmdWork ends at 0x40 with Radius/Flag where GC's Vec-shrink lands them; neither is read here,
+// and GC's own flags/attr byte at 0x44 has no PS2 counterpart in reach of this tree.
+struct cSmdWork {
+    Vec Pos;        // 0x00
+    Vec Ang;        // 0x0C
+    Vec Scale;      // 0x18
+    u8 BinId;       // 0x24  bin table index (0xFF: none)
+    u8 TplId;       // 0x25  tpl table index (0xFF: none)
+    u8 MotId;       // 0x26  motion table index (0xFF: none)
+    u8 WorkNo;      // 0x27  scroll object id (0xFF: unused, 0xFE: not registered)
+    f32 Radius;     // 0x28  (PS2 cSmdWork Radius; unread here)
+    u32 Flag;       // 0x2C  (PS2 cSmdWork Flag; unread here)
+    u8 pad_30[0x44 - 0x30];
+    u32 flags;      // 0x44  bit4: bin/tpl come from the common SMD, bit6: motion too; low byte -> cObj::attr
 };
 
 class cSmd {
@@ -33,7 +31,7 @@ public:
     u32 TplTblOfs;    // 0x08  offset table of the tpls
     u32 MotTblOfs;    // 0x0C  offset table of the motions
     union {
-        SmdWork work[1];   // 0x10
+        cSmdWork work[1];   // 0x10
         struct {
             u32 nGroup;    // 0x10
             u32 num[1];    // 0x14  works per group
@@ -41,7 +39,7 @@ public:
     };
 
     void slide(int offset);
-    SmdWork* getWorkPtr(int id);
+    cSmdWork* getWorkPtr(int id);
     void* getBinPtr(int id);
     void* getTplPtr(int id);
     void* getMotPtr(int id);
@@ -96,7 +94,7 @@ void SmdClear(int mode);
 void workInit(cObj* pObj);
 void SmdSetup(int blockNo);
 int setObj(int blkNo);
-int SmdSetParam(cObj* pObj, SmdWork* pSw);
+int SmdSetParam(cObj* pObj, cSmdWork* pSw);
 void SmxSetFlag(cObj* pObj, u32 flag);
 int SmxGetFlag(cObj* pObj);
 void smxInit(cObj* obj, u8 id);
@@ -107,7 +105,7 @@ int SmdGetObjNum();
 int SmdGetWorkId(cObj* pObj);
 void BlockCreate(int blkNo, cSmd* pBlock);
 void BlockDestroy(int blkNo);
-SmdWork* SmdGetWorkPtr(int idx);
+cSmdWork* SmdGetWorkPtr(int idx);
 cObj* SmdGetGroupObjPtr(u32 idx);
 cObj* SmdGetGroupObjPtr2(u32 idx);
 cObj* SmdGetGroupNext(cObj* pObj00);

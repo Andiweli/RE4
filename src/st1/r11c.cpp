@@ -1172,14 +1172,14 @@ extern "C" void Evt_R11CS00_Func(Event* e)
         }
         break;
     case 2: {
-        SmdWork* w;
+        cSmdWork* w;
 
         SmdSetTrans(0x3F, 1);
         w = SmdGetWorkPtr(0x3F);
         o = SmdGetObjPtr(0x3F);
         if (o && w) {
-            o->setPos(&w->pos);
-            o->setAng(&w->rot);
+            o->setPos(&w->Pos);
+            o->setAng(&w->Ang);
         }
         setRoomEtcDisp(0, 1, 1);
         setRoomEtcDisp(0x16, 1, 1);

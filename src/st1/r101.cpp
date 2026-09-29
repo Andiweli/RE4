@@ -1063,7 +1063,7 @@ extern "C" void Evt_R101S30_Func(Event* e)
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -1083,8 +1083,8 @@ extern "C" void Evt_R101S30_Func(Event* e)
     case 2:
         w = SmdGetWorkPtr(0x39);
         if ((obj = SmdGetObjPtr(0x39)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         LadderEventTrans(1);
         break;

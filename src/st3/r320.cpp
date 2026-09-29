@@ -2241,12 +2241,12 @@ static void Evt_R320S00_Func(Event* e)
         break;
     }
     case 2: {
-        SmdWork* w = SmdGetWorkPtr(0x22);
+        cSmdWork* w = SmdGetWorkPtr(0x22);
 
         obj = SmdGetObjPtr(0x22);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0x22, 0);
         SmdSetTrans(0x28, 1);
@@ -2410,12 +2410,12 @@ static void Evt_R320S01_Func(Event* e)
         break;
     }
     case 2: {
-        SmdWork* w = SmdGetWorkPtr(0x22);
+        cSmdWork* w = SmdGetWorkPtr(0x22);
 
         obj = SmdGetObjPtr(0x22);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0x22, 0);
         SmdSetTrans(0x28, 1);

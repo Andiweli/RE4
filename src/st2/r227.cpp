@@ -1047,15 +1047,15 @@ static void Evt_R227S01_Func(Event* e)
         }
         break;
     case 2: {
-        SmdWork* w;
+        cSmdWork* w;
 
         SmdSetTrans(0xA, 1);
         SmdSetTrans(0xF8, 0);
         w = SmdGetWorkPtr(0xA);
         mod = SmdGetObjPtr(0xA);
         if (mod && w) {
-            ((cModel*) mod)->setPos(&w->pos);
-            ((cModel*) mod)->setAng(&w->rot);
+            ((cModel*) mod)->setPos(&w->Pos);
+            ((cModel*) mod)->setAng(&w->Ang);
         }
         break;
     }
