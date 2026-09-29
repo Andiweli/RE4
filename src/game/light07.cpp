@@ -14,8 +14,8 @@ cLight07::cLight07()
 void Light07_Move(cLight* pLi)
 {
     Vec* n = &pLi->normal;
-    Vec* ang = (Vec*)pLi->work;
-    Vec* spd = (Vec*)(pLi->work + 0xC);
+    Vec* ang = &((LIT07_MOVE_FREE*)pLi->work)->Rot;
+    Vec* spd = &((LIT07_MOVE_FREE*)pLi->work)->Speed;
 
     switch (pLi->Rno0) {
     case 0:

@@ -10,17 +10,6 @@
 #include "math_sub.h"
 #include "foot_shadow.h"
 
-// cLight::work of a type 4 (foot shadow) light.
-struct FootLightWork {
-    u8 x0;
-    u8 x1;
-    u8 mode;    // 0x02  5: casts foot shadows
-    s8 height;  // 0x03  shadow height offset (* 10 + 50)
-    s16 rotX;   // 0x04  direction (degrees), xD 1 / 2
-    s16 rotY;   // 0x06
-    u8 angle;   // 0x08  spot half angle (degrees), xD 2; 0 = 90
-};
-
 // One shadow quad.
 struct ShadowInfo {
     Vec pos;
@@ -65,7 +54,7 @@ void DrawFootShadow(cModel* pMod)
     l = LightMgr.getActiveWork();
     cnt = 0;
     while (l) {
-        FootLightWork* w;
+        LIT04_MOVE_FREE* w;
         f32 rate;
         f32 range;
 
@@ -77,7 +66,7 @@ void DrawFootShadow(cModel* pMod)
         } else {
             cnt++;
         }
-        w = (FootLightWork*) l->work;
+        w = (LIT04_MOVE_FREE*) l->work;
         if ((l->be_flag & 3) != 3) {
             continue;
         }
@@ -92,7 +81,7 @@ void DrawFootShadow(cModel* pMod)
                 continue;
             }
         }
-        if (w->mode != 5) {
+        if (w->Kind != 5) {
             continue;
         }
         {
@@ -118,8 +107,8 @@ void DrawFootShadow(cModel* pMod)
             dir.x = 0.0f;
             dir.y = -1.0f;
             dir.z = 0.0f;
-            rot.x = (f32) w->rotX * 6.2831855f / 360.0f;
-            rot.y = (f32) w->rotY * 6.2831855f / 360.0f;
+            rot.x = (f32) w->Ang_x * 6.2831855f / 360.0f;
+            rot.y = (f32) w->Ang_y * 6.2831855f / 360.0f;
             rot.z = 0.0f;
             PSMTXRotRad(m1, 'x', rot.x);
             PSMTXRotAxisRad(m2, &axis, rot.y);
@@ -142,7 +131,7 @@ void DrawFootShadow(cModel* pMod)
             PSVECScale(&dir, &tmp, dot);
             PSVECAdd(&lpos, &tmp, &tmp);
             dist = PSVECSquareDistance(&pos, &tmp);
-            ang = (f32) w->angle;
+            ang = (f32) w->Fovy;
             if (ang == 0.0f) {
                 ang = 90.0f;
             }
@@ -180,7 +169,7 @@ void DrawFootShadow(cModel* pMod)
                     info.pos = p->world;
                     PSVECScale(&dir, &ofs, -(info.pos.y - pos.y) * (1.0f / dir.y));
                     PSVECAdd(&info.pos, &ofs, &info.pos);
-                    info.pos.y += (f32) w->height * 10.0f + 50.0f;
+                    info.pos.y += (f32) (s8) w->Tex_no * 10.0f + 50.0f;
                     size = dat->size;
                     info.size = size;
                     info.alpha = (f32) dat->color;

@@ -48,7 +48,7 @@ u32 cLightPathData::getSize()
 int cLightPath::setPath(u8* pPath, u8 flag)
 {
     if (!VALID_PTR(pPath)) { pLog->err(0, 0, "setPath() INVALID PTR %08X", pPath); return 0; }
-    pCur = pStart = pPath;
+    pPtr = pBase = pPath;
     Flag = flag;
     return 1;
 }
@@ -57,18 +57,18 @@ int cLightPath::setPath(u8* pPath, u8 flag)
 int cLightPath::movePath()
 {
     u8 v;
-    if (!VALID_PTR(pStart) || !VALID_PTR(pCur)) { pLog->err(2, 0, "Light05() INVALID PATH DATA"); return 0; }
-    v = pCur[0];
+    if (!VALID_PTR(pBase) || !VALID_PTR(pPtr)) { pLog->err(2, 0, "Light05() INVALID PATH DATA"); return 0; }
+    v = pPtr[0];
     if (v <= 200) {
         if (Flag & 2) v = 200 - v;
-        pCur = pCur + 1;
+        pPtr = pPtr + 1;
     } else if ((Flag & 1) == 0) {
-        pCur = pStart;
-        v = pCur[0];
+        pPtr = pBase;
+        v = pPtr[0];
         if (Flag & 2) v = 200 - v;
-        // COMPILER-DIFF: tie. The loop notes double this store's `this` ref weight (9 refs > pCur's
-        // 5/14 priority), which puts `this` in r9 and pCur in r11 like the original; no code changes.
-        do { pCur = pCur + 1; } while (0);
+        // COMPILER-DIFF: tie. The loop notes double this store's `this` ref weight (9 refs > pPtr's
+        // 5/14 priority), which puts `this` in r9 and pPtr in r11 like the original; no code changes.
+        do { pPtr = pPtr + 1; } while (0);
     }
     return v;
 }

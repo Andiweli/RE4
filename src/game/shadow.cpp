@@ -286,7 +286,7 @@ void ShadowTrans()
     l = LightMgr.getActiveWork();
     cnt = 0;
     while (l) {
-        ShadowLightWork* w;
+        LIT04_MOVE_FREE* w;
 
         if (cnt != 0) {
             l = LightMgr.getNext(l);
@@ -307,12 +307,12 @@ void ShadowTrans()
                 continue;
             }
         }
-        w = (ShadowLightWork*) l->work;
-        if (w->mode == 5) {
+        w = (LIT04_MOVE_FREE*) l->work;
+        if (w->Kind == 5) {
             continue;
         }
         StaFlagOn(pG, STA_USE_SHADOW_LIGHT);
-        if (w->mode >= 1 && w->mode <= 4) {
+        if (w->Kind >= 1 && w->Kind <= 4) {
             continue;
         }
         if (l->xD != 2) {
@@ -435,7 +435,7 @@ int Fit_ParallelShadowModelSet(cModel* m, int self)
     l = LightMgr.getActiveWork();
     cnt = 0;
     while (l) {
-        ShadowLightWork* w;
+        LIT04_MOVE_FREE* w;
         int inRange;
 
         if (cnt != 0) {
@@ -457,8 +457,8 @@ int Fit_ParallelShadowModelSet(cModel* m, int self)
                 continue;
             }
         }
-        w = (ShadowLightWork*) l->work;
-        if (w->mode == 5) {
+        w = (LIT04_MOVE_FREE*) l->work;
+        if (w->Kind == 5) {
             continue;
         }
         if (l->xD > 1) {
@@ -468,7 +468,7 @@ int Fit_ParallelShadowModelSet(cModel* m, int self)
             continue;
         }
         if (self) {
-            if (w->selfShadow == 0) {
+            if (w->SelfShadowLevel == 0) {
                 continue;
             }
         }
@@ -664,13 +664,13 @@ void shadowModelRender(ShadowMng* mng)
 void make_comn_fit_light(ShadowMng* mng, cModel* m)
 {
     cLight* l = mng->pLight;
-    ShadowLightWork* w = (ShadowLightWork*) l->work;
+    LIT04_MOVE_FREE* w = (LIT04_MOVE_FREE*) l->work;
     Vec pos;
     f32 dist;
     f32 r;
 
-    if (w->flags & 2) {
-        l->getPos2(&w->pos, &mng->lightPos);
+    if (w->Flag & 2) {
+        l->getPos2(&w->Lit_pos, &mng->lightPos);
     } else {
         l->getPos(&mng->lightPos);
     }
@@ -693,7 +693,7 @@ void make_comn_fit_light(ShadowMng* mng, cModel* m)
         break;
     }
     mng->fov = atan2f(r, dist) * (360.0f / PI);
-    mng->fov -= (f32) (int) w->angleSub;
+    mng->fov -= (f32) (int) w->Fovy_sub;
     {
         // COMPILER-DIFF: 13 (local-alloc qty order): r11 pinned after the 1.0 load and before the
         // conversion's lfd, so the fpmem loadaddr cannot take r11 and the 1.0 pool high gets it.
@@ -727,7 +727,7 @@ void make_comn_fit_light(ShadowMng* mng, cModel* m)
 void make_comn_parallel_light(ShadowMng* mng, cModel* m)
 {
     cLight* l = mng->pLight;
-    ShadowLightWork* w;
+    LIT04_MOVE_FREE* w;
     Vec rot;
     Vec v;
     Mtx rm;
@@ -742,11 +742,11 @@ void make_comn_parallel_light(ShadowMng* mng, cModel* m)
     mng->dir.y = -1.0f;
     mng->dir.z = shadow_add_dir_x;
     PSVECNormalize(&mng->dir, &mng->dir);
-    w = (ShadowLightWork*) l->work;
+    w = (LIT04_MOVE_FREE*) l->work;
     {
         const f32 zero = 0.0f;
-        rot.x = (f32) w->rotX * 6.2831855f / 360.0f;
-        rot.y = (f32) w->rotY * 6.2831855f / 360.0f;
+        rot.x = (f32) w->Ang_x * 6.2831855f / 360.0f;
+        rot.y = (f32) w->Ang_y * 6.2831855f / 360.0f;
         rot.z = 0.0f;
     }
     RotMatrix(rm, &rot);
@@ -769,7 +769,7 @@ void make_comn_parallel_light(ShadowMng* mng, cModel* m)
         break;
     }
     mng->fov = atan2f(r, dist) * (360.0f / PI);
-    mng->fov -= w->angleSub;
+    mng->fov -= w->Fovy_sub;
     {
         // COMPILER-DIFF: 13 (local-alloc qty order): see make_comn_fit_light.
         register u32 k asm("r11");
@@ -807,7 +807,7 @@ void make_fix_light(ShadowMng* mng)
     Mtx m1;
     Mtx m2;
     cLight* l = mng->pLight;
-    ShadowLightWork* w = (ShadowLightWork*) l->work;
+    LIT04_MOVE_FREE* w = (LIT04_MOVE_FREE*) l->work;
 
     l->getPos(&mng->lightPos);
     mng->target = mng->lightPos;
@@ -815,8 +815,8 @@ void make_fix_light(ShadowMng* mng)
     mng->dir.y = -1.0f;
     mng->dir.z = 0.0f;
     PSVECNormalize(&mng->dir, &mng->dir);
-    rot.x = (f32) w->rotX * 6.2831855f / 360.0f;
-    rot.y = (f32) w->rotY * 6.2831855f / 360.0f;
+    rot.x = (f32) w->Ang_x * 6.2831855f / 360.0f;
+    rot.y = (f32) w->Ang_y * 6.2831855f / 360.0f;
     rot.z = 0.0f;
     PSMTXRotRad(m1, 'x', rot.x);
     PSMTXRotAxisRad(m2, &axis, rot.y);
@@ -827,7 +827,7 @@ void make_fix_light(ShadowMng* mng)
         mng->dir.x = 0.01f;
     }
     PSVECAdd(&mng->target, &mng->dir, &mng->target);
-    mng->fov = (f32) w->angle;
+    mng->fov = (f32) w->Fovy;
     if (mng->fov == 0.0f) {
         mng->fov = 90.0f;
     }
@@ -929,7 +929,7 @@ void MakeSoftShadow(ShadowMng* mng)
     f32 zero0 = 0.0f;
     f32 zero;
     f32 alpha;
-    ShadowLightWork* w;
+    LIT04_MOVE_FREE* w;
     int a;
 
     SetNoScissor();
@@ -941,11 +941,11 @@ void MakeSoftShadow(ShadowMng* mng)
     a = 0xFF;
     alpha = (f32) (u8) a;
     SoftShadowGXDraw(mng, zero, zero, z, 1, zero, zero, alpha, 1.0f);
-    w = (ShadowLightWork*) mng->pLight->work;
-    if (w->soft > 1) {
+    w = (LIT04_MOVE_FREE*) mng->pLight->work;
+    if (w->SoftShadowLevel > 1) {
         SoftShadowGetEFB(mng, 1.0f, 2.0f, 1);
         SoftShadowGXDraw(mng, zero, zero, z, 2, zero, zero, alpha, 2.0f);
-        if (w->soft > 2) {
+        if (w->SoftShadowLevel > 2) {
             SoftShadowGetEFB(mng, fa, fb, 1);
             a = 0x80;
             SoftShadowGXDraw(mng, zero, zero, z, fd, zero, zero, (f32) (u8) a, fc);
@@ -970,7 +970,7 @@ f32 shd_tex_scale_x = 0.0003f;  // trans.cpp SelfShadowSetup reads it
 // texture, a soft blur, then a copy to the I8 texture.
 void make_shadow_texture(ShadowMng* mng)
 {
-    ShadowLightWork* w = (ShadowLightWork*) mng->pLight->work;
+    LIT04_MOVE_FREE* w = (LIT04_MOVE_FREE*) mng->pLight->work;
     u32 scrW;
     u32 scrH;
     u16 rs;
@@ -1110,17 +1110,17 @@ void make_shadow_texture(ShadowMng* mng)
     GXSetDstAlpha(0, 0);
     if (SHD_NO_SELF(mng)) {
         flag2 = 0;
-        if (w->flags & 4) {
+        if (w->Flag & 4) {
             flag2 = 1;
         }
-        if (w->flags & 1) {
+        if (w->Flag & 1) {
             GXTexObj* tex;
             GXTlutObj* tlut;
-            if (RoomGetTexObj(w->texId, 0, &tex)) {
-                RoomGetTlutObj(w->texId, &tlut);
+            if (RoomGetTexObj(w->Tex_no, 0, &tex)) {
+                RoomGetTlutObj(w->Tex_no, &tlut);
                 TransLightTexture(tex, tlut, 0, 0, 1, g_Shd_render_size, g_Shd_render_size, mng, flag2, 1);
             }
-        } else if (mng->pLight->xD == 2 && w->texId != 0xFF) {
+        } else if (mng->pLight->xD == 2 && w->Tex_no != 0xFF) {
             GXTexObj* tex;
             GXTlutObj* tlut;
             if (RoomGetTexObj(0, 0, &tex)) {
@@ -1131,7 +1131,7 @@ void make_shadow_texture(ShadowMng* mng)
     }
     SetScissorState();
     GXSetCopyFilter(0, 0, 0, 0);
-    if (w->soft) {
+    if (w->SoftShadowLevel) {
         MakeSoftShadow(mng);
     } else {
         GXSetTexCopySrc(0, 0, rs, rs);
@@ -1144,7 +1144,7 @@ void make_shadow_texture(ShadowMng* mng)
         GXCopyTex(mng->pTex, 1);
         GXPixModeSync();
     }
-    if (w->setStatus) {
+    if (w->bMultiShadow) {
         StaFlagOn(pG, STA_SHADOW_EQCOL);
     }
     GXSetAlphaUpdate(0);
@@ -1242,7 +1242,7 @@ void ProcShadowScrModel(cModel* m, ShadowMng* mngs)
         if (mngs->pLight->xD > 2) {
             continue;
         }
-        if (((ShadowLightWork*) mngs->pLight->work)->mode != 0) {
+        if (((LIT04_MOVE_FREE*) mngs->pLight->work)->Kind != 0) {
             continue;
         }
         if (mngs->self & 1) {
@@ -1336,8 +1336,8 @@ void shadowScrModelRender(ShadowMng* mngs)
     mng = mngs;
     num = g_Shd_num;
     for (n = 0; n < num; n++) {
-        ShadowLightWork* w = (ShadowLightWork*) mng->pLight->work;
-        if (w->mode >= 1 && w->mode <= 4) {
+        LIT04_MOVE_FREE* w = (LIT04_MOVE_FREE*) mng->pLight->work;
+        if (w->Kind >= 1 && w->Kind <= 4) {
             mng++;
             continue;
         }
@@ -1775,7 +1775,7 @@ ShadowMng* GetCastShadowMngPtr(cModel* m)
 
     for (i = 0; i < n; i++) {
         cLight* l = (cLight*) LightMgr.fastAt(i);
-        ShadowLightWork* w;
+        LIT04_MOVE_FREE* w;
         ShadowMng* mng;
 
         if ((l->be_flag & 3) != 3) {
@@ -1784,8 +1784,8 @@ ShadowMng* GetCastShadowMngPtr(cModel* m)
         if (l->Type != 4) {
             continue;
         }
-        w = (ShadowLightWork*) l->work;
-        if (w->mode == 5) {
+        w = (LIT04_MOVE_FREE*) l->work;
+        if (w->Kind == 5) {
             continue;
         }
         if (!(l->xF & m->LightInfo.EnableMask)) {
@@ -1796,7 +1796,7 @@ ShadowMng* GetCastShadowMngPtr(cModel* m)
                 continue;
             }
         }
-        if (w->mode < 1 || w->mode > 4) {
+        if (w->Kind < 1 || w->Kind > 4) {
             continue;
         }
         if (l->xD != 2) {

@@ -3,29 +3,22 @@
 #include "light.h"
 #include "math_sub.h"
 
-struct Light02Work {
-    f32 base;   // 0x00 base brightness rate
-    f32 amp;    // 0x04 sine amplitude
-    f32 freq;   // 0x08 cycles per second
-    f32 phase;  // 0x0C
-};
-
 // LightFuncTbl[2]: pulsing light; DispCol = Col * rate clamped to 0..255.
 // Pulsing light: brightness rate = base + amp * sin(phase), clamped to [0, 255] per channel.
 void Light02_Move(cLight* pLi)
 {
-    Light02Work* w = (Light02Work*)pLi->work;
+    LIT02_MOVE_FREE* w = (LIT02_MOVE_FREE*)pLi->work;
     f32 rate;
     f32 r;
     f32 g;
     f32 b;
 
-    if (w->freq <= 0.0f) {
-        w->freq = 0.00001f;
+    if (w->Speed <= 0.0f) {
+        w->Speed = 0.00001f;
     }
-    w->phase += w->freq * 6.2831855f / 30.0f;
-    w->phase = LIMIT_ANGLE(w->phase);
-    rate = w->base + w->amp * sinf(w->phase);
+    w->Radian += w->Speed * 6.2831855f / 30.0f;
+    w->Radian = LIMIT_ANGLE(w->Radian);
+    rate = w->Center + w->Range * sinf(w->Radian);
 
     r = rate * pLi->Col.r;
     if (r < 0.0f) {

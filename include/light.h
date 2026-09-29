@@ -40,6 +40,64 @@ struct LightPath {
     u8 pad_0[0x40];
 };
 
+// cLight::work (cLight+0x78), reinterpreted per Type by each light0X.cpp's own LightFuncTbl entry.
+struct LIT01_MOVE_FREE {
+    GXColor Col;     // 0x0  (unused)
+    s8 ColFlick;     // 0x4  random brightness range (+-)
+};
+
+struct LIT02_MOVE_FREE {
+    f32 Center;  // 0x0  base brightness rate
+    f32 Range;   // 0x4  sine amplitude
+    f32 Speed;   // 0x8  cycles per second
+    f32 Radian;  // 0xC  current phase
+};
+
+struct LIT03_MOVE_FREE {
+    Vec Rot;  // rotation speed per axis, radians/frame
+};
+
+// Shared by shadow.cpp (Kind 1..4, cast shadows) and foot_shadow.cpp (Kind 5, foot shadows): the
+// two disagree on what Tex_no and Fovy hold because both readers reinterpret the same bytes for
+// their own Kind. Tex_no is a real room texture id (RoomGetTexObj/RoomGetTlutObj) for Kind 1..4,
+// and a signed shadow height offset (*10+50) for Kind 5.
+struct LIT04_MOVE_FREE {
+    u16 Flag;            // 0x00  bit0: room texture light map (Tex_no), bit1: position from Lit_pos, bit2: use texture
+    u8 Kind;              // 0x02  0 normal, 1..4 cast, 5 foot
+    u8 Tex_no;             // 0x03  room texture id (0xFF none); Kind 5 reads it as (s8), a height offset
+    s16 Ang_x;             // 0x04  direction (degrees)
+    s16 Ang_y;             // 0x06
+    u8 Fovy;               // 0x08  perspective / spot half angle (degrees, 0 = 90)
+    u8 SelfShadowLevel;    // 0x09  self shadow passes, 0 = none
+    u8 SoftShadowLevel;    // 0x0A  soft shadow passes, 0 = hard
+    u8 bMultiShadow;       // 0x0B  nonzero sets STA_SHADOW_EQCOL after the texture renders
+    Vec Lit_pos;           // 0x0C  light position source when Flag bit1 is set
+    u8 Fovy_sub;           // 0x18  perspective angle (fov) reduction in degrees
+};
+
+struct LIT05_MOVE_FREE {
+    cLightPath Path;  // 0x0
+    u8 Id;            // 0xC  light path data number
+    u8 Flag;          // 0xD  path index inside the data
+};
+
+struct LIT06_MOVE_FREE {
+    f32 m_Start;  // 0x0  initial rate
+    f32 m_Speed;  // 0x4  rate change per frame (sign gives direction)
+    f32 m_Fade;   // 0x8  current brightness rate 0..1
+};
+
+struct LIT07_MOVE_FREE {
+    Vec Rot;    // 0x0  direction, radians
+    Vec Speed;  // 0xC  added to Rot every frame
+};
+
+struct LIT08_MOVE_FREE {
+    u8 type;  // 0x0
+    u8 id;    // 0x1  enemy id
+    u8 pno;   // 0x2  parts number
+};
+
 // One light entry of a light cut in the .lit file (0x12C bytes); cLight::operator= loads it.
 class cLight;
 class cLightWork {

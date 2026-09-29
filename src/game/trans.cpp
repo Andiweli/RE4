@@ -1034,10 +1034,10 @@ void commonModelTrans(cModel* m, cModelInfo* info, Mtx viewMat, int flag)
         if (!StaFlagChk(pG, STA_PROC_SHD_TEX)) {
         g_pShdMng = GetCastShadowMngPtr(m);
         if (g_pShdMng != 0) {
-            ShadowLightWork* w = (ShadowLightWork*) g_pShdMng->pLight->work;
+            LIT04_MOVE_FREE* w = (LIT04_MOVE_FREE*) g_pShdMng->pLight->work;
             TEXPalette* tpl;
-            if (RoomGetTplAddr(w->texId, &tpl) == 0) {
-                pLog->err(0, 0, "SHADOW_CAST : TEX_ID[%x] no data", w->texId);
+            if (RoomGetTplAddr(w->Tex_no, &tpl) == 0) {
+                pLog->err(0, 0, "SHADOW_CAST : TEX_ID[%x] no data", w->Tex_no);
                 g_pShdMng = 0;
             }
             u32 n = m->LightInfo.getLightNum();
@@ -2085,7 +2085,7 @@ void ShadowCastSetup(ModelPart* part, cModel* m)
     GXColor k;
     GXColor kc;
     ShadowMng* mng = g_pShdMng;
-    ShadowLightWork* w;
+    LIT04_MOVE_FREE* w;
     int coord;
     u32 mtx;
     int map;
@@ -2101,14 +2101,14 @@ void ShadowCastSetup(ModelPart* part, cModel* m)
     PSMTXConcat(mng->texMat, m->pList->mat, tm);
     GXLoadTexMtxImm(tm, mtx, 0);
     GXSetTexCoordGen2(coord, 0, 0, mtx, 0, 0x7D);
-    w = (ShadowLightWork*) mng->pLight->work;
-    if (RoomGetTexObj(w->texId, 0, &tex)) {
+    w = (LIT04_MOVE_FREE*) mng->pLight->work;
+    if (RoomGetTexObj(w->Tex_no, 0, &tex)) {
         GXLoadTexObj(tex, map);
-        if (RoomGetTlutObj(w->texId, &tlut)) {
+        if (RoomGetTlutObj(w->Tex_no, &tlut)) {
             GXLoadTlut(tlut, 0);
         }
     }
-    if (w->mode == 3 || w->mode == 4) {
+    if (w->Kind == 3 || w->Kind == 4) {
         SetCastShadowLight(m, &mng->lightPos, &mng->dir, mng);
     }
     k.r = mng->pLight->Col.r;
@@ -2117,14 +2117,14 @@ void ShadowCastSetup(ModelPart* part, cModel* m)
     k.a = mng->pLight->Col.a;
     kc = k;
     GXSetTevKColor(getKColor(), kc);
-    switch (w->mode) {
+    switch (w->Kind) {
     case 1:
         GXSetTevKColorSel(st, getKColorSel());
         GXSetTevKAlphaSel(st, getKAlphaSel());
         tev_kcolor++;
         // Each arm carries the stage's tail through `tev_stage++` so the arm does not end in a
         // call (flow's post-call nop would stop jump2 cross-jumping the shared `li r7; bl`).
-        if (w->flags & 4) {
+        if (w->Flag & 4) {
             GXSetTevOrder(st, coord, map, 0xFF);
             GXSetTevColorIn(st, 0xE, 0xF, 8, 0xF);
             GXSetTevColorOp(st, 0, 0, 0, 1, 0);
@@ -2150,7 +2150,7 @@ void ShadowCastSetup(ModelPart* part, cModel* m)
         GXSetTevKColorSel(st, getKColorSel());
         GXSetTevKAlphaSel(st, getKAlphaSel());
         tev_kcolor++;
-        if (w->flags & 4) {
+        if (w->Flag & 4) {
             GXSetTevOrder(st, coord, map, 4);
             GXSetTevColorIn(st, 0xE, 0xF, 8, 0xA);
             GXSetTevColorOp(st, 0, 0, 0, 1, 0);
@@ -2175,7 +2175,7 @@ void ShadowCastSetup(ModelPart* part, cModel* m)
         GXSetTevKColorSel(st, getKColorSel());
         GXSetTevKAlphaSel(st, getKAlphaSel());
         tev_kcolor++;
-        if (w->flags & 4) {
+        if (w->Flag & 4) {
             GXSetTevOrder(st, 0xFF, 0xFF, 4);
             GXSetTevColorIn(st, 0xE, 0xF, 0, 0xF);
             GXSetTevColorOp(st, 0, 0, 0, 1, 0);
@@ -2198,7 +2198,7 @@ void ShadowCastSetup(ModelPart* part, cModel* m)
         GXSetTevAlphaOp(st, 0, 0, 0, 1, 0);
         break;
     case 4:
-        if (w->flags & 4) {
+        if (w->Flag & 4) {
             GXSetTevOrder(st, coord, map, 5);
             GXSetTevColorIn(st, 0xA, 0xF, 8, 0xF);
             GXSetTevColorOp(st, 0, 0, 0, 1, 0);
@@ -2248,7 +2248,7 @@ void SelfShadowSetup(ModelPart* part, cModel* m, ShadowMng* mng)
     u32 mtx;
     int map;
     int st;
-    ShadowLightWork* w;
+    LIT04_MOVE_FREE* w;
     u32 i;
 
     coord = getTexCoord();
@@ -2308,8 +2308,8 @@ void SelfShadowSetup(ModelPart* part, cModel* m, ShadowMng* mng)
     (tev_stage = tev_stage + 1);
     tex_coord = tex_coord + 1;
     tex_map = tex_map + 1;
-    w = (ShadowLightWork*) mng->pLight->work;
-    for (i = 0; i < w->selfShadow; i++) {
+    w = (LIT04_MOVE_FREE*) mng->pLight->work;
+    for (i = 0; i < w->SelfShadowLevel; i++) {
         st = TEV_STAGE_ID();
         GXSetTevOrder(st, 0xFF, 0xFF, 0xFF);
         GXSetTevColorIn(st, 0xF, 0, 0, 0xF);

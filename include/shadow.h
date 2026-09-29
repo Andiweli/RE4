@@ -27,21 +27,6 @@ struct ShadowMng {
     void* pTex;          // 0xD0  g_Shd_tex_size^2 I8 shadow texture
 };
 
-// cLight::work of a type 4 (shadow) light.
-struct ShadowLightWork {
-    u16 flags;    // 0x00  bit0: room texture light map (texId), bit1: position from `pos` (getPos2), bit2: TransLightTexture flag
-    u8 mode;      // 0x02  5: foot shadows only (foot_shadow.cpp); 1..4: fixed shadow light
-    u8 texId;     // 0x03  room texture id of the light map (0xFF: none)
-    s16 rotX;     // 0x04  direction (degrees)
-    s16 rotY;     // 0x06
-    u8 angle;     // 0x08  fixed light perspective angle (0 = 90)
-    u8 selfShadow;  // 0x09  self shadow passes (trans: loop count), 0 = none
-    u8 soft;      // 0x0A  soft shadow passes (0 = hard)
-    u8 setStatus; // 0x0B  nonzero: Status_flg[1] bit 0x4000 set after the texture was rendered
-    Vec pos;      // 0x0C  light position source when flags bit1 is set
-    u8 angleSub;  // 0x18  perspective angle (fov) reduction in degrees
-};
-
 // Shadow object placement file (room "SHD" data): header then `num` entries.
 struct ShdEntry {
     Vec pos;      // 0x00
