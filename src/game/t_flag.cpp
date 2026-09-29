@@ -11,14 +11,14 @@
 #include <string.h>
 
 
-// Flag editor tool: pages of bit flags with names.
-
-struct FE_WORK {
-    s16 page;      // 0x00  fe_data index
-    s16 cursor;    // 0x02  bit number in the page
-    u16 mode;      // 0x04  func_tbl index (0 = move, 1 = die)
-    u32 stop_bak;  // 0x08  saved pG stop flags
-};
+// Flag editor tool: pages of bit flags with names. PS2 names this task's work struct `tagTEST`/`TEST`,
+// like the room-jump and debug-menu tool tasks; the three are unrelated, PS2 just reuses the name.
+typedef struct tagTEST {
+    s16 id;        // 0x00  fe_data index
+    s16 flag_bit;  // 0x02  bit number in the page
+    u16 r_no_0;    // 0x04  func_tbl index (0 = move, 1 = die)
+    u32 stopflag;  // 0x08  saved pG stop flags
+} TEST;
 
 struct FE_DATA {
     const char* name;    // 0x00
@@ -29,9 +29,9 @@ struct FE_DATA {
     u32 bit_name_size;       // 0x10
 };
 
-static void init(FE_WORK* t);
-static void move(FE_WORK* t);
-void die(FE_WORK* t);
+static void init(TEST* t);
+static void move(TEST* t);
+void die(TEST* t);
 int CkBit(u32* flags, u32 bit);
 
 static const char* dbg_s[125] = {
@@ -158,39 +158,39 @@ static FE_DATA fe_data[12] = {
     {"DISP", &Global.Disp_flg, 32, 0, dpf_s, 21},
 };
 
-FE_WORK Test;
+TEST Test;
 
 // Debug flag editor task: pages of the game's flag words (debug / disp / status / scenario / room
 // flags... in fe_data) with the bit names; runs until B.
 void FlagEdit()
 {
-    static void (*func_tbl[2])(FE_WORK*) = {move, die};
+    static void (*func_tbl[2])(TEST*) = {move, die};
 
-    Test.stop_bak = pG->Stop_flg;
+    Test.stopflag = pG->Stop_flg;
     BitOn(pG->Stop_flg, ~0x4000);
     init(&Test);
     TaskSleep(1);
     while (1) {
-        pG->Stop_flg = Test.stop_bak;
-        func_tbl[Test.mode](&Test);
-        Test.stop_bak = pG->Stop_flg;
+        pG->Stop_flg = Test.stopflag;
+        func_tbl[Test.r_no_0](&Test);
+        Test.stopflag = pG->Stop_flg;
         BitOn(pG->Stop_flg, ~0x4000);
         TaskSleep(1);
     }
 }
 
 // Editor start: page 0, cursor 0, the game frozen (Stop_flg saved).
-static void init(FE_WORK* t)
+static void init(TEST* t)
 {
-    Test.mode = 0;
-    t->cursor = 0;
-    t->page = 0;
+    Test.r_no_0 = 0;
+    t->flag_bit = 0;
+    t->id = 0;
     DbgFlagOn(pG, DBG_TEST_MODE);
 }
 
 // Editor frame: d-pad moves the cursor bit, C-stick / L / R change the page, A toggles the bit;
 // prints the page's words in hex, the cursor bit's value, number and name. B -> die.
-static void move(FE_WORK* pTest)
+static void move(TEST* pTest)
 {
     JOY* joy = GetBugCheckController();
     FE_DATA* p;
@@ -203,63 +203,63 @@ static void move(FE_WORK* pTest)
     s16 sh;
 
     if (joy->rep & JOY_RIGHT) {
-        pTest->cursor++;
+        pTest->flag_bit++;
     }
     if (joy->rep & JOY_LEFT) {
-        pTest->cursor--;
+        pTest->flag_bit--;
     }
     if (joy->rep & JOY_UP) {
-        pTest->cursor -= 16;
+        pTest->flag_bit -= 16;
     }
     if (joy->rep & JOY_DOWN) {
-        pTest->cursor += 16;
+        pTest->flag_bit += 16;
     }
     if (joy->rep & 0x20000) {
-        pTest->cursor++;
+        pTest->flag_bit++;
     } else if (joy->rep & 0x10000) {
-        pTest->cursor--;
+        pTest->flag_bit--;
     } else if (joy->rep & 0x80000) {
-        pTest->cursor -= 16;
+        pTest->flag_bit -= 16;
     } else if (joy->rep & 0x40000) {
-        pTest->cursor += 16;
+        pTest->flag_bit += 16;
     }
-    if (pTest->cursor >= fe_data[pTest->page].max) {
-        pTest->cursor -= fe_data[pTest->page].max;
-        pTest->page++;
-        if (pTest->page > 11) {
-            pTest->page = 0;
+    if (pTest->flag_bit >= fe_data[pTest->id].max) {
+        pTest->flag_bit -= fe_data[pTest->id].max;
+        pTest->id++;
+        if (pTest->id > 11) {
+            pTest->id = 0;
         }
     }
-    if (pTest->cursor < 0) {
-        pTest->page--;
-        if (pTest->page < 0) {
-            pTest->page = 11;
+    if (pTest->flag_bit < 0) {
+        pTest->id--;
+        if (pTest->id < 0) {
+            pTest->id = 11;
         }
-        pTest->cursor += fe_data[pTest->page].max;
+        pTest->flag_bit += fe_data[pTest->id].max;
     }
     if (joy->rep & JOY_R) {
-        pTest->cursor = 0;
-        pTest->page++;
-        if (pTest->page > 11) {
-            pTest->page = 0;
+        pTest->flag_bit = 0;
+        pTest->id++;
+        if (pTest->id > 11) {
+            pTest->id = 0;
         }
     }
     if (joy->rep & JOY_L) {
-        pTest->cursor = 0;
-        pTest->page--;
-        if (pTest->page < 0) {
-            pTest->page = 11;
+        pTest->flag_bit = 0;
+        pTest->id--;
+        if (pTest->id < 0) {
+            pTest->id = 11;
         }
     }
-    if (strcmp(fe_data[pTest->page].name, "ROOM_SAVE") == 0) {
+    if (strcmp(fe_data[pTest->id].name, "ROOM_SAVE") == 0) {
         if (RoomData.getRoomSavePtr(G_ROOM_ID) != NULL) {
-            fe_data[pTest->page].addr = (u32*) (RoomData.getRoomSavePtr(G_ROOM_ID) + 4);
+            fe_data[pTest->id].addr = (u32*) (RoomData.getRoomSavePtr(G_ROOM_ID) + 4);
         } else {
-            fe_data[pTest->page].addr = NULL;
+            fe_data[pTest->id].addr = NULL;
         }
     }
-    p = &fe_data[pTest->page];
-    if (fe_data[pTest->page].addr != NULL) {
+    p = &fe_data[pTest->id];
+    if (fe_data[pTest->id].addr != NULL) {
         for (i = 0; i < p->max / 16; i++) {
             w = ((u16*) p->addr)[i];
             a = BtoX(w >> 12);
@@ -269,7 +269,7 @@ static void move(FE_WORK* pTest)
             line = i / 4 + 6;
             eprintf(184, (i + line) * 14, 0, 0, "%04x %04x %04x %04x", a, b, c, d);
         }
-        bit = pTest->cursor;
+        bit = pTest->flag_bit;
         cur = bit;
         {
             // COMPILER-DIFF: #17. The original keeps `cur & 0xF` in scratch r11, untied from x's
@@ -285,7 +285,7 @@ static void move(FE_WORK* pTest)
             int x = (m + (m >> 2) + 23) * 8;
             eprintf(x, y, 2, 0, "%01x", CkBit(p->addr, cur));
         }
-        bit = pTest->cursor;
+        bit = pTest->flag_bit;
         if (joy->trg & JOY_A) {
             sh = bit % 32;
             p->addr[bit / 32] ^= 0x80000000 >> sh;
@@ -298,15 +298,15 @@ static void move(FE_WORK* pTest)
         eprintf(264, 70, 4, 0, "%s", p->bit_name[bit]);
     }
     if (joy->trg & JOY_B) {
-        pTest->mode++;
+        pTest->r_no_0++;
     }
 }
 
 // Editor end: restores Stop_flg, ends the task.
-void die(FE_WORK* p)
+void die(TEST* p)
 {
     DbgFlagOff(pG, DBG_TEST_MODE);
-    pG->Stop_flg = Test.stop_bak;
+    pG->Stop_flg = Test.stopflag;
     TaskSignal(0);
     TaskExit();
 }
