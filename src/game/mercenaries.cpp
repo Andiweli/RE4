@@ -248,7 +248,7 @@ int MercSysMoveStart(MercSysWork* wk)
         switch (st[1]) {
         case 0:
             if (smd != NULL) {
-                MotionSetCore(smd, MOTION(smd), wk->smdMot, 0, 0, 0x200, 0);
+                MotionSetCore(smd, &smd->Motion, wk->smdMot, 0, 0, 0x200, 0);
             }
             st[1]++;
             break;

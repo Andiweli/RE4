@@ -59,7 +59,7 @@ void PartsWorldPosCalc(cModel* pMod)
     Vec d;
 
     p = pMod->pList;
-    PSVECSubtract(&pMod->pos, &MOTION(pMod)->Pos_world, &d);
+    PSVECSubtract(&pMod->pos, &pMod->Motion.Pos_world, &d);
     pMod->mat[0][3] += d.x;
     pMod->mat[1][3] += d.y;
     pMod->mat[2][3] += d.z;
@@ -70,7 +70,7 @@ void PartsWorldPosCalc(cModel* pMod)
             p->mat[1][3] += d.y;
             p->mat[2][3] += d.z;
         }
-        MOTION(pMod)->Pos_world = pMod->pos;
+        pMod->Motion.Pos_world = pMod->pos;
     }
 }
 
@@ -83,14 +83,14 @@ void MotionBlendOff(cModel* pEm)
 // Pauses the motion (Mot_attr bit 3: the sequence frame stops advancing).
 void MotionPause(cModel* pEm)
 {
-    MOTION(pEm)->Mot_attr |= 8;
+    pEm->Motion.Mot_attr |= 8;
 }
 
 // Removes the motion: every parts back to its bind pose (position from the bind matrices, zero
 // rotation, unit scale unless flag bit 0), the attach camera reset, pMot = NULL.
 void MotionClear(cModel* pEm, int flag)
 {
-    MOTION_INFO* w = MOTION(pEm);
+    MOTION_INFO* w = &pEm->Motion;
     cParts* p;
     Mtx tmp;
     Mtx inv;
@@ -125,10 +125,10 @@ void MotionClear(cModel* pEm, int flag)
             memclr_asm(&w->pAttachCam->camera_data[j], sizeof(Vec));
         }
     }
-    MOTION(pEm)->pMot = 0;
+    pEm->Motion.pMot = 0;
 }
 
-// Starts motion `data` on work w (usually MOTION(m)) at `frame` with `hokan` blend frames from the
+// Starts motion `data` on work w (usually &m->Motion) at `frame` with `hokan` blend frames from the
 // current pose. Samples the root at the start and end to get the motion's total displacement
 // (Pos_dist/Ang_dist) for looping.
 void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int flags, int frame)
@@ -423,10 +423,10 @@ u32 MotionMove(cModel* pEm, CAMERA* pCamera)
     f32 inv;
 
     if (pEm->pMotionB != 0) {
-        pEm->pMotionB->Seq_speed = MOTION(pEm)->Seq_speed;
+        pEm->pMotionB->Seq_speed = pEm->Motion.Seq_speed;
     }
-    if (MOTION(pEm)->Mot_attr & 1) {
-        MotionGetSpeed(pEm, MOTION(pEm), 0, &spd, &rot);
+    if (pEm->Motion.Mot_attr & 1) {
+        MotionGetSpeed(pEm, &pEm->Motion, 0, &spd, &rot);
         if (pEm->pMotionB != 0) {
             pEm->pMotionB->Mot_flag |= 0x08000000;
             rate = pEm->pMotionB->Brate;
@@ -447,12 +447,12 @@ u32 MotionMove(cModel* pEm, CAMERA* pCamera)
                 }
             }
         }
-        MotionAddSpeed(pEm, MOTION(pEm), &spd, &rot);
+        MotionAddSpeed(pEm, &pEm->Motion, &spd, &rot);
     }
-    MotionMoveCore(pEm, MOTION(pEm), 0);
-    MotionSequenceCtrl(MOTION(pEm));
+    MotionMoveCore(pEm, &pEm->Motion, 0);
+    MotionSequenceCtrl(&pEm->Motion);
     pEm->partsMatCalc();
-    MOTION(pEm)->Mot_attr &= ~0x2000;
+    pEm->Motion.Mot_attr &= ~0x2000;
     if (pEm->pMotionB != 0) {
         pEm->pMotionB->Mot_flag |= 0x08000000;
         rate = pEm->pMotionB->Brate;
@@ -465,7 +465,7 @@ u32 MotionMove(cModel* pEm, CAMERA* pCamera)
                 MotionSequenceCtrl(pEm->pMotionB);
             }
         } else {
-            MOTION(pEm)->Mot_attr |= 0x2000;
+            pEm->Motion.Mot_attr |= 0x2000;
             for (p = pEm->pList; p != 0; p = p->pList) {
                 if (p->motParts.flags & 0x03000000) {
                     continue;
@@ -526,8 +526,8 @@ u32 MotionMove(cModel* pEm, CAMERA* pCamera)
         MTX_COPY_DOWN(save, pEm->mat);
         pEm->partsWorldCalc();
     }
-    if (MOTION(pEm)->Hokan_cnt != 0) {
-        MotionHokan(pEm, MOTION(pEm));
+    if (pEm->Motion.Hokan_cnt != 0) {
+        MotionHokan(pEm, &pEm->Motion);
         pEm->partsWorldCalc();
     }
     if (pEm->pDblJnt != 0) {
@@ -603,7 +603,7 @@ u32 MotionMove(cModel* pEm, CAMERA* pCamera)
         }
     }
     pEm->ang.y = LIMIT_ANGLE(pEm->ang.y);
-    return MOTION(pEm)->Mot_state;
+    return pEm->Motion.Mot_state;
 }
 
 // Advances a secondary motion (no root speed): pose, sequence, hokan. Returns its Mot_state.
@@ -813,7 +813,7 @@ void MotionHokan(cModel* m, MOTION_INFO* w)
     t /= (f32) w->Hokan_frame;
     u = 1.0f - t;
     for (p = m->pList; p != 0; p = p->pList) {
-        if (!(MOTION(m)->Mot_attr & 0x2000)) {
+        if (!(m->Motion.Mot_attr & 0x2000)) {
             if (!(p->motParts.flags & 0x10000000)) {
                 continue;
             }
@@ -1039,7 +1039,7 @@ void MotionAddSpeed(cModel* pEm, MOTION_INFO* w, Vec* Pos_move, Vec* Ang_move)
 // Root position/rotation keys at the previous sequence frame (Seq_old), without touching the state.
 void MotionGetPosition(cModel* pEm, Vec* pPos, Vec* pAng)
 {
-    MOTION_INFO* w = MOTION(pEm);
+    MOTION_INFO* w = &pEm->Motion;
     HERMITE_SET prm;
     HERMITE_SET* pp;
     int flip;
@@ -1224,7 +1224,7 @@ int MotionCheckCrossFrame(MOTION_INFO* w, f32 frame)
 // Mot_state of the model's motion, -1 when none is set.
 int MotionGetState(cModel* m)
 {
-    MOTION_INFO* w = MOTION(m);
+    MOTION_INFO* w = &m->Motion;
 
     if (w->pMot == 0) {
         return -1;
@@ -1572,7 +1572,7 @@ void MotionSpeedDispHeader(int x, int y, int who)
 // Debug (dead-stripped): prints the model's motion frame/speed values.
 void MotionSpeedDisp(cModel* m, int x, int y)
 {
-    MOTION_INFO* w = MOTION(m);
+    MOTION_INFO* w = &m->Motion;
 
     eprintf(x, y, 0, 0, "%s", (char*) w->pMot);
     lbl_80314C44.x = lbl_80314C44.x * 0.01f + w->Pos_move_old.x * 10.0f * 0.5f;

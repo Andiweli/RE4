@@ -3242,8 +3242,8 @@ address	size	section	unit	scope	name	demangled
 0x800D7294	0x158	.text	game/cDataSwap.cpp	global	SwapOut__9cDataSwapUlUlUl	cDataSwap::SwapOut
 0x800D73EC	0xA4	.text	game/cDataSwap.cpp	global	SwapIn__9cDataSwap	cDataSwap::SwapIn
 0x800D7490	0x14	.text	game/cMotBase.cpp	global	__8cMotBase	cMotBase::cMotBase
-0x800D74A4	0x7C	.text	game/cMotBase.cpp	global	set__8cMotBaseP9cMotModelP10MotionDataP3VecT3Uc	cMotBase::set
-0x800D7520	0x50	.text	game/cMotBase.cpp	global	set__8cMotBaseP9cMotModelP3VecT2Uc	cMotBase::set
+0x800D74A4	0x7C	.text	game/cMotBase.cpp	global	set__8cMotBaseP6cModelP10MotionDataP3VecT3Uc	cMotBase::set
+0x800D7520	0x50	.text	game/cMotBase.cpp	global	set__8cMotBaseP6cModelP3VecT2Uc	cMotBase::set
 0x800D7570	0x74	.text	game/cMotBase.cpp	global	adjust__8cMotBase	cMotBase::adjust
 0x800D75E4	0x20C	.text	game/cMotBase.cpp	global	move__8cMotBase	cMotBase::move
 0x800D77F0	0x28	.text	game/cockpit.cpp	global	gameInit__7Cockpit	Cockpit::gameInit

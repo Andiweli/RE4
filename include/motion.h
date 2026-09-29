@@ -10,15 +10,7 @@
 
 // MotionSeqKey / MotionData / MOTION_INFO are defined in model.h (cModel::Motion at 0x1D8).
 
-// The motion-driven model view (cMotBase::set(cMotModel*), MOTION(m)): cModel carries the work
-// itself now, so this adds nothing.
-class cMotModel : public cModel {
-public:
-};
-
 // MotionParts (cParts::motParts, 0x174) is defined in model.h.
-
-#define MOTION(m) (&((cMotModel*)(m))->Motion)
 
 // HermiteInterpolation parameter block.
 struct _HERMITE_SET {

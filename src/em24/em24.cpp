@@ -223,12 +223,12 @@ static void em24_R0_Init(cEm24* em)
     w->slopeRot.z = 0.0f;
     switch (em->set) {
     default:
-        MotionSetCore(em, MOTION(em), ARC(EM24_MOT_00F), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM24_MOT_00F), 0, 0, 5, 0);
         MotionMove(em, 0);
         em->setRno(1, two, 0, 0);
         break;
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM24_MOT_00F), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM24_MOT_00F), 0, 0, 5, 0);
         MotionMove(em, 0);
         em->setRno(1, 0, 0, 0);
         break;
@@ -252,7 +252,7 @@ static void em24_R1_BoxWait(cEm24* em)
     w->Be_flg |= 4;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM24_MOT_BOX_WAIT_017), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM24_MOT_BOX_WAIT_017), 0, 0, 5, 0);
         em->atari.off();
         w->Timer = 45;
         em->r_no_2++;
@@ -270,7 +270,7 @@ static void em24_R1_BoxWait(cEm24* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM24_MOT_BOX_WAIT_011), ARC(EM24_SEQ_BOX_WAIT), 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM24_MOT_BOX_WAIT_011), ARC(EM24_SEQ_BOX_WAIT), 3, 1, 0);
         w->spd.x = 0.0f;
         w->spd.y = -100.0f;
         w->spd.z = 200.0f;
@@ -324,7 +324,7 @@ static void em24_R1_CoilWait(cEm24* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM24_MOT_00F), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM24_MOT_00F), 0, 0, 5, 0);
         em->r_no_2++;
     case 1:
         MotionMove(em, 0);
@@ -333,7 +333,7 @@ static void em24_R1_CoilWait(cEm24* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM24_MOT_012), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM24_MOT_012), 0, 0, 1, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {
@@ -352,9 +352,9 @@ static void em24_R1_Free(cEm24* em)
     switch (em->r_no_2) {
     case 0:
         if (Rnd() & 1) {
-            MotionSetCore(em, MOTION(em), ARC(EM24_MOT_FREE_007), 0, 3, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM24_MOT_FREE_007), 0, 3, 5, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM24_MOT_FREE_008), 0, 3, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM24_MOT_FREE_008), 0, 3, 5, 0);
         }
         w->motEnd = Rnd() % 3;
         w->Target_dir = GetXZAngle(&pPL->pos, &em->pos);
@@ -382,9 +382,9 @@ static void em24_R1_Free(cEm24* em)
         break;
     case 2:
         if (Rnd() & 1) {
-            MotionSetCore(em, MOTION(em), ARC(EM24_MOT_FREE_009), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM24_MOT_FREE_009), 0, 3, 1, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM24_MOT_FREE_00A), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM24_MOT_FREE_00A), 0, 3, 1, 0);
         }
         em->r_no_2++;
     case 3:
@@ -403,7 +403,7 @@ static void em24_R1_Coil(cEm24* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM24_MOT_COIL), 0, 3, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM24_MOT_COIL), 0, 3, 5, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -411,7 +411,7 @@ static void em24_R1_Coil(cEm24* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM24_MOT_00F), 0, 3, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM24_MOT_00F), 0, 3, 5, 0);
         w->Timer = Rnd() % 90 + 90;
         em->r_no_2++;
     case 3:
@@ -425,7 +425,7 @@ static void em24_R1_Coil(cEm24* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM24_MOT_012), 0, 3, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM24_MOT_012), 0, 3, 5, 0);
         em->r_no_2++;
     case 5:
         em->ang.y += Muku(&em->pos, &pPL->pos, em->ang.y, PI / 64.0f);
@@ -459,10 +459,10 @@ static void em24_R0_Die(cEm24* em)
             em->r_no_3 = 0;
         }
         if (em->r_no_3) {
-            MotionSetCore(em, MOTION(em), ARC(EM24_MOT_DIE_015), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM24_MOT_DIE_015), 0, 3, 1, 0);
             EstSet(em, -1, 0, 0, EFF_EM24, 7, 0, ESP_CORE_KIND_NONE, em, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM24_MOT_DIE_013), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM24_MOT_DIE_013), 0, 3, 1, 0);
         }
         EmSetDie(em);
         em->r_no_1++;

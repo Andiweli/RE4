@@ -308,9 +308,9 @@ static void em26_R0_Init(cEm26* em)
     em->setStatus(EM_STATUS_ACTIVE);
     em->setRno(1, 0, 0, 0);
     if (w->flags & 0x10) {
-        MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 0x41, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM26_MOT_008), 0, 0, 0x41, 0);
     } else {
-        MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM26_MOT_008), 0, 0, 1, 0);
     }
     MotionMove(em, 0);
     em26_R0_Move(em);
@@ -332,9 +332,9 @@ static void em26_R1_Wait(cEm26* em)
     switch (em->r_no_2) {
     case 0:
         if (w->flags & 0x10) {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 0x45, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_008), 0, 0, 0x45, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_008), 0, 0, 5, 0);
         }
         em->r_no_2++;
     case 1:
@@ -346,9 +346,9 @@ static void em26_R1_Wait(cEm26* em)
         break;
     case 2:
         if (w->flags & 0x10) {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_WAIT), 0, 0, 0x41, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_WAIT), 0, 0, 0x41, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_WAIT), 0, 0, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_WAIT), 0, 0, 1, 0);
         }
         SndStop(w->sndId, 0);
         w->sndId = SndCall(8, 4, &em->pos, em->id, 0, em);
@@ -391,9 +391,9 @@ static void em26_R1_Atk(cEm26* em)
             mode = 0x41;
         }
         if (ang < 0.0f) {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_ATK_00E), ARC(EM26_SEQ_ATK_016), 0, mode, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_ATK_00E), ARC(EM26_SEQ_ATK_016), 0, mode, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_ATK_00F), ARC(EM26_SEQ_ATK_017), 0, mode, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_ATK_00F), ARC(EM26_SEQ_ATK_017), 0, mode, 0);
         }
         w->atkHit = 0;
         em->r_no_2++;
@@ -448,17 +448,17 @@ static void em26_R1_Dm_Small(cEm26* em)
         switch ((u32) kind) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_00A), 0, 0, mode, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DM_SMALL_00A), 0, 0, mode, 0);
             break;
         case 1:
             if (Rnd() & 1) {
-                MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_00B), 0, 0, mode, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DM_SMALL_00B), 0, 0, mode, 0);
             } else {
-                MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_010), 0, 0, mode, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DM_SMALL_010), 0, 0, mode, 0);
             }
             break;
         case 2:
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_00C), 0, 0, mode, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DM_SMALL_00C), 0, 0, mode, 0);
             break;
         }
         em->r_no_2++;
@@ -517,7 +517,7 @@ static void em26_R1_Die_Normal(cEm26* em)
         if (w->flags & 0x10) {
             mode = 0x41;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DIE_NORMAL), seq, 0, mode, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DIE_NORMAL), seq, 0, mode, 0);
         em->atari.m_flag &= ~0x200;
         SndStop(w->sndId, 0);
         w->sndId = SndCall(8, 8, &em->pos, em->id, 0, em);

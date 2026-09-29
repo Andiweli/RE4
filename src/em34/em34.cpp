@@ -311,14 +311,14 @@ static void em34_R0_Init(cEm34* em)
     switch (em->type) {
     case 0:
     default:
-        MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM34_MOT_011), 0, 0, 5, 0);
         break;
     case 1:
-        MotionSetCore(em, MOTION(em), ARC(EM34_MOT_014), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM34_MOT_014), 0, 0, 5, 0);
         break;
     case 2:
     case 3:
-        MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM34_MOT_017), 0, 0, 5, 0);
         break;
     }
     MotionMove(em, 0);
@@ -343,14 +343,14 @@ static void em34_R1_Wait(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_011), 0, 30, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_014), 0, 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_014), 0, 30, 5, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_017), 0, 30, 5, 0);
             break;
         }
         em->r_no_2++;
@@ -375,14 +375,14 @@ static void em34_R1_Walk(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_WALK_012), 0, 10, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_WALK_012), 0, 10, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_WALK_013), 0, 10, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_WALK_013), 0, 10, 5, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_WALK_018), 0, 10, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_WALK_018), 0, 10, 5, 0);
             break;
         }
         em->r_no_2++;
@@ -416,14 +416,14 @@ static void em34_R1_Atk(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 10, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_011), 0, 10, 5, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 10, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_017), 0, 10, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_ATK), ARC(EM34_SEQ_ATK), 10, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_ATK), ARC(EM34_SEQ_ATK), 10, 1, 0);
             break;
         }
         w->Atk_ck = 0;
@@ -460,14 +460,14 @@ static void em34_R1_Dm_Normal(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_011), 0, 3, 1, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_014), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_014), 0, 3, 1, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 0, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_017), 0, 0, 1, 0);
             break;
         }
         em->r_no_2++;
@@ -500,14 +500,14 @@ static void em34_R1_Die_Normal(cEm34* em)
         switch (em->type) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_011), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_011), 0, 3, 1, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_014), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_014), 0, 3, 1, 0);
             break;
         case 2:
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(EM34_MOT_017), 0, 0, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM34_MOT_017), 0, 0, 1, 0);
             break;
         }
         em->r_no_2++;

@@ -398,7 +398,7 @@ static void em29_R0_Init(cEm29* em)
         break;
     }
     em->ang.y = fRand1_1() * PI;
-    MotionSetCore(em, MOTION(em), ARC(EM29_MOT_007), 0, 0, 1, 0);
+    MotionSetCore(em, &em->Motion, ARC(EM29_MOT_007), 0, 0, 1, 0);
     MotionMove(em, 0);
     em29_R0_Move(em);
 }
@@ -419,7 +419,7 @@ static void em29_R1_WaitLand(cEm29* em)
     w->flags |= 0x20;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_007), 0, 0, 5, Rnd() % 20);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_007), 0, 0, 5, Rnd() % 20);
         w->timer = Rnd() % 30;
         em->r_no_2++;
     case 1:
@@ -433,7 +433,7 @@ static void em29_R1_WaitLand(cEm29* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_WAIT_LAND), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_WAIT_LAND), 0, 0, 5, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {
@@ -442,7 +442,7 @@ static void em29_R1_WaitLand(cEm29* em)
         break;
     case 4:
         em->pos.y += 400.0f;
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_00C), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_00C), 0, 0, 5, 0);
         MotionMove(em, 0);
         w->atkTimer = 180;
         em->setRno(1, 2, 0, 0);
@@ -465,7 +465,7 @@ static void em29_R1_WaitCeiling(cEm29* em)
     w->flags |= 0x40;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_WAIT_CEILING_008), 0, 0, 5, Rnd() % 20);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_WAIT_CEILING_008), 0, 0, 5, Rnd() % 20);
         w->timer = Rnd() % 30;
         em->r_no_2++;
     case 1:
@@ -479,7 +479,7 @@ static void em29_R1_WaitCeiling(cEm29* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_WAIT_CEILING_009), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_WAIT_CEILING_009), 0, 0, 5, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {
@@ -506,9 +506,9 @@ static void em29_R1_Walk(cEm29* em)
     switch (em->r_no_2) {
     case 0:
         if (Rnd() & 1) {
-            MotionSetCore(em, MOTION(em), ARC(EM29_MOT_WALK), 0, 0, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM29_MOT_WALK), 0, 0, 5, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM29_MOT_00C), 0, 0, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM29_MOT_00C), 0, 0, 5, 0);
         }
         w->tgtSpd.x = 0.0f;
         w->tgtSpd.y = fRand1_1() * 100.0f;
@@ -558,7 +558,7 @@ static void em29_R1_Turn(cEm29* em)
         } else {
             mot = ARC(EM29_MOT_TURN_00D);
         }
-        MotionSetCore(em, MOTION(em), mot, 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, mot, 0, 0, 1, 0);
         w->tgtSpd.x = 0.0f;
         w->tgtSpd.y = fRand1_1() * 100.0f;
         if (em->pos.y < SatMgr.getFloor(&em->pos, 0, 600.0f, 100000.0f, 0) + 500.0f) {
@@ -588,7 +588,7 @@ static void em29_R1_AtkDash(cEm29* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_ATK_DASH_012), ARC(EM29_SEQ_ATK_DASH), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_ATK_DASH_012), ARC(EM29_SEQ_ATK_DASH), 5, 1, 0);
         w->escTimer = 0;
         w->atkHit = 0;
         w->tgtSpd.x = 0.0f;
@@ -610,7 +610,7 @@ static void em29_R1_AtkDash(cEm29* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_ATK_DASH_013), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_ATK_DASH_013), 0, 0, 1, 0);
         w->escTimer = 0;
         w->atkHit = 0;
         w->tgtSpd.x = 0.0f;
@@ -637,7 +637,7 @@ static void em29_R1_AtkRush(cEm29* em)
     w->flags |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_00C), 0, 2, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_00C), 0, 2, 5, 0);
         w->tgtSpd.x = 0.0f;
         w->tgtSpd.z = fRand1_1() * 25.0f + 150.0f;
         w->tgtSpd.y = fRand1_1() * 100.0f;
@@ -667,7 +667,7 @@ static void em29_R1_AtkRush(cEm29* em)
         break;
     }
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_ATK_RUSH), 0, 2, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_ATK_RUSH), 0, 2, 5, 0);
         w->tgtSpd.x = 0.0f;
         w->tgtSpd.z = 0.0f;
         w->tgtSpd.y = fRand1_1() * 3.0f;
@@ -740,7 +740,7 @@ static void em29_R1_Dm_Air(cEm29* em)
         if (em->r_no_3) {
             flag = 0x41;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_DM_AIR), 0, 3, flag, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_DM_AIR), 0, 3, flag, 0);
         w->grav = fRand0_1() * 10.0f + 3.0f;
         w->spd.x = 0.0f;
         w->spd.y = 0.0f;
@@ -765,7 +765,7 @@ static void em29_R1_Dm_Air(cEm29* em)
         if (em->r_no_3) {
             flag = 0x41;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_016), 0, 3, flag, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_016), 0, 3, flag, 0);
         w->dmRot = fRand0_1() * 0.31415927f + 0.31415927f;
         if (Rnd() & 1) {
             w->dmRot = -w->dmRot;
@@ -792,7 +792,7 @@ static void em29_R1_Dm_Air(cEm29* em)
         if (em->r_no_3) {
             flag = 0x41;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_017), 0, 3, flag, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_017), 0, 3, flag, 0);
         if (em->be_flag & 2) {
             SndCall(8, 0xF, &em->pos, em->id, 0, em);
         }
@@ -827,7 +827,7 @@ static void em29_R1_Dm_Ceiling(cEm29* em)
         if (em->r_no_3) {
             flag = 0x41;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_016), 0, 3, flag, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_016), 0, 3, flag, 0);
         w->grav = fRand0_1() * 10.0f + 3.0f;
         w->dmRot = fRand0_1() * 0.31415927f + 0.31415927f;
         if (Rnd() & 1) {
@@ -855,7 +855,7 @@ static void em29_R1_Dm_Ceiling(cEm29* em)
         if (em->r_no_3) {
             flag = 0x41;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_017), 0, 3, flag, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_017), 0, 3, flag, 0);
         if (em->be_flag & 2) {
             SndCall(8, 0xF, &em->pos, em->id, 0, em);
         }
@@ -877,7 +877,7 @@ static void em29_R1_Dm_Land(cEm29* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_DM_LAND), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_DM_LAND), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -896,7 +896,7 @@ static void em29_R1_Dm_Recovery(cEm29* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_DM_RECOVERY), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_DM_RECOVERY), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -958,7 +958,7 @@ static void em29_R1_Die_Reset(cEm29* em)
         em->ang = w->initRot;
         em->pos_old = em->pos;
         em->Motion.Mot_flag &= ~0x40000000;
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_00C), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_00C), 0, 0, 1, 0);
         MotionMove(em, 0);
         PartsWorldPosCalc(em);
         for (p = em->pList; p; p = p->pList) {
@@ -994,7 +994,7 @@ static void em29_R1_Die_FadeOut(cEm29* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM29_MOT_00C), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM29_MOT_00C), 0, 0, 5, 0);
         w->tgtSpd.z = fRand1_1() * 25.0f + 75.0f;
         w->tgtSpd.x = 0.0f;
         w->tgtSpd.y = fRand1_1() * 100.0f;
@@ -1286,7 +1286,7 @@ static void plem29_BatRush(cPlayer* pl)
     pl->subArc = pPL->pEmCatch->subArc;
     switch (pl->r_no_2) {
     case 0:
-        MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM29_MOT_PL_BAT_RUSH), 0, 3, 5, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM29_MOT_PL_BAT_RUSH), 0, 3, 5, 0);
         PlSetDamageSe(0);
         pl->r_no_2++;
     case 1:

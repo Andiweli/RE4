@@ -843,7 +843,7 @@ static void door5_close()
                 RoomSeCall(0x13, &pPL->pos, 0, 0, 0);                                                              \
             }                                                                                                      \
             ActBtn.set(ACT_JUMP_MOVE, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, 0);                                                                 \
-            mf = (u32) MotionGetCurrentFrame(MOTION(pPL));                                                         \
+            mf = (u32) MotionGetCurrentFrame(&pPL->Motion);                                                         \
             eprintf(0x140, 0x15E, 0, 0, "%d", mf);                                                                 \
             if (mf - 5 > 0x41) {                                                                                   \
                 eprintf(0x20, 0x15E, 0, 0, "OK");                                                                  \

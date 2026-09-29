@@ -13,7 +13,7 @@ cMotBase::cMotBase()
 }
 
 // Starts following: model, start pose p / r (also the "old" pose), blend over `c` frames.
-void cMotBase::set(cMotModel* m, MotionData* data, Vec* p, Vec* r, u8 c)
+void cMotBase::set(cModel* m, MotionData* data, Vec* p, Vec* r, u8 c)
 {
     pMod = m;
     pos_old = *p;
@@ -25,7 +25,7 @@ void cMotBase::set(cMotModel* m, MotionData* data, Vec* p, Vec* r, u8 c)
 
 // Same with the model's current motion; clears Mot_attr bit0 (the motion does not move the
 // model itself while the base drives it).
-void cMotBase::set(cMotModel* pMod0, Vec* pos0, Vec* ang0, u8 hokan0)
+void cMotBase::set(cModel* pMod0, Vec* pos0, Vec* ang0, u8 hokan0)
 {
     set(pMod0, pMod0->Motion.pMot, pos0, ang0, hokan0);
     pMod0->Motion.Mot_attr &= ~1;

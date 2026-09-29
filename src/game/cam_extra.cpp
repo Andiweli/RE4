@@ -49,7 +49,7 @@ CameraAttachedToMotion::~CameraAttachedToMotion()
 // from the model's frame into the world; rebuilds the orientation with roll.
 void CameraAttachedToMotion::move()
 {
-    ATTACH_CAMERA* ac = MOTION(m_pModel)->pAttachCam;
+    ATTACH_CAMERA* ac = m_pModel->Motion.pAttachCam;
     Vec hit;
     Vec nrm;
     Vec pos;
@@ -76,7 +76,7 @@ void CameraAttachedToMotion::move()
     if (ac->parts[3] != 0xFF) {
         param.Fovy = ac->camera_data[3].y * 180.0f / PI;
     }
-    if (!(MOTION(m_pModel)->Mot_attr & 0x200)) {
+    if (!(m_pModel->Motion.Mot_attr & 0x200)) {
         PSMTXInverse(m_pModel->mat, inv);
         PSMTXMultVec(inv, &param.Campos, &pos);
         PSMTXMultVec(inv, &param.Target, &at);

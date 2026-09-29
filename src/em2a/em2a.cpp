@@ -367,7 +367,7 @@ static void em2a_R1_Trap1Set(cEm2a* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_TRAP1_SET), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_TRAP1_SET), 0, 0, 5, 0);
         em->r_no_2++;
     case 1:
         MotionMove(em, 0);
@@ -385,7 +385,7 @@ static void em2a_R1_Trap1Bite(cEm2a* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_00B), ARC(EM2A_SEQ_TRAP1_BITE), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_00B), ARC(EM2A_SEQ_TRAP1_BITE), 5, 1, 0);
         SndCall(8, 0, &em->pos, em->id, 0, em);
         SndCall(1, 0x39, &pPL->pos, 0, 0, pPL);
         EmCatchPLSet(em, 0.0f, 0, 34.69f, 0.0f, 250.42f, plem2a_Trap1Bite);
@@ -414,7 +414,7 @@ static void em2a_R1_Trap1Bite(cEm2a* em)
         if ((em->Motion.Seq_old.Free & 4) && pPL->dmg.isDamage()) {
             u16 frame = (*(u16*) ARC(EM2A_MOT_00B) & 0x3FFF) - 1;
 
-            MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_00B), 0, 0, 1, frame);
+            MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_00B), 0, 0, 1, frame);
             MotionMove(em, 0);
             em->hp = 0;
             em->r_no_2++;
@@ -431,7 +431,7 @@ static void plem2a_Trap1Bite(cPlayer* pl)
     pl->subArc = pPL->pEmCatch->subArc;
     switch (pl->r_no_2) {
     case 0:
-        MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM2A_MOT_PL_TRAP1_BITE), EM_ARC(pl, EM2A_SEQ_PL_TRAP1_BITE), 5, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM2A_MOT_PL_TRAP1_BITE), EM_ARC(pl, EM2A_SEQ_PL_TRAP1_BITE), 5, 1, 0);
         PlSetFace(1);
         EstSet(pl, -1, 0, 0, EFF_EM2A, 1, 0, ESP_CORE_KIND_NONE, pl, 0);
         LifeDownSet2(pPL, 300, 0, 1);
@@ -457,7 +457,7 @@ static void em2a_R1_Trap1BiteSub(cEm2a* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_TRAP1_BITE_SUB_016), 0, 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_TRAP1_BITE_SUB_016), 0, 5, 5, 0);
         SubCharSetFace(1);
         SndCall(8, 0, &em->pos, em->id, 0, em);
         EmCatchSubSet(em, pSUB, PI / 2.0f, 0, 409.6f, 0.0f, -12.87f, subem2a_Trap1Bite);
@@ -479,14 +479,14 @@ static void em2a_R1_Trap1BiteSub(cEm2a* em)
         em->Catch_at_adj = em->pos;
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_TRAP1_BITE_SUB_017), 0, 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_TRAP1_BITE_SUB_017), 0, 5, 5, 0);
         em->r_no_2++;
     case 3:
         MotionMove(em, 0);
         if (pSUB->dmg.isDamage()) {
             u16 frame = (*(u16*) ARC(EM2A_MOT_00B) & 0x3FFF) - 1;
 
-            MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_00B), 0, 0, 1, frame);
+            MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_00B), 0, 0, 1, frame);
             MotionMove(em, 0);
             em->hp = 0;
         } else {
@@ -494,7 +494,7 @@ static void em2a_R1_Trap1BiteSub(cEm2a* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_TRAP1_BITE_SUB_018), ARC(EM2A_SEQ_TRAP1_BITE_SUB), 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_TRAP1_BITE_SUB_018), ARC(EM2A_SEQ_TRAP1_BITE_SUB), 5, 1, 0);
         em->r_no_2++;
     case 5:
         MotionMove(em, 0);
@@ -512,7 +512,7 @@ static void subem2a_Trap1Bite(cSubChar* sub_)
     StaFlagOn(pG, STA_SUB_CATCHED);
     switch (sub->r_no_2) {
     case 0:
-        MotionSetCore(sub, MOTION(sub), EM_ARC(sub, EM2A_MOT_SUB_TRAP1_BITE_01A), 0, 5, 5, 0);
+        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, EM2A_MOT_SUB_TRAP1_BITE_01A), 0, 5, 5, 0);
         EstSet(sub, -1, 0, 0, EFF_EM2A, 7, 0, ESP_CORE_KIND_NONE, sub, 0);
         LifeDownSet2(pSUB, 300, 0, 1);
         sub->dmg.set(0, 2);
@@ -527,7 +527,7 @@ static void subem2a_Trap1Bite(cSubChar* sub_)
         }
         break;
     case 2:
-        MotionSetCore(sub, MOTION(sub), EM_ARC(sub, EM2A_MOT_SUB_TRAP1_BITE_01B), 0, 5, 5, 0);
+        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, EM2A_MOT_SUB_TRAP1_BITE_01B), 0, 5, 5, 0);
         sub->m_Work0 = 0;
         sub->r_no_2++;
     case 3:
@@ -544,7 +544,7 @@ static void subem2a_Trap1Bite(cSubChar* sub_)
         }
         break;
     case 4:
-        MotionSetCore(sub, MOTION(sub), EM_ARC(sub, EM2A_MOT_SUB_TRAP1_BITE_01C), 0, 5, 1, 0);
+        MotionSetCore(sub, &sub->Motion, EM_ARC(sub, EM2A_MOT_SUB_TRAP1_BITE_01C), 0, 5, 1, 0);
         EstSet(sub, -1, 0, 0, EFF_EM2A, 8, 0, ESP_CORE_KIND_NONE, sub, 0);
         sub->r_no_2++;
     case 5:
@@ -594,7 +594,7 @@ static void plemResuceAshley(cPlayer* pl)
         v.y = 0.0f;
         v.z = -685.31f;
         PSMTXMultVec(m, &v, &pl->pos);
-        MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM2A_MOT_PL_EM_RESUCE_ASHLEY), 0, 3, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM2A_MOT_PL_EM_RESUCE_ASHLEY), 0, 3, 1, 0);
         pl->r_no_2++;
     case 1:
         if (MotionMove(pl, 0)) {
@@ -653,9 +653,9 @@ static void em2a_R1_Trap1Break(cEm2a* em)
     switch (em->r_no_2) {
     case 0:
         if (em->r_no_3) {
-            MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_TRAP1_BREAK), ARC(EM2A_SEQ_TRAP1_BREAK_00F), 0, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_TRAP1_BREAK), ARC(EM2A_SEQ_TRAP1_BREAK_00F), 0, 1, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_TRAP1_BREAK), ARC(EM2A_SEQ_TRAP1_BREAK_00E), 0, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_TRAP1_BREAK), ARC(EM2A_SEQ_TRAP1_BREAK_00E), 0, 1, 0);
             SndCall(8, 0, &em->pos, em->id, 0, em);
             EstSet(em, -1, 0, 0, EFF_EM2A, 2, 0, ESP_CORE_KIND_NONE, em, 0);
         }
@@ -676,7 +676,7 @@ static void em2a_R1_Trap1Reset(cEm2a* em)
     switch (em->r_no_2) {
     case 0:
         (&pG->Em_list[em->emset_no])->set = 0;
-        MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_TRAP1_RESET), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_TRAP1_RESET), 0, 0, 1, 0);
         SndCall(8, 0, &em->pos, em->id, 0, em);
         em->r_no_2++;
     case 1:
@@ -699,7 +699,7 @@ static void em2a_R1_Trap1R100(cEm2a* em)
     case 0:
         em->r_no_2++;
     case 1:
-        MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_TRAP1_R100), ARC(EM2A_SEQ_TRAP1_R100), 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_TRAP1_R100), ARC(EM2A_SEQ_TRAP1_R100), 0, 1, 0);
         MotionMove(em, 0);
         if (em->flag & 1) {
             em->r_no_2++;
@@ -708,7 +708,7 @@ static void em2a_R1_Trap1R100(cEm2a* em)
     case 2:
         (&pG->Em_list[em->emset_no])->set = 0;
         em->hp = 0;
-        MotionSetCore(em, MOTION(em), ARC(EM2A_MOT_TRAP1_R100), ARC(EM2A_SEQ_TRAP1_R100), 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2A_MOT_TRAP1_R100), ARC(EM2A_SEQ_TRAP1_R100), 0, 1, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {

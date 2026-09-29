@@ -760,7 +760,7 @@ void subobjLadderClimb(cEm* pl)
         rot.x = rot.z = 0.0f;
         rot.y = obj->ang.y + PI;
         rot.y = LIMIT_ANGLE(rot.y);
-        ((cSubChar*) em)->m_MotBase.set((cMotModel*) em, &p, &rot, 10);
+        ((cSubChar*) em)->m_MotBase.set(em, &p, &rot, 10);
         MotionSetCore(em, &em->Motion, w->mot_tbl[16], 0, 5, 1, 0);
         em->atari.m_flag &= ~0x100;
         em->atari.m_flag |= 0x10;

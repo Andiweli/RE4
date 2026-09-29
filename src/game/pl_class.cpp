@@ -513,9 +513,9 @@ void jumpFallOn()
 void cPlayer::motionSet(void* m0, void* seq0, void* m1, void* seq1, int hokan, int frame)
 {
     if (dmMotCk()) {
-        MotionSetCore(this, MOTION(this), m0, seq0, hokan, 5, frame);
+        MotionSetCore(this, &this->Motion, m0, seq0, hokan, 5, frame);
     } else {
-        MotionSetCore(this, MOTION(this), m1, seq1, hokan, 5, frame);
+        MotionSetCore(this, &this->Motion, m1, seq1, hokan, 5, frame);
     }
 }
 
@@ -1097,7 +1097,7 @@ void cPlayer::interrupt()
     stat.on(F_SHADOW);
     m_BbtnCnt = 0;
     Neck->m_Mode = 1;
-    MOTION(this)->Seq_speed = 1.0f;
+    this->Motion.Seq_speed = 1.0f;
     stat.off(F_CROUCH);
     ang.y += pList->ang.y;
     pList->ang.y = 0.0f;
@@ -1259,9 +1259,9 @@ void cPlayer::setSlow(f32 speed)
     if (pG->pl_type != 0) {
         return;
     }
-    MOTION(this)->Seq_speed = speed;
+    this->Motion.Seq_speed = speed;
     if (Wep->m_pWep) {
-        MOTION(Wep->m_pWep)->Seq_speed = speed;
+        Wep->m_pWep->Motion.Seq_speed = speed;
     }
 }
 
@@ -1703,7 +1703,7 @@ void cMot3::set(cModel* m, void* m0, void* m1, void* m2, void* seq, u8 b, int c,
     mot1 = m1;
     mot2 = m2;
     m_Mode = c;
-    MotionSetCore(m, MOTION(m), m0, seq, mode, d, e);
+    MotionSetCore(m, &m->Motion, m0, seq, mode, d, e);
     set0(m1, e, mode);
     ((cEm*) m)->pMotionB->Brate = 0.0f;
 }

@@ -485,14 +485,14 @@ static void em3b_R1_Truck_Wait(cEm3b* em)
     switch (st) {
     case 0:
         em3bPosReset(em);
-        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00A), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_00A), 0, 0, 1, 0);
         MotionMove(em, 0);
         w->timer = 10;
         em->r_no_2++;
         break;
     case 1:
         em3bPosReset(em);
-        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_007), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_007), 0, 0, 1, 0);
         MotionMove(em, 0);
         if (w->timer) {
             w->timer--;
@@ -516,7 +516,7 @@ static void em3b_R1_Truck_Run(cEm3b* em)
     switch (em->r_no_2) {
     case 0:
         em3bPosReset(em);
-        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00A), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_00A), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -525,7 +525,7 @@ static void em3b_R1_Truck_Run(cEm3b* em)
         break;
     case 2:
         em3bPosReset(em);
-        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_007), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_007), 0, 3, 1, 0);
         w->timer = 450;
         w->seTimer = 30;
         EstSet(em, -1, 0, 0, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, em, 0);
@@ -602,11 +602,11 @@ static void em3b_R1_Truck_RunInto(cEm3b* em)
         int dir = em->r_no_3;
 
         if (dir) {
-            MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_TRUCK_RUN_INTO_009), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_TRUCK_RUN_INTO_009), 0, 3, 1, 0);
             EstSet(em, -1, 0, 0, EFF_ROOM, 0x26, 0, ESP_CORE_KIND_NONE, em, 0);
             w->timer = 60;
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_TRUCK_RUN_INTO_008), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_TRUCK_RUN_INTO_008), 0, 3, 1, 0);
             EstSet(em, -1, 0, 0, EFF_ROOM, 0x25, 0, ESP_CORE_KIND_NONE, em, 0);
             w->timer = 120;
         }
@@ -662,7 +662,7 @@ static void em3b_R1_Truck_RunInto(cEm3b* em)
 // Cart r_no_1 == 3: waits at the first frame of the track motion 0xD (the room switches it to run).
 static void em3b_R1_Cart_Wait(cEm3b* em)
 {
-    MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00D), 0, 0, 0, 0);
+    MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_00D), 0, 0, 0, 0);
     MotionMove(em, 0);
 }
 
@@ -676,7 +676,7 @@ static void em3b_R1_Cart_Run(cEm3b* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00D), 0, 3, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_00D), 0, 3, 5, 0);
         w->timer = 80;
         em->r_no_2++;
     case 1:
@@ -714,7 +714,7 @@ static void em3b_R1_Cart_Damage(cEm3b* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00E), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_00E), 0, 3, 1, 0);
         w->sndId2 = SndCall(6, 9, &em->pos, 0, 0, em);
         EmSetDie(em);
         em->clearStatus(EM_STATUS_ACTIVE);
@@ -739,7 +739,7 @@ static void em3b_R1_StopCart_Damage(cEm3b* em)
     case 0:
         EstSet(em, -1, 0, 0, EFF_OBM34, 3, 0, w->espKind, em, 0);
         w->dmgWait = 150;
-        MotionSetCore(em, MOTION(em), ARC(EM3B_MOT_00E), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM3B_MOT_00E), 0, 3, 1, 0);
         w->timer = 1;
         EmSetDie(em);
         em->r_no_2++;
@@ -918,7 +918,7 @@ static void subem3bRunDown()
     sub->subArc = arc;
     switch (st) {
     case 0:
-        MotionSetCore(sub, MOTION(sub), PL_ARC_PTR(arc, 0xF), 0, 3, 1, 0);
+        MotionSetCore(sub, &sub->Motion, PL_ARC_PTR(arc, 0xF), 0, 3, 1, 0);
         pG->ashley_life = st;
         sub->r_no_2++;
     case 1:

@@ -665,10 +665,10 @@ void termMotionSet(void* data, int no)
     cModel* m;
 
     m = MapMgr.getWork(0);
-    MotionSetCore(m, &((cMotModel*) m)->Motion, SS_ARC_PTR(d, 12), 0, (u8) no, 0x8000, 0);
+    MotionSetCore(m, &m->Motion, SS_ARC_PTR(d, 12), 0, (u8) no, 0x8000, 0);
     ShapeSet(GetModelInfoAddr(m->pModelInfo, 3), 0, SS_ARC_PTR(d, 13), 2);
     m = MapMgr.getWork(2);
-    MotionSetCore(m, &((cMotModel*) m)->Motion, SS_ARC_PTR(d, 14), 0, (u8) no, 0x8000, 0);
+    MotionSetCore(m, &m->Motion, SS_ARC_PTR(d, 14), 0, (u8) no, 0x8000, 0);
     ShapeSet(GetModelInfoAddr(m->pModelInfo, 3), 0, SS_ARC_PTR(d, 15), 0xA);
 }
 
@@ -681,9 +681,9 @@ void termMotionCancel(void* data, int no)
     cModel* m;
 
     m = MapMgr.getWork(0);
-    MotionSetCore(m, &((cMotModel*) m)->Motion, SS_ARC_PTR(wk->pTermDat, 14), 0, (u8) no, 0x8004, 0);
+    MotionSetCore(m, &m->Motion, SS_ARC_PTR(wk->pTermDat, 14), 0, (u8) no, 0x8004, 0);
     m = MapMgr.getWork(2);
-    MotionSetCore(m, &((cMotModel*) m)->Motion, SS_ARC_PTR(d, 4), 0, (u8) no, 0x8004, 0);
+    MotionSetCore(m, &m->Motion, SS_ARC_PTR(d, 4), 0, (u8) no, 0x8004, 0);
 }
 
 static cFileList term_file_list;

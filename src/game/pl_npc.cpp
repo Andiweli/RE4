@@ -119,9 +119,9 @@ void cSubChar::init()
     YarareAdd(this, &m_Yarare[1], -20.0f, -300.0f, 0.0f, 120.0f, 300.0f, 0x13, YAT_FLAG_ON);
     YarareAdd(this, &m_Yarare[2], 20.0f, -300.0f, 0.0f, 120.0f, 300.0f, 0x17, YAT_FLAG_ON);
     if (mot_ck()) {
-        MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x12), 0, 0, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x12), 0, 0, 5, 0);
     } else {
-        MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x6E), 0, 0, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x6E), 0, 0, 5, 0);
     }
     motionMove();
     posBustR = getPartsPtr(0x1D)->pos;
@@ -267,7 +267,7 @@ void cSubChar::moveFootwork()
                 m = SUB_MOT(pEm, 0x6E);
                 seq = 0;
             }
-            MOT_SET(pEm, MOTION(pEm), m, seq, 0, 4, 0);
+            MOT_SET(pEm, &pEm->Motion, m, seq, 0, 4, 0);
             pEm->motionMove();
         }
         if (mot_ck()) {
@@ -299,7 +299,7 @@ void cSubChar::moveFootwork()
             seq = 0;
             back = 0;
         }
-        MOT_SET(pEm, MOTION(pEm), m, seq, 0x14, 4, 0);
+        MOT_SET(pEm, &pEm->Motion, m, seq, 0x14, 4, 0);
         backCheckSet(back);
         m_Timer = Rnd();
         if (m_Timer < 60) {
@@ -334,10 +334,10 @@ void cSubChar::moveFootwork()
         break;
     case 0xA:
         if (dir < -0.19634955f) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x35), SUB_MOT(pEm, 0x5D), 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x35), SUB_MOT(pEm, 0x5D), 7, 5, 0);
             pEm->r_no_2 = 0xB;
         } else if (dir > 0.19634955f) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x36), SUB_MOT(pEm, 0x5E), 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x36), SUB_MOT(pEm, 0x5E), 7, 5, 0);
             pEm->r_no_2 = 0xC;
         } else {
             pEm->r_no_2 = 1;
@@ -355,9 +355,9 @@ void cSubChar::moveFootwork()
         break;
     case 0x14:
         if (mot_ck()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x1A), SUB_MOT(pEm, 0x53), 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x1A), SUB_MOT(pEm, 0x53), 7, 5, 0);
         } else {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x72), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x72), 0, 7, 5, 0);
         }
         pEm->r_no_2 = 0x1F;
     case 0x15:
@@ -369,7 +369,7 @@ void cSubChar::moveFootwork()
         setFace(2);
         if (!flg.check(F_RELAX)) {
             flg.on(F_RELAX);
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x19), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x19), 0, 7, 5, 0);
             r_no_2 = 0x1F;
         } else {
             neckSet(&pPL->pos);
@@ -400,11 +400,11 @@ void cSubChar::moveFootwork()
         }
         break;
     case 0x32:
-        MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x43), 0, 7, 1, 0);
+        MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x43), 0, 7, 1, 0);
         r_no_2 = 0x33;
     case 0x33:
         if (pEm->Motion.Seq_frame >= (f32) (pEm->Motion.Seq_frame_num - 1)) {
-            MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x44), 0, 7, 5, 0);
+            MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x44), 0, 7, 5, 0);
             r_no_2 = 0x34;
         }
         break;
@@ -520,18 +520,18 @@ void cSubChar::moveMove()
         m_Timer = 0;
         if (dir > 2.617994f || dir < -2.617994f) {
             if (!flg.check(F_DONT_RUN) && (ckPlRun() || dist > 3000.0f)) {
-                MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x26), SUB_MOT(pEm, 0x58), 7, 5, 0);
+                MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x26), SUB_MOT(pEm, 0x58), 7, 5, 0);
                 pEm->r_no_3 = 3;
             } else {
-                MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x26), SUB_MOT(pEm, 0x58), 7, 5, 0);
+                MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x26), SUB_MOT(pEm, 0x58), 7, 5, 0);
                 pEm->r_no_3 = 2;
             }
         } else {
             if (!flg.check(F_DONT_RUN) && (ckPlRun() || dist > 3000.0f)) {
-                MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x25), SUB_MOT(pEm, 0x57), 7, 4, 0);
+                MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x25), SUB_MOT(pEm, 0x57), 7, 4, 0);
                 pEm->r_no_3 = 1;
             } else {
-                MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x24), SUB_MOT(pEm, 0x56), 7, 4, 0);
+                MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x24), SUB_MOT(pEm, 0x56), 7, 4, 0);
                 pEm->r_no_3 = 0;
             }
         }
@@ -555,10 +555,10 @@ void cSubChar::moveMove()
             r_no_3 = 0;
         case 0:
             if (mot_ck()) {
-                MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x13), SUB_MOT(pEm, 0x50), 7, 4, 0);
+                MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x13), SUB_MOT(pEm, 0x50), 7, 4, 0);
                 backCheckSet(SUB_MOT(pEm, 0x15));
             } else {
-                MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x6F), SUB_MOT(pEm, 0x76), 7, 4, 0);
+                MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x6F), SUB_MOT(pEm, 0x76), 7, 4, 0);
                 backCheckSet(0);
             }
             break;
@@ -566,10 +566,10 @@ void cSubChar::moveMove()
             pEm->r_no_3 = 1;
         case 1:
             if (mot_ck()) {
-                MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x16), SUB_MOT(pEm, 0x52), 7, 4, 0);
+                MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x16), SUB_MOT(pEm, 0x52), 7, 4, 0);
                 backCheckSet(SUB_MOT(pEm, 0x17));
             } else {
-                MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x71), SUB_MOT(pEm, 0x78), 7, 4, 0);
+                MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x71), SUB_MOT(pEm, 0x78), 7, 4, 0);
                 backCheckSet(0);
             }
             break;
@@ -638,10 +638,10 @@ void cSubChar::moveMove()
         break;
     case 0xA:
         if (Muku2(ang.y, m_TargetDir, 3.1415927f) < 0.0f) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x35), SUB_MOT(pEm, 0x5D), 4, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x35), SUB_MOT(pEm, 0x5D), 4, 5, 0);
             r_no_2 = 0xB;
         } else {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x36), SUB_MOT(pEm, 0x5E), 4, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x36), SUB_MOT(pEm, 0x5E), 4, 5, 0);
             r_no_2 = 0xC;
         }
         motionMove();
@@ -668,8 +668,8 @@ void cSubChar::moveMove()
         Vec p;
         Vec r;
 
-        MotionGetSpeed(this, MOTION(this), 0, &p, &r);
-        MotionAddSpeed(this, MOTION(this), &p, &r);
+        MotionGetSpeed(this, &this->Motion, 0, &p, &r);
+        MotionAddSpeed(this, &this->Motion, &p, &r);
     } else if (r_no_2 == 4) {
         Vec d;
 
@@ -803,7 +803,7 @@ void cSubChar::moveBehind()
     }
     switch (r_no_2) {
     case 0:
-        MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x1D), 0, 3, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x1D), 0, 3, 5, 0);
         atari.off();
         m_Work0 = 0;
         r_no_2 = 1;
@@ -812,7 +812,7 @@ void cSubChar::moveBehind()
             r_no_2 = 0x14;
         }
         if (motionMove()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x1E), 0, 3, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x1E), 0, 3, 5, 0);
             r_no_2 = 2;
         }
         break;
@@ -830,18 +830,18 @@ void cSubChar::moveBehind()
         break;
     case 0xA:
         setHand(1);
-        MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x20), 0, 7, 5, 0);
+        MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x20), 0, 7, 5, 0);
         r_no_2 = 0xB;
     case 0xB:
         if ((plStat & 0x2080) || motionMove()) {
             setHand(0);
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x1E), 0, 3, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x1E), 0, 3, 5, 0);
             motionMove();
             r_no_2 = 2;
         }
         break;
     case 0x14:
-        MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x1F), 0, 3, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x1F), 0, 3, 5, 0);
         StaFlagOff(pG, STA_CRITICAL);
         atari.on();
         inSat();
@@ -870,7 +870,7 @@ void cSubChar::moveKagamu()
         }
         break;
     case 2:
-        MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x43), 0, 1, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x43), 0, 1, 5, 0);
         pEm->r_no_2 = 3;
         fyBak = pEm->pos.y;
         pEm->atari.offOba();
@@ -879,7 +879,7 @@ void cSubChar::moveKagamu()
             status.on(S_DOWN);
         }
         if (pEm->motionMove()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x44), 0, 3, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x44), 0, 3, 5, 0);
             pEm->r_no_2 = 4;
         }
         break;
@@ -889,7 +889,7 @@ void cSubChar::moveKagamu()
             pEm->m_Work0 = 0;
         } else {
             if (++pEm->m_Work0 > 30) {
-                MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x45), 0, 3, 5, 0);
+                MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x45), 0, 3, 5, 0);
                 pEm->atari.onOba();
                 pEm->r_no_2 = 5;
             }
@@ -911,12 +911,12 @@ void cSubChar::movePants()
 {
     switch (pEm->r_no_2) {
     case 0:
-        MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x21), 0, 7, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x21), 0, 7, 5, 0);
         m_StopSe = SndCall(8, 0x16, &pEm->pList->world, id, 0, 0);
         pEm->r_no_2 = 1;
     case 1:
         if (MotionMove(pEm, 0)) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x22), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x22), 0, 7, 5, 0);
             pEm->r_no_2 = 2;
         }
         ang.y += Muku(&pos, &pPL->pos, ang.y, 0.31415927f);
@@ -936,7 +936,7 @@ void cSubChar::movePants()
             pEm->r_no_2 = 2;
         } else {
             if (++pEm->r_no_3 > 30) {
-                MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x23), 0, 7, 5, 0);
+                MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x23), 0, 7, 5, 0);
                 pEm->r_no_2 = 4;
             }
         }
@@ -954,7 +954,7 @@ void cSubChar::moveDown()
 {
     switch (r_no_2) {
     case 0:
-        MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x43), 0, 7, 5, 0);
+        MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x43), 0, 7, 5, 0);
         status.on(S_DOWN);
         pEm->r_no_2 = 1;
     case 1:
@@ -963,7 +963,7 @@ void cSubChar::moveDown()
         }
         break;
     case 2:
-        MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x44), 0, 7, 1, 0);
+        MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x44), 0, 7, 1, 0);
         r_no_2 = 3;
     case 3:
         if (status.check(S_EM_NEAR) || (StaFlagChk(pG, STA_PL_CATCHED))) {
@@ -972,7 +972,7 @@ void cSubChar::moveDown()
             r_no_3--;
         }
         if (r_no_3 == 0) {
-            MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x45), 0, 7, 5, 0);
+            MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x45), 0, 7, 5, 0);
             r_no_2 = 4;
         }
         motionMove();
@@ -1050,8 +1050,8 @@ void cSubChar::moveFance()
             r.x = 0.0f;
             r.z = 0.0f;
         }
-        SUB_MOTBASE(this)->set((cMotModel*) this, &p, &r, 10);
-        MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x2C), SUB_MOT(pEm, 0x67), 7, 5, 0);
+        SUB_MOTBASE(this)->set(this, &p, &r, 10);
+        MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x2C), SUB_MOT(pEm, 0x67), 7, 5, 0);
         pEm->atari.offSca();
         atari.setPriority(PRI_LV2);
         pEm->dmg.set(0, 0x80);
@@ -1100,7 +1100,7 @@ void pl_fall_ok(cPlayer* pl)
     pl->subArc = arc;
     switch (pl->r_no_1) {
     case 0:
-        MOT_SET(pl, MOTION(pl), PL_ARC_PTR(arc, 0x3E), PL_ARC_PTR(arc, 0x68), 0, 5, 0);
+        MOT_SET(pl, &pl->Motion, PL_ARC_PTR(arc, 0x3E), PL_ARC_PTR(arc, 0x68), 0, 5, 0);
         pl->Wep->setTrans(0, 0);
         pl->r_no_1 = 1;
     case 1:
@@ -1157,7 +1157,7 @@ void cSubChar::moveFall()
         setPos(&pos);
         SetPlDamage(this, pl_fall_ok);
         pPL->dmg.set(0, 0x80);
-        MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x3F), SUB_MOT(pEm, 0x5F), 7, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x3F), SUB_MOT(pEm, 0x5F), 7, 5, 0);
         atari.offSca();
         r_no_2 = 5;
     case 5:
@@ -1219,7 +1219,7 @@ void cSubChar::moveAction()
         if (m_Work0 == 4) {
             m_StopSe = SndCall(8, 0x12, &pEm->pList->world, id, 0, 0);
         }
-        MOT_SET(pEm, MOTION(pEm), m, seq, 3, 0x101, 0);
+        MOT_SET(pEm, &pEm->Motion, m, seq, 3, 0x101, 0);
         atari.off();
         dmg.set(0, 0x80);
     case 1:
@@ -1235,7 +1235,7 @@ void cSubChar::moveAction()
         motionMove();
         if (pEm->Motion.Seq_frame >= 40.0f && landCheck()) {
             atari.on();
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x2D), SUB_MOT(pEm, 0x5A), 0, 0x101, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x2D), SUB_MOT(pEm, 0x5A), 0, 0x101, 0);
             motionMove();
             r_no_2 = 3;
         }
@@ -1281,7 +1281,7 @@ void cSubChar::moveLadder()
             m = SUB_MOT(pEm, 0x49);
             seq = SUB_MOT(pEm, 0x61);
         }
-        MOT_SET(pEm, MOTION(pEm), m, seq, 3, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, m, seq, 3, 5, 0);
         r_no_2 = 1;
         flg.on(F_SHADOW_OFF);
     case 1:
@@ -1297,7 +1297,7 @@ void cSubChar::moveLadder()
             m = SUB_MOT(pEm, 0x4A);
             seq = SUB_MOT(pEm, 0x62);
         }
-        MOT_SET(pEm, MOTION(pEm), m, seq, 3, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, m, seq, 3, 5, 0);
         r_no_2 = 3;
     case 3:
         if (motionMove()) {
@@ -1315,7 +1315,7 @@ void cSubChar::moveLadder()
             m = SUB_MOT(pEm, 0x4B);
             seq = SUB_MOT(pEm, 0x63);
         }
-        MOT_SET(pEm, MOTION(pEm), m, seq, 3, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, m, seq, 3, 5, 0);
         r_no_2 = 5;
     case 5:
         if (motionMove()) {
@@ -1481,7 +1481,7 @@ void cSubChar::moveHide()
             r_no_2 = 5;
             r = 4;
         }
-        MOT_SET(this, MOTION(this), m, seq, 7, (u16) r, 0);
+        MOT_SET(this, &this->Motion, m, seq, 7, (u16) r, 0);
         motionMove();
         r_no_2 = 1;
         break;
@@ -1501,9 +1501,9 @@ void cSubChar::moveHide()
         break;
     case 5:
         if (mot_ck()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x16), SUB_MOT(pEm, 0x52), 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x16), SUB_MOT(pEm, 0x52), 7, 5, 0);
         } else {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x71), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x71), 0, 7, 5, 0);
         }
         r_no_2 = 6;
         break;
@@ -1539,7 +1539,7 @@ void cSubChar::moveHide()
         break;
     }
     case 0xA:
-        MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x2C), SUB_MOT(pEm, 0x67), 7, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x2C), SUB_MOT(pEm, 0x67), 7, 5, 0);
         this->ang.y = atan2f(-norm.x, -norm.z);
         cCoord::matUpdate();
         PSVECScale(&norm, &a, 400.0f);
@@ -1563,7 +1563,7 @@ void cSubChar::moveHide()
             m_Work2--;
         }
         if (motionMove()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x43), 0, 7, 1, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x43), 0, 7, 1, 0);
             StaFlagOn(pG, STA_ASHLEY_HIDE);
             m_Work2 = 6;
             r_no_2 = 0xC;
@@ -1580,14 +1580,14 @@ void cSubChar::moveHide()
         r_no_3--;
         if (r_no_3 == 0) {
             this->ang.y = LIMIT_ANGLE(this->ang.y + 3.1415927f);
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x44), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x44), 0, 7, 5, 0);
             r_no_2 = 0xE;
         }
         break;
     case 0xE:
         motionMove();
         if (m_Work1) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x45), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x45), 0, 7, 5, 0);
             r_no_2 = 0xF;
             m_Work1 = Motion.Seq_frame_num - 3;
         }
@@ -1604,7 +1604,7 @@ void cSubChar::moveHide()
             m_Work1--;
         }
         if (motionMove()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x2C), SUB_MOT(pEm, 0x67), 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x2C), SUB_MOT(pEm, 0x67), 7, 5, 0);
             r_no_2 = 0x10;
         }
         break;
@@ -1630,12 +1630,12 @@ void cSubChar::moveStoop()
     }
     switch (r_no_2) {
     case 0:
-        MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x27), 0, 7, 5, 0);
+        MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x27), 0, 7, 5, 0);
         m_Work0 = 0;
         r_no_2 = 1;
     case 1:
         if (motionMove()) {
-            MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x28), 0, 7, 5, 0);
+            MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x28), 0, 7, 5, 0);
             r_no_2 = 2;
             status.on(S_DOWN);
         }
@@ -1647,7 +1647,7 @@ void cSubChar::moveStoop()
         motionMove();
         break;
     case 3:
-        MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x29), 0, 7, 5, 0);
+        MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x29), 0, 7, 5, 0);
         r_no_2 = 4;
         status.off(S_DOWN);
         break;
@@ -1672,10 +1672,10 @@ void cSubChar::moveFallWait()
         m_Work3 = 0;
         m_Work4 = 0;
         if (mot_ck()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x13), SUB_MOT(pEm, 0x50), 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x13), SUB_MOT(pEm, 0x50), 7, 5, 0);
             backCheckSet(SUB_MOT(pEm, 0x15));
         } else {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x6F), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x6F), 0, 7, 5, 0);
             backCheckSet(0);
         }
         m_Work1 = 0;
@@ -1706,9 +1706,9 @@ void cSubChar::moveFallWait()
         break;
     case 2:
         if (mot_ck()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x12), SUB_MOT(pEm, 0x4F), 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x12), SUB_MOT(pEm, 0x4F), 7, 5, 0);
         } else {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x6E), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x6E), 0, 7, 5, 0);
         }
         m_Work2 = 0;
         r_no_2 = 3;
@@ -1766,10 +1766,10 @@ void cSubChar::moveLadderWait()
     switch (r_no_2) {
     case 0:
         if (mot_ck()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x19), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x19), 0, 7, 5, 0);
             r_no_2 = 2;
         } else {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x6E), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x6E), 0, 7, 5, 0);
             r_no_2 = 1;
         }
         break;
@@ -1792,10 +1792,10 @@ void cSubChar::moveWindowWait()
     switch (r_no_2) {
     case 0:
         if (mot_ck()) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x19), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x19), 0, 7, 5, 0);
             r_no_2 = 2;
         } else {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x6E), 0, 7, 5, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x6E), 0, 7, 5, 0);
             r_no_2 = 1;
         }
         break;
@@ -1943,14 +1943,14 @@ void cSubChar::moveDamage()
             atari.off();
             break;
         }
-        MOT_SET(pEm, MOTION(pEm), m, 0, 3, 1, 0);
+        MOT_SET(pEm, &pEm->Motion, m, 0, 3, 1, 0);
         setFace(1);
         SndCall(8, 9, &pEm->pList->world, id, 0, 0);
         pEm->r_no_1 = 1;
     case 1:
         if (pEm->Motion.Seq_frame >= 10.0f && m_Work0 == 11 && landCheck()) {
             atari.on();
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x6B), 0, 3, 1, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x6B), 0, 3, 1, 0);
             EstSet(pEm, -1, 0, 0, EFF_PL01, ChkWaterEffectEnable(&pos) ? 10 : 9, 0, ESP_CORE_KIND_NONE, pEm, 0);
             r_no_1 = 10;
             if (DbgFlagChk(pG, DBG_NO_DEATH)) {
@@ -1996,7 +1996,7 @@ void cSubChar::moveDamage()
         } else {
             m = SUB_MOT(pEm, 0x34);
         }
-        MOT_SET(pEm, MOTION(pEm), m, 0, 3, 5, 0);
+        MOT_SET(pEm, &pEm->Motion, m, 0, 3, 5, 0);
         r_no_1 = 6;
     case 6:
         if (motionMove()) {
@@ -2020,9 +2020,9 @@ void cSubChar::moveDie()
     case 0:
         CamCtrl.deleteAttachCamera(pPL->Motion.pAttachCam, pPL);
         if (status.check(S_DOWN)) {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x30), 0, 3, 1, 0x32);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x30), 0, 3, 1, 0x32);
         } else {
-            MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x30), 0, 3, 1, 0);
+            MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x30), 0, 3, 1, 0);
             EstSet(this, -1, 0, 0, EFF_PL01, ChkWaterEffectEnable(&pos) ? 4 : 3, 0, ESP_CORE_KIND_NONE, this, 0);
         }
         SndCall(8, 0xD, &pList->world, id, 0, 0);
@@ -2059,9 +2059,9 @@ void cSubChar::moveEvent()
         switch (r_no_2) {
         case 0:
             if (mot_ck()) {
-                MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x16), SUB_MOT(pEm, 0x52), 10, 5, 0);
+                MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x16), SUB_MOT(pEm, 0x52), 10, 5, 0);
             } else {
-                MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x71), SUB_MOT(pEm, 0x78), 10, 5, 0);
+                MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x71), SUB_MOT(pEm, 0x78), 10, 5, 0);
             }
             r_no_2 = 1;
             Motion.Mot_attr &= ~1;
@@ -2073,9 +2073,9 @@ void cSubChar::moveEvent()
             this->ang.y += ang;
             if (fabsf(ang) < 0.20943952f) {
                 if (mot_ck()) {
-                    MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x16), SUB_MOT(pEm, 0x52), 10, 5, 0);
+                    MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x16), SUB_MOT(pEm, 0x52), 10, 5, 0);
                 } else {
-                    MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x71), SUB_MOT(pEm, 0x78), 10, 5, 0);
+                    MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x71), SUB_MOT(pEm, 0x78), 10, 5, 0);
                 }
                 r_no_2 = 2;
             }
@@ -2088,9 +2088,9 @@ void cSubChar::moveEvent()
             this->ang.y += Muku(&pos, &out, this->ang.y, 0.31415927f);
             if (GetDistance(pos, m_VecWork0) < 250000.0f) {
                 if (mot_ck()) {
-                    MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x12), SUB_MOT(pEm, 0x4F), 7, 5, 0);
+                    MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x12), SUB_MOT(pEm, 0x4F), 7, 5, 0);
                 } else {
-                    MOT_SET(pEm, MOTION(pEm), SUB_MOT(pEm, 0x6E), 0, 7, 5, 0);
+                    MOT_SET(pEm, &pEm->Motion, SUB_MOT(pEm, 0x6E), 0, 7, 5, 0);
                 }
                 setRno(5, 0, 0, 0);
             }
@@ -2116,7 +2116,7 @@ void cSubChar::moveDijection()
 {
     switch (r_no_1) {
     case 0:
-        MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x43), 0, 7, 5, 0);
+        MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x43), 0, 7, 5, 0);
         r_no_1 = 1;
         break;
     case 1:
@@ -2125,7 +2125,7 @@ void cSubChar::moveDijection()
         }
         break;
     case 2:
-        MOT_SET(this, MOTION(this), SUB_MOT(pEm, 0x44), 0, 7, 5, 0);
+        MOT_SET(this, &this->Motion, SUB_MOT(pEm, 0x44), 0, 7, 5, 0);
         r_no_2 = 3;
         break;
     case 3:

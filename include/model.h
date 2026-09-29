@@ -503,7 +503,7 @@ public:
     cModelInfo* pShadowModelInfo; // 0x160  (db_work "pShMdIfo")
     cLightInfo LightInfo;  // 0x164 .. 0x1D8
 
-    MOTION_INFO Motion;    // 0x1D8 .. 0x2A8  motion work (motion.h MOTION(m), cMotBase `m->Motion`; PS2 Motion)
+    MOTION_INFO Motion;    // 0x1D8 .. 0x2A8  motion work (cMotBase `m->Motion`; PS2 Motion)
     MOTION_INFO* pMotionB; // 0x2A8  second motion blended in by MotionMove
     u16* pXFlip;           // 0x2AC  parts index remap for flipped motions
     u16* pDblJnt;          // 0x2B0  {count, (dst, a, b, percent)...} quaternion blended parts
