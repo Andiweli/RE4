@@ -12,12 +12,12 @@
 int PathHasWeight(void* pPdat)
 {
     Path* p = (Path*)pPdat;
-    PathVtx* v = p->vtx;
+    PATH_UNIT* v = p->vtx;
     int i;
     int w = 0;
 
     for (i = 0; i < p->num; i++) {
-        w += v->nWeight;
+        w += v->weight_num;
         v++;
     }
     if (w != 0) return 1;
@@ -28,8 +28,8 @@ int PathHasWeight(void* pPdat)
 f32 PathGetLength(void* pPdat)
 {
     Path* p = (Path*)pPdat;
-    PathVtx* v = p->vtx;
-    return v[p->num - 1].dist;
+    PATH_UNIT* v = p->vtx;
+    return v[p->num - 1].Length;
 }
 
 // Point at `dist` along a fixed path, linear between vertices; `seg` caches the segment and is
@@ -37,8 +37,8 @@ f32 PathGetLength(void* pPdat)
 int PathGetPos(void* pPdat, f32 dist, u16* pPntNo, Vec* pPos)
 {
     Path* p = (Path*)pPdat;
-    PathVtx* v = p->vtx;
-    PathVtx* prev;
+    PATH_UNIT* v = p->vtx;
+    PATH_UNIT* prev;
     int step;
     f32 fstep;
     f32 len;
@@ -51,16 +51,16 @@ int PathGetPos(void* pPdat, f32 dist, u16* pPntNo, Vec* pPos)
     }
     step = -1;
     v += *pPntNo;
-    if (dist >= v->dist) step = 1;
+    if (dist >= v->Length) step = 1;
     fstep = (f32)step;
     do {
         *pPntNo += step;
         v += step;
-    } while (fstep * v->dist < fstep * dist);
+    } while (fstep * v->Length < fstep * dist);
     *pPntNo -= step;
     prev = v - step;
-    dist -= prev->dist;
-    dist /= v->dist - prev->dist;
+    dist -= prev->Length;
+    dist /= v->Length - prev->Length;
     PSVECSubtract(&v->pos, &prev->pos, &tmp);
     PSVECScale(&tmp, &tmp, dist);
     PSVECAdd(&prev->pos, &tmp, pPos);
@@ -72,8 +72,8 @@ int PathGetPos(void* pPdat, f32 dist, u16* pPntNo, Vec* pPos)
 int PathGetPosEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Vec* pPos)
 {
     Path* p = (Path*)pPdat;
-    PathVtx* v = p->vtx;
-    PathVtx* prev;
+    PATH_UNIT* v = p->vtx;
+    PATH_UNIT* prev;
     int step;
     f32 fstep;
     f32 len;
@@ -90,16 +90,16 @@ int PathGetPosEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Vec* pPos)
     }
     step = -1;
     v += *pPntNo;
-    if (dist >= v->dist) step = 1;
+    if (dist >= v->Length) step = 1;
     fstep = (f32)step;
     do {
         *pPntNo += step;
         v += step;
-    } while (fstep * v->dist < fstep * dist);
+    } while (fstep * v->Length < fstep * dist);
     *pPntNo -= step;
     prev = v - step;
-    dist -= prev->dist;
-    dist /= v->dist - prev->dist;
+    dist -= prev->Length;
+    dist /= v->Length - prev->Length;
     PathGetVtxMat(m0, pMod, prev);
     PathGetVtxMat(m1, pMod, v);
     PSMTXMultVec(m0, &prev->pos, &p0);
@@ -119,13 +119,13 @@ int PathGetPosEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Vec* pPos)
 int PathGetMatEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Mtx pMat)
 {
     Path* p = (Path*)pPdat;
-    PathVtx* vtx;
-    PathVtx* v;
-    PathVtx* prev;
-    PathVtx* v0;
-    PathVtx* pv;
-    PathVtx* pn;
-    PathVtx* pb;
+    PATH_UNIT* vtx;
+    PATH_UNIT* v;
+    PATH_UNIT* prev;
+    PATH_UNIT* v0;
+    PATH_UNIT* pv;
+    PATH_UNIT* pn;
+    PATH_UNIT* pb;
     int step;
     int j = 0;    // dead initialisers: 3 more insn uids, which decides gcse's hash table size
     int k = 0;    // and with it the spill-slot order of the PRE'd &local pseudos
@@ -164,15 +164,15 @@ int PathGetMatEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Mtx pMat)
     }
     step = -1;
     v = &vtx[*pPntNo];
-    if (dist >= v->dist) step = 1;
+    if (dist >= v->Length) step = 1;
     fstep = (f32)step;
     do {
         *pPntNo += step;
         v += step;
-    } while (fstep * v->dist < fstep * dist);
+    } while (fstep * v->Length < fstep * dist);
     *pPntNo -= step;
     prev = v - step;
-    t = (dist - prev->dist) / (v->dist - prev->dist);
+    t = (dist - prev->Length) / (v->Length - prev->Length);
 
     PathGetVtxMat(m0, pMod, prev);
     PathGetVtxMat(m1, pMod, v);
@@ -224,8 +224,8 @@ int PathGetMatEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Mtx pMat)
     }
     PSMTXMultVec(m0, &hpos, &hpos);
     PSMTXMultVecSR(m0, &hvel, &hvel);
-    PSMTXMultVecSR(m0, &(v - step)->nrm, &n0);
-    PSMTXMultVecSR(m1, &v->nrm, &n1);
+    PSMTXMultVecSR(m0, &(v - step)->normal, &n0);
+    PSMTXMultVecSR(m1, &v->normal, &n1);
     PSVECSubtract(&n1, &n0, &tmp);
     PSVECScale(&tmp, &tmp, t);
     PSVECAdd(&n0, &tmp, &up);
@@ -293,7 +293,7 @@ int PathGetMatEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Mtx pMat)
 
 // Skinning matrix of a path vertex: sum of the parts' matrices weighted by weight[] percent
 // (the last weight takes the remainder), concatenated with the same blend of their bind matrices.
-void PathGetVtxMat(Mtx pMat, cModel* pMod, PathVtx* pPunit)
+void PathGetVtxMat(Mtx pMat, cModel* pMod, PATH_UNIT* pPunit)
 {
     Mtx m;
     Mtx m2;
@@ -305,15 +305,15 @@ void PathGetVtxMat(Mtx pMat, cModel* pMod, PathVtx* pPunit)
     memclr_asm(m, sizeof(Mtx));
     memclr_asm(m2, sizeof(Mtx));
     wsum = 0.0f;
-    for (i = 0; i < pPunit->nWeight; i++) {
-        if (pPunit->partsNo[i] > pMod->nParts) {
+    for (i = 0; i < pPunit->weight_num; i++) {
+        if (pPunit->weight_id[i] > pMod->nParts) {
             PSMTXIdentity(pMat);
-            pLog->err(0, 0, "PathGetVtxMat(): Invalid Parts Number %d.\n", pPunit->partsNo[i]);
+            pLog->err(0, 0, "PathGetVtxMat(): Invalid Parts Number %d.\n", pPunit->weight_id[i]);
             return;
         }
-        p = pMod->getPartsPtr(pPunit->partsNo[i]);
-        w = (f32)pPunit->weight[i] * 0.01f;
-        if (i == pPunit->nWeight - 1) w = 1.0f - wsum;
+        p = pMod->getPartsPtr(pPunit->weight_id[i]);
+        w = (f32)pPunit->weight_rate[i] * 0.01f;
+        if (i == pPunit->weight_num - 1) w = 1.0f - wsum;
         wsum += w;
         MAT_ACC(m, p->mat, w);
         MAT_ACC(m2, p->lt_inv_mat, w);

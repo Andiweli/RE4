@@ -1938,7 +1938,7 @@ int SndRoomStrVolReset(int time)
     return ret;
 }
 
-void sndMuteSetMain(SndMute* m, u32 type, int on);
+void sndMuteSetMain(_MUTE_STAT* m, u32 type, int on);
 
 // Mutes / unmutes output groups: bit4 SE (headphones type), bit5 BGM, bit6 SE (TV), bit7 BGM (TV).
 void SndMuteSet(int kind, int sw)
@@ -1958,17 +1958,17 @@ void SndMuteSet(int kind, int sw)
 }
 
 // Mutes one group by saving its master volume and setting 0, or restores it.
-void sndMuteSetMain(SndMute* pMute, u32 type, int sw)
+void sndMuteSetMain(_MUTE_STAT* pMute, u32 type, int sw)
 {
     if (sw == 1) {
-        if (pMute->on == 0) {
-            pMute->vol = SndGetMasterVol(type);
+        if (pMute->mute_on == 0) {
+            pMute->vol_save = SndGetMasterVol(type);
             SndSetMasterVol(type, 0);
-            pMute->on = sw;
+            pMute->mute_on = sw;
         }
-    } else if (pMute->on == 1) {
-        SndSetMasterVol(type, pMute->vol);
-        pMute->on = 0;
+    } else if (pMute->mute_on == 1) {
+        SndSetMasterVol(type, pMute->vol_save);
+        pMute->mute_on = 0;
     }
 }
 

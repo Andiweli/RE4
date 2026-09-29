@@ -391,11 +391,11 @@ void VibSet(u32 time, u32 level, u16 delay, u16 flag)
 }
 
 // Queues every entry of a rumble pattern (start / end level ramp over `time` frames), or-ing `type`.
-void VibSetDataCore(VibData* d, u32 flag)
+void VibSetDataCore(VIB_INFO* d, u32 flag)
 {
     u32 i;
     VibWork* v;
-    VibDataEntry* e;
+    VIB_DATA* e;
     int lvl;
     int add;
 
@@ -406,11 +406,11 @@ void VibSetDataCore(VibData* d, u32 flag)
         }
         e = d->e;
         e += i;
-        lvl = e->lvl0 << 12;
-        add = ((e->lvl1 - e->lvl0) << 12) / e->time;
-        v->type = e->type | flag;
+        lvl = e->s_level << 12;
+        add = ((e->e_level - e->s_level) << 12) / e->time;
+        v->type = e->flag | flag;
         v->time = e->time;
-        v->wait = e->wait;
+        v->wait = e->delay;
         v->level = lvl;
         v->add = add;
     }
@@ -421,7 +421,7 @@ void VibSetData(VibDataTbl* t, u32 no, u32 type)
 {
     u32* ofs = t->ofs;
     if (no < t->num && ofs[no]) {
-        VibSetDataCore((VibData*) (ofs[no] + (u32) t), type);
+        VibSetDataCore((VIB_INFO*) (ofs[no] + (u32) t), type);
     }
 }
 

@@ -96,9 +96,9 @@ struct SndRoomSave {
     u32 str[6];      // 0xC0  room stream table
 };
 
-struct SndMute {
-    s32 on;          // 0x00
-    u8 vol;          // 0x04  master volume saved while muted
+struct _MUTE_STAT {
+    s32 mute_on;     // 0x00
+    u8 vol_save;     // 0x04  master volume saved while muted (PS2 sint8; kept unsigned, see below)
     u8 pad_5[3];
 };
 
@@ -144,7 +144,7 @@ struct SndEmHist {
 
 // Game sound work (`Snd`, 0xAE8 bytes, pSnd).
 struct SND_WORK {
-    SndMute mute[4];         // 0x00  core/pl, em, ... (SndMuteSet bits 0x10..0x80)
+    _MUTE_STAT mute[4];      // 0x00  core/pl, em, ... (SndMuteSet bits 0x10..0x80)
     u32 blk_flag[1];         // 0x20  block loaded bits (SND_BIT_*)
     SndPlayWork bgm_state[2]; // 0x24
     SndPlayWork str_state[4]; // 0x44

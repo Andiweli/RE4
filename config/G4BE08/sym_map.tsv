@@ -1234,7 +1234,7 @@ address	size	section	unit	scope	name	demangled
 0x8005EC00	0x64	.text	game/snd.cpp	global	SndRoomStrVolSet__Fii	SndRoomStrVolSet
 0x8005EC64	0x64	.text	game/snd.cpp	global	SndRoomStrVolReset__Fi	SndRoomStrVolReset
 0x8005ECC8	0xAC	.text	game/snd.cpp	global	SndMuteSet__Fii	SndMuteSet
-0x8005ED74	0x84	.text	game/snd.cpp	global	sndMuteSetMain__FP7SndMuteUli	sndMuteSetMain
+0x8005ED74	0x84	.text	game/snd.cpp	global	sndMuteSetMain__FP10_MUTE_STATUli	sndMuteSetMain
 0x8005EDF8	0xAC	.text	game/snd.cpp	global	SndSetMasterVol__FUli	SndSetMasterVol
 0x8005EEA4	0xA8	.text	game/snd.cpp	global	SndGetMasterVol__FUl	SndGetMasterVol
 0x8005EF4C	0xBC	.text	game/snd.cpp	global	SndSetOutputMode__Fii	SndSetOutputMode
@@ -5222,7 +5222,7 @@ address	size	section	unit	scope	name	demangled
 0x8016AEC8	0x150	.text	game/pad.cpp	global	VibControl__Fv	VibControl
 0x8016B018	0x44	.text	game/pad.cpp	global	PullVibWork__Fv	PullVibWork
 0x8016B05C	0x68	.text	game/pad.cpp	global	VibSet__FUlUlUsUs	VibSet
-0x8016B0C4	0xA8	.text	game/pad.cpp	global	VibSetDataCore__FP7VibDataUl	VibSetDataCore
+0x8016B0C4	0xA8	.text	game/pad.cpp	global	VibSetDataCore__FP8VIB_INFOUl	VibSetDataCore
 0x8016B16C	0x48	.text	game/pad.cpp	global	VibSetData__FP10VibDataTblUlUl	VibSetData
 0x8016B1B4	0x34	.text	game/pad.cpp	global	VibSetClearType__FUl	VibSetClearType
 0x8016B1E8	0x28	.text	game/pad.cpp	global	PadCheckStatus__FP3JOY	PadCheckStatus
@@ -5232,7 +5232,7 @@ address	size	section	unit	scope	name	demangled
 0x8016B540	0x144	.text	game/path.cpp	global	PathGetPos__FPvfPUsP3Vec	PathGetPos
 0x8016B684	0x19C	.text	game/path.cpp	global	PathGetPosEm__FPvP6cModelfPUsP3Vec	PathGetPosEm
 0x8016B820	0x7D0	.text	game/path.cpp	global	PathGetMatEm__FPvP6cModelfPUsPA3_f	PathGetMatEm
-0x8016BFF0	0x2A0	.text	game/path.cpp	global	PathGetVtxMat__FPA3_fP6cModelP7PathVtx	PathGetVtxMat
+0x8016BFF0	0x2A0	.text	game/path.cpp	global	PathGetVtxMat__FPA3_fP6cModelP9PATH_UNIT	PathGetVtxMat
 0x8016C290	0x480	.text	game/path.cpp	global	FuncPathParametrize__FPvT0	FuncPathParametrize
 0x8016C710	0x15C	.text	game/path.cpp	global	FuncPathCalc__FPvT0fP3Vec	FuncPathCalc
 0x8016C86C	0x6C	.text	game/path.cpp	global	FuncPathClear__FPv	FuncPathClear

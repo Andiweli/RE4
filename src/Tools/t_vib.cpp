@@ -12,12 +12,12 @@
 #include "t_util.h"
 #include <stdio.h>
 
-// Pad vibration pattern editor (Tools/t_vib.cpp): 64 patterns of up to 16 keys (VibDataEntry), edited
+// Pad vibration pattern editor (Tools/t_vib.cpp): 64 patterns of up to 16 keys (VIB_DATA), edited
 // on a level/frame grid and saved as the room's .vib file.
 
 struct TvibData {
     u32 num;             // 0x00
-    VibDataEntry e[16];  // 0x04
+    VIB_DATA e[16];  // 0x04
 };
 
 struct TvibFile {
@@ -73,10 +73,10 @@ void tvibVibLoopSetDisp();
 void tvibEditFrameDisp();
 void tvibModeFrameDisp();
 void tvibFrameVibDraw(TvibData* d);
-void tvibFrameLineDraw(VibDataEntry* e, u32 col);
+void tvibFrameLineDraw(VIB_DATA* e, u32 col);
 void tvibFrameMarkDraw(int lv, int frame, u32 col, u32 size);
 void tvibListVibDraw();
-void tvibListLineDraw(VibDataEntry* e, u32 col, int x, int y);
+void tvibListLineDraw(VIB_DATA* e, u32 col, int x, int y);
 void tvibFileSave(const char* path);
 void tvibFileLoad(const char* path);
 
@@ -201,8 +201,8 @@ static void tvib_R0_Select()
 
         V->testFrame = 0;
         for (i = 0; i < d->num; i++) {
-            VibDataEntry* e = &d->e[i];
-            int end = e->wait + e->time;
+            VIB_DATA* e = &d->e[i];
+            int end = e->delay + e->time;
 
             if (V->testFrame < end) {
                 V->testFrame = end;
@@ -213,7 +213,7 @@ static void tvib_R0_Select()
         V->cursor = 0;
         return;
     } else if ((Joy[0].trg & JOY_X) && d->num != 0) {
-        VibSetDataCore((VibData*) d, 8);
+        VibSetDataCore((VIB_INFO*) d, 8);
     }
     if (Joy[0].trg & JOY_B) {
         VibSetClearType(8);
@@ -297,7 +297,7 @@ static void tvib_R0_EditMenu()
 static void tvib_R0_Edit()
 {
     TvibData* d = &V->list[V->listNo];
-    VibDataEntry* e;
+    VIB_DATA* e;
     int i;
 
     V->dispFlag |= 1;
@@ -336,11 +336,11 @@ static void tvib_R0_Edit()
     if (Joy[0].trg & JOY_Y) {
         if (d->num < 16) {
             e = &d->e[d->num];
-            e->type = 0;
-            e->wait = V->frame;
+            e->flag = 0;
+            e->delay = V->frame;
             e->time = 1;
-            e->lvl0 = V->level;
-            e->lvl1 = V->level;
+            e->s_level = V->level;
+            e->e_level = V->level;
             V->editNo = d->num;
             d->num++;
             V->editSide = 1;
@@ -375,18 +375,18 @@ static void tvib_R0_Edit()
     }
     if (Joy[0].rep & (JOY_L | JOY_R)) {
         e = &d->e[V->editNo];
-        V->frame = e->wait;
-        V->level = e->lvl0;
+        V->frame = e->delay;
+        V->level = e->s_level;
     }
     if ((Joy[0].trg & JOY_A) && d->num != 0) {
         for (i = 0; i < (int) d->num; i++) {
             e = &d->e[i];
-            if (e->lvl0 == V->level && e->wait == V->frame) {
+            if (e->s_level == V->level && e->delay == V->frame) {
                 V->editNo = i;
                 V->editSide = 0;
                 break;
             }
-            if (e->lvl1 == V->level && e->wait + e->time == V->frame) {
+            if (e->e_level == V->level && e->delay + e->time == V->frame) {
                 V->editNo = i;
                 V->editSide = 1;
                 break;
@@ -394,8 +394,8 @@ static void tvib_R0_Edit()
         }
         if (i >= (int) d->num) {
             e = &d->e[V->editNo];
-            V->level = e->lvl0;
-            V->frame = e->wait;
+            V->level = e->s_level;
+            V->frame = e->delay;
             V->editSide = 0;
         } else {
             V->mode = 2;
@@ -415,63 +415,63 @@ static void tvib_R0_Edit()
 static void tvib_R0_EditVib()
 {
     TvibData* d = &V->list[V->listNo];
-    VibDataEntry* e = &d->e[V->editNo];
+    VIB_DATA* e = &d->e[V->editNo];
     u16 end;
 
     V->dispFlag |= 3;
     if (V->cursor == 0) {
         if (V->editSide == 0) {
-            V->level = e->lvl0;
-            V->frame = e->wait;
+            V->level = e->s_level;
+            V->frame = e->delay;
         } else {
-            V->level = e->lvl1;
-            V->frame = e->wait + e->time;
+            V->level = e->e_level;
+            V->frame = e->delay + e->time;
         }
         V->cursor++;
     }
     if (Joy[0].trg & JOY_L) {
         V->editSide = 0;
-        V->level = e->lvl0;
-        V->frame = e->wait;
+        V->level = e->s_level;
+        V->frame = e->delay;
     }
     if (Joy[0].trg & JOY_R) {
         V->editSide = 1;
-        V->level = e->lvl1;
-        V->frame = e->wait + e->time;
+        V->level = e->e_level;
+        V->frame = e->delay + e->time;
     }
-    end = e->wait + e->time;
+    end = e->delay + e->time;
     if (V->editSide == 0) {
         if ((Joy[0].rep & JOY_UP) || (Joy[0].on & JOY_SUP)) {
-            if (e->lvl0 < 8) {
-                e->lvl0++;
+            if (e->s_level < 8) {
+                e->s_level++;
             }
         }
         if ((Joy[0].rep & JOY_DOWN) || (Joy[0].on & JOY_SDOWN)) {
-            if (e->lvl0 != 0) {
-                e->lvl0--;
+            if (e->s_level != 0) {
+                e->s_level--;
             }
         }
         if ((Joy[0].rep & JOY_LEFT) || (Joy[0].on & 0x10000)) {
-            if (e->wait != 0) {
-                e->wait--;
+            if (e->delay != 0) {
+                e->delay--;
                 e->time++;
             }
         }
         if ((Joy[0].rep & JOY_RIGHT) || (Joy[0].on & 0x20000)) {
-            if (e->wait < end - 1) {
-                e->wait++;
+            if (e->delay < end - 1) {
+                e->delay++;
                 e->time--;
             }
         }
     } else {
         if ((Joy[0].rep & JOY_UP) || (Joy[0].on & JOY_SUP)) {
-            if (e->lvl1 < 8) {
-                e->lvl1++;
+            if (e->e_level < 8) {
+                e->e_level++;
             }
         }
         if ((Joy[0].rep & JOY_DOWN) || (Joy[0].on & JOY_SDOWN)) {
-            if (e->lvl1 != 0) {
-                e->lvl1--;
+            if (e->e_level != 0) {
+                e->e_level--;
             }
         }
         if ((Joy[0].rep & JOY_LEFT) || (Joy[0].on & 0x10000)) {
@@ -486,17 +486,17 @@ static void tvib_R0_EditVib()
         }
     }
     if (V->editSide == 0) {
-        V->level = e->lvl0;
-        V->frame = e->wait;
+        V->level = e->s_level;
+        V->frame = e->delay;
     } else {
-        V->level = e->lvl1;
-        V->frame = e->wait + e->time;
+        V->level = e->e_level;
+        V->frame = e->delay + e->time;
     }
     if (Joy[0].trg & JOY_X) {
-        if (e->type & 0x8000) {
-            e->type &= ~0x8000;
+        if (e->flag & 0x8000) {
+            e->flag &= ~0x8000;
         } else {
-            e->type |= 0x8000;
+            e->flag |= 0x8000;
         }
     }
     if (Joy[0].trg & (JOY_A | JOY_B | JOY_Y)) {
@@ -547,7 +547,7 @@ static void tvib_R0_VibLoopTest()
     V->testFrame++;
     if (V->testFrame >= V->loopFrame) {
         V->testFrame = 0;
-        VibSetDataCore((VibData*) d, 8);
+        VibSetDataCore((VIB_INFO*) d, 8);
     }
     V->dispFlag |= 9;
     V->frame = V->testFrame;
@@ -1177,9 +1177,9 @@ void tvibFrameVibDraw(TvibData* d)
     s16 i;
 
     for (i = 0; i < (s16) d->num; i++) {
-        VibDataEntry* e = &d->e[i];
+        VIB_DATA* e = &d->e[i];
         u32 col = 0xFFFFFFFF;
-        int rnd = e->type & 0x8000;
+        int rnd = e->flag & 0x8000;
         int size;
         u16 end;
 
@@ -1195,19 +1195,19 @@ void tvibFrameVibDraw(TvibData* d)
         tvibFrameLineDraw(e, col);
         col = 0xFFFFFFFF;
         size = 1;
-        end = e->wait + e->time;
+        end = e->delay + e->time;
         if (i == V->editNo) {
             col = 0xFFFF00FF;
             size = 2;
         }
-        tvibFrameMarkDraw(e->lvl0, e->wait, col, size);
-        tvibFrameMarkDraw(e->lvl1, end, col, size);
+        tvibFrameMarkDraw(e->s_level, e->delay, col, size);
+        tvibFrameMarkDraw(e->e_level, end, col, size);
     }
 }
 
 // One key as a line from (wait, lvl0) to (wait + time, lvl1) on the grid, clipped to the shown
 // frame window.
-void tvibFrameLineDraw(VibDataEntry* e, u32 col)
+void tvibFrameLineDraw(VIB_DATA* e, u32 col)
 {
     S16Vec v[2];
     GXColor c;
@@ -1222,11 +1222,11 @@ void tvibFrameLineDraw(VibDataEntry* e, u32 col)
 
     *(u32*) &c = col;
     scroll = V->scroll;
-    start = e->wait;
+    start = e->delay;
     end = start + e->time;
     if (start < scroll + frame_w - 1 && end > scroll) {
-        step = ((f32) e->lvl1 - (f32) e->lvl0) / (f32) e->time;
-        lv = (f32) e->lvl0;
+        step = ((f32) e->e_level - (f32) e->s_level) / (f32) e->time;
+        lv = (f32) e->s_level;
         n = end - scroll;
         for (i = start - scroll; i < n; i++) {
             cur = lv;
@@ -1344,9 +1344,9 @@ void tvibListVibDraw()
         v[1].z = 0;
         TprimDrawFrameFn_s16(v, (GXColor*) &col, 2);
         for (j = 0; j < (s16) d->num; j++) {
-            VibDataEntry* e = &d->e[j];
+            VIB_DATA* e = &d->e[j];
 
-            if (e->type & 0x8000) {
+            if (e->flag & 0x8000) {
                 col = 0xFF0000FF;
             } else {
                 col = 0xFFFFFFFF;
@@ -1374,13 +1374,13 @@ void tvibListVibDraw()
 }
 
 // One key as a line inside a list cell at (x, y).
-void tvibListLineDraw(VibDataEntry* e, u32 col, int x, int y)
+void tvibListLineDraw(VIB_DATA* e, u32 col, int x, int y)
 {
     S16Vec v[2];
-    f32 h0 = (8 - e->lvl0) * 2;
-    f32 h1 = (8 - e->lvl1) * 2;
-    int start = e->wait;
-    int end = e->wait + e->time;
+    f32 h0 = (8 - e->s_level) * 2;
+    f32 h1 = (8 - e->e_level) * 2;
+    int start = e->delay;
+    int end = e->delay + e->time;
 
     if (start > 178) {
         start = 178;

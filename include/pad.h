@@ -25,18 +25,18 @@ struct PADStatus {
 #define PAD_ERR_NOT_READY -2
 #define PAD_ERR_TRANSFER -3
 
-// Vibration pattern table (VibSetData): offsets from the table start to VibData blocks.
-struct VibDataEntry {
-    u16 type;  // 0x00
-    u16 wait;  // 0x02
-    u16 time;  // 0x04
-    u8 lvl0;   // 0x06  start level
-    u8 lvl1;   // 0x07  end level
+// Vibration pattern table (VibSetData): offsets from the table start to VIB_INFO blocks.
+struct VIB_DATA {
+    u16 flag;     // 0x00
+    u16 delay;    // 0x02
+    u16 time;     // 0x04
+    u8 s_level;   // 0x06  start level
+    u8 e_level;   // 0x07  end level
 };
 
-struct VibData {
+struct VIB_INFO {
     u32 num;
-    VibDataEntry e[1];
+    VIB_DATA e[1];
 };
 
 struct VibDataTbl {
@@ -62,7 +62,7 @@ void KeyClear(u64 un_stop_bit);
 void VibControl();
 VibWork* PullVibWork();
 void VibSet(u32 time, u32 level, u16 delay, u16 flag);
-void VibSetDataCore(VibData* pInfo, u32 flag);
+void VibSetDataCore(VIB_INFO* pInfo, u32 flag);
 void VibSetData(VibDataTbl* t, u32 no, u32 type);
 void VibSetClearType(u32 type);
 int PadCheckStatus(JOY* joy);
