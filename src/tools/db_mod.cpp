@@ -33,48 +33,6 @@
 // wrap / clamp helpers (the option pages)
 #define LOOP(x, lo, hi) (((x) < (lo)) ? (hi) : ((x) > (hi)) ? (lo) : (x))
 
-// The motion work of this build: model.h's MOTION_INFO
-// (0xD0 bytes; em.h MOTION_INFO is the same block).
-struct DbMotWork {
-    MotionData* data;     // 0x00
-    u32* keyTbl;          // 0x04
-    u16 hist[2][2][3];    // 0x08
-    f32 maxFrame;         // 0x20
-    f32 frame;            // 0x24
-    f32 prevFrame;        // 0x28
-    f32 prevFrame2;       // 0x2C
-    u8 nParts;            // 0x30
-    u8 pad_31[3];
-    u8* partsNo;          // 0x34
-    u16* partsInfo;       // 0x38
-    u16 rootPosIdx;       // 0x3C
-    u16 rootRotIdx;       // 0x3E
-    u16 flags;            // 0x40
-    u16 state;            // 0x42
-    u32 flags2;           // 0x44
-    Vec pos;              // 0x48
-    Vec posPrev;          // 0x54
-    Vec posDelta;         // 0x60
-    Vec basePos;          // 0x6C
-    Vec speed;            // 0x78
-    Vec rot;              // 0x84
-    Vec rotPrev;          // 0x90
-    Vec rotDelta;         // 0x9C
-    SEQUENCE_DATA* seq;    // 0xA8
-    SEQUENCE_DATA key0;    // 0xAC
-    SEQUENCE_DATA key1;    // 0xB0
-    SEQUENCE_DATA key2;    // 0xB4
-    f32 seqFrame;         // 0xB8
-    u16 seqMax;           // 0xBC
-    u8 pad_BE[2];
-    f32 speedRate;        // 0xC0
-    u8 hokanMax;          // 0xC4
-    u8 hokanCnt;          // 0xC5
-    u8 pad_C6[2];
-    f32 blendRate;        // 0xC8
-    ATTACH_CAMERA* cam;    // 0xCC
-};
-
 // File list of one model / texture / motion set (0x85C): names or data pointers, the load state per entry.
 class DB_MODEL_FILES {
 public:
@@ -112,7 +70,7 @@ public:
     void* pBinBuff[FILE_NUM];      // 0x048
     void* pTplBuff[FILE_NUM];      // 0x088
     void* pMotBuff[FILE_NUM];  // 0x0C8
-    DbMotWork motInfo[FILE_NUM];  // 0x108
+    MOTION_INFO motInfo[FILE_NUM];  // 0x108
     s8 motStat[FILE_NUM];     // 0xE08
     u8 motFlag[FILE_NUM];     // 0xE18
     s8 mot_num;                  // 0xE28
@@ -361,15 +319,15 @@ void init_dbEm(DB_EM* em, int start, int end)
                 Debug_free(em->pMotBuff[i]);
             }
             em->pMotBuff[i] = 0;
-            memclr_asm(&em->motInfo[i], sizeof(DbMotWork));
+            memclr_asm(&em->motInfo[i], sizeof(MOTION_INFO));
             em->motStat[i] = em->motFlag[i] = 0; // chain: motStat's address first, motFlag's store first
         }
         em->mot_num = 0;
         em->mot_cnt = 0;
-        em->motInfo[0].flags = 0x15;
-        em->motInfo[0].cam = (ATTACH_CAMERA*) mem_alloc(sizeof(ATTACH_CAMERA), __FILE__, 0xEB, 1, 13);
+        em->motInfo[0].Mot_attr = 0x15;
+        em->motInfo[0].pAttachCam = (ATTACH_CAMERA*) mem_alloc(sizeof(ATTACH_CAMERA), __FILE__, 0xEB, 1, 13);
         dbModelSetCamera(n, &pG->Camera);
-        em->motInfo[0].speedRate = 1.0f;
+        em->motInfo[0].Seq_speed = 1.0f;
         em->parentNo = n;
         // parent (the SI zero) before the name byte: the QI store then takes the wider zero's lowpart
         em->pEm_parent = 0;
@@ -1918,11 +1876,11 @@ static int dbmod_trans()
         pDbModState->mode--;
         return 0;
     }
-    flag = &em->motInfo[0].flags;
+    flag = &em->motInfo[0].Mot_attr;
     switch (pDbModState->step) {
     case 0:
-        if (em->motInfo[0].flags & 1) {
-            if (em->motInfo[0].flags & 0x10) {
+        if (em->motInfo[0].Mot_attr & 1) {
+            if (em->motInfo[0].Mot_attr & 0x10) {
                 pDbModState->transMode = 0;
             } else {
                 pDbModState->transMode = 2;
@@ -1956,7 +1914,7 @@ static int dbmod_trans()
             *flag = (*flag & ~0x10) | 0x4001;
             break;
         }
-        em->motInfo[0].flags = *flag;
+        em->motInfo[0].Mot_attr = *flag;
         break;
     }
     eprintf(5 * 8, 3 * 14, 5, 0, "---- TRANS -----");
@@ -1986,10 +1944,10 @@ static int dbmod_loop()
         pDbModState->mode--;
         return 0;
     }
-    flag = &em->motInfo[0].flags;
+    flag = &em->motInfo[0].Mot_attr;
     switch (pDbModState->step) {
     case 0:
-        if (em->motInfo[0].flags & 4) {
+        if (em->motInfo[0].Mot_attr & 4) {
             pDbModState->loopFlag = 1;
         } else {
             pDbModState->loopFlag = 0;
@@ -2011,7 +1969,7 @@ static int dbmod_loop()
         } else {
             *flag &= ~4;
         }
-        em->motInfo[0].flags = *flag;
+        em->motInfo[0].Mot_attr = *flag;
         break;
     }
     eprintf(5 * 8, 3 * 14, 5, 0, "----- LOOP -----");
@@ -2074,10 +2032,10 @@ static int dbmod_flip()
         pDbModState->mode--;
         return 0;
     }
-    flag = &em->motInfo[0].flags;
+    flag = &em->motInfo[0].Mot_attr;
     switch (pDbModState->step) {
     case 0:
-        if (em->motInfo[0].flags & 0x40) {
+        if (em->motInfo[0].Mot_attr & 0x40) {
             pDbModState->flipFlag = 1;
         } else {
             pDbModState->flipFlag = 0;
@@ -2098,7 +2056,7 @@ static int dbmod_flip()
         } else {
             *flag &= ~0x40;
         }
-        em->motInfo[0].flags = *flag;
+        em->motInfo[0].Mot_attr = *flag;
         break;
     }
     eprintf(5 * 8, 3 * 14, 5, 0, "----- FLIP -----");
@@ -2182,17 +2140,17 @@ static int dbmod_blend()
             if (em->pMotBuff[1] && old != method) {
                 switch (pDbModState->blendMode) {
                 case 0:
-                    MotionSetCore(em->pEm, &em->pEm->Motion, em->pMotBuff[0], 0, 0, em->motInfo[0].flags | 0x200, 0);
-                    em->pEm->pMotionB = (MOTION_INFO*) &em->motInfo[1];
+                    MotionSetCore(em->pEm, &em->pEm->Motion, em->pMotBuff[0], 0, 0, em->motInfo[0].Mot_attr | 0x200, 0);
+                    em->pEm->pMotionB = &em->motInfo[1];
                     em->pEm->pMotionB->Mot_flag &= 0x7FFFFFFF;
                     break;
                 case 1:
-                    MotionSetCore(em->pEm, &em->pEm->Motion, em->pMotBuff[0], 0, 0, em->motInfo[0].flags | 0x200, 0);
-                    em->pEm->pMotionB = (MOTION_INFO*) &em->motInfo[1];
+                    MotionSetCore(em->pEm, &em->pEm->Motion, em->pMotBuff[0], 0, 0, em->motInfo[0].Mot_attr | 0x200, 0);
+                    em->pEm->pMotionB = &em->motInfo[1];
                     em->pEm->pMotionB->Mot_flag |= 0x80000000;
                     break;
                 default:
-                    em->motInfo[1].blendRate = 0.0f;
+                    em->motInfo[1].Brate = 0.0f;
                     em->pEm->pMotionB = 0;
                     break;
                 }
@@ -2861,8 +2819,8 @@ void dbmodInfoDisp()
             eprintf2(7, 10, 300 + x * 7, y * 10, 0, 0, "%s", dbmodSkipPath(pDbModState->motName[0]));
             break;
         case 3:
-            if (em->motInfo[0].flags & 1) {
-                if (em->motInfo[0].flags & 0x10) {
+            if (em->motInfo[0].Mot_attr & 1) {
+                if (em->motInfo[0].Mot_attr & 0x10) {
                     eprintf2(7, 10, 300 + x * 7, y * 10, 0, 0, "ON");
                 } else {
                     eprintf2(7, 10, 300 + x * 7, y * 10, 0, 0, "ADD");
@@ -2872,7 +2830,7 @@ void dbmodInfoDisp()
             }
             break;
         case 4:
-            if (em->motInfo[0].flags & 4) {
+            if (em->motInfo[0].Mot_attr & 4) {
                 eprintf2(7, 10, 300 + x * 7, y * 10, 0, 0, "ON");
             } else {
                 eprintf2(7, 10, 300 + x * 7, y * 10, 0, 0, "OFF");
@@ -2912,12 +2870,12 @@ void dbModMotionSet(int frame)
             model = em->pEm;
             for (i = 0; i <= FILE_NUM - 1; i++) {
                 if (em->pMotBuff[i]) {
-                    em->motInfo[i].flags2 |= 0x20000000;
+                    em->motInfo[i].Mot_flag |= 0x20000000;
                     if (i == 0) {
-                        *(DbMotWork*) &model->Motion = em->motInfo[0];
-                        MotionSetCore(model, &model->Motion, em->pMotBuff[i], 0, 0, em->motInfo[0].flags | 0x200, frame);
+                        model->Motion = em->motInfo[0];
+                        MotionSetCore(model, &model->Motion, em->pMotBuff[i], 0, 0, em->motInfo[0].Mot_attr | 0x200, frame);
                     } else {
-                        MotionSetCore(model, &em->motInfo[i], em->pMotBuff[i], 0, 0, em->motInfo[0].flags | 0x200, frame);
+                        MotionSetCore(model, &em->motInfo[i], em->pMotBuff[i], 0, 0, em->motInfo[0].Mot_attr | 0x200, frame);
                     }
                 }
             }
@@ -2934,7 +2892,7 @@ void dbModMotionSetSeq(int no, void* seq, int flag, int frame)
     DB_EM* em = &dbModSlot[no];
     cEm* model = em->pEm;
 
-    em->motInfo[0].flags = flag;
+    em->motInfo[0].Mot_attr = flag;
     MotionSetCore(model, &model->Motion, em->pMotBuff[0], seq, 0, (u16) (flag | 0x200), (u16) frame);
     MotionGetPosition(model, &model->pos, &model->ang);
 }
@@ -3021,27 +2979,27 @@ void dbModMotionMove()
                 noMotion = 0;
                 if (i == 0) {
                     if (!(pDbModState->viewFlag & 2)) {
-                        dbModPlayMode(&em->motInfo[0].flags);
+                        dbModPlayMode(&em->motInfo[0].Mot_attr);
                     }
                     if (em->em_flag & 1) {
-                        em->motInfo[0].flags |= 8;
+                        em->motInfo[0].Mot_attr |= 8;
                     }
                 } else {
                     if (!(pDbModState->viewFlag & 2)) {
-                        dbModPlayMode(&em->motInfo[i].flags);
+                        dbModPlayMode(&em->motInfo[i].Mot_attr);
                     }
                 }
             }
         }
         if (noMotion == 0 && !SpfFlagChk(pG, SPF_OBJ)) {
-            model->Motion.Mot_attr = em->motInfo[0].flags;
+            model->Motion.Mot_attr = em->motInfo[0].Mot_attr;
             MotionMove(model, 0);
             if (model->pMotionB == 0 && em->mot_num > 1 && model->Motion.Mot_state != 0) {
                 em->mot_cnt++;
                 if (em->mot_cnt > em->mot_num - 1) {
                     em->mot_cnt = 0;
                 }
-                MotionSetCore(model, &model->Motion, em->pMotBuff[em->mot_cnt], 0, em->motFlag[em->mot_cnt], em->motInfo[0].flags | 0x200,
+                MotionSetCore(model, &model->Motion, em->pMotBuff[em->mot_cnt], 0, em->motFlag[em->mot_cnt], em->motInfo[0].Mot_attr | 0x200,
                               (u16) em->motStat[em->mot_cnt]);
             }
             if ((pDbModState->viewFlag & 1) && (em->em_flag & 1) == 0) {
@@ -3086,13 +3044,13 @@ void dbModMotionMove()
                 model->mat[2][2] = az.z;
             }
         } else {
-            if ((em->motInfo[0].flags & 1) && (em->motInfo[0].flags & 0x10)) {
+            if ((em->motInfo[0].Mot_attr & 1) && (em->motInfo[0].Mot_attr & 0x10)) {
                 if (model->Motion.Mot_state & 3) {
                     model->pos = em->pos0;
                     model->ang = em->ang0;
                 }
             } else {
-                if (!(em->motInfo[0].flags & 1)) {
+                if (!(em->motInfo[0].Mot_attr & 1)) {
                     model->pos = em->pos0;
                     model->ang = em->ang0;
                 }
@@ -3107,7 +3065,7 @@ void dbModMotionMove()
                 model->partsWorldCalc();
             }
         }
-        if (!(pDbModState->viewFlag & 4) && !(em->motInfo[0].flags & 0x4000)) {
+        if (!(pDbModState->viewFlag & 4) && !(em->motInfo[0].Mot_attr & 0x4000)) {
             if (pDbModState->viewFlag & 8) {
                 lim = 50000.0f;
             } else {
@@ -3717,21 +3675,21 @@ int DB_EM::loadMotion()
     case 1:
         for (i = 0; i < m_files[2].m_num; i++) {
             if (pMotBuff[i]) {
-                motInfo[i].flags2 |= 0x20000000;
+                motInfo[i].Mot_flag |= 0x20000000;
                 if (pDbModState->blendMode == 0 && i > 0) {
-                    motInfo[i].flags2 |= 0x10000000;
+                    motInfo[i].Mot_flag |= 0x10000000;
                 }
-                MotionSetCore(pEm, &motInfo[i], pMotBuff[i], 0, 0, motInfo[0].flags | 0x200, 0);
+                MotionSetCore(pEm, &motInfo[i], pMotBuff[i], 0, 0, motInfo[0].Mot_attr | 0x200, 0);
                 mot_num++;
             }
             switch (i) {
             case 0:
-                *(DbMotWork*) &pEm->Motion = motInfo[0];
+                pEm->Motion = motInfo[0];
                 pEm->pos = pos0;
                 pEm->ang = ang0;
                 break;
             case 1:
-                motInfo[1].blendRate = 0.0f;
+                motInfo[1].Brate = 0.0f;
                 break;
             }
         }
@@ -3842,54 +3800,54 @@ int LoadModelSetName(char* name, int motNum, int no)
 void SetTransMode(int mode, int no)
 {
     DB_EM* em = &dbModSlot[no];
-    u16* flag = &em->motInfo[0].flags;
+    u16* flag = &em->motInfo[0].Mot_attr;
 
     switch (mode) {
     case 0:
-        em->motInfo[0].flags |= 0x11;
-        em->motInfo[0].flags &= ~0x4000;
+        em->motInfo[0].Mot_attr |= 0x11;
+        em->motInfo[0].Mot_attr &= ~0x4000;
         break;
     case 1:
-        em->motInfo[0].flags &= ~0x4011;
+        em->motInfo[0].Mot_attr &= ~0x4011;
         break;
     case 2:
-        em->motInfo[0].flags |= 1;
-        em->motInfo[0].flags &= ~0x4010;
+        em->motInfo[0].Mot_attr |= 1;
+        em->motInfo[0].Mot_attr &= ~0x4010;
         break;
     case 3:
-        em->motInfo[0].flags &= ~0x10;
-        em->motInfo[0].flags |= 0x4001;
+        em->motInfo[0].Mot_attr &= ~0x10;
+        em->motInfo[0].Mot_attr |= 0x4001;
         break;
     }
-    em->motInfo[0].flags = *flag;
+    em->motInfo[0].Mot_attr = *flag;
 }
 
 // Loop flag (bit 2) of slot `no`'s motion 0.
 void SetLoopFlag(int on, int no)
 {
     DB_EM* em = &dbModSlot[no];
-    u16* flag = &em->motInfo[0].flags;
+    u16* flag = &em->motInfo[0].Mot_attr;
 
     if (on) {
-        em->motInfo[0].flags |= 4;
+        em->motInfo[0].Mot_attr |= 4;
     } else {
-        em->motInfo[0].flags &= ~4;
+        em->motInfo[0].Mot_attr &= ~4;
     }
-    em->motInfo[0].flags = *flag;
+    em->motInfo[0].Mot_attr = *flag;
 }
 
 // X-mirror flag (0x40) of slot `no`'s motion 0.
 void SetXFlipFlag(int on, int no)
 {
     DB_EM* em = &dbModSlot[no];
-    u16* flag = &em->motInfo[0].flags;
+    u16* flag = &em->motInfo[0].Mot_attr;
 
     if (on) {
-        em->motInfo[0].flags |= 0x40;
+        em->motInfo[0].Mot_attr |= 0x40;
     } else {
-        em->motInfo[0].flags &= ~0x40;
+        em->motInfo[0].Mot_attr &= ~0x40;
     }
-    em->motInfo[0].flags = *flag;
+    em->motInfo[0].Mot_attr = *flag;
 }
 
 // The enemy (model) of slot `no`, 0 for a bad slot.
@@ -3971,7 +3929,7 @@ void dbModelSetAng0(int no, Vec* rot)
 // Copies `cam` (pos, at, roll, fovy) into slot `no`'s motion attach camera.
 void dbModelSetCamera(int no, CAMERA* cam)
 {
-    ATTACH_CAMERA* ac = dbModSlot[no].motInfo[0].cam;
+    ATTACH_CAMERA* ac = dbModSlot[no].motInfo[0].pAttachCam;
 
     ac->camera_data[0] = cam->param.Campos;
     ac->camera_data[1] = cam->param.Target;
