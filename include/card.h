@@ -80,8 +80,8 @@ struct CARD_SLOT_INFO {
 };                          // 0xF8
 
 // Stream slot saved across the card screen.
-struct CardStr {
-    u32 id;      // 0x00
+struct STR_INFO {
+    u32 snd_id;      // 0x00
     s8 vol;      // 0x04
     u8 pad_5[3];
 };
@@ -174,7 +174,7 @@ private:
     s32 m_Timer;           // 0x384
     s32 m_StrTimer;        // 0x388
     s32 m_ResultCode;          // 0x38C  last CARD result code
-    CardStr m_StrInfo[4];      // 0x390
+    STR_INFO m_StrInfo[4];      // 0x390
     u32 m_SndId;        // 0x3B0
     s32 formatted;       // 0x3B4
     s32 exitFlag;        // 0x3B8

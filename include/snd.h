@@ -28,32 +28,34 @@ struct REVERB_INFO {
 };
 
 // Room sound header (`STB` sub-file of the room archive, pSnd->hdr; DefEffTbl when missing).
-struct SndRoomHdr {
-    REVERB_INFO efx[2];   // 0x00
-    u32 curve_sel[32];    // 0x40   offsets to SND_TBL_DATA, indexed by SND_SIT::curve_no
-    u32 vol_ofs[32];      // 0xC0   offsets to SND_TBL_INFO (volume by distance)
-    u32 pitch_ofs[32];    // 0x140  offsets to SND_TBL_INFO (pitch by distance)
-    u32 filter_ofs[32];   // 0x1C0  offsets to SND_TBL_INFO (filter by distance)
+struct SND_INFO {
+    REVERB_INFO dpl2;      // 0x00
+    REVERB_INFO stereo;    // 0x20
+    u32 offset_tbl[32];    // 0x40   offsets to SND_COMBINE_TBL, indexed by SND_SIT::curve_no
+    u32 offset_vol[32];      // 0xC0   offsets to SND_TBL_INFO (volume by distance)
+    u32 offset_pitch[32];    // 0x140  offsets to SND_TBL_INFO (pitch by distance)
+    u32 offset_filter[32];   // 0x1C0  offsets to SND_TBL_INFO (filter by distance)
 };
 
-// Which distance curves a SIT uses (SndRoomHdr::curve_sel target).
+// Which distance curves a SIT uses (SND_INFO::offset_tbl target); each pair is [stereo, DPL2].
+struct SND_COMBINE_TBL {
+    s8 vol_tbl[2];     // 0x00
+    s8 pitch_tbl[2];   // 0x02
+    s8 filter_tbl[2];  // 0x04
+    u8 flag;           // 0x06
+    u8 padd;           // 0x07
+};
+
 struct SND_TBL_DATA {
-    s8 svol;         // 0x00
-    s8 vol;          // 0x01
-    s8 pitch[2];     // 0x02  [DPL2, stereo]
-    s8 filter[2];    // 0x04
-};
-
-struct SndCurveEnt {
     f32 dist;        // 0x00
-    u16 x4;
+    u16 flag;
     u16 val;         // 0x06  read as s16 (pitch), s8 at 0x07 (filter), u8 at 0x07 (volume)
 };
 
 struct SND_TBL_INFO {
     u32 num;         // 0x00
     f32 scale;       // 0x04  applied to every entry's dist at room start
-    SndCurveEnt data[1]; // 0x08
+    SND_TBL_DATA data[1]; // 0x08
 };
 
 // Stream block file (SndMem.str_file[]).
@@ -103,16 +105,16 @@ struct _MUTE_STAT {
 };
 
 // BGM sequence / stream slot (Snd.bgm_work[2], Snd.str_work[4]).
-struct SndPlayWork {
-    u32 used : 8;    // 0x00
-    u32 stat : 8;    // 0x01  1 = stopped / faded out by the game
-    s32 vol : 8;     // 0x02
-    s32 vol_def : 8; // 0x03
-    u32 id;          // 0x04
-    s16 no;          // 0x08
-    u16 blk;         // 0x0A
+struct BGM_STAT {
+    u32 busy : 8;    // 0x00
+    u32 stop_req : 8;    // 0x01  1 = stopped / faded out by the game
+    s32 now_play_vol : 8;     // 0x02
+    s32 def_play_vol : 8; // 0x03
+    u32 play_id;          // 0x04
+    s16 play_no;          // 0x08
+    u16 play_blk;         // 0x0A
     u8 mute_vol;     // 0x0C  BGM volume saved by SndRoomBgmMute
-    u8 pad_D;
+    u8 padd;
     u16 timer;       // 0x0E  frames a stopped stream has been waiting
 };
 
@@ -146,8 +148,8 @@ struct SndEmHist {
 struct SND_WORK {
     _MUTE_STAT mute[4];      // 0x00  core/pl, em, ... (SndMuteSet bits 0x10..0x80)
     u32 blk_flag[1];         // 0x20  block loaded bits (SND_BIT_*)
-    SndPlayWork bgm_state[2]; // 0x24
-    SndPlayWork str_state[4]; // 0x44
+    BGM_STAT bgm_state[2]; // 0x24
+    BGM_STAT str_state[4]; // 0x44
     u8* mram_base_addr_bgm;            // 0x84  BGM MRAM allocation top (dvd.cpp grows it down)
     u32 aram_base_addr_bgm;            // 0x88  BGM ARAM allocation top (grows down)
     u8 snd_bgm_id[2];            // 0x8C
@@ -155,7 +157,7 @@ struct SND_WORK {
     s32 room_ok;             // 0x90  room sound data initialised
     struct SeAtHead* pSeAtHeader;  // 0x94  room "ESE" sound area data (se_at.cpp), NULL when none
     struct SeAt* pSeAtData; // 0x98  its records
-    SndRoomHdr* hdr;         // 0x9C
+    SND_INFO* hdr;         // 0x9C
     SndSurWork sur[48];      // 0xA0
     SndEmHist em_hist[32];   // 0x9A0
     u8* mram_top;            // 0xAA0  MRAM allocation pointer (dvd.cpp)
@@ -177,7 +179,7 @@ struct SND_WORK {
     u32* BlkFlag() { return blk_flag; }
     u8 EmId(int i) { return snd_em_id[i]; }
     u8 BgmId(int i) { return snd_bgm_id[i]; }
-    SndRoomHdr* Hdr() { return hdr; }
+    SND_INFO* Hdr() { return hdr; }
 };
 
 // "ESE" room file header (game/se_at.cpp), followed by the SeAt records at 0x10.
@@ -245,7 +247,7 @@ extern SND_WORK Snd;
 extern SndMemWork SndMem;
 extern u32 UseAramSize[14];
 extern SE_HISTORY History;
-extern SndRoomHdr DefEffTbl;
+extern SND_INFO DefEffTbl;
 // no `extern u32 aram_buf[3]` here: uninitialised objects (static or not) are emitted in
 // first-declaration order, and snd.cpp's `static callErr` precedes aram_buf in the original .bss
 extern u16 StrFileTbl[2];

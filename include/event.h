@@ -418,10 +418,10 @@ private:
 };
 
 // Enemy module the manager loaded for an event (EventMgr::readEm[8], 4 bytes).
-struct EvtReadEm {
-    u8 em;       // 0x00  enemy id (0 = none)
-    u8 swapped;  // 0x01  1 = its data was swapped into the module block
-    u8 pad_2[2];
+struct ReadWork {
+    u8 EmId;       // 0x00  enemy id (0 = none)
+    u8 SwapFlag;  // 0x01  1 = its data was swapped into the module block
+    u8 dummy[2];
 };
 
 // EventMgr::EvtReadExec `evtReadFlag` bits (PS2 EvtReadFlag): how the event is read and started.
@@ -447,7 +447,7 @@ public:
 private:
     char NowExeEvtName[0x30];  // 0x34  name of the running event ("" = none)
 private:
-    EvtReadEm ReadWkTbl[8];   // 0x64  enemy modules loaded per read slot
+    ReadWork ReadWkTbl[8];   // 0x64  enemy modules loaded per read slot
     char NameTmp[0x20];    // 0x84  NameChange result
     u32 pUnit[0x20];         // 0xA4  cleared by myRoomInit
     public: u8 pad_124[0x144 - 0x124];

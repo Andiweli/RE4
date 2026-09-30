@@ -1551,11 +1551,11 @@ int cDvd::ErrCheck(int disc_new, int proc)
     int discNo = GetDiscNo();
     int shown = 0;
     u8** pMes = MesData.m_Data;
-    SndPlayWork* pStr = Snd.str_state;
+    BGM_STAT* pStr = Snd.str_state;
     int paused = 0;
     int msg;
     int stat;
-    SndPlayWork* str;
+    BGM_STAT* str;
 
     do {
         stat = DVDGetDriveStatus();
@@ -1626,9 +1626,9 @@ int cDvd::ErrCheck(int disc_new, int proc)
                 ScreenReSize(0x200, 0x1C0);
                 str = pStr;
                 do {
-                    if (str->used == 1 && str->blk == 1) {
-                        if (SndStrStatusCk(str->id, 0x10)) {
-                            SndStrReq(str->id, 8, 0, 0);
+                    if (str->busy == 1 && str->play_blk == 1) {
+                        if (SndStrStatusCk(str->play_id, 0x10)) {
+                            SndStrReq(str->play_id, 8, 0, 0);
                         }
                     }
                 } while (++str <= &pStr[3]);

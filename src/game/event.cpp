@@ -74,16 +74,16 @@ static inline int EvtChk(u32 f, u32 mask)
     return (f & mask) ? 1 : 0;
 }
 
-struct EvtFogData {
-    HERMITE_1_FIX start;    // 0x000
-    HERMITE_1_FIX end;      // 0x404
+struct DatFog {
+    HERMITE_1_FIX ScurveStart;    // 0x000
+    HERMITE_1_FIX ScurveEnd;      // 0x404
 };
 
-struct EvtFocusData {
-    HERMITE_1_FIX near_;    // 0x000
-    HERMITE_1_FIX far_;     // 0x404
-    f32 nearLevel;     // 0x808
-    f32 farLevel;      // 0x80C
+struct DatFocus {
+    HERMITE_1_FIX ScurveNear;    // 0x000
+    HERMITE_1_FIX ScurveFar;     // 0x404
+    f32 LevelNear;     // 0x808
+    f32 LevelFar;      // 0x80C
 };
 
 // 12-byte model name copied as words (cObj FREE_OBJ18::evName).
@@ -1892,17 +1892,17 @@ void Event::FogMove(Event* pEvt, void* pDatFog)
     f32 start;
     f32 end;
     f32 t;
-    EvtFogData* d = (EvtFogData*) pDatFog;
+    DatFog* d = (DatFog*) pDatFog;
     int frame = pEvt->NowFrame;
 
     if (d == 0) {
         return;
     }
     t = (f32) frame;
-    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->start, t, &start)) {
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->ScurveStart, t, &start)) {
         LightMgr.setFogStart(start);
     }
-    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->end, t, &end)) {
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->ScurveEnd, t, &end)) {
         LightMgr.setFogEnd(end);
     }
     LightMgr.setFog();
@@ -1914,7 +1914,7 @@ void Event::FocusMove(Event* pEvt, void* pDatFocus)
     f32 near_;
     f32 far_;
     f32 t;
-    EvtFocusData* d = (EvtFocusData*) pDatFocus;
+    DatFocus* d = (DatFocus*) pDatFocus;
     int frame = pEvt->NowFrame;
 
     if (pEvt->FlgCkStatus(EvtStfToolFrontExec)) {
@@ -1924,11 +1924,11 @@ void Event::FocusMove(Event* pEvt, void* pDatFocus)
         return;
     }
     t = (f32) frame;
-    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->near_, t, &near_)) {
-        Filter01SetParam_CamZ(0, d->nearLevel, near_, 1);
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->ScurveNear, t, &near_)) {
+        Filter01SetParam_CamZ(0, d->LevelNear, near_, 1);
     }
-    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->far_, t, &far_)) {
-        Filter01SetParam_CamZ(1, d->farLevel, far_, 1);
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->ScurveFar, t, &far_)) {
+        Filter01SetParam_CamZ(1, d->LevelFar, far_, 1);
     }
 }
 
@@ -2314,8 +2314,8 @@ int EventMgr::EvtReadSub(char* pNameEvt, int loadType, int emId, int* pPtr, int 
         pLog->err(0, 0, "EventMgr::EvtRead : WkNo failed [%d]", no);
         return 0;
     }
-    ReadWkTbl[no].em = emId;
-    ReadWkTbl[no].swapped = 0;
+    ReadWkTbl[no].EmId = emId;
+    ReadWkTbl[no].SwapFlag = 0;
     if (loadType == 0) {
         if (emId != 0) {
             if (fresh == 1) {
@@ -2349,7 +2349,7 @@ int EventMgr::EvtReadSub(char* pNameEvt, int loadType, int emId, int* pPtr, int 
                 return 0;
             }
             MemorySwap(mod->pData, unit->getAddr(), unit->getSize());
-            ReadWkTbl[no].swapped = 1;
+            ReadWkTbl[no].SwapFlag = 1;
             r = mod->pData;
             if (pPtr != 0) {
                 *pPtr = (int) r;
@@ -2482,15 +2482,15 @@ int EventMgr::EvtFree(char* pNameEvt)
         pLog->err(0, 0, "EventMgr::EvtFree : WkNo failed [%d]", no);
         return 0;
     }
-    em = ReadWkTbl[no].em;
+    em = ReadWkTbl[no].EmId;
     if (unit != 0) {
         if (unit->waitLoadOk() == 0) {
             pLog->err(0, 0, "EvtFree() : out of memory (0x%x)[%s]", unit->getSize(), pNameEvt);
         }
-        if (em != 0 && ReadWkTbl[no].swapped == 1) {
+        if (em != 0 && ReadWkTbl[no].SwapFlag == 1) {
             mod = SearchEmModule(em);
             MemorySwap(mod->pData, unit->getAddr(), unit->getSize());
-            ReadWkTbl[no].swapped = 0;
+            ReadWkTbl[no].SwapFlag = 0;
             EspEmDataSwapPop(em);
         }
         unit->setCommand(CMND_CLEAR_DATA, 0, 0);

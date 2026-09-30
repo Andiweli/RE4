@@ -12,16 +12,16 @@ class Event;
 class cLightTool;
 struct DbSctrlWork;
 
-struct EvtFogData {
-    HERMITE_1_FIX start;    // 0x000
-    HERMITE_1_FIX end;      // 0x404
+struct DatFog {
+    HERMITE_1_FIX ScurveStart;    // 0x000
+    HERMITE_1_FIX ScurveEnd;      // 0x404
 };
 
-struct EvtFocusData {
-    HERMITE_1_FIX near_;    // 0x000
-    HERMITE_1_FIX far_;     // 0x404
-    f32 nearLevel;     // 0x808
-    f32 farLevel;      // 0x80C
+struct DatFocus {
+    HERMITE_1_FIX ScurveNear;    // 0x000
+    HERMITE_1_FIX ScurveFar;     // 0x404
+    f32 LevelNear;     // 0x808
+    f32 LevelFar;      // 0x80C
 };
 
 // Message list of the event (the tool's work, 0x964 bytes inside a 1,000,000-byte block): the
@@ -104,8 +104,8 @@ private:
     cLightTool* pTl;  // 0x98
     JOY* pJoy1;           // 0x9C  &Joy[0] (&Joy[2] while a sub tool runs)
     JOY* pJoy2;           // 0xA0  &Joy[1] (&Joy[3])
-    EvtFogData DatFogWk;       // 0xA4
-    EvtFocusData DatFocusWk;   // 0x8AC
+    DatFog DatFogWk;       // 0xA4
+    DatFocus DatFocusWk;   // 0x8AC
     DbSctrlWork* PDatDbSctrl;  // 0x10BC  (1,000,000 bytes)
 public:
     u32 x10C0[8];         // 0x10C0

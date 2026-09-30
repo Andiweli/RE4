@@ -218,8 +218,8 @@ public:
 };
 
 // One sequence key (MotionData sequence table entry / MOTION_INFO::Seq*).
-struct MotionSeqKey {
-    u16 frame;  // 0x00  motion frame in 10.6 fixed point
+struct SEQUENCE_DATA {
+    u16 Frame;  // 0x00  motion frame in 10.6 fixed point
     u8 Se;      // 0x02  sound number + 1 to play at this key, 0 = none (PS2 SEQUENCE_DATA.Se)
     u8 Free;    // 0x03  free bits: player sound kind (low 3 bits) / object event bits (PS2 SEQUENCE_DATA.Free)
 };
@@ -265,10 +265,10 @@ struct MOTION_INFO {
     Vec Ang;              // 0x84  root rotation (current)
     Vec Ang_old;          // 0x90
     Vec Ang_dist;         // 0x9C
-    MotionSeqKey* pSeq_top;    // 0xA8  sequence table (NULL = linear)
-    MotionSeqKey Seq;    // 0xAC  current
-    MotionSeqKey Seq_old;    // 0xB0  previous
-    MotionSeqKey Seq_old2;    // 0xB4  before previous
+    SEQUENCE_DATA* pSeq_top;    // 0xA8  sequence table (NULL = linear)
+    SEQUENCE_DATA Seq;    // 0xAC  current
+    SEQUENCE_DATA Seq_old;    // 0xB0  previous
+    SEQUENCE_DATA Seq_old2;    // 0xB4  before previous
     f32 Seq_frame;         // 0xB8  frame in sequence time
     u16 Seq_frame_num;           // 0xBC  sequence length
     u8 pad_BE[2];

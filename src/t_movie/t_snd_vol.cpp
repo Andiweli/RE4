@@ -1,5 +1,5 @@
 // t_movie REL: the SOUND TABLE EDITOR (t_snd_vol.cpp; the file name is not in the binary). Edits a
-// room's sound table file (snd/r<room>.stb = SndRoomHdr: the two AUX reverb parameter sets, 32 SET
+// room's sound table file (snd/r<room>.stb = SND_INFO: the two AUX reverb parameter sets, 32 SET
 // entries choosing a volume / pitch / filter distance curve per stereo and DPL2 output, and the 32
 // curves of each kind as up to 100 (distance, value) points). Modes: menu, table list (copy /
 // delete), the curve editor on a graph, reverb parameters, SET table, host load / save.
@@ -18,7 +18,7 @@
 
 
 
-// Distance curve entry as edited (SndCurveEnt with a signed value).
+// Distance curve entry as edited (SND_TBL_DATA with a signed value).
 struct TblEnt {
     f32 dist;  // 0x0
     u16 flag;  // 0x4  bit 0 = user point
@@ -32,14 +32,6 @@ struct EditTbl {
     TblEnt e[101];   // 0x008
 };
 
-// Which curves a SIT set uses ([0] stereo, [1] DPL2), 8 bytes.
-struct CombSel {
-    s8 vol[2];     // 0x0
-    s8 pitch[2];   // 0x2
-    s8 filter[2];  // 0x4
-    u8 used;       // 0x6
-    u8 pad;
-};
 
 struct SndVolWork {
     s16 mode;        // 0x00  index into mode_func
@@ -55,17 +47,17 @@ struct SndVolWork {
     int tblType;     // 0x20  0 volume, 1 pitch, 2 filter
     int editMode;    // 0x24
     s8 menuCur;      // 0x28
-    s8 setCur;       // 0x29  selected output set (0 stereo, 1 DPL2): efx / efxCur / CombSel column
+    s8 setCur;       // 0x29  selected output set (0 stereo, 1 DPL2): efx / efxCur / SND_COMBINE_TBL column
     s8 efxCur[2];    // 0x2A  cursor per set
     REVERB_INFO efx[2];     // 0x2C
-    CombSel sel[32];        // 0x6C
-    CombSel selBackup;      // 0x16C
+    SND_COMBINE_TBL sel[32];        // 0x6C
+    SND_COMBINE_TBL selBackup;      // 0x16C
     EditTbl* curTbl;        // 0x174
     EditTbl vol[32];        // 0x178
     EditTbl pitch[32];      // 0x6778
     EditTbl filter[32];     // 0xCD78
     EditTbl backup;         // 0x13378
-    u8 fileBuf[0x20000];    // 0x136A8  save/load image (SndRoomHdr + curve data)
+    u8 fileBuf[0x20000];    // 0x136A8  save/load image (SND_INFO + curve data)
     char path[0x40];        // 0x336A8
     u8 dest;         // 0x336E8  0 local, 1 server
     s8 stage;        // 0x336E9
@@ -85,7 +77,7 @@ static SndVolWork* sndVolWork = {NULL};
 static u32 cursorCol[16] = {0x808080FF, 0x909090FF, 0xA0A0A0FF, 0xB0B0B0FF, 0xC0C0C0FF, 0xD0D0D0FF, 0xE0E0E0FF, 0xF0F0F0FF,
                             0xF0F0F0FF, 0xE0E0E0FF, 0xD0D0D0FF, 0xC0C0C0FF, 0xB0B0B0FF, 0xA0A0A0FF, 0x909090FF, 0x808080FF};
 
-void getInfoData(SndRoomHdr* hdr);
+void getInfoData(SND_INFO* hdr);
 void init();
 void exit();
 static void edit_menu();
@@ -113,36 +105,36 @@ static void file_save();
 static void file_load();
 void ToolSndVolEdit();
 
-// Expands a room sound table image (SndRoomHdr: reverb parameters, per-set curve selection, the
+// Expands a room sound table image (SND_INFO: reverb parameters, per-set curve selection, the
 // volume / pitch / filter distance curves) into the editable tables.
-void getInfoData(SndRoomHdr* hdr)
+void getInfoData(SND_INFO* hdr)
 {
     int i;
     u32 ofs;
     u32 size;
     SND_TBL_INFO* t;
 
-    work->efx[0] = hdr->efx[0];
-    work->efx[1] = hdr->efx[1];
+    work->efx[0] = hdr->dpl2;
+    work->efx[1] = hdr->stereo;
     for (i = 0; i < 32; i++) {
         int pad0 = i, pad1 = i, pad2 = i, pad3 = i, pad4 = i, pad5 = i; // COMPILER-DIFF: 5 (interblock region size: the original does not hoist the giv increments of this loop)
-        ofs = hdr->curve_sel[i];
+        ofs = hdr->offset_tbl[i];
         if (ofs != 0) {
-            memcpy(&work->sel[i], (u8*) hdr + ofs, sizeof(CombSel));
+            memcpy(&work->sel[i], (u8*) hdr + ofs, sizeof(SND_COMBINE_TBL));
         }
-        ofs = hdr->vol_ofs[i];
+        ofs = hdr->offset_vol[i];
         if (ofs != 0) {
             t = (SND_TBL_INFO*) ((u8*) hdr + ofs);
             size = t->num * 8 + 8;
             memcpy(&work->vol[i], t, size);
         }
-        ofs = hdr->pitch_ofs[i];
+        ofs = hdr->offset_pitch[i];
         if (ofs != 0) {
             t = (SND_TBL_INFO*) ((u8*) hdr + ofs);
             size = t->num * 8 + 8;
             memcpy(&work->pitch[i], t, size);
         }
-        ofs = hdr->filter_ofs[i];
+        ofs = hdr->offset_filter[i];
         if (ofs != 0) {
             t = (SND_TBL_INFO*) ((u8*) hdr + ofs);
             size = t->num * 8 + 8;
@@ -1297,7 +1289,7 @@ static void edit_reverb_param()
 
 // Draws a SET's table selection (vol / pitch / filter for stereo and DPL2) with the source /
 // destination labels during a copy.
-void combine_tbl_disp(CombSel* sel)
+void combine_tbl_disp(SND_COMBINE_TBL* sel)
 {
     int i;
     int j;
@@ -1310,20 +1302,20 @@ void combine_tbl_disp(CombSel* sel)
         eprintf(0xA5, 0x58, 0, 0, "SET %2d", work->copySrc);
         eprintf(0xA5, 0xFC, 0, 0, "SET %2d", work->copyDst);
         for (i = 0; i < 4; i++) {
-            CombSel* s = i <= 1 ? &work->sel[work->copySrc] : &work->sel[work->copyDst];
-            if (s->used != 0) {
+            SND_COMBINE_TBL* s = i <= 1 ? &work->sel[work->copySrc] : &work->sel[work->copyDst];
+            if (s->flag != 0) {
                 int yb = 0x6A + i * 0x48;
                 int y = yb + (i / 2) * 0x14;
 
                 work->curTbl = work->vol;
-                ListDraw(0xA5, y, 0xFFFFFFFF, s->vol[i % 2], 0x40);
+                ListDraw(0xA5, y, 0xFFFFFFFF, s->vol_tbl[i % 2], 0x40);
                 work->curTbl = work->pitch;
-                ListDraw(0xA5 + w, y, 0xFFFFFFFF, s->pitch[i % 2], 0x41);
+                ListDraw(0xA5 + w, y, 0xFFFFFFFF, s->pitch_tbl[i % 2], 0x41);
                 work->curTbl = work->filter;
-                ListDraw(0xA5 + w * 2, y, 0xFFFFFFFF, s->filter[i % 2], 0x42);
+                ListDraw(0xA5 + w * 2, y, 0xFFFFFFFF, s->filter_tbl[i % 2], 0x42);
             }
         }
-    } else if (sel->used != 0) {
+    } else if (sel->flag != 0) {
         eprintf(0x129, 0x38, 0, 0, "STEREO  DPL2");
         eprintf(0xE1, 0x5A, 0, 0, "VOLUME");
         eprintf(0xE1, 0x6C, 0, 0, "PITCH");
@@ -1338,20 +1330,20 @@ void combine_tbl_disp(CombSel* sel)
                     c[j] = 6;
                 }
             }
-            eprintf(i * 64 + 0x139, 0x5A, c[0], 0, "%2d", sel->vol[i]);
+            eprintf(i * 64 + 0x139, 0x5A, c[0], 0, "%2d", sel->vol_tbl[i]);
             work->curTbl = work->vol;
             eprintf(0xA5, ybase - 0x12, 0, 0, "VOLUME TBL");
             int y = i * 0x4B + ybase;
 
-            ListDraw(0xA5, y, col[0], sel->vol[i], 0x40);
-            eprintf(i * 64 + 0x139, 0x6C, c[1], 0, "%2d", sel->pitch[i]);
+            ListDraw(0xA5, y, col[0], sel->vol_tbl[i], 0x40);
+            eprintf(i * 64 + 0x139, 0x6C, c[1], 0, "%2d", sel->pitch_tbl[i]);
             work->curTbl = work->pitch;
             eprintf(0xA5 + w, ybase - 0x12, 0, 0, "PITCH TBL");
-            ListDraw(0xA5 + w, y, col[1], sel->pitch[i], 0x41);
-            eprintf(i * 64 + 0x139, 0x7E, c[2], 0, "%2d", sel->filter[i]);
+            ListDraw(0xA5 + w, y, col[1], sel->pitch_tbl[i], 0x41);
+            eprintf(i * 64 + 0x139, 0x7E, c[2], 0, "%2d", sel->filter_tbl[i]);
             work->curTbl = work->filter;
             eprintf(0xA5 + w * 2, ybase - 0x12, 0, 0, "FILTER TBL");
-            ListDraw(0xA5 + w * 2, y, col[2], sel->filter[i], 0x42);
+            ListDraw(0xA5 + w * 2, y, col[2], sel->filter_tbl[i], 0x42);
         }
     }
 }
@@ -1377,19 +1369,19 @@ static void combine_tbl_select()
         }
     } else if (Joy[0].trg & 0x100) {
         work->selBackup = work->sel[work->cur];
-        work->sel[work->cur].used = 1;
+        work->sel[work->cur].flag = 1;
         work->sub = 1;
         work->step = 0;
         work->x6 = 0;
     } else if (Joy[0].trg & 0x800) {
-        if (work->sel[work->cur].used != 0) {
+        if (work->sel[work->cur].flag != 0) {
             work->copySrc = work->copyDst = work->cur;
             work->sub = 2;
             work->step = 0;
             work->x6 = 0;
         }
     } else if (Joy[0].trg & 0x10) {
-        if (work->sel[work->cur].used != 0) {
+        if (work->sel[work->cur].flag != 0) {
             work->sub = 3;
             work->step = 0;
             work->x6 = 0;
@@ -1409,7 +1401,7 @@ static void combine_tbl_select()
 // SET edit: L/R pick the column (stereo / DPL2), up/down the row, left/right the table number.
 static void combine_tbl_edit()
 {
-    CombSel* sel = &work->sel[work->cur];
+    SND_COMBINE_TBL* sel = &work->sel[work->cur];
 
     if (Joy[0].trg & 0x20) {
         work->setCur = 1;
@@ -1422,31 +1414,31 @@ static void combine_tbl_edit()
     } else if (Joy[0].rep2 & 0x10001) {
         switch (work->efxCur[work->setCur]) {
         case 0:
-            sel->vol[work->setCur]--;
-            sel->vol[work->setCur] = sel->vol[work->setCur] < -1 ? -1 : sel->vol[work->setCur] > 31 ? 31 : sel->vol[work->setCur];
+            sel->vol_tbl[work->setCur]--;
+            sel->vol_tbl[work->setCur] = sel->vol_tbl[work->setCur] < -1 ? -1 : sel->vol_tbl[work->setCur] > 31 ? 31 : sel->vol_tbl[work->setCur];
             break;
         case 1:
-            sel->pitch[work->setCur]--;
-            sel->pitch[work->setCur] = sel->pitch[work->setCur] < -1 ? -1 : sel->pitch[work->setCur] > 31 ? 31 : sel->pitch[work->setCur];
+            sel->pitch_tbl[work->setCur]--;
+            sel->pitch_tbl[work->setCur] = sel->pitch_tbl[work->setCur] < -1 ? -1 : sel->pitch_tbl[work->setCur] > 31 ? 31 : sel->pitch_tbl[work->setCur];
             break;
         case 2:
-            sel->filter[work->setCur]--;
-            sel->filter[work->setCur] = sel->filter[work->setCur] < -1 ? -1 : sel->filter[work->setCur] > 31 ? 31 : sel->filter[work->setCur];
+            sel->filter_tbl[work->setCur]--;
+            sel->filter_tbl[work->setCur] = sel->filter_tbl[work->setCur] < -1 ? -1 : sel->filter_tbl[work->setCur] > 31 ? 31 : sel->filter_tbl[work->setCur];
             break;
         }
     } else if (Joy[0].rep2 & 0x20002) {
         switch (work->efxCur[work->setCur]) {
         case 0:
-            sel->vol[work->setCur]++;
-            sel->vol[work->setCur] = sel->vol[work->setCur] < -1 ? -1 : sel->vol[work->setCur] > 31 ? 31 : sel->vol[work->setCur];
+            sel->vol_tbl[work->setCur]++;
+            sel->vol_tbl[work->setCur] = sel->vol_tbl[work->setCur] < -1 ? -1 : sel->vol_tbl[work->setCur] > 31 ? 31 : sel->vol_tbl[work->setCur];
             break;
         case 1:
-            sel->pitch[work->setCur]++;
-            sel->pitch[work->setCur] = sel->pitch[work->setCur] < -1 ? -1 : sel->pitch[work->setCur] > 31 ? 31 : sel->pitch[work->setCur];
+            sel->pitch_tbl[work->setCur]++;
+            sel->pitch_tbl[work->setCur] = sel->pitch_tbl[work->setCur] < -1 ? -1 : sel->pitch_tbl[work->setCur] > 31 ? 31 : sel->pitch_tbl[work->setCur];
             break;
         case 2:
-            sel->filter[work->setCur]++;
-            sel->filter[work->setCur] = sel->filter[work->setCur] < -1 ? -1 : sel->filter[work->setCur] > 31 ? 31 : sel->filter[work->setCur];
+            sel->filter_tbl[work->setCur]++;
+            sel->filter_tbl[work->setCur] = sel->filter_tbl[work->setCur] < -1 ? -1 : sel->filter_tbl[work->setCur] > 31 ? 31 : sel->filter_tbl[work->setCur];
             break;
         }
     } else if (Joy[0].trg & 0x100) {
@@ -1508,7 +1500,7 @@ static void combine_tbl_copy()
             work->yesno ^= 1;
         } else if (Joy[0].trg & 0x100) {
             if (work->yesno == 0) {
-                memcpy(&work->sel[work->copyDst], &work->sel[work->copySrc], sizeof(CombSel));
+                memcpy(&work->sel[work->copyDst], &work->sel[work->copySrc], sizeof(SND_COMBINE_TBL));
                 work->step++;
                 work->timer = 30;
             } else {
@@ -1542,7 +1534,7 @@ static void combine_tbl_delete()
             work->yesno ^= 1;
         } else if (Joy[0].trg & 0x100) {
             if (work->yesno == 0) {
-                memclr_asm(&work->sel[work->cur], sizeof(CombSel));
+                memclr_asm(&work->sel[work->cur], sizeof(SND_COMBINE_TBL));
                 work->step++;
                 work->timer = 30;
             } else {
@@ -1597,7 +1589,7 @@ static void edit_combine_tbl()
 }
 
 // Mode 6, [DATA SAVE]: LOCAL (d:/bio4/room/snd/r<room>.stb) or SERVER (x:/soft/room/snd/...);
-// packs the reverb parameters, set selections and curves into a SndRoomHdr image and writes it.
+// packs the reverb parameters, set selections and curves into a SND_INFO image and writes it.
 static void file_save()
 {
     u8* p;
@@ -1605,7 +1597,7 @@ static void file_save()
     int size = 0;
     int i;
     int n;
-    CombSel* s;
+    SND_COMBINE_TBL* s;
 
     eprintf(0x40, 0x28, 0, 0, "[DATA SAVE]");
     eprintf(0x40, 0x60, 0, 0, "SELECT SAVE FILE");
@@ -1657,62 +1649,62 @@ static void file_save()
         }
         break;
     case 2: {
-        SndRoomHdr* hdr;
+        SND_INFO* hdr;
 
         p = work->fileBuf;
-        hdr = (SndRoomHdr*) p;
-        hdr->efx[0] = work->efx[0];
-        hdr->efx[1] = work->efx[1];
-        ofs = sizeof(SndRoomHdr);
+        hdr = (SND_INFO*) p;
+        hdr->dpl2 = work->efx[0];
+        hdr->stereo = work->efx[1];
+        ofs = sizeof(SND_INFO);
         for (i = 0; i < 32; i++) {
             s = &work->sel[i];
 
-            if (s->used != 0) {
-                hdr->curve_sel[i] = ofs;
-                ofs += sizeof(CombSel);
+            if (s->flag != 0) {
+                hdr->offset_tbl[i] = ofs;
+                ofs += sizeof(SND_COMBINE_TBL);
             } else {
-                hdr->curve_sel[i] = 0;
+                hdr->offset_tbl[i] = 0;
             }
         }
         for (i = 0; i < 32; i++) {
             EditTbl* t = &work->vol[i];
 
             if (t->num != 0) {
-                hdr->vol_ofs[i] = ofs;
+                hdr->offset_vol[i] = ofs;
                 ofs += 8 + t->num * 8;
             } else {
-                hdr->vol_ofs[i] = 0;
+                hdr->offset_vol[i] = 0;
             }
         }
         for (i = 0; i < 32; i++) {
             EditTbl* t = &work->pitch[i];
 
             if (t->num != 0) {
-                hdr->pitch_ofs[i] = ofs;
+                hdr->offset_pitch[i] = ofs;
                 ofs += 8 + t->num * 8;
             } else {
-                hdr->pitch_ofs[i] = 0;
+                hdr->offset_pitch[i] = 0;
             }
         }
         for (i = 0; i < 32; i++) {
             EditTbl* t = &work->filter[i];
 
             if (t->num != 0) {
-                hdr->filter_ofs[i] = ofs;
+                hdr->offset_filter[i] = ofs;
                 ofs += 8 + t->num * 8;
             } else {
-                hdr->filter_ofs[i] = 0;
+                hdr->offset_filter[i] = 0;
             }
         }
-        n = sizeof(SndRoomHdr);
+        n = sizeof(SND_INFO);
         memcpy(p, hdr, n);
         p += n;
         size = n;
         for (i = 0; i < 32; i++) {
             s = &work->sel[i];
 
-            if (s->used != 0) {
-                n = sizeof(CombSel);
+            if (s->flag != 0) {
+                n = sizeof(SND_COMBINE_TBL);
                 memcpy(p, s, n);
                 p += n;
                 size += n;
@@ -1874,7 +1866,7 @@ static void file_load()
         if (ret == 0) {
             pLog->err(0, 0, "%s : LOAD ERROR !!!!", work->path);
         } else {
-            getInfoData((SndRoomHdr*) work->fileBuf);
+            getInfoData((SND_INFO*) work->fileBuf);
         }
         work->timer = 30;
         if (ret != 0) {

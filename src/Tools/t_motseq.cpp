@@ -21,7 +21,7 @@
 #include "tools.h"
 #include "eprintf.h"
 
-// Motion sequence editor (Tools/t_motseq.cpp): edits the key sequence (u16 count + MotionSeqKey[])
+// Motion sequence editor (Tools/t_motseq.cpp): edits the key sequence (u16 count + SEQUENCE_DATA[])
 // of the motion shown in db_mod's slot 0 and saves it as a .seq file.
 
 int SetToolLight(int no);      // db_light_tools.cpp
@@ -34,7 +34,7 @@ struct MsqSeq {
     u16 num;                        // 0x0000  keys in use
     u8 reverse;                     // 0x0002  1: the sequence runs backwards (msqMakeSequence start > end)
     u8 pad_3;
-    MotionSeqKey key[MSQ_KEY_MAX];  // 0x0004  frame (10.6), se + 1, flag bits
+    SEQUENCE_DATA key[MSQ_KEY_MAX];  // 0x0004  frame (10.6), se + 1, flag bits
     u8 pad_1004[0x1090 - 0x1004];
     u32 x1090;                      // 0x1090
     u32 x1094;                      // 0x1094
@@ -47,7 +47,7 @@ struct MsqSeq {
     u8 copyFlagDisp[8];             // 0x10AC  flag bits of the copy buffer (display)
     u8 speed;                       // 0x10B4  0: off, 1: on, 2: on + position reset
     u8 pad_10B5[3];
-    MotionSeqKey copy;              // 0x10B8  copy buffer
+    SEQUENCE_DATA copy;              // 0x10B8  copy buffer
     u32 viewFlag;                   // 0x10BC  MotionSetCore flags (low half -> dbModSlot[0].seqFlag)
 };
 
@@ -428,7 +428,7 @@ static void msq_R0_SeqResize()
     cModel* m = dbModSlot[0].pModel;
     int max;
     int i;
-    MotionSeqKey* k;
+    SEQUENCE_DATA* k;
 
     if (w->seq[0].reverse & 1) {
         msqSetMode(3);
@@ -443,7 +443,7 @@ static void msq_R0_SeqResize()
     i = w->seq[0].num - 1;
     if (i >= 0) {
         k = &w->seq[0].key[i];
-        if (k->frame > max) {
+        if (k->Frame > max) {
             w->seq[0].num--;
             for (;;) {
                 i--;
@@ -451,7 +451,7 @@ static void msq_R0_SeqResize()
                     goto done;
                 }
                 k = &w->seq[0].key[i];
-                if (k->frame <= max) {
+                if (k->Frame <= max) {
                     goto done;
                 }
                 w->seq[0].num--;
@@ -461,7 +461,7 @@ static void msq_R0_SeqResize()
 done:
     if (w->seq[0].num == 0) {
         k = &w->seq[0].key[0];
-        k->frame = 0;
+        k->Frame = 0;
         w->seq[0].num = 1;
         k->Free = 0;
         k->Se = 0;
@@ -470,11 +470,11 @@ done:
         return;
     }
     if (w->seq[0].num > 1) {
-        int step = w->seq[0].key[1].frame - w->seq[0].key[0].frame;
+        int step = w->seq[0].key[1].Frame - w->seq[0].key[0].Frame;
         int f;
 
         k = &w->seq[0].key[w->seq[0].num - 1];
-        f = k->frame;
+        f = k->Frame;
         if (step > 0) {
             f += step;
             // Goto loop (no loop notes): the shared zero of the two byte stores then has 3 refs
@@ -485,7 +485,7 @@ done:
             again2:
                 w->seq[0].num++;
                 k = &w->seq[0].key[w->seq[0].num - 1];
-                k->frame = f;
+                k->Frame = f;
                 k->Free = z;
                 k->Se = z;
                 f += step;
@@ -897,13 +897,13 @@ static void msq_R0_Quit()
 void msqMakeSequence(int start, int end, int add)
 {
     MsqWork* w = MSQ;
-    MotionSeqKey* k = w->seq[0].key;
+    SEQUENCE_DATA* k = w->seq[0].key;
     u32 n = 1;
     int f = start;
     int i;
 
     for (i = 0; i < MSQ_KEY_MAX; i++) {
-        k->frame = f;
+        k->Frame = f;
         k->Se = 0;
         k->Free = 0;
         if (start <= end) {
@@ -937,8 +937,8 @@ void msqSeqDelete(u32 no)
     u32 i;
 
     if (w->seq[0].num > 1) {
-        MotionSeqKey* d;
-        MotionSeqKey* s;
+        SEQUENCE_DATA* d;
+        SEQUENCE_DATA* s;
 
         w->seq[0].num--;
         d = &w->seq[0].key[no];
@@ -959,12 +959,12 @@ void msqSeqDelete(u32 no)
 void msqSeqAdd(u32 no)
 {
     MsqWork* w = MSQ;
-    MotionSeqKey prev;
-    MotionSeqKey tmp;
+    SEQUENCE_DATA prev;
+    SEQUENCE_DATA tmp;
     u32 i;
 
     if (w->seq[0].num < 999) {
-        MotionSeqKey* p = &w->seq[0].key[no];
+        SEQUENCE_DATA* p = &w->seq[0].key[no];
         w->seq[0].num++;
         prev = *p;
         for (i = no; i < MSQ_KEY_MAX; i++) {
@@ -982,22 +982,22 @@ void msqSeqAdd(u32 no)
 void msqSeqFrameAdd(int no, u32 step, int sub)
 {
     MsqWork* w = MSQ;
-    MotionSeqKey* k = &w->seq[0].key[no];
+    SEQUENCE_DATA* k = &w->seq[0].key[no];
     cModel* m = dbModSlot[0].pModel;
 
     if (sub) {
-        if (k->frame > step) {
-            k->frame -= step;
+        if (k->Frame > step) {
+            k->Frame -= step;
         } else {
-            k->frame = 0;
+            k->Frame = 0;
         }
     } else {
         u32 max;
 
-        k->frame += step;
+        k->Frame += step;
         max = (u32) m->Motion.Mot_frame_max << 6;
-        if (k->frame > max) {
-            k->frame = max;
+        if (k->Frame > max) {
+            k->Frame = max;
         }
     }
 }
@@ -1015,7 +1015,7 @@ void msqDisp()
     int c;
     int r;
     char* p;
-    MotionSeqKey* k;
+    SEQUENCE_DATA* k;
     s16 cur;
     s16 y0;
     int cx;  // text column; set to 3 and 48 (two sets: gcse cprop leaves `cx * 8` unfolded after the loops)
@@ -1119,7 +1119,7 @@ void msqDisp()
         eprintf(24, 196, 0, MSQ->col, "--SEQUENCE INFO--");
         k = &w->seq[0].key[cur];
         eprintf(cx * 8, 210, 0, MSQ->col, "Frame:%4.2f [%03d]",
-                (f32) (k->frame >> 6) + (f32) (k->frame & 0x3F) / 64.0f, cur);
+                (f32) (k->Frame >> 6) + (f32) (k->Frame & 0x3F) / 64.0f, cur);
         eprintf(cx * 8, 224, 0, MSQ->col, "Free :0x%02x", k->Free);
         j = 0;
         for (i = 0; i < 8; i++) {
@@ -1310,7 +1310,7 @@ void msqFrameSizeCk()
     i = 0;
     if (i < w->seq[0].num) {
         do {
-            if (w->seq[0].key[i].frame > max) {
+            if (w->seq[0].key[i].Frame > max) {
                 MSQ->errTimer = 150;
                 MSQ->errType = 1;
                 break;

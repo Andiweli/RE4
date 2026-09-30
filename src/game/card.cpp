@@ -1134,8 +1134,8 @@ void cCard::exit()
                     FadeSet(0x80000000, (GXColor*) &c0, (GXColor*) &c1, 10, 0, 0);
                 }
                 for (i = 0; i < 4; i++) {
-                    if (m_StrInfo[i].id != 0 && SndStrStatusCk(m_StrInfo[i].id, 0x10) != 0) {
-                        SndStrReq(m_StrInfo[i].id, 4, 100, m_StrInfo[i].vol);
+                    if (m_StrInfo[i].snd_id != 0 && SndStrStatusCk(m_StrInfo[i].snd_id, 0x10) != 0) {
+                        SndStrReq(m_StrInfo[i].snd_id, 4, 100, m_StrInfo[i].vol);
                     }
                 }
                 SndSePauseAll(0);
@@ -1753,7 +1753,7 @@ int cCard::initialize(int type)
             return 0;
         }
         if (!(pG->CardStatus & 0x80)) {
-            SndPlayWork* s;
+            BGM_STAT* s;
             int i;
             g_id->init(this->m_aMode, (CardArc*) m_IdDataAddr);
             m_Width_bak = (int) Screen.width;
@@ -1766,12 +1766,12 @@ int cCard::initialize(int type)
             s = Snd.str_state;
             i = 0;
             do {
-                if (s->used == 1 && s->stat == 0) {
-                    m_StrInfo[i].id = s->id;
-                    m_StrInfo[i].vol = s->vol;
-                    SndStrReq(s->id, 4, 100, 1);
+                if (s->busy == 1 && s->stop_req == 0) {
+                    m_StrInfo[i].snd_id = s->play_id;
+                    m_StrInfo[i].vol = s->now_play_vol;
+                    SndStrReq(s->play_id, 4, 100, 1);
                 } else {
-                    m_StrInfo[i].id = 0;
+                    m_StrInfo[i].snd_id = 0;
                 }
                 i++;
                 s++;

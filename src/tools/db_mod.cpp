@@ -60,10 +60,10 @@ struct DbMotWork {
     Vec rot;              // 0x84
     Vec rotPrev;          // 0x90
     Vec rotDelta;         // 0x9C
-    MotionSeqKey* seq;    // 0xA8
-    MotionSeqKey key0;    // 0xAC
-    MotionSeqKey key1;    // 0xB0
-    MotionSeqKey key2;    // 0xB4
+    SEQUENCE_DATA* seq;    // 0xA8
+    SEQUENCE_DATA key0;    // 0xAC
+    SEQUENCE_DATA key1;    // 0xB0
+    SEQUENCE_DATA key2;    // 0xB4
     f32 seqFrame;         // 0xB8
     u16 seqMax;           // 0xBC
     u8 pad_BE[2];
@@ -2927,7 +2927,7 @@ void dbModMotionSet(int frame)
         }
     }
 }
-// Plays motion sequence `seq` (MotionSeqKey table) on slot `no` from key `frame` with MotionWork
+// Plays motion sequence `seq` (SEQUENCE_DATA table) on slot `no` from key `frame` with MotionWork
 // flags `flag` (t_motseq / t_event drive this).
 void dbModMotionSetSeq(int no, void* seq, int flag, int frame)
 {

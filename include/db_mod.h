@@ -49,7 +49,7 @@ void dbModMotionMove();
 u32 dbModGetViewFlag();
 void dbModSetViewFlag(u32 flag);
 void dbModUnsetViewFlag(u32 flag);
-// Plays sequence `seq` (u16 count + MotionSeqKey[]) on slot `slot` from key `no`.
+// Plays sequence `seq` (u16 count + SEQUENCE_DATA[]) on slot `slot` from key `no`.
 void dbModMotionSetSeq(int slot, void* seq, int flag, int no);
 // Copies the motion file name of slot `slot` into `dst`.
 void dbModGetMotFilename(int slot, char* dst);

@@ -186,7 +186,7 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
         w->Seq_old2.Se = 0;
         w->Seq_old2.Free = 0;
     } else {
-        w->pSeq_top = (MotionSeqKey*) (seq + 2);
+        w->pSeq_top = (SEQUENCE_DATA*) (seq + 2);
         w->Seq_frame_num = seq[0];
         if ((u32) frame >= w->Seq_frame_num) {
             frame = (u16) (w->Seq_frame_num - 1);
@@ -195,10 +195,10 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
         w->Mot_attr = (((u8*) seq)[2] & 1) ? (flags | 0x1000) : (flags & 0xEFFF);
     }
     if (w->pSeq_top == 0) {
-        w->Seq.frame = (u16) (w->Seq_frame * 64.0f);
-        w->Seq_old.frame = (u16) (w->Seq_frame * 64.0f);
+        w->Seq.Frame = (u16) (w->Seq_frame * 64.0f);
+        w->Seq_old.Frame = (u16) (w->Seq_frame * 64.0f);
     } else {
-        MotionSeqKey k = w->pSeq_top[(u16) w->Seq_frame];
+        SEQUENCE_DATA k = w->pSeq_top[(u16) w->Seq_frame];
 
         w->Seq = k;
         w->Seq_old = k;
@@ -342,7 +342,7 @@ void MotionSetCore(cModel* m, void* w_, void* data_, void* seq_, int hokan, int 
     if (w->pSeq_top == 0) {
         w->Mot_frame = (f32) f;
     } else {
-        u16 k = w->pSeq_top[f].frame;
+        u16 k = w->pSeq_top[f].Frame;
         w->Mot_frame = (f32) (k >> 6) + (f32) (k & 0x3F) * 0.0015625f;
     }
     w->Mot_frame_sav = w->Mot_frame;
@@ -634,7 +634,7 @@ void MotionMoveCore(cModel* pEm, MOTION_INFO* w, CAMERA* pCamera)
         return;
     }
     if (!(w->Mot_attr & 0x8000)) {
-        w->Mot_frame = SEQ_FRAME(w->Seq.frame);
+        w->Mot_frame = SEQ_FRAME(w->Seq.Frame);
     } else {
         w->Mot_frame = w->Seq_frame;
     }
@@ -949,7 +949,7 @@ void MotionGetSpeed(cModel* pEm, MOTION_INFO* w, int flg, Vec* Pos_move, Vec* An
     Mtx rm;
     int flip;
 
-    w->Mot_frame = SEQ_FRAME(w->Seq.frame);
+    w->Mot_frame = SEQ_FRAME(w->Seq.Frame);
     pp->Attr = 0;
     w->Ang_old = w->Ang;
     w->Pos_old = w->Pos;
@@ -1046,7 +1046,7 @@ void MotionGetPosition(cModel* pEm, Vec* pPos, Vec* pAng)
 
     pPos->x = pPos->y = pPos->z = 0.0f;
     pAng->x = pAng->y = pAng->z = 0.0f;
-    w->Mot_frame = SEQ_FRAME(w->Seq_old.frame);
+    w->Mot_frame = SEQ_FRAME(w->Seq_old.Frame);
     pp = &prm;
     pp->Attr = 0;
     asm("" : : "r"(pp));  // COMPILER-DIFF: pp must outrank w for r31
@@ -1130,7 +1130,7 @@ u16 MotionSequenceCtrl(MOTION_INFO* w)
         }
         w->Seq_old = w->Seq;
         if (w->pSeq_top == 0) {
-            w->Seq.frame = (u16) (w->Seq_frame * 64.0f);
+            w->Seq.Frame = (u16) (w->Seq_frame * 64.0f);
         } else {
             // One `sf` variable carries seqFrame, the fraction (`sf -= (f32)(int)fi`) and the
             // else-arm product (`sf *=`): 9 refs rank it above mf and the 0x43300000 double.
@@ -1145,18 +1145,18 @@ u16 MotionSequenceCtrl(MOTION_INFO* w)
                 if (nx >= w->Seq_frame_num) {
                     f32 mf = w->Mot_frame_max * 64.0f;
 
-                    if (mf == (f32) (int) w->pSeq_top[fi].frame) {
-                        w->Seq.frame = (u16) (sf * 64.0f);
-                    } else if (w->pSeq_top[0].frame == 0) {
-                        w->Seq.frame = w->pSeq_top[fi].frame + (u16) (sf * (mf - (f32) (int) w->pSeq_top[fi].frame));
+                    if (mf == (f32) (int) w->pSeq_top[fi].Frame) {
+                        w->Seq.Frame = (u16) (sf * 64.0f);
+                    } else if (w->pSeq_top[0].Frame == 0) {
+                        w->Seq.Frame = w->pSeq_top[fi].Frame + (u16) (sf * (mf - (f32) (int) w->pSeq_top[fi].Frame));
                     }
                 } else {
-                    sf *= (f32) (w->pSeq_top[nx].frame - w->pSeq_top[fi].frame);
-                    w->Seq.frame = w->pSeq_top[fi].frame + (u16) sf;
+                    sf *= (f32) (w->pSeq_top[nx].Frame - w->pSeq_top[fi].Frame);
+                    w->Seq.Frame = w->pSeq_top[fi].Frame + (u16) sf;
                 }
             }
-            if ((f32) (int) w->Seq.frame > w->Mot_frame_max * 64.0f) {
-                pLog->err(0, 0, "MotSeqCtrl(@0x%08x): %.2f Invalid Seq. Frame", w, (f32) (int) w->Seq.frame * 0.015625f);
+            if ((f32) (int) w->Seq.Frame > w->Mot_frame_max * 64.0f) {
+                pLog->err(0, 0, "MotSeqCtrl(@0x%08x): %.2f Invalid Seq. Frame", w, (f32) (int) w->Seq.Frame * 0.015625f);
             }
         }
     } else {
