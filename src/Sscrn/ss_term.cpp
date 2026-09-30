@@ -425,9 +425,9 @@ TermOpe term_ope_tbl[24] = {
 // The archive inside op/opNN.das starts 0x400 bytes in. Read through an inline (not a macro on the
 // member): the table stores may alias wk->pOpData, so the pointer is reloaded per statement, and
 // `ofs + (u32) arc` is not reassociated with the +0x400.
-static inline SsArc* opArc(SUB_SCREEN* wk)
+static inline u32* opArc(SUB_SCREEN* wk)
 {
-    return (SsArc*) ((u8*) wk->pTermMes + 0x400);
+    return (u32*) ((u8*) wk->pTermMes + 0x400);
 }
 #define OP_ARC_PTR(wk, no) SS_ARC_PTR(opArc(wk), no)
 
@@ -498,18 +498,18 @@ void SsTermMain::OpeMdtSetNo(int no)
     if (no > 0x17) {
         pLog->err(0, 0, "SsTermMain::OpeMdtSetNo [%d]", no);
     } else {
-        OpeMdtSetSub(term_ope_tbl[no].mdtNo, term_ope_tbl[no].seq, term_ope_tbl[no].mes);
+        OpeMdtSetSub(term_ope_tbl[no].mdtNo, (OpeMesSeq*) term_ope_tbl[no].seq, (u8*) term_ope_tbl[no].mes);
     }
 }
 
 // Resets the op player (TermOpeWork) onto a voice stream number, a OpeMesSeq table and a message
 // block (MesData slot 2): sequence index / counters to 0, stream not started.
-void SsTermMain::OpeMdtSetSub(int mdtNo, void* seq, void* mes)
+void SsTermMain::OpeMdtSetSub(int mdtNo, OpeMesSeq* seq, u8* mes)
 {
     ope.mdtNo = mdtNo;
-    ope.seq = (OpeMesSeq*) seq;
+    ope.seq = seq;
     ope.mes = mes;
-    MesData.registData(2, (u8*) mes);
+    MesData.registData(2, mes);
     ope.seqIdx = 0;
     ope.mesWait = 0;
     ope.flags &= ~0x08000000;
@@ -659,7 +659,7 @@ int partnerType(int no)
 // cancel motion, 12/13 = the player model's motion / shape data, 14/15 = the partner's.
 void termMotionSet(void* data, int no)
 {
-    SsArc* d = (SsArc*) data;
+    u32* d = (u32*) data;
     cModel* m;
 
     m = MapMgr.getWork(0);
@@ -675,7 +675,7 @@ void termMotionSet(void* data, int no)
 void termMotionCancel(void* data, int no)
 {
     SUB_SCREEN* wk = &SubScreenWk;
-    SsArc* d = (SsArc*) data;
+    u32* d = (u32*) data;
     cModel* m;
 
     m = MapMgr.getWork(0);
@@ -713,7 +713,7 @@ void SsTermInit::move(SUB_SCREEN* wk)
         IdSub.dispSw(IDC_SSCRN_PESETA, 0);
         sscrnModelFree(wk);
         sscrnLightClear(wk);
-        wk->pTermDat = (SsArc*) (wk->pSwitchOffs + (u32) wk->pBuf);
+        wk->pTermDat = (u32*) (wk->pSwitchOffs + (u32) wk->pBuf);
         sscrnDataFilename(wk, "ss_term.dat");
 #line 1101 "D:/Bio4/Prog/ss_term.cpp"
         term_read_req = DVD_READ_N(wk->filename, 0, 0, 0, 0, 5);
@@ -723,7 +723,7 @@ void SsTermInit::move(SUB_SCREEN* wk)
         _rno++;
     case 3:
         Dvd.ReadCheck(term_read_req, 0, 0, &term);
-        wk->pTermDat = (SsArc*) term;
+        wk->pTermDat = (u32*) term;
         _rno++;
     case 4: {
         char name[32];
@@ -740,7 +740,7 @@ void SsTermInit::move(SUB_SCREEN* wk)
 #line 1156 "D:/Bio4/Prog/ss_term.cpp"
         term_read_req = DVD_READ_N(name, 0, 0, 0, 0, 5);
         Dvd.ReadCheck(term_read_req, 0, 0, &partner);
-        wk->pTelDat = partner;
+        wk->pTelDat = (u32*) partner;
         _rno++;
     }
     case 6:

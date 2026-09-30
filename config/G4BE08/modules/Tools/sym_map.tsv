@@ -167,7 +167,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00018AD0	0x638	Tools/db_mod.cpp	local	dbmod_p_info__Fv	dbmod_p_info
 .text	0x00019108	0x1C	Tools/db_mod.cpp	local	dbmod_null__Fv	dbmod_null
 .text	0x00019124	0x334	Tools/db_mod.cpp	global	dbmodInfoDisp__Fv	dbmodInfoDisp
-.text	0x00019458	0x74	Tools/db_mod.cpp	global	dbModMotionSetSeq__FiPvii	dbModMotionSetSeq
+.text	0x00019458	0x74	Tools/db_mod.cpp	global	dbModMotionSetSeq__FScP13SEQUENCE_FILEUlUl	dbModMotionSetSeq
 .text	0x000194CC	0xA4	Tools/db_mod.cpp	global	dbModPlayMode__FPUs	dbModPlayMode
 .text	0x00019570	0xA54	Tools/db_mod.cpp	global	dbModMotionMove__Fv	dbModMotionMove
 .text	0x00019FC4	0x38	Tools/db_mod.cpp	global	dbModGetMotFilename__FiPc	dbModGetMotFilename

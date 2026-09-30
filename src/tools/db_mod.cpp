@@ -269,7 +269,7 @@ void dbModelSetPos0(int no, Vec* pos);
 void dbModelSetAng0(int no, Vec* rot);
 u32 dbModGetViewFlag();
 void dbModUnsetViewFlag(u32 flag);
-void dbModMotionSetSeq(int slot, void* seq, int flag, int no);
+void dbModMotionSetSeq(s8 slot, SEQUENCE_FILE* seq, u32 flag, u32 no);
 void dbModGetMotFilename(int slot, char* dst);
 int SetToolLight(int no);  // db_light_tools.cpp / db_light_esp.cpp
 
@@ -2885,7 +2885,7 @@ void dbModMotionSet(int frame)
 }
 // Plays motion sequence `seq` (SEQUENCE_DATA table) on slot `no` from key `frame` with MotionWork
 // flags `flag` (t_motseq / t_event drive this).
-void dbModMotionSetSeq(int no, void* seq, int flag, int frame)
+void dbModMotionSetSeq(s8 no, SEQUENCE_FILE* seq, u32 flag, u32 frame)
 {
     DB_EM* em = &dbModSlot[no];
     cEm* model = em->pEm;

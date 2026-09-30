@@ -15,11 +15,8 @@ struct SUB_SCREEN;
 struct SsFileWork;
 struct ItemScreenWork;
 
-// Sub screen data archive (ss_cmmn.dat / ss_pzzl.dat): a table of byte offsets to its sub-files.
-struct SsArc {
-    u32 ofs[0x12];
-};
-#define SS_ARC_PTR(arc, no) ((void*) ((arc)->ofs[no] + (u32) (arc)))
+// Sub screen data archive (ss_cmmn.dat / ss_pzzl.dat): a u32* to a table of byte offsets to its sub-files.
+#define SS_ARC_PTR(arc, no) ((void*) ((arc)[no] + (u32) (arc)))
 
 // The sub screen's record in the save image (PS2 SSCRN_SAVE_DATA, 4 bytes). GC saves the whole word
 // at SUB_SCREEN::save (map_mode, map_mark, ...); PS2 keeps only map_mark here.
@@ -83,18 +80,18 @@ struct SUB_SCREEN {
     u32 pCommonOffs;              // 0x1D0  ss_cmmn.dat offset
     u32 pSwitchOffs;              // 0x1D4  ss_pzzl.dat offset
     s32 relAddr;              // 0x1D8  Sscrn.rel address (0 while unlinked)
-    SsArc* pCmmn;             // 0x1DC
-    SsArc* pSwitchDat;        // 0x1E0  read buffer of the screen being switched to (item / map / puzzle .dat) (PS2 pSwitchDat)
-    SsArc* pPzzlDat;          // 0x1E4  puzzle screen data (SubScreenTask: = pSwitchDat once read) (PS2 pPzzlDat)
-    SsArc* pItemDat;             // 0x1E8  ss_item.dat archive (Sscrn ss_item)
-    SsArc* pTermDat;             // 0x1EC  ss_term.dat archive (Sscrn ss_term)
+    u32* pCmmn;             // 0x1DC
+    u32* pSwitchDat;        // 0x1E0  read buffer of the screen being switched to (item / map / puzzle .dat) (PS2 pSwitchDat)
+    u32* pPzzlDat;          // 0x1E4  puzzle screen data (SubScreenTask: = pSwitchDat once read) (PS2 pPzzlDat)
+    u32* pItemDat;             // 0x1E8  ss_item.dat archive (Sscrn ss_item)
+    u32* pTermDat;             // 0x1EC  ss_term.dat archive (Sscrn ss_term)
     void* pTermMes;            // 0x1F0  op/opNN.das (Sscrn ss_term: the message/sequence archive at +0x400)
-    SsArc* pMapDat;           // 0x1F4  ss_map.dat archive (Sscrn ss_map: common map data, pSwitchDat while the map is open)
-    SsArc* pMapObj;          // 0x1F8  SS/cmn/map_objNN.dat archive of the current area (Sscrn ss_map)
-    SsArc* pFileDat;             // 0x1FC  ss_file.dat archive (Sscrn ss_file)
-    SsArc* pExam;             // 0x200  item examine id data archive (examine ItemExamine::idSet)
-    SsArc* pShopDat;             // 0x204  ss_shop.dat archive (Sscrn ss_shop: read to pBuf + pFreeOffs)
-    void* pTelDat;           // 0x208  SS/cmn/ss_ocNNN.dat (Sscrn ss_term: the partner model data)
+    u32* pMapDat;           // 0x1F4  ss_map.dat archive (Sscrn ss_map: common map data, pSwitchDat while the map is open)
+    u32* pMapObj;          // 0x1F8  SS/cmn/map_objNN.dat archive of the current area (Sscrn ss_map)
+    u32* pFileDat;             // 0x1FC  ss_file.dat archive (Sscrn ss_file)
+    u32* pExam;             // 0x200  item examine id data archive (examine ItemExamine::idSet)
+    u32* pShopDat;             // 0x204  ss_shop.dat archive (Sscrn ss_shop: read to pBuf + pFreeOffs)
+    u32* pTelDat;           // 0x208  SS/cmn/ss_ocNNN.dat (Sscrn ss_term: the partner model data)
     void* pTplDat;            // 0x20C  0x20000-byte file picture TPL buffer (Sscrn ss_file)
     void* pWepDat;               // 0x210  weapon model data (pBuf + 0x2E5E00, Sscrn SubScreenTask / weaponChangeTask)
     void* binoA;              // 0x214  CameraControl::GetBinocularIDAddr

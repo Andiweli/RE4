@@ -401,7 +401,7 @@ void SsShopInit::move(SUB_SCREEN* wk)
     case 2:
         sscrnModelFree(wk);
         sscrnLightClear(wk);
-        wk->pShopDat = (SsArc*) (wk->pFreeOffs + (u32) wk->pBuf);
+        wk->pShopDat = (u32*) (wk->pFreeOffs + (u32) wk->pBuf);
         sscrnDataFilename(wk, "ss_shop.dat");
 #line 312 "D:/Bio4/Prog/ss_shop.cpp"
         shop_read_req = DVD_READ_N(wk->filename, wk->pShopDat, 0, 0, 0, 0x10);

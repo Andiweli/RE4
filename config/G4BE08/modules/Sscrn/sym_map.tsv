@@ -266,8 +266,8 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00016260	0xC	Sscrn/ss_map.cpp	global	fn_Sscrn_16260	.
 .text	0x0001626C	0x4	Sscrn/ss_map.cpp	global	__dl__5cUnitPvUi	cUnit::operator delete
 .text	0x00016270	0x3C0	Sscrn/ss_model.cpp	global	weaponFilename__FPci	weaponFilename
-.text	0x00016630	0x120	Sscrn/ss_model.cpp	global	tel00ModelInit__FP6cModelP5SsArc	tel00ModelInit
-.text	0x00016750	0x138	Sscrn/ss_model.cpp	global	hunniganModelInit__FP6cModelPvUl	hunniganModelInit
+.text	0x00016630	0x120	Sscrn/ss_model.cpp	global	tel00ModelInit__FP6cModelPUl	tel00ModelInit
+.text	0x00016750	0x138	Sscrn/ss_model.cpp	global	hunniganModelInit__FP6cModelPUlUl	hunniganModelInit
 .text	0x00016888	0x124	Sscrn/ss_model.cpp	global	playerModelInit__Fv	playerModelInit
 .text	0x000169AC	0x218	Sscrn/ss_model.cpp	global	ashleyModelInit__Fv	ashleyModelInit
 .text	0x00016BC4	0x350	Sscrn/ss_model.cpp	global	adaModelInit__FUsUs	adaModelInit
@@ -462,9 +462,9 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0002D1EC	0x3CC	Sscrn/ss_term.cpp	global	OpeMesTblInit__10SsTermMainP10SUB_SCREEN	SsTermMain::OpeMesTblInit
 .text	0x0002D5B8	0x38	Sscrn/ss_term.cpp	global	OpeMdtSet__10SsTermMain	SsTermMain::OpeMdtSet
 .text	0x0002D5F0	0x70	Sscrn/ss_term.cpp	global	OpeMdtSetNo__10SsTermMaini	SsTermMain::OpeMdtSetNo
-.text	0x0002D660	0x38	Sscrn/ss_term.cpp	global	OpeMdtSetSub__10SsTermMainiPvT2	SsTermMain::OpeMdtSetSub
+.text	0x0002D660	0x38	Sscrn/ss_term.cpp	global	OpeMdtSetSub__10SsTermMainiPQ210SsTermMain9OpeMesSeqPUc	SsTermMain::OpeMdtSetSub
 .text	0x0002D698	0x25C	Sscrn/ss_term.cpp	global	OpeMesMove__10SsTermMain	SsTermMain::OpeMesMove
-.text	0x0002D8F4	0x94	Sscrn/ss_term.cpp	global	OpeSeqMove__10SsTermMainP9OpeMesSeq	SsTermMain::OpeSeqMove
+.text	0x0002D8F4	0x94	Sscrn/ss_term.cpp	global	OpeSeqMove__10SsTermMainPQ210SsTermMain9OpeMesSeq	SsTermMain::OpeSeqMove
 .text	0x0002D988	0x124	Sscrn/ss_term.cpp	global	OpeMesSet__10SsTermMainii	SsTermMain::OpeMesSet
 .text	0x0002DAAC	0x48	Sscrn/ss_term.cpp	global	OpeMesClear__10SsTermMain	SsTermMain::OpeMesClear
 .text	0x0002DAF4	0x4C	Sscrn/ss_term.cpp	global	OpeSndStrStop__10SsTermMain	SsTermMain::OpeSndStrStop

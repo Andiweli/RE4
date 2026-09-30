@@ -224,6 +224,14 @@ struct SEQUENCE_DATA {
     u8 Free;    // 0x03  free bits: player sound kind (low 3 bits) / object event bits (PS2 SEQUENCE_DATA.Free)
 };
 
+// Motion sequence file (.seq): key count, flag byte, then the keys.
+struct SEQUENCE_FILE {
+    u16 Frame_num;       // 0x00  keys in the file
+    u8 Flag;             // 0x02
+    u8 Dummy;            // 0x03
+    SEQUENCE_DATA Data[0];  // 0x04
+};
+
 // Key-frame data header (the `data` given to MotionSetCore). Packed:
 //   u16 maxFrame (low 14 bits), u8 nParts, u16 parts[nParts], u8 partsNo[nParts],
 //   4-aligned u32 keyOfs[nParts] (relocated in place to absolute key pointers).

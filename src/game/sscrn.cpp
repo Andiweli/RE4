@@ -448,8 +448,8 @@ void SubScreenExec()
             MemSetCurrentHeap(12);
             if (wk->relAddr >= 0) {
                 wk->relAddr = wk->pPreplfOffs + (u32) wk->pBuf;
-                wk->pCmmn = (SsArc*) (wk->pCommonOffs + (u32) wk->pBuf);
-                wk->pSwitchDat = (SsArc*) (wk->pSwitchOffs + (u32) wk->pBuf);
+                wk->pCmmn = (u32*) (wk->pCommonOffs + (u32) wk->pBuf);
+                wk->pSwitchDat = (u32*) (wk->pSwitchOffs + (u32) wk->pBuf);
             }
             wk->p_module = (OSModuleHeader*) wk->relAddr;
             {

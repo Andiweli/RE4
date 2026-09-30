@@ -314,15 +314,6 @@ public:
     virtual void move(SUB_SCREEN* pWk);
 };
 
-// One entry of the op message sequence table (0x10 bytes).
-struct OpeMesSeq {
-    u16 be_flag;
-    s16 No;    // 0x02  copied to SsTermMain::TermSub::x14
-    int Frame;  // 0x04  frame the entry fires at
-    int NoMes; // 0x08  message number (-1: wait for the message end)
-    int Timer;   // 0x0C  message clear time; -1 ends the sequence
-};
-
 // One op number of ss_term's op table (SsTermMain::OpeMesTblInit, 0x14 bytes, 24 entries in .data).
 struct TermOpe {
     int mdtNo;  // 0x00  0x8C ..
@@ -334,6 +325,15 @@ struct TermOpe {
 
 class SsTermMain : public Widget<SUB_SCREEN> {
 public:
+    // One entry of the op message sequence table (0x10 bytes).
+    struct OpeMesSeq {
+        u16 be_flag;
+        s16 No;    // 0x02  copied to SsTermMain::TermSub::x14
+        int Frame;  // 0x04  frame the entry fires at
+        int NoMes; // 0x08  message number (-1: wait for the message end)
+        int Timer;   // 0x0C  message clear time; -1 ends the sequence
+    };
+
     // The op message player (memset at init).
     struct TermOpeWork {
         u32 flags;    // 0x1C  0x08000000 voice stream started, 0x10000000 sequence ended / skipped
@@ -370,7 +370,7 @@ public:
     void OpeMesTblInit(SUB_SCREEN* wk);
     void OpeMdtSet();
     void OpeMdtSetNo(int no);
-    void OpeMdtSetSub(int mdtNo, void* seq, void* mes);
+    void OpeMdtSetSub(int mdtNo, OpeMesSeq* seq, u8* mes);
     int OpeMesMove();
     int OpeSeqMove(OpeMesSeq* s);
     void OpeMesSet(int no, int wait);
@@ -424,8 +424,8 @@ void adaModelInit(u16 no, u16 type);
 void klauserModelInit(u16 no, u16 type);
 void hunkModelInit(u16 no, u16 type);
 void weskerModelInit(u16 no, u16 type);
-void tel00ModelInit(cModel* m, SsArc* arc);
-void hunniganModelInit(cModel* m, void* data, u32 type);
+void tel00ModelInit(cModel* m, u32* arc);
+void hunniganModelInit(cModel* m, u32* data, u32 type);
 // ss_main.cpp helpers the screens share
 void clearZbuffer();
 void dispScrollBar(u32 top, u32 n, u32 num, ID_UNIT* bar, ID_UNIT* up, ID_UNIT* down);

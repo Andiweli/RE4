@@ -2065,7 +2065,7 @@ void doorModelInit(SUB_SCREEN* wk)
     void* bin;
 
     if ((int) wk->pMapObj >= 0) {
-        wk->pMapObj = (SsArc*) ((u8*) wk->pMapObj + (u32) wk->pBuf);
+        wk->pMapObj = (u32*) ((u8*) wk->pMapObj + (u32) wk->pBuf);
     }
     m = wk->map;
     base = (s8) wk->map_obj_num;
@@ -2421,7 +2421,7 @@ void SsMapInit::move(SUB_SCREEN* wk)
             break;
         }
         wk->pMapDat = wk->pSwitchDat;
-        wk->pMapObj = (SsArc*) ((u8*) wk->pSwitchDat + result);
+        wk->pMapObj = (u32*) ((u8*) wk->pSwitchDat + result);
         state++;
     }
     case 4:

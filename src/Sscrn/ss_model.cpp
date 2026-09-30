@@ -54,7 +54,7 @@ void wep45Init(int no, int type);
 void wep47Init(int no);
 
 // The player archive (pG->pPlArc) and the weapon data (SUB_SCREEN::x210): both are offset tables.
-#define WEP_ARC(wk, no) SS_ARC_PTR((SsArc*) (wk)->pWepDat, no)
+#define WEP_ARC(wk, no) SS_ARC_PTR((u32*) (wk)->pWepDat, no)
 
 // Sub screen weapon data file for weapon number `no` of the current character (pG->pl_type: 0 Leon,
 // 2 Ada, 3 HUNK, 4 Krauser, 5 Wesker): SS/cmn/ss_wepNN.dat, NN = the wepNN module that owns the
@@ -159,7 +159,7 @@ static inline void ssModelLight(cModel* m)
 
 // Codec screen: the player's radio pose model from the player archive plus the radio/hand parts of
 // ss_term.dat (sub-files 10..13).
-void tel00ModelInit(cModel* m, SsArc* arc)
+void tel00ModelInit(cModel* m, u32* arc)
 {
     SUB_SCREEN* wk = &SubScreenWk;
 
@@ -173,9 +173,9 @@ void tel00ModelInit(cModel* m, SsArc* arc)
 
 // Codec screen partner from SS/cmn/ss_ocNNN.dat (sub-files 5..11): base body + four parts, and the
 // sixth part (11) for partnerType 0/2 (Hunnigan); type 1 leaves it out.
-void hunniganModelInit(cModel* m, void* data, u32 type)
+void hunniganModelInit(cModel* m, u32* data, u32 type)
 {
-    SsArc* d = (SsArc*) data;
+    u32* d = (u32*) data;
 
     m->modelInit(SS_ARC_PTR(d, 6), SS_ARC_PTR(d, 5));
     m->addModel(ssModInfoMgr.create(SS_ARC_PTR(d, 7), SS_ARC_PTR(d, 5)));

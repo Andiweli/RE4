@@ -49,7 +49,7 @@ u32 dbModGetViewFlag();
 void dbModSetViewFlag(u32 flag);
 void dbModUnsetViewFlag(u32 flag);
 // Plays sequence `seq` (u16 count + SEQUENCE_DATA[]) on slot `slot` from key `no`.
-void dbModMotionSetSeq(int slot, void* seq, int flag, int no);
+void dbModMotionSetSeq(s8 slot, SEQUENCE_FILE* seq, u32 flag, u32 no);
 // Copies the motion file name of slot `slot` into `dst`.
 void dbModGetMotFilename(int slot, char* dst);
 // Slot access and the model set loader (db_port.cpp drives them for the effect tool).
