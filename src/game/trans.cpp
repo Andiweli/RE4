@@ -290,26 +290,26 @@ public:
 #define TEV_STAGE_ID() (((cTevStage*) &tev_stage)->getID())
 #define IND_STAGE_ID() (((cIndTexStage*) &ind_stage)->getID())
 
-void ThermoShaderSetup(cModel* m, cModelInfo* info, ModelPart* part);
-void shaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv);
-void TextureBlend(ModelPart* part, cModelInfo* info, int colIn, int alphaIn);
-void TextureBlend2(ModelPart* part, cModelInfo* info, int colIn, int alphaIn);
-void TextureBlend3(ModelPart* part, cModelInfo* info, int colIn, int alphaIn);
-void materialSetup(ModelPart* part, cModelInfo* info, int colIn, int alphaIn);
-static void specularSetup(ModelPart* part, cModelInfo* info, int flag);
-void specularSetup2(ModelPart* part, int flag);
-void GlobalIlluminationSetup(ModelPart* part, int nrm8);
+void ThermoShaderSetup(cModel* m, cModelInfo* info, cPolyHeader* part);
+void shaderSetup(cModel* m, cModelInfo* info, cPolyHeader* part, Mtx mv);
+void TextureBlend(cPolyHeader* part, cModelInfo* info, int colIn, int alphaIn);
+void TextureBlend2(cPolyHeader* part, cModelInfo* info, int colIn, int alphaIn);
+void TextureBlend3(cPolyHeader* part, cModelInfo* info, int colIn, int alphaIn);
+void materialSetup(cPolyHeader* part, cModelInfo* info, int colIn, int alphaIn);
+static void specularSetup(cPolyHeader* part, cModelInfo* info, int flag);
+void specularSetup2(cPolyHeader* part, int flag);
+void GlobalIlluminationSetup(cPolyHeader* part, int nrm8);
 void SetCastShadowLight(cModel* m, Vec* pos, Vec* dir, ShadowMng* mng);
-void ShadowCastSetup(ModelPart* part, cModel* m);
-void SelfShadowSetup(ModelPart* part, cModel* m, ShadowMng* mng);
-void bumpSetup(ModelPart* part, cModelInfo* info);
-void alphaSetup(cModel* m, ModelPart* part, cModelInfo* info, int thermo);
+void ShadowCastSetup(cPolyHeader* part, cModel* m);
+void SelfShadowSetup(cPolyHeader* part, cModel* m, ShadowMng* mng);
+void bumpSetup(cPolyHeader* part, cModelInfo* info);
+void alphaSetup(cModel* m, cPolyHeader* part, cModelInfo* info, int thermo);
 void CalcSk1_x(void* dst, void* src, u32 n);
 void CalcSk1_x2(void* dst, void* src, u32 n);
 int MakeWeightPaletteExt(cWeightExt* w, int n);
 int MakeWeightPalette(cWeight* w, int n);
 void updateMatrices(Mtx m, Mtx dst, cModel* model);
-void RefractShaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv);
+void RefractShaderSetup(cModel* m, cModelInfo* info, cPolyHeader* part, Mtx mv);
 
 // Binds model texture `id` to texture map `map`: from the GX work's texture objects (0..0xF7), or
 // a render-to-texture manager's texture (0xF8..).
@@ -1059,7 +1059,7 @@ void commonModelTrans(cModel* m, cModelInfo* info, Mtx viewMat, int flag)
         void* tex;
         f32 (*mat0)[4];
         u16 nParts;
-        ModelPart* part;
+        cPolyHeader* part;
         u32 i;
 
         if (!StaFlagChk(pG, STA_PROC_SHD_TEX) && m->ot_type == 7) {
@@ -1242,8 +1242,8 @@ void commonModelTrans(cModel* m, cModelInfo* info, Mtx viewMat, int flag)
 #line 2044 "D:/Bio4/Prog/trans.cpp"
                 HALT();
             }
-            GXCallDisplayList(p, part->size);
-            part = (ModelPart*) (p + part->size);
+            GXCallDisplayList(p, part->buff_size);
+            part = (cPolyHeader*) (p + part->buff_size);
             if (IND_STAGE_ID() != 0) {
                 GXSetNumIndStages(0);
                 GXSetTevDirect(0);
@@ -1285,7 +1285,7 @@ void cTexChg::move(GXTexObj* texObj)
 
 // Thermal-scope view (Status_flg[1] 0x04000000, the rifle's infrared scope): the part is drawn
 // with the thermo palette instead of its material.
-void ThermoShaderSetup(cModel* m, cModelInfo* info, ModelPart* part)
+void ThermoShaderSetup(cModel* m, cModelInfo* info, cPolyHeader* part)
 {
     int st;
     int map;
@@ -1308,7 +1308,7 @@ void ThermoShaderSetup(cModel* m, cModelInfo* info, ModelPart* part)
     tev_stage++;
     tex_map++;
     tex_coord++;
-    if (part->flags & 4) {
+    if (part->flag & 4) {
         alphaSetup(m, part, info, 1);
     }
     GXSetNumTevStages(tev_stage);
@@ -1320,7 +1320,7 @@ void ThermoShaderSetup(cModel* m, cModelInfo* info, ModelPart* part)
 // or cast-shadow stages, the material (texture, blends), specular / bump (part flags), global
 // illumination (be_flag 0x01000000), the alpha texture (part flags 4), and the colour scale of
 // the model's TevScaleGroup (gxCsScale).
-void shaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv)
+void shaderSetup(cModel* m, cModelInfo* info, cPolyHeader* part, Mtx mv)
 {
     int selfDone;
     int st;
@@ -1368,7 +1368,7 @@ void shaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv)
         }
         materialSetup(part, info, colIn, alphaIn);
     }
-    if (part->flags & 0x80) {
+    if (part->flag & 0x80) {
         specularSetup2(part, 0);
     } else {
         specularSetup(part, info, 0);
@@ -1377,7 +1377,7 @@ void shaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv)
     if (m->be_flag & 0x01000000) {
         GlobalIlluminationSetup(part, isBit(info->model_addr->flags, 0x20000000));
     }
-    if (part->flags & 4) {
+    if (part->flag & 4) {
         alphaSetup(m, part, info, 0);
     }
     st = TEV_STAGE_ID();
@@ -1425,12 +1425,12 @@ void shaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv)
 }
 
 // Load the blend table's texture for `part` (tbl: [0] count, [4 + 2i] part texture id or 0xF7, [5 + 2i] texture id).
-static inline void loadBlendTex(ModelPart* part, u8* tbl, int map)
+static inline void loadBlendTex(cPolyHeader* part, u8* tbl, int map)
 {
     int i;
     for (i = 0; i < tbl[0]; i++) {
         u8* e = &tbl[5] + i * 2;
-        if (part->texId == e[-1] || e[-1] == 0xF7) {
+        if (part->material_tex == e[-1] || e[-1] == 0xF7) {
             org_LoadTexObj(e[0], map);
         }
     }
@@ -1438,7 +1438,7 @@ static inline void loadBlendTex(ModelPart* part, u8* tbl, int map)
 
 // Material blend type 0 (blendType 0): the blend-table textures (matched to the part's texture)
 // layered over the base stage with the info's blendRatio as constant-colour weight.
-void TextureBlend(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
+void TextureBlend(cPolyHeader* part, cModelInfo* info, int colIn, int alphaIn)
 {
     int st;
     ModelTexInfo* t;
@@ -1478,7 +1478,7 @@ void TextureBlend(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
         int ofs = i * 2;
         u8* e = tbl + 4;
         u8 id = e[ofs];
-        if (part->texId == id || id == 0xF7) {
+        if (part->material_tex == id || id == 0xF7) {
             int reg;
             GXColor k;
             GXColor kc;
@@ -1520,7 +1520,7 @@ void TextureBlend(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
 
 // Material blend type 1: the blend-table texture layered over the base with the blendRatio
 // weight; the alpha comes from the second texture (probably: differs from type 0 in the alpha path).
-void TextureBlend2(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
+void TextureBlend2(cPolyHeader* part, cModelInfo* info, int colIn, int alphaIn)
 {
     int st;
     ModelTexInfo* t;
@@ -1560,7 +1560,7 @@ void TextureBlend2(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
         int ofs = i * 2;
         u8* e = tbl + 4;
         u8 id = e[ofs];
-        if (part->texId == id || id == 0xF7) {
+        if (part->material_tex == id || id == 0xF7) {
             int reg;
             GXColor k;
             GXColor kc;
@@ -1602,7 +1602,7 @@ void TextureBlend2(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
 
 // Material blend type 2: the blend-table texture over the base (blendRatio 0 = no second
 // texture) with the alpha kept from the input (`use_alp`).
-void TextureBlend3(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
+void TextureBlend3(cPolyHeader* part, cModelInfo* info, int colIn, int alphaIn)
 {
     static int use_alp = 1;
     ModelTexInfo* t;
@@ -1637,7 +1637,7 @@ void TextureBlend3(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
         int ofs = i * 2;
         u8* e = tbl + 4;
         u8 id = e[ofs];
-        if (part->texId == id || id == 0xF7) {
+        if (part->material_tex == id || id == 0xF7) {
             u8 texId;
             u8* e2 = tbl + 5;
             texId = e2[ofs];
@@ -1736,7 +1736,7 @@ void TextureBlend3(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
 // Base material stage: the part's texture (animated frame when the info animates), texgen by UV
 // or by the UV-scroll matrix, then one of the blend types when the info blends (flags bit2),
 // producing the colour from `colIn` / `alphaIn`.
-void materialSetup(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
+void materialSetup(cPolyHeader* part, cModelInfo* info, int colIn, int alphaIn)
 {
     int st;
     ModelTexInfo* t;
@@ -1749,7 +1749,7 @@ void materialSetup(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
     coord = getTexCoord();
     g_material_tex_coord = coord;
     t = MODEL_TEX(info);
-    texId = part->texId;
+    texId = part->material_tex;
     if ((t->flags & 2) && t->anim != 0) {
         u8* tbl = t->anim + 4;
         texId = tbl[t->frame];
@@ -1795,7 +1795,7 @@ void materialSetup(ModelPart* part, cModelInfo* info, int colIn, int alphaIn)
 
 // Specular / environment stage (part flags 0x13): the specular texture selected by the part,
 // normal-based texgen, colour from the part's spec colour or the info colour2.
-static void specularSetup(ModelPart* part, cModelInfo* info, int flag)
+static void specularSetup(cPolyHeader* part, cModelInfo* info, int flag)
 {
     GXColor col;
     GXColor kc;
@@ -1807,13 +1807,13 @@ static void specularSetup(ModelPart* part, cModelInfo* info, int flag)
     u32 mtx;
     u8 type;
 
-    if ((part->flags & 0x13) == 0) {
+    if ((part->flag & 0x13) == 0) {
         return;
     }
     if (info->color2[3] == 0) {
-        col.r = part->specR;
-        col.g = part->specG;
-        col.b = part->specB;
+        col.r = part->specular_r;
+        col.g = part->specular_g;
+        col.b = part->specular_b;
         col.a = 0xFF;
     } else {
         col.r = info->color2[0];
@@ -1821,7 +1821,7 @@ static void specularSetup(ModelPart* part, cModelInfo* info, int flag)
         col.b = info->color2[2];
         col.a = 0xFF;
     }
-    scale = (f32) (int) part->specPow * 0.01f;
+    scale = (f32) (int) part->specular_decay * 0.01f;
     if (scale == 0.0f) {
         scale = 0.5f;
     }
@@ -1836,12 +1836,12 @@ static void specularSetup(ModelPart* part, cModelInfo* info, int flag)
         PSMTXConcat(s, specular_mat, tmp);
         PSMTXConcat(t, tmp, tmp);
     }
-    type = part->specType;
+    type = part->specular_type;
     st = TEV_STAGE_ID();
     map = getTexMap();
     g_specular_tev_stage = st;
-    if (!(part->flags & 0x10)) {
-        u32 idx = part->specTex;
+    if (!(part->flag & 0x10)) {
+        u32 idx = part->specular_tex;
         if (idx == 0xFF) {
             idx = 0;
         }
@@ -1895,7 +1895,7 @@ static void specularSetup(ModelPart* part, cModelInfo* info, int flag)
 
 // Bump-mapped specular variant (part flags 0x80): indirect stage with the bump texture
 // perturbing the specular lookup.
-void specularSetup2(ModelPart* part, int flag)
+void specularSetup2(cPolyHeader* part, int flag)
 {
     static f32 bp_mx = 0.0f;
     static f32 bp_my = 0.0f;
@@ -1905,14 +1905,14 @@ void specularSetup2(ModelPart* part, int flag)
     int st;
 
     do {
-        if (!(part->flags & 3)) {
+        if (!(part->flag & 3)) {
             return;
         }
     } while (0);
     st = TEV_STAGE_ID();
     {
         int map = getTexMap();
-        org_LoadTexObj(part->bumpTex, map);
+        org_LoadTexObj(part->bump_tex, map);
         int coord = getTexCoord();
         GXSetTexCoordGen2(coord, 1, 4, 0x3C, 0, 0x7D);
         GXSetTevOrder(st, coord, map, 4);
@@ -1930,7 +1930,7 @@ void specularSetup2(ModelPart* part, int flag)
         u32 mtx = getTexMtx();
         int map = getTexMap();
         Mtx tmp;
-        org_LoadTexObj(part->bumpTex, map);
+        org_LoadTexObj(part->bump_tex, map);
         PSMTXIdentity(tmp);
         tmp[0][2] = bp_mx;
         tmp[1][2] = bp_my;
@@ -1990,7 +1990,7 @@ void specularSetup2(ModelPart* part, int flag)
 
 // Adds the global illumination texture stage (normal-based lookup; scale 0.25 for 8-bit normals);
 // off with Disp_flg 0x00080000.
-void GlobalIlluminationSetup(ModelPart* part, int nrm8)
+void GlobalIlluminationSetup(cPolyHeader* part, int nrm8)
 {
     Mtx tmp;
     int st;
@@ -2080,7 +2080,7 @@ void SetCastShadowLight(cModel* m, Vec* pos, Vec* dir, ShadowMng* mng)
 
 // Adds the stage that projects the shadow light's texture (g_pShdMng texMat x the parts matrix)
 // onto the part, modulating the colour.
-void ShadowCastSetup(ModelPart* part, cModel* m)
+void ShadowCastSetup(cPolyHeader* part, cModel* m)
 {
     GXTexObj* tex;
     GXTlutObj* tlut;
@@ -2242,7 +2242,7 @@ void ShadowCastSetup(ModelPart* part, cModel* m)
 
 // Self-shadow stage: the model's own depth shadow map compared through an indirect texture (the
 // IndTex ramp) so parts in their own shadow darken.
-void SelfShadowSetup(ModelPart* part, cModel* m, ShadowMng* mng)
+void SelfShadowSetup(cPolyHeader* part, cModel* m, ShadowMng* mng)
 {
     static int shd_tex_no = 0;
     static f32 shd_z = -1.001f;
@@ -2331,9 +2331,9 @@ void SelfShadowSetup(ModelPart* part, cModel* m, ShadowMng* mng)
 
 // Bump stage (part flags bit0): the part's bump texture (or the blend table's) as an indirect
 // texture perturbing the base lookup.
-void bumpSetup(ModelPart* part, cModelInfo* info)
+void bumpSetup(cPolyHeader* part, cModelInfo* info)
 {
-    int off = !(part->flags & 1);
+    int off = !(part->flag & 1);
     ModelTexInfo* t;
     int map;
     int coord;
@@ -2345,14 +2345,14 @@ void bumpSetup(ModelPart* part, cModelInfo* info)
     }
     t = MODEL_TEX(info);
     __GXSetIndirectMask(0);
-    texId = part->bumpTex;
+    texId = part->bump_tex;
     map = getTexMap();
     if (info->flagsDC & 4) {
         u8* tbl = t->blendTbl;
         int i;
         for (i = 0; i < tbl[0]; i++) {
             u8* e = &tbl[5] + i * 2;
-            if (part->bumpTex == e[-1] || e[-1] == 0xF7) {
+            if (part->bump_tex == e[-1] || e[-1] == 0xF7) {
                 texId = e[0];
             }
         }
@@ -2371,7 +2371,7 @@ void bumpSetup(ModelPart* part, cModelInfo* info)
 
 // Alpha texture stage (part flags 4): alpha compare against the part's alphaRef (or the model's
 // alpha_omit), the alpha texture multiplied into the output alpha.
-void alphaSetup(cModel* m, ModelPart* part, cModelInfo* info, int thermo)
+void alphaSetup(cModel* m, cPolyHeader* part, cModelInfo* info, int thermo)
 {
     int map;
     int st;
@@ -2381,12 +2381,12 @@ void alphaSetup(cModel* m, ModelPart* part, cModelInfo* info, int thermo)
     GXSetZCompLoc(0);
     ref = m->alpha_omit;
     if (ref == 0xFF) {
-        GXSetAlphaCompare(4, part->alphaRef, 1, 4, 0xFF);
+        GXSetAlphaCompare(4, part->alpha_omit, 1, 4, 0xFF);
     } else {
         GXSetAlphaCompare(4, ref, 1, 4, 0xFF);
     }
     map = getTexMap();
-    org_LoadTexObj(part->alphaTex, map);
+    org_LoadTexObj(part->alpha_tex, map);
     st = TEV_STAGE_ID();
     if ((info->flagsDC & 8) || thermo) {
         coord = getTexCoord();
@@ -2665,7 +2665,7 @@ void updateMatrices(Mtx m, Mtx dst, cModel* model)
 
 // Refraction shader (Shader_type 1 / 2, Refract_ratio): the captured screen (render texture)
 // looked up through an indirect texture built from the normals, mixed by the refract ratio.
-void RefractShaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv)
+void RefractShaderSetup(cModel* m, cModelInfo* info, cPolyHeader* part, Mtx mv)
 {
     static f32 mul_x = 1.0f;
     static f32 mul_y = 1.0f;
@@ -2779,7 +2779,7 @@ void RefractShaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv)
         if (info->flagsDC & 4) {
             loadBlendTex(part, t->blendTbl, map);
         } else {
-            org_LoadTexObj(part->texId, map);
+            org_LoadTexObj(part->material_tex, map);
         }
         GXSetTexCoordGen2(coord, 1, 4, 0x3C, 0, 0x7D);
         {
@@ -2822,7 +2822,7 @@ void RefractShaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv)
         tev_stage++;
         specularSetup(part, info, 0);
         bumpSetup(part, info);
-        if (part->flags & 4) {
+        if (part->flag & 4) {
             alphaSetup(m, part, info, 0);
         }
     }

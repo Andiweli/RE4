@@ -785,17 +785,17 @@ void cModelInfo::setBlendType(u8 type)
 void cModelInfo::setSpecular(u8 r, u8 g, u8 b)
 {
     cModelData* d = model_addr;
-    ModelPart* part = d->pParts;
+    cPolyHeader* part = d->pParts;
     u32 n = d->displist_num;
     u32 i;
 
     for (i = 0; i < n; i++) {
-        part->specR = r;
-        part->specG = g;
-        part->specB = b;
+        part->specular_r = r;
+        part->specular_g = g;
+        part->specular_b = b;
         {
             u8* next = (u8*) (part + 1);
-            part = (ModelPart*) (next + part->size);
+            part = (cPolyHeader*) (next + part->buff_size);
         }
     }
 }
@@ -938,7 +938,7 @@ void calcModelAddr(cModelData* d)
     d->pTex = base + (u32) d->pTex;
     d->pHead = (ModelDataHead*) (base + (u32) d->pHead);
     d->pWeight = base + (u32) d->pWeight;
-    d->pParts = (ModelPart*) (base + (u32) d->pParts);
+    d->pParts = (cPolyHeader*) (base + (u32) d->pParts);
     d->vtxOrig = base + (u32) d->vtxOrig;
     d->nrmOrig = base + (u32) d->nrmOrig;
     if (d->version > 0x20030817) {
@@ -967,7 +967,7 @@ void calcModelOffset(cModelData* d)
     d->pTex = (void*) ((u8*) d->pTex - base);
     d->pHead = (ModelDataHead*) ((u8*) d->pHead - base);
     d->pWeight = (void*) ((u8*) d->pWeight - base);
-    d->pParts = (ModelPart*) ((u8*) d->pParts - base);
+    d->pParts = (cPolyHeader*) ((u8*) d->pParts - base);
     d->vtxOrig = (void*) ((u8*) d->vtxOrig - base);
     d->nrmOrig = (void*) ((u8*) d->nrmOrig - base);
     if (d->version > 0x20030817) {
@@ -992,7 +992,7 @@ void slideModelAddr(u32 addr, int ofs)
     d->pTex = (u8*) d->pTex + ofs;
     d->pHead = (ModelDataHead*) ((u8*) d->pHead + ofs);
     d->pWeight = (u8*) d->pWeight + ofs;
-    d->pParts = (ModelPart*) ((u8*) d->pParts + ofs);
+    d->pParts = (cPolyHeader*) ((u8*) d->pParts + ofs);
     d->vtxOrig = (u8*) d->vtxOrig + ofs;
     d->nrmOrig = (u8*) d->nrmOrig + ofs;
     if (d->version > 0x20030817) {

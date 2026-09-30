@@ -1374,7 +1374,7 @@ static void shadowShaderSetup(ShadowMng** tbl, u32 num)
 }
 
 // TEV / texgen setup for projecting `num` shadow textures onto one model part (per-part variant).
-void shadowShaderSetup2(cModel* m, ModelPart* part, ShadowMng** tbl, u32 num)
+void shadowShaderSetup2(cModel* m, cPolyHeader* part, ShadowMng** tbl, u32 num)
 {
     static const GXColor col_tbl[4] = {{0xFF, 0, 0, 0}, {0, 0xFF, 0, 0}, {0, 0, 0xFF, 0}, {0, 0, 0, 0xFF}};
     static const GXColor col0 = {0, 0, 0, 0};
@@ -1527,7 +1527,7 @@ void shadowModelTrans(cModel* m, cModelInfo* info, Mtx viewMat, ShadowMng** tbl,
         cModelData* d = info->model_addr;
         void* texArr = d->pTex;
         u16 nParts;
-        ModelPart* part;
+        cPolyHeader* part;
 
         GXClearVtxDesc();
         GXSetVtxDesc(9, 3);
@@ -1570,8 +1570,8 @@ void shadowModelTrans(cModel* m, cModelInfo* info, Mtx viewMat, ShadowMng** tbl,
             u8* p;
             shadowShaderSetup2(m, part, tbl, num);
             p = (u8*) part + 0x20;
-            GXCallDisplayList(p, part->size);
-            part = (ModelPart*) (p + part->size);
+            GXCallDisplayList(p, part->buff_size);
+            part = (cPolyHeader*) (p + part->buff_size);
         }
     }
     if (DbgFlagChk(pG, DBG_SHADOW_LIGHT)) {
@@ -1601,7 +1601,7 @@ void shadowModelTrans2(cModel* m, cModelInfo* info, Mtx viewMat)
         cModelData* d = info->model_addr;
         void* texArr = d->pTex;
         u16 nParts;
-        ModelPart* part;
+        cPolyHeader* part;
 
         GXClearVtxDesc();
         GXSetVtxDesc(9, 3);
@@ -1638,8 +1638,8 @@ void shadowModelTrans2(cModel* m, cModelInfo* info, Mtx viewMat)
         part = d->pParts;
         for (i = 0; i < nParts; i++) {
             u8* p = (u8*) part + 0x20;
-            GXCallDisplayList(p, part->size);
-            part = (ModelPart*) (p + part->size);
+            GXCallDisplayList(p, part->buff_size);
+            part = (cPolyHeader*) (p + part->buff_size);
         }
     }
 }

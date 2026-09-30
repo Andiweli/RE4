@@ -82,23 +82,23 @@ typedef struct {
     u16 lyn2[2];        // 0x78
 } SND_SHD;
 
-typedef struct {
-    u32 num;        // 0x00  number of SITs
-    SND_SIT* sit;   // 0x04
-    u8* dls;        // 0x08  wavetable (WTFILEHEADER + SYN WT tables)
-    u8* seq;        // 0x0C  sequence table (SND_SEQ_TBL)
-    u32 aram;       // 0x10  ARAM address of the block's samples
-    u8 pad_14[0xC];
-} SND_ISS_BLK;
+struct SND_IBLK {
+    u32 sit_num;        // 0x00  number of SITs
+    SND_SIT* sit_adrs;   // 0x04
+    u8* wt_adrs;        // 0x08  wavetable (WTFILEHEADER + SYN WT tables)
+    u8* seq_adrs;        // 0x0C  sequence table (SND_SEQ_TBL)
+    u32 pcm_adrs;       // 0x10  ARAM address of the block's samples
+    u32 dummy[3];
+};
 
-// SND_ISS_BLK::seq: u32 count followed by one offset (from the table start) per bank.
+// SND_IBLK::seq: u32 count followed by one offset (from the table start) per bank.
 
-typedef struct {
-    u32 num;        // 0x00
-    SND_RIT* rit;   // 0x04
-    u8* shd;        // 0x08  table of offsets to the stream headers
-    u8 pad_C[4];
-} SND_STR_BLK;
+struct SND_RBLK {
+    u32 rit_num;        // 0x00
+    SND_RIT* rit_adrs;   // 0x04
+    u8* sbh_adrs;        // 0x08  table of offsets to the stream headers
+    u32 dummy;
+};
 
 // Wavetable (DLS) file header: offsets to the SYN WTINST / WTREGION / WTART tables.
 struct WTFILEHEADER {
@@ -151,7 +151,7 @@ struct SND_CTRL {
     u8 pad_51[1];
     u16 pitch;          // 0x52  (0x200) cents added to the base pitch
     u16 dop_p;          // 0x54  (0x400) distance pitch offset
-    u16 req_bit;            // 0x56  (0x800) SND_AXV_WORK::flag bits
+    u16 req_bit;            // 0x56  (0x800) SND_AXV::flag bits
     u16 para_flag;           // 0x58  which override parameters are valid
     u8 pad_5A[2];
     u32 seq_adjust;           // 0x5C  sequencer clock (1/1000 ms units, wraps at 999000)
@@ -202,13 +202,13 @@ struct SND_REQ {
     s8 aux_b;       // 0x20
     s8 lpf;      // 0x21  low-pass filter table index
     s16 pitch;      // 0x22  cents added to the base pitch
-    u16 dop_p;  // 0x24  distance pitch offset (SND_AXV_WORK::pitch_ofs)
-    u16 req_bit;    // 0x26  SE flags (SND_AXV_WORK::flag)
+    u16 dop_p;  // 0x24  distance pitch offset (SND_AXV::pitch_ofs)
+    u16 req_bit;    // 0x26  SE flags (SND_AXV::flag)
     s16 rnd_pitch;      // 0x28  random pitch (cents)
     u8 pad_2A[2];
 };
 
-struct SND_AXV_WORK_;
+struct SND_AXV;
 
 // Voice slot (Snd_voice_work[64], 0x20 bytes).
 struct SND_VOICE {
@@ -221,7 +221,7 @@ struct SND_VOICE {
     u8 pad_B[1];
     u32 timer;      // 0x0C
     s32 adsr_rel;   // 0x10  release time for the note off
-    struct SND_AXV_WORK_* axv_ptr;  // 0x14
+    struct SND_AXV* axv_ptr;  // 0x14
     u16 blk_no;     // 0x18
     u16 req_no;     // 0x1A
     s8 vprio;        // 0x1C
@@ -231,59 +231,60 @@ struct SND_VOICE {
 };
 
 // AX voice work (Snd_axv_work[64], 0x80 bytes): one AX voice playing a wavetable sample.
-typedef struct SND_AXV_WORK_ {
-    u16 status;     // 0x00  0x1 in use, 0x2 attack envelope, 0x4 release envelope, 0x8 keep,
+struct SND_AXV {
+    u16 be_flag;     // 0x00  0x1 in use, 0x2 attack envelope, 0x4 release envelope, 0x8 keep,
                     //       0x10 volume down
-    u16 no;         // 0x02
+    u16 work_id;         // 0x02
     u32 snd_id;     // 0x04
     s8 srd_type;    // 0x08
-    u8 adsr_on;     // 0x09
-    u16 upd;        // 0x0A  0x1 volume, 0x2 pan, 0x4 aux A, 0x8 aux B, 0x10 lpf on/off, 0x20 lpf coefs,
+    u8 se_type;     // 0x09
+    u16 update;        // 0x0A  0x1 volume, 0x2 pan, 0x4 aux A, 0x8 aux B, 0x10 lpf on/off, 0x20 lpf coefs,
                     //       0x40 pitch, 0x100 stop, 0x200 start
-    u16 flag;       // 0x0C  request parameter (SND_REQ::x26): 0x2 = no volume down
-    u8 pad_E[2];
-    AXVPB* voice;   // 0x10
-    SND_VOICE* vw;     // 0x14
-    u32 aram;       // 0x18
-    u8* wt;         // 0x1C  wavetable
-    SND_SIT* sit;   // 0x20
-    WTFILEHEADER* hdr;        // 0x24
-    WTINST* inst;   // 0x28
-    WTREGION* rgn;  // 0x2C
-    WTART* art;     // 0x30
-    WTSAMPLE* sample;       // 0x34
-    WTADPCM* adpcm; // 0x38
-    f32 rate;       // 0x3C
+    u16 req_bit;       // 0x0C  request parameter (SND_REQ::x26): 0x2 = no volume down
+    u16 dummy;
+    AXVPB* ax_voice;   // 0x10
+    SND_VOICE* voice_adrs;     // 0x14
+    u32 pcm_adrs;       // 0x18
+    u8* wt_adrs;         // 0x1C  wavetable
+    SND_SIT* sit_ptr;   // 0x20
+    WTFILEHEADER* fhp;        // 0x24
+    WTINST* isp;   // 0x28
+    WTREGION* rgp;  // 0x2C
+    WTART* atp;     // 0x30
+    WTSAMPLE* smp;       // 0x34
+    WTADPCM* adp; // 0x38
+    f32 sample_rate;       // 0x3C
     s32 ax_vol;     // 0x40
-    s32 ax_auxA;    // 0x44
-    s32 ax_auxB;    // 0x48
-    s16 vol;        // 0x4C  << 8
-    s16 svol;       // 0x4E
-    s16 vdown_src_vol;      // 0x50
-    s16 vdown_src_svol;     // 0x52
-    s16 vdown_vol;  // 0x54
-    s16 vdown_svol; // 0x56
+    s32 ax_aux_a;    // 0x44
+    s32 ax_aux_b;    // 0x48
+    s16 ste_vol;        // 0x4C  << 8
+    s16 srd_vol;       // 0x4E
+    s16 sv_ste_vol;      // 0x50
+    s16 sv_srd_vol;     // 0x52
+    s16 vd_ste_vol;  // 0x54
+    s16 vd_srd_vol; // 0x56
     s16 now_vol;    // 0x58
-    s16 calc_vol;   // 0x5A
-    u8 pad_5C[4];
-    u32 attack_steps;       // 0x60
-    s32 rel_time;   // 0x64
-    s16 env_vol;    // 0x68
-    s16 env_target; // 0x6A
-    s16 env_step;   // 0x6C
-    u16 env_cnt;    // 0x6E
-    s16 pitch_base; // 0x70  cents
-    u16 pitch_ofs;  // 0x72
-    s16 pitch;      // 0x74
-    s8 pan;         // 0x76
-    s8 span;        // 0x77
+    s16 out_vol;   // 0x5A
+    s16 fade_spd;      // 0x5C
+    s16 fade_end;      // 0x5E
+    u32 adsr_atk;       // 0x60
+    s32 adsr_rel;   // 0x64
+    s16 adsr_vol;    // 0x68
+    s16 adsr_end; // 0x6A
+    s16 adsr_spd;   // 0x6C
+    u16 adsr_ctr;    // 0x6E
+    s16 org_pitch; // 0x70  cents
+    u16 dop_pitch;  // 0x72
+    s16 out_pitch;      // 0x74
+    s8 out_pan;         // 0x76
+    s8 srd_span;        // 0x77
     s8 out_span;    // 0x78
-    s8 auxA;        // 0x79
-    s8 auxB;        // 0x7A
-    s8 lpf_on;      // 0x7B
-    s8 lpf_no;      // 0x7C
+    s8 out_aux_a;        // 0x79
+    s8 out_aux_b;        // 0x7A
+    s8 lpf_flag;      // 0x7B
+    s8 lpf_freq;      // 0x7C
     u8 pad_7D[3];
-} SND_AXV_WORK;
+};
 
 // MIDI sequence work (Snd_seq_work[8], 0x328C bytes).
 struct SND_SEQ {
@@ -360,7 +361,7 @@ struct SND_STR {
     s8 pan;         // 0x28
     s8 span;        // 0x29
     s8 vol;         // 0x2A
-    s8 svol;        // 0x2B  surround volume (same order as SND_AXV_WORK vol/svol)
+    s8 svol;        // 0x2B  surround volume (same order as SND_AXV vol/svol)
     s8 aux_a;        // 0x2C
     s8 aux_b;        // 0x2D
     u8 pad_2E[2];
@@ -427,25 +428,66 @@ struct SND_STR {
 };
 
 // Sound test / debug work (Snd_test_work, 0x7C0 bytes, 32-aligned).
-typedef struct {
-    u8 mode;            // 0x00  test mode (snd_test.h SndTestWork names)
-    u8 tbl;             // 0x01  0 = SIT, 1 = RIT
-    u8 type;            // 0x02  SIT type
-    u8 aux;             // 0x03  effect slot being edited
-    u8 pad_4[8];
-    u16 menu;           // 0x0C  1 = mode menu shown
-    u16 dispFlag;       // 0x0E  0x1 request parameters, 0x2 voice map, 0x4 aux state
-    u8 pad_10[8];
-    u16 blkMax[2];      // 0x18  blocks per table (0xE SIT, 2 RIT)
-    u8 pad_1C[0x9C - 0x1C];
-    char path0[0x100];  // 0x9C
-    char path1[0x380];  // 0x19C
-    u32 sitData[14];    // 0x51C  SIT parameters being edited
-    u32 ritData[2];     // 0x554  RIT parameters being edited
-    u8 pad_55C[0x6B8 - 0x55C];
-    u32 aram_base;      // 0x6B8
-    u8 pad_6BC[0x7C0 - 0x6BC];
-} SND_TEST_WORK;
+struct SND_TEST {
+    s8 rno00;      // 0x00  menu cursor / test mode (0 SIT, 1 RIT, 2 AUX A, 3 AUX B, 4 VOL, 5 DUMP, 6/7 LOAD)
+    s8 tbl_type;       // 0x01  0 = SIT (ISS), 1 = RIT (stream)
+    s8 sit_type;      // 0x02  SIT type (0 dummy, 1 normal, 2 ADSR, 3 MIDI)
+    s8 aux_type;       // 0x03  effect slot being edited (0 AUX A, 1 AUX B)
+    s8 load_type;   // 0x04  load menu table (0 SIT, 1 RIT)
+    u8 disp_ax;    // 0x05  show the wavetable data instead of the SIT
+    u8 disp_midi;   // 0x06  show the sequencer channels instead of the MIDI SIT
+    u8 pad_7;
+    u32 timer;    // 0x08
+    s16 menu_flag;     // 0x0C  1 = mode menu shown
+    u16 disp_flag; // 0x0E  0x1 request parameters, 0x2 voice map, 0x4 aux state
+    u32 snd_id;    // 0x10  last issued sound
+    s16 blk_no[2]; // 0x14  current block per table
+    s16 blk_max[2];    // 0x18
+    s16 req_no[2]; // 0x1C  current request per table
+    s16 req_now;   // 0x20  request being edited
+    s16 req_max[2];    // 0x22
+    s8 tbl_idx[2]; // 0x26  parameter cursor per table
+    s8 tbl_now;       // 0x28  parameter cursor being edited
+    u8 pad_29;
+    s16 efx_idx[2];   // 0x2A  effect type per slot
+    s16 efx_now;   // 0x2E
+    s8 efx_ok[2];   // 0x30  1 executed, 0 changing, -1 stopped
+    s8 aux_idx[2];  // 0x32
+    s8 aux_now;    // 0x34
+    s8 vol_idx; // 0x35
+    u8 pad_36[2];
+    u32 joy_now;       // 0x38  Joy[0] copy taken by SoundTest every frame
+    u32 joy_old;      // 0x3C
+    u32 joy_trg;      // 0x40
+    u32 joy_rep;      // 0x44
+    SND_SIT sit;  // 0x48  SIT being edited
+    SND_RIT rit;  // 0x60  RIT being edited
+    SND_SIT* stp;    // 0x70
+    SND_RIT* rip;    // 0x74
+    DVDDir dir;   // 0x78
+    DVDDirEntry entry;  // 0x84
+    int file_max;   // 0x90
+    int file_top;   // 0x94
+    int file_now;   // 0x98
+    char dir_name[2][0x100];  // 0x9C
+    char* file_name[0x80];  // 0x29C
+    u8 file_dir[0x80];    // 0x49C
+    char* iss_blk_name[14];  // 0x51C
+    char* str_blk_name[2];   // 0x554
+    char str_sbb_name[256];  // 0x55C
+    u32* iss_blk_adrs[14];   // 0x65C
+    u32* str_blk_adrs[2];    // 0x694
+    WTFILEHEADER* fhp;  // 0x69C
+    WTINST* isp; // 0x6A0
+    WTREGION* rgp;    // 0x6A4
+    WTART* atp;   // 0x6A8
+    WTSAMPLE* smp; // 0x6AC
+    WTADPCM* adp;   // 0x6B0
+    SND_AXV* axv_ptr;    // 0x6B4
+    u32 aram_adrs; // 0x6B8
+    u8 pad_6BC[4];
+    u8 aram_dump[0x100];   // 0x6C0  ARAM dump buffer
+};
 
 // AUX effect slot (Snd_efx_work[2], 0x278 bytes).
 typedef void (*SND_AUX_CB)(void*, void*);
@@ -482,13 +524,13 @@ extern SND_CTRL Snd_ctrl_work;
 extern SND_EFX Snd_efx_work[2];
 extern SND_REQ Snd_req_work[SND_REQ_BANK_MAX][SND_REQ_MAX];
 extern SND_VOICE Snd_voice_work[SND_VOICE_MAX];
-extern SND_AXV_WORK Snd_axv_work[SND_AXV_MAX];
-extern SND_ISS_BLK Snd_iss_blk[SND_ISS_BLK_MAX];
-extern SND_STR_BLK Snd_str_blk[SND_STR_BLK_MAX];
+extern SND_AXV Snd_axv_work[SND_AXV_MAX];
+extern SND_IBLK Snd_iss_blk[SND_ISS_BLK_MAX];
+extern SND_RBLK Snd_str_blk[SND_STR_BLK_MAX];
 extern SND_SEQ Snd_seq_work[SND_SEQ_MAX];
 extern SND_STR Snd_str_work[SND_STR_MAX];
 extern u8* Snd_str_buff[SND_STR_MAX];
-extern SND_TEST_WORK Snd_test_work;
+extern SND_TEST Snd_test_work;
 
 #ifdef SND_DRV_GAME_API
 // Game-side view of the driver entry points (game/snd.cpp): the game's header declared the small
@@ -579,7 +621,7 @@ SND_REQ* Snd_search_req_work_snd_id(u32 snd_id, u8 type);
 // snd_sub3.c
 void Snd_iss_blk_init(u32 blk_no, void* data);
 void Snd_str_blk_init(u32 blk_no, void* data);
-SND_ISS_BLK* Snd_get_blk_adrs(u16 blk_no, u16 req_no);
+SND_IBLK* Snd_get_blk_adrs(u16 blk_no, u16 req_no);
 SND_SIT* Snd_get_sit_adrs(u16 blk_no, u16 req_no);
 SND_RIT* Snd_get_rit_adrs(u16 blk_no, u16 req_no);
 SND_SHD* Snd_get_shd_adrs(u16 blk_no, u16 req_no);
@@ -634,10 +676,10 @@ void se_ctrl_execute(SND_CTRL* ctrl);
 void se_ctrl_fade_out(SND_CTRL* ctrl, int mode);
 void se_ctrl_pause_on(SND_CTRL* ctrl);
 void se_ctrl_pause_on2(SND_CTRL* ctrl);
-void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL* ctrl);
+void seCtrlPauseOn_sub(SND_AXV* axv, SND_CTRL* ctrl);
 void se_ctrl_pause_off(SND_CTRL* ctrl);
 void se_ctrl_pause_off2(SND_CTRL* ctrl);
-void seCtrlPauseOff_sub(SND_AXV_WORK* axv);
+void seCtrlPauseOff_sub(SND_AXV* axv);
 void se_ctrl_vdown_on(SND_CTRL* ctrl);
 void se_ctrl_vdown_off(SND_CTRL* ctrl);
 void se_ctrl_reset_pan_or_vol(SND_CTRL* ctrl, int mode);
@@ -645,44 +687,44 @@ void iss_req_execute(SND_CTRL* ctrl);
 void iss_req_command(SND_REQ* req);
 void req_cmd_se_stop(SND_REQ* req);
 void req_cmd_se_para(SND_REQ* req);
-void req_cmd_se_pan(SND_AXV_WORK* axv, SND_REQ* req, u16 bit);
-void req_cmd_se_vol(SND_AXV_WORK* axv, SND_REQ* req, u16 bit);
-void req_cmd_se_aux(SND_AXV_WORK* axv, SND_REQ* req, u16 bit);
-void req_cmd_se_lpf(SND_AXV_WORK* axv, SND_REQ* req, u16 bit);
-void req_cmd_se_pitch(SND_AXV_WORK* axv, SND_REQ* req, u16 bit);
+void req_cmd_se_pan(SND_AXV* axv, SND_REQ* req, u16 bit);
+void req_cmd_se_vol(SND_AXV* axv, SND_REQ* req, u16 bit);
+void req_cmd_se_aux(SND_AXV* axv, SND_REQ* req, u16 bit);
+void req_cmd_se_lpf(SND_AXV* axv, SND_REQ* req, u16 bit);
+void req_cmd_se_pitch(SND_AXV* axv, SND_REQ* req, u16 bit);
 
 // snd_iss3.c
 void Snd_req_iss_new_play(SND_REQ* req);
-void iss_new_voice_work(SND_ISS_BLK* blk, SND_SIT* sit, SND_REQ* req);
-void iss_voice_work_init(SND_VOICE* vw, SND_AXV_WORK* axv, SND_REQ* req, s8 prio);
-void iss_ax_set_wt_ptr(SND_AXV_WORK* axv, SND_SIT* sit);
-void iss_ax_set_adsr(SND_AXV_WORK* axv);
-void iss_ax_set_vol(SND_AXV_WORK* axv, SND_REQ* req, SND_SIT* sit);
-void iss_ax_set_pan(SND_AXV_WORK* axv, SND_REQ* req, SND_SIT* sit);
-void iss_ax_set_aux(SND_AXV_WORK* axv, SND_REQ* req, SND_SIT* sit);
-void iss_ax_set_pitch(SND_AXV_WORK* axv, SND_REQ* req, SND_SIT* sit);
-void iss_ax_set_lpf(SND_AXV_WORK* axv, SND_REQ* req);
-void iss_ax_set_para(SND_AXV_WORK* axv, SND_REQ* req);
+void iss_new_voice_work(SND_IBLK* blk, SND_SIT* sit, SND_REQ* req);
+void iss_voice_work_init(SND_VOICE* vw, SND_AXV* axv, SND_REQ* req, s8 prio);
+void iss_ax_set_wt_ptr(SND_AXV* axv, SND_SIT* sit);
+void iss_ax_set_adsr(SND_AXV* axv);
+void iss_ax_set_vol(SND_AXV* axv, SND_REQ* req, SND_SIT* sit);
+void iss_ax_set_pan(SND_AXV* axv, SND_REQ* req, SND_SIT* sit);
+void iss_ax_set_aux(SND_AXV* axv, SND_REQ* req, SND_SIT* sit);
+void iss_ax_set_pitch(SND_AXV* axv, SND_REQ* req, SND_SIT* sit);
+void iss_ax_set_lpf(SND_AXV* axv, SND_REQ* req);
+void iss_ax_set_para(SND_AXV* axv, SND_REQ* req);
 void cb_drop_voice(void* voice);
 
 // snd_iss4.c
 void Snd_axv_work_clear(void);
-SND_AXV_WORK* Snd_open_axv_work(void);
+SND_AXV* Snd_open_axv_work(void);
 void Snd_axv_work_close_check(void);
-void axv_close_ck_main(SND_AXV_WORK* axv);
-void Snd_axv_work_note_off(SND_AXV_WORK* axv, s32 time);
-int Snd_axv_work_get_out_mode(SND_AXV_WORK* axv);
-void Snd_axv_work_choice_now_vol(SND_AXV_WORK* axv);
-void Snd_axv_work_calc_vdown_vol(SND_AXV_WORK* axv);
-void Snd_axv_work_calc_ax_vol(SND_AXV_WORK* axv);
-void Snd_axv_work_choice_out_span(SND_AXV_WORK* axv);
+void axv_close_ck_main(SND_AXV* axv);
+void Snd_axv_work_note_off(SND_AXV* axv, s32 time);
+int Snd_axv_work_get_out_mode(SND_AXV* axv);
+void Snd_axv_work_choice_now_vol(SND_AXV* axv);
+void Snd_axv_work_calc_vdown_vol(SND_AXV* axv);
+void Snd_axv_work_calc_ax_vol(SND_AXV* axv);
+void Snd_axv_work_choice_out_span(SND_AXV* axv);
 void Snd_axv_work_control(void);
-void axv_work_adsr(SND_AXV_WORK* axv);
-void axv_work_update(SND_AXV_WORK* axv);
-void axv_work_update_vol_pan(SND_AXV_WORK* axv);
-void axv_work_update_aux(SND_AXV_WORK* axv);
-void axv_work_update_lpf(SND_AXV_WORK* axv);
-void axv_work_update_pitch(SND_AXV_WORK* axv);
+void axv_work_adsr(SND_AXV* axv);
+void axv_work_update(SND_AXV* axv);
+void axv_work_update_vol_pan(SND_AXV* axv);
+void axv_work_update_aux(SND_AXV* axv);
+void axv_work_update_lpf(SND_AXV* axv);
+void axv_work_update_pitch(SND_AXV* axv);
 
 // snd_efx.c
 void Snd_efx_work_clear(void);
@@ -742,7 +784,7 @@ u32 Snd_seq_get_delta(SND_SEQ* seq);
 void Snd_seq_send_midi(SND_CTRL* msg, SND_SEQ* seq);
 void Snd_send_midi(SYNSYNTH* synth, u8 status, u8 data1, u8 data2);
 void Snd_seq_work_calc_ax_vol(SND_SEQ* seq);
-void Snd_iss_new_seq_work(SND_ISS_BLK* blk, SND_SIT* sit, SND_REQ* req);
+void Snd_iss_new_seq_work(SND_IBLK* blk, SND_SIT* sit, SND_REQ* req);
 SND_SEQ* open_seq_work(void);
 void seq_work_init_track(SND_SEQ* seq);
 

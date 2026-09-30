@@ -2,7 +2,7 @@
 // and applies the global SE controls and the pending requests to the AX voices.
 #include "snd_drv.h"
 
-typedef void (*SND_REQ_CMD)(SND_AXV_WORK*, SND_REQ*, u16);
+typedef void (*SND_REQ_CMD)(SND_AXV*, SND_REQ*, u16);
 
 // Audio frame: frees finished AX voices, then (unless a reset is in progress) applies the global
 // SE controls and executes the request bank; finally pushes the pending AX voice updates.
@@ -64,7 +64,7 @@ void se_ctrl_execute(SND_CTRL* ctrl)
 // the protected voices (axv flag 4).
 void se_ctrl_fade_out(SND_CTRL* ctrl, int mode)
 {
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     SND_VOICE* vw;
     int i;
     s32 time;
@@ -81,7 +81,7 @@ void se_ctrl_fade_out(SND_CTRL* ctrl, int mode)
         if (axv == NULL) {
             continue;
         }
-        if (mode == 1 && (axv->flag & 0x4)) {
+        if (mode == 1 && (axv->req_bit & 0x4)) {
             continue;
         }
         if (ctrl->se_fout_time == 0) {
@@ -106,15 +106,15 @@ void se_ctrl_pause_on(SND_CTRL* ctrl)
 // Pauses the AX voices of block se_pause_type (-1 = all).
 void se_ctrl_pause_on2(SND_CTRL* ctrl)
 {
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     SND_VOICE* vw;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         axv = &Snd_axv_work[i];
         if (ctrl->pause_blk != -1) {
-            if (axv->status != 0) {
-                vw = axv->vw;
+            if (axv->be_flag != 0) {
+                vw = axv->voice_adrs;
                 if (vw != NULL && vw->blk_no == ctrl->pause_blk) {
                     seCtrlPauseOn_sub(axv, ctrl);
                 }
@@ -127,34 +127,34 @@ void se_ctrl_pause_on2(SND_CTRL* ctrl)
 
 // Pauses one AX voice (status bit3, update 0x100) unless it is releasing, unpausable (flag 1, when
 // not forced by se_ctrl 4), stopped, or a one-shot within 800 samples of its end.
-void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL* ctrl)
+void seCtrlPauseOn_sub(SND_AXV* axv, SND_CTRL* ctrl)
 {
     SND_VOICE* vw;
     u32 cur;
     u32 end;
 
-    if (axv->status == 0) {
+    if (axv->be_flag == 0) {
         return;
     }
-    if (axv->status & 0x4) {
+    if (axv->be_flag & 0x4) {
         return;
     }
-    if (!(ctrl->se_ctrl_flag & 0x4) && (axv->flag & 0x1)) {
+    if (!(ctrl->se_ctrl_flag & 0x4) && (axv->req_bit & 0x1)) {
         return;
     }
-    if (axv->voice->pb.state == 0) {
+    if (axv->ax_voice->pb.state == 0) {
         return;
     }
-    if (axv->voice->pb.addr.loopFlag == 0) {
-        cur = *(u32*) &axv->voice->pb.addr.currentAddressHi;
-        end = *(u32*) &axv->voice->pb.addr.endAddressHi;
+    if (axv->ax_voice->pb.addr.loopFlag == 0) {
+        cur = *(u32*) &axv->ax_voice->pb.addr.currentAddressHi;
+        end = *(u32*) &axv->ax_voice->pb.addr.endAddressHi;
         if (end - cur <= 800) {
             return;
         }
     }
-    axv->status |= 0x8;
-    axv->upd |= 0x100;
-    vw = axv->vw;
+    axv->be_flag |= 0x8;
+    axv->update |= 0x100;
+    vw = axv->voice_adrs;
     if (vw != NULL) {
         vw->be_flag |= 0x2;
     }
@@ -174,15 +174,15 @@ void se_ctrl_pause_off(SND_CTRL* ctrl)
 // Resumes the AX voices of block se_pause_type (-1 = all).
 void se_ctrl_pause_off2(SND_CTRL* ctrl)
 {
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     SND_VOICE* vw;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         axv = &Snd_axv_work[i];
         if (ctrl->pause_blk != -1) {
-            if (axv->status != 0) {
-                vw = axv->vw;
+            if (axv->be_flag != 0) {
+                vw = axv->voice_adrs;
                 if (vw != NULL && vw->blk_no == ctrl->pause_blk) {
                     seCtrlPauseOff_sub(axv);
                 }
@@ -194,17 +194,17 @@ void se_ctrl_pause_off2(SND_CTRL* ctrl)
 }
 
 // Resumes one paused AX voice (update 0x200).
-void seCtrlPauseOff_sub(SND_AXV_WORK* axv)
+void seCtrlPauseOff_sub(SND_AXV* axv)
 {
     SND_VOICE* vw;
 
-    if (axv->status == 0) {
+    if (axv->be_flag == 0) {
         return;
     }
-    if (axv->status & 0x8) {
-        axv->status &= ~0x8;
-        axv->upd |= 0x200;
-        vw = axv->vw;
+    if (axv->be_flag & 0x8) {
+        axv->be_flag &= ~0x8;
+        axv->update |= 0x200;
+        vw = axv->voice_adrs;
         if (vw != NULL) {
             vw->be_flag &= ~0x2;
         }
@@ -214,22 +214,22 @@ void seCtrlPauseOff_sub(SND_AXV_WORK* axv)
 // Volume-down on every AX voice not flagged exempt (flag 2): status bit4, volume recomputed.
 void se_ctrl_vdown_on(SND_CTRL* ctrl)
 {
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         axv = &Snd_axv_work[i];
-        if (axv->status == 0) {
+        if (axv->be_flag == 0) {
             continue;
         }
-        if (axv->status & 0x4) {
+        if (axv->be_flag & 0x4) {
             continue;
         }
-        if (axv->flag & 0x2) {
+        if (axv->req_bit & 0x2) {
             continue;
         }
-        axv->status |= 0x10;
-        axv->upd |= 0x1;
+        axv->be_flag |= 0x10;
+        axv->update |= 0x1;
         Snd_axv_work_calc_vdown_vol(axv);
     }
 }
@@ -237,19 +237,19 @@ void se_ctrl_vdown_on(SND_CTRL* ctrl)
 // Ends the volume-down on every AX voice; se_state bit1 off.
 void se_ctrl_vdown_off(SND_CTRL* ctrl)
 {
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         axv = &Snd_axv_work[i];
-        if (axv->status == 0) {
+        if (axv->be_flag == 0) {
             continue;
         }
-        if ((axv->status & 0x10) == 0) {
+        if ((axv->be_flag & 0x10) == 0) {
             continue;
         }
-        axv->status &= ~0x10;
-        axv->upd |= 0x1;
+        axv->be_flag &= ~0x10;
+        axv->update |= 0x1;
     }
     ctrl->status_flag &= ~0x2;
 }
@@ -257,21 +257,21 @@ void se_ctrl_vdown_off(SND_CTRL* ctrl)
 // Marks every AX voice for a pan (mode 3) or volume (4) recomputation (output mode change).
 void se_ctrl_reset_pan_or_vol(SND_CTRL* ctrl, int mode)
 {
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         axv = &Snd_axv_work[i];
-        if (axv->status == 0) {
+        if (axv->be_flag == 0) {
             continue;
         }
-        if (axv->status & 0x4) {
+        if (axv->be_flag & 0x4) {
             continue;
         }
         if (mode == 3) {
-            axv->upd |= 0x2;
+            axv->update |= 0x2;
         } else {
-            axv->upd |= 0x1;
+            axv->update |= 0x1;
         }
     }
 }
@@ -334,7 +334,7 @@ void req_cmd_se_stop(SND_REQ* req)
 void req_cmd_se_para(SND_REQ* req)
 {
     SND_VOICE* vw;
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     int i;
     int j;
     u16 bit;
@@ -369,79 +369,79 @@ void req_cmd_se_para(SND_REQ* req)
 }
 
 // New pan (bit 2) or surround pan (bit 4).
-void req_cmd_se_pan(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
+void req_cmd_se_pan(SND_AXV* axv, SND_REQ* req, u16 bit)
 {
     if (bit == 0x2) {
-        axv->pan = req->pan;
+        axv->out_pan = req->pan;
     } else {
-        axv->span = req->span;
+        axv->srd_span = req->span;
     }
-    axv->upd |= 0x2;
+    axv->update |= 0x2;
 }
 
 // New volume (bit 8) or surround volume (bit 0x10), also as the volume-down source.
-void req_cmd_se_vol(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
+void req_cmd_se_vol(SND_AXV* axv, SND_REQ* req, u16 bit)
 {
     if (bit == 0x8) {
-        axv->vol = req->vol << 8;
-        axv->vdown_src_vol = axv->vol;
+        axv->ste_vol = req->vol << 8;
+        axv->sv_ste_vol = axv->ste_vol;
     } else {
-        axv->svol = req->svol << 8;
-        axv->vdown_src_svol = axv->svol;
+        axv->srd_vol = req->svol << 8;
+        axv->sv_srd_vol = axv->srd_vol;
     }
-    axv->upd |= 0x1;
+    axv->update |= 0x1;
 }
 
 // New AUX A (bit 0x20) or AUX B (0x40) send.
-void req_cmd_se_aux(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
+void req_cmd_se_aux(SND_AXV* axv, SND_REQ* req, u16 bit)
 {
     if (bit == 0x20) {
-        axv->auxA = req->aux_a;
-        axv->upd |= 0x4;
+        axv->out_aux_a = req->aux_a;
+        axv->update |= 0x4;
     } else {
-        axv->auxB = req->aux_b;
-        axv->upd |= 0x8;
+        axv->out_aux_b = req->aux_b;
+        axv->update |= 0x8;
     }
 }
 
 // Low-pass filter on / off / changed (lpf_no -1 = off).
-void req_cmd_se_lpf(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
+void req_cmd_se_lpf(SND_AXV* axv, SND_REQ* req, u16 bit)
 {
-    if (axv->lpf_on == 0) {
+    if (axv->lpf_flag == 0) {
         if (req->lpf == -1) {
             return;
         }
-        axv->lpf_on = 1;
-        axv->lpf_no = req->lpf;
-        axv->upd |= 0x10;
+        axv->lpf_flag = 1;
+        axv->lpf_freq = req->lpf;
+        axv->update |= 0x10;
     } else {
         if (req->lpf == -1) {
-            axv->lpf_on = 0;
-            axv->lpf_no = -1;
-            axv->upd |= 0x10;
+            axv->lpf_flag = 0;
+            axv->lpf_freq = -1;
+            axv->update |= 0x10;
         } else {
-            axv->lpf_no = req->lpf;
-            axv->upd |= 0x20;
+            axv->lpf_freq = req->lpf;
+            axv->update |= 0x20;
         }
     }
 }
 
 // Pitch: bit 0x200 adds to the base, 0x400 sets the offset; total clamped to +-2400 cents.
-void req_cmd_se_pitch(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
+void req_cmd_se_pitch(SND_AXV* axv, SND_REQ* req, u16 bit)
 {
     if (bit == 0x200) {
-        axv->pitch_base += req->pitch;
+        axv->org_pitch += req->pitch;
     } else {
-        axv->pitch_ofs = req->dop_p;
+        axv->dop_pitch = req->dop_p;
     }
-    axv->pitch = axv->pitch_base + axv->pitch_ofs;
-    if (axv->pitch > 2400) {
-        OSReport("OUT PITCH HIGH over : %d\n", axv->pitch);
-        axv->pitch = 2400;
+    axv->out_pitch = axv->org_pitch + axv->dop_pitch;
+    if (axv->out_pitch > 2400) {
+        OSReport("OUT PITCH HIGH over : %d\n", axv->out_pitch);
+        axv->out_pitch = 2400;
     }
-    if (axv->pitch < -2400) {
-        OSReport("OUT PITCH LOW  over : %d\n", axv->pitch);
-        axv->pitch = -2400;
+    if (axv->out_pitch < -2400) {
+        OSReport("OUT PITCH LOW  over : %d\n", axv->out_pitch);
+        axv->out_pitch = -2400;
     }
-    axv->upd |= 0x40;
+    axv->update |= 0x40;
 }

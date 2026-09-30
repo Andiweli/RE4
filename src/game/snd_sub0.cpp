@@ -225,28 +225,28 @@ s16 Snd_get_rnd_pitch(SND_SIT* sit)
 // Resets the sound-test (debug menu) work: 14 SE blocks / 2 stream blocks, paths "/", display flags.
 void Snd_test_work_clear(void)
 {
-    SND_TEST_WORK* test;
+    SND_TEST* test;
     u32 i;
     u8* p;
 
     p = (u8*) &Snd_test_work;
-    for (i = 0; i < sizeof(SND_TEST_WORK); i++) {
+    for (i = 0; i < sizeof(SND_TEST); i++) {
         *p++ = 0;
     }
     test = &Snd_test_work;
-    test->tbl = 0;
-    test->aux = 0;
-    test->menu = 1;
-    test->dispFlag = 7;
-    test->blkMax[0] = 0xE;
-    test->blkMax[1] = 2;
-    strcpy(test->path0, "/");
-    strcpy(test->path1, "/");
+    test->tbl_type = 0;
+    test->aux_type = 0;
+    test->menu_flag = 1;
+    test->disp_flag = 7;
+    test->blk_max[0] = 0xE;
+    test->blk_max[1] = 2;
+    strcpy(test->dir_name[0], "/");
+    strcpy(test->dir_name[1], "/");
     for (i = 0; i < 14; i++) {
-        test->sitData[i] = 0;
+        test->iss_blk_name[i] = 0;
     }
     for (i = 0; i < 2; i++) {
-        test->ritData[i] = 0;
+        test->str_blk_name[i] = 0;
     }
-    test->aram_base = Snd_ctrl_work.zero_adrs;
+    test->aram_adrs = Snd_ctrl_work.zero_adrs;
 }

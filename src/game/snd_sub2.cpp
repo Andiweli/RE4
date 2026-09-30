@@ -7,7 +7,7 @@
 // and clears the SE controls (reset_flag bit4 = SE side done). Returns 1 while resetting.
 int Snd_se_reset_check(SND_CTRL* ctrl)
 {
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     int i;
 
     if (ctrl->reset_flag & 0x10) {
@@ -17,7 +17,7 @@ int Snd_se_reset_check(SND_CTRL* ctrl)
         Snd_req_work_clear();
         for (i = 0; i < SND_AXV_MAX; i++) {
             axv = &Snd_axv_work[i];
-            if (axv->status != 0) {
+            if (axv->be_flag != 0) {
                 Snd_axv_work_note_off(axv, 1);
             }
         }
@@ -57,7 +57,7 @@ void Snd_req_work_copy_para(SND_CTRL* ctrl, SND_REQ* req)
 {
     SND_SIT* sit;
 
-    sit = Snd_iss_blk[req->blk_no].sit;
+    sit = Snd_iss_blk[req->blk_no].sit_adrs;
     sit += req->req_no;
     req->prio = -1;
     req->pan = -1;

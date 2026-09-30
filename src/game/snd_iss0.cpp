@@ -22,7 +22,7 @@ int req_iss_main(u16 blk_no, u16 req_no, u8* para)
     SND_SIT* sit;
 
     ctrl->IsLink = 0;
-    if (req_no >= Snd_iss_blk[blk_no].num) {
+    if (req_no >= Snd_iss_blk[blk_no].sit_num) {
         OSReport("SND REQ_NO is not found.\n");
         OSReport("BLK_NO : %d / REQ_NO : %d\n", blk_no, req_no);
         return 0;
@@ -32,7 +32,7 @@ int req_iss_main(u16 blk_no, u16 req_no, u8* para)
         ctrl->snd_id++;
     }
     while (1) {
-        sit = Snd_iss_blk[blk_no].sit;
+        sit = Snd_iss_blk[blk_no].sit_adrs;
         sit += req_no;
         if (sit->flag & 0x8000) {
             OSReport("SND REQ_NO is dummy data.\n");

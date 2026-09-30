@@ -832,7 +832,7 @@ void DrawObjWireframe(cObj* pObj, int col)
 {
     const u8 vtx_size[8] = {8, 8, 10, 12, 10, 8, 8, 0};
     cModelData* md;
-    ModelPart* part;
+    cPolyHeader* part;
     u8* cmd;
     s16* vtx;
     s16* v;
@@ -860,7 +860,7 @@ void DrawObjWireframe(cObj* pObj, int col)
     for (np = 0; np < md->displist_num; np++) {
         DB_poly_num = DB_poly_num + part->nPoly;
         cmd = (u8*) part + 0x20;
-        part = (ModelPart*) ((u8*) part + part->size + 0x20);
+        part = (cPolyHeader*) ((u8*) part + part->buff_size + 0x20);
         do {
             if (cmd >= (u8*) part) {
                 break;

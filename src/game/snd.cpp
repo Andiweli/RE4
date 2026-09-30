@@ -380,7 +380,7 @@ int sndExistCheck(int blk, u32 call_no)
     if (!SND_BIT_CK(f, (u16) blk)) {
         return 0;
     }
-    if (call_no >= Snd_iss_blk[blk].num) {
+    if (call_no >= Snd_iss_blk[blk].sit_num) {
         return 0;
     }
     if (Snd_iss_get_sit_type(blk, call_no) == 0x8000) {
@@ -1546,8 +1546,8 @@ void SndNextRoomInit()
     memclr_asm(&pSnd->room_ok, sizeof(SND_WORK) - 0x90);
     SND_BIT_CLR(pSnd->blk_flag, 6);
     SND_BIT_CLR(pSnd->blk_flag, 5);
-    memclr_asm(&Snd_iss_blk[6], sizeof(SND_ISS_BLK));
-    memclr_asm(&Snd_iss_blk[5], sizeof(SND_ISS_BLK));
+    memclr_asm(&Snd_iss_blk[6], sizeof(SND_IBLK));
+    memclr_asm(&Snd_iss_blk[5], sizeof(SND_IBLK));
     UseAramSize[6] = 0;
     memclr_asm(callErr[6], sizeof(callErr[6]));
     UseAramSize[5] = 0;
@@ -1555,7 +1555,7 @@ void SndNextRoomInit()
     for (i = 0; i < 6; i++) {
         pSnd->snd_em_id[i] = 0xFF;
         SND_BIT_CLR(pSnd->blk_flag, i + 8);
-        memclr_asm(&Snd_iss_blk[i + 8], sizeof(SND_ISS_BLK));
+        memclr_asm(&Snd_iss_blk[i + 8], sizeof(SND_IBLK));
         UseAramSize[i + 8] = 0;
         memclr_asm(callErr[i + 8], sizeof(callErr[i + 8]));
     }
@@ -2497,7 +2497,7 @@ void SndBlkInit(int type, int id, int no)
         blk = no + 3;
         break;
     }
-    Snd_iss_blk[blk].aram = SndMem.blk_aram[blk];
+    Snd_iss_blk[blk].pcm_adrs = SndMem.blk_aram[blk];
     adr = (u32) SndMem.blk_mram[blk];
     if (blk != 3 && blk != 4) {
         adr += *(u32*) adr;

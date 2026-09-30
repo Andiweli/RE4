@@ -204,12 +204,12 @@ int se_pro_ck_req_work(int bank)
 // 1 when any AX voice is in use.
 int se_pro_ck_axv_work(void)
 {
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         axv = &Snd_axv_work[i];
-        if (axv->status != 0) {
+        if (axv->be_flag != 0) {
             return 1;
         }
     }

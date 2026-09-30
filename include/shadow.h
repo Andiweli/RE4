@@ -74,7 +74,7 @@ void make_shadow_texture(ShadowMng* mng);
 int shadowChkInFrustum(ShadowMng* mng, cModel* m);
 void ProcShadowScrModel(cModel* m, ShadowMng* mngs);
 void shadowScrModelRender(ShadowMng* mngs);
-void shadowShaderSetup2(cModel* m, struct ModelPart* part, ShadowMng** tbl, u32 num);
+void shadowShaderSetup2(cModel* m, struct cPolyHeader* part, ShadowMng** tbl, u32 num);
 void shadowModelTrans(cModel* m, class cModelInfo* info, Mtx viewMat, ShadowMng** tbl, u32 num);
 void shadowModelTrans2(cModel* m, class cModelInfo* info, Mtx viewMat);
 void TransLightTexture(GXTexObj* tex, GXTlutObj* tlut, s16 x, s16 y, s16 z, s16 w, s16 h, ShadowMng* mng, int flag2, int flag1);

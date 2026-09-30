@@ -191,7 +191,7 @@ void Snd_dev_voice_ck(void)
     }
     ctrl->now_axv_vo = 0;
     for (i = 0; i < SND_AXV_MAX; i++) {
-        if (Snd_axv_work[i].status != 0) {
+        if (Snd_axv_work[i].be_flag != 0) {
             ctrl->now_axv_vo++;
         }
     }

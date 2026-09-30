@@ -60,22 +60,22 @@ class cModel;
 class cLight;
 
 // One primitive part of a cModelData (dbmodule DrawObjWireframe): 0x20 header, then the GX-style stream.
-struct ModelPart {
+struct cPolyHeader {
     u8 pad_0[0xB];
-    u8 flags;        // 0x0B  material flags (trans shaderSetup): bit0 bump, bit1, bit2 alpha texture, bit4 specular texture in the tpl, bit7 specularSetup2
-    u8 texId;        // 0x0C  texture id (trans materialSetup)
-    u8 bumpTex;      // 0x0D  bump / indirect texture id
-    u8 alphaTex;     // 0x0E  alpha texture id
-    u8 specTex;      // 0x0F  Specular[] index (0xFF = 0)
-    u8 specR;        // 0x10  specular colour
-    u8 specG;        // 0x11
-    u8 specB;        // 0x12
-    u8 specType;     // 0x13  0: konst colour stage, 1: texture alpha
-    u8 alphaRef;     // 0x14  alpha compare reference when the model's x103 is 0xFF
-    u8 specPow;      // 0x15  specular scale (percent)
+    u8 flag;        // 0x0B  material flags (trans shaderSetup): bit0 bump, bit1, bit2 alpha texture, bit4 specular texture in the tpl, bit7 specularSetup2
+    u8 material_tex;        // 0x0C  texture id (trans materialSetup)
+    u8 bump_tex;      // 0x0D  bump / indirect texture id
+    u8 alpha_tex;     // 0x0E  alpha texture id
+    u8 specular_tex;      // 0x0F  Specular[] index (0xFF = 0)
+    u8 specular_r;        // 0x10  specular colour
+    u8 specular_g;        // 0x11
+    u8 specular_b;        // 0x12
+    u8 specular_type;     // 0x13  0: konst colour stage, 1: texture alpha
+    u8 alpha_omit;     // 0x14  alpha compare reference when the model's x103 is 0xFF
+    u8 specular_decay;      // 0x15  specular scale (percent)
     u8 pad_16;
     u8 specTexOrg;   // 0x17  specular texture id when flags bit4 is set
-    u32 size;        // 0x18  byte length of the primitive stream following the header
+    u32 buff_size;        // 0x18  byte length of the primitive stream following the header
     u32 nPoly;       // 0x1C  polygon count (debug statistics)
 };
 
@@ -103,7 +103,7 @@ struct cModelData {
     u8 weight_palette_num;  // 0x18  cWeight entries of pWeight (trans MakeWeightPalette); <= 1 with nParts == 1: rigid, original arrays
     u8 nParts;       // 0x19  parts count (cModel::setModel copies it into cModel::nParts)
     u16 displist_num;  // 0x1A  primitive (display list) part count (dbmodule DrawObjWireframe)
-    struct ModelPart* pParts;  // 0x1C  first part header (0x20 bytes + primitive stream)
+    struct cPolyHeader* pParts;  // 0x1C  first part header (0x20 bytes + primitive stream)
     u32 flags;       // 0x20  bit31: s16 tex coords (frac 8), bit30 (0x40000000): SmxGetFlag bit1, bit29: s8 normals
     u32 nTex;        // 0x24  texture count (trans: must be <= 0xF7)
     u8 shift;        // 0x28  vertex fixed-point shift (dbmodule: scale = 1 / (1 << shift))

@@ -128,7 +128,7 @@ void Snd_seq_work_calc_ax_vol(SND_SEQ* seq)
 // Starts a sequence from a play request: a free work, tracks reset, synth on the block's DLS and
 // ARAM, sequence data = the block's sequence table entry for the SIT's bank, first delta read,
 // volume from the request or the SIT; status 0x11 running.
-void Snd_iss_new_seq_work(SND_ISS_BLK* blk, SND_SIT* sit, SND_REQ* req)
+void Snd_iss_new_seq_work(SND_IBLK* blk, SND_SIT* sit, SND_REQ* req)
 {
     SND_SEQ* seq;
     u8* tbl;
@@ -143,14 +143,14 @@ void Snd_iss_new_seq_work(SND_ISS_BLK* blk, SND_SIT* sit, SND_REQ* req)
     seq->snd_id = req->snd_id;
     seq->seq_type = req->use_type;
     seq_work_init_track(seq);
-    seq->pcm_adrs = blk->aram;
-    seq->wt_adrs = blk->dls;
+    seq->pcm_adrs = blk->pcm_adrs;
+    seq->wt_adrs = blk->wt_adrs;
     seq->sit_ptr = sit;
     SYNInitSynth(&seq->synth, seq->wt_adrs, seq->pcm_adrs, Snd_ctrl_work.zero_adrs, 30, 30, 1);
     bank = (u16) ((u16) (sit->note >> 8) & 0xFF);
-    tbl = blk->seq;
+    tbl = blk->seq_adrs;
     ofs = ((u32*) tbl)[bank + 1];
-    seq->top_seq_ptr = blk->seq + ofs;
+    seq->top_seq_ptr = blk->seq_adrs + ofs;
     seq->now_seq_ptr = seq->top_seq_ptr;
     seq->lop_seq_ptr = seq->top_seq_ptr;
     seq->time = Snd_seq_get_delta(seq);
