@@ -212,7 +212,7 @@ static void edit(AtariToolWork* w)
 {
     cSat* s = w->sat;
     Vec* vtx = s->vtx;
-    AtPoly* poly = s->poly_p;
+    SAT_POLY* poly = s->poly_p;
     u32 attr;
     Vec* nrm;
     Vec* pv;
@@ -243,7 +243,7 @@ static void edit(AtariToolWork* w)
     }
     eprintf(400, 48, 0, 0, "F:%d S:%d W:%d", w->nA, w->nB, w->nC);
     eprintf(400, 64, 0, 0, "V:%d %d %d %d", poly[w->polyNo].v[0], poly[w->polyNo].v[1], poly[w->polyNo].v[2],
-            poly[w->polyNo].n);
+            poly[w->polyNo].m_Normal);
     eprintf(400, 96, 0, 0, "%08x", (poly[w->polyNo].e[0] << 16) | poly[w->polyNo].e[1]);
     attr = Get_poly_attr(&poly[w->polyNo]);
     eprintf(400, 112, attr & 0x4000 ? 0 : 7, 0, "EM_HOHIT");
@@ -273,9 +273,9 @@ static void edit(AtariToolWork* w)
     eprintf(440, 384, 0, 0, "X:%2.2f", nrm[w->polyNo].x);
     eprintf(440, 400, 0, 0, "Y:%2.2f", nrm[w->polyNo].y);
     eprintf(440, 416, 0, 0, "Z:%2.2f", nrm[w->polyNo].z);
-    v2.x = v.x + nrm[poly[w->polyNo].n].x * 3000.0f;
-    v2.y = v.y + nrm[poly[w->polyNo].n].y * 3000.0f;
-    v2.z = v.z + nrm[poly[w->polyNo].n].z * 3000.0f;
+    v2.x = v.x + nrm[poly[w->polyNo].m_Normal].x * 3000.0f;
+    v2.y = v.y + nrm[poly[w->polyNo].m_Normal].y * 3000.0f;
+    v2.z = v.z + nrm[poly[w->polyNo].m_Normal].z * 3000.0f;
     r = Rnd() % 20;
     v2.x += r;
     r = Rnd() % 20;
@@ -376,7 +376,7 @@ static void plmove10(AtariToolWork* w)
         Draw_local_pos(&w->pos, 1000, gp->Camera.v_mat);
     }
     if (w->joy.on & 0x400) {
-        int hit = At_poly_sphere_ck(satTbl0, (u16*) &satTbl0[0].poly_p[w->polyNo], &oldPos, &w->pos, 100.0f, 0, 0);
+        int hit = At_poly_sphere_ck(satTbl0, &satTbl0[0].poly_p[w->polyNo], &oldPos, &w->pos, 100.0f, 0, 0);
 
         eprintf(100, 160, 0, 0, "HIT CK:%d = %d", w->polyNo, hit);
     } else {

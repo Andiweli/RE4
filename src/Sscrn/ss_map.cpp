@@ -1254,7 +1254,7 @@ void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMa
     f32 best;
     int idx;
     int i;
-    AtPoly* poly;
+    SAT_POLY* poly;
     Vec* vtx;
 
     pl.x = plMat[0][3];
@@ -1287,7 +1287,7 @@ void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMa
     }
     poly = satB.poly_p;
     for (i = 0; i < satB.floor_num + satB.slope_num; i++, poly++) {
-        if (At_poly_line_ck(&satB, &hit2, (u16*) poly, &a, &b, 0, 0)) {
+        if (At_poly_line_ck(&satB, &hit2, poly, &a, &b, 0, 0)) {
             if (hit2.y <= best) {
                 idx = i;
                 hit = hit2;
@@ -1321,7 +1321,7 @@ void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMa
                 u32 col;
 
                 if (i != idx) {
-                    col = poly->attr;
+                    col = poly->m_Status;
                 } else {
                     col = 0xFFFF0000;
                 }

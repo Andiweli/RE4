@@ -109,18 +109,12 @@ enum EAT_ATTR {
 };
 
 // One collision triangle (0x14 bytes): three vertex, one normal and three edge indices, attribute.
-struct AtPoly {
-    u16 v[3];        // 0x00
-    u16 n;           // 0x06
-    u16 e[3];        // 0x08
-    u8 pad_E[2];
-    union {
-        struct {
-            u16 attrHi;  // 0x10  attribute word high half
-            u16 attrLo;  // 0x12
-        };
-        u32 attr;        // 0x10  the attribute word (SAT_ATTR / EAT_ATTR; atari createSat)
-    };
+struct SAT_POLY {
+    u16 v[3];         // 0x00  PS2 m_Vertex0/1/2
+    u16 m_Normal;     // 0x06
+    u16 e[3];         // 0x08  PS2 m_Edge0/1/2
+    u16 m_Dummy7;     // 0x0E
+    u32 m_Status;     // 0x10  the attribute word (SAT_ATTR / EAT_ATTR; atari createSat)
 };
 
 extern int SEck;   // game/atari.cpp: scenario-effect check mode (skips the attribute filters)
@@ -140,12 +134,12 @@ u32 AtSphereCapsuleCk(Vec* c, f32 sph_r, Vec* p0, Vec* p1, f32 cap_r);
 void AtCapsuleDisp(Vec* pPosTop, Vec* pPosBot, f32 r, u32 rgba);
 void AtCubeDisp(Mtx m, Vec* pos, f32 sx, f32 sy, f32 sz, u32 color);
 // Segment p0-p1 against one polygon; returns the attribute | SAT_ATTR_HIT or 0.
-u32 At_poly_line_ck(cSat* atp, Vec* cross, u16* polygon, Vec* vert0, Vec* vert1, u32 flag, u32 mask);
+u32 At_poly_line_ck(cSat* atp, Vec* cross, SAT_POLY* polygon, Vec* vert0, Vec* vert1, u32 flag, u32 mask);
 // Sphere moving from `oldPos` to `pos` against one polygon; `pos` is pushed out. Returns the hit
 // kind (1 crossed the plane, 2 touching) or 0.
-u32 At_poly_sphere_ck(cSat* atp, u16* polygon, Vec* pos0, Vec* pos1, f32 r, u32 flag, u32 mask);
+u32 At_poly_sphere_ck(cSat* atp, SAT_POLY* polygon, Vec* pos0, Vec* pos1, f32 r, u32 flag, u32 mask);
 u32 At_poly_sphere_ck2(Vec* tri, Vec* n, u32 attr, Vec* oldPos, Vec* pos, f32 r, u32 flag, u32 mask);
-u32 Get_poly_attr(AtPoly* poly);
+u32 Get_poly_attr(SAT_POLY* poly);
 // XZ rectangles of 4 corners.
 int At_rect_point_ck(Vec* rect, Vec* pnt);
 int At_rect_rect_ck(Vec* rect0, Vec* rect1);

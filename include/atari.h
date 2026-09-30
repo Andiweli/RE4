@@ -30,7 +30,7 @@ public:
     u16 m_nSlope;          // 0x0E
     u16 m_nWall;          // 0x10
     u16 m_nBlock;         // 0x12
-    // 0x14: Vec vtx[nVertex]; Vec nrm[nNormal]; Vec edge[nEdge]; AtPoly poly[nPoly]; cSatBlock blocks
+    // 0x14: Vec vtx[nVertex]; Vec nrm[nNormal]; Vec edge[nEdge]; SAT_POLY poly[nPoly]; cSatBlock blocks
 
     Vec* getVertexPtr();
     int dataCheck();
@@ -77,7 +77,7 @@ public:
     Vec* vtx;        // 0x0C
     Vec* norm_p;        // 0x10
     Vec* edge_p;       // 0x14
-    AtPoly* poly_p;    // 0x18
+    SAT_POLY* poly_p;    // 0x18
     u16 vertex_num;     // 0x1C
     u16 polygon_num;       // 0x1E
     u16 floor_num;          // 0x20

@@ -3028,10 +3028,10 @@ address	size	section	unit	scope	name	demangled
 0x800C8ACC	0x278	.text	game/at_sub.cpp	global	AtSphereCapsuleCk__FP3VecfT0T0f	AtSphereCapsuleCk
 0x800C8D44	0x1EC	.text	game/at_sub.cpp	global	AtCapsuleDisp__FP3VecT0fUl	AtCapsuleDisp
 0x800C8F30	0x278	.text	game/at_sub.cpp	global	AtCubeDisp__FPA3_fP3VecfffUl	AtCubeDisp
-0x800C91A8	0x374	.text	game/at_sub.cpp	global	At_poly_line_ck__FP4cSatP3VecPUsT1T1UlUl	At_poly_line_ck
-0x800C951C	0x104	.text	game/at_sub.cpp	global	At_poly_sphere_ck__FP4cSatPUsP3VecT2fUlUl	At_poly_sphere_ck
+0x800C91A8	0x374	.text	game/at_sub.cpp	global	At_poly_line_ck__FP4cSatP3VecP8SAT_POLYT1T1UlUl	At_poly_line_ck
+0x800C951C	0x104	.text	game/at_sub.cpp	global	At_poly_sphere_ck__FP4cSatP8SAT_POLYP3VecT2fUlUl	At_poly_sphere_ck
 0x800C9620	0x418	.text	game/at_sub.cpp	global	At_poly_sphere_ck2__FP3VecT0UlT0T0fUlUl	At_poly_sphere_ck2
-0x800C9A38	0x14	.text	game/at_sub.cpp	global	Get_poly_attr__FP6AtPoly	Get_poly_attr
+0x800C9A38	0x14	.text	game/at_sub.cpp	global	Get_poly_attr__FP8SAT_POLY	Get_poly_attr
 0x800C9A4C	0xA8	.text	game/at_sub.cpp	global	At_rect_point_ck__FP3VecT0	At_rect_point_ck
 0x800C9AF4	0xE4	.text	game/at_sub.cpp	global	At_rect_rect_ck__FP3VecT0	At_rect_rect_ck
 0x800C9BD8	0x5C	.text	game/at_sub.cpp	global	Get_ang_dir__Ff	Get_ang_dir
