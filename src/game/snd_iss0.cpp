@@ -80,7 +80,7 @@ int req_iss_one(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
 // and the control parameters copied in.
 int req_iss_one_sub(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
 
     req = Snd_open_req_work();
     if (req == NULL) {
@@ -104,10 +104,10 @@ int req_iss_one_sub(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
 // What sound id `snd_id` is: 1 SE (pending or on a voice), 2 sequence, 4 stream, 0 unknown / done.
 int Snd_get_play_type(u32 snd_id)
 {
-    SND_REQ_WORK* req;
-    SND_VOICE_WORK* voice;
-    SND_SEQ_WORK* seq;
-    SND_STR_WORK* str;
+    SND_REQ* req;
+    SND_VOICE* voice;
+    SND_SEQ* seq;
+    SND_STR* str;
     int old;
     int type = 0;
 

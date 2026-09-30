@@ -50,7 +50,7 @@ struct R20bWork {
     TexRenderMng* tex2;   // 0x0E4
     u8 tbl0[0x80];        // 0x0E8
     u8 tbl1[0x80];        // 0x168
-    TexRenderCam cam;     // 0x1E8
+    TexRenderEvtCamStruct cam;     // 0x1E8
     u8 pad_4EC[0x7F0 - 0x4EC];
     void* tpl9300;        // 0x7F0  original texture palette of evm9300
     u32 str;              // 0x7F4  SndStrReq handle of the entry camera

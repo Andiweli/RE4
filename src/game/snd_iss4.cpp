@@ -40,7 +40,7 @@ SND_AXV_WORK* Snd_open_axv_work(void)
 void Snd_axv_work_close_check(void)
 {
     SND_AXV_WORK* axv;
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
@@ -51,11 +51,11 @@ void Snd_axv_work_close_check(void)
     }
     for (i = 0; i < SND_VOICE_MAX; i++) {
         vw = &Snd_voice_work[i];
-        if (vw->status == 0) {
+        if (vw->be_flag == 0) {
             continue;
         }
-        if (vw->count != -1) {
-            vw->count++;
+        if (vw->timer != -1) {
+            vw->timer++;
         }
     }
 }
@@ -64,7 +64,7 @@ void Snd_axv_work_close_check(void)
 // freed, the voice work unlinked.
 void axv_close_ck_main(SND_AXV_WORK* axv)
 {
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
 
     if (axv->status & 0x8) {
         return;
@@ -76,8 +76,8 @@ void axv_close_ck_main(SND_AXV_WORK* axv)
     AXFreeVoice(axv->voice);
     vw = axv->vw;
     if (vw != NULL) {
-        vw->status = 0;
-        vw->axv = NULL;
+        vw->be_flag = 0;
+        vw->axv_ptr = NULL;
     }
     axv->status = 0;
     axv->vw = NULL;
@@ -88,7 +88,7 @@ void axv_close_ck_main(SND_AXV_WORK* axv)
 // voice work is freed at once (status bit2 = releasing).
 void Snd_axv_work_note_off(SND_AXV_WORK* axv, s32 time)
 {
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     u16 mask;
     s16 diff;
 
@@ -110,8 +110,8 @@ void Snd_axv_work_note_off(SND_AXV_WORK* axv, s32 time)
     AXSetVoicePriority(axv->voice, 1);
     vw = axv->vw;
     if (vw != NULL) {
-        vw->status = 0;
-        vw->axv = NULL;
+        vw->be_flag = 0;
+        vw->axv_ptr = NULL;
     }
     mask = 0xA;
     axv->status &= ~mask;

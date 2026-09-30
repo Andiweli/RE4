@@ -1,5 +1,5 @@
 // game/snd_seq0: sound driver sequence (MIDI BGM) requests from the game side — fade / stop /
-// volume requests are set as bits on the SND_SEQ_WORK for the audio frame (snd_seq1) to execute,
+// volume requests are set as bits on the SND_SEQ for the audio frame (snd_seq1) to execute,
 // plus the fade / end / sounding checks.
 #include "snd_drv.h"
 
@@ -19,19 +19,19 @@ int Snd_seq_req(u32 snd_id, u32 cmd, u32 time, u32 vol)
 // Stores the request bits / fade parameters on the sequence work.
 int seq_req_sub(u32 snd_id, u32 cmd, u32 time, u32 vol)
 {
-    SND_SEQ_WORK* seq;
+    SND_SEQ* seq;
 
     seq = Snd_search_seq_work_snd_id(snd_id);
     if (seq == NULL) {
         return 1;
     }
-    seq->req |= cmd;
+    seq->req_flag |= cmd;
     if (cmd & 0x1) {
-        seq->fade_time = time;
-        seq->fade_vol = vol;
+        seq->req_fade_time = time;
+        seq->req_fade_end = vol;
     }
     if (cmd & 0x4) {
-        seq->vol = time;
+        seq->req_vol = time;
     }
     return 0;
 }
@@ -51,30 +51,30 @@ void Snd_seq_fade_out_type(u8 type, s16 time)
 // For every running sequence whose type matches: mode 0 volume refresh, 1 fade-out / stop request.
 void seq_type_sub(u8 type, int mode, s16 time)
 {
-    SND_SEQ_WORK* seq;
+    SND_SEQ* seq;
     int old;
     int i;
 
     old = OSDisableInterrupts();
     for (i = 0; i < SND_SEQ_MAX; i++) {
         seq = &Snd_seq_work[i];
-        if (seq->status == 0) {
+        if (seq->be_flag == 0) {
             continue;
         }
-        if (!(seq->type & type)) {
+        if (!(seq->seq_type & type)) {
             continue;
         }
         switch (mode) {
         case 0:
-            seq->flag |= 0x1;
+            seq->update |= 0x1;
             break;
         case 1:
             if (time == 0) {
-                seq->req |= 0x2;
+                seq->req_flag |= 0x2;
             } else {
-                seq->req |= 0x1;
-                seq->fade_time = time;
-                seq->fade_vol = 0;
+                seq->req_flag |= 0x1;
+                seq->req_fade_time = time;
+                seq->req_fade_end = 0;
             }
             break;
         }
@@ -85,13 +85,13 @@ void seq_type_sub(u8 type, int mode, s16 time)
 // 1 while the sequence is fading, 0 when steady, -1 when unknown.
 int Snd_seq_fade_check(u32 snd_id)
 {
-    SND_SEQ_WORK* seq;
+    SND_SEQ* seq;
 
     seq = Snd_search_seq_work_snd_id(snd_id);
     if (seq == NULL) {
         return -1;
     }
-    if (seq->status & 0x100) {
+    if (seq->be_flag & 0x100) {
         return 1;
     } else {
         return 0;
@@ -101,8 +101,8 @@ int Snd_seq_fade_check(u32 snd_id)
 // -1 while the sequence is still queued, 1 while it plays, 0 when gone.
 int Snd_seq_end_check(u32 snd_id)
 {
-    SND_REQ_WORK* req;
-    SND_SEQ_WORK* seq;
+    SND_REQ* req;
+    SND_SEQ* seq;
     int old;
 
     old = OSDisableInterrupts();
@@ -140,7 +140,7 @@ int Snd_seq_pronounce_ck_type(u8 type)
 // 0x10 when the request bank holds a pending sequence play of `type`.
 int seq_pro_ck_req_work(int bank, u8 type)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
     int i;
 
     for (i = 0; i < SND_REQ_MAX; i++) {
@@ -164,12 +164,12 @@ int seq_pro_ck_req_work(int bank, u8 type)
 // 2 when a sequence of `type` is active.
 int seq_pro_ck_seq_work(u8 type)
 {
-    SND_SEQ_WORK* seq;
+    SND_SEQ* seq;
     int i;
 
     for (i = 0; i < SND_SEQ_MAX; i++) {
         seq = &Snd_seq_work[i];
-        if (seq->status != 0 && (type & seq->type)) {
+        if (seq->be_flag != 0 && (type & seq->seq_type)) {
             return 2;
         }
     }

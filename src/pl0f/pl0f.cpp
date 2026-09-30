@@ -202,7 +202,7 @@ void cPl0f::move()
         PSMTXMultVecSR(m, &v, &v);
         SndCall(8, 0x17, &pos, 0xF, 0, 0);
         for (i = 0; i < 2; i++) {
-            w->node[i].spd = v;
+            w->node[i].Spd = v;
         }
     }
 }
@@ -243,11 +243,11 @@ void cPl0f::setPos(Vec* p, f32 ang)
     u32 i;
 
     for (i = 0; i < 2; i++) {
-        Pl0fNode* n = &w->node[i];
+        BOAT_CTRL_WK* n = &w->node[i];
 
-        n->spd.x = 0.0f;
-        n->spd.y = 0.0f;
-        n->spd.z = 0.0f;
+        n->Spd.x = 0.0f;
+        n->Spd.y = 0.0f;
+        n->Spd.z = 0.0f;
     }
     pos = *p;
     pos_old = pos;
@@ -288,27 +288,27 @@ static void pl0f_R0_Init(cPl0f* em)
     em->atari.setPriority(PRI_LV1);
     em->setStatus(EM_STATUS_LOCKOFF);
     EspDataLoad((u32) ARC(PL0F_EFF_004), EFF_PL0F, 0);
-    w->node[0].pos.x = 0.0f;
-    w->node[0].pos.y = 0.0f;
-    w->node[0].pos.z = 2500.0f;
-    w->node[1].pos.x = 0.0f;
-    w->node[1].pos.y = 0.0f;
-    w->node[1].pos.z = -1500.0f;
+    w->node[0].Ofs.x = 0.0f;
+    w->node[0].Ofs.y = 0.0f;
+    w->node[0].Ofs.z = 2500.0f;
+    w->node[1].Ofs.x = 0.0f;
+    w->node[1].Ofs.y = 0.0f;
+    w->node[1].Ofs.z = -1500.0f;
     for (i = 0; i < 2; i++) {
-        Pl0fNode* n = &w->node[i];
+        BOAT_CTRL_WK* n = &w->node[i];
 
-        n->dist[i] = 0.0f;
-        n->maxLen = 25000.0f;
-        n->spd.x = 0.0f;
-        n->spd.y = 0.0f;
-        n->spd.z = 0.0f;
+        n->Len[i] = 0.0f;
+        n->Fix_len = 25000.0f;
+        n->Spd.x = 0.0f;
+        n->Spd.y = 0.0f;
+        n->Spd.z = 0.0f;
         for (j = i + 1; j < 2; j++) {
-            Pl0fNode* m = &w->node[j];
+            BOAT_CTRL_WK* m = &w->node[j];
             f32 len;
 
-            len = VEC_DIST(&n->pos, &m->pos);
-            n->dist[j] = len;
-            m->dist[i] = len;
+            len = VEC_DIST(&n->Ofs, &m->Ofs);
+            n->Len[j] = len;
+            m->Len[i] = len;
         }
     }
     w->Ripple_wait = 0x1D;
@@ -604,7 +604,7 @@ static void pl0f_R1_Drop(cPl0f* em)
             for (i = 0; i < 2; i++) {
                 Vec d;
 
-                d = w->node[i].spd;
+                d = w->node[i].Spd;
                 if (d.x != 0.0f && d.y != 0.0f && d.z != 0.0f) {
                     d.x = 0.0f;
                     d.y = 0.0f;
@@ -614,7 +614,7 @@ static void pl0f_R1_Drop(cPl0f* em)
 #line 806
                 VECNormalize(&d, &d);
                 PSVECScale(&d, &d, spd);
-                w->node[i].spd = d;
+                w->node[i].Spd = d;
             }
         }
         break;
@@ -793,9 +793,9 @@ static void pl0f_R1_R10eOut2(cPl0f* em)
 // `len` rather than an inline, so the `&d` arguments stay one PRE'd pseudo per block while the member
 // reads stay frame-direct, and the squared length goes through `len` (f12).
 #define PL0F_NODE_LIMIT(n, line)                                                                   \
-    PSVECSubtract(&(n)->wpos, &(n)->fixPos, &d);                                                   \
+    PSVECSubtract(&(n)->Pos, &(n)->Fix, &d);                                                   \
     len = d.x * d.x + d.z * d.z;                                                                   \
-    if (len > (n)->maxLen * (n)->maxLen) {                                                         \
+    if (len > (n)->Fix_len * (n)->Fix_len) {                                                         \
         if (0.0f == d.x && 0.0f == d.y && 0.0f == d.z) {                                           \
             pLog->err(0, 0, "VECNormalize:[%s/%d]", "D:/Bio4/Prog/pl0f.cpp", line);              \
             d.x = d.y = d.z = 0.0f;                                                                \
@@ -803,8 +803,8 @@ static void pl0f_R1_R10eOut2(cPl0f* em)
             PSVECNormalize(&d, &d);                                                                \
         }                                                                                          \
         d.y = 0.0f;                                                                                \
-        PSVECScale(&d, &d, (n)->maxLen);                                                           \
-        PSVECAdd(&(n)->fixPos, &d, &(n)->wpos);                                                    \
+        PSVECScale(&d, &d, (n)->Fix_len);                                                           \
+        PSVECAdd(&(n)->Fix, &d, &(n)->Pos);                                                    \
     }
 
 // The hull physics of the frame: the bow and stern nodes move, four relaxation passes restore their
@@ -819,7 +819,7 @@ void pl0fBoatControl(cPl0f* em)
     u32 k;
     u32 pass;
     f32 len;
-    Pl0fNode* n;
+    BOAT_CTRL_WK* n;
 
     // `i` and `n` are the SAME variables in all three node loops. Fresh variables would let gcse and
     // loop.c turn the second loop's index into a `mulli` and its member addresses into stepping
@@ -828,47 +828,47 @@ void pl0fBoatControl(cPl0f* em)
     TransMatrix(m, &em->pos);
     for (i = 0; i < 2; i++) {
         n = &w->node[i];
-        PSMTXMultVec(m, &n->pos, &n->wpos);
-        n->wposOld = n->wpos;
-        PSVECAdd(&n->wpos, &n->spd, &n->wpos);
-        if (n->fixed) {
+        PSMTXMultVec(m, &n->Ofs, &n->Pos);
+        n->Old = n->Pos;
+        PSVECAdd(&n->Pos, &n->Spd, &n->Pos);
+        if (n->Flg) {
             PL0F_NODE_LIMIT(n, 1205);
         }
     }
     for (pass = 0; pass < 4; pass++) {
         for (i = 0; i < 2; i++) {
             n = &w->node[i];
-            if (n->fixed) {
+            if (n->Flg) {
                 PL0F_NODE_LIMIT(n, 1226);
             }
             for (k = 0; k < 2; k++) {
                 if (i != k) {
-                    Pl0fNode* o = &w->node[k];
+                    BOAT_CTRL_WK* o = &w->node[k];
                     f32 rate;
 
-                    PSVECSubtract(&o->wpos, &n->wpos, &d);
+                    PSVECSubtract(&o->Pos, &n->Pos, &d);
                     len = PSVECMag(&d);   // the routine's `len`: f12 (`fmr f12,f1`), not tied to f1
-                    rate = (n->dist[k] - len) * 0.5f;   // 0.5 enters the pool before 1.0
+                    rate = (n->Len[k] - len) * 0.5f;   // 0.5 enters the pool before 1.0
                     PSVECScale(&d, &d, (1.0f / len) * rate);   // 1/len is the left operand of the fmuls
-                    PSVECAdd(&o->wpos, &d, &o->wpos);
-                    PSVECSubtract(&n->wpos, &d, &n->wpos);
+                    PSVECAdd(&o->Pos, &d, &o->Pos);
+                    PSVECSubtract(&n->Pos, &d, &n->Pos);
                 }
             }
         }
     }
     for (i = 0; i < 2; i++) {
         n = &w->node[i];
-        n->fixed = 0;
-        PSVECSubtract(&n->wpos, &n->wposOld, &n->spd);
-        PSVECScale(&n->spd, &n->spd, pl0f_spd_damp);
+        n->Flg = 0;
+        PSVECSubtract(&n->Pos, &n->Old, &n->Spd);
+        PSVECScale(&n->Spd, &n->Spd, pl0f_spd_damp);
     }
     pl0fScrAdjust(em);
-    PSVECSubtract(&w->node[0].wpos, &w->node[1].wpos, &d);
+    PSVECSubtract(&w->node[0].Pos, &w->node[1].Pos, &d);
     em->ang.x = 0.0f;
     em->ang.y = atan2f(d.x, d.z);
     RotMatrix(em->mat, &em->ang);
-    PSVECScale(&w->node[0].pos, &d, -1.0f);
-    TransMatrix(em->mat, &w->node[0].wpos);
+    PSVECScale(&w->node[0].Ofs, &d, -1.0f);
+    TransMatrix(em->mat, &w->node[0].Pos);
     PSMTXMultVec(em->mat, &d, &d);
     TransMatrix(em->mat, &d);
     em->pos = d;
@@ -876,8 +876,8 @@ void pl0fBoatControl(cPl0f* em)
     pl0fWaterEff(em);
     pl0fBoatRoll(em);
     if (w->Boat_spd > 100.0f) {
-        AddWaterPower(w->node[0].wpos, fRand1_1() * 0.3f);
-        AddWaterPower(w->node[1].wpos, fRand1_1() * 0.3f);
+        AddWaterPower(w->node[0].Pos, fRand1_1() * 0.3f);
+        AddWaterPower(w->node[1].Pos, fRand1_1() * 0.3f);
     }
     {
         cPlayer* pl = pPL;
@@ -1028,7 +1028,7 @@ void pl0fBoatAddSpd(cPl0f* em, u32 no, Vec* spd)
     FREE_PL0F* w = PL0F_WK(em);
 
     if (no < 2) {
-        PSVECAdd(&w->node[no].spd, spd, &w->node[no].spd);
+        PSVECAdd(&w->node[no].Spd, spd, &w->node[no].Spd);
     }
 }
 
@@ -1138,7 +1138,7 @@ void pl0fBoatSpdControl(cPl0f* em)
 void pl0fBoatChaseBoss(cPl0f* em)
 {
     cEm* boss = PL0F_WK(em)->pBoss;   // no work pointer: pBoss folds into em+0x3F0
-    Pl0fNode* n;
+    BOAT_CTRL_WK* n;
     Vec v;
     Vec b;
 
@@ -1150,11 +1150,11 @@ void pl0fBoatChaseBoss(cPl0f* em)
     v.y = 0.0f;
     v.z = -2000.0f;
     PSMTXMultVec(boss->mat, &v, &v);
-    v.y = n->wpos.y;
-    n->fixed = 1;
-    n->fixPos = v;
+    v.y = n->Pos.y;
+    n->Flg = 1;
+    n->Fix = v;
     if (boss->flag & 8) {
-        n->maxLen = 500000.0f;
+        n->Fix_len = 500000.0f;
     } else {
         f32 len;
 
@@ -1162,11 +1162,11 @@ void pl0fBoatChaseBoss(cPl0f* em)
         b.y = 0.0f;
         b.z = -2000.0f;
         PSMTXMultVec(boss->mat, &b, &b);
-        len = VEC_DISTXZ(&n->wpos, &b);
-        if (len < n->maxLen && len > 25000.0f) {
-            n->maxLen = len;
+        len = VEC_DISTXZ(&n->Pos, &b);
+        if (len < n->Fix_len && len > 25000.0f) {
+            n->Fix_len = len;
         } else {
-            n->maxLen = n->maxLen * 0.97f + 750.0f;
+            n->Fix_len = n->Fix_len * 0.97f + 750.0f;
         }
     }
 }
@@ -1634,7 +1634,7 @@ int pl0fCrashCk(cPl0f* em)
 
         if (e->isAlive() && e->id == 0x2F && (s16) e->hp > 0) {
             for (i = 0; i < 2; i++) {
-                if (EmYarareContactCk(e, &w->node[i].wpos, 800.0f, &hit)) {
+                if (EmYarareContactCk(e, &w->node[i].Pos, 800.0f, &hit)) {
                     int away = 0;
 
                     if (StaFlagChk(pG, STA_PL_SPEAR_SET)) {
@@ -1656,9 +1656,9 @@ int pl0fCrashCk(cPl0f* em)
             f32 r = o->scale.x * 1800.0f;
 
             for (i = 0; i < 2; i++) {
-                Pl0fNode* nd = &w->node[i];
+                BOAT_CTRL_WK* nd = &w->node[i];
 
-                if ((nd->wpos.x - o->pos.x) * (nd->wpos.x - o->pos.x) + (nd->wpos.z - o->pos.z) * (nd->wpos.z - o->pos.z) < r * r) {
+                if ((nd->Pos.x - o->pos.x) * (nd->Pos.x - o->pos.x) + (nd->Pos.z - o->pos.z) * (nd->Pos.z - o->pos.z) < r * r) {
                     int away;
 
                     ((cObj1c*) o)->setCrash();
@@ -1705,7 +1705,7 @@ void pl0fCrashAdjustSet(cPl0f* em, Vec* p, int away)
         PSVECScale(&d, &d, 300.0f);
     }
     for (i = 0; i < 2; i++) {
-        w->node[i].spd = d;
+        w->node[i].Spd = d;
     }
 }
 
@@ -1738,17 +1738,17 @@ void pl0fScrAdjust(cPl0f* em)
         return;
     }
     for (i = 0; i < 2; i++) {
-        Pl0fNode* n = &w->node[i];
+        BOAT_CTRL_WK* n = &w->node[i];
 
         nrm.x = 0.0f;
         nrm.y = 0.0f;
         nrm.z = 0.0f;
-        p = n->wpos;
-        SatMgr.adjust(&nrm, &n->wposOld, &p, 300.0f, 0x2081, 0);
+        p = n->Pos;
+        SatMgr.adjust(&nrm, &n->Old, &p, 300.0f, 0x2081, 0);
         if (!(nrm.x == 0.0f && nrm.y == 0.0f && nrm.z == 0.0f)) {
             f32 len;
 
-            PSVECSubtract(&p, &n->wpos, &d);
+            PSVECSubtract(&p, &n->Pos, &d);
             d.y = 0.0f;
             if (!(d.x == 0.0f && d.z == 0.0f)) {
                 len = SQRTF(d.x * d.x + d.z * d.z) * 1.2f;
@@ -1756,8 +1756,8 @@ void pl0fScrAdjust(cPl0f* em)
                 VECNormalize(&d, &d);
                 PSVECScale(&d, &d, len);
                 for (j = 0; j < 2; j++) {
-                    Vec* wp = &w->node[j].wpos;
-                    Vec* sp = &w->node[j].spd;
+                    Vec* wp = &w->node[j].Pos;
+                    Vec* sp = &w->node[j].Spd;
 
                     PSVECAdd(wp, &d, wp);
                     *sp = d;
@@ -3280,7 +3280,7 @@ int testSearchEm2f(cPl0f* em)
             f32 len;
             int i;
 
-            Pl0fNode* n = &w->node[0];   // node pointer kept callee-saved across the calls; `w` itself dies before them
+            BOAT_CTRL_WK* n = &w->node[0];   // node pointer kept callee-saved across the calls; `w` itself dies before them
 
             w->pBoss = e;
             em->r_no_0 = 1;   // plain byte stores: the 6 stays in the loop, the zero is hoisted (an int inline hoists both)
@@ -3302,11 +3302,11 @@ int testSearchEm2f(cPl0f* em)
             v.y = 0.0f;
             v.z = -2000.0f;
             PSMTXMultVec(w->pBoss->mat, &v, &v);
-            len = VEC_DISTXZ(&n->wpos, &v);
+            len = VEC_DISTXZ(&n->Pos, &v);
             if (len > 25000.0f) {
-                n->maxLen = len;
+                n->Fix_len = len;
             } else {
-                n->maxLen = 25000.0f;
+                n->Fix_len = 25000.0f;
             }
             return 1;
         }

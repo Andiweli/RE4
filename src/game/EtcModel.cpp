@@ -46,12 +46,6 @@ struct EtcList {
     ETS_DATA data[1];  // 0x10
 };
 
-// Room save record as GetEtcFlgPtr sees it: the 64 etc flag words at 0x28.
-struct EtcRoomSave {
-    u8 pad_0[0x28];
-    u16 etcFlag[0x40];   // 0x28
-};
-
 // Additive ambient colour per etc kind (EtcSetAddAmb argument), one row per ambient type.
 struct EtcAmbRgb {
     u8 r;
@@ -2558,7 +2552,7 @@ u16* GetEtcFlgPtr(u32 etc_no, u16 room_no)
     if (p == 0) {
         return 0;
     }
-    return &((EtcRoomSave*) p)->etcFlag[etc_no];
+    return &((ROOM_SAVE_DATA*) p)->EtcModelFlg[etc_no];
 }
 
 // display flag (be_flag bit1) of an etc model

@@ -91,13 +91,6 @@ struct SndBgmTbl {
     u32 list_ofs;    // 0x04  offset to the u16 room id list, 0xFFFF terminated
 };
 
-// Room save record bytes used here (cRoomData::getRoomSavePtr).
-struct SndRoomSave {
-    u8 pad_0[0xA8];
-    u32 bgm[6];      // 0xA8  room BGM table: slot 0 low half, slot 1 high half
-    u32 str[6];      // 0xC0  room stream table
-};
-
 struct _MUTE_STAT {
     s32 mute_on;     // 0x00
     u8 vol_save;     // 0x04  master volume saved while muted (PS2 sint8; kept unsigned, see below)
@@ -156,7 +149,7 @@ struct SND_WORK {
     u16 doorse_id;             // 0x8E  door SE table loaded
     s32 room_ok;             // 0x90  room sound data initialised
     struct SeAtHead* pSeAtHeader;  // 0x94  room "ESE" sound area data (se_at.cpp), NULL when none
-    struct SeAt* pSeAtData; // 0x98  its records
+    struct SE_AT_DATA* pSeAtData; // 0x98  its records
     SND_INFO* hdr;         // 0x9C
     SndSurWork sur[48];      // 0xA0
     CALL_EXCLUDE em_hist[32];   // 0x9A0
@@ -182,7 +175,7 @@ struct SND_WORK {
     SND_INFO* Hdr() { return hdr; }
 };
 
-// "ESE" room file header (game/se_at.cpp), followed by the SeAt records at 0x10.
+// "ESE" room file header (game/se_at.cpp), followed by the SE_AT_DATA records at 0x10.
 struct SeAtHead {
     char magic[4];   // 0x00  "ESE"
     u16 version;     // 0x04  0x100
@@ -191,21 +184,21 @@ struct SeAtHead {
 };
 
 // Timed / area sound entry (game/se_at.cpp), 0x2C bytes.
-struct SeAt {
-    u8 flags;        // 0x00  bit0: enabled (SeAtSetOnOff)
-    u8 no;           // 0x01  id (GetSeAtPtr)
-    u16 flags2;      // 0x02  bit0: no position
+struct SE_AT_DATA {
+    u8 be_flg;        // 0x00  bit0: enabled (SeAtSetOnOff)
+    u8 at_no;           // 0x01  id (GetSeAtPtr)
+    u16 flag;      // 0x02  bit0: no position
     Vec pos;         // 0x04
     u16 x10;         // 0x10
     u16 blk;         // 0x12  SndCall block
     u16 x14;         // 0x14
     u16 se_no;       // 0x16  SndCall number
     u16 interval;    // 0x18  fixed interval, 0 = random (rnd_base + Rnd() % rnd_range)
-    u16 wait;        // 0x1A  first-play delay
-    u16 cnt;         // 0x1C  frames until the next play
-    s16 repeat;      // 0x1E  plays left (0 = endless), -1 = finished
+    u16 delay;        // 0x1A  first-play delay
+    u16 ctr;         // 0x1C  frames until the next play
+    s16 call_num;      // 0x1E  plays left (0 = endless), -1 = finished
     u16 rnd_base;    // 0x20
-    u16 rnd_range;   // 0x22
+    u16 rnd_interval;   // 0x22
     u8 pad_24[0x2C - 0x24];
 };
 
@@ -213,7 +206,7 @@ struct SeAt {
 void SeAtCheck();
 void SeAtInit();
 int SeAtSetOnOff(int no, int sw);
-SeAt* GetSeAtPtr(int no);
+SE_AT_DATA* GetSeAtPtr(int no);
 u32 SeAtSndCall(int no);
 
 // ARAM / MRAM sound data map (`SndMem`, 0xA0 bytes).

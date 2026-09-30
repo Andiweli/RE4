@@ -174,7 +174,7 @@ void disp_sit_type(SndTestWork* w, SND_SIT* sit);
 
 void disp_sit_normal(SND_ISS_BLK* blk, SND_SIT* sit, int x, int y);
 void disp_sit_midi(SND_ISS_BLK* blk, SND_SIT* sit, int x, int y);
-void disp_seq_volume(SND_SEQ_WORK* seq);
+void disp_seq_volume(SND_SEQ* seq);
 static void snd_test_disp_rit();
 int str_get_player_id();
 void disp_cursor(SndTestWork* w, int x, int y);
@@ -1148,10 +1148,10 @@ static char* on_off_name[2] = {"OFF", " ON"};
 void disp_sit_normal(SND_ISS_BLK* blk, SND_SIT* sit, int x, int y)
 {
     u8* wt = blk->dls;
-    SND_WT_HDR* hdr = (SND_WT_HDR*) wt;
-    WTINST* inst = (WTINST*) (wt + hdr->inst_ofs);
-    WTREGION* rgn = (WTREGION*) (wt + hdr->rgn_ofs);
-    WTART* art = (WTART*) (wt + hdr->art_ofs);
+    WTFILEHEADER* hdr = (WTFILEHEADER*) wt;
+    WTINST* inst = (WTINST*) (wt + hdr->offsetMelodicInst);
+    WTREGION* rgn = (WTREGION*) (wt + hdr->offsetRegions);
+    WTART* art = (WTART*) (wt + hdr->offsetArticulations);
     s32 dlsVol;
     s32 synVol;
     s32 axVol;
@@ -1218,7 +1218,7 @@ void disp_sit_normal(SND_ISS_BLK* blk, SND_SIT* sit, int x, int y)
 // Prints a MIDI SIT: MIDI_NO, VOL_FLAG, VOL, CH_NO and the sequence work's state.
 void disp_sit_midi(SND_ISS_BLK* blk, SND_SIT* sit, int x, int y)
 {
-    SND_SEQ_WORK* seq;
+    SND_SEQ* seq;
 
     eprintf(x, y, 0, 1, "MIDI_NO   : %5d", sit->note >> 8);
     eprintf(x, y + 0xE, 0, 1, "VOL_FLAG  : %5d", sit->curve_no);
@@ -1242,24 +1242,24 @@ void disp_sit_midi(SND_ISS_BLK* blk, SND_SIT* sit, int x, int y)
     if (seq == NULL) {
         seq = &Snd_seq_work[0];
     }
-    eprintf(0x18, y + 0x54, 0, 1, "BE_FLAG : %04X", seq->status);
-    eprintf(0x18, y + 0x62, 0, 1, "WORK_ID : %04X", seq->no);
-    eprintf(0x18, y + 0x7E, 0, 1, "TOP SEQ : %08X", seq->seq_top);
-    eprintf(0x18, y + 0x8C, 0, 1, "NOW SEQ : %08X", seq->seq_pos);
-    eprintf(0x18, y + 0x9A, 0, 1, "LOP SEQ : %08X", seq->seq_loop);
+    eprintf(0x18, y + 0x54, 0, 1, "BE_FLAG : %04X", seq->be_flag);
+    eprintf(0x18, y + 0x62, 0, 1, "WORK_ID : %04X", seq->work_id);
+    eprintf(0x18, y + 0x7E, 0, 1, "TOP SEQ : %08X", seq->top_seq_ptr);
+    eprintf(0x18, y + 0x8C, 0, 1, "NOW SEQ : %08X", seq->now_seq_ptr);
+    eprintf(0x18, y + 0x9A, 0, 1, "LOP SEQ : %08X", seq->lop_seq_ptr);
     eprintf(0x18, y + 0xA8, 0, 1, "TEMPO   : %8d", seq->tempo);
-    eprintf(0x18, y + 0xB6, 0, 1, "TPM     : %8d", seq->division);
-    eprintf(0x18, y + 0xC4, 0, 1, "D TIME  : %8d", seq->delta);
+    eprintf(0x18, y + 0xB6, 0, 1, "TPM     : %8d", seq->tpm);
+    eprintf(0x18, y + 0xC4, 0, 1, "D TIME  : %8d", seq->time);
     disp_seq_volume(seq);
 }
 
 // Prints the sequence work's volume.
-void disp_seq_volume(SND_SEQ_WORK* seq)
+void disp_seq_volume(SND_SEQ* seq)
 {
-    eprintf(0xD0, 0x16C, 0, 1, "OUT : %04XH", seq->calc_vol);
-    eprintf(0xD0, 0x17A, 0, 1, "NOW : %04XH", seq->vol2);
-    eprintf(0xD0, 0x196, 0, 1, "FDE : %04XH", seq->fade_target);
-    eprintf(0xD0, 0x1A4, 0, 1, "SPD : %0d", seq->fade_step);
+    eprintf(0xD0, 0x16C, 0, 1, "OUT : %04XH", seq->out_vol);
+    eprintf(0xD0, 0x17A, 0, 1, "NOW : %04XH", seq->now_vol);
+    eprintf(0xD0, 0x196, 0, 1, "FDE : %04XH", seq->nml_fade_end);
+    eprintf(0xD0, 0x1A4, 0, 1, "SPD : %0d", seq->nml_fade_spd);
 }
 
 // RIT screen: stream block / request numbers, the RIT fields and the stream status.
@@ -1269,7 +1269,7 @@ static void snd_test_disp_rit()
     SND_STR_BLK* blk = &Snd_str_blk[w->blkNo[w->tbl]];
     SND_RIT* rit = blk->rit;
     SND_SHD* shd;
-    SND_STR_WORK* str;
+    SND_STR* str;
     // The MONOPOLY row's y is `li r4,84; addi r4,r4,84` in the original: a single-set constant pseudo
     // (REG_EQUIV 84) whose init local-alloc's update_equiv_regs moves in front of its only use, because
     // substituting 84 into `y0 + 0x54` fails: validate_replace_rtx's "constant last" swap of
@@ -1291,19 +1291,19 @@ static void snd_test_disp_rit()
     if (str == NULL) {
         str = &Snd_str_work[str_get_player_id()];
     }
-    eprintf(0x18, 0x54, 0, 1, "BE_FLAG : %04XH %02XH", str->status, Snd_ctrl_work.dvd_err);
-    eprintf(0x18, 0x62, 0, 1, "RNO     : %02X %02X", str->state, str->prev_state);
-    eprintf(0x18, 0x70, 0, 1, "DVD E/S : %02X %02X %2d", str->err, str->dvd_status, str->read_done);
-    eprintf(0x18, 0x7E, 0, 1, "DVD NIE : %2d %2d %2d", str->read_cnt, str->read_blk, str->dma_blk);
-    eprintf(0x18, 0x8C, 0, 1, "DMA NIE : %2d %2d %2d", str->dma_cnt, str->dma_aram_blk, str->dma_last_blk);
-    eprintf(0x18, 0x9A, 0, 1, "PLY IDX : %2d %2d %03X", str->play_blk, str->prev_blk, str->blk_cnt);
-    eprintf(0x18, 0xB6, 0, 1, "TOP NBL : %08XH", str->loop_start);
-    eprintf(0x18, 0xC4, 0, 1, "END NBL : %08XH", str->loop_end);
-    eprintf(0x18, 0xE0, 0, 1, "ARM NBL : %08XH", str->play_nbl);
-    eprintf(0x18, 0xEE, 0, 1, "PLY NBL : %08XH", str->play_pos);
-    eprintf(0x18, 0xFC, 0, 1, "NXT NBL : %08XH", str->blk_end);
-    eprintf(0x18, 0x118, 0, 1, "ST SIZE : %08XH", str->read_end);
-    eprintf(0x18, 0x126, 0, 1, "ST POS  : %08XH", str->read_ofs);
+    eprintf(0x18, 0x54, 0, 1, "BE_FLAG : %04XH %02XH", str->be_flag, Snd_ctrl_work.dvd_err);
+    eprintf(0x18, 0x62, 0, 1, "RNO     : %02X %02X", str->rno, str->rno_sv);
+    eprintf(0x18, 0x70, 0, 1, "DVD E/S : %02X %02X %2d", str->err_flag, str->dvd_status, str->dvd_comp);
+    eprintf(0x18, 0x7E, 0, 1, "DVD NIE : %2d %2d %2d", str->dvd_req_num, str->dvd_req_idx, str->dvd_end_idx);
+    eprintf(0x18, 0x8C, 0, 1, "DMA NIE : %2d %2d %2d", str->dma_req_num, str->dma_req_idx, str->dma_end_idx);
+    eprintf(0x18, 0x9A, 0, 1, "PLY IDX : %2d %2d %03X", str->now_play_idx, str->old_play_idx, str->ttl_play_idx);
+    eprintf(0x18, 0xB6, 0, 1, "TOP NBL : %08XH", str->lptop_nbl);
+    eprintf(0x18, 0xC4, 0, 1, "END NBL : %08XH", str->lpend_nbl);
+    eprintf(0x18, 0xE0, 0, 1, "ARM NBL : %08XH", str->aram_nbl);
+    eprintf(0x18, 0xEE, 0, 1, "PLY NBL : %08XH", str->play_nbl);
+    eprintf(0x18, 0xFC, 0, 1, "NXT NBL : %08XH", str->next_nbl);
+    eprintf(0x18, 0x118, 0, 1, "ST SIZE : %08XH", str->file_size);
+    eprintf(0x18, 0x126, 0, 1, "ST POS  : %08XH", str->file_pos);
     eprintf(0xD0, 0x54, 0, 1, "STR_NO    : %5d", rit->str_no);
     eprintf(0xD0, 0x62, 0, 1, "VOL_FLAG  : %5d", (s8) rit->pad_6[0]);
     eprintf(0xD0, 0x70, 0, 1, "VOL       : %5d", rit->vol);
@@ -1329,10 +1329,10 @@ static void snd_test_disp_rit()
         eprintf(0xD0, 0x126, 0, 1, "STR LOOP  :   OFF");
     }
     disp_str_status(w, 0xD0, 0x54);
-    eprintf(0xD0, 0x16C, 0, 1, "OUT : %04XH", str->calc_vol);
-    eprintf(0xD0, 0x17A, 0, 1, "NOW : %04XH", str->vol2);
-    eprintf(0xD0, 0x196, 0, 1, "FDE : %04XH", str->fade_target);
-    eprintf(0xD0, 0x1A4, 0, 1, "SPD : %0d", str->fade_step);
+    eprintf(0xD0, 0x16C, 0, 1, "OUT : %04XH", str->out_vol);
+    eprintf(0xD0, 0x17A, 0, 1, "NOW : %04XH", str->now_vol);
+    eprintf(0xD0, 0x196, 0, 1, "FDE : %04XH", str->nml_fade_end);
+    eprintf(0xD0, 0x1A4, 0, 1, "SPD : %0d", str->nml_fade_spd);
 }
 
 // first stream player in use (0 when none)
@@ -1341,7 +1341,7 @@ int str_get_player_id()
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (Snd_str_work[i].status != 0) {
+        if (Snd_str_work[i].be_flag != 0) {
             return i;
         }
     }
@@ -1392,12 +1392,12 @@ void disp_str_status(SndTestWork* w, int x, int y)
 
     x += 0xA8;
     for (i = 0; i < 4; i++) {
-        SND_STR_WORK* str = &Snd_str_work[i];
+        SND_STR* str = &Snd_str_work[i];
 
-        if (str->status == 0) {
+        if (str->be_flag == 0) {
             eprintf(x, y, 7, 1, "%02d : NO MOVE\n", i);
         } else {
-            eprintf(x, y, str_state_col[str->state], 1, "%02d : %s\n", i, str_state_name[str->state]);
+            eprintf(x, y, str_state_col[str->rno], 1, "%02d : %s\n", i, str_state_name[str->rno]);
         }
         y += 0xE;
     }
@@ -1408,14 +1408,14 @@ void disp_str_status(SndTestWork* w, int x, int y)
 // initializer into the constant pool (expr.c ADDR_EXPR -> force_const_mem), which is the `.4byte
 // Snd_voice_work` word at the end of disp_sequencer's pool that the loop preheader reads with
 // `lis; addi; lwz 0()`.
-static inline int seq_note_count(int ch, SND_VOICE_WORK* const& work)
+static inline int seq_note_count(int ch, SND_VOICE* const& work)
 {
-    SND_VOICE_WORK* vw = work;
+    SND_VOICE* vw = work;
     int notes = 0;
     int i;
 
     for (i = 0; i < 64; i++) {
-        if (vw->status != 0 && vw->type == 2 && vw->seq_ch == ch) {
+        if (vw->be_flag != 0 && vw->play_type == 2 && vw->track == ch) {
             notes++;
         }
         vw++;
@@ -1426,7 +1426,7 @@ static inline int seq_note_count(int ch, SND_VOICE_WORK* const& work)
 // Prints the sequencer channels (program, note, volume per channel).
 void disp_sequencer()
 {
-    SND_SEQ_WORK* seq;
+    SND_SEQ* seq;
     int ch;
     int y0;
 
@@ -1457,30 +1457,30 @@ void disp_sequencer()
     y0 = 0x54;
     for (ch = 0; ch < 16; ch++) {
         int x = 0x70 + ch * 0x18;
-        SND_VOICE_WORK* const voices = Snd_voice_work;
+        SND_VOICE* const voices = Snd_voice_work;
         int y;
 
         // `ch + 1`: the target passes r10 = ch+1 to the label eprintf2 and keeps that value
         // (`mr r26,r10`) as the loop's next ch
         eprintf2(6, 13, x, 0x54, 0, 1, "%03d", ch + 1);
-        if (seq->ch_flag[ch] & 1) {
+        if (seq->flag[ch] & 1) {
             eprintf2(6, 13, x, 0x54, 4, 1, "D");
         }
         y = y0 + 0x54;
         eprintf2(6, 13, x, 0x62, 0, 1, "%3d", seq_note_count(ch, voices));
-        eprintf2(6, 13, x, 0x70, 0, 1, "%3d", seq->ch_prio[ch]);
-        eprintf2(6, 13, x, 0x7E, 0, 1, "%3d", seq->ch_prog[ch] + 1);
-        eprintf2(6, 13, x, 0x8C, 0, 1, "%3d", (s8) seq->ch_vol[ch]);
-        eprintf2(6, 13, x, 0x9A, 0, 1, "%3d", (s8) seq->ch_exp[ch]);
-        eprintf2(6, 13, x, y, 0, 1, "%3d", seq->ch_pan[ch]);
-        eprintf2(6, 13, x, 0xB6, 0, 1, "%3d", seq->ch_pitch_lo[ch]);
-        eprintf2(6, 13, x, 0xC4, 0, 1, "%3d", seq->ch_pitch_hi[ch]);
-        eprintf2(6, 13, x, 0xD2, 0, 1, "%3d", seq->ch_data_msb[ch]);
-        eprintf2(6, 13, x, 0xE0, 0, 1, "%3d", seq->ch_data_lsb[ch]);
-        eprintf2(6, 13, x, 0xEE, 0, 1, "%3d", (s8) seq->ch_mod[ch]);
-        eprintf2(6, 13, x, 0xFC, 0, 1, "%3d", (s8) seq->ch_hold[ch]);
-        eprintf2(6, 13, x, 0x10A, 0, 1, "%3d", (s8) seq->ch_reverb[ch]);
-        eprintf2(6, 13, x, 0x118, 0, 1, "%3d", (s8) seq->ch_chorus[ch]);
+        eprintf2(6, 13, x, 0x70, 0, 1, "%3d", seq->prio[ch]);
+        eprintf2(6, 13, x, 0x7E, 0, 1, "%3d", seq->prog[ch] + 1);
+        eprintf2(6, 13, x, 0x8C, 0, 1, "%3d", (s8) seq->vol[ch]);
+        eprintf2(6, 13, x, 0x9A, 0, 1, "%3d", (s8) seq->exp[ch]);
+        eprintf2(6, 13, x, y, 0, 1, "%3d", seq->pan[ch]);
+        eprintf2(6, 13, x, 0xB6, 0, 1, "%3d", seq->pitch_m[ch]);
+        eprintf2(6, 13, x, 0xC4, 0, 1, "%3d", seq->pitch_l[ch]);
+        eprintf2(6, 13, x, 0xD2, 0, 1, "%3d", seq->pitch_sen_m[ch]);
+        eprintf2(6, 13, x, 0xE0, 0, 1, "%3d", seq->pitch_sen_l[ch]);
+        eprintf2(6, 13, x, 0xEE, 0, 1, "%3d", (s8) seq->modulation[ch]);
+        eprintf2(6, 13, x, 0xFC, 0, 1, "%3d", (s8) seq->hold[ch]);
+        eprintf2(6, 13, x, 0x10A, 0, 1, "%3d", (s8) seq->aux_a[ch]);
+        eprintf2(6, 13, x, 0x118, 0, 1, "%3d", (s8) seq->aux_b[ch]);
     }
     disp_seq_volume(seq);
 }
@@ -1524,18 +1524,18 @@ void disp_se_wt_data(SndTestWork* w, SND_ISS_BLK* blk, SND_SIT* sit)
 // Resolves the SIT's program to its WT instrument / region / art / sample / ADPCM pointers.
 void get_wt_ptr(SndTestWork* w, SND_ISS_BLK* blk, SND_SIT* sit)
 {
-    SND_WT_HDR* hdr = (SND_WT_HDR*) blk->dls;
+    WTFILEHEADER* hdr = (WTFILEHEADER*) blk->dls;
 
     w->wt = blk->dls;
-    w->inst = (WTINST*) (blk->dls + hdr->inst_ofs);
+    w->inst = (WTINST*) (blk->dls + hdr->offsetMelodicInst);
     w->inst = (WTINST*) ((u8*) w->inst + (sit->note & 0xFF00));
-    w->rgn = (WTREGION*) (blk->dls + hdr->rgn_ofs);
+    w->rgn = (WTREGION*) (blk->dls + hdr->offsetRegions);
     w->rgn += w->inst->keyRegion[sit->note & 0xFF];
-    w->art = (WTART*) (blk->dls + hdr->art_ofs);
+    w->art = (WTART*) (blk->dls + hdr->offsetArticulations);
     w->art += w->rgn->articulationIndex;
-    w->sample = (WTSAMPLE*) (blk->dls + hdr->sample_ofs);
+    w->sample = (WTSAMPLE*) (blk->dls + hdr->offsetSamples);
     w->sample += w->rgn->sampleIndex;
-    w->adpcm = (WTADPCM*) (blk->dls + hdr->adpcm_ofs);
+    w->adpcm = (WTADPCM*) (blk->dls + hdr->offsetAdpcmContext);
     w->adpcm += w->sample->adpcmIndex;
 }
 
@@ -1563,7 +1563,7 @@ void disp_adsr_para(SndTestWork* w)
 // Finds the AX voice work playing sndId (w->axv, NULL when none).
 void get_axv_ptr(SndTestWork* w)
 {
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
 
     if (w->sndId == 0) {
         return;
@@ -1572,10 +1572,10 @@ void get_axv_ptr(SndTestWork* w)
     if (vw == NULL) {
         return;
     }
-    if (vw->axv == NULL) {
+    if (vw->axv_ptr == NULL) {
         return;
     }
-    w->axv = vw->axv;
+    w->axv = vw->axv_ptr;
 }
 
 // Draws the mode menu with the cursor.
@@ -1635,7 +1635,7 @@ void Snd_test_disp_voice(SndTestWork* w)
         for (j = 0; j < 8; j++) {
             int n = i * 8 + j;
             int y = 0x142 + j * 0xE;
-            if (Snd_voice_work[n].status != 0) {
+            if (Snd_voice_work[n].be_flag != 0) {
                 eprintf(x, y, 4, 1, "%02d", n);
             } else {
                 eprintf(x, y, 7, 1, "%02d", n);

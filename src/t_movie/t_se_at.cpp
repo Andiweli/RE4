@@ -20,7 +20,7 @@
 
 void SetToolLight(int on);  // this module's db_light object
 
-// Tool-side view of the SeAt record (block / se number as ints).
+// Tool-side view of the SE_AT_DATA record (block / se number as ints).
 struct TSeAt {
     u8 flags;        // 0x00  bit 0 enabled, bit 1 created
     u8 no;           // 0x01
@@ -81,7 +81,7 @@ static SeAtWork* seAtWk;
 static TSeAt* seAtCur;
 #define pCur (seAtCur)
 static SeAtHead* seAtSaveHead;
-static SeAt* seAtSaveList;
+static SE_AT_DATA* seAtSaveList;
 
 static const char* seAtBlockName[7] = {"CORE", "WEAPON", "BGM 0", "BGM 1", "DOOR", "FOOT", "ROOM"};
 
@@ -167,7 +167,7 @@ void seAtInit()
     CameraCamposDistance(cam, 2500.0f);
     {
         SeAtHead* head = Snd.pSeAtHeader;
-        SeAt* list = Snd.pSeAtData;
+        SE_AT_DATA* list = Snd.pSeAtData;
         Snd.pSeAtData = NULL;
         Snd.pSeAtHeader = NULL;
         // the original's `lwz pW` waits for the four stores (ours floats it to the block top:
@@ -882,7 +882,7 @@ static TOOL_MENU seAtSaveMenu[3] = {
     {1, "DON'T SAVE", NULL},
 };
 
-// DATA SAVE: SERVER / LOCAL / DON'T SAVE; packs the live records (header + SeAt) and writes them.
+// DATA SAVE: SERVER / LOCAL / DON'T SAVE; packs the live records (header + SE_AT_DATA) and writes them.
 static void seAtDataSave()
 {
     char pathX[0x40];
@@ -1004,7 +1004,7 @@ static void preview_init()
     pW->fileHead.version = 0x100;
     pW->fileHead.num = n;
     Snd.pSeAtHeader = &pW->fileHead;
-    Snd.pSeAtData = (SeAt*) pW->file;
+    Snd.pSeAtData = (SE_AT_DATA*) pW->file;
     pW->sub++;
 }
 

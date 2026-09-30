@@ -19,7 +19,7 @@ int Snd_se_set_paras(u32 snd_id)
 // Queues the type 4 / cmd 1 (set parameters) request with the control work copied in.
 int se_set_paras_sub(u32 snd_id)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
 
     req = Snd_open_req_work();
     if (req == NULL) {
@@ -36,8 +36,8 @@ int se_set_paras_sub(u32 snd_id)
 // -1 while the SE is still queued, 1 while a voice plays it, 0 when it is gone.
 int Snd_se_end_check(u32 snd_id)
 {
-    SND_REQ_WORK* req;
-    SND_VOICE_WORK* voice;
+    SND_REQ* req;
+    SND_VOICE* voice;
     int old;
 
     old = OSDisableInterrupts();
@@ -70,7 +70,7 @@ int Snd_se_stop_one(u32 snd_id)
 // Queues a type 4 command request (0 stop, 1 set parameters) for a sound id.
 int se_cmd_req_work(u16 cmd, u32 snd_id, u16 para)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
 
     req = Snd_open_req_work();
     if (req == NULL) {
@@ -180,7 +180,7 @@ int Snd_se_pronounce_ck_all(void)
 // 0x10 when the request bank holds a pending SE play (type 2 with a SE SIT).
 int se_pro_ck_req_work(int bank)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
     int i;
 
     for (i = 0; i < SND_REQ_MAX; i++) {

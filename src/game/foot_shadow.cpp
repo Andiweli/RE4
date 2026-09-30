@@ -11,10 +11,10 @@
 #include "foot_shadow.h"
 
 // One shadow quad.
-struct ShadowInfo {
+struct SHD_DISP {
     Vec pos;
     f32 size;
-    f32 alpha;
+    f32 color;
 };
 
 // Attenuation of a shadow at `pos` for a light at `lpos` with squared range `range`.
@@ -143,8 +143,8 @@ void DrawFootShadow(cModel* pMod)
         }
         {
             FootShadowTbl* tbl = (FootShadowTbl*) pMod->pFsdTbl;
-            ShadowInfo prev;
-            ShadowInfo info;
+            SHD_DISP prev;
+            SHD_DISP info;
             GXTexObj* tex;
             u32 i;
             int prevOn;
@@ -160,7 +160,7 @@ void DrawFootShadow(cModel* pMod)
             for (i = 0; i < tbl->nTbl; i++) {
                 FOOTSHADOW_DATA* dat = &tbl->dat[i];
                 cParts* p = pMod->getPartsPtr(dat->joint);
-                ShadowInfo mid;
+                SHD_DISP mid;
                 Vec ofs;
 
                 {
@@ -172,8 +172,8 @@ void DrawFootShadow(cModel* pMod)
                     info.pos.y += (f32) (s8) w->Tex_no * 10.0f + 50.0f;
                     size = dat->size;
                     info.size = size;
-                    info.alpha = (f32) dat->color;
-                    drawShadowParts(tex, &info.pos, size, info.alpha * rate * shadowRate(&info.pos, &lpos, range));
+                    info.color = (f32) dat->color;
+                    drawShadowParts(tex, &info.pos, size, info.color * rate * shadowRate(&info.pos, &lpos, range));
                 }
                 if (prevOn) {
                     if (prevCnt == 1) {
@@ -183,8 +183,8 @@ void DrawFootShadow(cModel* pMod)
                         PSVECScale(&mid.pos, &mid.pos, 0.5f);
                         size = (prev.size + info.size) * 0.5f;
                         mid.size = size;
-                        mid.alpha = (prev.alpha + info.alpha) * 0.5f;
-                        drawShadowParts(tex, &mid.pos, size, mid.alpha * rate * shadowRate(&mid.pos, &lpos, range));
+                        mid.color = (prev.color + info.color) * 0.5f;
+                        drawShadowParts(tex, &mid.pos, size, mid.color * rate * shadowRate(&mid.pos, &lpos, range));
                     } else if (prevCnt != 0) {
                         Vec step;
                         Vec diff;
@@ -204,8 +204,8 @@ void DrawFootShadow(cModel* pMod)
                             PSVECAdd(&prev.pos, &step, &mid.pos);
                             size = prev.size * s + info.size * t;
                             mid.size = size;
-                            mid.alpha = prev.alpha * s + info.alpha * t;
-                            drawShadowParts(tex, &mid.pos, size, mid.alpha * rate * shadowRate(&mid.pos, &lpos, range));
+                            mid.color = prev.color * s + info.color * t;
+                            drawShadowParts(tex, &mid.pos, size, mid.color * rate * shadowRate(&mid.pos, &lpos, range));
                         }
                     }
                 }

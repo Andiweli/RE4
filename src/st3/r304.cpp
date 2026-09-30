@@ -33,8 +33,8 @@ struct R304Work {
     TexRenderMng* tex2;   // 0x004
     u8 texTbl[0x80];      // 0x008
     u8 texTbl2[0x80];     // 0x088
-    TexRenderCam cam;     // 0x108
-    TexRenderCam cam2;    // 0x40C
+    TexRenderEvtCamStruct cam;     // 0x108
+    TexRenderEvtCamStruct cam2;    // 0x40C
     cEmWrap em;           // 0x710
 };
 

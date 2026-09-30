@@ -28,11 +28,11 @@ struct Path {
 };
 
 // B-spline control points (id_sys path0).
-struct FuncPathData {
-    s8 k;         // 0x00  spline order
+struct FUNC_PATH_PTR {
+    s8 Order;         // 0x00  spline order
     u8 pad_1[6];
-    s8 n;         // 0x07  control point count
-    Vec pos[1];   // 0x08
+    s8 nPoint;         // 0x07  control point count
+    Vec Point[1];   // 0x08
 };
 
 // Parametrised B-spline (id_sys path1).

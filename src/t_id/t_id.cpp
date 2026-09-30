@@ -1099,7 +1099,7 @@ int idEditPos(IdTool* w, int x, int y)
     int yy;
 
     w->pPath = &idPath;
-    idPath.path = (FuncPathData*) &d->path0;
+    idPath.path = (FUNC_PATH_PTR*) &d->path0;
     w->pRandom = &idRandom;
     idRandom.pVal = (s16*) d->x17C8;
     joy = &Joy[0];
@@ -1135,12 +1135,12 @@ int idEditPos(IdTool* w, int x, int y)
         if (!(joy->on & 0xF000F)) {
             toolIdGridLock(&w->grid, pos, pos);
         }
-        if (w->pPath->path->n != 0) {
+        if (w->pPath->path->nPoint != 0) {
             Vec dif;
 
-            PSVECSubtract(&d->pos, &w->pPath->path->pos[0], &dif);
-            for (i = 0; i < w->pPath->path->n; i++) {
-                PSVECAdd(&w->pPath->path->pos[i], &dif, &w->pPath->path->pos[i]);
+            PSVECSubtract(&d->pos, &w->pPath->path->Point[0], &dif);
+            for (i = 0; i < w->pPath->path->nPoint; i++) {
+                PSVECAdd(&w->pPath->path->Point[i], &dif, &w->pPath->path->Point[i]);
             }
         }
         break;
@@ -1304,13 +1304,13 @@ int idEditPos(IdTool* w, int x, int y)
         case 1:
             switch (w->subStep) {
             case 0:
-                if (w->pPath->path->n == 0) {
-                    w->pPath->path->n = 1;
-                    w->pPath->path->pos[0] = d->pos;
+                if (w->pPath->path->nPoint == 0) {
+                    w->pPath->path->nPoint = 1;
+                    w->pPath->path->Point[0] = d->pos;
                     w->pPath->routine = 0;
                     w->pPath->step = 1;
-                    w->pPath->path->k = 1;
-                    w->pPath->path->n = 2;
+                    w->pPath->path->Order = 1;
+                    w->pPath->path->nPoint = 2;
                 }
                 if (w->parentNo != 0xFF) {
                     Vec t;
@@ -1339,7 +1339,7 @@ int idEditPos(IdTool* w, int x, int y)
         case 2:
             switch (w->subStep) {
             case 0:
-                if (w->pPath->path->n <= 1) {
+                if (w->pPath->path->nPoint <= 1) {
                     w->editStep = 1;
                     break;
                 }
@@ -1353,7 +1353,7 @@ int idEditPos(IdTool* w, int x, int y)
                 w->pSctrl->flags = 3;
                 if (w->pSctrl->curve->nPoint <= 1) {
                     f32 xr = 90.0f;
-                    f32 n = (f32) (w->pPath->path->n - 1);
+                    f32 n = (f32) (w->pPath->path->nPoint - 1);
 
                     SctrlInitAxisRange(w->pSctrl, xr * 1.2f, xr * -0.2f, n * 1.2f, n * -0.2f);
                     SctrlInitCursor(w->pSctrl, 0.0f, 0.0f);
@@ -3186,24 +3186,24 @@ int toolIdDataEncode(void* buf, IdTool* w)
             rec->flags_7F = d->maskSw;
             rec->transSub = d->power;
             if (d->path0.n > 0) {
-                FuncPathData* p = (FuncPathData*) ext;
+                FUNC_PATH_PTR* p = (FUNC_PATH_PTR*) ext;
                 FuncPathWork* q;
 
                 rec->ofs[0] = ext - base;
-                p->k = d->path0.k;
-                p->n = d->path0.n;
-                for (k = 0; k < p->n; k++) {
-                    p->pos[k] = d->path0.pos[k];
+                p->Order = d->path0.k;
+                p->nPoint = d->path0.n;
+                for (k = 0; k < p->nPoint; k++) {
+                    p->Point[k] = d->path0.pos[k];
                 }
-                ext += p->n * sizeof(Vec) + 8;
+                ext += p->nPoint * sizeof(Vec) + 8;
                 rec->ofs[1] = ext - base;
                 q = (FuncPathWork*) ext;
-                for (k = 0; k < p->n; k++) {
+                for (k = 0; k < p->nPoint; k++) {
                     q->alpha[k].x = 0.0f;
                     q->alpha[k].y = 0.0f;
                     q->alpha[k].z = 0.0f;
                 }
-                ext += p->n * sizeof(Vec) + 8;
+                ext += p->nPoint * sizeof(Vec) + 8;
             } else {
                 rec->ofs[0] = 0;
                 rec->ofs[1] = 0;
@@ -3375,12 +3375,12 @@ int toolIdDataDecode(void* buf, IdTool* w)
             d->maskSw = r1->flags_7F;
             d->power = r1->transSub;
             if (r1->ofs[0] != 0) {
-                FuncPathData* p = (FuncPathData*) (r1->ofs[0] + (u32) base);
+                FUNC_PATH_PTR* p = (FUNC_PATH_PTR*) (r1->ofs[0] + (u32) base);
 
-                d->path0.k = p->k;
-                d->path0.n = p->n;
-                for (k = 0; k < p->n; k++) {
-                    d->path0.pos[k] = p->pos[k];
+                d->path0.k = p->Order;
+                d->path0.n = p->nPoint;
+                for (k = 0; k < p->nPoint; k++) {
+                    d->path0.pos[k] = p->Point[k];
                 }
             }
             if (r1->ofs[2] != 0) {
@@ -3443,12 +3443,12 @@ int toolIdDataDecode(void* buf, IdTool* w)
             d->maskSw = r2->flags_7F;
             d->power = r2->transSub;
             if (r2->ofs[0] != 0) {
-                FuncPathData* p = (FuncPathData*) (r2->ofs[0] + (u32) base);
+                FUNC_PATH_PTR* p = (FUNC_PATH_PTR*) (r2->ofs[0] + (u32) base);
 
-                d->path0.k = p->k;
-                d->path0.n = p->n;
-                for (k = 0; k < p->n; k++) {
-                    d->path0.pos[k] = p->pos[k];
+                d->path0.k = p->Order;
+                d->path0.n = p->nPoint;
+                for (k = 0; k < p->nPoint; k++) {
+                    d->path0.pos[k] = p->Point[k];
                 }
             }
             if (r2->ofs[2] != 0) {

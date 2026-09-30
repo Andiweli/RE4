@@ -6,7 +6,7 @@
 #include "path.h"
 
 // B-spline path editor of the interface-design tool (t_id/db_path.cpp, D:/Bio4/Prog/db_path.cpp): edits a
-// FuncPathData in place with a 3D cursor. t_id.cpp allocates the work and calls DbPath() every frame.
+// FUNC_PATH_PTR in place with a 3D cursor. t_id.cpp allocates the work and calls DbPath() every frame.
 struct DbPathWork {
     s8 routine;     // 0x00  0 edit, 1 menu, 2 quit
     s8 step;        // 0x01
@@ -16,7 +16,7 @@ struct DbPathWork {
     u8 pad_5[3];
     int x;          // 0x08  menu position
     int y;          // 0x0C
-    FuncPathData* path;  // 0x10
+    FUNC_PATH_PTR* path;  // 0x10
     Vec* pEnd;      // 0x14  &path->pos[path->n]
     s8 grab;        // 0x18  grabbed control point, -1 = none
     s8 insertIdx;   // 0x19  insertion index found on the curve, -1 = none

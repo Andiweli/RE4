@@ -326,7 +326,7 @@ void PathGetVtxMat(Mtx pMat, cModel* pMod, PATH_UNIT* pPunit)
 // matrices from MEM_ALLOC. Returns 1 on success.
 int FuncPathParametrize(void* pPath, void* pB)
 {
-    FuncPathData* d = (FuncPathData*)pPath;
+    FUNC_PATH_PTR* d = (FUNC_PATH_PTR*)pPath;
     FuncPathWork* w = (FuncPathWork*)pB;
     f32* A;
     f32* Ainv;
@@ -336,8 +336,8 @@ int FuncPathParametrize(void* pPath, void* pB)
     f32* tmp_alpha;
     int i;
 
-    w->n = d->n;
-    w->k = d->k;
+    w->n = d->nPoint;
+    w->k = d->Order;
     if (w->k > w->n - 1) w->k = w->n - 1;
     if (w->n <= 1) return 1;
 
@@ -394,9 +394,9 @@ int FuncPathParametrize(void* pPath, void* pB)
     }
 
     for (i = 0; i < w->n; i++) {
-        x[i] = d->pos[i].x;
-        y[i] = d->pos[i].y;
-        z[i] = d->pos[i].z;
+        x[i] = d->Point[i].x;
+        y[i] = d->Point[i].y;
+        z[i] = d->Point[i].z;
     }
     for (i = 0; i < w->n; i++) {
         if (de_Boor_Cox(w->n, NULL, (f32)i, w->k, &A[w->n * i]) == 0) return 0;
@@ -458,13 +458,13 @@ int FuncPathCalc(void* pPath, void* pB, f32 t, Vec* p)
 // Empties the control point list (n = 0).
 void FuncPathClear(void* pPath)
 {
-    FuncPathData* d = (FuncPathData*)pPath;
+    FUNC_PATH_PTR* d = (FUNC_PATH_PTR*)pPath;
     int i;
 
-    for (i = 0; i < d->n; i++) {
-        memclr_asm(&d->pos[i], sizeof(Vec));
+    for (i = 0; i < d->nPoint; i++) {
+        memclr_asm(&d->Point[i], sizeof(Vec));
     }
-    d->n = 0;
+    d->nPoint = 0;
 }
 
 // The split object's .sdata is 8-aligned.

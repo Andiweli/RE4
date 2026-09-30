@@ -33,7 +33,7 @@ static void gxDraw(f32 x, f32 y, f32 z, f32 alpha, void* buf);
 void drawBuffer();
 void store();
 void render();
-ExamInfo* examInfo(int id, int ext);
+ITEM_EXAMINE_INFO* examInfo(int id, int ext);
 
 f32 cap_dist_min = 8000.0f;
 f32 cap_dist_max = 10000.0f;
@@ -41,7 +41,7 @@ static f32 g_rad_x = 0.0f;
 f32 cap_xrad_max = 0.3926991f;
 static f32 cap_xrad_min = -1.0471976f;
 
-static ExamInfo exam_info[225] = {
+static ITEM_EXAMINE_INFO exam_info[225] = {
     { 0x00, 0, { 60.0f, 0.0f, 0.0f }, 1.1f, 4, 0, 0 },
     { 0x01, 0, { 0.0f, 0.0f, 20.0f }, 1.1f, 4, 0, 0 },
     { 0x02, 0, { 0.0f, 0.0f, 20.0f }, 1.1f, 4, 0, 0 },
@@ -268,7 +268,7 @@ static ExamInfo exam_info[225] = {
     { 0xF2, 0, { 0.0f, 0.0f, 0.0f }, 20.0f, 0, 0, 0 },
     { 0xF3, 0, { 0.0f, 0.0f, 0.0f }, 20.0f, 0, 0, 0 },
 };
-ExamInfo exam_info_ext[2] = {
+ITEM_EXAMINE_INFO exam_info_ext[2] = {
     { 0x59, 0, { -5.0f, 0.0f, 0.0f }, 2.1f, 4, 0, 0 },
     { 0x8A, 0, { -5.0f, 0.0f, 0.0f }, 2.1f, 4, 0, 0 },
 };
@@ -393,9 +393,9 @@ void render()
 
 // View parameters for item `id`: the merchant ext table first when ext != 0, then the main table;
 // 0 when the item has no entry.
-ExamInfo* examInfo(int id, int ext_flag)
+ITEM_EXAMINE_INFO* examInfo(int id, int ext_flag)
 {
-    ExamInfo* p;
+    ITEM_EXAMINE_INFO* p;
     int i;
     int n;
 
@@ -403,14 +403,14 @@ ExamInfo* examInfo(int id, int ext_flag)
         n = 2;
         p = exam_info_ext;
         for (i = 0; i < n; i++, p++) {
-            if (id == p->id) {
+            if (id == p->item_id) {
                 return p;
             }
         }
     }
     p = exam_info;
     for (i = 0; i < 225; i++, p++) {
-        if (id == p->id) {
+        if (id == p->item_id) {
             return p;
         }
     }
@@ -564,7 +564,7 @@ void ItemExamine::idSet()
 // Starts examining `model_` of item `id_` in mode `mode_`: saves the model's flags/pos/ang/ot and
 // its root parts, recentres the root on the model bound centre, applies the exam_info rotation
 // (degrees), builds the id overlay, sets the treasure camera (mode 2), creates the three lights of
-// the exam light set (pArc ofs_58..68 by ExamInfo::light) and starts the item's est (owner 0xD1).
+// the exam light set (pArc ofs_58..68 by ITEM_EXAMINE_INFO::light) and starts the item's est (owner 0xD1).
 void ItemExamine::init(u16 id, cModel* p_model, u8 scrn_flag)
 {
     static f32 c0 = -0.5f;
@@ -649,7 +649,7 @@ void ItemExamine::init(u16 id, cModel* p_model, u8 scrn_flag)
         arc = pG->pCore;
         lit = (cLit*) (arc->ofs_58 + (u32) arc);
         if (m_pInfo) {
-            switch (m_pInfo->light) {
+            switch (m_pInfo->light_no) {
             case 0:
                 lit = (cLit*) (arc->ofs_58 + (u32) arc);
                 break;
@@ -704,7 +704,7 @@ void ItemExamine::level(s8 pwr, s8 spd, s8 rld, s8 blt)
     m_level[3] = blt;
 }
 
-// Per-frame: spins the model pi/60 rad per frame about the axis chosen by ExamInfo rot0/rot1
+// Per-frame: spins the model pi/60 rad per frame about the axis chosen by ITEM_EXAMINE_INFO rot0/rot1
 // (world y or model y; the treasure viewer lets the stick rotate and C up/down zoom between
 // cap_dist_min/max instead), fits the camera so the model bound spans the id frame, lights it and
 // queues the background render.
@@ -734,7 +734,7 @@ void ItemExamine::move()
     if (m_pInfo) {
         switch (m_scrn_flag) {
         case 1:
-            switch (m_pInfo->rot1) {
+            switch (m_pInfo->axis_id) {
             case 0:
                 rotMode = 0;
                 break;
@@ -744,7 +744,7 @@ void ItemExamine::move()
             }
             break;
         case 0:
-            switch (m_pInfo->rot0) {
+            switch (m_pInfo->axis_scr) {
             case 0:
                 rotMode = 0;
                 break;

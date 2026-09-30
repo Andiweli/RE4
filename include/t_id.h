@@ -14,7 +14,7 @@
 #define ID_PATH_MAX 0x40
 #define ID_CURVE_MAX 0x40
 
-// FuncPathData with room for ID_PATH_MAX control points (0x308 bytes).
+// FUNC_PATH_PTR with room for ID_PATH_MAX control points (0x308 bytes).
 struct IdPathData {
     s8 k;              // 0x00
     u8 pad_1[6];

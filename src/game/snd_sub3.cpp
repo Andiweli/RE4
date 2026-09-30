@@ -149,7 +149,7 @@ s8 get_dls_vol_pan(u16 blk_no, u16 req_no, int mode)
 {
     SND_ISS_BLK* blk;
     SND_SIT* sit;
-    SND_WT_HDR* hdr;
+    WTFILEHEADER* hdr;
     WTINST* inst;
     WTREGION* rgn;
     WTART* art;
@@ -157,12 +157,12 @@ s8 get_dls_vol_pan(u16 blk_no, u16 req_no, int mode)
 
     blk = Snd_get_blk_adrs(blk_no, req_no);
     sit = Snd_get_sit_adrs(blk_no, req_no);
-    hdr = (SND_WT_HDR*) blk->dls;
-    inst = (WTINST*) (blk->dls + hdr->inst_ofs);
+    hdr = (WTFILEHEADER*) blk->dls;
+    inst = (WTINST*) (blk->dls + hdr->offsetMelodicInst);
     inst += (u16) (sit->note >> 8);
-    rgn = (WTREGION*) (blk->dls + hdr->rgn_ofs);
+    rgn = (WTREGION*) (blk->dls + hdr->offsetRegions);
     rgn += inst->keyRegion[sit->note & 0xFF];
-    art = (WTART*) (blk->dls + hdr->art_ofs);
+    art = (WTART*) (blk->dls + hdr->offsetArticulations);
     art += rgn->articulationIndex;
     if (mode == 0) {
         vol = rgn->attn / 0x10000;

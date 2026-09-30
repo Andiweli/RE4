@@ -18,15 +18,15 @@ class cPl0f;
 
 // One end of the boat: a point mass on the water (pl0fBoatControl moves both and keeps them at
 // their rest distance, the boat's position and heading come from them).
-struct Pl0fNode {
-    int fixed;        // 0x00  1: pulled towards fixPos (crash adjust)
-    Vec pos;          // 0x04  rest offset in the boat's frame
-    Vec wpos;         // 0x10  world position
-    Vec wposOld;      // 0x1C  ... of the previous frame
-    Vec spd;          // 0x28
-    Vec fixPos;       // 0x34  pull target (pl0fCrashAdjustSet)
-    f32 maxLen;       // 0x40  max distance from fixPos
-    f32 dist[2];      // 0x44  rest distance to the other node
+struct BOAT_CTRL_WK {
+    int Flg;        // 0x00  1: pulled towards fixPos (crash adjust)
+    Vec Ofs;          // 0x04  rest offset in the boat's frame
+    Vec Pos;         // 0x10  world position
+    Vec Old;      // 0x1C  ... of the previous frame
+    Vec Spd;          // 0x28
+    Vec Fix;       // 0x34  pull target (pl0fCrashAdjustSet)
+    f32 Fix_len;       // 0x40  max distance from fixPos
+    f32 Len[2];      // 0x44  rest distance to the other node
 };
 
 // Work of the boat, overlaid on cEm from 0x3E0.
@@ -63,7 +63,7 @@ struct FREE_PL0F {
     CLOTH_INFO Cloth;   // 0x100  long rope pendulum (pl0fLongRopeSet)
     cObjChain* pRope; // 0x160  long rope chain object
     cObj* pAnchor;    // 0x164  anchor object (pl0fSetAnchor)
-    Pl0fNode node[2]; // 0x168  bow / stern
+    BOAT_CTRL_WK node[2]; // 0x168  bow / stern
     u8 pad_200[0x548 - 0x200];
     cPl0f* pSelf;     // 0x548  testSearchEm2f
 };

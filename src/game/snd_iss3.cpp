@@ -3,7 +3,7 @@
 #include "snd_drv.h"
 
 // Executes a play request: a sequence SIT (flag 4) starts a MIDI sequence, else a sampled SE voice.
-void Snd_req_iss_new_play(SND_REQ_WORK* req)
+void Snd_req_iss_new_play(SND_REQ* req)
 {
     SND_ISS_BLK* blk;
     SND_SIT* sit;
@@ -21,9 +21,9 @@ void Snd_req_iss_new_play(SND_REQ_WORK* req)
 // Starts one sampled SE: a voice work (by priority, possibly stealing), an AX voice slot and an AX
 // voice (priority 30), all parameters set up from the request / SIT / DLS, MIX channel initialised,
 // voice running. Silently drops the SE when any resource is exhausted.
-void iss_new_voice_work(SND_ISS_BLK* blk, SND_SIT* sit, SND_REQ_WORK* req)
+void iss_new_voice_work(SND_ISS_BLK* blk, SND_SIT* sit, SND_REQ* req)
 {
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     SND_AXV_WORK* axv;
     s8 prio;
 
@@ -61,25 +61,25 @@ void iss_new_voice_work(SND_ISS_BLK* blk, SND_SIT* sit, SND_REQ_WORK* req)
     iss_ax_set_pitch(axv, req, sit);
     iss_ax_set_lpf(axv, req);
     iss_ax_set_para(axv, req);
-    vw->rel_time = axv->rel_time;
+    vw->adsr_rel = axv->rel_time;
     MIXInitChannel(axv->voice, 0, axv->ax_vol, axv->ax_auxA, axv->ax_auxB, axv->pan, axv->out_span, 0);
     AXSetVoiceState(axv->voice, 1);
 }
 
 // Links the voice work and the AX voice work for the request (type 1 SE, id, block / number,
 // priority, the SIT's se_flag into the AX flags).
-void iss_voice_work_init(SND_VOICE_WORK* vw, SND_AXV_WORK* axv, SND_REQ_WORK* req, s8 prio)
+void iss_voice_work_init(SND_VOICE* vw, SND_AXV_WORK* axv, SND_REQ* req, s8 prio)
 {
-    vw->status = 1;
+    vw->be_flag = 1;
     vw->snd_id = req->snd_id;
     vw->srd_type = req->srd_type;
-    vw->out_mode = 2;
-    vw->type = 1;
-    vw->count = 0;
-    vw->axv = axv;
+    vw->use_type = 2;
+    vw->play_type = 1;
+    vw->timer = 0;
+    vw->axv_ptr = axv;
     vw->blk_no = req->blk_no;
     vw->req_no = req->req_no;
-    vw->prio = prio;
+    vw->vprio = prio;
     axv->status = 1;
     axv->snd_id = req->snd_id;
     axv->srd_type = req->srd_type;
@@ -95,16 +95,16 @@ void iss_ax_set_wt_ptr(SND_AXV_WORK* axv, SND_SIT* sit)
     u16 prog;
 
     prog = sit->note;
-    axv->hdr = (SND_WT_HDR*) axv->wt;
-    axv->inst = (WTINST*) (axv->wt + axv->hdr->inst_ofs);
+    axv->hdr = (WTFILEHEADER*) axv->wt;
+    axv->inst = (WTINST*) (axv->wt + axv->hdr->offsetMelodicInst);
     axv->inst += (u16) (prog >> 8);
-    axv->rgn = (WTREGION*) (axv->wt + axv->hdr->rgn_ofs);
+    axv->rgn = (WTREGION*) (axv->wt + axv->hdr->offsetRegions);
     axv->rgn += axv->inst->keyRegion[prog & 0xFF];
-    axv->art = (WTART*) (axv->wt + axv->hdr->art_ofs);
+    axv->art = (WTART*) (axv->wt + axv->hdr->offsetArticulations);
     axv->art += axv->rgn->articulationIndex;
-    axv->sample = (WTSAMPLE*) (axv->wt + axv->hdr->sample_ofs);
+    axv->sample = (WTSAMPLE*) (axv->wt + axv->hdr->offsetSamples);
     axv->sample += axv->rgn->sampleIndex;
-    axv->adpcm = (WTADPCM*) (axv->wt + axv->hdr->adpcm_ofs);
+    axv->adpcm = (WTADPCM*) (axv->wt + axv->hdr->offsetAdpcmContext);
     axv->adpcm += axv->sample->adpcmIndex;
 }
 
@@ -142,7 +142,7 @@ void iss_ax_set_adsr(SND_AXV_WORK* axv)
 
 // Volume / surround volume: request override, else the SIT, else the region attenuation
 // (surround = volume); applies a running volume-down (se_state bit1) and computes the AX volume.
-void iss_ax_set_vol(SND_AXV_WORK* axv, SND_REQ_WORK* req, SND_SIT* sit)
+void iss_ax_set_vol(SND_AXV_WORK* axv, SND_REQ* req, SND_SIT* sit)
 {
     s32 vol;
 
@@ -174,7 +174,7 @@ void iss_ax_set_vol(SND_AXV_WORK* axv, SND_REQ_WORK* req, SND_SIT* sit)
 }
 
 // Pan / surround pan: request, else SIT, else the articulation pan / 0x7F.
-void iss_ax_set_pan(SND_AXV_WORK* axv, SND_REQ_WORK* req, SND_SIT* sit)
+void iss_ax_set_pan(SND_AXV_WORK* axv, SND_REQ* req, SND_SIT* sit)
 {
     if (req->pan >= 0) {
         axv->pan = req->pan;
@@ -194,7 +194,7 @@ void iss_ax_set_pan(SND_AXV_WORK* axv, SND_REQ_WORK* req, SND_SIT* sit)
 }
 
 // AUX A / B send levels: request, else SIT, else 0; converted to AX attenuation.
-void iss_ax_set_aux(SND_AXV_WORK* axv, SND_REQ_WORK* req, SND_SIT* sit)
+void iss_ax_set_aux(SND_AXV_WORK* axv, SND_REQ* req, SND_SIT* sit)
 {
     if (req->aux_a >= 0) {
         axv->auxA = req->aux_a;
@@ -216,7 +216,7 @@ void iss_ax_set_aux(SND_AXV_WORK* axv, SND_REQ_WORK* req, SND_SIT* sit)
 
 // Pitch in cents: (note - unity note) * 100 + fine tune + the request's pitch / pitch_add as the
 // base, plus the request's pitch offset.
-void iss_ax_set_pitch(SND_AXV_WORK* axv, SND_REQ_WORK* req, SND_SIT* sit)
+void iss_ax_set_pitch(SND_AXV_WORK* axv, SND_REQ* req, SND_SIT* sit)
 {
     WTREGION* rgn;
     int cents;
@@ -234,7 +234,7 @@ void iss_ax_set_pitch(SND_AXV_WORK* axv, SND_REQ_WORK* req, SND_SIT* sit)
 }
 
 // Low-pass filter number from the request (-1 = off).
-void iss_ax_set_lpf(SND_AXV_WORK* axv, SND_REQ_WORK* req)
+void iss_ax_set_lpf(SND_AXV_WORK* axv, SND_REQ* req)
 {
     if (req->lpf == -1) {
         axv->lpf_on = 0;
@@ -247,7 +247,7 @@ void iss_ax_set_lpf(SND_AXV_WORK* axv, SND_REQ_WORK* req)
 // Programs the AX voice: ADPCM sample addresses in ARAM (nibble addressing, 14 samples per 16
 // bytes; loop points or the silent zero table as loop for one-shots), coefficients, sample rate
 // ratio from the pitch (clamped to 4x), LPF coefficients from Snd_lpf_tbl.
-void iss_ax_set_para(SND_AXV_WORK* axv, SND_REQ_WORK* req)
+void iss_ax_set_para(SND_AXV_WORK* axv, SND_REQ* req)
 {
     WTREGION* rgn;
     WTSAMPLE* sample;
@@ -352,7 +352,7 @@ void cb_drop_voice(void* voice)
 {
     AXVPB* axvpb;
     SND_AXV_WORK* axv;
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     u32 i;
     int old;
 
@@ -367,8 +367,8 @@ void cb_drop_voice(void* voice)
         MIXReleaseChannel(axv->voice);
         vw = axv->vw;
         if (vw != NULL) {
-            vw->status = 0;
-            vw->axv = NULL;
+            vw->be_flag = 0;
+            vw->axv_ptr = NULL;
         }
         axv->status = 0;
         axv->vw = NULL;

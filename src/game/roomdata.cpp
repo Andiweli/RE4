@@ -75,7 +75,7 @@ static StageTbl Room_data_tbl[10] = {
 cRoomData RoomData;
 
 // Boot: counts the rooms of the five stage tables (m_RoomNum) and those with a save record (stat 1,
-// m_SaveNum), allocates the save buffer (header + one 0xD8-byte RoomSave per room) and stamps each
+// m_SaveNum), allocates the save buffer (header + one 0xD8-byte ROOM_SAVE_DATA per room) and stamps each
 // record with its stage / room id.
 void cRoomData::init()
 {
@@ -102,8 +102,8 @@ void cRoomData::init()
         }
     }
 #line 306
-    m_pRoomSaveHead = (RoomSaveHdr*) MEM_CALLOC(m_SaveNum * sizeof(RoomSave) + sizeof(RoomSaveHdr), 1, 13);
-    m_pRoomSaveHead->size = m_SaveNum * sizeof(RoomSave) + sizeof(RoomSaveHdr);
+    m_pRoomSaveHead = (RoomSaveHdr*) MEM_CALLOC(m_SaveNum * sizeof(ROOM_SAVE_DATA) + sizeof(RoomSaveHdr), 1, 13);
+    m_pRoomSaveHead->size = m_SaveNum * sizeof(ROOM_SAVE_DATA) + sizeof(RoomSaveHdr);
     // A local widens `m_SaveNum` (u16) to u32 before the store: written directly, the load of `m_SaveNum` and
     // the reload of `pSaveBuf` (after the `size` store above) swap order against the target.
     u32 n = m_SaveNum;
@@ -117,7 +117,7 @@ void cRoomData::init()
                 *(u8*) (ofs + (u32) m_pRoomSaveData) = stage;
                 rec = (u8*) (ofs + (u32) m_pRoomSaveData);
                 rec[1] = i;
-                ofs += sizeof(RoomSave);
+                ofs += sizeof(ROOM_SAVE_DATA);
             }
         }
     }
@@ -133,7 +133,7 @@ void cRoomData::save(void* p)
 {
     RoomSaveHdr* h = (RoomSaveHdr*) p;
 
-    memcpy(h, m_pRoomSaveHead, m_SaveNum * sizeof(RoomSave) + sizeof(RoomSaveHdr));
+    memcpy(h, m_pRoomSaveHead, m_SaveNum * sizeof(ROOM_SAVE_DATA) + sizeof(RoomSaveHdr));
 }
 
 // Restores the room records from a save game image, matched by id (records of rooms the build no
@@ -141,15 +141,15 @@ void cRoomData::save(void* p)
 void cRoomData::load(void* p)
 {
     RoomSaveHdr* h = (RoomSaveHdr*) p;
-    RoomSave* rec = (RoomSave*) ((u8*) p + sizeof(RoomSaveHdr));
-    RoomSave* dst;
+    ROOM_SAVE_DATA* rec = (ROOM_SAVE_DATA*) ((u8*) p + sizeof(RoomSaveHdr));
+    ROOM_SAVE_DATA* dst;
     u32 j;
     int i;
 
     for (j = 0; j < h->num; j++, rec++) {
         for (i = 0; i < m_SaveNum; i++) {
-            dst = (RoomSave*) (i * sizeof(RoomSave) + (u32) m_pRoomSaveData);
-            if (rec->id == dst->id) {
+            dst = (ROOM_SAVE_DATA*) (i * sizeof(ROOM_SAVE_DATA) + (u32) m_pRoomSaveData);
+            if (rec->RoomNo == dst->RoomNo) {
                 *dst = *rec;
                 break;
             }
@@ -161,8 +161,8 @@ void cRoomData::load(void* p)
 void cRoomData::clear(void* p)
 {
     RoomSaveHdr* h = (RoomSaveHdr*) p;
-    RoomSave* rec = (RoomSave*) ((u8*) p + sizeof(RoomSaveHdr));
-    RoomSave* dst;
+    ROOM_SAVE_DATA* rec = (ROOM_SAVE_DATA*) ((u8*) p + sizeof(RoomSaveHdr));
+    ROOM_SAVE_DATA* dst;
     u32 j;
     int i;
     u16 id;
@@ -173,11 +173,11 @@ void cRoomData::clear(void* p)
         i = 0;
         if (i < m_SaveNum) {
             do {
-                dst = (RoomSave*) (i * sizeof(RoomSave) + (u32) m_pRoomSaveData);
-                id = rec->id;
-                if (id == dst->id) {
-                    memclr_asm(dst, sizeof(RoomSave));
-                    ((RoomSave*) (i * sizeof(RoomSave) + (u32) m_pRoomSaveData))->id = id;
+                dst = (ROOM_SAVE_DATA*) (i * sizeof(ROOM_SAVE_DATA) + (u32) m_pRoomSaveData);
+                id = rec->RoomNo;
+                if (id == dst->RoomNo) {
+                    memclr_asm(dst, sizeof(ROOM_SAVE_DATA));
+                    ((ROOM_SAVE_DATA*) (i * sizeof(ROOM_SAVE_DATA) + (u32) m_pRoomSaveData))->RoomNo = id;
                     break;
                 }
                 i++;
@@ -186,7 +186,7 @@ void cRoomData::clear(void* p)
     }
 }
 
-// The RoomSave record of room `room` (stage << 8 | no); 0 when the room is out of range or has no
+// The ROOM_SAVE_DATA record of room `room` (stage << 8 | no); 0 when the room is out of range or has no
 // record.
 u8* cRoomData::getRoomSavePtr(u16 room_no)
 {
@@ -209,7 +209,7 @@ u8* cRoomData::getRoomSavePtr(u16 room_no)
         for (i = 0; checkRoomRange(s, i) == 1; i++) {
             if (p->tbl[i].save_flg == 1) {
                 if (stage == s && no == i) {
-                    return m_pRoomSaveData + k * sizeof(RoomSave);
+                    return m_pRoomSaveData + k * sizeof(ROOM_SAVE_DATA);
                 }
                 k++;
             }

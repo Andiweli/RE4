@@ -1,4 +1,4 @@
-// game/snd_sub2: sound driver request works (SND_REQ_WORK, two banks of 64 — the game fills one
+// game/snd_sub2: sound driver request works (SND_REQ, two banks of 64 — the game fills one
 // while the audio frame executes the other): reset handling, copying the game's control
 // parameters (Snd_ctrl_work ovr_flag bits) into a request, allocation and lookup by sound id.
 #include "snd_drv.h"
@@ -32,7 +32,7 @@ int Snd_se_reset_check(SND_CTRL_WORK* ctrl)
 // Clears both request banks (numbered).
 void Snd_req_work_clear(void)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
     u32 i;
     u32 j;
     u32 k;
@@ -42,7 +42,7 @@ void Snd_req_work_clear(void)
         for (j = 0; j < SND_REQ_MAX; j++) {
             req = &Snd_req_work[i][j];
             p = (u8*) req;
-            for (k = 0; k < sizeof(SND_REQ_WORK); k++) {
+            for (k = 0; k < sizeof(SND_REQ); k++) {
                 *p++ = 0;
             }
             req->work_id = j;
@@ -53,7 +53,7 @@ void Snd_req_work_clear(void)
 // Copies the game's overrides into the request: ovr_flag bit0 priority, 1 pan, 2 span, 3 vol, 4
 // svol, 5 / 6 AUX A / B, 7 LPF, 9 pitch add, 10 pitch offset, 11 se_flag (others -1 = use the
 // SIT / DLS); a play request also draws its random pitch (shared across a chained request).
-void Snd_req_work_copy_para(SND_CTRL_WORK* ctrl, SND_REQ_WORK* req)
+void Snd_req_work_copy_para(SND_CTRL_WORK* ctrl, SND_REQ* req)
 {
     SND_SIT* sit;
 
@@ -114,10 +114,10 @@ void Snd_req_work_copy_para(SND_CTRL_WORK* ctrl, SND_REQ_WORK* req)
 }
 
 // A free slot in the game-side request bank, NULL when full or during a reset.
-SND_REQ_WORK* Snd_open_req_work(void)
+SND_REQ* Snd_open_req_work(void)
 {
     SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
-    SND_REQ_WORK* req;
+    SND_REQ* req;
     int i;
 
     if (ctrl->reset_flag & 0x10) {
@@ -133,10 +133,10 @@ SND_REQ_WORK* Snd_open_req_work(void)
 }
 
 // A pending play request (type mask 1 SE / 2 sequence) with sound id `snd_id`, or NULL.
-SND_REQ_WORK* Snd_search_req_work_snd_id(u32 snd_id, u8 type)
+SND_REQ* Snd_search_req_work_snd_id(u32 snd_id, u8 type)
 {
     SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
-    SND_REQ_WORK* req;
+    SND_REQ* req;
     int i;
     int j;
 

@@ -36,8 +36,8 @@ struct R330Work {
     TexRenderMng* tex[2];   // 0x000  render targets of the two screens
     u8 texTbl0[0x80];       // 0x008  blend table of tex[0]
     u8 texTbl1[0x80];       // 0x088  blend table of tex[1]
-    TexRenderCam cam0;      // 0x108  event render camera of tex[0]
-    TexRenderCam cam1;      // 0x40C  event render camera of tex[1]
+    TexRenderEvtCamStruct cam0;      // 0x108  event render camera of tex[0]
+    TexRenderEvtCamStruct cam1;      // 0x40C  event render camera of tex[1]
 };
 
 // Event HUD: a percentage pair (unit ids 1..4 / 5..8 of id table 0x2C) driven by the event mode.

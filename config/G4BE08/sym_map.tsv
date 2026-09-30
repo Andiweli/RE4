@@ -5985,9 +5985,9 @@ address	size	section	unit	scope	name	demangled
 0x8019F970	0x94	.text	game/TexRender.cpp	global	TexRenderModRes__FP6cModelUl	TexRenderModRes
 0x8019FA04	0xA0	.text	game/TexRender.cpp	global	TexRenderModAddOt__FiP6cModel	TexRenderModAddOt
 0x8019FAA4	0xBC	.text	game/TexRender.cpp	global	TexRenderModAddOtMirror__FiP6cModel	TexRenderModAddOtMirror
-0x8019FB60	0x78	.text	game/TexRender.cpp	global	TexRenderCamAddOt__FiP12TexRenderCamP12TexRenderEvtPv	TexRenderCamAddOt
-0x8019FBD8	0x1BC	.text	game/TexRender.cpp	global	CamRenderPrev__FP12TexRenderCam	CamRenderPrev
-0x8019FD94	0x64	.text	game/TexRender.cpp	global	CamRenderAfter__FP12TexRenderCam	CamRenderAfter
+0x8019FB60	0x78	.text	game/TexRender.cpp	global	TexRenderCamAddOt__FiP21TexRenderEvtCamStructP12TexRenderEvtPv	TexRenderCamAddOt
+0x8019FBD8	0x1BC	.text	game/TexRender.cpp	global	CamRenderPrev__FP21TexRenderEvtCamStruct	CamRenderPrev
+0x8019FD94	0x64	.text	game/TexRender.cpp	global	CamRenderAfter__FP21TexRenderEvtCamStruct	CamRenderAfter
 0x8019FDF8	0x60	.text	game/TexRender.cpp	local	__static_initialization_and_destruction_0_8019FDF8	__static_initialization_and_destruction_0
 0x8019FE58	0x2C	.text	game/TexRender.cpp	global	global_constructors_keyed_to_g_TexUse	global constructors keyed to g_TexUse
 0x8019FE84	0xE4	.text	game/texture.cpp	global	Init__7cTexSysPCcUl	cTexSys::Init

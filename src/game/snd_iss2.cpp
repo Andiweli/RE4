@@ -2,7 +2,7 @@
 // and applies the global SE controls and the pending requests to the AX voices.
 #include "snd_drv.h"
 
-typedef void (*SND_REQ_CMD)(SND_AXV_WORK*, SND_REQ_WORK*, u16);
+typedef void (*SND_REQ_CMD)(SND_AXV_WORK*, SND_REQ*, u16);
 
 // Audio frame: frees finished AX voices, then (unless a reset is in progress) applies the global
 // SE controls and executes the request bank; finally pushes the pending AX voice updates.
@@ -65,19 +65,19 @@ void se_ctrl_execute(SND_CTRL_WORK* ctrl)
 void se_ctrl_fade_out(SND_CTRL_WORK* ctrl, int mode)
 {
     SND_AXV_WORK* axv;
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     int i;
     s32 time;
 
     for (i = 0; i < SND_VOICE_MAX; i++) {
         vw = &Snd_voice_work[i];
-        if (vw->status == 0) {
+        if (vw->be_flag == 0) {
             continue;
         }
-        if (vw->type != 1) {
+        if (vw->play_type != 1) {
             continue;
         }
-        axv = vw->axv;
+        axv = vw->axv_ptr;
         if (axv == NULL) {
             continue;
         }
@@ -85,7 +85,7 @@ void se_ctrl_fade_out(SND_CTRL_WORK* ctrl, int mode)
             continue;
         }
         if (ctrl->se_fade_time == 0) {
-            time = vw->rel_time;
+            time = vw->adsr_rel;
         } else {
             time = ctrl->se_fade_time;
         }
@@ -107,7 +107,7 @@ void se_ctrl_pause_on(SND_CTRL_WORK* ctrl)
 void se_ctrl_pause_on2(SND_CTRL_WORK* ctrl)
 {
     SND_AXV_WORK* axv;
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
@@ -129,7 +129,7 @@ void se_ctrl_pause_on2(SND_CTRL_WORK* ctrl)
 // not forced by se_ctrl 4), stopped, or a one-shot within 800 samples of its end.
 void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL_WORK* ctrl)
 {
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     u32 cur;
     u32 end;
 
@@ -156,7 +156,7 @@ void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL_WORK* ctrl)
     axv->upd |= 0x100;
     vw = axv->vw;
     if (vw != NULL) {
-        vw->status |= 0x2;
+        vw->be_flag |= 0x2;
     }
 }
 
@@ -175,7 +175,7 @@ void se_ctrl_pause_off(SND_CTRL_WORK* ctrl)
 void se_ctrl_pause_off2(SND_CTRL_WORK* ctrl)
 {
     SND_AXV_WORK* axv;
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
@@ -196,7 +196,7 @@ void se_ctrl_pause_off2(SND_CTRL_WORK* ctrl)
 // Resumes one paused AX voice (update 0x200).
 void seCtrlPauseOff_sub(SND_AXV_WORK* axv)
 {
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
 
     if (axv->status == 0) {
         return;
@@ -206,7 +206,7 @@ void seCtrlPauseOff_sub(SND_AXV_WORK* axv)
         axv->upd |= 0x200;
         vw = axv->vw;
         if (vw != NULL) {
-            vw->status &= ~0x2;
+            vw->be_flag &= ~0x2;
         }
     }
 }
@@ -279,7 +279,7 @@ void se_ctrl_reset_pan_or_vol(SND_CTRL_WORK* ctrl, int mode)
 // Executes every request of the back bank (commands or new plays), then swaps the banks.
 void iss_req_execute(SND_CTRL_WORK* ctrl)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
     int i;
 
     for (i = 0; i < SND_REQ_MAX; i++) {
@@ -299,7 +299,7 @@ void iss_req_execute(SND_CTRL_WORK* ctrl)
 }
 
 // A type 4 request: cmd 0 stop, else set parameters.
-void iss_req_command(SND_REQ_WORK* req)
+void iss_req_command(SND_REQ* req)
 {
     if (req->cmd_no == 0) {
         req_cmd_se_stop(req);
@@ -309,20 +309,20 @@ void iss_req_command(SND_REQ_WORK* req)
 }
 
 // Stops every SE voice with the request's sound id.
-void req_cmd_se_stop(SND_REQ_WORK* req)
+void req_cmd_se_stop(SND_REQ* req)
 {
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     int i;
 
     for (i = 0; i < SND_VOICE_MAX; i++) {
         vw = &Snd_voice_work[i];
-        if (vw->status == 0) {
+        if (vw->be_flag == 0) {
             continue;
         }
         if (vw->snd_id != req->snd_id) {
             continue;
         }
-        if (vw->type != 1) {
+        if (vw->play_type != 1) {
             continue;
         }
         Snd_stop_voice_work(vw);
@@ -331,9 +331,9 @@ void req_cmd_se_stop(SND_REQ_WORK* req)
 
 // Applies the request's parameter bits (req->flag: pan, span, vol, svol, AUX A / B, filter, pitch
 // add / offset) to every AX voice of the sound id.
-void req_cmd_se_para(SND_REQ_WORK* req)
+void req_cmd_se_para(SND_REQ* req)
 {
-    SND_VOICE_WORK* vw;
+    SND_VOICE* vw;
     SND_AXV_WORK* axv;
     int i;
     int j;
@@ -345,16 +345,16 @@ void req_cmd_se_para(SND_REQ_WORK* req)
 
     for (i = 0; i < SND_VOICE_MAX; i++) {
         vw = &Snd_voice_work[i];
-        if (vw->status == 0) {
+        if (vw->be_flag == 0) {
             continue;
         }
         if (vw->snd_id != req->snd_id) {
             continue;
         }
-        if (vw->type != 1) {
+        if (vw->play_type != 1) {
             continue;
         }
-        axv = vw->axv;
+        axv = vw->axv_ptr;
         if (axv == NULL) {
             continue;
         }
@@ -369,7 +369,7 @@ void req_cmd_se_para(SND_REQ_WORK* req)
 }
 
 // New pan (bit 2) or surround pan (bit 4).
-void req_cmd_se_pan(SND_AXV_WORK* axv, SND_REQ_WORK* req, u16 bit)
+void req_cmd_se_pan(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
 {
     if (bit == 0x2) {
         axv->pan = req->pan;
@@ -380,7 +380,7 @@ void req_cmd_se_pan(SND_AXV_WORK* axv, SND_REQ_WORK* req, u16 bit)
 }
 
 // New volume (bit 8) or surround volume (bit 0x10), also as the volume-down source.
-void req_cmd_se_vol(SND_AXV_WORK* axv, SND_REQ_WORK* req, u16 bit)
+void req_cmd_se_vol(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
 {
     if (bit == 0x8) {
         axv->vol = req->vol << 8;
@@ -393,7 +393,7 @@ void req_cmd_se_vol(SND_AXV_WORK* axv, SND_REQ_WORK* req, u16 bit)
 }
 
 // New AUX A (bit 0x20) or AUX B (0x40) send.
-void req_cmd_se_aux(SND_AXV_WORK* axv, SND_REQ_WORK* req, u16 bit)
+void req_cmd_se_aux(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
 {
     if (bit == 0x20) {
         axv->auxA = req->aux_a;
@@ -405,7 +405,7 @@ void req_cmd_se_aux(SND_AXV_WORK* axv, SND_REQ_WORK* req, u16 bit)
 }
 
 // Low-pass filter on / off / changed (lpf_no -1 = off).
-void req_cmd_se_lpf(SND_AXV_WORK* axv, SND_REQ_WORK* req, u16 bit)
+void req_cmd_se_lpf(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
 {
     if (axv->lpf_on == 0) {
         if (req->lpf == -1) {
@@ -427,7 +427,7 @@ void req_cmd_se_lpf(SND_AXV_WORK* axv, SND_REQ_WORK* req, u16 bit)
 }
 
 // Pitch: bit 0x200 adds to the base, 0x400 sets the offset; total clamped to +-2400 cents.
-void req_cmd_se_pitch(SND_AXV_WORK* axv, SND_REQ_WORK* req, u16 bit)
+void req_cmd_se_pitch(SND_AXV_WORK* axv, SND_REQ* req, u16 bit)
 {
     if (bit == 0x200) {
         axv->pitch_base += req->pitch;

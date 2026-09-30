@@ -159,7 +159,7 @@ void SndInit2()
 }
 
 // Copies the default BGM / stream numbers of every listed room from the BGM table file into that
-// room's save record (SndRoomSave), so scripts can change them per save.
+// room's save record (ROOM_SAVE_DATA), so scripts can change them per save.
 void SndBgmTblInit()
 {
     SndBgmTbl* t = SndMem.bgm_tbl;
@@ -168,13 +168,13 @@ void SndBgmTblInit()
     int j;
 
     while (*rl != 0xFFFF) {
-        SndRoomSave* rs = (SndRoomSave*) RoomData.getRoomSavePtr(*rl);
+        ROOM_SAVE_DATA* rs = (ROOM_SAVE_DATA*) RoomData.getRoomSavePtr(*rl);
         if (rs != NULL) {
             u32* ofs = (u32*) ((u8*) SndMem.bgm_tbl + SndMem.bgm_tbl->room_ofs);
             SndBgmRoom* room = (SndBgmRoom*) ((u8*) ofs + ofs[i]);
             for (j = 0; j < 6; j++) {
-                rs->bgm[j] = room->e[0].bgm[j];
-                rs->str[j] = room->e[0].str[j];
+                rs->BgmTable[j] = room->e[0].bgm[j];
+                rs->StrTable[j] = room->e[0].str[j];
             }
         }
         rl++;
@@ -629,7 +629,7 @@ int wepSeCheck(u16* call_no, Vec* pos)
     return ret;
 }
 
-struct SndRndTbl {
+struct SBL_DATA {
     u16 num;
     u16 last;
     u16 e[1];
@@ -644,7 +644,7 @@ void seRandomCheck(int blk, u16* call_no)
     s8 g;
     u8* data;
     u32* tbl;
-    SndRndTbl* t;
+    SBL_DATA* t;
 
     if (blk == 3 || blk == 4) {
         return;
@@ -662,7 +662,7 @@ void seRandomCheck(int blk, u16* call_no)
     if (tbl[g] == 0) {
         return;
     }
-    t = (SndRndTbl*) ((u8*) tbl + tbl[g]);
+    t = (SBL_DATA*) ((u8*) tbl + tbl[g]);
     do {
         *call_no = *(t->e + Rnd() % t->num);
         retry--;
@@ -1075,8 +1075,8 @@ void SndBlkStop(int blk)
     int i;
 
     for (i = 0; i < SND_VOICE_MAX; i++) {
-        SND_VOICE_WORK* v = &Snd_voice_work[i];
-        if (v->status != 0 && v->type == 1 && v->blk_no == blk) {
+        SND_VOICE* v = &Snd_voice_work[i];
+        if (v->be_flag != 0 && v->play_type == 1 && v->blk_no == blk) {
             Snd_se_stop_one(v->snd_id);
         }
     }
@@ -1364,9 +1364,9 @@ void SndWatcher()
                 OSReport("SND: BGM %d STOP\n", i);
                 memclr_asm(w, sizeof(BGM_STAT));
             } else {
-                SND_SEQ_WORK* s = Snd_search_seq_work_snd_id(w->play_id);
+                SND_SEQ* s = Snd_search_seq_work_snd_id(w->play_id);
                 if (s != NULL) {
-                    w->now_play_vol = s->vol2 >> 8;
+                    w->now_play_vol = s->now_vol >> 8;
                 }
             }
         }
@@ -1389,9 +1389,9 @@ void SndWatcher()
                 OSReport("SND: STREAM %d STOP\n", i);
                 memclr_asm(w, sizeof(BGM_STAT));
             } else {
-                SND_STR_WORK* s = Snd_search_str_work_snd_id(w->play_id);
+                SND_STR* s = Snd_search_str_work_snd_id(w->play_id);
                 if (s != NULL) {
-                    w->now_play_vol = s->vol2 >> 8;
+                    w->now_play_vol = s->now_vol >> 8;
                 }
             }
         }
@@ -1449,7 +1449,7 @@ void SndWatcher()
 // "keep" bits 0x8000 | 0x4000) are faded (200) or stopped.
 void nextRoomStreamCheck()
 {
-    SndRoomSave* rs = (SndRoomSave*) RoomData.getRoomSavePtr(pG->RoomNo_next);
+    ROOM_SAVE_DATA* rs = (ROOM_SAVE_DATA*) RoomData.getRoomSavePtr(pG->RoomNo_next);
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -1458,13 +1458,13 @@ void nextRoomStreamCheck()
         if (rs == NULL) {
             stop = 1;
         } else {
-            u16 s = (u16) rs->str[0];
+            u16 s = (u16) rs->StrTable[0];
             if (w->busy != 0) {
                 if (SysFlagChk(pG, SYS_LOAD_GAME) || ((pG->System_flg >> 19) & 1)) { // two tests, not merged into one mask
                     stop = 1;
                 } else {
-                    SND_STR_WORK* sw = Snd_search_str_work_snd_id(w->play_id);
-                    if (sw->status & 0x8000) {
+                    SND_STR* sw = Snd_search_str_work_snd_id(w->play_id);
+                    if (sw->be_flag & 0x8000) {
                         SndStrReq(w->play_id, 8, 0, 0);
                         continue;
                     }
@@ -1489,7 +1489,7 @@ void nextRoomStreamCheck()
 // (the BGM MRAM / ARAM tops reset).
 void nextRoomBgmCheck()
 {
-    SndRoomSave* rs = (SndRoomSave*) RoomData.getRoomSavePtr(pG->RoomNo_next);
+    ROOM_SAVE_DATA* rs = (ROOM_SAVE_DATA*) RoomData.getRoomSavePtr(pG->RoomNo_next);
     int i;
     int flag = 1;
 
@@ -1497,7 +1497,7 @@ void nextRoomBgmCheck()
         BGM_STAT* w = &pSnd->bgm_state[i];
         if (i == 0) {
             if (rs != NULL) {
-                u16 b = (u16) rs->bgm[0];
+                u16 b = (u16) rs->BgmTable[0];
                 if ((b & 0x8000) && (u8) b == pSnd->snd_bgm_id[0]) {
                     flag = 0;
                     if (!(b & 0x4000) && w->busy != 0) {
@@ -1582,7 +1582,7 @@ struct SndCurveEntS {
 int SndRoomStartInit()
 {
     u32 i;
-    SndRoomSave* rs;
+    ROOM_SAVE_DATA* rs;
     REVERB_INFO* e;
 
     pSnd->hdr = (SND_INFO*) GetDataExt(pG->pRoom, "STB", 0);
@@ -1639,11 +1639,11 @@ int SndRoomStartInit()
             }
         }
     }
-    rs = (SndRoomSave*) RoomData.getRoomSavePtr(G_ROOM_ID);
+    rs = (ROOM_SAVE_DATA*) RoomData.getRoomSavePtr(G_ROOM_ID);
     if (rs != NULL) {
         for (i = 0; i < 6; i++) {
-            pSnd->room_bgm_tbl[i] = rs->bgm[i];
-            pSnd->room_str_tbl[i] = rs->str[i];
+            pSnd->room_bgm_tbl[i] = rs->BgmTable[i];
+            pSnd->room_str_tbl[i] = rs->StrTable[i];
         }
     }
     memclr_asm(&History, sizeof(SE_HISTORY));
@@ -1831,7 +1831,7 @@ int SndRoomBgmMute(u8 blk_no, int sw, int time)
     if (w->busy == 1 && w->stop_req == 0) {
         if (sw == 1) {
             if (Snd_seq_fade_check(w->play_id) == 1) {
-                w->mute_vol = Snd_search_seq_work_snd_id(w->play_id)->fade_vol;
+                w->mute_vol = Snd_search_seq_work_snd_id(w->play_id)->req_fade_end;
             } else {
                 w->mute_vol = w->now_play_vol;
             }
@@ -2274,7 +2274,7 @@ void SndSoftReset()
 // current room). Returns 1 when found.
 int SndBgmTblSet(u16 room_no, int tbl_no)
 {
-    SndRoomSave* rs = (SndRoomSave*) RoomData.getRoomSavePtr(room_no);
+    ROOM_SAVE_DATA* rs = (ROOM_SAVE_DATA*) RoomData.getRoomSavePtr(room_no);
     SndBgmRoom* r = NULL;
     int ret = 0;
     u16* rl;
@@ -2299,8 +2299,8 @@ int SndBgmTblSet(u16 room_no, int tbl_no)
             for (j = 0; j < r->num; j++) {
                 if (r->e[j].id == tbl_no) {
                     for (k = 0; k < 6; k++) {
-                        rs->bgm[k] = r->e[j].bgm[k];
-                        rs->str[k] = r->e[j].str[k];
+                        rs->BgmTable[k] = r->e[j].bgm[k];
+                        rs->StrTable[k] = r->e[j].str[k];
                         if (room_no == pG->room_id) {
                             pSnd->room_bgm_tbl[k] = r->e[j].bgm[k];
                             pSnd->room_str_tbl[k] = r->e[j].str[k];
@@ -2319,7 +2319,7 @@ int SndBgmTblSet(u16 room_no, int tbl_no)
 // table words, also in the save record when `save`.
 void SndBgmTblSetEnable(int kind, int tbl_update)
 {
-    SndRoomSave* rs = (SndRoomSave*) RoomData.getRoomSavePtr(G_ROOM_ID);
+    ROOM_SAVE_DATA* rs = (ROOM_SAVE_DATA*) RoomData.getRoomSavePtr(G_ROOM_ID);
     int i;
 
     for (i = 0; i < 6; i++) {
@@ -2328,8 +2328,8 @@ void SndBgmTblSetEnable(int kind, int tbl_update)
                 pSnd->room_bgm_tbl[i] |= 0x4000;
             }
             if (tbl_update == 1 && rs != NULL) {
-                if (rs->bgm[i] & 0x8000) {
-                    rs->bgm[i] |= 0x4000;
+                if (rs->BgmTable[i] & 0x8000) {
+                    rs->BgmTable[i] |= 0x4000;
                 }
             }
         }
@@ -2338,8 +2338,8 @@ void SndBgmTblSetEnable(int kind, int tbl_update)
                 pSnd->room_bgm_tbl[i] |= 0x40000000;
             }
             if (tbl_update == 1 && rs != NULL) {
-                if (rs->bgm[i] & 0x80000000) {
-                    rs->bgm[i] |= 0x40000000;
+                if (rs->BgmTable[i] & 0x80000000) {
+                    rs->BgmTable[i] |= 0x40000000;
                 }
             }
         }
@@ -2348,8 +2348,8 @@ void SndBgmTblSetEnable(int kind, int tbl_update)
                 pSnd->room_str_tbl[i] |= 0x4000;
             }
             if (tbl_update == 1 && rs != NULL) {
-                if (rs->str[i] & 0x8000) {
-                    rs->str[i] |= ~0x4000;
+                if (rs->StrTable[i] & 0x8000) {
+                    rs->StrTable[i] |= ~0x4000;
                 }
             }
         }
@@ -2359,7 +2359,7 @@ void SndBgmTblSetEnable(int kind, int tbl_update)
 // Clears the auto-start bits (see SndBgmTblSetEnable).
 void SndBgmTblSetDisable(int kind, int tbl_update)
 {
-    SndRoomSave* rs = (SndRoomSave*) RoomData.getRoomSavePtr(G_ROOM_ID);
+    ROOM_SAVE_DATA* rs = (ROOM_SAVE_DATA*) RoomData.getRoomSavePtr(G_ROOM_ID);
     int i;
 
     for (i = 0; i < 6; i++) {
@@ -2368,8 +2368,8 @@ void SndBgmTblSetDisable(int kind, int tbl_update)
                 pSnd->room_bgm_tbl[i] &= ~0x4000;
             }
             if (tbl_update == 1 && rs != NULL) {
-                if (rs->bgm[i] & 0x8000) {
-                    rs->bgm[i] &= ~0x4000;
+                if (rs->BgmTable[i] & 0x8000) {
+                    rs->BgmTable[i] &= ~0x4000;
                 }
             }
         }
@@ -2378,8 +2378,8 @@ void SndBgmTblSetDisable(int kind, int tbl_update)
                 pSnd->room_bgm_tbl[i] &= ~0x40000000;
             }
             if (tbl_update == 1 && rs != NULL) {
-                if (rs->bgm[i] & 0x80000000) {
-                    rs->bgm[i] &= ~0x40000000;
+                if (rs->BgmTable[i] & 0x80000000) {
+                    rs->BgmTable[i] &= ~0x40000000;
                 }
             }
         }
@@ -2388,8 +2388,8 @@ void SndBgmTblSetDisable(int kind, int tbl_update)
                 pSnd->room_str_tbl[i] &= ~0x4000;
             }
             if (tbl_update == 1 && rs != NULL) {
-                if (rs->str[i] & 0x8000) {
-                    rs->str[i] &= ~0x4000;
+                if (rs->StrTable[i] & 0x8000) {
+                    rs->StrTable[i] &= ~0x4000;
                 }
             }
         }
@@ -2737,7 +2737,7 @@ void debugDisp()
     eprintf2(7, 0xE, 0x1B0, 0x157, 0, 9, "STR   %2d", Snd_ctrl_work.str_num);
     eprintf2(7, 0xE, 0x1B0, 0x165, 0, 9, "SEQ   %2d", Snd_ctrl_work.seq_num);
     for (i = 0; i < 64; i++) {
-        if (Snd_voice_work[i].status != 0) {
+        if (Snd_voice_work[i].be_flag != 0) {
             eprintf2(8, 0xB, (i / 8) * 20 + 0xFA, (i % 8) * 14 + 0x13B, 4, 9, "%02d ", i);
         } else {
             eprintf2(8, 0xB, (i / 8) * 20 + 0xFA, (i % 8) * 14 + 0x13B, 7, 9, "%02d ", i);

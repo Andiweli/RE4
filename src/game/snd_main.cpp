@@ -172,7 +172,7 @@ void Snd_iss_control(void)
 void Snd_dev_voice_ck(void)
 {
     SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
-    SND_SEQ_WORK* seq;
+    SND_SEQ* seq;
     int i;
 
     ctrl->dsp_cycles_max = AXGetMaxDspCycles();
@@ -182,7 +182,7 @@ void Snd_dev_voice_ck(void)
     }
     ctrl->voice_num = 0;
     for (i = 0; i < SND_VOICE_MAX; i++) {
-        if (Snd_voice_work[i].status != 0) {
+        if (Snd_voice_work[i].be_flag != 0) {
             ctrl->voice_num++;
         }
     }
@@ -200,10 +200,10 @@ void Snd_dev_voice_ck(void)
     }
     ctrl->str_num = 0;
     for (i = 0; i < SND_STR_MAX; i++) {
-        if (Snd_str_work[i].voiceL != NULL) {
+        if (Snd_str_work[i].ax_voice_l != NULL) {
             ctrl->str_num++;
         }
-        if (Snd_str_work[i].voiceR != NULL) {
+        if (Snd_str_work[i].ax_voice_r != NULL) {
             ctrl->str_num++;
         }
     }
@@ -213,7 +213,7 @@ void Snd_dev_voice_ck(void)
     ctrl->seq_num = 0;
     for (i = 0; i < SND_SEQ_MAX; i++) {
         seq = &Snd_seq_work[i];
-        if (seq->aram != 0) {
+        if (seq->pcm_adrs != 0) {
             ctrl->seq_num += SYNGetActiveNotes(&seq->synth);
         }
     }

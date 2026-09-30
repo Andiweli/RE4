@@ -10,7 +10,7 @@
 #include "db_path.h"
 
 // B-spline path editor of the interface-design tool (D:/Bio4/Prog/db_path.cpp; the same object in
-// t_id and t_event). Edits a FuncPathData (type POINT / LINEAR / B-SPL2..4, up to 64 control points)
+// t_id and t_event). Edits a FUNC_PATH_PTR (type POINT / LINEAR / B-SPL2..4, up to 64 control points)
 // with a 3D cursor moved by the caller: pathEdit grabs, appends, inserts and deletes points, pathMenu
 // is the Z menu (type, clear), pathDraw draws the parametrised curve. Entry: DbPath every frame.
 
@@ -60,12 +60,12 @@ static int pathQuit(DbPathWork* w)
     return 0;
 }
 
-// Routine 1, the Z menu: Type (POINT / LINEAR / B-SPL2..4 = FuncPathData::k), Clear (YES/NO
+// Routine 1, the Z menu: Type (POINT / LINEAR / B-SPL2..4 = FUNC_PATH_PTR::k), Clear (YES/NO
 // empties the path); B back to editing. Returns 1.
 static int pathMenu(DbPathWork* w)
 {
     JOY* joy = &Joy[0];
-    FuncPathData* path = w->path;
+    FUNC_PATH_PTR* path = w->path;
     int x;
     int y;
     int i;
@@ -89,14 +89,14 @@ static int pathMenu(DbPathWork* w)
         {
             switch (w->cursor) {
             case 0:
-                w->pEnd = &w->path->pos[path->n];
+                w->pEnd = &w->path->Point[path->nPoint];
                 if (joy->rep & 0x00010001) {
-                    path->k--;
+                    path->Order--;
                 }
                 if (joy->rep & 0x00020002) {
-                    path->k++;
+                    path->Order++;
                 }
-                path->k = path->k < 0 ? 0 : (path->k > 3 ? 3 : path->k);
+                path->Order = path->Order < 0 ? 0 : (path->Order > 3 ? 3 : path->Order);
                 break;
             case 1:
                 if (joy->trg & 0x100) {
@@ -149,7 +149,7 @@ static int pathMenu(DbPathWork* w)
             int j;
             for (j = 0; j <= 3; j++) {
                 int col = 7;
-                if (j == path->k) {
+                if (j == path->Order) {
                     col = 0;
                 }
                 eprintf(x + 0x40 + j * 0x38, y + i * 14, col, 0, "%s", path_type_name[j]);
@@ -177,7 +177,7 @@ static int pathMenu(DbPathWork* w)
 static int pathEdit(DbPathWork* w)
 {
     Vec* cur = &w->pos;
-    FuncPathData* path = w->path;
+    FUNC_PATH_PTR* path = w->path;
     JOY* joy = &Joy[0];
     int ret = 1;
 
@@ -204,10 +204,10 @@ static int pathEdit(DbPathWork* w)
             w->routine = 2;
             break;
         }
-        if (path->n == 0) {
+        if (path->nPoint == 0) {
             w->step = 1;
-            path->k = 1;
-            path->n = 1;
+            path->Order = 1;
+            path->nPoint = 1;
             break;
         }
         if (joy->trg & 0x10) {
@@ -217,7 +217,7 @@ static int pathEdit(DbPathWork* w)
         }
         if (joy->trg & 0x100) {
             if (pathGrabPoint(w)) {
-                *cur = path->pos[w->grab];
+                *cur = path->Point[w->grab];
                 w->step = 2;
                 path_edit_mode = 0;
             }
@@ -225,7 +225,7 @@ static int pathEdit(DbPathWork* w)
         if (joy->trg & 0x800) {
             if (pathGrabLine(w)) {
                 if (w->grab != -1) {
-                    *cur = path->pos[w->grab];
+                    *cur = path->Point[w->grab];
                 } else if (w->insertIdx != -1) {
                     *cur = w->insertPos;
                 }
@@ -237,23 +237,23 @@ static int pathEdit(DbPathWork* w)
         break;
     case 1:
         if (joy->trg & 0x200) {
-            if (path->n > 1) {
+            if (path->nPoint > 1) {
                 w->step = 0;
-                path->n--;
+                path->nPoint--;
             } else {
-                path->n = 0;
+                path->nPoint = 0;
                 ret = 0;
             }
             break;
         }
-        path->pos[path->n - 1] = *cur;
-        if ((joy->trg & 0x100) && path->n <= PATH_MAX_POINT - 1) {
+        path->Point[path->nPoint - 1] = *cur;
+        if ((joy->trg & 0x100) && path->nPoint <= PATH_MAX_POINT - 1) {
             if (w->gridLock) {
                 pathGridLock(&w->grid, cur, cur);
             }
-            path->pos[path->n - 1] = *cur;
-            path->pos[path->n] = path->pos[path->n - 1];
-            path->n++;
+            path->Point[path->nPoint - 1] = *cur;
+            path->Point[path->nPoint] = path->Point[path->nPoint - 1];
+            path->nPoint++;
         }
         if (joy->trg & 0x10) {
             w->routine = 1;
@@ -264,12 +264,12 @@ static int pathEdit(DbPathWork* w)
         switch (path_edit_mode) {
         case 0:
             if (joy->on & 0x100) {
-                path->pos[w->grab] = *cur;
+                path->Point[w->grab] = *cur;
             } else {
                 if (w->gridLock) {
                     pathGridLock(&w->grid, cur, cur);
                 }
-                path->pos[w->grab] = *cur;
+                path->Point[w->grab] = *cur;
                 w->step = 0;
                 path_edit_mode = 0;
             }
@@ -317,13 +317,13 @@ static int pathEdit(DbPathWork* w)
 // Nearest control point within PATH_GRAB_DIST of the cursor -> w->grab; 1 when one was found.
 static int pathGrabPoint(DbPathWork* w)
 {
-    FuncPathData* path = w->path;
+    FUNC_PATH_PTR* path = w->path;
     Vec* cur = &w->pos;
     f32 min = PATH_GRAB_DIST;
     int i;
 
-    for (i = 0; i < path->n; i++) {
-        f32 d = PSVECDistance(&path->pos[i], cur);
+    for (i = 0; i < path->nPoint; i++) {
+        f32 d = PSVECDistance(&path->Point[i], cur);
         if (d <= min) {
             w->grab = i;
             min = d;
@@ -339,7 +339,7 @@ static int pathGrabLine(DbPathWork* w)
     PathParam buf;
     Vec pt;
     f32 min = PATH_GRAB_DIST;
-    FuncPathData* path = w->path;
+    FUNC_PATH_PTR* path = w->path;
     FuncPathWork* param = (FuncPathWork*) &buf;
     Vec* cur = &w->pos;
     int i;
@@ -356,12 +356,12 @@ static int pathGrabLine(DbPathWork* w)
 
 #line 447 "D:/Bio4/Prog/db_path.cpp"
             basis = (f32*) MEM_ALLOC(param->n * 4, 1, 13);
-            t = (f32) ((path->n - 1) * i) / PATH_DRAW_DIV + PATH_T_START;
-            de_Boor_Cox(path->n, 0, t, param->k, basis);
+            t = (f32) ((path->nPoint - 1) * i) / PATH_DRAW_DIV + PATH_T_START;
+            de_Boor_Cox(path->nPoint, 0, t, param->k, basis);
             pt.z = 0.0f;
             pt.y = 0.0f;
             pt.x = 0.0f;
-            for (j = 0; j < path->n; j++) {
+            for (j = 0; j < path->nPoint; j++) {
                 pt.x = basis[j] * param->alpha[j].x + pt.x;
                 pt.y = basis[j] * param->alpha[j].y + pt.y;
                 pt.z = basis[j] * param->alpha[j].z + pt.z;
@@ -378,8 +378,8 @@ static int pathGrabLine(DbPathWork* w)
         }
     }
     w->grab = -1;
-    for (i = 0; i < path->n; i++) {
-        f32 d = PSVECDistance(&path->pos[i], cur);
+    for (i = 0; i < path->nPoint; i++) {
+        f32 d = PSVECDistance(&path->Point[i], cur);
         if (d <= min) {
             w->grab = i;
             min = d;
@@ -391,30 +391,30 @@ static int pathGrabLine(DbPathWork* w)
 // Removes control point w->grab.
 static void pathDeletePoint(DbPathWork* w)
 {
-    FuncPathData* path = w->path;
+    FUNC_PATH_PTR* path = w->path;
     int i;
 
-    path->n--;
-    for (i = w->grab; i < path->n; i++) {
-        path->pos[i] = path->pos[i + 1];
+    path->nPoint--;
+    for (i = w->grab; i < path->nPoint; i++) {
+        path->Point[i] = path->Point[i + 1];
     }
-    path->pos[path->n] = vecZero;
+    path->Point[path->nPoint] = vecZero;
 }
 
 // Inserts a control point at w->insertIdx with the grabbed curve position; no-op at 64 points.
 void pathInsertPoint(DbPathWork* w)
 {
-    FuncPathData* path = w->path;
+    FUNC_PATH_PTR* path = w->path;
     int i;
 
-    if (path->n > PATH_MAX_POINT - 1) {
+    if (path->nPoint > PATH_MAX_POINT - 1) {
         return;
     }
-    for (i = path->n; i > w->insertIdx; i--) {
-        path->pos[i] = path->pos[i - 1];
+    for (i = path->nPoint; i > w->insertIdx; i--) {
+        path->Point[i] = path->Point[i - 1];
     }
-    path->pos[w->insertIdx] = w->insertPos;
-    path->n++;
+    path->Point[w->insertIdx] = w->insertPos;
+    path->nPoint++;
 }
 
 // Draws the full-screen cross-hair through the cursor (plus ofs) and prints its coordinates.
@@ -444,7 +444,7 @@ void pathDraw(DbPathWork* w, Vec* ofs)
     Vec pt;
     Vec a;
     Vec b;
-    FuncPathData* path = w->path;
+    FUNC_PATH_PTR* path = w->path;
     FuncPathWork* param = (FuncPathWork*) &buf;
     int i;
 
@@ -459,12 +459,12 @@ void pathDraw(DbPathWork* w, Vec* ofs)
 
 #line 586 "D:/Bio4/Prog/db_path.cpp"
             basis = (f32*) MEM_ALLOC(param->n * 4, 1, 13);
-            t = (f32) ((path->n - 1) * i) / PATH_DRAW_DIV + PATH_T_START;
-            de_Boor_Cox(path->n, 0, t, param->k, basis);
+            t = (f32) ((path->nPoint - 1) * i) / PATH_DRAW_DIV + PATH_T_START;
+            de_Boor_Cox(path->nPoint, 0, t, param->k, basis);
             pt.z = 0.0f;
             pt.y = 0.0f;
             pt.x = 0.0f;
-            for (j = 0; j < path->n; j++) {
+            for (j = 0; j < path->nPoint; j++) {
                 pt.x = basis[j] * param->alpha[j].x + pt.x;
                 pt.y = basis[j] * param->alpha[j].y + pt.y;
                 pt.z = basis[j] * param->alpha[j].z + pt.z;
@@ -478,8 +478,8 @@ void pathDraw(DbPathWork* w, Vec* ofs)
             path_draw_prev = pt;
         }
     }
-    for (i = 0; i < w->path->n; i++) {
-        PSVECAdd(&w->path->pos[i], ofs, &pt);
+    for (i = 0; i < w->path->nPoint; i++) {
+        PSVECAdd(&w->path->Point[i], ofs, &pt);
         Draw_sphere(&pt, 2.0f, 0xFFFFFFFF, 1, 1);
     }
 }

@@ -338,10 +338,10 @@ void TexRenderModAddOtMirror(int ot, cModel* m)
 
 // Queues a camera swap around render target OT `ot`: CamRenderPrev before its passes and
 // CamRenderAfter after them, using the event's camera motion `data`.
-void TexRenderCamAddOt(int ot, TexRenderCam* pWk, TexRenderEvt* evt, void* data)
+void TexRenderCamAddOt(int ot, TexRenderEvtCamStruct* pWk, TexRenderEvt* evt, void* data)
 {
     pWk->pEvt = evt;
-    pWk->data = data;
+    pWk->pDat = data;
     AddOtDirect(ot, pWk, (void (*)()) CamRenderPrev, 4, 1, NULL, 0.0f);
     AddOtDirect(ot, pWk, (void (*)()) CamRenderAfter, 2, 1, NULL, 0.0f);
 }
@@ -359,7 +359,7 @@ static inline bool evtFlag(TexRenderEvt* e, u32 bit)
 // Before the render-to-texture passes: builds a CameraMotion at the event's frame (frameB with
 // flag 0x40000000, the last frame with 0x08000000), saves pG->Camera and installs the motion camera
 // with its projection / view matrices.
-void CamRenderPrev(TexRenderCam* pWk)
+void CamRenderPrev(TexRenderEvtCamStruct* pWk)
 {
     TexRenderEvt* e = pWk->pEvt;
     int frame = e->frame;
@@ -370,16 +370,16 @@ void CamRenderPrev(TexRenderCam* pWk)
     if (evtFlag(e, 0x08000000)) {
         frame = e->frameEnd - 1;
     }
-    pWk->pCam = new (&pWk->cam) CameraMotion(pWk->data, 0, 0, (f32) frame);
-    pWk->pCam->move();
-    pWk->save = pG->Camera;
-    pG->Camera = *pWk->pCam;
+    pWk->pProc = new (&pWk->cam) CameraMotion(pWk->pDat, 0, 0, (f32) frame);
+    pWk->pProc->move();
+    pWk->CameraBak = pG->Camera;
+    pG->Camera = *pWk->pProc;
     C_MTXPerspective(pG->Camera.ProjMat, pG->Camera.param.Fovy, 4.0f / 3.0f, ((F32S*) &ZNEAR)->v, ((F32S*) &ZFAR)->v);
     C_MTXLookAt(pG->Camera.v_mat, &pG->Camera.param.Campos, &pG->Camera.Up, &pG->Camera.param.Target);
 }
 
 // After the passes: restores pG->Camera.
-void CamRenderAfter(TexRenderCam* pWk)
+void CamRenderAfter(TexRenderEvtCamStruct* pWk)
 {
-    pG->Camera = pWk->save;
+    pG->Camera = pWk->CameraBak;
 }
