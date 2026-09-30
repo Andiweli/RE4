@@ -136,7 +136,7 @@ void CamStick2World(CAMERA* pCam, JOY* pJoy, Vec* pVec)
 }
 
 // The world-space view frustum of the current camera (View.worldFull).
-ViewFrustum* CameraViewFrustumPtr(CAMERA* pCam)
+GEOM_HEXAHEDRON* CameraViewFrustumPtr(CAMERA* pCam)
 {
     return &View.worldFull;
 }

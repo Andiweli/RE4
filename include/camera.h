@@ -47,7 +47,7 @@ int CameraGetProjection();
 void CameraGameInit();
 void CameraRoomInit();
 void CameraMove();
-struct ViewFrustum* CameraViewFrustumPtr(CAMERA* cam);
+struct GEOM_HEXAHEDRON* CameraViewFrustumPtr(CAMERA* cam);
 void CameraGetUpVec(CAMERA* pCam, Vec* up);
 void CameraGetLookVec(CAMERA* pCam, Vec* look);
 void CameraGetLookVecInverse(CAMERA* pCam, Vec* look_inv);

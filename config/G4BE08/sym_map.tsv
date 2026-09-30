@@ -4665,7 +4665,7 @@ address	size	section	unit	scope	name	demangled
 0x80147FF4	0xC0	.text	game/game.cpp	global	dispWorkNum__t8cManager1Z6cLightiiii	cManager<cLight>::dispWorkNum
 0x801480B4	0x300	.text	game/geometry.cpp	global	collision_point_cone_rev_play__FP3VecP13GEOM_CONE_REVf	collision_point_cone_rev_play
 0x801483B4	0x74	.text	game/geometry.cpp	global	collision_point_cone_rev_play_face__FP3VecP13GEOM_CONE_REVfT0f	collision_point_cone_rev_play_face
-0x80148428	0xA4	.text	game/geometry.cpp	global	collision_sphere_hexahedron__FP9GeoSphereP13GeoHexahedron	collision_sphere_hexahedron
+0x80148428	0xA4	.text	game/geometry.cpp	global	collision_sphere_hexahedron__FP11GEOM_SPHEREP15GEOM_HEXAHEDRON	collision_sphere_hexahedron
 0x801484CC	0x44	.text	game/gx_sub.cpp	global	bio4_GXSetCopyClear__FG7GXColorUl	bio4_GXSetCopyClear
 0x80148510	0x324	.text	game/gx_sub.cpp	global	bio4_AddBgColor__Fv	bio4_AddBgColor
 0x80148834	0x64	.text	game/hermite.cpp	global	Hermite_1Clear__FP13HERMITE_1_PTR	Hermite_1Clear

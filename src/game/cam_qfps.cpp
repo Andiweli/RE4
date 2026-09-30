@@ -1191,7 +1191,7 @@ void CameraQuasiFPS::move()
     static Vec campos_aim_eff;
     static Vec target_aim_eff;
     static f32 lr_rate = 0.6f;
-    static ViewFrustum view_box[16];
+    static GEOM_HEXAHEDRON view_box[16];
     static int cnt = 0;
     CAMERA c;
     Mtx m;
@@ -1261,14 +1261,14 @@ void CameraQuasiFPS::move()
         int j;
 
         {
-            ViewFrustum* vf = &View.localFull;
+            GEOM_HEXAHEDRON* vf = &View.localFull;
             Vec* src;
 
             CameraSetOrientationRoll(&c);
-            src = vf->point;
+            src = vf->vertex;
             for (j = 0; j < 8; j++, src++) {
-                PSMTXMultVec(c.mat, src, &view_box[cnt].point[j]);
-                PSMTXMultVec(c.mat, src, &view_box[cnt].point[j]);
+                PSMTXMultVec(c.mat, src, &view_box[cnt].vertex[j]);
+                PSMTXMultVec(c.mat, src, &view_box[cnt].vertex[j]);
             }
         }
         for (i = 0; i < 16; i++) {
@@ -1282,20 +1282,20 @@ void CameraQuasiFPS::move()
                 } else {
                     col = 0xFF606060;
                 }
-                Draw_line3d(&view_box[i].point[j], &view_box[i].point[(j + 1) % 4], col, 0);
+                Draw_line3d(&view_box[i].vertex[j], &view_box[i].vertex[(j + 1) % 4], col, 0);
             }
         }
-        Draw_line3d(&view_box[cnt].point[0], &view_box[cnt].point[3], 0xFFFFFFFF, 0);
-        Draw_line3d(&view_box[cnt].point[3], &view_box[cnt].point[7], 0xFFFFFFFF, 0);
-        Draw_line3d(&view_box[cnt].point[7], &view_box[cnt].point[4], 0xFFFFFFFF, 0);
-        Draw_line3d(&view_box[cnt].point[4], &view_box[cnt].point[0], 0xFFFFFFFF, 0);
-        poly[0] = view_box[cnt].point[0];
-        poly[1] = view_box[cnt].point[3];
-        poly[2] = view_box[cnt].point[4];
+        Draw_line3d(&view_box[cnt].vertex[0], &view_box[cnt].vertex[3], 0xFFFFFFFF, 0);
+        Draw_line3d(&view_box[cnt].vertex[3], &view_box[cnt].vertex[7], 0xFFFFFFFF, 0);
+        Draw_line3d(&view_box[cnt].vertex[7], &view_box[cnt].vertex[4], 0xFFFFFFFF, 0);
+        Draw_line3d(&view_box[cnt].vertex[4], &view_box[cnt].vertex[0], 0xFFFFFFFF, 0);
+        poly[0] = view_box[cnt].vertex[0];
+        poly[1] = view_box[cnt].vertex[3];
+        poly[2] = view_box[cnt].vertex[4];
         Draw_poly(poly, 0x40FFFFFF, 1);
-        poly[0] = view_box[cnt].point[3];
-        poly[1] = view_box[cnt].point[7];
-        poly[2] = view_box[cnt].point[4];
+        poly[0] = view_box[cnt].vertex[3];
+        poly[1] = view_box[cnt].vertex[7];
+        poly[2] = view_box[cnt].vertex[4];
         Draw_poly(poly, 0x40FFFFFF, 1);
         cnt++;
         cnt %= 16;

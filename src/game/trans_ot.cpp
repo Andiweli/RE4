@@ -144,8 +144,8 @@ int AddOtWorldPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
     OtData* q;
     Vec look;
     Vec d;
-    GeoSphere sph;
-    GeoHexahedron* h;
+    GEOM_SPHERE sph;
+    GEOM_HEXAHEDRON* h;
     u32 no;
     f32 z;
 
@@ -155,9 +155,9 @@ int AddOtWorldPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
         return 0xFFFF;
     }
     cam = &pG->Camera;
-    h = (GeoHexahedron*) CameraViewFrustumPtr(cam);
+    h = CameraViewFrustumPtr(cam);
     sph.pos = *pos;
-    sph.r = radius;
+    sph.radius = radius;
     if (!collision_sphere_hexahedron(&sph, h)) {
         return 0xFFFF;
     }
@@ -194,8 +194,8 @@ int AddOtModelPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
     OtData* q;
     Vec look;
     Vec d;
-    GeoSphere sph;
-    GeoHexahedron* h;
+    GEOM_SPHERE sph;
+    GEOM_HEXAHEDRON* h;
     u32 no;
     f32 z;
 
@@ -205,9 +205,9 @@ int AddOtModelPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
         return 0xFFFF;
     }
     cam = &pG->Camera;
-    h = (GeoHexahedron*) CameraViewFrustumPtr(cam);
+    h = CameraViewFrustumPtr(cam);
     sph.pos = *pos;
-    sph.r = radius;
+    sph.radius = radius;
     if (!collision_sphere_hexahedron(&sph, h)) {
         return 0xFFFF;
     }
@@ -242,13 +242,13 @@ int AddOtDirect(int ot, void* data, void (*func)(), u32 no, u16 flag, Vec* pos, 
     OtWork* w;
     OtData* p;
     OtData* q;
-    GeoSphere sph;
-    GeoHexahedron* h;
+    GEOM_SPHERE sph;
+    GEOM_HEXAHEDRON* h;
 
     if (radius != 0.0f && pos != 0) {
-        h = (GeoHexahedron*) CameraViewFrustumPtr(&pG->Camera);
+        h = CameraViewFrustumPtr(&pG->Camera);
         sph.pos = *pos;
-        sph.r = radius;
+        sph.radius = radius;
         if (!collision_sphere_hexahedron(&sph, h)) {
             return 0xFFFF;
         }
