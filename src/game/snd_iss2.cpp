@@ -8,7 +8,7 @@ typedef void (*SND_REQ_CMD)(SND_AXV_WORK*, SND_REQ*, u16);
 // SE controls and executes the request bank; finally pushes the pending AX voice updates.
 void Snd_iss_manager(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     int ret;
 
     Snd_axv_work_close_check();
@@ -22,47 +22,47 @@ void Snd_iss_manager(void)
 
 // Runs the se_ctrl bits set by snd_iss1 (fade-outs, pauses, resumes, volume down / up, pan or
 // volume reset) and clears them.
-void se_ctrl_execute(SND_CTRL_WORK* ctrl)
+void se_ctrl_execute(SND_CTRL* ctrl)
 {
-    if (ctrl->se_ctrl & 0x200) {
+    if (ctrl->se_ctrl_flag & 0x200) {
         se_ctrl_fade_out(ctrl, 1);
     }
-    if (ctrl->se_ctrl & 0x400) {
+    if (ctrl->se_ctrl_flag & 0x400) {
         se_ctrl_fade_out(ctrl, 2);
     }
-    if (ctrl->se_ctrl & 0x1) {
+    if (ctrl->se_ctrl_flag & 0x1) {
         se_ctrl_pause_on(ctrl);
     }
-    if (ctrl->se_ctrl & 0x2) {
+    if (ctrl->se_ctrl_flag & 0x2) {
         se_ctrl_pause_on2(ctrl);
     }
-    if (ctrl->se_ctrl & 0x4) {
+    if (ctrl->se_ctrl_flag & 0x4) {
         se_ctrl_pause_on(ctrl);
     }
-    if (ctrl->se_ctrl & 0x8) {
+    if (ctrl->se_ctrl_flag & 0x8) {
         se_ctrl_pause_off(ctrl);
     }
-    if (ctrl->se_ctrl & 0x10) {
+    if (ctrl->se_ctrl_flag & 0x10) {
         se_ctrl_pause_off2(ctrl);
     }
-    if (ctrl->se_ctrl & 0x20) {
+    if (ctrl->se_ctrl_flag & 0x20) {
         se_ctrl_vdown_on(ctrl);
     }
-    if (ctrl->se_ctrl & 0x40) {
+    if (ctrl->se_ctrl_flag & 0x40) {
         se_ctrl_vdown_off(ctrl);
     }
-    if (ctrl->se_ctrl & 0x80) {
+    if (ctrl->se_ctrl_flag & 0x80) {
         se_ctrl_reset_pan_or_vol(ctrl, 3);
     }
-    if (ctrl->se_ctrl & 0x100) {
+    if (ctrl->se_ctrl_flag & 0x100) {
         se_ctrl_reset_pan_or_vol(ctrl, 4);
     }
-    ctrl->se_ctrl = 0;
+    ctrl->se_ctrl_flag = 0;
 }
 
 // Note-off with a fade (se_fade_time, or the voice's own release) on every SE voice; mode 1 skips
 // the protected voices (axv flag 4).
-void se_ctrl_fade_out(SND_CTRL_WORK* ctrl, int mode)
+void se_ctrl_fade_out(SND_CTRL* ctrl, int mode)
 {
     SND_AXV_WORK* axv;
     SND_VOICE* vw;
@@ -84,17 +84,17 @@ void se_ctrl_fade_out(SND_CTRL_WORK* ctrl, int mode)
         if (mode == 1 && (axv->flag & 0x4)) {
             continue;
         }
-        if (ctrl->se_fade_time == 0) {
+        if (ctrl->se_fout_time == 0) {
             time = vw->adsr_rel;
         } else {
-            time = ctrl->se_fade_time;
+            time = ctrl->se_fout_time;
         }
         Snd_axv_work_note_off(axv, time);
     }
 }
 
 // Pauses every AX voice.
-void se_ctrl_pause_on(SND_CTRL_WORK* ctrl)
+void se_ctrl_pause_on(SND_CTRL* ctrl)
 {
     int i;
 
@@ -104,7 +104,7 @@ void se_ctrl_pause_on(SND_CTRL_WORK* ctrl)
 }
 
 // Pauses the AX voices of block se_pause_type (-1 = all).
-void se_ctrl_pause_on2(SND_CTRL_WORK* ctrl)
+void se_ctrl_pause_on2(SND_CTRL* ctrl)
 {
     SND_AXV_WORK* axv;
     SND_VOICE* vw;
@@ -112,10 +112,10 @@ void se_ctrl_pause_on2(SND_CTRL_WORK* ctrl)
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         axv = &Snd_axv_work[i];
-        if (ctrl->se_pause_type != -1) {
+        if (ctrl->pause_blk != -1) {
             if (axv->status != 0) {
                 vw = axv->vw;
-                if (vw != NULL && vw->blk_no == ctrl->se_pause_type) {
+                if (vw != NULL && vw->blk_no == ctrl->pause_blk) {
                     seCtrlPauseOn_sub(axv, ctrl);
                 }
             }
@@ -127,7 +127,7 @@ void se_ctrl_pause_on2(SND_CTRL_WORK* ctrl)
 
 // Pauses one AX voice (status bit3, update 0x100) unless it is releasing, unpausable (flag 1, when
 // not forced by se_ctrl 4), stopped, or a one-shot within 800 samples of its end.
-void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL_WORK* ctrl)
+void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL* ctrl)
 {
     SND_VOICE* vw;
     u32 cur;
@@ -139,7 +139,7 @@ void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL_WORK* ctrl)
     if (axv->status & 0x4) {
         return;
     }
-    if (!(ctrl->se_ctrl & 0x4) && (axv->flag & 0x1)) {
+    if (!(ctrl->se_ctrl_flag & 0x4) && (axv->flag & 0x1)) {
         return;
     }
     if (axv->voice->pb.state == 0) {
@@ -161,18 +161,18 @@ void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL_WORK* ctrl)
 }
 
 // Resumes every AX voice; se_state bit0 off.
-void se_ctrl_pause_off(SND_CTRL_WORK* ctrl)
+void se_ctrl_pause_off(SND_CTRL* ctrl)
 {
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         seCtrlPauseOff_sub(&Snd_axv_work[i]);
     }
-    ctrl->se_state &= ~0x1;
+    ctrl->status_flag &= ~0x1;
 }
 
 // Resumes the AX voices of block se_pause_type (-1 = all).
-void se_ctrl_pause_off2(SND_CTRL_WORK* ctrl)
+void se_ctrl_pause_off2(SND_CTRL* ctrl)
 {
     SND_AXV_WORK* axv;
     SND_VOICE* vw;
@@ -180,10 +180,10 @@ void se_ctrl_pause_off2(SND_CTRL_WORK* ctrl)
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         axv = &Snd_axv_work[i];
-        if (ctrl->se_pause_type != -1) {
+        if (ctrl->pause_blk != -1) {
             if (axv->status != 0) {
                 vw = axv->vw;
-                if (vw != NULL && vw->blk_no == ctrl->se_pause_type) {
+                if (vw != NULL && vw->blk_no == ctrl->pause_blk) {
                     seCtrlPauseOff_sub(axv);
                 }
             }
@@ -212,7 +212,7 @@ void seCtrlPauseOff_sub(SND_AXV_WORK* axv)
 }
 
 // Volume-down on every AX voice not flagged exempt (flag 2): status bit4, volume recomputed.
-void se_ctrl_vdown_on(SND_CTRL_WORK* ctrl)
+void se_ctrl_vdown_on(SND_CTRL* ctrl)
 {
     SND_AXV_WORK* axv;
     int i;
@@ -235,7 +235,7 @@ void se_ctrl_vdown_on(SND_CTRL_WORK* ctrl)
 }
 
 // Ends the volume-down on every AX voice; se_state bit1 off.
-void se_ctrl_vdown_off(SND_CTRL_WORK* ctrl)
+void se_ctrl_vdown_off(SND_CTRL* ctrl)
 {
     SND_AXV_WORK* axv;
     int i;
@@ -251,11 +251,11 @@ void se_ctrl_vdown_off(SND_CTRL_WORK* ctrl)
         axv->status &= ~0x10;
         axv->upd |= 0x1;
     }
-    ctrl->se_state &= ~0x2;
+    ctrl->status_flag &= ~0x2;
 }
 
 // Marks every AX voice for a pan (mode 3) or volume (4) recomputation (output mode change).
-void se_ctrl_reset_pan_or_vol(SND_CTRL_WORK* ctrl, int mode)
+void se_ctrl_reset_pan_or_vol(SND_CTRL* ctrl, int mode)
 {
     SND_AXV_WORK* axv;
     int i;
@@ -277,13 +277,13 @@ void se_ctrl_reset_pan_or_vol(SND_CTRL_WORK* ctrl, int mode)
 }
 
 // Executes every request of the back bank (commands or new plays), then swaps the banks.
-void iss_req_execute(SND_CTRL_WORK* ctrl)
+void iss_req_execute(SND_CTRL* ctrl)
 {
     SND_REQ* req;
     int i;
 
     for (i = 0; i < SND_REQ_MAX; i++) {
-        req = &Snd_req_work[ctrl->req_bank_sub][i];
+        req = &Snd_req_work[ctrl->req_exec_idx][i];
         if (req->be_flag == 0) {
             continue;
         }
@@ -294,8 +294,8 @@ void iss_req_execute(SND_CTRL_WORK* ctrl)
         }
         req->be_flag = 0;
     }
-    ctrl->req_bank ^= 1;
-    ctrl->req_bank_sub ^= 1;
+    ctrl->req_push_idx ^= 1;
+    ctrl->req_exec_idx ^= 1;
 }
 
 // A type 4 request: cmd 0 stop, else set parameters.

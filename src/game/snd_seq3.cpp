@@ -88,12 +88,12 @@ u32 Snd_seq_get_delta(SND_SEQ* seq)
 }
 
 // Forwards the current 3-byte message to the sequence's synth.
-void Snd_seq_send_midi(SND_CTRL_WORK* msg, SND_SEQ* seq)
+void Snd_seq_send_midi(SND_CTRL* msg, SND_SEQ* seq)
 {
     int old;
 
     old = OSDisableInterrupts();
-    SYNMidiInput(&seq->synth, msg->midi_msg);
+    SYNMidiInput(&seq->synth, msg->seq_data);
     OSRestoreInterrupts(old);
 }
 
@@ -114,12 +114,12 @@ void Snd_send_midi(SYNSYNTH* synth, u8 status, u8 data1, u8 data2)
 // AX volume from the system BGM (type 2) or SE volume x master x the sequence's 8.8 volume.
 void Snd_seq_work_calc_ax_vol(SND_SEQ* seq)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
     if (seq->seq_type == 2) {
-        seq->out_vol = ctrl->sys_vol[1] / 127 * (ctrl->sys_vol[3] >> 8);
+        seq->out_vol = ctrl->vol_mas_se / 127 * (ctrl->vol_iss_se >> 8);
     } else {
-        seq->out_vol = ctrl->sys_vol[0] / 127 * (ctrl->sys_vol[2] >> 8);
+        seq->out_vol = ctrl->vol_mas_bgm / 127 * (ctrl->vol_iss_bgm >> 8);
     }
     seq->out_vol = seq->out_vol / 127 * (seq->now_vol >> 8);
     seq->ax_vol = Snd_vol_syn_to_ax((s16) (seq->out_vol >> 8));
@@ -146,7 +146,7 @@ void Snd_iss_new_seq_work(SND_ISS_BLK* blk, SND_SIT* sit, SND_REQ* req)
     seq->pcm_adrs = blk->aram;
     seq->wt_adrs = blk->dls;
     seq->sit_ptr = sit;
-    SYNInitSynth(&seq->synth, seq->wt_adrs, seq->pcm_adrs, Snd_ctrl_work.aram_base, 30, 30, 1);
+    SYNInitSynth(&seq->synth, seq->wt_adrs, seq->pcm_adrs, Snd_ctrl_work.zero_adrs, 30, 30, 1);
     bank = (u16) ((u16) (sit->note >> 8) & 0xFF);
     tbl = blk->seq;
     ofs = ((u32*) tbl)[bank + 1];

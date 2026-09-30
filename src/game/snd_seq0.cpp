@@ -121,15 +121,15 @@ int Snd_seq_end_check(u32 snd_id)
 // Non-zero while a sequence of `type` is queued (0x10) or playing (2).
 int Snd_seq_pronounce_ck_type(u8 type)
 {
-    SND_CTRL_WORK* ctrl;
+    SND_CTRL* ctrl;
     int old;
     int ret;
 
     old = OSDisableInterrupts();
     ctrl = &Snd_ctrl_work;
     ret = 0;
-    ret |= seq_pro_ck_req_work(ctrl->req_bank, type);
-    ret |= seq_pro_ck_req_work(ctrl->req_bank_sub, type);
+    ret |= seq_pro_ck_req_work(ctrl->req_push_idx, type);
+    ret |= seq_pro_ck_req_work(ctrl->req_exec_idx, type);
     OSRestoreInterrupts(old);
     old = OSDisableInterrupts();
     ret |= seq_pro_ck_seq_work(type);

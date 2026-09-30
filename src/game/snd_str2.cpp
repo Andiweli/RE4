@@ -256,7 +256,7 @@ void str_ax_voice_loop_to_end(SND_STR* str)
 {
     u32 zero;
 
-    zero = Snd_ctrl_work.aram_base * 2 + 2;
+    zero = Snd_ctrl_work.zero_adrs * 2 + 2;
     str->rno = 3;
     AXSetVoiceLoop(str->ax_voice_l, 0);
     AXSetVoiceLoopAddr(str->ax_voice_l, zero);

@@ -5,7 +5,7 @@
 
 // Audio frame: on a reset request drops all pending requests, releases every AX voice (1 step)
 // and clears the SE controls (reset_flag bit4 = SE side done). Returns 1 while resetting.
-int Snd_se_reset_check(SND_CTRL_WORK* ctrl)
+int Snd_se_reset_check(SND_CTRL* ctrl)
 {
     SND_AXV_WORK* axv;
     int i;
@@ -22,8 +22,8 @@ int Snd_se_reset_check(SND_CTRL_WORK* ctrl)
             }
         }
         ctrl->reset_flag |= 0x10;
-        ctrl->se_state = 0;
-        ctrl->se_ctrl = 0;
+        ctrl->status_flag = 0;
+        ctrl->se_ctrl_flag = 0;
         return 1;
     }
     return 0;
@@ -53,7 +53,7 @@ void Snd_req_work_clear(void)
 // Copies the game's overrides into the request: ovr_flag bit0 priority, 1 pan, 2 span, 3 vol, 4
 // svol, 5 / 6 AUX A / B, 7 LPF, 9 pitch add, 10 pitch offset, 11 se_flag (others -1 = use the
 // SIT / DLS); a play request also draws its random pitch (shared across a chained request).
-void Snd_req_work_copy_para(SND_CTRL_WORK* ctrl, SND_REQ* req)
+void Snd_req_work_copy_para(SND_CTRL* ctrl, SND_REQ* req)
 {
     SND_SIT* sit;
 
@@ -70,7 +70,7 @@ void Snd_req_work_copy_para(SND_CTRL_WORK* ctrl, SND_REQ* req)
     req->pitch = 0;
     req->dop_p = 0;
     req->req_bit = 0;
-    req->flag = ctrl->ovr_flag;
+    req->flag = ctrl->para_flag;
     if (req->flag & 0x1) {
         req->prio = ctrl->prio;
     }
@@ -93,19 +93,19 @@ void Snd_req_work_copy_para(SND_CTRL_WORK* ctrl, SND_REQ* req)
         req->aux_b = ctrl->aux_b;
     }
     if (req->flag & 0x80) {
-        req->lpf = ctrl->lpf_no;
+        req->lpf = ctrl->lpf;
     }
     if (req->flag & 0x200) {
-        req->pitch = ctrl->pitch_add;
+        req->pitch = ctrl->pitch;
     }
     if (req->flag & 0x400) {
-        req->dop_p = ctrl->pitch_ofs;
+        req->dop_p = ctrl->dop_p;
     }
     if (req->flag & 0x800) {
-        req->req_bit = ctrl->se_flag;
+        req->req_bit = ctrl->req_bit;
     }
     if (req->use_type != 4) {
-        if (ctrl->multi_req == 1) {
+        if (ctrl->IsLink == 1) {
             req->rnd_pitch = ctrl->rnd_pitch;
         } else {
             req->rnd_pitch = Snd_get_rnd_pitch(sit);
@@ -116,7 +116,7 @@ void Snd_req_work_copy_para(SND_CTRL_WORK* ctrl, SND_REQ* req)
 // A free slot in the game-side request bank, NULL when full or during a reset.
 SND_REQ* Snd_open_req_work(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     SND_REQ* req;
     int i;
 
@@ -124,7 +124,7 @@ SND_REQ* Snd_open_req_work(void)
         return NULL;
     }
     for (i = 0; i < SND_REQ_MAX; i++) {
-        req = &Snd_req_work[ctrl->req_bank][i];
+        req = &Snd_req_work[ctrl->req_push_idx][i];
         if (req->be_flag == 0) {
             return req;
         }
@@ -135,7 +135,7 @@ SND_REQ* Snd_open_req_work(void)
 // A pending play request (type mask 1 SE / 2 sequence) with sound id `snd_id`, or NULL.
 SND_REQ* Snd_search_req_work_snd_id(u32 snd_id, u8 type)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     SND_REQ* req;
     int i;
     int j;

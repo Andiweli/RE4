@@ -10,7 +10,8 @@
 
 class Event;
 class cLightTool;
-struct DbSctrlWork;
+struct _DB_SCTRL;
+typedef struct _DB_SCTRL DB_SCTRL;
 
 struct DatFog {
     HERMITE_1_FIX ScurveStart;    // 0x000
@@ -106,7 +107,7 @@ private:
     JOY* pJoy2;           // 0xA0  &Joy[1] (&Joy[3])
     DatFog DatFogWk;       // 0xA4
     DatFocus DatFocusWk;   // 0x8AC
-    DbSctrlWork* PDatDbSctrl;  // 0x10BC  (1,000,000 bytes)
+    DB_SCTRL* PDatDbSctrl;  // 0x10BC  (1,000,000 bytes)
 public:
     u32 x10C0[8];         // 0x10C0
     u8 pad_10E0[0x28];

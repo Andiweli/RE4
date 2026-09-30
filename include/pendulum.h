@@ -40,21 +40,21 @@ struct CLOTH_INFO {
 };
 
 // One collision volume in world space (penClothAtMake), 0x84 bytes.
-struct PenAt {
-    int type;            // 0x00  0 sphere, 1 cylinder
-    Mtx mat;             // 0x04  cylinder space -> world
-    Mtx inv;             // 0x34  world -> cylinder space
-    Vec p0;              // 0x64  sphere centre / cylinder start
-    Vec p1;              // 0x70  cylinder end
-    f32 r;               // 0x7C  radius
-    f32 len;             // 0x80  cylinder length
+struct CLOTH_AT_DATA {
+    int Type;            // 0x00  0 sphere, 1 cylinder
+    Mtx m;             // 0x04  cylinder space -> world
+    Mtx im;             // 0x34  world -> cylinder space
+    Vec Pos;              // 0x64  sphere centre / cylinder start
+    Vec Pos2;              // 0x70  cylinder end
+    f32 R;               // 0x7C  radius
+    f32 Len;             // 0x80  cylinder length
 };
 
 // Collision volume list built per frame in the locked cache (0xE0000000).
 struct PenAtWork {
     int num;             // 0x00
-    PenAt* pAt;          // 0x04
-    PenAt at[1];         // 0x08
+    CLOTH_AT_DATA* pAt;          // 0x04
+    CLOTH_AT_DATA at[1];         // 0x08
 };
 
 // Wind of the pendulum system (PenWindSet; light.cpp cPenWind::set)

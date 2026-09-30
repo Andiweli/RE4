@@ -113,46 +113,46 @@ int Snd_se_fade_out_all2(s16 time)
 // block type, 0x20 volume down to `para`, 0x40 volume back. Refused (1) during a reset.
 int se_ctrl_sub(u16 cmd, s16 para)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
     if (ctrl->reset_flag & 0x10) {
         return 1;
     }
     switch (cmd) {
     case 0x200:
-        ctrl->se_ctrl |= 0x200;
-        ctrl->se_fade_time = para;
+        ctrl->se_ctrl_flag |= 0x200;
+        ctrl->se_fout_time = para;
         break;
     case 0x400:
-        ctrl->se_ctrl |= 0x400;
-        ctrl->se_fade_time = para;
+        ctrl->se_ctrl_flag |= 0x400;
+        ctrl->se_fout_time = para;
         break;
     case 0x1:
-        ctrl->se_ctrl |= 0x1;
-        ctrl->se_state |= 0x1;
+        ctrl->se_ctrl_flag |= 0x1;
+        ctrl->status_flag |= 0x1;
         break;
     case 0x2:
-        ctrl->se_ctrl |= 0x2;
-        ctrl->se_pause_type = para;
+        ctrl->se_ctrl_flag |= 0x2;
+        ctrl->pause_blk = para;
         break;
     case 0x4:
-        ctrl->se_ctrl |= 0x4;
-        ctrl->se_pause_type = para;
+        ctrl->se_ctrl_flag |= 0x4;
+        ctrl->pause_blk = para;
         break;
     case 0x8:
-        ctrl->se_ctrl |= 0x8;
+        ctrl->se_ctrl_flag |= 0x8;
         break;
     case 0x10:
-        ctrl->se_ctrl |= 0x10;
-        ctrl->se_pause_type = para;
+        ctrl->se_ctrl_flag |= 0x10;
+        ctrl->pause_blk = para;
         break;
     case 0x20:
-        ctrl->se_ctrl |= 0x20;
-        ctrl->se_state |= 0x2;
-        ctrl->se_vdown_vol = para;
+        ctrl->se_ctrl_flag |= 0x20;
+        ctrl->status_flag |= 0x2;
+        ctrl->vdown_value = para;
         break;
     case 0x40:
-        ctrl->se_ctrl |= 0x40;
+        ctrl->se_ctrl_flag |= 0x40;
         break;
     }
     return 0;
@@ -161,15 +161,15 @@ int se_ctrl_sub(u16 cmd, s16 para)
 // Non-zero while any SE is queued (0x10) or any AX voice is sounding (1).
 int Snd_se_pronounce_ck_all(void)
 {
-    SND_CTRL_WORK* ctrl;
+    SND_CTRL* ctrl;
     int old;
     int ret;
 
     old = OSDisableInterrupts();
     ctrl = &Snd_ctrl_work;
     ret = 0;
-    ret |= se_pro_ck_req_work(ctrl->req_bank);
-    ret |= se_pro_ck_req_work(ctrl->req_bank_sub);
+    ret |= se_pro_ck_req_work(ctrl->req_push_idx);
+    ret |= se_pro_ck_req_work(ctrl->req_exec_idx);
     OSRestoreInterrupts(old);
     old = OSDisableInterrupts();
     ret |= se_pro_ck_axv_work();

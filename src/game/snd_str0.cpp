@@ -21,7 +21,7 @@ u32 Snd_str_prepare(u16 blk_no, u16 req_no, char* name, s8 no)
 // the header, 8 ARAM blocks (a stream that fits entirely is "short"), and acquires the AX voices.
 u32 Snd_str_init(SND_SHD* shd, SND_RIT* rit, u32 aram, char* name, s8 no)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     SND_STR* str;
     s8 idx;
 
@@ -35,11 +35,11 @@ u32 Snd_str_init(SND_SHD* shd, SND_RIT* rit, u32 aram, char* name, s8 no)
         return 0;
     }
     DVDOpen(name, &str->info);
-    ctrl->req_id++;
-    if (ctrl->req_id == 0) {
-        ctrl->req_id++;
+    ctrl->snd_id++;
+    if (ctrl->snd_id == 0) {
+        ctrl->snd_id++;
     }
-    str->snd_id = ctrl->req_id;
+    str->snd_id = ctrl->snd_id;
     if (rit->flag & 0x1) {
         str->str_type = 2;
     } else {

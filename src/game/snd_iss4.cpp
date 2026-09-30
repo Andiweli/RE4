@@ -154,18 +154,18 @@ void Snd_axv_work_choice_now_vol(SND_AXV_WORK* axv)
 // Volume-down volumes = source volumes scaled by se_vdown_vol / 127.
 void Snd_axv_work_calc_vdown_vol(SND_AXV_WORK* axv)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
-    axv->vdown_vol = axv->vdown_src_vol / 127 * ctrl->se_vdown_vol;
-    axv->vdown_svol = axv->vdown_src_svol / 127 * ctrl->se_vdown_vol;
+    axv->vdown_vol = axv->vdown_src_vol / 127 * ctrl->vdown_value;
+    axv->vdown_svol = axv->vdown_src_svol / 127 * ctrl->vdown_value;
 }
 
 // AX attenuation from system SE volume x master x the voice volume x the envelope (8.8 fixed).
 void Snd_axv_work_calc_ax_vol(SND_AXV_WORK* axv)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
-    axv->calc_vol = ctrl->sys_vol[1] / 127 * (ctrl->sys_vol[3] >> 8);
+    axv->calc_vol = ctrl->vol_mas_se / 127 * (ctrl->vol_iss_se >> 8);
     axv->calc_vol = axv->calc_vol / 127 * (axv->now_vol >> 8);
     axv->calc_vol = axv->calc_vol / 127 * (axv->env_vol >> 8);
     axv->ax_vol = Snd_vol_syn_to_ax((s16) (axv->calc_vol >> 8));

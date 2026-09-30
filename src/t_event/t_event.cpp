@@ -357,7 +357,7 @@ ToolEvt::ToolEvt()
     DbgFlagOn(pG, DBG_EVENT_TOOL);
     PFil = Debug_alloc(8000000, 1);
     memclr_asm(PFil, 4);
-    PDatDbSctrl = (DbSctrlWork*) Debug_alloc(1000000, 1);
+    PDatDbSctrl = (DB_SCTRL*) Debug_alloc(1000000, 1);
     memclr_asm(PDatDbSctrl, 1000000);
     PMesDat = (EventMessageData*) Debug_alloc(1000000, 1);
     memclr_asm(PMesDat, 1000000);
@@ -1341,19 +1341,19 @@ void ToolEvt::SubToolIn(ToolEvt* t, int sw, int bit)
 // grid lock 1), cursor on the first key.
 void ToolEvt::SctrlToolInit(ToolEvt* t, HERMITE_1_PTR* curve, f32 xMax, f32 yMax)
 {
-    memset(t->PDatDbSctrl, 0, sizeof(DbSctrlWork));
-    t->PDatDbSctrl->curve = curve;
+    memset(t->PDatDbSctrl, 0, sizeof(DB_SCTRL));
+    t->PDatDbSctrl->pScurve = curve;
     SctrlSetAxisLabel(t->PDatDbSctrl, "Frame", "Param");
-    t->PDatDbSctrl->gridX = xMax;
-    t->PDatDbSctrl->gridY = yMax;
-    t->PDatDbSctrl->grid.x = 1.0f;
-    t->PDatDbSctrl->grid.y = 1.0f;
-    t->PDatDbSctrl->flags = 1;
+    t->PDatDbSctrl->grid_disp_X = xMax;
+    t->PDatDbSctrl->grid_disp_Y = yMax;
+    t->PDatDbSctrl->Grid.x = 1.0f;
+    t->PDatDbSctrl->Grid.y = 1.0f;
+    t->PDatDbSctrl->Graph_flag = 1;
     SctrlInitAxisRange(t->PDatDbSctrl, xMax * 1.2f, xMax * -0.2f, yMax * 1.2f, yMax * -0.2f);
-    if (t->PDatDbSctrl->curve->nPoint <= 1) {
+    if (t->PDatDbSctrl->pScurve->nPoint <= 1) {
         SctrlInitCursor(t->PDatDbSctrl, 0.0f, 0.0f);
     } else {
-        SctrlInitCursor(t->PDatDbSctrl, t->PDatDbSctrl->curve->Point[0].T, t->PDatDbSctrl->curve->Point[0].Q);
+        SctrlInitCursor(t->PDatDbSctrl, t->PDatDbSctrl->pScurve->Point[0].T, t->PDatDbSctrl->pScurve->Point[0].Q);
     }
 }
 

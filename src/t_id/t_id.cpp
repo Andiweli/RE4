@@ -69,10 +69,10 @@ static ID_DATA idData[ID_DATA_NUM];
 static ID_DATA idClip[ID_CLIP_NUM];
 IDSystem toolIdSys;
 static DbPathWork idPath;
-static DbSctrlWork idSctrl0;
-static DbSctrlWork idSctrl1;
-static DbSctrlWork idSctrl2;
-static DbSctrlWork idSctrl3;
+static DB_SCTRL idSctrl0;
+static DB_SCTRL idSctrl1;
+static DB_SCTRL idSctrl2;
+static DB_SCTRL idSctrl3;
 static IdRandomWork idRandom;
 void* pIdBuf0;
 void* pIdBuf1;
@@ -99,8 +99,8 @@ void toolIdInit(IdTool* w)
     IdDebugAllocBuffer();
     memclr_asm(w, sizeof(IdTool));
     memclr_asm(&idPath, sizeof(DbPathWork));
-    memclr_asm(&idSctrl0, sizeof(DbSctrlWork));
-    memclr_asm(&idSctrl1, sizeof(DbSctrlWork));
+    memclr_asm(&idSctrl0, sizeof(DB_SCTRL));
+    memclr_asm(&idSctrl1, sizeof(DB_SCTRL));
     TaskSuspend(0);
     col.b = 0x30;
     col.g = 0x30;
@@ -1344,14 +1344,14 @@ int idEditPos(IdTool* w, int x, int y)
                     break;
                 }
                 w->pSctrl = &idSctrl0;
-                idSctrl0.curve = (HERMITE_1_PTR*) &d->curve0;
+                idSctrl0.pScurve = (HERMITE_1_PTR*) &d->curve0;
                 SctrlSetAxisLabel(w->pSctrl, "Frame", "Param");
-                w->pSctrl->gridX = 15.0f;
-                w->pSctrl->gridY = 0.5f;
-                w->pSctrl->grid.x = 1.0f;
-                w->pSctrl->grid.y = 0.01f;
-                w->pSctrl->flags = 3;
-                if (w->pSctrl->curve->nPoint <= 1) {
+                w->pSctrl->grid_disp_X = 15.0f;
+                w->pSctrl->grid_disp_Y = 0.5f;
+                w->pSctrl->Grid.x = 1.0f;
+                w->pSctrl->Grid.y = 0.01f;
+                w->pSctrl->Graph_flag = 3;
+                if (w->pSctrl->pScurve->nPoint <= 1) {
                     f32 xr = 90.0f;
                     f32 n = (f32) (w->pPath->path->nPoint - 1);
 
@@ -1359,7 +1359,7 @@ int idEditPos(IdTool* w, int x, int y)
                     SctrlInitCursor(w->pSctrl, 0.0f, 0.0f);
                 } else {
                     SctrlAdjustAxisRange(w->pSctrl);
-                    SctrlInitCursor(w->pSctrl, w->pSctrl->curve->Point[0].T, w->pSctrl->curve->Point[0].Q);
+                    SctrlInitCursor(w->pSctrl, w->pSctrl->pScurve->Point[0].T, w->pSctrl->pScurve->Point[0].Q);
                 }
                 w->subStep++;
                 break;
@@ -1622,14 +1622,14 @@ int idEditSize(IdTool* w, int x, int y)
             switch (w->subStep) {
             case 0:
                 w->pSctrl = &idSctrl1;
-                idSctrl1.curve = (HERMITE_1_PTR*) &d->curve1;
+                idSctrl1.pScurve = (HERMITE_1_PTR*) &d->curve1;
                 SctrlSetAxisLabel(w->pSctrl, "Frame", "Scale");
-                w->pSctrl->gridX = 15.0f;
-                w->pSctrl->gridY = 0.5f;
-                w->pSctrl->grid.x = 1.0f;
-                w->pSctrl->grid.y = 0.01f;
-                w->pSctrl->flags = 3;
-                if (w->pSctrl->curve->nPoint <= 1) {
+                w->pSctrl->grid_disp_X = 15.0f;
+                w->pSctrl->grid_disp_Y = 0.5f;
+                w->pSctrl->Grid.x = 1.0f;
+                w->pSctrl->Grid.y = 0.01f;
+                w->pSctrl->Graph_flag = 3;
+                if (w->pSctrl->pScurve->nPoint <= 1) {
                     f32 xr = 90.0f;
                 f32 yr = 2.0f;
 
@@ -1637,7 +1637,7 @@ int idEditSize(IdTool* w, int x, int y)
                     SctrlInitCursor(w->pSctrl, 0.0f, 0.0f);
                 } else {
                     SctrlAdjustAxisRange(w->pSctrl);
-                    SctrlInitCursor(w->pSctrl, w->pSctrl->curve->Point[0].T, w->pSctrl->curve->Point[0].Q);
+                    SctrlInitCursor(w->pSctrl, w->pSctrl->pScurve->Point[0].T, w->pSctrl->pScurve->Point[0].Q);
                 }
                 w->subStep++;
                 break;
@@ -1894,14 +1894,14 @@ int idEditColor(IdTool* w, int x, int y)
         switch (w->subStep) {
         case 0:
             w->pSctrl = &idSctrl2;
-            idSctrl2.curve = (HERMITE_1_PTR*) &d->curve2;
+            idSctrl2.pScurve = (HERMITE_1_PTR*) &d->curve2;
             SctrlSetAxisLabel(w->pSctrl, "Frame", "Color");
-            w->pSctrl->gridX = 15.0f;
-            w->pSctrl->gridY = 50.0f;
-            w->pSctrl->grid.x = 1.0f;
-            w->pSctrl->grid.y = 1.0f;
-            w->pSctrl->flags = 3;
-            if (w->pSctrl->curve->nPoint <= 1) {
+            w->pSctrl->grid_disp_X = 15.0f;
+            w->pSctrl->grid_disp_Y = 50.0f;
+            w->pSctrl->Grid.x = 1.0f;
+            w->pSctrl->Grid.y = 1.0f;
+            w->pSctrl->Graph_flag = 3;
+            if (w->pSctrl->pScurve->nPoint <= 1) {
                 f32 xr = 90.0f;
                 f32 yr = 256.0f;
 
@@ -1909,7 +1909,7 @@ int idEditColor(IdTool* w, int x, int y)
                 SctrlInitCursor(w->pSctrl, 0.0f, 0.0f);
             } else {
                 SctrlAdjustAxisRange(w->pSctrl);
-                SctrlInitCursor(w->pSctrl, w->pSctrl->curve->Point[0].T, w->pSctrl->curve->Point[0].Q);
+                SctrlInitCursor(w->pSctrl, w->pSctrl->pScurve->Point[0].T, w->pSctrl->pScurve->Point[0].Q);
             }
             w->subStep++;
             break;
@@ -2100,14 +2100,14 @@ int idEditRot(IdTool* w, int x, int y)
         switch (w->subStep) {
         case 0:
             w->pSctrl = &idSctrl3;
-            idSctrl3.curve = (HERMITE_1_PTR*) &d->curve3;
+            idSctrl3.pScurve = (HERMITE_1_PTR*) &d->curve3;
             SctrlSetAxisLabel(w->pSctrl, "Frame", "Degree");
-            w->pSctrl->gridX = 15.0f;
-            w->pSctrl->gridY = 45.0f;
-            w->pSctrl->grid.x = 1.0f;
-            w->pSctrl->grid.y = 1.0f;
-            w->pSctrl->flags = 3;
-            if (w->pSctrl->curve->nPoint <= 1) {
+            w->pSctrl->grid_disp_X = 15.0f;
+            w->pSctrl->grid_disp_Y = 45.0f;
+            w->pSctrl->Grid.x = 1.0f;
+            w->pSctrl->Grid.y = 1.0f;
+            w->pSctrl->Graph_flag = 3;
+            if (w->pSctrl->pScurve->nPoint <= 1) {
                 f32 xr = 90.0f;
                 f32 yr = 360.0f;
 
@@ -2115,7 +2115,7 @@ int idEditRot(IdTool* w, int x, int y)
                 SctrlInitCursor(w->pSctrl, 0.0f, 0.0f);
             } else {
                 SctrlAdjustAxisRange(w->pSctrl);
-                SctrlInitCursor(w->pSctrl, w->pSctrl->curve->Point[0].T, w->pSctrl->curve->Point[0].Q);
+                SctrlInitCursor(w->pSctrl, w->pSctrl->pScurve->Point[0].T, w->pSctrl->pScurve->Point[0].Q);
             }
             w->subStep++;
             break;

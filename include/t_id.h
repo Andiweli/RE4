@@ -115,7 +115,7 @@ struct IdTool {
     u8 dispTop;         // 0x60  edit list drawn at the top rows
     u8 pad_61[3];
     DbPathWork* pPath;  // 0x64
-    DbSctrlWork* pSctrl;  // 0x68
+    DB_SCTRL* pSctrl;  // 0x68
     IdRandomWork* pRandom;  // 0x6C
     CAMERA camSave;     // 0x70 .. 0x168
     s8 colCur;          // 0x168

@@ -9,7 +9,7 @@ typedef void (*SND_STR_PLAYER)(SND_STR*);
 // A driver reset flags every stream for cancel.
 void Snd_stream_player(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     SND_STR* str;
     u32 i;
     static SND_STR_PLAYER str_player_tbl[] = {
@@ -17,8 +17,8 @@ void Snd_stream_player(void)
         str_player_idle,   str_player_error, str_abort_init,    str_abort_wait,
     };
 
-    if (ctrl->dvd_err != -1) {
-        ctrl->dvd_err = 0;
+    if (ctrl->dvd_err_flag != -1) {
+        ctrl->dvd_err_flag = 0;
     }
     if (ctrl->reset_flag & 0x1) {
         ctrl->reset_flag |= 0x20;

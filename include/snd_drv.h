@@ -111,28 +111,34 @@ struct WTFILEHEADER {
 };
 
 // Main control work (Snd_ctrl_work, 0xB4 bytes).
-typedef struct {
-    u32 frame;              // 0x00  audio frame counter
-    u32 sound_mode;         // 0x04  0 mono, 1 stereo, 2 DPL2
-    u32 req_id;             // 0x08  last issued sound id (never 0)
-    u32 aram_base;          // 0x0C
-    u32 aram_free;          // 0x10
-    s32 dvd_err;            // 0x14  last DVD error status (-1 = none)
-    s32 req_bank;           // 0x18  Snd_req_work bank in use
-    s32 req_bank_sub;       // 0x1C  the other Snd_req_work bank
-    u16 rnd;                // 0x20  random seed
+struct SND_CTRL {
+    u32 audio_frame;              // 0x00  audio frame counter
+    u32 snd_mode;         // 0x04  0 mono, 1 stereo, 2 DPL2
+    u32 snd_id;             // 0x08  last issued sound id (never 0)
+    u32 zero_adrs;          // 0x0C
+    u32 aram_adrs;          // 0x10
+    s32 dvd_err_flag;            // 0x14  last DVD error status (-1 = none)
+    s32 req_push_idx;           // 0x18  Snd_req_work bank in use
+    s32 req_exec_idx;       // 0x1C  the other Snd_req_work bank
+    u16 random;                // 0x20  random seed
     u16 reset_flag;         // 0x22  0x1 soft reset requested, 0x10 done
-    u16 se_state;           // 0x24  0x1 paused, 0x2 volume down
-    u16 se_ctrl;            // 0x26  pending SE commands (se_ctrl_sub): 0x80 reset pan, 0x100 reset vol
-    s16 se_fade_time;       // 0x28
-    s16 se_vdown_vol;       // 0x2A
-    u8 srd_type;            // 0x2C  surround type of the request being issued
+    u16 status_flag;           // 0x24  0x1 paused, 0x2 volume down
+    u16 se_ctrl_flag;            // 0x26  pending SE commands (se_ctrl_sub): 0x80 reset pan, 0x100 reset vol
+    s16 se_fout_time;       // 0x28
+    s16 vdown_value;       // 0x2A
+    u8 now_srd_type;            // 0x2C  surround type of the request being issued
     u8 pad_2D[1];
     u16 rnd_pitch;          // 0x2E
-    s32 multi_req;          // 0x30  set while issuing a chained (0x2000) request
-    s16 se_pause_type;      // 0x34  block number to pause, -1 = all
-    u8 pad_36[6];
-    s16 sys_vol[6];         // 0x3C  system volumes (<< 8), bit 1..0x20 selects
+    s32 IsLink;          // 0x30  set while issuing a chained (0x2000) request
+    s16 pause_blk;      // 0x34  block number to pause, -1 = all
+    s16 pause_no;           // 0x36
+    u32 pause_id;           // 0x38
+    s16 vol_mas_bgm;   // 0x3C  system volumes (<< 8), selected by bit 1..0x20 in order
+    s16 vol_mas_se;    // 0x3E  system volume (<< 8)
+    s16 vol_iss_bgm;   // 0x40  system volume (<< 8)
+    s16 vol_iss_se;    // 0x42  system volume (<< 8)
+    s16 vol_str_bgm;   // 0x44  system volume (<< 8)
+    s16 vol_str_se;    // 0x46  system volume (<< 8)
     u8 prio;                // 0x48  request override parameters, copied into SND_REQ when the ovr_flag bit is set: priority (0x1)
     u8 pan;                 // 0x49  (0x2) from the camera angle
     u8 span;                // 0x4A  (0x4)
@@ -140,38 +146,38 @@ typedef struct {
     u8 svol;                // 0x4C  (0x10)
     u8 aux_a;               // 0x4D  (0x20) area AUX send
     u8 aux_b;               // 0x4E  (0x40)
-    u8 lpf_no;              // 0x4F  (0x80) distance filter
-    u8 srd_type_ovr;        // 0x50  surround type override (ovr_flag & 0x100): 1 = positioned
+    u8 lpf;              // 0x4F  (0x80) distance filter
+    u8 srd_type;        // 0x50  surround type override (ovr_flag & 0x100): 1 = positioned
     u8 pad_51[1];
-    u16 pitch_add;          // 0x52  (0x200) cents added to the base pitch
-    u16 pitch_ofs;          // 0x54  (0x400) distance pitch offset
-    u16 se_flag;            // 0x56  (0x800) SND_AXV_WORK::flag bits
-    u16 ovr_flag;           // 0x58  which override parameters are valid
+    u16 pitch;          // 0x52  (0x200) cents added to the base pitch
+    u16 dop_p;          // 0x54  (0x400) distance pitch offset
+    u16 req_bit;            // 0x56  (0x800) SND_AXV_WORK::flag bits
+    u16 para_flag;           // 0x58  which override parameters are valid
     u8 pad_5A[2];
-    u32 seq_tick;           // 0x5C  sequencer clock (1/1000 ms units, wraps at 999000)
-    u32 seq_msec;           // 0x60  milliseconds elapsed this audio frame
-    u8 midi_msg[3];         // 0x64  MIDI event being decoded (snd_seq1/snd_seq2)
+    u32 seq_adjust;           // 0x5C  sequencer clock (1/1000 ms units, wraps at 999000)
+    u32 seq_proc;           // 0x60  milliseconds elapsed this audio frame
+    u8 seq_data[3];         // 0x64  MIDI event being decoded (snd_seq1/snd_seq2)
     u8 pad_67[1];
-    u8 midi_type;           // 0x68  status & 0xF0
-    u8 midi_ch;             // 0x69  status & 0x0F
+    u8 code;           // 0x68  status & 0xF0
+    u8 track;             // 0x69  status & 0x0F
     u8 pad_6A[2];
-    s32 efx_err;            // 0x6C
-    u32 dsp_cycles_max;     // 0x70
-    u32 dsp_cycles_peak;    // 0x74
-    u32 dsp_cycles;         // 0x78
-    u16 voice_peak;         // 0x7C
-    u16 voice_num;          // 0x7E
-    u16 axv_peak;           // 0x80
-    u16 axv_num;            // 0x82
-    u16 str_peak;           // 0x84
-    u16 str_num;            // 0x86
-    u16 seq_peak;           // 0x88
-    u16 seq_num;            // 0x8A
-    u16 total_peak;         // 0x8C
-    u16 total_num;          // 0x8E
-    ARQRequest arq;         // 0x90
-    volatile s32 dma_busy;  // 0xB0 (snd_test cb_dma_end/aram_dump_dma address the field through the struct base)
-} SND_CTRL_WORK;
+    u32 efx_mem;            // 0x6C
+    u32 dsp_cyc;     // 0x70
+    u32 max_cyc;    // 0x74
+    u32 now_cyc;         // 0x78
+    u16 max_voice;         // 0x7C
+    u16 now_voice;          // 0x7E
+    u16 max_axv_vo;           // 0x80
+    u16 now_axv_vo;            // 0x82
+    u16 max_str_vo;           // 0x84
+    u16 now_str_vo;            // 0x86
+    u16 max_syn_vo;           // 0x88
+    u16 now_syn_vo;            // 0x8A
+    u16 max_total_vo;         // 0x8C
+    u16 now_total_vo;          // 0x8E
+    ARQRequest arq_req;         // 0x90
+    volatile s32 arq_flag;  // 0xB0 (snd_test cb_dma_end/aram_dump_dma address the field through the struct base)
+};
 
 // Sound request (Snd_req_work[2][64], 0x2C bytes).
 struct SND_REQ {
@@ -443,20 +449,20 @@ typedef struct {
 
 // AUX effect slot (Snd_efx_work[2], 0x278 bytes).
 typedef void (*SND_AUX_CB)(void*, void*);
-typedef struct {
-    u16 status;     // 0x00  0x1 running, 0x2 stopping (buffers being cleared)
-    s16 aux;        // 0x02  0 = AUX A, 1 = AUX B
-    s16 type;       // 0x04  1 reverb hi, 2 reverb std, 3 chorus, 4 delay, 5 reverb hi DPL2, 6 stop, 7 error
-    u8 pad_6[2];
-    s32 err;        // 0x08
+struct SND_EFX {
+    u16 be_flag;   // 0x00  0x1 running, 0x2 stopping (buffers being cleared)
+    s16 work_id;   // 0x02  0 = AUX A, 1 = AUX B
+    s16 efx_type;  // 0x04  1 reverb hi, 2 reverb std, 3 chorus, 4 delay, 5 reverb hi DPL2, 6 stop, 7 error
+    u8 dummy[2];
+    u32 efx_mem;   // 0x08  PS2 records the effect's memory use here; GC only clears it
     union {
-        AXFX_REVERBHI hi;
-        AXFX_REVERBSTD std;
+        AXFX_REVERBHI rev_hi;
+        AXFX_REVERBSTD rev_std;
         AXFX_CHORUS chorus;
         AXFX_DELAY delay;
-        AXFX_REVERBHI_DPL2 dpl2;
-    } fx;           // 0x0C
-} SND_EFX_WORK;
+        AXFX_REVERBHI_DPL2 rev_dpl2;
+    };              // 0x0C
+};
 
 // Random number state (Snd_rnd): the word and its two bytes.
 typedef union {
@@ -472,8 +478,8 @@ typedef struct {
 } SND_LPF;
 
 // snd_ram.c
-extern SND_CTRL_WORK Snd_ctrl_work;
-extern SND_EFX_WORK Snd_efx_work[2];
+extern SND_CTRL Snd_ctrl_work;
+extern SND_EFX Snd_efx_work[2];
 extern SND_REQ Snd_req_work[SND_REQ_BANK_MAX][SND_REQ_MAX];
 extern SND_VOICE Snd_voice_work[SND_VOICE_MAX];
 extern SND_AXV_WORK Snd_axv_work[SND_AXV_MAX];
@@ -564,9 +570,9 @@ SND_VOICE* Snd_search_voice_work_snd_id(u32 snd_id);
 SND_VOICE* Snd_search_voice_work_seq(SND_SEQ* seq, u8 ch, u8 note);
 
 // snd_sub2.c
-int Snd_se_reset_check(SND_CTRL_WORK* ctrl);
+int Snd_se_reset_check(SND_CTRL* ctrl);
 void Snd_req_work_clear(void);
-void Snd_req_work_copy_para(SND_CTRL_WORK* ctrl, SND_REQ* req);
+void Snd_req_work_copy_para(SND_CTRL* ctrl, SND_REQ* req);
 SND_REQ* Snd_open_req_work(void);
 SND_REQ* Snd_search_req_work_snd_id(u32 snd_id, u8 type);
 
@@ -594,16 +600,16 @@ void Snd_sound_mode_init(void);
 u32 Snd_sound_mode_init_load(u32 mode);
 u32 Snd_get_sound_mode(void);
 void Snd_set_sound_mode(u32 mode);
-void snd_mode_set_ax_mix(SND_CTRL_WORK* ctrl);
+void snd_mode_set_ax_mix(SND_CTRL* ctrl);
 void Snd_iss_control(void);
 void Snd_dev_voice_ck(void);
 
 // snd_iss0.c
 int Snd_iss_req_para(u16 blk_no, u16 req_no, u8* para);
 int req_iss_main(u16 blk_no, u16 req_no, u8* para);
-void req_set_srd_type(SND_CTRL_WORK* ctrl, SND_SIT* sit, u8* para);
-int req_iss_one(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no);
-int req_iss_one_sub(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no);
+void req_set_srd_type(SND_CTRL* ctrl, SND_SIT* sit, u8* para);
+int req_iss_one(SND_CTRL* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no);
+int req_iss_one_sub(SND_CTRL* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no);
 int Snd_get_play_type(u32 snd_id);
 
 // snd_iss1.c
@@ -624,18 +630,18 @@ int Snd_se_pause_off2(s16 type);
 
 // snd_iss2.c
 void Snd_iss_manager(void);
-void se_ctrl_execute(SND_CTRL_WORK* ctrl);
-void se_ctrl_fade_out(SND_CTRL_WORK* ctrl, int mode);
-void se_ctrl_pause_on(SND_CTRL_WORK* ctrl);
-void se_ctrl_pause_on2(SND_CTRL_WORK* ctrl);
-void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL_WORK* ctrl);
-void se_ctrl_pause_off(SND_CTRL_WORK* ctrl);
-void se_ctrl_pause_off2(SND_CTRL_WORK* ctrl);
+void se_ctrl_execute(SND_CTRL* ctrl);
+void se_ctrl_fade_out(SND_CTRL* ctrl, int mode);
+void se_ctrl_pause_on(SND_CTRL* ctrl);
+void se_ctrl_pause_on2(SND_CTRL* ctrl);
+void seCtrlPauseOn_sub(SND_AXV_WORK* axv, SND_CTRL* ctrl);
+void se_ctrl_pause_off(SND_CTRL* ctrl);
+void se_ctrl_pause_off2(SND_CTRL* ctrl);
 void seCtrlPauseOff_sub(SND_AXV_WORK* axv);
-void se_ctrl_vdown_on(SND_CTRL_WORK* ctrl);
-void se_ctrl_vdown_off(SND_CTRL_WORK* ctrl);
-void se_ctrl_reset_pan_or_vol(SND_CTRL_WORK* ctrl, int mode);
-void iss_req_execute(SND_CTRL_WORK* ctrl);
+void se_ctrl_vdown_on(SND_CTRL* ctrl);
+void se_ctrl_vdown_off(SND_CTRL* ctrl);
+void se_ctrl_reset_pan_or_vol(SND_CTRL* ctrl, int mode);
+void iss_req_execute(SND_CTRL* ctrl);
 void iss_req_command(SND_REQ* req);
 void req_cmd_se_stop(SND_REQ* req);
 void req_cmd_se_para(SND_REQ* req);
@@ -681,11 +687,11 @@ void axv_work_update_pitch(SND_AXV_WORK* axv);
 // snd_efx.c
 void Snd_efx_work_clear(void);
 int Snd_efx_req(s16 no, s16 type);
-void efx_req_off(SND_EFX_WORK* efx);
-void efx_req_stop(SND_EFX_WORK* efx);
-int efx_req_set_new(SND_EFX_WORK* efx, s16 type);
-int efx_req_set_update(SND_EFX_WORK* efx, s16 type);
-void efx_buffer_free(SND_EFX_WORK* efx, s16 type);
+void efx_req_off(SND_EFX* efx);
+void efx_req_stop(SND_EFX* efx);
+int efx_req_set_new(SND_EFX* efx, s16 type);
+int efx_req_set_update(SND_EFX* efx, s16 type);
+void efx_buffer_free(SND_EFX* efx, s16 type);
 void cb_efx_clear_bass(AXFX_BUFFERUPDATE* buf, void* context);
 int Snd_efx_get_status(s16 no);
 s16 Snd_efx_get_type(s16 no);
@@ -704,7 +710,7 @@ int seq_pro_ck_seq_work(u8 type);
 
 // snd_seq1.c
 void Snd_midi_sequencer(void);
-void seq_player(SND_CTRL_WORK* ctrl, SND_SEQ* seq);
+void seq_player(SND_CTRL* ctrl, SND_SEQ* seq);
 int seq_reset_check(SND_SEQ* seq);
 void seq_tpr_check(SND_SEQ* seq);
 void seq_req_check(SND_SEQ* seq);
@@ -712,28 +718,28 @@ void seq_req_vol_set(SND_SEQ* seq);
 void seq_req_fade_set(SND_SEQ* seq, s16 time, s16 vol);
 int seq_fade_check(SND_SEQ* seq);
 void seq_fade_new_vol_set(SND_SEQ* seq, s16 step, s16 target);
-void seq_one_msec(SND_CTRL_WORK* ctrl, SND_SEQ* seq);
-void seq_one_msec_main(SND_CTRL_WORK* ctrl, SND_SEQ* seq);
+void seq_one_msec(SND_CTRL* ctrl, SND_SEQ* seq);
+void seq_one_msec_main(SND_CTRL* ctrl, SND_SEQ* seq);
 void seq_play_end(SND_SEQ* seq);
 void seq_play_update(SND_SEQ* seq);
 
 // snd_seq2.c
-void Snd_seq_midi_message(SND_CTRL_WORK* m, SND_SEQ* seq);
-void seq_note_on(SND_CTRL_WORK* m, SND_SEQ* seq);
-void seq_note_off(SND_CTRL_WORK* m, SND_SEQ* seq);
-void seq_prog_change(SND_CTRL_WORK* m, SND_SEQ* seq);
-void seq_ctrl_change(SND_CTRL_WORK* m, SND_SEQ* seq);
-void seq_ctrl_data_entry(SND_CTRL_WORK* m, SND_SEQ* seq);
-void seq_pitch(SND_CTRL_WORK* m, SND_SEQ* seq);
-void seq_event(SND_CTRL_WORK* m, SND_SEQ* seq);
-void seq_drums_flag_ck(SND_CTRL_WORK* m, SND_SEQ* seq);
+void Snd_seq_midi_message(SND_CTRL* m, SND_SEQ* seq);
+void seq_note_on(SND_CTRL* m, SND_SEQ* seq);
+void seq_note_off(SND_CTRL* m, SND_SEQ* seq);
+void seq_prog_change(SND_CTRL* m, SND_SEQ* seq);
+void seq_ctrl_change(SND_CTRL* m, SND_SEQ* seq);
+void seq_ctrl_data_entry(SND_CTRL* m, SND_SEQ* seq);
+void seq_pitch(SND_CTRL* m, SND_SEQ* seq);
+void seq_event(SND_CTRL* m, SND_SEQ* seq);
+void seq_drums_flag_ck(SND_CTRL* m, SND_SEQ* seq);
 
 // snd_seq3.c
 void Snd_seq_work_clear(void);
 SND_SEQ* Snd_search_seq_work_snd_id(u32 snd_id);
 void Snd_seq_work_close_check(void);
 u32 Snd_seq_get_delta(SND_SEQ* seq);
-void Snd_seq_send_midi(SND_CTRL_WORK* msg, SND_SEQ* seq);
+void Snd_seq_send_midi(SND_CTRL* msg, SND_SEQ* seq);
 void Snd_send_midi(SYNSYNTH* synth, u8 status, u8 data1, u8 data2);
 void Snd_seq_work_calc_ax_vol(SND_SEQ* seq);
 void Snd_iss_new_seq_work(SND_ISS_BLK* blk, SND_SIT* sit, SND_REQ* req);

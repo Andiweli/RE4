@@ -99,42 +99,42 @@ static void (*move_type_tbl[5])(SndTestWork*, TestPara*) = {move_type_num, move_
                                                             move_type_flag, move_type_nop};
 
 static EfxParaF efx_para_rev_hi[6] = {
-    {0.0f, 0.1f, 0.05f, 0.05f, {&Snd_efx_work[0].fx.hi.preDelay, &Snd_efx_work[1].fx.hi.preDelay}},
-    {0.0f, 10.0f, 0.125f, 1.0f, {&Snd_efx_work[0].fx.hi.time, &Snd_efx_work[1].fx.hi.time}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.hi.coloration, &Snd_efx_work[1].fx.hi.coloration}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.hi.damping, &Snd_efx_work[1].fx.hi.damping}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.hi.crosstalk, &Snd_efx_work[1].fx.hi.crosstalk}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.hi.mix, &Snd_efx_work[1].fx.hi.mix}},
+    {0.0f, 0.1f, 0.05f, 0.05f, {&Snd_efx_work[0].rev_hi.preDelay, &Snd_efx_work[1].rev_hi.preDelay}},
+    {0.0f, 10.0f, 0.125f, 1.0f, {&Snd_efx_work[0].rev_hi.time, &Snd_efx_work[1].rev_hi.time}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_hi.coloration, &Snd_efx_work[1].rev_hi.coloration}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_hi.damping, &Snd_efx_work[1].rev_hi.damping}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_hi.crosstalk, &Snd_efx_work[1].rev_hi.crosstalk}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_hi.mix, &Snd_efx_work[1].rev_hi.mix}},
 };
 static EfxParaF efx_para_rev_std[5] = {
-    {0.0f, 0.1f, 0.05f, 0.05f, {&Snd_efx_work[0].fx.std.preDelay, &Snd_efx_work[1].fx.std.preDelay}},
-    {0.0f, 10.0f, 0.125f, 1.0f, {&Snd_efx_work[0].fx.std.time, &Snd_efx_work[1].fx.std.time}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.std.coloration, &Snd_efx_work[1].fx.std.coloration}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.std.damping, &Snd_efx_work[1].fx.std.damping}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.std.mix, &Snd_efx_work[1].fx.std.mix}},
+    {0.0f, 0.1f, 0.05f, 0.05f, {&Snd_efx_work[0].rev_std.preDelay, &Snd_efx_work[1].rev_std.preDelay}},
+    {0.0f, 10.0f, 0.125f, 1.0f, {&Snd_efx_work[0].rev_std.time, &Snd_efx_work[1].rev_std.time}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_std.coloration, &Snd_efx_work[1].rev_std.coloration}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_std.damping, &Snd_efx_work[1].rev_std.damping}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_std.mix, &Snd_efx_work[1].rev_std.mix}},
 };
 static EfxParaU efx_para_chorus[3] = {
-    {5, 15, 1, 5, {&Snd_efx_work[0].fx.chorus.baseDelay, &Snd_efx_work[1].fx.chorus.baseDelay}},
-    {0, 5, 1, 1, {&Snd_efx_work[0].fx.chorus.variation, &Snd_efx_work[1].fx.chorus.variation}},
-    {500, 10000, 1, 1000, {&Snd_efx_work[0].fx.chorus.period, &Snd_efx_work[1].fx.chorus.period}},
+    {5, 15, 1, 5, {&Snd_efx_work[0].chorus.baseDelay, &Snd_efx_work[1].chorus.baseDelay}},
+    {0, 5, 1, 1, {&Snd_efx_work[0].chorus.variation, &Snd_efx_work[1].chorus.variation}},
+    {500, 10000, 1, 1000, {&Snd_efx_work[0].chorus.period, &Snd_efx_work[1].chorus.period}},
 };
 static EfxParaU efx_para_delay[9] = {
-    {10, 5000, 1, 100, {&Snd_efx_work[0].fx.delay.delay[0], &Snd_efx_work[1].fx.delay.delay[0]}},
-    {10, 5000, 1, 100, {&Snd_efx_work[0].fx.delay.delay[1], &Snd_efx_work[1].fx.delay.delay[1]}},
-    {10, 5000, 1, 100, {&Snd_efx_work[0].fx.delay.delay[2], &Snd_efx_work[1].fx.delay.delay[2]}},
-    {0, 100, 1, 10, {&Snd_efx_work[0].fx.delay.feedback[0], &Snd_efx_work[1].fx.delay.feedback[0]}},
-    {0, 100, 1, 10, {&Snd_efx_work[0].fx.delay.feedback[1], &Snd_efx_work[1].fx.delay.feedback[1]}},
-    {0, 100, 1, 10, {&Snd_efx_work[0].fx.delay.feedback[2], &Snd_efx_work[1].fx.delay.feedback[2]}},
-    {0, 100, 1, 10, {&Snd_efx_work[0].fx.delay.output[0], &Snd_efx_work[1].fx.delay.output[0]}},
-    {0, 100, 1, 10, {&Snd_efx_work[0].fx.delay.output[1], &Snd_efx_work[1].fx.delay.output[1]}},
-    {0, 100, 1, 10, {&Snd_efx_work[0].fx.delay.output[2], &Snd_efx_work[1].fx.delay.output[2]}},
+    {10, 5000, 1, 100, {&Snd_efx_work[0].delay.delay[0], &Snd_efx_work[1].delay.delay[0]}},
+    {10, 5000, 1, 100, {&Snd_efx_work[0].delay.delay[1], &Snd_efx_work[1].delay.delay[1]}},
+    {10, 5000, 1, 100, {&Snd_efx_work[0].delay.delay[2], &Snd_efx_work[1].delay.delay[2]}},
+    {0, 100, 1, 10, {&Snd_efx_work[0].delay.feedback[0], &Snd_efx_work[1].delay.feedback[0]}},
+    {0, 100, 1, 10, {&Snd_efx_work[0].delay.feedback[1], &Snd_efx_work[1].delay.feedback[1]}},
+    {0, 100, 1, 10, {&Snd_efx_work[0].delay.feedback[2], &Snd_efx_work[1].delay.feedback[2]}},
+    {0, 100, 1, 10, {&Snd_efx_work[0].delay.output[0], &Snd_efx_work[1].delay.output[0]}},
+    {0, 100, 1, 10, {&Snd_efx_work[0].delay.output[1], &Snd_efx_work[1].delay.output[1]}},
+    {0, 100, 1, 10, {&Snd_efx_work[0].delay.output[2], &Snd_efx_work[1].delay.output[2]}},
 };
 static EfxParaF efx_para_rev_dpl2[5] = {
-    {0.0f, 0.1f, 0.05f, 0.05f, {&Snd_efx_work[0].fx.dpl2.preDelay, &Snd_efx_work[1].fx.dpl2.preDelay}},
-    {0.0f, 10.0f, 0.125f, 1.0f, {&Snd_efx_work[0].fx.dpl2.time, &Snd_efx_work[1].fx.dpl2.time}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.dpl2.coloration, &Snd_efx_work[1].fx.dpl2.coloration}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.dpl2.damping, &Snd_efx_work[1].fx.dpl2.damping}},
-    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].fx.dpl2.mix, &Snd_efx_work[1].fx.dpl2.mix}},
+    {0.0f, 0.1f, 0.05f, 0.05f, {&Snd_efx_work[0].rev_dpl2.preDelay, &Snd_efx_work[1].rev_dpl2.preDelay}},
+    {0.0f, 10.0f, 0.125f, 1.0f, {&Snd_efx_work[0].rev_dpl2.time, &Snd_efx_work[1].rev_dpl2.time}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_dpl2.coloration, &Snd_efx_work[1].rev_dpl2.coloration}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_dpl2.damping, &Snd_efx_work[1].rev_dpl2.damping}},
+    {0.0f, 1.0f, 0.125f, 0.25f, {&Snd_efx_work[0].rev_dpl2.mix, &Snd_efx_work[1].rev_dpl2.mix}},
 };
 
 static int test_move_epara_f32(SndTestWork* w);
@@ -144,8 +144,8 @@ static int (*test_move_epara_tbl[6])(SndTestWork*) = {NULL, test_move_epara_f32,
                                                       test_move_epara_u32, test_move_epara_u32, test_move_epara_f32};
 // parameters per effect type
 static s8 test_aux_para_num[6] = {0, 6, 5, 3, 9, 5};
-static s16* vol_ptr_tbl[6] = {&Snd_ctrl_work.sys_vol[0], &Snd_ctrl_work.sys_vol[1], &Snd_ctrl_work.sys_vol[2],
-                              &Snd_ctrl_work.sys_vol[3], &Snd_ctrl_work.sys_vol[4], &Snd_ctrl_work.sys_vol[5]};
+static s16* vol_ptr_tbl[6] = {&Snd_ctrl_work.vol_mas_bgm, &Snd_ctrl_work.vol_mas_se, &Snd_ctrl_work.vol_iss_bgm,
+                              &Snd_ctrl_work.vol_iss_se, &Snd_ctrl_work.vol_str_bgm, &Snd_ctrl_work.vol_str_se};
 
 int Snd_test_mode();
 void test_mode_menu(SndTestWork* w);
@@ -163,8 +163,8 @@ void test_blk_no_select(SndTestWork* w);
 int test_blk_enable_ck(SndTestWork* w, int dir);
 void Snd_test_efx_init(SndTestWork* w);
 int Snd_test_efx_main(SndTestWork* w);
-int test_efx_type_select(SndTestWork* w, SND_EFX_WORK* efx);
-int test_efx_on_or_off(SndTestWork* w, SND_EFX_WORK* efx);
+int test_efx_type_select(SndTestWork* w, SND_EFX* efx);
+int test_efx_on_or_off(SndTestWork* w, SND_EFX* efx);
 int test_aux_para_select(SndTestWork* w);
 void test_tbl_aux_ck(SndTestWork* w);
 int Snd_test_volume(SndTestWork* w);
@@ -190,11 +190,11 @@ void Snd_test_disp_voice(SndTestWork* w);
 void Snd_test_disp_req_para(SndTestWork* w);
 void Snd_test_disp_aux(SndTestWork* w);
 void Snd_test_disp_efx();
-static void test_disp_efx_rev_hi(SndTestWork* w, SND_EFX_WORK* efx, int x, int y);
-static void test_disp_efx_rev_std(SndTestWork* w, SND_EFX_WORK* efx, int x, int y);
-static void test_disp_efx_chorus(SndTestWork* w, SND_EFX_WORK* efx, int x, int y);
-static void test_disp_efx_delay(SndTestWork* w, SND_EFX_WORK* efx, int x, int y);
-static void test_disp_efx_rev_dpl2(SndTestWork* w, SND_EFX_WORK* efx, int x, int y);
+static void test_disp_efx_rev_hi(SndTestWork* w, SND_EFX* efx, int x, int y);
+static void test_disp_efx_rev_std(SndTestWork* w, SND_EFX* efx, int x, int y);
+static void test_disp_efx_chorus(SndTestWork* w, SND_EFX* efx, int x, int y);
+static void test_disp_efx_delay(SndTestWork* w, SND_EFX* efx, int x, int y);
+static void test_disp_efx_rev_dpl2(SndTestWork* w, SND_EFX* efx, int x, int y);
 void Snd_test_disp_vol();
 void Snd_test_load_init(SndTestWork* w);
 void Snd_test_mode_load(SndTestWork* w);
@@ -630,15 +630,15 @@ int test_play_or_stop(SndTestWork* w)
         u32 id;
 
         if (tbl == 0) {
-            SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+            SND_CTRL* ctrl = &Snd_ctrl_work;
             SND_SIT* sit = Snd_get_sit_adrs(blk, w->reqCur);
 
             if (sit->srd_type == 1) {
-                ctrl->srd_type_ovr = 1;
+                ctrl->srd_type = 1;
             } else {
-                ctrl->srd_type_ovr = 0;
+                ctrl->srd_type = 0;
             }
-            ctrl->ovr_flag = 0x100;
+            ctrl->para_flag = 0x100;
             id = Snd_iss_req_para(blk, w->reqCur, NULL);
             if (id) {
                 w->sndId = id;
@@ -742,17 +742,17 @@ int test_blk_enable_ck(SndTestWork* w, int dir)
 // AUX mode entry: reads the slot's current effect type / running state into the work.
 void Snd_test_efx_init(SndTestWork* w)
 {
-    SND_EFX_WORK* efx = &Snd_efx_work[w->aux];
+    SND_EFX* efx = &Snd_efx_work[w->aux];
 
-    if (efx->status & 1) {
+    if (efx->be_flag & 1) {
         w->efxState[w->aux] = 1;
     } else {
         w->efxState[w->aux] = -1;
     }
-    if (efx->type == 6) {
+    if (efx->efx_type == 6) {
         w->efxType[w->aux] = 0;
     } else {
-        w->efxType[w->aux] = efx->type;
+        w->efxType[w->aux] = efx->efx_type;
     }
 }
 
@@ -760,7 +760,7 @@ void Snd_test_efx_init(SndTestWork* w)
 // (float / u32 tables); 1 when the display must refresh.
 int Snd_test_efx_main(SndTestWork* w)
 {
-    SND_EFX_WORK* efx = &Snd_efx_work[w->aux];
+    SND_EFX* efx = &Snd_efx_work[w->aux];
 
     if (test_efx_type_select(w, efx) != 0) {
         return 1;
@@ -783,7 +783,7 @@ int Snd_test_efx_main(SndTestWork* w)
 
 // L cycles the slot's effect type (reverb hi / std, chorus, delay, DPL2 reverb); the effect is
 // stopped for the change.
-int test_efx_type_select(SndTestWork* w, SND_EFX_WORK* efx)
+int test_efx_type_select(SndTestWork* w, SND_EFX* efx)
 {
     if (!(w->trg & 0x40)) {
         return 0;
@@ -802,7 +802,7 @@ int test_efx_type_select(SndTestWork* w, SND_EFX_WORK* efx)
 }
 
 // A starts the effect with the edited parameters, Z stops it.
-int test_efx_on_or_off(SndTestWork* w, SND_EFX_WORK* efx)
+int test_efx_on_or_off(SndTestWork* w, SND_EFX* efx)
 {
     if (w->trg & 0x100) {
         if (w->efxState[w->aux] <= 0) {
@@ -1019,7 +1019,7 @@ void test_tbl_aux_ck(SndTestWork* w)
     *p = v;
 }
 
-// VOL mode: up/down pick one of the six system volumes (Snd_ctrl_work.sys_vol), left/right change
+// VOL mode: up/down pick one of the six system volumes (the six vol_* fields of Snd_ctrl_work), left/right change
 // it; 1 when something changed.
 int Snd_test_volume(SndTestWork* w)
 {
@@ -1291,7 +1291,7 @@ static void snd_test_disp_rit()
     if (str == NULL) {
         str = &Snd_str_work[str_get_player_id()];
     }
-    eprintf(0x18, 0x54, 0, 1, "BE_FLAG : %04XH %02XH", str->be_flag, Snd_ctrl_work.dvd_err);
+    eprintf(0x18, 0x54, 0, 1, "BE_FLAG : %04XH %02XH", str->be_flag, Snd_ctrl_work.dvd_err_flag);
     eprintf(0x18, 0x62, 0, 1, "RNO     : %02X %02X", str->rno, str->rno_sv);
     eprintf(0x18, 0x70, 0, 1, "DVD E/S : %02X %02X %2d", str->err_flag, str->dvd_status, str->dvd_comp);
     eprintf(0x18, 0x7E, 0, 1, "DVD NIE : %2d %2d %2d", str->dvd_req_num, str->dvd_req_idx, str->dvd_end_idx);
@@ -1624,7 +1624,7 @@ void Snd_test_disp_voice(SndTestWork* w)
     int i;
     int j;
 
-    eprintf(0x1C0, 0x134, 0, 1, sound_mode_name[Snd_ctrl_work.sound_mode]);
+    eprintf(0x1C0, 0x134, 0, 1, sound_mode_name[Snd_ctrl_work.snd_mode]);
     for (i = 0; i < 8; i++) {
         // x is a per-row statement; n and y are inner-body expressions (y a reduced giv, n
         // computed in the loop header) and the voice is indexed by n: the address giv's
@@ -1650,15 +1650,15 @@ static char* tbl_name[2] = {"I.S.S.(SIT)", "STREAM(RIT)"};
 void Snd_test_disp_req_para(SndTestWork* unused)
 {
     SndTestWork* w = &Snd_test_work;
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
     eprintf(0x18, 0x142, 0, 1, "TBL    : %s", tbl_name[w->tbl]);
     eprintf(0x18, 0x150, 0, 1, "BLK_NO : %4d / %4d", w->blkNo[w->tbl], w->blkMax[w->tbl] - 1);
     eprintf(0x18, 0x15E, 0, 1, "REQ_NO : %4d / %4d", w->reqCur, w->reqMax[w->tbl] - 1);
-    eprintf(0x18, 0x17A, 0, 1, "MASTER : %4d / %4d", ctrl->sys_vol[0] >> 8, ctrl->sys_vol[1] >> 8);
-    eprintf(0x18, 0x188, 0, 1, "ISS    : %4d / %4d", ctrl->sys_vol[2] >> 8, ctrl->sys_vol[3] >> 8);
-    eprintf(0x18, 0x196, 0, 1, "STR    : %4d / %4d", ctrl->sys_vol[4] >> 8, ctrl->sys_vol[5] >> 8);
-    eprintf(0x18, 0x1A4, 0, 1, "VOICE  : %4d / %4d", ctrl->voice_num, ctrl->voice_peak);
+    eprintf(0x18, 0x17A, 0, 1, "MASTER : %4d / %4d", ctrl->vol_mas_bgm >> 8, ctrl->vol_mas_se >> 8);
+    eprintf(0x18, 0x188, 0, 1, "ISS    : %4d / %4d", ctrl->vol_iss_bgm >> 8, ctrl->vol_iss_se >> 8);
+    eprintf(0x18, 0x196, 0, 1, "STR    : %4d / %4d", ctrl->vol_str_bgm >> 8, ctrl->vol_str_se >> 8);
+    eprintf(0x18, 0x1A4, 0, 1, "VOICE  : %4d / %4d", ctrl->now_voice, ctrl->max_voice);
 }
 
 static u8 efx_type_col[8] = {7, 4, 4, 4, 4, 4, 0, 2};
@@ -1678,14 +1678,14 @@ void Snd_test_disp_aux(SndTestWork* w)
 static char* aux_name[2] = {"AUX A", "AUX B"};
 static char* efx_name[6] = {"NO EFFECT  ", "REVERB HI  ", "REVERB STD.", "CHORUS     ", "DELAY      ", "REVERB DPL2"};
 // Effect parameter printers by effect type.
-static void (*test_disp_efx_tbl[7])(SndTestWork*, SND_EFX_WORK*, int, int) = {
+static void (*test_disp_efx_tbl[7])(SndTestWork*, SND_EFX*, int, int) = {
     NULL, test_disp_efx_rev_hi, test_disp_efx_rev_std, test_disp_efx_chorus, test_disp_efx_delay, test_disp_efx_rev_dpl2, NULL};
 
 // Prints both AUX slots' effect type and state.
 void Snd_test_disp_efx()
 {
     SndTestWork* w = &Snd_test_work;
-    SND_EFX_WORK* efx = &Snd_efx_work[w->aux];
+    SND_EFX* efx = &Snd_efx_work[w->aux];
     int col;
     int y;
 
@@ -1701,7 +1701,7 @@ void Snd_test_disp_efx()
     switch (w->efxState[w->aux]) {
     case 1:
         eprintf(0x18, 0x8C, 4, 1, "EXECUTED.");
-        eprintf(0x18, 0x10A, 0, 1, "USE MEMORY is %7d (0x%06XH) Bytes.", efx->err, efx->err);
+        eprintf(0x18, 0x10A, 0, 1, "USE MEMORY is %7d (0x%06XH) Bytes.", efx->efx_mem, efx->efx_mem);
         break;
     case 0:
         if (w->frame & 0x10) {
@@ -1727,75 +1727,75 @@ void Snd_test_disp_efx()
 }
 
 // Reverb HI parameters (the float table).
-static void test_disp_efx_rev_hi(SndTestWork* w, SND_EFX_WORK* efx, int x, int y)
+static void test_disp_efx_rev_hi(SndTestWork* w, SND_EFX* efx, int x, int y)
 {
-    eprintf(x, y, 0, 1, "PREDELAY    ( 0.000 -  0.100) : %2.4fF", efx->fx.hi.preDelay);
-    eprintf(x, y + 0xE, 0, 1, "TIME        ( 0.010 - 10.000) : %2.4fF", efx->fx.hi.time);
-    eprintf(x, y + 0x1C, 0, 1, "COLORATION  ( 0.000 -  1.000) : %2.4fF", efx->fx.hi.coloration);
-    eprintf(x, y + 0x2A, 0, 1, "DAMPING     ( 0.000 -  1.000) : %2.4fF", efx->fx.hi.damping);
-    eprintf(x, y + 0x38, 0, 1, "CROSSTALK   ( 0.000 -  1.000) : %2.4fF", efx->fx.hi.crosstalk);
-    eprintf(x, y + 0x46, 0, 1, "MIX         ( 0.000 -  1.000) : %2.4fF", efx->fx.hi.mix);
+    eprintf(x, y, 0, 1, "PREDELAY    ( 0.000 -  0.100) : %2.4fF", efx->rev_hi.preDelay);
+    eprintf(x, y + 0xE, 0, 1, "TIME        ( 0.010 - 10.000) : %2.4fF", efx->rev_hi.time);
+    eprintf(x, y + 0x1C, 0, 1, "COLORATION  ( 0.000 -  1.000) : %2.4fF", efx->rev_hi.coloration);
+    eprintf(x, y + 0x2A, 0, 1, "DAMPING     ( 0.000 -  1.000) : %2.4fF", efx->rev_hi.damping);
+    eprintf(x, y + 0x38, 0, 1, "CROSSTALK   ( 0.000 -  1.000) : %2.4fF", efx->rev_hi.crosstalk);
+    eprintf(x, y + 0x46, 0, 1, "MIX         ( 0.000 -  1.000) : %2.4fF", efx->rev_hi.mix);
 }
 
 // Reverb STD parameters.
-static void test_disp_efx_rev_std(SndTestWork* w, SND_EFX_WORK* efx, int x, int y)
+static void test_disp_efx_rev_std(SndTestWork* w, SND_EFX* efx, int x, int y)
 {
-    eprintf(x, y, 0, 1, "PREDELAY    ( 0.000 -  0.100) : %2.4fF", efx->fx.std.preDelay);
-    eprintf(x, y + 0xE, 0, 1, "TIME        ( 0.010 - 10.000) : %2.4fF", efx->fx.std.time);
-    eprintf(x, y + 0x1C, 0, 1, "COLORATION  ( 0.000 -  1.000) : %2.4fF", efx->fx.std.coloration);
-    eprintf(x, y + 0x2A, 0, 1, "DAMPING     ( 0.000 -  1.000) : %2.4fF", efx->fx.std.damping);
-    eprintf(x, y + 0x38, 0, 1, "MIX         ( 0.000 -  1.000) : %2.4fF", efx->fx.std.mix);
+    eprintf(x, y, 0, 1, "PREDELAY    ( 0.000 -  0.100) : %2.4fF", efx->rev_std.preDelay);
+    eprintf(x, y + 0xE, 0, 1, "TIME        ( 0.010 - 10.000) : %2.4fF", efx->rev_std.time);
+    eprintf(x, y + 0x1C, 0, 1, "COLORATION  ( 0.000 -  1.000) : %2.4fF", efx->rev_std.coloration);
+    eprintf(x, y + 0x2A, 0, 1, "DAMPING     ( 0.000 -  1.000) : %2.4fF", efx->rev_std.damping);
+    eprintf(x, y + 0x38, 0, 1, "MIX         ( 0.000 -  1.000) : %2.4fF", efx->rev_std.mix);
 }
 
 // Chorus parameters.
-static void test_disp_efx_chorus(SndTestWork* w, SND_EFX_WORK* efx, int x, int y)
+static void test_disp_efx_chorus(SndTestWork* w, SND_EFX* efx, int x, int y)
 {
-    eprintf(x, y, 0, 1, "BASEDELAY   (     5 -     15) : %8d", efx->fx.chorus.baseDelay);
-    eprintf(x, y + 0xE, 0, 1, "VARIATION   (     0 -      5) : %8d", efx->fx.chorus.variation);
-    eprintf(x, y + 0x1C, 0, 1, "PERIOD      (   500 -  10000) : %8d", efx->fx.chorus.period);
+    eprintf(x, y, 0, 1, "BASEDELAY   (     5 -     15) : %8d", efx->chorus.baseDelay);
+    eprintf(x, y + 0xE, 0, 1, "VARIATION   (     0 -      5) : %8d", efx->chorus.variation);
+    eprintf(x, y + 0x1C, 0, 1, "PERIOD      (   500 -  10000) : %8d", efx->chorus.period);
 }
 
 // Delay parameters (per channel).
-static void test_disp_efx_delay(SndTestWork* w, SND_EFX_WORK* efx, int x, int y)
+static void test_disp_efx_delay(SndTestWork* w, SND_EFX* efx, int x, int y)
 {
-    eprintf(x, y, 0, 1, "DELAY[0]    (    10 -   5000) : %8d", efx->fx.delay.delay[0]);
-    eprintf(x, y + 0xE, 0, 1, "DELAY[1]    (    10 -   5000) : %8d", efx->fx.delay.delay[1]);
-    eprintf(x, y + 0x1C, 0, 1, "DELAY[2]    (    10 -   5000) : %8d", efx->fx.delay.delay[2]);
-    eprintf(x, y + 0x2A, 0, 1, "FEEDBACK[0] (     0 -    100) : %8d", efx->fx.delay.feedback[0]);
-    eprintf(x, y + 0x38, 0, 1, "FEEDBACK[1] (     0 -    100) : %8d", efx->fx.delay.feedback[1]);
-    eprintf(x, y + 0x46, 0, 1, "FEEDBACK[2] (     0 -    100) : %8d", efx->fx.delay.feedback[2]);
-    eprintf(x, y + 0x54, 0, 1, "OUTPUT[0]   (     0 -    100) : %8d", efx->fx.delay.output[0]);
-    eprintf(x, y + 0x62, 0, 1, "OUTPUT[1]   (     0 -    100) : %8d", efx->fx.delay.output[1]);
-    eprintf(x, y + 0x70, 0, 1, "OUTPUT[2]   (     0 -    100) : %8d", efx->fx.delay.output[2]);
+    eprintf(x, y, 0, 1, "DELAY[0]    (    10 -   5000) : %8d", efx->delay.delay[0]);
+    eprintf(x, y + 0xE, 0, 1, "DELAY[1]    (    10 -   5000) : %8d", efx->delay.delay[1]);
+    eprintf(x, y + 0x1C, 0, 1, "DELAY[2]    (    10 -   5000) : %8d", efx->delay.delay[2]);
+    eprintf(x, y + 0x2A, 0, 1, "FEEDBACK[0] (     0 -    100) : %8d", efx->delay.feedback[0]);
+    eprintf(x, y + 0x38, 0, 1, "FEEDBACK[1] (     0 -    100) : %8d", efx->delay.feedback[1]);
+    eprintf(x, y + 0x46, 0, 1, "FEEDBACK[2] (     0 -    100) : %8d", efx->delay.feedback[2]);
+    eprintf(x, y + 0x54, 0, 1, "OUTPUT[0]   (     0 -    100) : %8d", efx->delay.output[0]);
+    eprintf(x, y + 0x62, 0, 1, "OUTPUT[1]   (     0 -    100) : %8d", efx->delay.output[1]);
+    eprintf(x, y + 0x70, 0, 1, "OUTPUT[2]   (     0 -    100) : %8d", efx->delay.output[2]);
 }
 
 // DPL2 reverb parameters.
-static void test_disp_efx_rev_dpl2(SndTestWork* w, SND_EFX_WORK* efx, int x, int y)
+static void test_disp_efx_rev_dpl2(SndTestWork* w, SND_EFX* efx, int x, int y)
 {
-    eprintf(x, y, 0, 1, "PREDELAY    ( 0.000 -  0.100) : %2.4fF", efx->fx.dpl2.preDelay);
-    eprintf(x, y + 0xE, 0, 1, "TIME        ( 0.010 - 10.000) : %2.4fF", efx->fx.dpl2.time);
-    eprintf(x, y + 0x1C, 0, 1, "COLORATION  ( 0.000 -  1.000) : %2.4fF", efx->fx.dpl2.coloration);
-    eprintf(x, y + 0x2A, 0, 1, "DAMPING     ( 0.000 -  1.000) : %2.4fF", efx->fx.dpl2.damping);
-    eprintf(x, y + 0x38, 0, 1, "MIX         ( 0.000 -  1.000) : %2.4fF", efx->fx.dpl2.mix);
+    eprintf(x, y, 0, 1, "PREDELAY    ( 0.000 -  0.100) : %2.4fF", efx->rev_dpl2.preDelay);
+    eprintf(x, y + 0xE, 0, 1, "TIME        ( 0.010 - 10.000) : %2.4fF", efx->rev_dpl2.time);
+    eprintf(x, y + 0x1C, 0, 1, "COLORATION  ( 0.000 -  1.000) : %2.4fF", efx->rev_dpl2.coloration);
+    eprintf(x, y + 0x2A, 0, 1, "DAMPING     ( 0.000 -  1.000) : %2.4fF", efx->rev_dpl2.damping);
+    eprintf(x, y + 0x38, 0, 1, "MIX         ( 0.000 -  1.000) : %2.4fF", efx->rev_dpl2.mix);
 }
 
 // VOL screen: the six system volumes with the cursor.
 void Snd_test_disp_vol()
 {
     SndTestWork* w = &Snd_test_work;
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     int y;
 
     y = w->volCursor * 14 + 0x54;
     eprintf(0xA8, y, 4, 1, ">");
     y = w->volCursor * 14 + 0x54;
     eprintf(0x160, y, 4, 1, "<");
-    eprintf(0xB8, 0x54, 0, 1, "MASTER VOL BGM : %3d", ctrl->sys_vol[0] >> 8);
-    eprintf(0xB8, 0x62, 0, 1, "MASTER VOL SE  : %3d", ctrl->sys_vol[1] >> 8);
-    eprintf(0xB8, 0x70, 0, 1, "I.S.S. VOL BGM : %3d", ctrl->sys_vol[2] >> 8);
-    eprintf(0xB8, 0x7E, 0, 1, "I.S.S. VOL SE  : %3d", ctrl->sys_vol[3] >> 8);
-    eprintf(0xB8, 0x8C, 0, 1, "STREAM VOL BGM : %3d", ctrl->sys_vol[4] >> 8);
-    eprintf(0xB8, 0x9A, 0, 1, "STREAM VOL SE  : %3d", ctrl->sys_vol[5] >> 8);
+    eprintf(0xB8, 0x54, 0, 1, "MASTER VOL BGM : %3d", ctrl->vol_mas_bgm >> 8);
+    eprintf(0xB8, 0x62, 0, 1, "MASTER VOL SE  : %3d", ctrl->vol_mas_se >> 8);
+    eprintf(0xB8, 0x70, 0, 1, "I.S.S. VOL BGM : %3d", ctrl->vol_iss_bgm >> 8);
+    eprintf(0xB8, 0x7E, 0, 1, "I.S.S. VOL SE  : %3d", ctrl->vol_iss_se >> 8);
+    eprintf(0xB8, 0x8C, 0, 1, "STREAM VOL BGM : %3d", ctrl->vol_str_bgm >> 8);
+    eprintf(0xB8, 0x9A, 0, 1, "STREAM VOL SE  : %3d", ctrl->vol_str_se >> 8);
 }
 
 // LOAD mode entry: opens the disc directory of the current table.
@@ -2132,7 +2132,7 @@ void Snd_test_aram_dump(SndTestWork* w)
         }
     }
     if (w->trg & 0x400) {
-        w->aramAdrs = Snd_ctrl_work.aram_base;
+        w->aramAdrs = Snd_ctrl_work.zero_adrs;
     }
     if ((s32) w->aramAdrs < 0) {
         w->aramAdrs = 0x00FFFF00;
@@ -2187,21 +2187,21 @@ void blk_enable_ck(SndTestWork* w, int dir)
 // Starts the ARAM -> MRAM DMA of the 0x100-byte page at aramAdrs.
 void aram_dump_dma(SndTestWork* w)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
-    ctrl->dma_busy = 1;
-    ARQPostRequest(&ctrl->arq, 0, 1, 0, w->aramAdrs, (u32) Snd_test_work.dump, 0x100, cb_dma_end);
+    ctrl->arq_flag = 1;
+    ARQPostRequest(&ctrl->arq_req, 0, 1, 0, w->aramAdrs, (u32) Snd_test_work.dump, 0x100, cb_dma_end);
     do {
-    } while (ctrl->dma_busy != 0);
+    } while (ctrl->arq_flag != 0);
     DCInvalidateRange(w->dump, 0x100);
 }
 
 // ARQ callback: marks the dump page ready.
 static void cb_dma_end(u32 task)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
-    ctrl->dma_busy = 0;
+    ctrl->arq_flag = 0;
 }
 
 // Hex dump of the fetched ARAM page with its address.

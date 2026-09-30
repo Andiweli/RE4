@@ -165,7 +165,7 @@ void iss_ax_set_vol(SND_AXV_WORK* axv, SND_REQ* req, SND_SIT* sit)
     axv->svol = axv->svol << 8;
     axv->vdown_src_vol = axv->vol;
     axv->vdown_src_svol = axv->svol;
-    if ((Snd_ctrl_work.se_state & 0x2) && !(axv->flag & 0x2)) {
+    if ((Snd_ctrl_work.status_flag & 0x2) && !(axv->flag & 0x2)) {
         axv->status |= 0x10;
         Snd_axv_work_calc_vdown_vol(axv);
     }
@@ -270,7 +270,7 @@ void iss_ax_set_para(SND_AXV_WORK* axv, SND_REQ* req)
     cur = axv->aram * 2 + sample->offset;
     cur += 2;
     if (rgn->loopLength == 0) {
-        loop_addr = Snd_ctrl_work.aram_base * 2 + 2;
+        loop_addr = Snd_ctrl_work.zero_adrs * 2 + 2;
         end_addr = cur;
         end_addr += sample->length / 14 * 16 + sample->length % 14;
         addr.loopFlag = 0;

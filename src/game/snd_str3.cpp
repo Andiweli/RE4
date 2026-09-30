@@ -48,7 +48,7 @@ void str_ax_adrs_set_short(SND_STR* str)
 {
     u32 zero;
 
-    zero = Snd_ctrl_work.aram_base * 2 + 2;
+    zero = Snd_ctrl_work.zero_adrs * 2 + 2;
     if (str->short_flag & 0x2) {
         str->ax_lptop_l = str->ar_buff_nbl_l + str->lptop_nbl;
         str->ax_lptop_r = str->ar_buff_nbl_r + str->lptop_nbl;

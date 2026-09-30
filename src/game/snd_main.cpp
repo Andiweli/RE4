@@ -23,22 +23,22 @@ void Snd_system_init(void)
 // seed, compressor on, and all sub-works (requests, effects, AX voices, voices, sequences, streams, test).
 void snd_work_clear(void)
 {
-    SND_CTRL_WORK* ctrl;
+    SND_CTRL* ctrl;
     u32 i;
     u8* p;
 
     p = (u8*) &Snd_ctrl_work;
-    for (i = 0; i < sizeof(SND_CTRL_WORK); i++) {
+    for (i = 0; i < sizeof(SND_CTRL); i++) {
         *p++ = 0;
     }
     ctrl = &Snd_ctrl_work;
-    ctrl->aram_base = ARGetBaseAddress();
-    ctrl->aram_free = ctrl->aram_base + 0x100;
-    OSReport("A-RAM ADDRESS : %08XH\n", ctrl->aram_free);
+    ctrl->zero_adrs = ARGetBaseAddress();
+    ctrl->aram_adrs = ctrl->zero_adrs + 0x100;
+    OSReport("A-RAM ADDRESS : %08XH\n", ctrl->aram_adrs);
     zero_buff_clear();
-    ctrl->req_bank = 0;
-    ctrl->req_bank_sub = 1;
-    ctrl->rnd = 0xD37;
+    ctrl->req_push_idx = 0;
+    ctrl->req_exec_idx = 1;
+    ctrl->random = 0xD37;
     AXSetCompressor(1);
     Snd_req_work_clear();
     Snd_efx_work_clear();
@@ -56,15 +56,15 @@ void cb_dma_end(u32 task);
 // waits for the DMA.
 void zero_buff_clear(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
     memclr_asm(zero_tbl, sizeof(zero_tbl));
     DCFlushRange(zero_tbl, sizeof(zero_tbl));
-    ctrl->dma_busy = 1;
-    ARQPostRequest(&ctrl->arq, 0, ARQ_TYPE_MRAM_TO_ARAM, ARQ_PRIORITY_HIGH, (u32) zero_tbl, ctrl->aram_base,
+    ctrl->arq_flag = 1;
+    ARQPostRequest(&ctrl->arq_req, 0, ARQ_TYPE_MRAM_TO_ARAM, ARQ_PRIORITY_HIGH, (u32) zero_tbl, ctrl->zero_adrs,
                    sizeof(zero_tbl), cb_dma_end);
     while (1) {
-        if (ctrl->dma_busy == 0) {
+        if (ctrl->arq_flag == 0) {
             break;
         }
     }
@@ -73,7 +73,7 @@ void zero_buff_clear(void)
 // ARQ callback: the zero-table upload finished.
 void cb_dma_end(u32 task)
 {
-    Snd_ctrl_work.dma_busy = 0;
+    Snd_ctrl_work.arq_flag = 0;
 }
 
 // AX audio-frame callback (every 5 ms): voice manager, stream refill, MIDI sequencer, then the
@@ -90,19 +90,19 @@ void cb_audio_frame(void)
     SYNRunAudioFrame();
     AXARTServiceSounds();
     MIXUpdateSettings();
-    Snd_ctrl_work.frame++;
+    Snd_ctrl_work.audio_frame++;
     OSRestoreInterrupts(old);
 }
 
 // Output mode from the console setting (0 mono, 1 stereo).
 void Snd_sound_mode_init(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
     if (OSGetSoundMode() == 0) {
-        ctrl->sound_mode = 0;
+        ctrl->snd_mode = 0;
     } else {
-        ctrl->sound_mode = 1;
+        ctrl->snd_mode = 1;
     }
     snd_mode_set_ax_mix(ctrl);
 }
@@ -111,27 +111,27 @@ void Snd_sound_mode_init(void)
 // in effect.
 u32 Snd_sound_mode_init_load(u32 mode)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
-    if (ctrl->sound_mode == 1 && mode == 2) {
-        ctrl->sound_mode = 2;
+    if (ctrl->snd_mode == 1 && mode == 2) {
+        ctrl->snd_mode = 2;
     }
     snd_mode_set_ax_mix(ctrl);
-    return ctrl->sound_mode;
+    return ctrl->snd_mode;
 }
 
 // Current output mode (0 mono, 1 stereo, 2 DPL2).
 u32 Snd_get_sound_mode(void)
 {
-    return Snd_ctrl_work.sound_mode;
+    return Snd_ctrl_work.snd_mode;
 }
 
 // Sets the output mode and the console setting to match.
 void Snd_set_sound_mode(u32 mode)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
-    ctrl->sound_mode = mode;
+    ctrl->snd_mode = mode;
     if (mode == 0) {
         OSSetSoundMode(0);
     } else {
@@ -141,9 +141,9 @@ void Snd_set_sound_mode(u32 mode)
 }
 
 // AX / MIX modes for the output mode (DPL2 = AX mode 2, MIX 3).
-void snd_mode_set_ax_mix(SND_CTRL_WORK* ctrl)
+void snd_mode_set_ax_mix(SND_CTRL* ctrl)
 {
-    switch (ctrl->sound_mode) {
+    switch (ctrl->snd_mode) {
     case 0:
         AXSetMode(0);
         MIXSetSoundMode(0);
@@ -171,57 +171,57 @@ void Snd_iss_control(void)
 // Statistics: DSP cycles, active voices / AX voices / stream channels / synth notes with their peaks.
 void Snd_dev_voice_ck(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     SND_SEQ* seq;
     int i;
 
-    ctrl->dsp_cycles_max = AXGetMaxDspCycles();
-    ctrl->dsp_cycles = AXGetDspCycles();
-    if (ctrl->dsp_cycles >= ctrl->dsp_cycles_peak) {
-        ctrl->dsp_cycles_peak = ctrl->dsp_cycles;
+    ctrl->dsp_cyc = AXGetMaxDspCycles();
+    ctrl->now_cyc = AXGetDspCycles();
+    if (ctrl->now_cyc >= ctrl->max_cyc) {
+        ctrl->max_cyc = ctrl->now_cyc;
     }
-    ctrl->voice_num = 0;
+    ctrl->now_voice = 0;
     for (i = 0; i < SND_VOICE_MAX; i++) {
         if (Snd_voice_work[i].be_flag != 0) {
-            ctrl->voice_num++;
+            ctrl->now_voice++;
         }
     }
-    if (ctrl->voice_num >= ctrl->voice_peak) {
-        ctrl->voice_peak = ctrl->voice_num;
+    if (ctrl->now_voice >= ctrl->max_voice) {
+        ctrl->max_voice = ctrl->now_voice;
     }
-    ctrl->axv_num = 0;
+    ctrl->now_axv_vo = 0;
     for (i = 0; i < SND_AXV_MAX; i++) {
         if (Snd_axv_work[i].status != 0) {
-            ctrl->axv_num++;
+            ctrl->now_axv_vo++;
         }
     }
-    if (ctrl->axv_num >= ctrl->axv_peak) {
-        ctrl->axv_peak = ctrl->axv_num;
+    if (ctrl->now_axv_vo >= ctrl->max_axv_vo) {
+        ctrl->max_axv_vo = ctrl->now_axv_vo;
     }
-    ctrl->str_num = 0;
+    ctrl->now_str_vo = 0;
     for (i = 0; i < SND_STR_MAX; i++) {
         if (Snd_str_work[i].ax_voice_l != NULL) {
-            ctrl->str_num++;
+            ctrl->now_str_vo++;
         }
         if (Snd_str_work[i].ax_voice_r != NULL) {
-            ctrl->str_num++;
+            ctrl->now_str_vo++;
         }
     }
-    if (ctrl->str_num >= ctrl->str_peak) {
-        ctrl->str_peak = ctrl->str_num;
+    if (ctrl->now_str_vo >= ctrl->max_str_vo) {
+        ctrl->max_str_vo = ctrl->now_str_vo;
     }
-    ctrl->seq_num = 0;
+    ctrl->now_syn_vo = 0;
     for (i = 0; i < SND_SEQ_MAX; i++) {
         seq = &Snd_seq_work[i];
         if (seq->pcm_adrs != 0) {
-            ctrl->seq_num += SYNGetActiveNotes(&seq->synth);
+            ctrl->now_syn_vo += SYNGetActiveNotes(&seq->synth);
         }
     }
-    if (ctrl->seq_num >= ctrl->seq_peak) {
-        ctrl->seq_peak = ctrl->seq_num;
+    if (ctrl->now_syn_vo >= ctrl->max_syn_vo) {
+        ctrl->max_syn_vo = ctrl->now_syn_vo;
     }
-    ctrl->total_num = ctrl->axv_num + ctrl->str_num + ctrl->seq_num;
-    if (ctrl->total_num >= ctrl->total_peak) {
-        ctrl->total_peak = ctrl->total_num;
+    ctrl->now_total_vo = ctrl->now_axv_vo + ctrl->now_str_vo + ctrl->now_syn_vo;
+    if (ctrl->now_total_vo >= ctrl->max_total_vo) {
+        ctrl->max_total_vo = ctrl->now_total_vo;
     }
 }

@@ -6,7 +6,7 @@
 // sequence (status bit4) for that many milliseconds; a reset request ends them all.
 void Snd_midi_sequencer(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     SND_SEQ* seq;
     u32 i;
     u32 t0;
@@ -15,12 +15,12 @@ void Snd_midi_sequencer(void)
     if (ctrl->reset_flag & 0x1) {
         ctrl->reset_flag |= 0x40;
     }
-    t0 = ctrl->seq_tick / 1000;
-    ctrl->seq_tick += 4995;
-    t1 = ctrl->seq_tick / 1000;
-    ctrl->seq_msec = t1 - t0;
-    if (ctrl->seq_tick == 999000) {
-        ctrl->seq_tick = 0;
+    t0 = ctrl->seq_adjust / 1000;
+    ctrl->seq_adjust += 4995;
+    t1 = ctrl->seq_adjust / 1000;
+    ctrl->seq_proc = t1 - t0;
+    if (ctrl->seq_adjust == 999000) {
+        ctrl->seq_adjust = 0;
     }
     for (i = 0; i < SND_SEQ_MAX; i++) {
         seq = &Snd_seq_work[i];
@@ -32,7 +32,7 @@ void Snd_midi_sequencer(void)
 
 // One audio frame of a sequence: reset check, track overrides, requests, fade step, then the MIDI
 // events for each elapsed millisecond, and the master volume update.
-void seq_player(SND_CTRL_WORK* ctrl, SND_SEQ* seq)
+void seq_player(SND_CTRL* ctrl, SND_SEQ* seq)
 {
     u32 i;
 
@@ -44,7 +44,7 @@ void seq_player(SND_CTRL_WORK* ctrl, SND_SEQ* seq)
     if (seq_fade_check(seq) != 0) {
         return;
     }
-    for (i = 0; i < ctrl->seq_msec; i++) {
+    for (i = 0; i < ctrl->seq_proc; i++) {
         seq_one_msec(ctrl, seq);
     }
     seq_play_update(seq);
@@ -184,7 +184,7 @@ void seq_fade_new_vol_set(SND_SEQ* seq, s16 step, s16 target)
 
 // One millisecond of sequence time: counts the delta down by `division` and plays every event
 // that comes due (delta = next delta time x tempo).
-void seq_one_msec(SND_CTRL_WORK* ctrl, SND_SEQ* seq)
+void seq_one_msec(SND_CTRL* ctrl, SND_SEQ* seq)
 {
     while (1) {
         if (seq->time == 0) {
@@ -204,16 +204,16 @@ void seq_one_msec(SND_CTRL_WORK* ctrl, SND_SEQ* seq)
 }
 
 // Reads the next 3-byte MIDI message at seq_pos and dispatches it (Snd_seq_midi_message).
-void seq_one_msec_main(SND_CTRL_WORK* ctrl, SND_SEQ* seq)
+void seq_one_msec_main(SND_CTRL* ctrl, SND_SEQ* seq)
 {
     u8* p;
 
     p = seq->now_seq_ptr;
-    ctrl->midi_msg[0] = *p++;
-    ctrl->midi_msg[1] = *p++;
-    ctrl->midi_msg[2] = *p++;
-    ctrl->midi_type = ctrl->midi_msg[0] & 0xF0;
-    ctrl->midi_ch = ctrl->midi_msg[0] & 0x0F;
+    ctrl->seq_data[0] = *p++;
+    ctrl->seq_data[1] = *p++;
+    ctrl->seq_data[2] = *p++;
+    ctrl->code = ctrl->seq_data[0] & 0xF0;
+    ctrl->track = ctrl->seq_data[0] & 0x0F;
     Snd_seq_midi_message(ctrl, seq);
 }
 

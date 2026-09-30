@@ -716,7 +716,7 @@ void getCam2SndAngle(f32* pan, f32* span, f32* dist, Vec* pos);
 // sndSurroundCalc keeps updating them. Returns the sound id, or 0 when not played.
 u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
 {
-    SND_CTRL_WORK* c = &Snd_ctrl_work;
+    SND_CTRL* c = &Snd_ctrl_work;
     SND_SIT* sit;
     u32 snd_id;
     int ret;
@@ -770,7 +770,7 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
         return 0;
     }
 
-    c->ovr_flag = 0;
+    c->para_flag = 0;
     sit = Snd_get_sit_adrs(blk, no);
     v = Snd_iss_get_sit_vol(blk, no);
     sv = Snd_iss_get_sit_svol(blk, no);
@@ -794,7 +794,7 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
         if (seq == 0 && pan_ok == 1) {
             s8 p = sit->pan;
             if (p < 0) {
-                c->ovr_flag |= 0x2;
+                c->para_flag |= 0x2;
                 pan = sndPanCalc(pan_f);
                 c->pan = pan;
             } else {
@@ -804,7 +804,7 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
             }
             p = sit->span;
             if (p < 0) {
-                c->ovr_flag |= 0x4;
+                c->para_flag |= 0x4;
                 span = sndSpanCalc(pan_f);
                 c->span = span;
             } else {
@@ -812,16 +812,16 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
                 span = p;
                 pan_calc = 0;
             }
-            if (c->ovr_flag & 0x6) {
-                c->ovr_flag |= 0x100;
-                c->srd_type_ovr = 1;
+            if (c->para_flag & 0x6) {
+                c->para_flag |= 0x100;
+                c->srd_type = 1;
             }
         }
     } else {
         vol_calc = 0;
-        c->srd_type_ovr = 0;
+        c->srd_type = 0;
         curve_ok = 0;
-        c->ovr_flag |= 0x100;
+        c->para_flag |= 0x100;
         pan_calc = 0;
     }
 
@@ -837,14 +837,14 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
             svol_ofs = pTbl->vol_tbl[0];
             v = sndVolCalc(v, vol_ofs, dist);
             sv = sndVolCalc(sv, svol_ofs, dist);
-            c->ovr_flag |= 0x400;
+            c->para_flag |= 0x400;
             pitch_ofs = pTbl->pitch_tbl[m];
-            c->pitch_ofs = sndPitchCalc(pitch_ofs, dist);
+            c->dop_p = sndPitchCalc(pitch_ofs, dist);
             filter_ofs = pTbl->filter_tbl[m];
             f = sndFilterCalc(filter_ofs, dist);
             if (f != -1) {
-                c->lpf_no = f;
-                c->ovr_flag |= 0x80;
+                c->lpf = f;
+                c->para_flag |= 0x80;
             }
         } else {
             vol_calc = 0;
@@ -860,7 +860,7 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
     }
 
     if (sit->aux_a == -1) {
-        c->ovr_flag |= 0x20;
+        c->para_flag |= 0x20;
         if (pSnd->hdr != NULL) {
             REVERB_INFO* p = &pSnd->hdr->dpl2;
             if (pSys->SndMode != 2) {
@@ -895,30 +895,30 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
     }
 
     c->aux_b = 0;
-    c->se_flag = 0;
-    c->ovr_flag |= 0x40;
+    c->req_bit = 0;
+    c->para_flag |= 0x40;
     if (sit->se_flag != 0) {
-        c->ovr_flag |= 0x840;
+        c->para_flag |= 0x840;
         if (sit->se_flag & 0x2) {
-            c->se_flag = 1;
+            c->req_bit = 1;
         }
         if (sit->se_flag & 0x4) {
-            c->se_flag |= 0x2;
+            c->req_bit |= 0x2;
         }
         if (sit->se_flag & 0x1) {
-            c->se_flag |= 0x4;
+            c->req_bit |= 0x4;
         }
     }
     if (vol & ~0xFF) {
-        c->ovr_flag |= 0x800;
+        c->para_flag |= 0x800;
         if (vol & 0x100) {
-            c->se_flag |= 0x1;
+            c->req_bit |= 0x1;
         }
         if (vol & 0x200) {
-            c->se_flag |= 0x2;
+            c->req_bit |= 0x2;
         }
         if (vol & 0x400) {
-            c->se_flag |= 0x4;
+            c->req_bit |= 0x4;
         }
     }
 
@@ -940,9 +940,9 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
 
     c->vol = v;
     c->svol = sv;
-    c->ovr_flag |= 0x18;
+    c->para_flag |= 0x18;
     if (sit->srd_type == 1) {
-        c->ovr_flag &= 0x860;
+        c->para_flag &= 0x860;
     }
     snd_id = Snd_iss_req_para(blk, no, 0);
 
@@ -1011,7 +1011,7 @@ u32 SndCall(u16 blk, u16 no, Vec* pos, int id, int vol, cUnit* obj)
 // over `time` frames). Returns 1 on success.
 int SndSetVol(u32 id, int vol, int time)
 {
-    SND_CTRL_WORK* c = &Snd_ctrl_work;
+    SND_CTRL* c = &Snd_ctrl_work;
     int ret = 0;
 
     switch (Snd_get_play_type(id)) {
@@ -1019,7 +1019,7 @@ int SndSetVol(u32 id, int vol, int time)
         break;
     case 1:
         c->vol = vol;
-        c->ovr_flag = 0x18;
+        c->para_flag = 0x18;
         c->svol = vol;
         ret = Snd_se_set_paras(id) == 0;
         break;
@@ -1036,12 +1036,12 @@ int SndSetVol(u32 id, int vol, int time)
 // Doppler pitch offset on a playing SE.
 int SndSetDopPitch(u32 id, int pitch)
 {
-    SND_CTRL_WORK* c = &Snd_ctrl_work;
+    SND_CTRL* c = &Snd_ctrl_work;
     int ret = 0;
 
     if (Snd_get_play_type(id) == 1) {
-        c->pitch_ofs = pitch;
-        c->ovr_flag = 0x400;
+        c->dop_p = pitch;
+        c->para_flag = 0x400;
         ret = Snd_se_set_paras(id) == 0;
     }
     return ret;
@@ -2100,7 +2100,7 @@ void sndSurroundCalc()
 {
     static int (*end_check_tbl[2])(u32) = { Snd_se_end_check, Snd_seq_end_check };
     int i;
-    SND_CTRL_WORK* c = &Snd_ctrl_work;
+    SND_CTRL* c = &Snd_ctrl_work;
     f32 pan;
     f32 dist;
 
@@ -2111,7 +2111,7 @@ void sndSurroundCalc()
         if (w->type == 0) {
             continue;
         }
-        c->ovr_flag = 0;
+        c->para_flag = 0;
         idx = 0;
         if (w->type & 0x1) {
             idx = 1;
@@ -2140,34 +2140,34 @@ void sndSurroundCalc()
                 getCam2SndAngle(&pan, 0, &dist, &w->pos);
             }
             if (w->inner != 0) {
-                c->ovr_flag |= 0x18;
+                c->para_flag |= 0x18;
                 c->vol = sit->vol;
                 c->svol = sit->svol;
                 sndInnerVolCheck(sit, &c->vol, &c->svol);
             } else {
                 if (w->vol_calc != 0) {
-                    c->ovr_flag |= 0x418;
+                    c->para_flag |= 0x418;
                     c->vol = sndVolCalc(Snd_iss_get_sit_vol(w->blk, w->no), w->vol_ofs, dist);
                     c->svol = sndVolCalc(Snd_iss_get_sit_svol(w->blk, w->no), w->svol_ofs, dist);
                     sndWallCheck(sit, &c->vol, &c->svol, &w->pos);
                     sndVolCtrlAtCheck(sit, &c->vol, &c->svol, &w->pos);
                     sndInnerVolCheck(sit, &c->vol, &c->svol);
-                    c->pitch_ofs = sndPitchCalc(w->pitch_ofs, dist);
-                    c->lpf_no = sndFilterCalc(w->filter_ofs, dist);
-                    c->ovr_flag |= 0x80;
+                    c->dop_p = sndPitchCalc(w->pitch_ofs, dist);
+                    c->lpf = sndFilterCalc(w->filter_ofs, dist);
+                    c->para_flag |= 0x80;
                 }
                 if (w->pan_calc != 0) {
-                    c->ovr_flag |= 0x6;
+                    c->para_flag |= 0x6;
                     if (sit->pan & 0x80) {
                         c->pan = sndPanCalc(pan);
                     } else {
-                        c->ovr_flag &= ~0x2;
+                        c->para_flag &= ~0x2;
                         c->pan = sit->pan;
                     }
                     if (sit->span & 0x80) {
                         c->span = sndSpanCalc(pan);
                     } else {
-                        c->ovr_flag &= ~0x4;
+                        c->para_flag &= ~0x4;
                         c->span = sit->span;
                     }
                 }
@@ -2540,27 +2540,27 @@ int SndBgmDataReadCheck(int bgm_no)
 // driver.
 void SndSetReverb()
 {
-    SND_EFX_WORK* w = &Snd_efx_work[0];
+    SND_EFX* w = &Snd_efx_work[0];
     REVERB_INFO* p;
 
     if (pSys->SndMode == 2) {
         p = &pSnd->hdr->dpl2;
-        w->fx.dpl2.tempDisableFX = 0;
-        w->fx.dpl2.preDelay = p->Delay;
-        w->fx.dpl2.time = p->Time;
-        w->fx.dpl2.coloration = p->Coloration;
-        w->fx.dpl2.damping = p->Damping;
-        w->fx.dpl2.mix = p->Mix;
+        w->rev_dpl2.tempDisableFX = 0;
+        w->rev_dpl2.preDelay = p->Delay;
+        w->rev_dpl2.time = p->Time;
+        w->rev_dpl2.coloration = p->Coloration;
+        w->rev_dpl2.damping = p->Damping;
+        w->rev_dpl2.mix = p->Mix;
         Snd_efx_req(0, 5);
     } else {
         p = &pSnd->hdr->stereo;
-        w->fx.hi.tempDisableFX = 0;
-        w->fx.hi.preDelay = p->Delay;
-        w->fx.hi.time = p->Time;
-        w->fx.hi.coloration = p->Coloration;
-        w->fx.hi.damping = p->Damping;
-        w->fx.hi.crosstalk = p->Crosstalk;
-        w->fx.hi.mix = p->Mix;
+        w->rev_hi.tempDisableFX = 0;
+        w->rev_hi.preDelay = p->Delay;
+        w->rev_hi.time = p->Time;
+        w->rev_hi.coloration = p->Coloration;
+        w->rev_hi.damping = p->Damping;
+        w->rev_hi.crosstalk = p->Crosstalk;
+        w->rev_hi.mix = p->Mix;
         Snd_efx_req(0, 1);
     }
 }
@@ -2732,10 +2732,10 @@ void debugDisp()
     y2 += 0xE;
     eprintf2(7, 0xE, 0x20, y2, 0, 0xA, "FREE SIZE   %06x", 0xD00000 - ARAM_FREE_BASE);
 
-    eprintf2(7, 0xE, 0x1B0, 0x13B, 0, 9, "TOTAL %2d", Snd_ctrl_work.total_num);
-    eprintf2(7, 0xE, 0x1B0, 0x149, 0, 9, "SE    %2d", Snd_ctrl_work.axv_num);
-    eprintf2(7, 0xE, 0x1B0, 0x157, 0, 9, "STR   %2d", Snd_ctrl_work.str_num);
-    eprintf2(7, 0xE, 0x1B0, 0x165, 0, 9, "SEQ   %2d", Snd_ctrl_work.seq_num);
+    eprintf2(7, 0xE, 0x1B0, 0x13B, 0, 9, "TOTAL %2d", Snd_ctrl_work.now_total_vo);
+    eprintf2(7, 0xE, 0x1B0, 0x149, 0, 9, "SE    %2d", Snd_ctrl_work.now_axv_vo);
+    eprintf2(7, 0xE, 0x1B0, 0x157, 0, 9, "STR   %2d", Snd_ctrl_work.now_str_vo);
+    eprintf2(7, 0xE, 0x1B0, 0x165, 0, 9, "SEQ   %2d", Snd_ctrl_work.now_syn_vo);
     for (i = 0; i < 64; i++) {
         if (Snd_voice_work[i].be_flag != 0) {
             eprintf2(8, 0xB, (i / 8) * 20 + 0xFA, (i % 8) * 14 + 0x13B, 4, 9, "%02d ", i);
@@ -2748,14 +2748,14 @@ void debugDisp()
         eprintf2(7, 0xE, 0x20, 0x10, 6, 0xA, "SOUND MODE");
         eprintf2(7, 0xE, 0x20, 0x1E, 0, 0xA, "%s", mode_tbl[pSys->SndMode]);
         eprintf2(7, 0xE, 0x20, 0x2C, 6, 0xA, "REVERB TYPE");
-        eprintf2(7, 0xE, 0x20, 0x3A, 0, 0xA, "%s", rev_tbl[Snd_efx_work[0].type]);
+        eprintf2(7, 0xE, 0x20, 0x3A, 0, 0xA, "%s", rev_tbl[Snd_efx_work[0].efx_type]);
         eprintf2(7, 0xE, 0x20, 0x48, 6, 0xA, "REVERB SETTINGS");
-        eprintf2(7, 0xE, 0x20, 0x56, 0, 0xA, "DELAY        %2.2f", Snd_efx_work[0].fx.hi.preDelay);
-        eprintf2(7, 0xE, 0x20, 0x64, 0, 0xA, "TIME         %2.2f", Snd_efx_work[0].fx.hi.time);
-        eprintf2(7, 0xE, 0x20, 0x72, 0, 0xA, "COLORATION   %2.2f", Snd_efx_work[0].fx.hi.coloration);
-        eprintf2(7, 0xE, 0x20, 0x80, 0, 0xA, "DAMPING      %2.2f", Snd_efx_work[0].fx.hi.damping);
-        eprintf2(7, 0xE, 0x20, 0x8E, 0, 0xA, "CROSSTALK    %2.2f", Snd_efx_work[0].fx.hi.crosstalk);
-        eprintf2(7, 0xE, 0x20, 0x9C, 0, 0xA, "MIX          %2.2f", Snd_efx_work[0].fx.hi.mix);
+        eprintf2(7, 0xE, 0x20, 0x56, 0, 0xA, "DELAY        %2.2f", Snd_efx_work[0].rev_hi.preDelay);
+        eprintf2(7, 0xE, 0x20, 0x64, 0, 0xA, "TIME         %2.2f", Snd_efx_work[0].rev_hi.time);
+        eprintf2(7, 0xE, 0x20, 0x72, 0, 0xA, "COLORATION   %2.2f", Snd_efx_work[0].rev_hi.coloration);
+        eprintf2(7, 0xE, 0x20, 0x80, 0, 0xA, "DAMPING      %2.2f", Snd_efx_work[0].rev_hi.damping);
+        eprintf2(7, 0xE, 0x20, 0x8E, 0, 0xA, "CROSSTALK    %2.2f", Snd_efx_work[0].rev_hi.crosstalk);
+        eprintf2(7, 0xE, 0x20, 0x9C, 0, 0xA, "MIX          %2.2f", Snd_efx_work[0].rev_hi.mix);
         eprintf2(7, 0xE, 0x20, 0xAA, 6, 0xA, "DEFAULT AUX A");
         eprintf2(7, 0xE, 0x20, 0xB8, 0, 0xA, "CORE           %3d", pSnd->Hdr()->dpl2.Aux_core);
         eprintf2(7, 0xE, 0x20, 0xC6, 0, 0xA, "WEAPON         %3d", pSnd->Hdr()->dpl2.Aux_weapon);

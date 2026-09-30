@@ -62,12 +62,12 @@ void Snd_str_work_close_check(void)
 // AX volume from the system BGM (type 2) or SE volume x the stream master x the 8.8 volume.
 void Snd_str_work_calc_ax_vol(SND_STR* str)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
     if (str->str_type == 2) {
-        str->out_vol = ctrl->sys_vol[1] / 127 * (ctrl->sys_vol[5] >> 8);
+        str->out_vol = ctrl->vol_mas_se / 127 * (ctrl->vol_str_se >> 8);
     } else {
-        str->out_vol = ctrl->sys_vol[0] / 127 * (ctrl->sys_vol[4] >> 8);
+        str->out_vol = ctrl->vol_mas_bgm / 127 * (ctrl->vol_str_bgm >> 8);
     }
     str->out_vol = str->out_vol / 127 * (str->now_vol >> 8);
     str->ax_vol = Snd_vol_syn_to_ax((s16) (str->out_vol >> 8));
@@ -88,7 +88,7 @@ void Snd_str_work_choice_out_span(SND_STR* str)
 // ctrl->dvd_err (the game shows the disc error screen).
 void Snd_str_get_dvd_status(SND_STR* str)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
     str->err_flag = 0;
     str->dvd_status = DVDGetCommandBlockStatus(&str->info.cb);
@@ -110,14 +110,14 @@ void Snd_str_get_dvd_status(SND_STR* str)
         return;
     }
     str->be_flag |= 0x8000;
-    if (ctrl->dvd_err != -1) {
+    if (ctrl->dvd_err_flag != -1) {
         switch (str->dvd_status) {
         case DVD_STATE_FATAL_ERROR:
         case DVD_STATE_NO_DISK:
         case DVD_STATE_COVER_OPEN:
         case DVD_STATE_WRONG_DISK:
         case DVD_STATE_RETRY:
-            ctrl->dvd_err = str->dvd_status;
+            ctrl->dvd_err_flag = str->dvd_status;
             break;
         }
     }
