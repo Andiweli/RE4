@@ -1903,7 +1903,7 @@ void mapTblInit(SUB_SCREEN* wk)
 // Map screen model managers: 0x80 model infos / 0x100 parts / 0x80 MapMgr works (no player model).
 void mapModelAlloc(SUB_SCREEN* wk)
 {
-    wk->attr_flag |= 1;
+    wk->model_flag |= 1;
     ssModInfoMgr.roomInit();
     ssModInfoMgr.arrayAlloc(0x80);
     ssPartsMgr.roomInit();
@@ -2376,7 +2376,7 @@ void SsMapInit::move(SUB_SCREEN* wk)
     case 0:
         if (wk->scrn_out_func(wk) == 1) {
             if (wk->menu_old == 2) {
-                wk->wait_cnt = 1;
+                wk->trans_off = 1;
             }
             IdSubErase();
             IdNumErase();
@@ -2413,7 +2413,7 @@ void SsMapInit::move(SUB_SCREEN* wk)
         ssPlMotion = 0;
         ssWepModel2 = 0;
         IdAllocBuffer();
-        wk->wait_cnt = 0;
+        wk->trans_off = 0;
         state++;
     case 3: {
         int result;

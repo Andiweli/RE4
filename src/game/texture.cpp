@@ -46,7 +46,7 @@ void cTexSys::Clear()
     TEX_WK* w = m_texw_array;
 
     for (i = 0; i < 256; i++, w++) {
-        w->Owner = 0;
+        w->Owner = TEX_OWNER_NONE;
     }
     x5408 = 0;
     for (i = 0; i < nTexObj; i++) {
@@ -201,7 +201,7 @@ int cTexSys::TexRegist(TEXPalette* tpl, TexAnm* anm, u8 id, u32 owner, int clamp
     }
     w->texHdr = desc->textureHeader;
     w->Anm_addr = anm;
-    w->Owner = owner;
+    w->Owner = (TEX_OWNER) owner;
     w->Tpl_addr = tpl;
     for (i = 0; i < w->nTexObj; i++) {
         obj = &w->pTex_obj_start[i];
@@ -238,7 +238,7 @@ int cTexSys::GetTplAddr(u32 id, TEXPalette** tpl_addr)
 {
     TEX_WK* w = &m_texw_array[id];
 
-    if (w->Owner == 0) {
+    if (w->Owner == TEX_OWNER_NONE) {
         return 0;
     }
     *tpl_addr = w->Tpl_addr;
@@ -250,7 +250,7 @@ int cTexSys::GetTexObj(u32 id, u32 no, GXTexObj** texobj)
 {
     TEX_WK* w = &m_texw_array[id];
 
-    if (w->Owner == 0) {
+    if (w->Owner == TEX_OWNER_NONE) {
         return 0;
     }
     *texobj = &w->pTex_obj_start[no];
@@ -262,7 +262,7 @@ int cTexSys::GetAnmAddr(u32 id, TexAnm** anm)
 {
     TEX_WK* w = &m_texw_array[id];
 
-    if (w->Owner == 0) {
+    if (w->Owner == TEX_OWNER_NONE) {
         return 0;
     }
     *anm = w->Anm_addr;
@@ -274,7 +274,7 @@ int cTexSys::GetTlutObj(u32 id, GXTlutObj** out)
 {
     TEX_WK* w = &m_texw_array[id];
 
-    if (w->Owner == 0) {
+    if (w->Owner == TEX_OWNER_NONE) {
         return 0;
     }
     if (w->texHdr->format - 8 <= 1) {
@@ -309,7 +309,7 @@ int cTexSys::TexRelease(u32 owner)
 
     for (w = m_texw_array, i = 0; i < 256; w++, i++) {
         if (w->Owner == owner) {
-            w->Owner = 0;
+            w->Owner = TEX_OWNER_NONE;
             base = w->pTex_obj_start - pTexObj;
             for (j = base; j < base + w->nTexObj; j++) {
                 SetTexObjFlag(j, 0);

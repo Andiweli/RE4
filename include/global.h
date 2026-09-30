@@ -1133,7 +1133,7 @@ enum KEY_FLAG {
     KYF_ST2_01 = 51,
     KYF_ST2_02 = 52,
     KYF_ST2_03 = 53,
-    KYF_ST2_04 = 54,
+    KYF_ST2_04 = 54, // TODO: KYF_MAX in this build (the "no key" value emdoor.cpp uses); the entries from KYF_ST2_04 on are PS2-only?
     KYF_ST2_05 = 55,
     KYF_ST2_06 = 56,
     KYF_ST2_07 = 57,

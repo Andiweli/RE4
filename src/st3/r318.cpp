@@ -62,23 +62,6 @@ struct R318Work {
     u32 laserSnd;            // 0xF8  laser hum SndCall handle
 };
 
-// sce_com.cpp ElevatorParam
-struct ElevatorParam {
-    s32 mode;
-    u32 smdId;
-    Vec elPos;
-    Vec plPos;
-    Vec plAng;
-    s32 camNo;
-    u16 pad_30;
-    u16 sndNo;
-    u16 pad_34;
-    u16 sndStop;
-    Vec jumpPos;
-    Vec jumpAng;
-    u16 roomNo;
-};
-
 
 // Effect sequence record tail: the second position at cEsp+0x100 (a laser beam end point).
 struct R318EspView {
@@ -89,8 +72,8 @@ struct R318EspView {
 
 static R318Work* r318_work;
 
-static ElevatorParam r318_elvArrive = {0, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 2, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
-static ElevatorParam r318_elvLeave = {1, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 0, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
+static ElevatorParam r318_elvArrive = {Ele2FArrival, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 2, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
+static ElevatorParam r318_elvLeave = {Ele2FStarting, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 0, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
 
 // cObjScr (game/obj02.cpp) is not in a header: the callback setter of a scripted map object.
 void cObjScrSetCallBack(cObj* o, void (*func)(cObj*)) asm("SetCallBack__7cObjScrPFP4cObj_v");

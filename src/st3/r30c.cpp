@@ -77,7 +77,7 @@ void R30cInit()
 #line 51 "D:/Bio4/Prog/r30c.cpp"
     wp = (R30cWork*) MEM_CALLOC(sizeof(R30cWork), 1, 0xd);
     if (getRoomEtcDoor(1, &r30c_work->door, 1)) {
-        r30c_work->door->setKey(0x13);
+        r30c_work->door->setKey(KYF_R30C_DOOR);
     }
     if (!KyfFlagChk(pG, KYF_R30C_DOOR)) {
         SceAtDataSet_exec(3, 0x12, 0, (TaskFunc) r30c_checkImprisonDoor, 0, 1);

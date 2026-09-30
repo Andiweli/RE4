@@ -34,18 +34,18 @@ void SetTvMode(GXRenderModeObj* pRmode)
     case 0:
     case 2:
         if (pRK->tv_mode == 0) {
-            pRmode->viTVmode = 0;
-            pRmode->xFBmode = 1;
+            pRmode->viTVmode = VI_TVMODE_NTSC_INT;
+            pRmode->xFBmode = VI_XFBMODE_DF;
         } else {
-            pRmode->viTVmode = 2;
-            pRmode->xFBmode = 0;
+            pRmode->viTVmode = VI_TVMODE_NTSC_PROG;
+            pRmode->xFBmode = VI_XFBMODE_SF;
         }
         break;
     case 1:
-        pRmode->viTVmode = 4;
+        pRmode->viTVmode = VI_TVMODE_PAL_INT;
         break;
     case 5:
-        pRmode->viTVmode = 0x14;
+        pRmode->viTVmode = VI_TVMODE_EURGB60_INT;
         break;
     default:
 #line 46
@@ -133,11 +133,11 @@ void tvModeMenu_progressive(TV_MODE* pTv)
         }
         if (pRK->tv_mode != old) {
             if (pRK->tv_mode == 1) {
-                pTv->pRmode->viTVmode = 2;
-                pTv->pRmode->xFBmode = 0;
+                pTv->pRmode->viTVmode = VI_TVMODE_NTSC_PROG;
+                pTv->pRmode->xFBmode = VI_XFBMODE_SF;
             } else {
-                pTv->pRmode->viTVmode = 0;
-                pTv->pRmode->xFBmode = 1;
+                pTv->pRmode->viTVmode = VI_TVMODE_NTSC_INT;
+                pTv->pRmode->xFBmode = VI_XFBMODE_DF;
             }
             systemVISetBlack(1);
             VIFlush();

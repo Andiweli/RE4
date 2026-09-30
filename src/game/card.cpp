@@ -1782,9 +1782,9 @@ int cCard::initialize(int type)
     }
     dispFlag = 1;
     CRCInit();
-    m_Slot[0].SlotNo = 0;
-    m_Slot[1].SlotNo = 1;
-    m_Slot[2].SlotNo = 2;
+    m_Slot[0].SlotNo = SLOT_A;
+    m_Slot[1].SlotNo = SLOT_B;
+    m_Slot[2].SlotNo = HARD_DISK;
     return 1;
 }
 

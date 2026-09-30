@@ -7,6 +7,17 @@
 
 class cObj;
 
+// Rank reached in a stage (Mercenaries): N (none) to S.
+enum MercSysRankIdEnum {
+    MercSysRankIdN = 0,
+    MercSysRankIdD = 1,
+    MercSysRankIdC = 2,
+    MercSysRankIdB = 3,
+    MercSysRankIdA = 4,
+    MercSysRankIdS = 5,
+    MercSysRankIdMax = 6
+};
+
 // Result block at the head of the Mercenaries work (MercSysResultInit fills it).
 struct MercResultInfo {
     u32 score;       // 0x00  final score
@@ -87,7 +98,7 @@ struct MercSysSaveWork {
         u32 mode;    // 0x04
         u32 newFlag; // 0x08
     } stage[4];      // 0x00
-    int rank[5][4];  // 0x30  [mode][stage]
+    MercSysRankIdEnum rank[5][4];  // 0x30  [mode][stage]
 };
 
 extern MercSysWork MercSysWk;

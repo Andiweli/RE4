@@ -17,28 +17,11 @@ struct R31aWork {
     u8 dummy;
 };
 
-// sce_com.cpp ElevatorParam
-struct ElevatorParam {
-    s32 mode;
-    u32 smdId;
-    Vec elPos;
-    Vec plPos;
-    Vec plAng;
-    s32 camNo;
-    u16 pad_30;
-    u16 sndNo;
-    u16 pad_34;
-    u16 sndStop;
-    Vec jumpPos;
-    Vec jumpAng;
-    u16 roomNo;
-};
-
 
 static R31aWork* r31a_work;
 
-static ElevatorParam r31a_elvArrive = {2, 0, {3250.0f, -578.0f, 0.0f}, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 1, 0, 2, 0, 1, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 0x318};
-static ElevatorParam r31a_elvLeave = {3, 0, {3250.0f, -578.0f, 0.0f}, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 1, 0, 0, 0, 1, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 0x318};
+static ElevatorParam r31a_elvArrive = {Ele1FArrival, 0, {3250.0f, -578.0f, 0.0f}, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 1, 0, 2, 0, 1, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 0x318};
+static ElevatorParam r31a_elvLeave = {Ele1FStarting, 0, {3250.0f, -578.0f, 0.0f}, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 1, 0, 0, 0, 1, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 0x318};
 
 // Room init: no water splashes; area 0 = the elevator back down to r318 (SceElevator, action colour);
 // arriving from r318 by a normal transition plays the elevator's arrival ride.

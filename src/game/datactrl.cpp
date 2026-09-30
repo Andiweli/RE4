@@ -52,7 +52,7 @@ inline void cDataUnit::setName(char* s)
 // controller holds commands back (m_nblock_read_stop).
 void cDataUnit::setCommand(int cmd, void* arg, u8 wait)
 {
-    m_command = cmd;
+    m_command = (DATA_COMMAND) cmd;
     this->m_arg_addr = arg;
     this->m_mode = wait;
     if (wait != 0 || DC.checkNBlkStop() != 1) {
@@ -69,7 +69,7 @@ int cDataUnit::getCommand()
 // Sets the unit state (see the condition codes in datactrl.h).
 void cDataUnit::setCondition(int c)
 {
-    m_condition = c;
+    m_condition = (DATA_CONDITION) c;
 }
 
 // The unit state: 0 none, 1 / 2 MRAM loading / ok, 3 / 4 ARAM loading / ok, 5..8 transfers.
@@ -119,7 +119,7 @@ void cDataUnit::fixMramAddr(void* a)
 // 1 when the data is in MRAM and usable (condition 2); 0 while idle or elsewhere.
 int cDataUnit::isUseOk()
 {
-    if (m_condition == COND_NO_DATA && m_command == 0) {
+    if (m_condition == COND_NO_DATA && m_command == CMND_NONE) {
         setErr(5);
         return 0;
     }
@@ -129,7 +129,7 @@ int cDataUnit::isUseOk()
 // Blocks (TaskSleep) until the data is in MRAM; 0 when the unit is idle or the wait failed.
 int cDataUnit::waitUseOk()
 {
-    if (m_condition == COND_NO_DATA && m_command == 0) {
+    if (m_condition == COND_NO_DATA && m_command == CMND_NONE) {
         setErr(5);
         return 0;
     }
@@ -149,7 +149,7 @@ int cDataUnit::waitUseOk()
 // 1 when the data is resident in MRAM or ARAM (condition 2 or 4).
 int cDataUnit::isLoadOk()
 {
-    if (m_condition == COND_NO_DATA && m_command == 0) {
+    if (m_condition == COND_NO_DATA && m_command == CMND_NONE) {
         setErr(5);
         return 0;
     }
@@ -162,7 +162,7 @@ int cDataUnit::isLoadOk()
 // Blocks until the data is resident somewhere.
 int cDataUnit::waitLoadOk()
 {
-    if (m_condition == COND_NO_DATA && m_command == 0) {
+    if (m_condition == COND_NO_DATA && m_command == CMND_NONE) {
         setErr(5);
         return 0;
     }
@@ -222,7 +222,7 @@ void cDataUnit::setLoadToMram()
         }
         m_id = no;
         if (no >= 0) {
-            m_command = 0;
+            m_command = CMND_NONE;
             m_condition = COND_MRAM_LOAD;
             if (m_mode == 1) {
                 checkLoadToMram();
@@ -248,7 +248,7 @@ void cDataUnit::setLoadToMram()
             m_addr = m_fix_addr;
             DCFlushRange(m_arg_addr, m_size);
         }
-        m_command = 0;
+        m_command = CMND_NONE;
         OSReport("DC:%s set MRAM_TO_MRAM\n", m_name);
         break;
     case COND_ARAM_OK:
@@ -276,7 +276,7 @@ void cDataUnit::setLoadToMram()
         no = Aram.DmaTransReq(1, (u32) m_addr, (u32) m_dest_addr, m_size, m_mode);
         m_id = no;
         if (no >= 0) {
-            m_command = 0;
+            m_command = CMND_NONE;
             m_condition = COND_ARAM_TO_MRAM;
             if (m_mode == 1) {
                 checkAramToMram();
@@ -325,7 +325,7 @@ void cDataUnit::setLoadToAram()
         }
         m_id = no;
         if (no >= 0) {
-            m_command = 0;
+            m_command = CMND_NONE;
             m_condition = COND_ARAM_LOAD;
             if (m_mode == 1) {
                 checkLoadToAram();
@@ -351,7 +351,7 @@ void cDataUnit::setLoadToAram()
         no = Aram.DmaTransReq(0, (u32) m_addr, (u32) m_dest_addr, m_size, m_mode);
         m_id = no;
         if (no >= 0) {
-            m_command = 0;
+            m_command = CMND_NONE;
             m_condition = COND_MRAM_TO_ARAM;
             if (m_mode == 1) {
                 checkMramToAram();
@@ -376,7 +376,7 @@ void cDataUnit::setLoadToAram()
                 no = Aram.DmaTransReq(1, (u32) m_addr, (u32) m_dest_addr, m_size, m_mode);
                 m_id = no;
                 if (no >= 0) {
-                    m_command = 0;
+                    m_command = CMND_NONE;
                     m_condition = COND_ARAM_TO_ARAM;
                     OSReport("DC:%s set ARAM_TO_ARAM\n", m_name);
                 } else {
@@ -397,7 +397,7 @@ void cDataUnit::setLoadToAram()
 // to condition 0 (the ARAM space is reclaimed by the sort).
 int cDataUnit::setClear()
 {
-    m_command = 0;
+    m_command = CMND_NONE;
     switch (m_condition) {
     case COND_ARAM_TO_MRAM:
     case COND_MRAM_TO_ARAM:

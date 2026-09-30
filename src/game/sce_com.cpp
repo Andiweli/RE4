@@ -74,23 +74,6 @@ struct cItemEvent {
     int param;            // 0x1C
 };
 
-// Elevator script data (SceElevator task argument).
-struct ElevatorParam {
-    s32 mode;              // 0x00  0/2: arrive, 1/3: leave (1/0 move down)
-    u32 smdId;             // 0x04  scroll object of the cage
-    Vec elPos;             // 0x08  cage rest position
-    Vec plPos;             // 0x14  player position on the cage
-    Vec plAng;             // 0x20
-    s32 camNo;             // 0x2C  camera cut (-1 = none)
-    u16 pad_30;
-    u16 sndNo;             // 0x32
-    u16 pad_34;
-    u16 sndStop;           // 0x36
-    Vec jumpPos;           // 0x38  room jump destination
-    Vec jumpAng;           // 0x44
-    u16 roomNo;            // 0x50
-};
-
 static void* ItemEventTbl[16];
 static CAMERA SceCam;
 
@@ -1283,7 +1266,7 @@ void SceElevator(ElevatorParam* d)
     if (d->camNo != -1) {
         CamCtrl.CutCall((s8) d->camNo);
     }
-    if (d->mode == 1 || d->mode == 3) {
+    if (d->mode == Ele2FStarting || d->mode == Ele1FStarting) {
         SndCall(6, d->sndNo, &obj->pos, 0, 0, 0);
         spd = accel;
         jp = &d->jumpPos;
@@ -1312,7 +1295,7 @@ void SceElevator(ElevatorParam* d)
                 spd = maxSpd;
             }
             step = spd;
-            if (d->mode == 1) {
+            if (d->mode == Ele2FStarting) {
                 step = -spd;
             }
             obj->setPos(obj->pos.x, obj->pos.y + step, obj->pos.z);
@@ -1329,11 +1312,11 @@ void SceElevator(ElevatorParam* d)
             }
         }
     }
-    if (d->mode == 0 || d->mode == 2) {
+    if (d->mode == Ele2FArrival || d->mode == Ele1FArrival) {
         StaFlagOff(pG, STA_SUSPEND);
         spd = maxSpd;
         move = stopDist2;
-        if (d->mode == 0) {
+        if (d->mode == Ele2FArrival) {
             move = -move;
         }
         obj->setPos(obj->pos.x, obj->pos.y + move, obj->pos.z);
@@ -1353,7 +1336,7 @@ void SceElevator(ElevatorParam* d)
                 }
             }
             move = spd;
-            if (d->mode != 0) {
+            if (d->mode != Ele2FArrival) {
                 move = -move;
             }
             obj->setPos(obj->pos.x, obj->pos.y + move, obj->pos.z);
@@ -1364,12 +1347,12 @@ void SceElevator(ElevatorParam* d)
                 pG->quake_ofs = q;
             }
             done = 0;
-            if (d->mode == 0) {
+            if (d->mode == Ele2FArrival) {
                 if (obj->pos.y >= d->elPos.y) {
                     done = 1;
                 }
             }
-            if (d->mode == 2) {
+            if (d->mode == Ele1FArrival) {
                 if (obj->pos.y <= d->elPos.y) {
                     done = 1;
                 }

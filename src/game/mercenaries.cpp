@@ -260,7 +260,7 @@ int MercSysMoveStart(MercSysWork* wk)
                 MercSysSaveWork save;
 
                 MercSysGetSaveWork(&save);
-                if (save.rank[wk->mode][wk->stage] <= 4) {
+                if (save.rank[wk->mode][wk->stage] <= MercSysRankIdA) {
                     SceMesSet(wk->mesAC, 0x20, 1, 100, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
                 }
             }
@@ -540,7 +540,7 @@ int MercSysResultInit(MercSysWork* pWk)
         save.stage[pWk->stage].newFlag = 0;
     }
     if (save.rank[pWk->rslt.mode][pWk->stage] < pWk->rslt.rank) {
-        save.rank[pWk->rslt.mode][pWk->stage] = pWk->rslt.rank;
+        save.rank[pWk->rslt.mode][pWk->stage] = (MercSysRankIdEnum) pWk->rslt.rank;
     }
     MercSysSetSaveWork(&save);
     pWk->rslt.hiScore = save.stage[pWk->stage].score;
@@ -559,7 +559,7 @@ int MercSysResultInit(MercSysWork* pWk)
 
         for (k = 0; k < 4; k++) {
             for (j = 0; j < 5; j++) {
-                if (save.rank[j][k] > 4) {
+                if (save.rank[j][k] > MercSysRankIdA) {
                     cnt++;
                 }
             }
@@ -703,7 +703,7 @@ void MercSysGetSaveWork(MercSysSaveWork* pSaveWk)
             if (FlagChkVar(pSys->MercSysRank, (u32) (i * 15 + j * 3 + 2))) {
                 r |= 1;
             }
-            pSaveWk->rank[j][i] = r;
+            pSaveWk->rank[j][i] = (MercSysRankIdEnum) r;
         }
     }
 }

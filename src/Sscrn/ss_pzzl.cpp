@@ -1230,7 +1230,7 @@ void SsPzzlInit::move(SUB_SCREEN* wk)
     case 0:
         if (wk->scrn_out_func(wk) == 1) {
             if (wk->menu_old == 2) {
-                wk->wait_cnt = 1;
+                wk->trans_off = 1;
             }
             IdSubErase();
             IdNumErase();
@@ -1265,7 +1265,7 @@ void SsPzzlInit::move(SUB_SCREEN* wk)
         } else {
             sscrnModelClear(wk);
         }
-        wk->wait_cnt = 0;
+        wk->trans_off = 0;
         state++;
     case 3: {
         int result;
@@ -1448,7 +1448,7 @@ void SsPzzlMain::init(SUB_SCREEN* wk)
         cur = thinking;
         cur->init(wk);
     } else {
-        if ((wk->flags & 4) && wk->puzzlePlayer->spacePtr()->getPieceNum() != 0) {
+        if ((wk->attr_flag & 4) && wk->puzzlePlayer->spacePtr()->getPieceNum() != 0) {
             wk->puzzlePlayer->m_p_active_board = wk->puzzlePlayer->spacePtr();
             thinking->init(wk);
         }
@@ -1643,10 +1643,10 @@ void SsPzzlMain::quit(SUB_SCREEN* wk)
             // x300 first: with x40 first the arm's tail is the else arm's `stw x40` insn, which our
             // jump2 cross-jumps as a single-insn tail (COMPILER-DIFF: 6)
             wk->p_get_item = 0;
-            wk->model_flag = 0;
+            wk->item_get_flag = 0;
         } else {
             wk->puzzlePlayer->save();
-            wk->model_flag = 1;
+            wk->item_get_flag = 1;
         }
     }
     pzzl_dbg.quit(wk);
@@ -2464,7 +2464,7 @@ void PieceCommand::move(SUB_SCREEN* wk)
                 if (pG->pl_type == 1) {
                     break;
                 }
-                if (wk->flags & 2) {
+                if (wk->attr_flag & 2) {
                     for (int i = 0; i < num * 2 + 6; i++) {
                         id[i]->rev_flag |= 0xF;
                     }

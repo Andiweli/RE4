@@ -40,29 +40,12 @@ struct R225Work {
     cObj* door;    // 0x04  the SetObjSmd dummy that rides along with the door
 };
 
-// sce_com.cpp ElevatorParam
-struct ElevatorParam {
-    s32 mode;
-    u32 smdId;
-    Vec elPos;
-    Vec plPos;
-    Vec plAng;
-    s32 camNo;
-    u16 pad_30;
-    u16 sndNo;
-    u16 pad_34;
-    u16 sndStop;
-    Vec jumpPos;
-    Vec jumpAng;
-    u16 roomNo;
-};
-
 static R225Work* r225_work;
 
 // Stores through references (not MEM_IN_STRUCT_P): the static pointer / pPL reload after each one.
 
-static ElevatorParam r225_elvArrive = {2, 0x15, {0.0f, 0.0f, 0.0f}, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, -1, 0, 0xE, 0, 0xF, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0x226};
-static ElevatorParam r225_elvLeave = {3, 0x15, {0.0f, 0.0f, 0.0f}, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 8, 0, 0xD, 0, 0xF, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0x226};
+static ElevatorParam r225_elvArrive = {Ele1FArrival, 0x15, {0.0f, 0.0f, 0.0f}, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, -1, 0, 0xE, 0, 0xF, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0x226};
+static ElevatorParam r225_elvLeave = {Ele1FStarting, 0x15, {0.0f, 0.0f, 0.0f}, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 8, 0, 0xD, 0, 0xF, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0x226};
 
 static void gnd_open();
 static void r225_operateCrank();

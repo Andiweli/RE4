@@ -27,19 +27,38 @@ struct SSCRN_SAVE_DATA {
     u32 save;
 };
 
+enum SS_OPEN_FLAG {
+    SS_OPEN_NULL = 0,
+    SS_OPEN_NORMAL = 1,
+    SS_OPEN_MAP = 2,
+    SS_OPEN_PZZL = 4,
+    SS_OPEN_SHOP = 16,
+    SS_OPEN_TERM = 32,
+    SS_OPEN_FILE = 64,
+    SS_OPEN_ITEM = 128,
+    SS_OPEN_CAP = 256
+};
+
+enum SS_ATTR_FLAG {
+    SS_ATTR_NULL = 0,
+    SS_ATTR_EVENT = 1,
+    SS_ATTR_BOAT = 2,
+    SS_ATTR_ASHLEY = 4
+};
+
 // The work is the `SUB_SCREEN` of the Sscrn module's `Widget<SUB_SCREEN>` template (the module's
 // mangled names carry the tag); SubScreenWork is the DOL-side alias.
 struct SUB_SCREEN {
     char filename[0x28];          // 0x000  "SS/<lang>/<file>" (sscrnSetLanguage / sscrnDataFilename)
     u8 Loop;                  // 0x028  1 while the sub screen main loop runs (sscrn opens, SubScreenTask exit clears)
     u8 pad_29[3];
-    s32 open_flag;             // 0x02C  open type: 1 inventory, 2, 0x10, 0x20 puzzle, 0x40, 0x80
-    s32 flags;                // 0x030  bit0 event, bit1 (flags_5010 bit21 at open), bit3 no sound
+    SS_OPEN_FLAG open_flag;    // 0x02C  open type: 1 inventory, 2, 0x10, 0x20 puzzle, 0x40, 0x80
+    SS_ATTR_FLAG attr_flag;       // 0x030  bit0 event, bit1 (flags_5010 bit21 at open), bit3 no sound
     s32 close_flag;           // 0x034  set by the screens as they close (2 item, 4 map, 8 term, 0x10 file, 0x10000 shop); cleared on menu change
-    s32 attr_flag;
-    s32 wait;                 // 0x03C  frames left before SubScreenCall may open (SubScreenWait)
     s32 model_flag;
-    s32 wait_cnt;
+    s32 wait_cnt;                 // 0x03C  frames left before SubScreenCall may open (SubScreenWait)
+    s32 item_get_flag;
+    s32 trans_off;
     s32 str_id;
     int (*scrn_out_func)(SUB_SCREEN*);  // 0x04C  screen exit routine (Sscrn ss_*: sscrn_*_out), run until it returns 1
     u32 stop_bak;              // 0x050  pG->flags_170 while open
@@ -176,25 +195,6 @@ void SubScreenWait(int frame);
 void SubScreenCall();
 int sscrnStageNo();
 u16 sscrnRoomNo(u16 room_no);
-enum SS_OPEN_FLAG {
-    SS_OPEN_NULL = 0,
-    SS_OPEN_NORMAL = 1,
-    SS_OPEN_MAP = 2,
-    SS_OPEN_PZZL = 4,
-    SS_OPEN_SHOP = 16,
-    SS_OPEN_TERM = 32,
-    SS_OPEN_FILE = 64,
-    SS_OPEN_ITEM = 128,
-    SS_OPEN_CAP = 256
-};
-
-enum SS_ATTR_FLAG {
-    SS_ATTR_NULL = 0,
-    SS_ATTR_EVENT = 1,
-    SS_ATTR_BOAT = 2,
-    SS_ATTR_ASHLEY = 4
-};
-
 int SubScreenOpen(int type, int flags);
 void SubScreenMiss();
 void SubScreenExec();

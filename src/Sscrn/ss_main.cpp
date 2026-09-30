@@ -163,7 +163,7 @@ void generalModelAlloc(SUB_SCREEN* wk)
 {
     int i;
 
-    wk->attr_flag |= 1;
+    wk->model_flag |= 1;
     ssModInfoMgr.roomInit();
     ssModInfoMgr.arrayAlloc(0xA0);
     ssPartsMgr.roomInit();
@@ -381,7 +381,7 @@ void SubScreenTask()
         EspGenLoopMove();
         IdSub.trans();
         IdNum.trans();
-        if (wk->wait_cnt == 0) {
+        if (wk->trans_off == 0) {
             cModel* m;
             void (*func)(cModel*);
             // `m->next` read before the call (`lwz r30, 4(r30)` above the `blrl`).
@@ -794,7 +794,7 @@ void sscrnModelClear(SUB_SCREEN* wk)
 // and frees the three arrays. No-op unless attr_flag bit 0 is set.
 void sscrnModelFree(SUB_SCREEN* wk)
 {
-    int off = !(wk->attr_flag & 1);
+    int off = !(wk->model_flag & 1);
 
     if (off) {
         return;
@@ -806,7 +806,7 @@ void sscrnModelFree(SUB_SCREEN* wk)
         ssModInfoMgr.arrayFree();
         ssPartsMgr.arrayFree();
         MapMgr.arrayFree();
-        wk->attr_flag &= ~1;
+        wk->model_flag &= ~1;
     }
 }
 

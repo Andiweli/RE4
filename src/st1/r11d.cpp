@@ -120,7 +120,7 @@ void R11dInit()
     }
     if (!KyfFlagChk(pG, KYF_R11D_IRON_DOOR)) {
         if (getRoomEtcDoor(0x26, &r11d_work->door, 1)) {
-            r11d_work->door->setKey(0xB);
+            r11d_work->door->setKey(KYF_R11D_IRON_DOOR);
         }
         SceAtDataSet_exec(8, SCE_LEVEL10, 0, (TaskFunc) r11d_checkIronDoor, 0, 1);
         SceExec(0x12, (TaskFunc) r11d_checkIronDoorKeyUse, 0, 0, SCE_PRIO_DEF_2, 0);

@@ -2,6 +2,7 @@
 #define OPTION_H
 
 #include "types.h"
+#include "sce.h"
 
 // game/option.cpp: the pause/title option menu, the result screens and the chapter end screen.
 
@@ -49,7 +50,7 @@ public:
 class ChapterEnd {
 private:
     void* _addr;       // 0x00  chapter id archive
-    s32 _chapter;      // 0x04
+    CHAPTER_NO _chapter;      // 0x04
 public:
     u8 pad_8[4];
 

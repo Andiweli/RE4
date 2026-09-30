@@ -163,7 +163,7 @@ void SsItemInit::move(SUB_SCREEN* wk)
             break;
         }
         if (wk->menu_old == 2) {
-            wk->wait_cnt = 1;
+            wk->trans_off = 1;
         }
         IdSubErase();
         IdNumErase();
@@ -203,7 +203,7 @@ void SsItemInit::move(SUB_SCREEN* wk)
         } else {
             sscrnModelClear(wk);
         }
-        wk->wait_cnt = 0;
+        wk->trans_off = 0;
         state++;
     case 3: {
         int stat;

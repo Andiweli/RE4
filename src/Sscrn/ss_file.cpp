@@ -271,7 +271,7 @@ void SsFileInit::move(SUB_SCREEN* wk)
             break;
         }
         if (wk->menu_old == 2) {
-            wk->wait_cnt = 1;
+            wk->trans_off = 1;
         }
         IdSubErase();
         IdNumErase();
@@ -305,7 +305,7 @@ void SsFileInit::move(SUB_SCREEN* wk)
         } else {
             sscrnModelClear(wk);
         }
-        wk->wait_cnt = 0;
+        wk->trans_off = 0;
         state++;
     case 3: {
         int stat;
@@ -419,7 +419,7 @@ void SsFileMain::init(SUB_SCREEN* wk)
     if (wk->open_flag == 0x40) {
         int no = fileId2No(wk->get_item_id);
         ItemMgr.get(wk->get_item_id, 0);
-        wk->model_flag = 1;
+        wk->item_get_flag = 1;
         if (pSys->language == 0) {
             cMes.setupFont(0x1C, 0x1C, (u8*) SS_ARC_PTR(wk->pFileDat, 4), 3);
         }

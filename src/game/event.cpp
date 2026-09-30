@@ -3064,7 +3064,7 @@ EventDebug::~EventDebug()
 // Room init: clears the tool's disable bits (FlagEtc).
 int EventDebug::myRoomInit()
 {
-    FlagEtc = 0;
+    FlagEtc[0] = (FlagEtcFlag) 0;
     return 1;
 }
 

@@ -153,7 +153,8 @@ cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo)
     w->pChain = 0;
     w->Se_cancel = 0;
     w->Be_flg = 0;
-    w->Key_flag = 0x36;
+    // TODO: 0x36 is the "no key" value here, which is KYF_ST2_04 in this enum (PS2 uses KYF_MAX)
+    w->Key_flag = KYF_ST2_04;
     w->rnd = Rnd() % 5;
     w->Door_hp = (Rnd() & 1) + 1;
     w->Open_timer = 0;
@@ -1810,10 +1811,11 @@ void emDoor_R1_Break(cEmDoor* pEm)
         if (flg) {
             *flg |= 1;
         }
-        if (w->Key_flag != 0x36) {
+        // TODO: "no key" is KYF_MAX on PS2
+        if (w->Key_flag != KYF_ST2_04) {
             u32* tbl = pG->Key_flg;
 
-            FlagOn(tbl, w->Key_flag);
+            FlagOn(tbl, (u32) w->Key_flag);
         }
         pEm->r_no_2++;
     }
@@ -2550,7 +2552,8 @@ u32 cEmDoor::ckOpen()
     if (ckObj() == 0) {
         return 2;
     }
-    if (w->Key_flag != 0x36 && emDoorKeyCk(w->Key_flag) == 0) {
+    // TODO: "no key" is KYF_MAX on PS2
+    if (w->Key_flag != KYF_ST2_04 && emDoorKeyCk(w->Key_flag) == 0) {
         return 3;
     }
     return 0;
@@ -2564,7 +2567,9 @@ int cEmDoor::ckKick(Vec* pPos)
     Mtx m;
     Vec v;
 
-    if (w->Key_flag != 0x36 && emDoorKeyCk(w->Key_flag) == 0) {
+    // TODO: "no key" is KYF_MAX on PS2
+
+    if (w->Key_flag != KYF_ST2_04 && emDoorKeyCk(w->Key_flag) == 0) {
         return 0;
     }
     if (w->Lock_L_hp > 1) {
@@ -2898,7 +2903,8 @@ void emDoorActEvtCk(cEmDoor* pEm)
     if (w->Be_flg & 1) {
         return;
     }
-    if (w->Key_flag != 0x36 && emDoorKeyCk(w->Key_flag) == 0) {
+    // TODO: "no key" is KYF_MAX on PS2
+    if (w->Key_flag != KYF_ST2_04 && emDoorKeyCk(w->Key_flag) == 0) {
         return;
     }
     ang = fabsf(Muku2(w->base_dir, pPL->ang.y, PI));
@@ -3346,9 +3352,9 @@ void cEmDoor::setNormal()
 }
 
 // The pG->Key_flg key bit required to open the door (0x36 = none).
-void cEmDoor::setKey(int no)
+void cEmDoor::setKey(KEY_FLAG key_flag)
 {
-    EMDOOR_WK(this)->Key_flag = no;
+    EMDOOR_WK(this)->Key_flag = key_flag;
 }
 
 // The intact door `m` (an NPC / partner) stands in front of and faces, within its reach box;

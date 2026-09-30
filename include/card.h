@@ -59,12 +59,19 @@ s32 CARDGetStatus(s32 chan, s32 fileNo, CardStat* stat);
 s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CardStat* stat, CardCallback callback);
 }
 
-// One memory card slot (SlotNo 0 = slot A, 1 = slot B, 2 = the host "HARD DISK" of the dev kit).
+enum SLOT_NO {
+    SLOT_A = 0,
+    SLOT_B = 1,
+    HARD_DISK = 2,  // the host disk of the dev kit
+    SLOT_MAX = 3
+};
+
+// One memory card slot.
 // PS2's CARD_SLOT_INFO is 0xE4 bytes: workArea, freeFiles, pad_6C and serial below are GC's own,
 // no PS2 equivalent (the Dolphin CARD API needs the async work area; PS2's doesn't track a serial).
 struct CARD_SLOT_INFO {
     void* workArea;         // 0x00  CARDMountAsync work area (0xA000, slot A only)
-    s32 SlotNo;             // 0x04
+    SLOT_NO SlotNo;         // 0x04
     u32 Status;             // 0x08  error bits (2 no card, 4 no space, 0x10 broken, 0x20 wrong device,
                             //       0x40 fatal, 0x80 sector size, 0x100 save file seen, 0x200 system
                             //       file seen, 0x400/0x800 which file lacks space)

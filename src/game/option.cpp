@@ -83,7 +83,7 @@ void setLangExt3(char* name)
 // and not while Status_flg[0] 0x400 (menus locked) or 0x40 (event running) are set.
 int OptionOpenCheck()
 {
-    if (SubScreenWk.wait > 0) {
+    if (SubScreenWk.wait_cnt > 0) {
         return 0;
     }
     u32 f = pG->Status_flg[0];
@@ -1077,7 +1077,7 @@ void ChapterEnd::init(void* d, u8 no)
     IdSys.roomInit();
     IdTexDataLoad(DATA_PTR(_addr, 0x10), TEX_OWNER_ID_TITLE);
     IdSys.set((ID_FILE_HEADER*) DATA_PTR(_addr, 0x14), 0xFF, IDC_TITLE, 0x13, 6, 0);
-    _chapter = no;
+    _chapter = (CHAPTER_NO) no;
 }
 
 // Fills the chapter result: this chapter / next chapter numbers ("chap-sec"), chapter and total hit

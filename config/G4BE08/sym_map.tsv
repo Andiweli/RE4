@@ -3814,7 +3814,7 @@ address	size	section	unit	scope	name	demangled
 0x8010425C	0x80	.text	game/emdoor.cpp	global	setClose__7cEmDoor	cEmDoor::setClose
 0x801042DC	0x8C	.text	game/emdoor.cpp	global	setDowned__7cEmDoori	cEmDoor::setDowned
 0x80104368	0x10	.text	game/emdoor.cpp	global	setNormal__7cEmDoor	cEmDoor::setNormal
-0x80104378	0x8	.text	game/emdoor.cpp	global	setKey__7cEmDoori	cEmDoor::setKey
+0x80104378	0x8	.text	game/emdoor.cpp	global	setKey__7cEmDoor8KEY_FLAG	cEmDoor::setKey
 0x80104380	0x230	.text	game/emdoor.cpp	global	DoorOpenCk__FP6cModel	DoorOpenCk
 0x801045B0	0x28	.text	game/emdoor.cpp	global	SubOpenDoorSet__FP7cEmDoor	SubOpenDoorSet
 0x801045D8	0x21C	.text	game/emdoor.cpp	global	subDoorKick__Fv	subDoorKick

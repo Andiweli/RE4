@@ -4,6 +4,7 @@
 #include "types.h"
 #include "vec.h"
 #include "hermite.h"
+#include "texture.h"
 
 // Screen id (widget) unit (game/id_sys.cpp), 0x138 bytes.
 struct ID_UNIT {
@@ -252,22 +253,6 @@ void* IdGetBufferAddr(int type);
 void IdSetBufferType(int type);
 void IdTexGameInit();
 void IdTexRoomInit();
-enum TEX_OWNER {
-    TEX_OWNER_NONE = 0,
-    TEX_OWNER_CORE = 1,
-    TEX_OWNER_ROOM = 2,
-    TEX_OWNER_ID_TOOL = 3,
-    TEX_OWNER_ID_COCKPIT = 4,
-    TEX_OWNER_ID_CINESCO = 5,
-    TEX_OWNER_ID_EVENT = 6,
-    TEX_OWNER_ID_TITLE = 7,
-    TEX_OWNER_ID_SHARE = 8,
-    TEX_OWNER_ID_SSCRN = 9,
-    TEX_OWNER_ID_DEAD = 10,
-    TEX_OWNER_ID_SCOPE = 11,
-    TEX_OWNER_MAX = 12
-};
-
 void IdTexRelease(int owner);
 int IdTexDataLoad(void* data, int id);
 

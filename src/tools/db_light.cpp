@@ -84,6 +84,9 @@ public:
     int createPath(cLightPathHeader* dst);
 };
 
+// Which light set the tool is editing.
+enum eDataType { DT_WORK, DT_CUT, DT_ROOM, DT_CORE, DT_TOOL };
+
 class cLightTool {
 public:
     u32 Flag;             // 0x00  bit0: object move, bit2: analyze, bit3: cut select follows the camera,
@@ -108,7 +111,7 @@ public:
     u8 EditCutNo;          // 0x15  cut the game camera selects
     u8 CutNum;            // 0x16
     u8 pad_17;
-    int DataType;              // 0x18  0 room local, 1 room server, 2 event, 3 core, 4 tool, 5 item
+    eDataType DataType;        // 0x18
     u8 be_flag;                // 0x1C  move() result: 1 = running, 2 = player mode, 0 = quit
     u8 Mode;              // 0x1D  0 init, 1 camera mode, 2 player mode, 10 mode select
     u8 PageNo;              // 0x1E  debug print page (pG->debug_mode) the eprintf calls draw on (PS2 PageNo; was `color`)
@@ -355,7 +358,7 @@ cLightTool::cLightTool() : modeSel(0, 2, 0)
     pTool = this;
     be_flag = 1;
     table_height = 7;
-    DataType = 1;
+    DataType = DT_CUT;
     rno0 = rno1 = rno2 = rno3 = rno4 = rno5 = rno6 = rno7 = sno0 = sno1 = sno2 = sno3 = pno0 = pno1 = pno2 = pno3 = 0;
     cursor = 0;
     cursorCtr = 0;
@@ -403,17 +406,17 @@ int cLightTool::move()
 
     eprintf(0x18, 0xE, 0, PageNo, "LIGHT TOOL");
     switch (DataType) {
-    case 0:
-    case 1:
+    case DT_WORK:
+    case DT_CUT:
         eprintf(0x1B0, 0xE, 0, PageNo, "CUT%02d/%02d", cutNo, CutNum);
         break;
-    case 4:
+    case DT_TOOL:
         eprintf(0x1B8, 0xE, 0, PageNo, "TOOL %02d", cutNo);
         break;
-    case 2:
+    case DT_ROOM:
         eprintf(0x1A8, 0xE, 0, PageNo, "ROOM%02d/%02d", cutNo, CutNum);
         break;
-    case 3:
+    case DT_CORE:
         eprintf(0x1B8, 0xE, 0, PageNo, "CORE %02d", cutNo);
         break;
     }
@@ -536,13 +539,13 @@ u32 cLightTool::dblCk(u32 bit)
 // (edit any cut), else only while the game camera is in the edited cut.
 int cLightTool::editEnable()
 {
-    if (DataType == 3) {
+    if (DataType == DT_CORE) {
         return 1;
     }
-    if (DataType == 2) {
+    if (DataType == DT_ROOM) {
         return 1;
     }
-    if (DataType == 4) {
+    if (DataType == DT_TOOL) {
         return 1;
     }
     if (dblCk(8)) {
@@ -3252,10 +3255,10 @@ void edit_fog_common(FOG* fog)
         switch (pTool->cursor) {
         case 0:
             if (pTool->Pad1.rep & JOY_RIGHT) {
-                fog->Type = fogTypeNext(fog->Type);
+                fog->Type = (GXFogType) fogTypeNext(fog->Type);
             }
             if (pTool->Pad1.rep & JOY_LEFT) {
-                fog->Type = fogTypeBack(fog->Type);
+                fog->Type = (GXFogType) fogTypeBack(fog->Type);
             }
             break;
         case 1:
@@ -4053,7 +4056,7 @@ static void load()
         if (pTool->Lit.fileLoad(path)) {
             pTool->cutNo = pTool->EditCutNo;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = (pTool->cursor != 1) ? 1 : 2;
+            pTool->DataType = (pTool->cursor != 1) ? DT_CUT : DT_ROOM;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4084,7 +4087,7 @@ static void load()
             file_lock(path);
             pTool->cutNo = pTool->EditCutNo;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = (pTool->cursor != 1) ? 1 : 2;
+            pTool->DataType = (pTool->cursor != 1) ? DT_CUT : DT_ROOM;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4109,7 +4112,7 @@ static void load()
         if (pTool->Lit.fileLoad(path)) {
             pTool->cutNo = 0;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = 4;
+            pTool->DataType = DT_TOOL;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4135,7 +4138,7 @@ static void load()
             file_lock(path);
             pTool->cutNo = 0;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = 3;
+            pTool->DataType = DT_CORE;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4176,7 +4179,7 @@ static void load()
             file_lock(path);
             pTool->cutNo = pTool->EditCutNo = 0;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = (pTool->cursor != 1) ? 1 : 2;
+            pTool->DataType = (pTool->cursor != 1) ? DT_CUT : DT_ROOM;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4201,7 +4204,7 @@ static void load()
         if (pTool->Lit.fileLoad(path)) {
             pTool->cutNo = 0;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = 4;
+            pTool->DataType = DT_TOOL;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4240,10 +4243,10 @@ static void save()
         default:
             pTool->cursor = (DbgFlagChk(pG, DBG_EVENT_TOOL)) ? 2 : 1;
             break;
-        case 4:
+        case DT_TOOL:
             pTool->cursor = 2;
             break;
-        case 3:
+        case DT_CORE:
             pTool->cursor = 3;
             break;
         }
@@ -4266,11 +4269,11 @@ static void save()
             switch (pTool->cursor) {
             case 0:
                 pTool->rno1 = 2;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 1:
                 pTool->rno1 = 4;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 2:
                 pTool->rno1 = 14;
@@ -4290,19 +4293,19 @@ static void save()
                 break;
             case 3:
                 pTool->rno1 = 6;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 4:
                 pTool->rno1 = 8;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 5:
                 pTool->rno1 = 12;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 6:
                 pTool->rno1 = 0x10;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             }
         }

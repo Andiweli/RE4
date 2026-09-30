@@ -2,6 +2,7 @@
 #define TPL_H
 
 #include "types.h"
+#include <dolphin/gx/GXEnum.h>
 
 // TPL texture palette layout (charPipeline/texPalette.h without the SDK includes). File offsets
 // are relocated to pointers by cTexSys::CalcTplAddr.
@@ -9,7 +10,7 @@ struct CLUTHeader {
     u16 numEntries;  // 0x00
     u8 unpacked;     // 0x02
     u8 pad8;         // 0x03
-    u32 format;      // 0x04
+    GXTlutFmt format;  // 0x04
     void* data;      // 0x08
 };
 

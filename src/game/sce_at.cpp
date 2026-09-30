@@ -1232,7 +1232,7 @@ void sceAtGetItem(SCE_AT_ITEM* w)
         while (SubScreenWk.close_flag == 0) {
             SceSleep(1);
         }
-        if (SubScreenWk.model_flag == 0) {
+        if (SubScreenWk.item_get_flag == 0) {
             ITEM_CANCEL();
         }
     } else {
@@ -1454,7 +1454,7 @@ void sceAtGetItem_NoModel(SCE_AT_ITEM* w)
         while (SubScreenWk.close_flag == 0) {
             SceSleep(1);
         }
-        if (SubScreenWk.model_flag == 0) {
+        if (SubScreenWk.item_get_flag == 0) {
             ITEM_CANCEL_NOMODEL();
         }
     } else {

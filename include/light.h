@@ -2,6 +2,7 @@
 #define LIGHT_H
 
 #include "types.h"
+#include <dolphin/gx/GXEnum.h>
 #include "vec.h"
 #include "gx.h"
 #include "cManager.h"
@@ -235,7 +236,7 @@ struct LightPathHeader {
 
 // Fog block (cLightEnv+0x8, copied to `fogNew` by setEnv).
 struct FOG {
-    s32 Type;          // 0x00  GX fog type (0 = off)
+    GXFogType Type;    // 0x00  GX fog type (0 = off)
     f32 Start;         // 0x04
     f32 End;           // 0x08
     GXColor Color;     // 0x0C

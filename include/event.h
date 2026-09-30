@@ -564,7 +564,7 @@ private:
 public:
     ModelFiles* PMod; // 0xE0  0x60 entries
 private:
-    u32 FlagEtc;             // 0xE4  FlagEtcFlag bits (tool switches)
+    FlagEtcFlag FlagEtc[1];  // 0xE4  tool switches: bit FlagEtcFlag of the word
 
 public:
     EventDebug();
@@ -572,17 +572,17 @@ public:
     int myRoomInit();          // room start (game gameRoomInit)
     bool FlagCkEtc(u32 no)
     {
-        u32* f = &FlagEtc;
+        u32* f = (u32*) FlagEtc;
         return (f[no >> 5] & (0x80000000 >> (no & 0x1F))) != 0;
     }
     void FlagOnEtc(u32 no)
     {
-        u32* f = &FlagEtc;
+        u32* f = (u32*) FlagEtc;
         f[no >> 5] |= 0x80000000 >> (no & 0x1F);
     }
     void FlagOffEtc(u32 no)
     {
-        u32* f = &FlagEtc;
+        u32* f = (u32*) FlagEtc;
         f[no >> 5] &= ~(0x80000000 >> (no & 0x1F));
     }
     int GetStfStrTimer() { return StfStrTimer; }

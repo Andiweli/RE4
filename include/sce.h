@@ -99,8 +99,32 @@ enum OpenBoxType {
 
 void OpenBoxMain(int type, int mode, int se, u32 id1, u32 id2, int itemNo);
 void SceDebugDisp(const char* fmt, ...);
-// sce_com.cpp: the elevator task; every room that has one defines its own ElevatorParam copy.
-struct ElevatorParam;
+// Elevator step: which floor the cage arrives at or leaves from.
+enum ElevatorEnum {
+    Ele2FArrival = 0,
+    Ele2FStarting = 1,
+    Ele1FArrival = 2,
+    Ele1FStarting = 3
+};
+
+// Elevator script data (SceElevator task argument); the rooms that have an elevator fill one in.
+struct ElevatorParam {
+    ElevatorEnum mode;     // 0x00  Ele*Arrival / Ele*Starting (1/0 move down)
+    u32 smdId;             // 0x04  scroll object of the cage
+    Vec elPos;             // 0x08  cage rest position
+    Vec plPos;             // 0x14  player position on the cage
+    Vec plAng;             // 0x20
+    s32 camNo;             // 0x2C  camera cut (-1 = none)
+    u16 pad_30;
+    u16 sndNo;             // 0x32
+    u16 pad_34;
+    u16 sndStop;           // 0x36
+    Vec jumpPos;           // 0x38  room jump destination
+    Vec jumpAng;           // 0x44
+    u16 roomNo;            // 0x50
+};
+
+// sce_com.cpp: the elevator task.
 void SceElevator(ElevatorParam* d);
 
 // sce_com.cpp: debug trigger check, always 0 (title's mercenaries unlock-all). C++ linkage.

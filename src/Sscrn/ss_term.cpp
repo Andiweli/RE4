@@ -768,7 +768,7 @@ void termModelAlloc(SUB_SCREEN* wk)
 {
     int i;
 
-    wk->attr_flag |= 1;
+    wk->model_flag |= 1;
     ssModInfoMgr.roomInit();
     ssModInfoMgr.arrayAlloc(0x10);
     ssPartsMgr.roomInit();

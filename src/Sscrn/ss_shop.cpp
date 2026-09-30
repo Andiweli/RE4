@@ -355,7 +355,7 @@ void shopModelAlloc(SUB_SCREEN* wk)
     pzlPlayer* pl = wk->puzzlePlayer;
     int i;
 
-    wk->attr_flag |= 1;
+    wk->model_flag |= 1;
     ssModInfoMgr.roomInit();
     ssModInfoMgr.arrayAlloc(pl->pieceMax() + 4);
     ssPartsMgr.roomInit();

@@ -162,10 +162,10 @@ void SubScreenRoomInit()
 {
     SubScreenWork* wk = &SubScreenWk;
 
-    wk->open_flag = 0;
-    wk->flags = 0;
+    wk->open_flag = SS_OPEN_NULL;
+    wk->attr_flag = SS_ATTR_NULL;
     wk->close_flag = 0;
-    wk->wait = 0;
+    wk->wait_cnt = 0;
     if (ItemMgr.search(0x7C)) {
         wk->board_size = 0;
     }
@@ -192,7 +192,7 @@ void SubScreenRoomInit()
 // Blocks the sub screen from opening for `frames` frames (events, item pick-ups).
 void SubScreenWait(int frame)
 {
-    SubScreenWk.wait = frame;
+    SubScreenWk.wait_cnt = frame;
 }
 
 // Per frame (game loop): when the player (and Ashley) live, the screen is armed and the player
@@ -213,11 +213,11 @@ void SubScreenCall()
         return;
     }
     if (pPL->subScrCheck() == 1) {
-        wk->wait--;
-        if (wk->wait > 0) {
+        wk->wait_cnt--;
+        if (wk->wait_cnt > 0) {
             return;
         }
-        wk->wait = 0;
+        wk->wait_cnt = 0;
         if (Key.trg & 0x100000) {
             SubScreenOpen(SS_OPEN_NORMAL, 0);
         } else if (Key.trg & 0x200000) {
@@ -276,15 +276,15 @@ int SubScreenOpen(int type, int flags)
         return 0;
     }
     StaFlagOn(pG, STA_SSCRN_REQUEST);
-    wk->open_flag = type;
-    wk->flags = flags;
+    wk->open_flag = (SS_OPEN_FLAG) type;
+    wk->attr_flag = (SS_ATTR_FLAG) flags;
     wk->close_flag = 0;
-    wk->model_flag = 0;
+    wk->item_get_flag = 0;
     if (flags & 1) {
         SceEventStart(0);
     } else {
         if (StaFlagChk(pG, STA_PL_BOAT)) {
-            wk->flags = flags | 2;
+            wk->attr_flag = (SS_ATTR_FLAG) (flags | 2);
         }
         wk->stop_bak = pG->Stop_flg;
         pG->Stop_flg = 0xFFFFFFFF;
@@ -299,13 +299,13 @@ void SubScreenMiss()
 {
     SubScreenWork* wk = &SubScreenWk;
 
-    if (wk->flags & 1) {
+    if (wk->attr_flag & 1) {
         SceEventEnd(0);
     } else {
         pG->Stop_flg = wk->stop_bak;
     }
-    wk->flags = 0;
-    wk->open_flag = 0;
+    wk->attr_flag = SS_ATTR_NULL;
+    wk->open_flag = SS_OPEN_NULL;
     StaFlagOff(pG, STA_SSCRN_REQUEST);
 }
 
@@ -511,7 +511,7 @@ void SubScreenExec()
                 wk->menu_no = 1;
             }
             wk->Loop = 1;
-            wk->wait_cnt = 0;
+            wk->trans_off = 0;
             LightMgr.inSscrn();
             LightMgr.create(0, 9, -2, 0);
             {
@@ -633,7 +633,7 @@ void SubScreenExit()
         case 4:
             if (pG->pl_type != 1 && (pG->weapon_no != wepNo || pG->weapon_type != wepType || pG->bullet_type != wepLv)) {
                 cPlayer* pl;
-                if (wk->flags & 2) {
+                if (wk->attr_flag & 2) {
                     ItemMgr.arm(0);
                     wepLv = 0;
                     wepNo = WeaponId2WeaponNo(ItemMgr.weaponId());
@@ -722,13 +722,13 @@ void SubScreenExit()
                 }
                 LightMgr.outSscrn(mode);
             }
-            if (wk->flags & 1) {
+            if (wk->attr_flag & 1) {
                 SceEventEnd(0);
             } else {
                 pG->Stop_flg = wk->stop_bak;
             }
-            wk->open_flag = 0;
-            wk->flags = 0;
+            wk->open_flag = SS_OPEN_NULL;
+            wk->attr_flag = SS_ATTR_NULL;
             pG->debug_mode = wk->debugMode;
             if (wk->debug_flg_bak) {
                 DbgFlagOn(pG, DBG_PROC_BAR);
