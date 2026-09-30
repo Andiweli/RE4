@@ -28,7 +28,7 @@ struct R103Work {
 };
 
 // Cesspit: object / area numbers
-struct R103Cesspit {
+typedef struct _DATA_WORK {
     u32 cover;      // 0x00  scroll object: the cesspit cover
     u32 lid;        // 0x04  scroll object: the lid
     int itemAt;     // 0x08  item area
@@ -36,21 +36,21 @@ struct R103Cesspit {
     int at10;       // 0x10
     int at14;       // 0x14
     int at18;       // 0x18  cover area (r103_execOpenCover)
-};
+} DATA_WORK;
 
 // Shelf: the two door objects
-struct R103Shelf {
+typedef struct _SHELF_SMD {
     u8 door[2];
-};
+} SHELF_SMD;
 
 static R103Work* r103_work;
 
 // The original's .data is 8-aligned (r105 has the same).
 asm(".section .data; .balign 8");
-R103Cesspit r103_cesspit = {0x52, 0x53, 0x8A, 0x9E, 6, 3, 0xA};
-static R103Shelf r103_shelf0 = {{0x57, 0x58}};
-static R103Shelf r103_shelf1 = {{0x59, 0x5A}};
-static R103Shelf r103_shelf2 = {{0x5B, 0x5C}};
+DATA_WORK r103_cesspit = {0x52, 0x53, 0x8A, 0x9E, 6, 3, 0xA};
+static SHELF_SMD r103_shelf0 = {{0x57, 0x58}};
+static SHELF_SMD r103_shelf1 = {{0x59, 0x5A}};
+static SHELF_SMD r103_shelf2 = {{0x5B, 0x5C}};
 
 // Hit effects of attribute type 4
 static const AtEffInfo r103_eff_info = {
@@ -58,17 +58,17 @@ static const AtEffInfo r103_eff_info = {
 };
 
 static void r103_getFile();
-void r103_openShelf_main(R103Shelf* s, int opened);
-void r103_openedShelf(R103Shelf* s);
-void r103_openShelf(R103Shelf* s);
+void r103_openShelf_main(SHELF_SMD* s, int opened);
+void r103_openedShelf(SHELF_SMD* s);
+void r103_openShelf(SHELF_SMD* s);
 void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8, void* m9);
 void r103_setSubMissionTarget(u32 objNo);
-static void r103_execOpenCover(R103Cesspit* c);
-static void r103_checkCloseCover(R103Cesspit* c);
-void r103_checkCesspit0(R103Cesspit* c);
-void r103_checkCesspit1(R103Cesspit* c);
-void r103_checkCesspit2(R103Cesspit* c);
-void r103_initCesspit(R103Cesspit* c);
+static void r103_execOpenCover(DATA_WORK* c);
+static void r103_checkCloseCover(DATA_WORK* c);
+void r103_checkCesspit0(DATA_WORK* c);
+void r103_checkCesspit1(DATA_WORK* c);
+void r103_checkCesspit2(DATA_WORK* c);
+void r103_initCesspit(DATA_WORK* c);
 static void r103_BgmStartCheck();
 
 // Room init (in st1_1 and st1_3): the ten corpse models only outside region 0 (Japan hides them and
@@ -125,7 +125,7 @@ static void r103_getFile()
 }
 
 // Open shelf `s` (opened != 0: already open): the two doors turn 110 degrees over 30 frames.
-void r103_openShelf_main(R103Shelf* s, int opened)
+void r103_openShelf_main(SHELF_SMD* s, int opened)
 {
     cObj* a;
     cObj* b;
@@ -170,13 +170,13 @@ void r103_openShelf_main(R103Shelf* s, int opened)
 }
 
 // Item-event "already opened": pose shelf `s` open without the animation.
-void r103_openedShelf(R103Shelf* s)
+void r103_openedShelf(SHELF_SMD* s)
 {
     r103_openShelf_main(s, 1);
 }
 
 // Item-event opener: animate shelf `s` open when its item is taken.
-void r103_openShelf(R103Shelf* s)
+void r103_openShelf(SHELF_SMD* s)
 {
     r103_openShelf_main(s, 0);
 }
@@ -256,7 +256,7 @@ void r103_setSubMissionTarget(u32 objNo)
 }
 
 // The cesspit cover swings open.
-static void r103_execOpenCover(R103Cesspit* c)
+static void r103_execOpenCover(DATA_WORK* c)
 {
     cObj* lid;
 
@@ -279,7 +279,7 @@ static void r103_execOpenCover(R103Cesspit* c)
 }
 
 // The cover: a hit enemy on the scroll object; once shot it falls, the lid opens and bounces.
-static void r103_checkCloseCover(R103Cesspit* c)
+static void r103_checkCloseCover(DATA_WORK* c)
 {
     cObj* cover;
     cObj* lid;
@@ -351,7 +351,7 @@ static inline void r103_moveItemModel(SCE_AT_DATA* at, SCE_AT_DATA* at2)
 }
 
 // Cesspit state 0: the cover is still closed; the item found in it moves onto the lid.
-void r103_checkCesspit0(R103Cesspit* c)
+void r103_checkCesspit0(DATA_WORK* c)
 {
     SCE_AT_DATA* at;
 
@@ -381,7 +381,7 @@ void r103_checkCesspit0(R103Cesspit* c)
 }
 
 // Cesspit state 1: the cover is open; the item area follows the found / taken flags.
-void r103_checkCesspit1(R103Cesspit* c)
+void r103_checkCesspit1(DATA_WORK* c)
 {
     SCE_AT_DATA* at;
 
@@ -421,7 +421,7 @@ void r103_checkCesspit1(R103Cesspit* c)
 }
 
 // Cesspit state 2: the lid is open; the item found moves onto the lid.
-void r103_checkCesspit2(R103Cesspit* c)
+void r103_checkCesspit2(DATA_WORK* c)
 {
     SCE_AT_DATA* at;
 
@@ -438,7 +438,7 @@ void r103_checkCesspit2(R103Cesspit* c)
 }
 
 // Cesspit setup from the saved state.
-void r103_initCesspit(R103Cesspit* c)
+void r103_initCesspit(DATA_WORK* c)
 {
     SCE_AT_DATA* at;
 

@@ -69,11 +69,11 @@ static f32 r30b_spd = 100.0f;
 static f32 r30b_accel = 5.0f;
 static Vec r30b_patrolTbl0[2] = {{-11900.0f, -2000.0f, -6500.0f}, {-7000.0f, -2000.0f, -5000.0f}};
 static Vec r30b_patrolTbl1[2] = {{-11500.0f, -2000.0f, -600.0f}, {-7400.0f, -2000.0f, -200.0f}};
-static EmControlPoint r30b_sitTbl0[1] = {{{-6870.0f, -2000.0f, -3900.0f}, 0xE}};
-static EmControlPoint r30b_sitTbl1[2] = {{{-11590.0f, 1000.0f, -12800.0f}, 8}, {{-8790.0f, -2000.0f, -2610.0f}, 0xE}};
-static EmControlPoint r30b_sitTbl3[1] = {{{-6000.0f, -2000.0f, -1200.0f}, 0xE}};
-static EmControlPoint r30b_sitTbl2[2] = {{{-11590.0f, 1000.0f, -12800.0f}, 8}, {{-7480.0f, -2000.0f, 1400.0f}, 0xE}};
-static EmControlPoint r30b_sitTbl2b[1] = {{{-7480.0f, -2000.0f, 1400.0f}, 0xE}};
+static TarWork r30b_sitTbl0[1] = {{{-6870.0f, -2000.0f, -3900.0f}, 0xE}};
+static TarWork r30b_sitTbl1[2] = {{{-11590.0f, 1000.0f, -12800.0f}, 8}, {{-8790.0f, -2000.0f, -2610.0f}, 0xE}};
+static TarWork r30b_sitTbl3[1] = {{{-6000.0f, -2000.0f, -1200.0f}, 0xE}};
+static TarWork r30b_sitTbl2[2] = {{{-11590.0f, 1000.0f, -12800.0f}, 8}, {{-7480.0f, -2000.0f, 1400.0f}, 0xE}};
+static TarWork r30b_sitTbl2b[1] = {{{-7480.0f, -2000.0f, 1400.0f}, 0xE}};
 static Vec r30b_gotoTbl[3] = {{-5600.0f, -2000.0f, -4900.0f}, {-5780.0f, 1000.0f, -14700.0f}, {-10000.0f, 1000.0f, -14700.0f}};
 static Vec r30b_gotoTbl2[1] = {{-5600.0f, -2000.0f, -4900.0f}};
 // The module's .data tail is 8-aligned in the original (0x23C -> 0x240; st3.cpp's linker word follows).

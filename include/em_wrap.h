@@ -139,7 +139,7 @@ public:
 
 // Scripted enemy control (cEmControl: a handle plus up to 16 way points), the patrol task and the
 // guard task built on it.
-struct EmControlPoint {
+struct TarWork {
     Vec pos;
     int mode;                   // 0xC   setGoto mode of the point (the st3 route tables; 0 in the Vec tables)
 };
@@ -149,14 +149,14 @@ public:
     int nPoint;                 // 0x0   way points (<= 15)
     int cur;                    // 0x4   current way point
     int prev;                   // 0x8   previous way point
-    EmControlPoint point[16];   // 0xC
+    TarWork point[16];   // 0xC
     cEmWrap em;                 // 0x10C
     int active;                 // 0x118
 
     int SetControl(int no, Vec* tbl, int n, int errOn);
-    int SetControl(int no, EmControlPoint* tbl, int n, int errOn);  // st3 revision (src/st/em_wrap_v3.cpp)
+    int SetControl(int no, TarWork* tbl, int n, int errOn);  // st3 revision (src/st/em_wrap_v3.cpp)
     void SetTargetPos(Vec* tbl, int n);
-    void SetTargetTbl(EmControlPoint* tbl, int n);                   // st3 revision
+    void SetTargetTbl(TarWork* tbl, int n);                   // st3 revision
     void EndControl();
 };
 
@@ -176,7 +176,7 @@ public:
 
 class cEmRouteExec : public cEmControl {
 public:
-    int SetRouteExec(s16 no, EmControlPoint* tbl, int n, u8 prio, int errOn);
+    int SetRouteExec(s16 no, TarWork* tbl, int n, u8 prio, int errOn);
     static void TaskMove(cEmRouteExec* p);
 };
 

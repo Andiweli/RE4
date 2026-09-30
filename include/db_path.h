@@ -7,7 +7,7 @@
 
 // B-spline path editor of the interface-design tool (t_id/db_path.cpp, D:/Bio4/Prog/db_path.cpp): edits a
 // FUNC_PATH_PTR in place with a 3D cursor. t_id.cpp allocates the work and calls DbPath() every frame.
-struct DbPathWork {
+typedef struct _DB_PATH {
     s8 routine;     // 0x00  0 edit, 1 menu, 2 quit
     s8 step;        // 0x01
     s8 x2;
@@ -28,12 +28,12 @@ struct DbPathWork {
     u8 pad_35[3];
     Vec grid;       // 0x38  grid step (x, y)
     Vec ofs;        // 0x44  drawing offset
-};
+} DB_PATH;
 
-int DbPath(DbPathWork* w, int x, int y);
-void pathInsertPoint(DbPathWork* w);
-void pathCursor(DbPathWork* w);
-void pathDraw(DbPathWork* w, Vec* ofs);
+int DbPath(DB_PATH* w, int x, int y);
+void pathInsertPoint(DB_PATH* w);
+void pathCursor(DB_PATH* w);
+void pathDraw(DB_PATH* w, Vec* ofs);
 void pathGridLock(Vec* grid, Vec* in, Vec* out);
 
 #endif

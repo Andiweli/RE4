@@ -53,10 +53,10 @@ public:
     int check();
     int checkActive();
     int getCamNo();
-    void init(const struct R20eFenceData* d);
+    void init(const struct FENCE_DATA* d);
 };
 
-struct R20eFenceData {
+struct FENCE_DATA {
     u32 objId;    // 0x00
     int atNo;     // 0x04
     int camNo;    // 0x08
@@ -117,7 +117,7 @@ struct R20eThrough {
     int x14;       // 0x14
 };
 
-static R20eFenceData r20e_fenceTbl[3] = {
+static FENCE_DATA r20e_fenceTbl[3] = {
     {0x37, 0xE, 0x19, 5},
     {0x38, 0xF, 0x17, 6},
     {0x39, 0x10, 0x18, 7},
@@ -291,7 +291,7 @@ int cFence20e::getCamNo()
 }
 
 // Bind a maze fence from its table entry (object, area, camera cut, save flag) and snap it to the saved state.
-void cFence20e::init(const R20eFenceData* d)
+void cFence20e::init(const FENCE_DATA* d)
 {
     obj = SmdGetObjPtr(d->objId);
     if (obj) {

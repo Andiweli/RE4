@@ -242,7 +242,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00017008	0x274	st2_1/r20d.cpp	global	r20d_initCrank__Fv	r20d_initCrank
 .text	0x0001727C	0x7F4	st2_1/r20d.cpp	local	r20d_operateCrank__Fi	r20d_operateCrank
 .text	0x00017A70	0xC0	st2_1/r20d.cpp	global	move__6cFencef	cFence::move
-.text	0x00017B30	0x1B0	st2_1/r20d.cpp	global	init__6cFenceP13R20dFenceData	cFence::init
+.text	0x00017B30	0x1B0	st2_1/r20d.cpp	global	init__6cFenceP10FENCE_DATA	cFence::init
 .text	0x00017CE0	0x88	st2_1/r20d.cpp	local	r20d_execFlagOn__Fv	r20d_execFlagOn
 .text	0x00017D68	0xA4	st2_1/r20d.cpp	global	r20d_initFence__Fv	r20d_initFence
 .text	0x00017E0C	0x28	st2_1/r20d.cpp	local	r20d_execDeathTrap__Fv	r20d_execDeathTrap
@@ -267,7 +267,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00019DD8	0x8	st2_1/r20e.cpp	global	check__9cFence20e	cFence20e::check
 .text	0x00019DE0	0x8	st2_1/r20e.cpp	global	checkActive__9cFence20e	cFence20e::checkActive
 .text	0x00019DE8	0x8	st2_1/r20e.cpp	global	getCamNo__9cFence20e	cFence20e::getCamNo
-.text	0x00019DF0	0x118	st2_1/r20e.cpp	global	init__9cFence20ePC13R20eFenceData	cFence20e::init
+.text	0x00019DF0	0x118	st2_1/r20e.cpp	global	init__9cFence20ePC10FENCE_DATA	cFence20e::init
 .text	0x00019F08	0x50	st2_1/r20e.cpp	global	r20e_getFenceNo__FiPiT1	r20e_getFenceNo
 .text	0x00019F58	0x104	st2_1/r20e.cpp	local	r20e_checkSwitch_end__Fi	r20e_checkSwitch_end
 .text	0x0001A05C	0x3FC	st2_1/r20e.cpp	local	r20e_checkSwitch__Fi	r20e_checkSwitch

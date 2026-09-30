@@ -10,7 +10,7 @@ static char hexDigit[] = "0123456789ABCDEF";
 static const f32 dbNumRange[7][2] = DB_NUM_RANGE_INIT;
 
 // 1 when `p` is inside the rectangle.
-int DB_RECT::ChkHitRect(DB_POINT* p)
+int DB_RECT::ChkHitRect(DB_POSITION* p)
 {
     int hit = 0;
 
@@ -150,12 +150,12 @@ void DB_PRIMITIVE::CallDrawCallback()
     }
 }
 
-// the .y store goes through a DB_POINT* (`(mem (plus p 4))`: cse1 does not forward it into the DB_RECT temp's
+// the .y store goes through a DB_POSITION* (`(mem (plus p 4))`: cse1 does not forward it into the DB_RECT temp's
 // re-read, the load survives to sched1 behind the store and reload_cse turns it into `fmr`); the .x store precedes
 // the rect copy (its output dependence on the rect stores otherwise sinks it below them)
 void DB_PRIMITIVE::SetSize(f32 w, f32 h)
 {
-    DB_POINT* s = &size;
+    DB_POSITION* s = &size;
 
     s->y = h;
     size.x = w;
@@ -165,7 +165,7 @@ void DB_PRIMITIVE::SetSize(f32 w, f32 h)
 // Drawing offset inside the primitive (the hit rect stays).
 void DB_PRIMITIVE::SetBase(f32 x, f32 y)
 {
-    DB_POINT* b = &base;
+    DB_POSITION* b = &base;
 
     b->y = y;
     base.x = x;
@@ -241,10 +241,10 @@ void DB_PRIMITIVE::Draw()
 
 // Click test of the tree: children first (local coordinates), then this rect (OnClick, the hit
 // callback, click[btn] set; a left click on a selectable one makes it `select`), then siblings.
-int DB_PRIMITIVE::ChkClick(DB_POINT* p, int btn)
+int DB_PRIMITIVE::ChkClick(DB_POSITION* p, int btn)
 {
     int hit = 0;
-    DB_POINT lp;
+    DB_POSITION lp;
 
     lp.x = 0.0f;
     lp.y = 0.0f;
@@ -273,10 +273,10 @@ int DB_PRIMITIVE::ChkClick(DB_POINT* p, int btn)
 }
 
 // Double click test of the tree (OnDoubleClick on the hit primitive).
-int DB_PRIMITIVE::ChkDoubleClick(DB_POINT* p, int btn)
+int DB_PRIMITIVE::ChkDoubleClick(DB_POSITION* p, int btn)
 {
     int hit = 0;
-    DB_POINT lp;
+    DB_POSITION lp;
 
     lp.x = 0.0f;
     lp.y = 0.0f;
@@ -298,10 +298,10 @@ int DB_PRIMITIVE::ChkDoubleClick(DB_POINT* p, int btn)
 }
 
 // Button release over the tree: OnMouseUp on the primitives that were clicked, click[btn] cleared.
-int DB_PRIMITIVE::ChkMouseUp(DB_POINT* p, int btn)
+int DB_PRIMITIVE::ChkMouseUp(DB_POSITION* p, int btn)
 {
     int hit = 0;
-    DB_POINT lp;
+    DB_POSITION lp;
 
     lp.x = 0.0f;
     lp.y = 0.0f;
@@ -318,10 +318,10 @@ int DB_PRIMITIVE::ChkMouseUp(DB_POINT* p, int btn)
 }
 
 // Mouse-over test of the tree: mouseOn set on the hit primitives.
-int DB_PRIMITIVE::ChkMouseOn(DB_POINT* p)
+int DB_PRIMITIVE::ChkMouseOn(DB_POSITION* p)
 {
     int hit = 0;
-    DB_POINT lp;
+    DB_POSITION lp;
 
     lp.x = 0.0f;
     lp.y = 0.0f;
@@ -342,7 +342,7 @@ int DB_PRIMITIVE::ChkMouseOn(DB_POINT* p)
 }
 
 // Drag: OnMouseDrag with the mouse delta on every primitive of the tree clicked with `btn`.
-int DB_PRIMITIVE::ChkMouseDrag(DB_POINT* p, int btn)
+int DB_PRIMITIVE::ChkMouseDrag(DB_POSITION* p, int btn)
 {
     int hit = 0;
 
@@ -354,22 +354,22 @@ int DB_PRIMITIVE::ChkMouseDrag(DB_POINT* p, int btn)
 }
 
 // Default click handler: nothing.
-void DB_PRIMITIVE::OnClick(DB_POINT* p, int btn)
+void DB_PRIMITIVE::OnClick(DB_POSITION* p, int btn)
 {
 }
 
 // Default double click handler: nothing.
-void DB_PRIMITIVE::OnDoubleClick(DB_POINT* p, int btn)
+void DB_PRIMITIVE::OnDoubleClick(DB_POSITION* p, int btn)
 {
 }
 
 // Default release handler: nothing.
-void DB_PRIMITIVE::OnMouseUp(DB_POINT* p, int btn)
+void DB_PRIMITIVE::OnMouseUp(DB_POSITION* p, int btn)
 {
 }
 
 // Default drag handler: nothing.
-void DB_PRIMITIVE::OnMouseDrag(DB_POINT* p, int btn)
+void DB_PRIMITIVE::OnMouseDrag(DB_POSITION* p, int btn)
 {
 }
 
@@ -716,7 +716,7 @@ void DB_WINDOW::SetCloseCallback(DB_WINDOW_CALLBACK cb)
 }
 
 // A click on the window body: nothing beyond the activation done by the array.
-void DB_WINDOW::OnClick(DB_POINT* p, int btn)
+void DB_WINDOW::OnClick(DB_POSITION* p, int btn)
 {
 }
 
@@ -793,15 +793,15 @@ int DB_WINDOW_TITLE::SetString(const char* s)
     return ret;
 }
 
-// the .y reads of base/size go through a DB_POINT* accessor: gcse PREs `&base`/`&size` into
+// the .y reads of base/size go through a DB_POSITION* accessor: gcse PREs `&base`/`&size` into
 // callee-saved registers (`lfs 4(r30)`) while the .x reads stay `this`-relative
-static inline f32 DB_PointY(DB_POINT* p)
+static inline f32 DB_PointY(DB_POSITION* p)
 {
     return p->y;
 }
 
 // a + p->y (keeps the load order of the title draw).
-static inline f32 DB_AddY(f32 a, DB_POINT* p)
+static inline f32 DB_AddY(f32 a, DB_POSITION* p)
 {
     return a + p->y;
 }
@@ -824,9 +824,9 @@ void DB_WINDOW_TITLE::Draw()
 }
 
 // Left-dragging the title moves the parent window.
-void DB_WINDOW_TITLE::OnMouseDrag(DB_POINT* p, int btn)
+void DB_WINDOW_TITLE::OnMouseDrag(DB_POSITION* p, int btn)
 {
-    DB_POINT np;
+    DB_POSITION np;
 
     np.x = 0.0f;
     np.y = 0.0f;
@@ -839,7 +839,7 @@ void DB_WINDOW_TITLE::OnMouseDrag(DB_POINT* p, int btn)
 }
 
 // Left double click on the title closes the parent window.
-void DB_WINDOW_TITLE::OnDoubleClick(DB_POINT* p, int btn)
+void DB_WINDOW_TITLE::OnDoubleClick(DB_POSITION* p, int btn)
 {
     if (btn == 0 && parent) {
         if (parent->type == DB_PRIM_WINDOW) {
@@ -865,7 +865,7 @@ void DB_BUTTON_CLOSE::Draw()
 }
 
 // Left click closes the parent window.
-void DB_BUTTON_CLOSE::OnClick(DB_POINT* p, int btn)
+void DB_BUTTON_CLOSE::OnClick(DB_POSITION* p, int btn)
 {
     if (btn == 0 && parent) {
         if (parent->type == DB_PRIM_WINDOW) {
@@ -967,7 +967,7 @@ void DB_BUTTON::SetCallback(DB_PRIM_CALLBACK cb_)
 }
 
 // Left click runs the action.
-void DB_BUTTON::OnClick(DB_POINT* p, int btn)
+void DB_BUTTON::OnClick(DB_POSITION* p, int btn)
 {
     if (cb) {
         cb(this);
@@ -1270,7 +1270,7 @@ void DB_NUMERIC::ClearToDefault()
 }
 
 // Left double click resets the value to the default.
-void DB_NUMERIC::OnDoubleClick(DB_POINT* p, int btn)
+void DB_NUMERIC::OnDoubleClick(DB_POSITION* p, int btn)
 {
     if ((numFlg & DB_NUM_FLAG_LOCK) == 0 && btn == 0) {
         ClearToDefault();
@@ -1923,7 +1923,7 @@ void DB_SLIDEBAR::Update()
 }
 
 // Left drag moves the knob by the mouse delta / length and stores the value.
-void DB_SLIDEBAR::OnMouseDrag(DB_POINT* p, int btn)
+void DB_SLIDEBAR::OnMouseDrag(DB_POSITION* p, int btn)
 {
     if (btn == 0) {
         if (p->x != 0.0f) {

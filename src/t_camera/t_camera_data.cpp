@@ -61,9 +61,9 @@ int tcDataExport(u8* buf)
     Vec* vp;
     Vec* pos;
     u16* fp;
-    TcAdat* a;
-    TcCdat* c;
-    TcLdat* l;
+    TC_AREA_DATA* a;
+    TC_CAMERA_DATA* c;
+    LERP_DATA* l;
     int i;
     int j;
     int num;
@@ -116,7 +116,7 @@ int tcDataExport(u8* buf)
     {
         dc = cut;
         for (i = 0; i < 0x40; i++) {
-            TcCdat* cd = &tcCdat[i];
+            TC_CAMERA_DATA* cd = &tcCdat[i];
             if (cd->enable != 0xFF) {
                 Vec* pp;
                 Vec* at;
@@ -158,7 +158,7 @@ int tcDataExport(u8* buf)
         LERP_DATA* d = lerp;
         for (i = 0; i < 0x40; i++) {
             l = &tcLdat[i];
-            if (l->enable != 0xFF) {
+            if (l->Be_flag != 0xFF) {
                 *d = *(LERP_DATA*) l;
                 d++;
             }
@@ -270,7 +270,7 @@ int tcDataImport(u8* buf)
     {
         AREA_DATA* s = area;
         for (i = 0; i < hdr->nAdat; i++) {
-            TcAdat* a = tcAdatNew();
+            TC_AREA_DATA* a = tcAdatNew();
             a->area_no = s->No;
             a->cam_no = s->Suffix;
             pTc->adatTypeNum[s->No]++;
@@ -303,7 +303,7 @@ int tcDataImport(u8* buf)
     {
         CAMERA_DATA* s = cut;
         for (i = 0; i < hdr->nCdat; i++) {
-            TcCdat* c = tcCdatNew();
+            TC_CAMERA_DATA* c = tcCdatNew();
             c->cam_no = s->No;
             cnt[s->No]++;
             if (cnt[s->No] != 1) {
@@ -343,9 +343,9 @@ int tcDataImport(u8* buf)
     {
         LERP_DATA* s = lerp;
         for (i = 0; i < hdr->nLdat; i++) {
-            TcLdat* l = tcLdatNew();
+            LERP_DATA* l = tcLdatNew();
             *(LERP_DATA*) l = *s;
-            l->x5 = 0;
+            l->Attr = 0;
             s++;
         }
     }
@@ -444,7 +444,7 @@ void tcSetBesideFloor(f32 ratio)
 // Copies the shoulder camera ready / transition offset tables into the current cut's key data.
 void tcSetBesideOffset(QFPS_OFFSET (*ready)[3], QFPS_OFFSET (*trans)[3])
 {
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
     int n = 0;
     int i;
     int j;
@@ -477,7 +477,7 @@ void tcSetBesideCamera()
 {
     QFPS_OFFSET ready[2][3];
     QFPS_OFFSET trans[2][3];
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
     int i;
     int j;
     int n = 0;

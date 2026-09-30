@@ -69,7 +69,7 @@ struct cEspSeqTbl {
     u16 Life_max;      // 0xB8 (esp_efm: life) (PS2 Life_max)
     u16 Life_time;     // 0xBA (esp_efm: start frame) (PS2 Life_time)
     u8 Ptn_no;         // 0xBC (esp_sub: start animation pattern) (PS2 Ptn_no)
-    u8 Anm_rate;       // 0xBD (esp_sub: animation speed - 0x20) (PS2 sint8 Anm_rate)
+    s8 Anm_rate;       // 0xBD (esp_sub: animation speed - 0x20) (PS2 sint8 Anm_rate)
     u16 Anm_cnt;       // 0xBE (esp_sub: animation counter) (PS2 Anm_cnt)
     u8 Release_time;   // 0xC0 (esp_efm: parent release frame) (PS2 Release_time)
     u8 Groupe_no;      // 0xC1 (PS2 Groupe_no)

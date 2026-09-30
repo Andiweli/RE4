@@ -27,14 +27,14 @@ struct PathParam {
     Vec alpha[PATH_MAX_POINT];
 };
 
-static int pathEdit(DbPathWork* w);
-static int pathMenu(DbPathWork* w);
-static int pathQuit(DbPathWork* w);
-static int pathGrabPoint(DbPathWork* w);
-static int pathGrabLine(DbPathWork* w);
-static void pathDeletePoint(DbPathWork* w);
+static int pathEdit(DB_PATH* w);
+static int pathMenu(DB_PATH* w);
+static int pathQuit(DB_PATH* w);
+static int pathGrabPoint(DB_PATH* w);
+static int pathGrabLine(DB_PATH* w);
+static void pathDeletePoint(DB_PATH* w);
 
-static int (*path_routine_tbl[3])(DbPathWork*) = {pathEdit, pathMenu, pathQuit};
+static int (*path_routine_tbl[3])(DB_PATH*) = {pathEdit, pathMenu, pathQuit};
 static const char* path_menu_name[2] = {"Type :", "Clear:"};
 static const char* path_type_name[5] = {"POINT", "LINEAR", "B-SPL2", "B-SPL3", "B-SPL4"};
 static s8 path_edit_mode = 0;  // step 2: 0 = moving a grabbed point, 1 = insert / delete prompt
@@ -43,7 +43,7 @@ static Vec path_draw_prev;
 
 // Runs the path editor one frame: menu at (x, y), draws the path (with w->ofs) and the 3D cross
 // cursor, then the routine (0 pathEdit, 1 pathMenu, 2 pathQuit); 0 once the editor quit.
-int DbPath(DbPathWork* w, int x, int y)
+int DbPath(DB_PATH* w, int x, int y)
 {
     w->blink++;
     w->x = x;
@@ -54,7 +54,7 @@ int DbPath(DbPathWork* w, int x, int y)
 }
 
 // Routine 2: resets the editor state, returns 0 (the caller closes it).
-static int pathQuit(DbPathWork* w)
+static int pathQuit(DB_PATH* w)
 {
     w->routine = w->step = w->x2 = w->x3 = 0;
     return 0;
@@ -62,7 +62,7 @@ static int pathQuit(DbPathWork* w)
 
 // Routine 1, the Z menu: Type (POINT / LINEAR / B-SPL2..4 = FUNC_PATH_PTR::k), Clear (YES/NO
 // empties the path); B back to editing. Returns 1.
-static int pathMenu(DbPathWork* w)
+static int pathMenu(DB_PATH* w)
 {
     JOY* joy = &Joy[0];
     FUNC_PATH_PTR* path = w->path;
@@ -174,7 +174,7 @@ static int pathMenu(DbPathWork* w)
 // a point -> step 2 drag, Y on the curve grabs a point or an insertion spot -> step 2 with the
 // delete / insert YES/NO, Z the menu, B quits); step 1 appends points (an empty path starts here:
 // A places, grid-locked, B ends). Returns 0 when the path was emptied.
-static int pathEdit(DbPathWork* w)
+static int pathEdit(DB_PATH* w)
 {
     Vec* cur = &w->pos;
     FUNC_PATH_PTR* path = w->path;
@@ -315,7 +315,7 @@ static int pathEdit(DbPathWork* w)
 }
 
 // Nearest control point within PATH_GRAB_DIST of the cursor -> w->grab; 1 when one was found.
-static int pathGrabPoint(DbPathWork* w)
+static int pathGrabPoint(DB_PATH* w)
 {
     FUNC_PATH_PTR* path = w->path;
     Vec* cur = &w->pos;
@@ -334,7 +334,7 @@ static int pathGrabPoint(DbPathWork* w)
 
 // Nearest point of the curve (sampled PATH_DRAW_DIV times) -> insertPos / insertIdx, then the nearest
 // control point -> grab; 1 when either is within PATH_GRAB_DIST.
-static int pathGrabLine(DbPathWork* w)
+static int pathGrabLine(DB_PATH* w)
 {
     PathParam buf;
     Vec pt;
@@ -389,7 +389,7 @@ static int pathGrabLine(DbPathWork* w)
 }
 
 // Removes control point w->grab.
-static void pathDeletePoint(DbPathWork* w)
+static void pathDeletePoint(DB_PATH* w)
 {
     FUNC_PATH_PTR* path = w->path;
     int i;
@@ -402,7 +402,7 @@ static void pathDeletePoint(DbPathWork* w)
 }
 
 // Inserts a control point at w->insertIdx with the grabbed curve position; no-op at 64 points.
-void pathInsertPoint(DbPathWork* w)
+void pathInsertPoint(DB_PATH* w)
 {
     FUNC_PATH_PTR* path = w->path;
     int i;
@@ -418,7 +418,7 @@ void pathInsertPoint(DbPathWork* w)
 }
 
 // Draws the full-screen cross-hair through the cursor (plus ofs) and prints its coordinates.
-void pathCursor(DbPathWork* w)
+void pathCursor(DB_PATH* w)
 {
     Vec a;
     Vec b;
@@ -438,7 +438,7 @@ void pathCursor(DbPathWork* w)
 
 // Draws the control points (the grabbed one marked) and the parametrised curve (200 segments,
 // FuncPathParametrize) offset by `ofs`.
-void pathDraw(DbPathWork* w, Vec* ofs)
+void pathDraw(DB_PATH* w, Vec* ofs)
 {
     PathParam buf;
     Vec pt;

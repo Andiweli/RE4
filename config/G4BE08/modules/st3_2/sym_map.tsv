@@ -43,8 +43,8 @@ section	offset	size	unit	scope	name	demangled
 .text	0x000039F0	0x8C	st3_2/r317.cpp	local	R317ContinuePointSet__Fv	R317ContinuePointSet
 .text	0x00003A7C	0x5C8	st3_2/r317.cpp	global	R317EventS00__Fv	R317EventS00
 .text	0x00004044	0xAC	st3_2/r317.cpp	global	R317Elevator2Init__Fv	R317Elevator2Init
-.text	0x000040F0	0x968	st3_2/r317.cpp	global	SceElevator2Main__FP16SceElevator2Data	SceElevator2Main
-.text	0x00004A58	0x108	st3_2/r317.cpp	global	SceElevator2End__FP16SceElevator2Data	SceElevator2End
+.text	0x000040F0	0x968	st3_2/r317.cpp	global	SceElevator2Main__FP14ElevatorParam2	SceElevator2Main
+.text	0x00004A58	0x108	st3_2/r317.cpp	global	SceElevator2End__FP14ElevatorParam2	SceElevator2End
 .text	0x00004B60	0x18	st3_2/r317.cpp	local	R317EventS00Action__Fv	R317EventS00Action
 .text	0x00004B78	0x18	st3_2/r317.cpp	local	R317EventS07Action__Fv	R317EventS07Action
 .text	0x00004B90	0x18	st3_2/r317.cpp	local	R317EventS09Action__Fv	R317EventS09Action

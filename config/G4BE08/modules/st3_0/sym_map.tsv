@@ -2,13 +2,13 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00000000	0x98	st3_0/em_wrap.cpp	local	cEmControl_SetControl	cEmControl::SetControl
 .text	0x00000098	0x98	st3_0/em_wrap.cpp	global	cEmControl_SetControl_98	cEmControl::SetControl
 .text	0x00000130	0xAC	st3_0/em_wrap.cpp	global	SetTargetPos__10cEmControlP3Veci	cEmControl::SetTargetPos
-.text	0x000001DC	0xB4	st3_0/em_wrap.cpp	global	SetTargetTbl__10cEmControlP14EmControlPointi	cEmControl::SetTargetTbl
+.text	0x000001DC	0xB4	st3_0/em_wrap.cpp	global	SetTargetTbl__10cEmControlP7TarWorki	cEmControl::SetTargetTbl
 .text	0x00000290	0x88	st3_0/em_wrap.cpp	global	EndControl__10cEmControl	cEmControl::EndControl
 .text	0x00000318	0x64	st3_0/em_wrap.cpp	global	SetPatrol__9cEmPatrolsP3VeciUci	cEmPatrol::SetPatrol
 .text	0x0000037C	0xD0	st3_0/em_wrap.cpp	global	TaskMove__9cEmPatrolP9cEmPatrol	cEmPatrol::TaskMove
 .text	0x0000044C	0x64	st3_0/em_wrap.cpp	global	SetRouteRun__11cEmRouteRunsP3VeciUci	cEmRouteRun::SetRouteRun
 .text	0x000004B0	0xB4	st3_0/em_wrap.cpp	global	TaskMove__11cEmRouteRunP11cEmRouteRun	cEmRouteRun::TaskMove
-.text	0x00000564	0x64	st3_0/em_wrap.cpp	global	SetRouteExec__12cEmRouteExecsP14EmControlPointiUci	cEmRouteExec::SetRouteExec
+.text	0x00000564	0x64	st3_0/em_wrap.cpp	global	SetRouteExec__12cEmRouteExecsP7TarWorkiUci	cEmRouteExec::SetRouteExec
 .text	0x000005C8	0xAC	st3_0/em_wrap.cpp	global	TaskMove__12cEmRouteExecP12cEmRouteExec	cEmRouteExec::TaskMove
 .text	0x00000674	0x30	st3_0/em_wrap.cpp	global	__7cEmWrap	cEmWrap::cEmWrap
 .text	0x000006A4	0x1C	st3_0/em_wrap.cpp	global	initWork__7cEmWrap	cEmWrap::initWork

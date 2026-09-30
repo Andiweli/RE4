@@ -40,7 +40,7 @@ struct R317Work {
 };
 
 // Two-gear elevator (sce_com's ElevatorParam with a second stop, the gear objects and a second cut).
-struct SceElevator2Data {
+struct ElevatorParam2 {
     s32 dir;        // 0x00  3 up / 1 down
     u32 objId;      // 0x04  cage
     u32 objId2;     // 0x08  gear (uv scroll forward)
@@ -70,8 +70,8 @@ static R317Work* r317_work;
 // The original object's .rodata (0x4cc -> 0x4d0) and .data (0xdc -> 0xe0) are 8-aligned: r318's
 // sections start 8-aligned in the REL.
 asm(".section .rodata\n\t.balign 8\n\t.section .data\n\t.balign 8\n\t.text");
-static SceElevator2Data r317_elvUp = {3, 0x2A, 0x19, 0x1A, {0.0f, 0.0f, 0.0f}, {0.0f, 10825.0f, 0.0f}, {6860.0f, -4775.0f, 11950.0f}, {6860.0f, 6016.0f, 11950.0f}, {0.0f, 3.1415927f, 0.0f}, 2, 3, 2, 4, 3, 0};
-static SceElevator2Data r317_elvDown = {1, 0x2A, 0x19, 0x1A, {0.0f, 10825.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {6860.0f, 6016.0f, 11950.0f}, {6860.0f, -4775.0f, 11950.0f}, {0.0f, 1.5707964f, 0.0f}, 3, 2, 2, 4, 3, 0};
+static ElevatorParam2 r317_elvUp = {3, 0x2A, 0x19, 0x1A, {0.0f, 0.0f, 0.0f}, {0.0f, 10825.0f, 0.0f}, {6860.0f, -4775.0f, 11950.0f}, {6860.0f, 6016.0f, 11950.0f}, {0.0f, 3.1415927f, 0.0f}, 2, 3, 2, 4, 3, 0};
+static ElevatorParam2 r317_elvDown = {1, 0x2A, 0x19, 0x1A, {0.0f, 10825.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {6860.0f, 6016.0f, 11950.0f}, {6860.0f, -4775.0f, 11950.0f}, {0.0f, 1.5707964f, 0.0f}, 3, 2, 2, 4, 3, 0};
 
 static f32 r317_elvSpd = 0.0f;
 static f32 r317_elvMaxSpd = 100.0f;
@@ -112,8 +112,8 @@ static inline void EffectDelete2001()
 static void R317ContinuePointSet();
 void R317EventS00();
 void R317Elevator2Init();
-void SceElevator2Main(SceElevator2Data* d);
-void SceElevator2End(SceElevator2Data* d);
+void SceElevator2Main(ElevatorParam2* d);
+void SceElevator2End(ElevatorParam2* d);
 static void R317EventS00Action();
 static void R317EventS07Action();
 static void R317EventS09Action();
@@ -320,7 +320,7 @@ void R317Elevator2Init()
 // sce_com's SceElevator for the gear elevator: the cage accelerates until the fade, the arrival
 // starts stopDist2 away at full speed and decelerates; the two gears scroll their texture with
 // the speed.
-void SceElevator2Main(SceElevator2Data* d)
+void SceElevator2Main(ElevatorParam2* d)
 {
     cPlayer* pl = pPL;
     cObj* obj;
@@ -543,7 +543,7 @@ void SceElevator2Main(SceElevator2Data* d)
 
 // End of the two-gear elevator ride: fade killed, the cage and the player snapped to the arrival
 // positions, the gear UV scroll stopped, the motor sound stopped with the stop SE.
-void SceElevator2End(SceElevator2Data* d)
+void SceElevator2End(ElevatorParam2* d)
 {
     cObj* obj = SmdGetObjPtr(d->objId);
     cObj* gear1 = SmdGetObjPtr(d->objId2);

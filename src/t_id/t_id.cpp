@@ -68,7 +68,7 @@ static IdToolFunc toolIdFunc[3] = { toolIdPrev, toolIdMenu, toolIdMain };
 static ID_DATA idData[ID_DATA_NUM];
 static ID_DATA idClip[ID_CLIP_NUM];
 IDSystem toolIdSys;
-static DbPathWork idPath;
+static DB_PATH idPath;
 static DB_SCTRL idSctrl0;
 static DB_SCTRL idSctrl1;
 static DB_SCTRL idSctrl2;
@@ -98,7 +98,7 @@ void toolIdInit(IdTool* w)
     ToolArrayPush(0);
     IdDebugAllocBuffer();
     memclr_asm(w, sizeof(IdTool));
-    memclr_asm(&idPath, sizeof(DbPathWork));
+    memclr_asm(&idPath, sizeof(DB_PATH));
     memclr_asm(&idSctrl0, sizeof(DB_SCTRL));
     memclr_asm(&idSctrl1, sizeof(DB_SCTRL));
     TaskSuspend(0);

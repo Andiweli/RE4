@@ -216,7 +216,7 @@ DB_PRIM_ARRAY::~DB_PRIM_ARRAY()
 int DB_PRIM_ARRAY::ChkMouseButton(DB_PRIMITIVE* p, DB_MOUSE m, int btn)
 {
     int ret = 0;
-    DB_POINT pt;
+    DB_POSITION pt;
 
     pt = m.pos;
     if (m.dblClick[btn]) {
@@ -380,7 +380,7 @@ DB_NUMERIC2* DB_PRIM_ARRAY::MakeNumeric2Primitive()
 
 // Builds a window at `pos` of size w x h with (unless keyFlag says otherwise) a close button and a
 // title bar reading `title`; keyFlag kept in the window.
-DB_WINDOW* DB_PRIM_ARRAY::CreateNormalWindow(const char* title, DB_POINT* pos, f32* w, f32* h, u32* keyFlag)
+DB_WINDOW* DB_PRIM_ARRAY::CreateNormalWindow(const char* title, DB_POSITION* pos, f32* w, f32* h, u32* keyFlag)
 {
     DB_WINDOW* win;
 
@@ -390,7 +390,7 @@ DB_WINDOW* DB_PRIM_ARRAY::CreateNormalWindow(const char* title, DB_POINT* pos, f
         win->SetSize(*w, *h);
         if (!(*keyFlag & DB_WIN_KEY_NO_CLOSE)) {
             DB_BUTTON_CLOSE* c;
-            DB_POINT cp;
+            DB_POSITION cp;
 
             c = MakeButtonClosePrimitive();
             cp.x = win->size.x - 12.0f;
@@ -400,7 +400,7 @@ DB_WINDOW* DB_PRIM_ARRAY::CreateNormalWindow(const char* title, DB_POINT* pos, f
         }
         if (!(*keyFlag & DB_WIN_KEY_NO_TITLE)) {
             DB_WINDOW_TITLE* t;
-            DB_POINT tp;
+            DB_POSITION tp;
 
             t = MakeWindowTitlePrimitive();
             tp.x = 0.0f;
@@ -424,7 +424,7 @@ static f32 dbNumRangeOf(DB_NUMERIC* n, int hi)
 }
 
 // Adds a label `s` at `pos` inside `parent` (size from the text).
-DB_STRING* DB_PRIM_ARRAY::CreateString(DB_PRIMITIVE* parent, const char* s, DB_POINT* pos)
+DB_STRING* DB_PRIM_ARRAY::CreateString(DB_PRIMITIVE* parent, const char* s, DB_POSITION* pos)
 {
     DB_STRING* p;
 
@@ -438,7 +438,7 @@ DB_STRING* DB_PRIM_ARRAY::CreateString(DB_PRIMITIVE* parent, const char* s, DB_P
 }
 
 #define DB_CREATE_NUMERIC(T)                                                                                    \
-    DB_NUMERIC* DB_PRIM_ARRAY::CreateNumeric(DB_WINDOW* w, T* num, DB_POINT* pos, int* selX, int selY, u32 flg) \
+    DB_NUMERIC* DB_PRIM_ARRAY::CreateNumeric(DB_WINDOW* w, T* num, DB_POSITION* pos, int* selX, int selY, u32 flg) \
     {                                                                                                           \
         DB_NUMERIC* p;                                                                                          \
                                                                                                                 \
@@ -460,7 +460,7 @@ DB_CREATE_NUMERIC(u32)
 DB_CREATE_NUMERIC(f32)
 
 #define DB_CREATE_NUMERIC2(T)                                                                                            \
-    DB_NUMERIC2* DB_PRIM_ARRAY::CreateNumeric2(DB_WINDOW* w, T* num, T* num2, DB_POINT* pos, int* selX, int selY, u32 flg) \
+    DB_NUMERIC2* DB_PRIM_ARRAY::CreateNumeric2(DB_WINDOW* w, T* num, T* num2, DB_POSITION* pos, int* selX, int selY, u32 flg) \
     {                                                                                                                    \
         DB_NUMERIC2* p;                                                                                                  \
                                                                                                                          \
@@ -483,7 +483,7 @@ DB_CREATE_NUMERIC2(s32)
 DB_CREATE_NUMERIC2(f32)
 
 // Adds a button `s` at `pos` inside window `w` with its click callback, selectable by keyboard.
-DB_BUTTON* DB_PRIM_ARRAY::CreateButton(DB_WINDOW* w, const char* s, DB_POINT* pos, DB_PRIM_CALLBACK cb, int* selX, int selY)
+DB_BUTTON* DB_PRIM_ARRAY::CreateButton(DB_WINDOW* w, const char* s, DB_POSITION* pos, DB_PRIM_CALLBACK cb, int* selX, int selY)
 {
     DB_BUTTON* p;
 
@@ -564,7 +564,7 @@ void DB_PRIM_ARRAY::ButtonUpdate(DB_MOUSE* m)
     u32 btn;
     DB_WINDOW* w;
     DB_PRIMITIVE* p;
-    DB_POINT mv;
+    DB_POSITION mv;
 
     for (i = 0; i < numWin; i++) {
         w = win[i];
@@ -602,7 +602,7 @@ void DB_PRIM_ARRAY::SelectUpdate(DB_MOUSE* m)
 {
     u32 i;
     DB_WINDOW* w;
-    DB_POINT pt;
+    DB_POSITION pt;
 
     for (i = 0; i < numPrim; i++) {
         if (prim[i]) {

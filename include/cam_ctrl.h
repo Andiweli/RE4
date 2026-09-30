@@ -25,7 +25,7 @@ struct _AREA_DATA {  // hit area
     u8 Attr;       // 0x03  bit 4 = ?, bit 8 = ?, 0x20 set from 8 by calcAddr, 0x40 = check dir, 0x80 = no light update
     f32 Dir;       // 0x04  facing angle the player must have (Attr & 0x40)
     u8 Type_char;  // 0x08  matched against battle/state attribute
-    u8 Type_addr;  // 0x09  t_camera TcAdat::attr3; 0xFF = none
+    u8 Type_addr;  // 0x09  t_camera TC_AREA_DATA::attr3; 0xFF = none
     u8 dummy[0x20 - 0x0A];
     f32 Height;    // 0x20
     f32 Y;         // 0x24

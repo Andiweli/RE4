@@ -1,13 +1,13 @@
 cEmControl_SetControl = .text:0x00000000; // type:function size:0x98 scope:local
 cEmControl_SetControl_98 = .text:0x00000098; // type:function size:0x98 scope:global
 SetTargetPos__10cEmControlP3Veci = .text:0x00000130; // type:function size:0xAC scope:global
-SetTargetTbl__10cEmControlP14EmControlPointi = .text:0x000001DC; // type:function size:0xB4 scope:global
+SetTargetTbl__10cEmControlP7TarWorki = .text:0x000001DC; // type:function size:0xB4 scope:global
 EndControl__10cEmControl = .text:0x00000290; // type:function size:0x88 scope:global
 SetPatrol__9cEmPatrolsP3VeciUci = .text:0x00000318; // type:function size:0x64 scope:global
 TaskMove__9cEmPatrolP9cEmPatrol = .text:0x0000037C; // type:function size:0xD0 scope:global
 SetRouteRun__11cEmRouteRunsP3VeciUci = .text:0x0000044C; // type:function size:0x64 scope:global
 TaskMove__11cEmRouteRunP11cEmRouteRun = .text:0x000004B0; // type:function size:0xB4 scope:global
-SetRouteExec__12cEmRouteExecsP14EmControlPointiUci = .text:0x00000564; // type:function size:0x64 scope:global
+SetRouteExec__12cEmRouteExecsP7TarWorkiUci = .text:0x00000564; // type:function size:0x64 scope:global
 TaskMove__12cEmRouteExecP12cEmRouteExec = .text:0x000005C8; // type:function size:0xAC scope:global
 __7cEmWrap = .text:0x00000674; // type:function size:0x30 scope:global
 initWork__7cEmWrap = .text:0x000006A4; // type:function size:0x1C scope:global

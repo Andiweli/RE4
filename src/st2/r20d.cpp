@@ -49,10 +49,10 @@ public:
     f32 t;         // 0x20  0 lowered .. 1 raised
 
     void move(f32 t);
-    void init(struct R20dFenceData* d);
+    void init(struct FENCE_DATA* d);
 };
 
-struct R20dFenceData {
+struct FENCE_DATA {
     int objNo;     // 0x00
     f32 w;         // 0x04  collision size x
     f32 d;         // 0x08  collision size z
@@ -108,7 +108,7 @@ struct R20dThroughData {
 
 static R20dWork* r20d_work;
 
-static R20dFenceData r20d_fenceData[3] = {
+static FENCE_DATA r20d_fenceData[3] = {
     {0x18, 3000.0f, 300.0f, {0.0f, 2000.0f, 0.0f}},
     {0x29, 300.0f, 3000.0f, {0.0f, 2000.0f, 0.0f}},
     {0x2A, 300.0f, 2100.0f, {0.0f, 0.0f, 2000.0f}},
@@ -658,7 +658,7 @@ void cFence::move(f32 t)
 
 // Bind fence data: the scroll object (script-moved), lowered position, raise vector, and a 4-corner
 // collision piece (SAT) around it sized from the data's w/d.
-void cFence::init(R20dFenceData* d)
+void cFence::init(FENCE_DATA* d)
 {
     f32 hz;
     f32 hx;

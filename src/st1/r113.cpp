@@ -36,7 +36,7 @@ struct R113Work {
 };
 
 // r103's cesspit table (r103_initCesspit)
-struct R103Cesspit {
+typedef struct _DATA_WORK {
     u32 cover;
     u32 lid;
     int itemAt;
@@ -44,20 +44,20 @@ struct R103Cesspit {
     int at10;
     int at14;
     int at18;
-};
+} DATA_WORK;
 
-struct R103Shelf {
+typedef struct _SHELF_SMD {
     u8 door[2];
-};
+} SHELF_SMD;
 
 static R113Work* r113_work;
 
 // The original's .data is 8-aligned (r105 has the same).
 asm(".section .data; .balign 8");
-static R103Cesspit r113_cesspit = {0x52, 0x53, 0x81, 0x9F, 6, 5, 7};
-static R103Shelf r113_shelf0 = {{0x57, 0x58}};
-static R103Shelf r113_shelf1 = {{0x59, 0x5A}};
-static R103Shelf r113_shelf2 = {{0x5B, 0x5C}};
+static DATA_WORK r113_cesspit = {0x52, 0x53, 0x81, 0x9F, 6, 5, 7};
+static SHELF_SMD r113_shelf0 = {{0x57, 0x58}};
+static SHELF_SMD r113_shelf1 = {{0x59, 0x5A}};
+static SHELF_SMD r113_shelf2 = {{0x5B, 0x5C}};
 
 // Hit effects of attribute type 4
 static const AtEffInfo r113_eff_info = {
@@ -65,10 +65,10 @@ static const AtEffInfo r113_eff_info = {
 };
 
 // r103.cpp (the same module)
-void r103_initCesspit(R103Cesspit* c);
+void r103_initCesspit(DATA_WORK* c);
 void r103_setSubMissionTarget(u32 objNo);
-void r103_openedShelf(R103Shelf* s);
-void r103_openShelf(R103Shelf* s);
+void r103_openedShelf(SHELF_SMD* s);
+void r103_openShelf(SHELF_SMD* s);
 
 static void r113_getFile();
 static void r113_execHide(int mode);

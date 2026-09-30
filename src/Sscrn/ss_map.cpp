@@ -125,7 +125,7 @@ struct MapDoorTbl {
 };
 
 // Room display flags (mapColor): stage flag numbers.
-struct MapDispFlag {
+struct MAP_DISP_FLAG {
     u16 room;
     u16 pad;
     u32 hide;
@@ -209,7 +209,7 @@ int markSavePosition(SUB_SCREEN* wk, int no, Vec* pos);
 void markSaveDisp(SUB_SCREEN* wk, int sw);
 int mapPos2screenPos(Vec* pos, Vec* out);
 void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMat, Mtx out, int multi);
-MapDispFlag* searchMapDispFlag(u16 room, MapDispFlag* tbl, int n);
+MAP_DISP_FLAG* searchMapDispFlag(u16 room, MAP_DISP_FLAG* tbl, int n);
 int mapColor(u16 room);
 int mapRoomNum(MapRoomData* p);
 void* mapBinAddr(MapRoomData* p, int no);
@@ -1363,8 +1363,8 @@ void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMa
     }
 }
 
-// Finds the display-flag row of `room` in a per-stage MapDispFlag table (0 when absent).
-MapDispFlag* searchMapDispFlag(u16 room, MapDispFlag* tbl, int n)
+// Finds the display-flag row of `room` in a per-stage MAP_DISP_FLAG table (0 when absent).
+MAP_DISP_FLAG* searchMapDispFlag(u16 room, MAP_DISP_FLAG* tbl, int n)
 {
     int i;
 
@@ -1379,7 +1379,7 @@ MapDispFlag* searchMapDispFlag(u16 room, MapDispFlag* tbl, int n)
 // Room model colour: 0 current room, 1 visited, 2 open, 3 cleared, 4 hidden.
 int mapColor(u16 room)
 {
-    MapDispFlag st1[22] = {
+    MAP_DISP_FLAG st1[22] = {
         {0x100, 0, 0, 29, 28}, {0x101, 0, 0, 29, 0},  {0x102, 0, 0, 29, 0},  {0x103, 0, 0, 29, 0},
         {0x104, 0, 0, 29, 28}, {0x105, 0, 0, 29, 28}, {0x106, 0, 0, 29, 28}, {0x107, 0, 0, 29, 28},
         {0x108, 0, 0, 29, 0},  {0x109, 0, 0, 29, 11}, {0x10A, 0, 0, 29, 11}, {0x10B, 0, 0, 29, 11},
@@ -1387,7 +1387,7 @@ int mapColor(u16 room)
         {0x117, 0, 0, 29, 0},  {0x11C, 0, 0, 29, 0},  {0x11D, 0, 0, 29, 0},  {0x11E, 0, 0, 29, 0},
         {0x11F, 0, 0, 29, 0},  {0x200, 0, 0, 29, 0},
     };
-    MapDispFlag st2a[27] = {
+    MAP_DISP_FLAG st2a[27] = {
         {0x200, 0, 0, 40, 0}, {0x201, 0, 0, 40, 0}, {0x202, 0, 0, 40, 0}, {0x203, 0, 0, 40, 0},
         {0x204, 0, 0, 40, 0}, {0x205, 0, 0, 40, 0}, {0x206, 0, 0, 40, 0}, {0x207, 0, 0, 40, 0},
         {0x208, 0, 0, 40, 0}, {0x209, 0, 0, 40, 0}, {0x20A, 0, 0, 40, 0}, {0x20B, 0, 0, 40, 0},
@@ -1396,64 +1396,64 @@ int mapColor(u16 room)
         {0x214, 0, 0, 40, 0}, {0x215, 0, 0, 40, 0}, {0x216, 0, 0, 40, 0}, {0x217, 0, 0, 40, 0},
         {0x218, 0, 0, 40, 0}, {0x219, 0, 0, 40, 0}, {0x222, 0, 0, 40, 0},
     };
-    MapDispFlag st2b[11] = {
+    MAP_DISP_FLAG st2b[11] = {
         {0x21D, 0, 0, 40, 0}, {0x220, 0, 0, 40, 0}, {0x221, 0, 0, 40, 0}, {0x223, 0, 0, 40, 0},
         {0x224, 0, 0, 40, 0}, {0x225, 0, 0, 40, 0}, {0x226, 0, 0, 40, 0}, {0x227, 0, 0, 40, 0},
         {0x228, 0, 0, 40, 0}, {0x229, 0, 0, 40, 0}, {0x22A, 0, 0, 40, 0},
     };
-    MapDispFlag st2c[2] = {
+    MAP_DISP_FLAG st2c[2] = {
         {0x21A, 0, 0, 40, 0}, {0x21B, 0, 0, 40, 0},
     };
-    MapDispFlag st3a[1] = {
+    MAP_DISP_FLAG st3a[1] = {
         {0x300, 0, 0, 47, 0},
     };
-    MapDispFlag st3b[5] = {
+    MAP_DISP_FLAG st3b[5] = {
         {0x301, 0, 0, 47, 0}, {0x303, 0, 0, 47, 0}, {0x304, 0, 0, 47, 0}, {0x305, 0, 0, 47, 0},
         {0x306, 0, 0, 47, 0},
     };
-    MapDispFlag st3c[8] = {
+    MAP_DISP_FLAG st3c[8] = {
         {0x306, 0, 0, 47, 0}, {0x307, 0, 0, 47, 0}, {0x308, 0, 0, 47, 0}, {0x309, 0, 0, 47, 0},
         {0x30A, 0, 0, 47, 0}, {0x30B, 0, 0, 47, 0}, {0x30C, 0, 0, 47, 0}, {0x30E, 0, 0, 47, 0},
     };
-    MapDispFlag st3d[5] = {
+    MAP_DISP_FLAG st3d[5] = {
         {0x310, 0, 0, 47, 0}, {0x311, 0, 0, 47, 0}, {0x312, 0, 0, 47, 0}, {0x30D, 0, 0, 47, 0},
         {0x30F, 0, 0, 47, 0},
     };
-    MapDispFlag st3e[13] = {
+    MAP_DISP_FLAG st3e[13] = {
         {0x315, 0, 0, 47, 0}, {0x316, 0, 0, 47, 0}, {0x317, 0, 0, 47, 0}, {0x318, 0, 0, 47, 0},
         {0x31A, 0, 0, 47, 0}, {0x31B, 0, 0, 47, 0}, {0x31D, 0, 0, 47, 0}, {0x31C, 0, 0, 47, 0},
         {0x320, 0, 0, 47, 0}, {0x321, 0, 0, 47, 0}, {0x325, 0, 0, 47, 0}, {0x326, 0, 0, 47, 0},
         {0x327, 0, 0, 47, 0},
     };
-    MapDispFlag st3f[5] = {
+    MAP_DISP_FLAG st3f[5] = {
         {0x329, 0, 0, 47, 0}, {0x330, 0, 0, 47, 0}, {0x331, 0, 0, 47, 0}, {0x332, 0, 0, 47, 0},
         {0x333, 0, 0, 47, 0},
     };
-    MapDispFlag st4a[1] = {
+    MAP_DISP_FLAG st4a[1] = {
         {0x400, 0, 0, 29, 0},
     };
-    MapDispFlag st4b[1] = {
+    MAP_DISP_FLAG st4b[1] = {
         {0x402, 0, 0, 29, 0},
     };
-    MapDispFlag st4c[1] = {
+    MAP_DISP_FLAG st4c[1] = {
         {0x403, 0, 0, 29, 0},
     };
-    MapDispFlag st4d[1] = {
+    MAP_DISP_FLAG st4d[1] = {
         {0x404, 0, 0, 29, 0},
     };
-    MapDispFlag st4e[1] = {
+    MAP_DISP_FLAG st4e[1] = {
         {0x405, 0, 0, 29, 0},
     };
-    MapDispFlag st4f[1] = {
+    MAP_DISP_FLAG st4f[1] = {
         {0x406, 0, 0, 29, 0},
     };
-    MapDispFlag st4g[8] = {
+    MAP_DISP_FLAG st4g[8] = {
         {0x40A, 0, 0, 29, 0}, {0x40B, 0, 0, 29, 0}, {0x40C, 0, 0, 29, 0}, {0x40D, 0, 0, 29, 0},
         {0x40E, 0, 0, 29, 0}, {0x40F, 0, 0, 29, 0}, {0x410, 0, 0, 29, 0}, {0x411, 0, 0, 29, 0},
     };
-    MapDispFlag* tbl = 0;
+    MAP_DISP_FLAG* tbl = 0;
     int n = 0;
-    MapDispFlag* p;
+    MAP_DISP_FLAG* p;
     int passed;
 
     switch (getAreaNo(room)) {

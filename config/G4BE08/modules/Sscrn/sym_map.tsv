@@ -190,7 +190,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000FA54	0x130	Sscrn/ss_map.cpp	global	markSaveDisp__FP10SUB_SCREENi	markSaveDisp
 .text	0x0000FB84	0x130	Sscrn/ss_map.cpp	global	mapPos2screenPos__FP3VecT0	mapPos2screenPos
 .text	0x0000FCB4	0x6CC	Sscrn/ss_map.cpp	global	mapPositionCheck__FP10cSatHeaderT0PA3_fN22i	mapPositionCheck
-.text	0x00010380	0x40	Sscrn/ss_map.cpp	global	searchMapDispFlag__FUsP11MapDispFlagi	searchMapDispFlag
+.text	0x00010380	0x40	Sscrn/ss_map.cpp	global	searchMapDispFlag__FUsP13MAP_DISP_FLAGi	searchMapDispFlag
 .text	0x000103C0	0x7B0	Sscrn/ss_map.cpp	global	mapColor__FUs	mapColor
 .text	0x00010B70	0x10	Sscrn/ss_map.cpp	global	mapRoomNum__FP11MapRoomData	mapRoomNum
 .text	0x00010B80	0x18	Sscrn/ss_map.cpp	global	mapBinAddr__FP11MapRoomDatai	mapBinAddr
