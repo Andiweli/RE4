@@ -265,8 +265,9 @@ void AtCubeDisp(Mtx m, Vec* pos, f32 sx, f32 sy, f32 sz, u32 color)
 // tests, then the attribute filter (flag bits 0x400..0x8000 skip polygon classes 0x40 / 0x400 /
 // 0x4000 / 0x8000 / 0x400000 / 0x800000, `mask` bits skip directly). Returns the polygon's
 // attribute word (never 0 on a hit) and the hit point in *out; 0 when missed.
-u32 At_poly_line_ck(AtPolyData* atp, Vec* cross, AtPoly* polygon, Vec* vert0, Vec* vert1, u32 flag, u32 mask)
+u32 At_poly_line_ck(cSat* atp, Vec* cross, u16* pPoly, Vec* vert0, Vec* vert1, u32 flag, u32 mask)
 {
+    AtPoly* polygon = (AtPoly*) pPoly;
     Vec d0;
     Vec d1;
     Vec c;
@@ -276,7 +277,7 @@ u32 At_poly_line_ck(AtPolyData* atp, Vec* cross, AtPoly* polygon, Vec* vert0, Ve
     Vec* v0 = &vtx[polygon->v[0]];
     Vec* v1;
     Vec* v2;
-    Vec* nrm = &atp->nrm[polygon->n];
+    Vec* nrm = &atp->norm_p[polygon->n];
     f32 dp0;
     f32 dp1;
     f32 t;
@@ -300,18 +301,18 @@ u32 At_poly_line_ck(AtPolyData* atp, Vec* cross, AtPoly* polygon, Vec* vert0, Ve
     v1 = &vtx[polygon->v[1]];
     PSVECSubtract(vert1, vert0, &a);
     PSVECSubtract(vert0, v0, &b);
-    PSVECCrossProduct(&atp->edge[polygon->e[0]], &a, &c);
+    PSVECCrossProduct(&atp->edge_p[polygon->e[0]], &a, &c);
     if (PSVECDotProduct(&c, &b) < 0.0f) {
         return 0;
     }
     v2 = &vtx[polygon->v[2]];
     PSVECSubtract(vert0, v1, &b);
-    PSVECCrossProduct(&atp->edge[polygon->e[1]], &a, &c);
+    PSVECCrossProduct(&atp->edge_p[polygon->e[1]], &a, &c);
     if (PSVECDotProduct(&c, &b) < 0.0f) {
         return 0;
     }
     PSVECSubtract(vert0, v2, &b);
-    PSVECCrossProduct(&atp->edge[polygon->e[2]], &a, &c);
+    PSVECCrossProduct(&atp->edge_p[polygon->e[2]], &a, &c);
     if (PSVECDotProduct(&c, &b) < 0.0f) {
         return 0;
     }
@@ -372,8 +373,9 @@ static f32 At_line_rate(f32 a, f32 b)
 }
 
 // Gathers the triangle's vertices / normal / attribute and runs At_poly_sphere_ck2.
-u32 At_poly_sphere_ck(AtPolyData* atp, AtPoly* polygon, Vec* pos0, Vec* pos1, f32 r, u32 flag, u32 mask)
+u32 At_poly_sphere_ck(cSat* atp, u16* pPoly, Vec* pos0, Vec* pos1, f32 r, u32 flag, u32 mask)
 {
+    AtPoly* polygon = (AtPoly*) pPoly;
     Vec tri[3];
     Vec n;
     u32 attr;
@@ -387,9 +389,9 @@ u32 At_poly_sphere_ck(AtPolyData* atp, AtPoly* polygon, Vec* pos0, Vec* pos1, f3
     tri[2].x = atp->vtx[polygon->v[2]].x;
     tri[2].y = atp->vtx[polygon->v[2]].y;
     tri[2].z = atp->vtx[polygon->v[2]].z;
-    n.x = atp->nrm[polygon->n].x;
-    n.y = atp->nrm[polygon->n].y;
-    n.z = atp->nrm[polygon->n].z;
+    n.x = atp->norm_p[polygon->n].x;
+    n.y = atp->norm_p[polygon->n].y;
+    n.z = atp->norm_p[polygon->n].z;
     attr = Get_poly_attr(polygon);
     return At_poly_sphere_ck2(tri, &n, attr, pos0, pos1, r, flag, mask);
 }

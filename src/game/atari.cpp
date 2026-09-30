@@ -35,7 +35,7 @@ u8 polyBit[0x400];
 // the piece the last hitCheck2 hit (hitCheck transforms the normal with its matrix)
 static cSat* pBypassAt;
 
-int atck(Vec* vec0, Vec* vec1, cAtariInfo* info, cModel* m, int flag);
+int atck(Vec* vec0, Vec* vec1, Vec* offset, cModel* m, int flag);
 int blkPolySphereCk(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, f32 r, int flag, Vec* nrm, int mask);
 int blkPolySphereCkCore(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, f32 r, int flag, Vec* nrm, int mask);
 int blkPolyLineCk(cSat* sat, cSatBlock* blk, Vec* pos0, Vec* pos1, int flag, int mask, Vec* hit, Vec** pn);
@@ -91,84 +91,84 @@ int cSatMgr::checkRect(cModel* pMod)
     b.x = info->m_radius;
     b.y = 0.0f;
     b.z = info->m_radius2 * 0.9f;
-    ret = atck(&a, &b, info, pMod, 0);
+    ret = atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = 0.0f;
     a.y = 0.0f;
     a.z = 0.0f;
     b.x = info->m_radius;
     b.y = 0.0f;
     b.z = 0.0f;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = 0.0f;
     a.y = 0.0f;
     a.z = -info->m_radius2 * 0.9f;
     b.x = info->m_radius;
     b.y = 0.0f;
     b.z = -info->m_radius2 * 0.9f;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = 0.0f;
     a.y = 0.0f;
     a.z = info->m_radius2 * 0.9f;
     b.x = -info->m_radius;
     b.y = 0.0f;
     b.z = info->m_radius2 * 0.9f;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = 0.0f;
     a.y = 0.0f;
     a.z = 0.0f;
     b.x = -info->m_radius;
     b.y = 0.0f;
     b.z = 0.0f;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = 0.0f;
     a.y = 0.0f;
     a.z = -info->m_radius2 * 0.9f;
     b.x = -info->m_radius;
     b.y = 0.0f;
     b.z = -info->m_radius2 * 0.9f;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = info->m_radius * 0.9f;
     a.y = 0.0f;
     a.z = 0.0f;
     b.x = info->m_radius * 0.9f;
     b.y = 0.0f;
     b.z = info->m_radius2;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = 0.0f;
     a.y = 0.0f;
     a.z = 0.0f;
     b.x = 0.0f;
     b.y = 0.0f;
     b.z = info->m_radius2;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = -info->m_radius * 0.9f;
     a.y = 0.0f;
     a.z = 0.0f;
     b.x = -info->m_radius * 0.9f;
     b.y = 0.0f;
     b.z = info->m_radius2;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = info->m_radius * 0.9f;
     a.y = 0.0f;
     a.z = 0.0f;
     b.x = info->m_radius * 0.9f;
     b.y = 0.0f;
     b.z = -info->m_radius2;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = 0.0f;
     a.y = 0.0f;
     a.z = 0.0f;
     b.x = 0.0f;
     b.y = 0.0f;
     b.z = -info->m_radius2;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     a.x = -info->m_radius * 0.9f;
     a.y = 0.0f;
     a.z = 0.0f;
     b.x = -info->m_radius * 0.9f;
     b.y = 0.0f;
     b.z = -info->m_radius2;
-    ret |= atck(&a, &b, info, pMod, 0);
+    ret |= atck(&a, &b, &info->m_offset, pMod, 0);
     return ret;
 }
 
@@ -195,7 +195,7 @@ int cSatMgr::checkAir(cModel* pMod, int mask)
 
 // Segment a-b (model local, offset by the info position) against the scenario; the model is
 // pushed back to the hit point. Returns 1 when it moved by a metre or more.
-int atck(Vec* vec0, Vec* vec1, cAtariInfo* offset, cModel* pMod, int flag)
+int atck(Vec* vec0, Vec* vec1, Vec* offset, cModel* pMod, int flag)
 {
     Vec v0;
     Vec v1;
@@ -203,8 +203,8 @@ int atck(Vec* vec0, Vec* vec1, cAtariInfo* offset, cModel* pMod, int flag)
     Vec nrm;
     Vec old;
 
-    PSVECAdd(vec0, &offset->m_offset, &v0);
-    PSVECAdd(vec1, &offset->m_offset, &v1);
+    PSVECAdd(vec0, offset, &v0);
+    PSVECAdd(vec1, offset, &v1);
     RotVector(&v0, &pMod->ang, &v0);
     RotVector(&v1, &pMod->ang, &v1);
     PSVECAdd(&v0, &pMod->pos, &v0);
@@ -807,7 +807,7 @@ int blkPolySphereCkCore(cSat* pAt, cSatBlock* pBlock, Vec* pos0, Vec* pos1, f32 
             continue;
         }
         polyBitSet(*idx);
-        if (At_poly_sphere_ck((AtPolyData*) pAt, poly, pos0, pos1, radius, flag, mask)) {
+        if (At_poly_sphere_ck(pAt, (u16*) poly, pos0, pos1, radius, flag, mask)) {
             ret = 1;
             if (pNorm) {
                 *pNorm = pAt->norm_p[pAt->poly_p[*idx].n];
@@ -974,7 +974,7 @@ int blkPolyLineCkCore(cSat* pAt, cSatBlock* pBlock, Vec* pos0, Vec* pos1, int fl
             continue;
         }
         polyBit[no >> 3] |= bit;
-        attr = At_poly_line_ck((AtPolyData*) pAt, &h, poly, pos0, pos1, flag, mask);
+        attr = At_poly_line_ck(pAt, &h, (u16*) poly, pos0, pos1, flag, mask);
         if (attr) {
             if (GetDistance(pos0, &h) < GetDistance(pos0, pCross)) {
                 *pCross = h;

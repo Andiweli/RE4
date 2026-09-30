@@ -1287,7 +1287,7 @@ void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMa
     }
     poly = satB.poly_p;
     for (i = 0; i < satB.floor_num + satB.slope_num; i++, poly++) {
-        if (At_poly_line_ck((AtPolyData*) &satB, &hit2, poly, &a, &b, 0, 0)) {
+        if (At_poly_line_ck(&satB, &hit2, (u16*) poly, &a, &b, 0, 0)) {
             if (hit2.y <= best) {
                 idx = i;
                 hit = hit2;

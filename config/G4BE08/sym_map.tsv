@@ -3028,8 +3028,8 @@ address	size	section	unit	scope	name	demangled
 0x800C8ACC	0x278	.text	game/at_sub.cpp	global	AtSphereCapsuleCk__FP3VecfT0T0f	AtSphereCapsuleCk
 0x800C8D44	0x1EC	.text	game/at_sub.cpp	global	AtCapsuleDisp__FP3VecT0fUl	AtCapsuleDisp
 0x800C8F30	0x278	.text	game/at_sub.cpp	global	AtCubeDisp__FPA3_fP3VecfffUl	AtCubeDisp
-0x800C91A8	0x374	.text	game/at_sub.cpp	global	At_poly_line_ck__FP10AtPolyDataP3VecP6AtPolyT1T1UlUl	At_poly_line_ck
-0x800C951C	0x104	.text	game/at_sub.cpp	global	At_poly_sphere_ck__FP10AtPolyDataP6AtPolyP3VecT2fUlUl	At_poly_sphere_ck
+0x800C91A8	0x374	.text	game/at_sub.cpp	global	At_poly_line_ck__FP4cSatP3VecPUsT1T1UlUl	At_poly_line_ck
+0x800C951C	0x104	.text	game/at_sub.cpp	global	At_poly_sphere_ck__FP4cSatPUsP3VecT2fUlUl	At_poly_sphere_ck
 0x800C9620	0x418	.text	game/at_sub.cpp	global	At_poly_sphere_ck2__FP3VecT0UlT0T0fUlUl	At_poly_sphere_ck2
 0x800C9A38	0x14	.text	game/at_sub.cpp	global	Get_poly_attr__FP6AtPoly	Get_poly_attr
 0x800C9A4C	0xA8	.text	game/at_sub.cpp	global	At_rect_point_ck__FP3VecT0	At_rect_point_ck
@@ -3041,7 +3041,7 @@ address	size	section	unit	scope	name	demangled
 0x800C9D24	0xE4	.text	game/atari.cpp	global	check__7cSatMgrP6cModeli	cSatMgr::check
 0x800C9E08	0x358	.text	game/atari.cpp	global	checkRect__7cSatMgrP6cModel	cSatMgr::checkRect
 0x800CA160	0xC0	.text	game/atari.cpp	global	checkAir__7cSatMgrP6cModeli	cSatMgr::checkAir
-0x800CA220	0x180	.text	game/atari.cpp	global	atck__FP3VecT0P10cAtariInfoP6cModeli	atck
+0x800CA220	0x180	.text	game/atari.cpp	global	atck__FP3VecN20P6cModeli	atck
 0x800CA3A0	0x368	.text	game/atari.cpp	global	scrAtCheckSphere__7cSatMgrP6cModelP10cAtariInfoi	cSatMgr::scrAtCheckSphere
 0x800CA708	0x178	.text	game/atari.cpp	global	scrAtCheckSphereAir__7cSatMgrP6cModelP10cAtariInfoi	cSatMgr::scrAtCheckSphereAir
 0x800CA880	0x1B4	.text	game/atari.cpp	global	wallAdjust__7cSatMgrP3VecN21fii	cSatMgr::wallAdjust

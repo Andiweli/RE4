@@ -4,14 +4,7 @@
 #include "types.h"
 #include "vec.h"
 
-// Collision polygon data block (game/at_sub.cpp, game/atari.cpp): vertex, face normal and
-// edge normal tables the polygons index into.
-struct AtPolyData {
-    u8 pad_0[0xC];
-    Vec* vtx;        // 0x0C
-    Vec* nrm;        // 0x10  face normals
-    Vec* edge;       // 0x14  edge normals
-};
+class cSat;
 
 // Check flags of the At_poly_*_ck / hitCheck `flag` word (PS2 SAT_TYPE): which atari sets to test and, in
 // SAT_TYPE_MIDDLE..SAT_TYPE_SEE, which *_NOHIT attribute bits exclude a polygon.
@@ -147,10 +140,10 @@ u32 AtSphereCapsuleCk(Vec* c, f32 sph_r, Vec* p0, Vec* p1, f32 cap_r);
 void AtCapsuleDisp(Vec* pPosTop, Vec* pPosBot, f32 r, u32 rgba);
 void AtCubeDisp(Mtx m, Vec* pos, f32 sx, f32 sy, f32 sz, u32 color);
 // Segment p0-p1 against one polygon; returns the attribute | SAT_ATTR_HIT or 0.
-u32 At_poly_line_ck(AtPolyData* atp, Vec* cross, AtPoly* polygon, Vec* vert0, Vec* vert1, u32 flag, u32 mask);
+u32 At_poly_line_ck(cSat* atp, Vec* cross, u16* polygon, Vec* vert0, Vec* vert1, u32 flag, u32 mask);
 // Sphere moving from `oldPos` to `pos` against one polygon; `pos` is pushed out. Returns the hit
 // kind (1 crossed the plane, 2 touching) or 0.
-u32 At_poly_sphere_ck(AtPolyData* atp, AtPoly* polygon, Vec* pos0, Vec* pos1, f32 r, u32 flag, u32 mask);
+u32 At_poly_sphere_ck(cSat* atp, u16* polygon, Vec* pos0, Vec* pos1, f32 r, u32 flag, u32 mask);
 u32 At_poly_sphere_ck2(Vec* tri, Vec* n, u32 attr, Vec* oldPos, Vec* pos, f32 r, u32 flag, u32 mask);
 u32 Get_poly_attr(AtPoly* poly);
 // XZ rectangles of 4 corners.

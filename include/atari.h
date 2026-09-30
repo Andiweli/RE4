@@ -74,7 +74,7 @@ public:
         FLAG_ENABLE = 2,   // takes part in the collision checks
     };
 
-    Vec* vtx;        // 0x0C  (the three table pointers double as the AtPolyData the at_sub checks take)
+    Vec* vtx;        // 0x0C
     Vec* norm_p;        // 0x10
     Vec* edge_p;       // 0x14
     AtPoly* poly_p;    // 0x18
