@@ -332,7 +332,7 @@ enum {
 };
 
 
-DvdReq DvdReqWork;
+DVD_REQ_WORK DvdReqWork;
 cDvd Dvd;
 cAram Aram;
 static u8 header_buff[0x800] __attribute__((aligned(32)));
@@ -345,18 +345,18 @@ static DvdHeader* pFilehead_save[2];
 // Returns the request number for ReadCheck.
 int DvdRead(int fileNo, void* dst, u32 aram, u32 ofs, u32 length, int mode, const char* file, int line)
 {
-    DvdReq* w = &DvdReqWork;
+    DVD_REQ_WORK* w = &DvdReqWork;
 
-    memclr_asm(w, sizeof(DvdReq));
-    w->dst = dst;
-    w->fileNo = fileNo;
-    w->aram = aram;
-    w->ofs = ofs;
-    w->length = length;
+    memclr_asm(w, sizeof(DVD_REQ_WORK));
+    w->mram_addr = dst;
+    w->file_no = fileNo;
+    w->aram_addr = aram;
+    w->offset = ofs;
+    w->size = length;
     w->prio = 4;
     w->mode = mode;
-    sprintf(w->file, "%s", file);
-    w->line = line;
+    sprintf(w->reqfile, "%s", file);
+    w->reqline = line;
     return Dvd.ReadReq();
 }
 
@@ -364,19 +364,19 @@ int DvdRead(int fileNo, void* dst, u32 aram, u32 ofs, u32 length, int mode, cons
 // through the data controller, 0x11 debug heap). Every unit's DVD_READ_N / DvdReadN goes here.
 int DvdReadN(const char* name, void* dst, int a, int b, int c, int mode, const char* file, int line)
 {
-    DvdReq* w = &DvdReqWork;
+    DVD_REQ_WORK* w = &DvdReqWork;
 
-    memclr_asm(w, sizeof(DvdReq));
-    sprintf(w->name, "%s", name);
-    w->dst = dst;
-    w->fileNo = 0xFFFF;
-    w->aram = a;
-    w->ofs = b;
-    w->length = c;
+    memclr_asm(w, sizeof(DVD_REQ_WORK));
+    sprintf(w->fname, "%s", name);
+    w->mram_addr = dst;
+    w->file_no = 0xFFFF;
+    w->aram_addr = a;
+    w->offset = b;
+    w->size = c;
     w->prio = 4;
     w->mode = mode;
-    sprintf(w->file, "%s", file);
-    w->line = line;
+    sprintf(w->reqfile, "%s", file);
+    w->reqline = line;
     return Dvd.ReadReq();
 }
 
@@ -852,27 +852,27 @@ int cDvdQueue::Read()
 // heap, keep).
 void cDvdQueue::Initialize()
 {
-    DvdReq* w = &DvdReqWork;
+    DVD_REQ_WORK* w = &DvdReqWork;
     char buf[0x40];
     int hed;
     int pc;
 
-    if (w->fileNo != 0xFFFF) {
-        entrynum = FileTbl[w->fileNo].entrynum;
-        sprintf(m_Name, "%s", FileTbl[w->fileNo].name);
+    if (w->file_no != 0xFFFF) {
+        entrynum = FileTbl[w->file_no].entrynum;
+        sprintf(m_Name, "%s", FileTbl[w->file_no].name);
     } else {
-        entrynum = DVDConvertPathToEntrynum(w->name);
-        sprintf(m_Name, "%s", w->name);
+        entrynum = DVDConvertPathToEntrynum(w->fname);
+        sprintf(m_Name, "%s", w->fname);
     }
     if (SysFlagChk(pG, SYS_SN_PC_READ)) {
         sprintf(buf, "d:\\bio4/data/%s", m_Name);
         sprintf(m_Name, "%s", buf);
     }
-    m_FileNo = w->fileNo;
-    pBuff = w->dst;
-    aram = w->aram;
-    m_Offset = w->ofs;
-    length = w->length;
+    m_FileNo = w->file_no;
+    pBuff = w->mram_addr;
+    aram = w->aram_addr;
+    m_Offset = w->offset;
+    length = w->size;
     m_Prio = w->prio;
     hed = w->mode & 0x8;
     if (hed) {
@@ -900,8 +900,8 @@ void cDvdQueue::Initialize()
     if (w->mode & 0x40) {
         SetFlag(0x20000000);
     }
-    sprintf(reqfile, "%s", w->file);
-    reqline = w->line;
+    sprintf(reqfile, "%s", w->reqfile);
+    reqline = w->reqline;
     pc = 1;
     if (SysFlagChk(pG, SYS_SN_PC_READ) == 0) {
         pc = 0;

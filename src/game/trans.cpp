@@ -67,15 +67,17 @@ struct cPartsWk {
 };
 
 // Skinning weights: up to 3 matrices per vertex.
-struct WeightExt {
-    u16 idx[3];   // 0x00
-    u16 num;      // 0x06
-    u8 weight[4]; // 0x08  percent
+struct cWeightExt {
+    u16 WeightId[3];  // 0x00
+    u16 nWeight;      // 0x06
+    u8 Weight[3];     // 0x08  percent
+    u8 padding;       // 0x0B
 };
-struct Weight {
-    u8 id[3];    // 0x00
-    u8 num;       // 0x03
-    u8 wht[4]; // 0x04  percent
+struct cWeight {
+    u8 WeightId[3];  // 0x00
+    u8 nWeight;      // 0x03
+    u8 Weight[3];    // 0x04  percent
+    u8 padding;      // 0x07
 };
 
 #define PTR_INVALID(p) ((s32) (p) >= 0 || (u32) (p) > 0x82FFFFFF)
@@ -304,8 +306,8 @@ void bumpSetup(ModelPart* part, cModelInfo* info);
 void alphaSetup(cModel* m, ModelPart* part, cModelInfo* info, int thermo);
 void CalcSk1_x(void* dst, void* src, u32 n);
 void CalcSk1_x2(void* dst, void* src, u32 n);
-int MakeWeightPaletteExt(WeightExt* w, int n);
-int MakeWeightPalette(Weight* w, int n);
+int MakeWeightPaletteExt(cWeightExt* w, int n);
+int MakeWeightPalette(cWeight* w, int n);
 void updateMatrices(Mtx m, Mtx dst, cModel* model);
 void RefractShaderSetup(cModel* m, cModelInfo* info, ModelPart* part, Mtx mv);
 
@@ -741,9 +743,9 @@ int commonScreenMatSub(cModel* m, cModelInfo* info)
         }
         info->pNrmBuf[pG->DblBufIdx] = buf;
         if (d->weight_ext_num > 0xFF) {
-            MakeWeightPaletteExt((WeightExt*) d->pWeight, d->weight_ext_num);
+            MakeWeightPaletteExt((cWeightExt*) d->pWeight, d->weight_ext_num);
         } else {
-            MakeWeightPalette((Weight*) d->pWeight, d->weight_palette_num);
+            MakeWeightPalette((cWeight*) d->pWeight, d->weight_palette_num);
         }
         setupGQR6(((d->shift << 24) | (d->shift << 8)) | 0x00070007);
         src = d->vtxOrig;
@@ -803,31 +805,31 @@ void calcWeightMat(cModel* m)
 
 // Builds the blended skinning matrices for the extended weight table (u8 percentages, more than
 // 255 palette entries). Returns the count.
-int MakeWeightPaletteExt(WeightExt* w0, int n)
+int MakeWeightPaletteExt(cWeightExt* w0, int n)
 {
     GxWork* gx = GXWORK();
     int cnt = 0;
     int i;
     u32 wa = (u32) w0;
-#define w ((WeightExt*) wa)
+#define w ((cWeightExt*) wa)
 
-    for (i = 0; i < n; i++, wa += sizeof(WeightExt)) {
+    for (i = 0; i < n; i++, wa += sizeof(cWeightExt)) {
         Mtx m;
         f32 total;
         int j;
 
         memclr_asm(m, sizeof(Mtx));
         total = 0.0f;
-        for (j = 0; j < w->num; j++) {
+        for (j = 0; j < w->nWeight; j++) {
             f32 rate;
             f32* s;
-            PSQ_L_U8_TO(rate, &w->weight[j]);
+            PSQ_L_U8_TO(rate, &w->Weight[j]);
             rate *= 0.01f;
-            if (j == w->num - 1) {
+            if (j == w->nWeight - 1) {
                 rate = 1.0f - total;
             }
             total += rate;
-            s = (f32*) gx->mtx[w->idx[j]];
+            s = (f32*) gx->mtx[w->WeightId[j]];
             m[0][0] += *s++ * rate;
             m[0][1] += *s++ * rate;
             m[0][2] += *s++ * rate;
@@ -850,36 +852,36 @@ int MakeWeightPaletteExt(WeightExt* w0, int n)
 
 // Builds the blended skinning matrices for the weight table (sum of parts matrices x weights, the
 // last weight takes the remainder). Returns the count.
-int MakeWeightPalette(Weight* w0, int n)
+int MakeWeightPalette(cWeight* w0, int n)
 {
     GxWork* gx = GXWORK();
     int cnt;
     int i;
     u32 wa = (u32) w0;
-#define w ((Weight*) wa)
+#define w ((cWeight*) wa)
 
     if (PTR_INVALID(w0)) {
         pLog->err(0, 0, "MakeWeightPalette() PTR ERR");
         return 0;
     }
     cnt = 0;
-    for (i = 0; i < n; i++, wa += sizeof(Weight)) {
+    for (i = 0; i < n; i++, wa += sizeof(cWeight)) {
         Mtx m;
         f32 total;
         int j;
 
         memclr_asm(m, sizeof(Mtx));
         total = 0.0f;
-        for (j = 0; j < w->num; j++) {
+        for (j = 0; j < w->nWeight; j++) {
             f32 rate;
             f32* s;
-            PSQ_L_U8_TO(rate, &w->wht[j]);
+            PSQ_L_U8_TO(rate, &w->Weight[j]);
             rate *= 0.01f;
-            if (j == w->num - 1) {
+            if (j == w->nWeight - 1) {
                 rate = 1.0f - total;
             }
             total += rate;
-            s = (f32*) gx->mtx[w->id[j]];
+            s = (f32*) gx->mtx[w->WeightId[j]];
             m[0][0] += *s++ * rate;
             m[0][1] += *s++ * rate;
             m[0][2] += *s++ * rate;

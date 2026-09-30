@@ -30,9 +30,9 @@ struct RckPoint {
     u16 nLine;    // 0x0E  lines leaving the point
 };
 
-struct RckLine {
-    s16 to;   // 0x00  target point, -1 = none
-    u16 len;  // 0x02  distance / 10
+struct RTP_LINE {
+    s16 connect;   // 0x00  target point, -1 = none
+    u16 dist;  // 0x02  distance / 10
 };
 
 struct RckHeader {
@@ -70,13 +70,13 @@ struct RckWork {
     void* savedRtp;     // 0x2B8  pG->pRoomRtp on entry
     RckHeader hdr;      // 0x2BC
     RckPoint pt[RCK_POINT_MAX];                    // 0x2D4
-    RckLine line[RCK_POINT_MAX][RCK_POINT_MAX];    // 0xAD4
+    RTP_LINE line[RCK_POINT_MAX][RCK_POINT_MAX];    // 0xAD4
     s8 next[RCK_POINT_MAX][RCK_POINT_MAX];         // 0x10AD4
 };
 
-struct RckNode {
-    u8 done;   // 0x0
-    s8 prev;   // 0x1
+struct RTP_CHECK {
+    u8 mark;   // 0x0
+    s8 pre;   // 0x1
     u16 pad;
     u32 dist;  // 0x4
 };
@@ -437,7 +437,7 @@ void rckPointAdd()
     int no;
     f32 gy;
     int t;
-    RckLine* l;
+    RTP_LINE* l;
 
     if (n > 0x7F) {
         return;
@@ -460,11 +460,11 @@ void rckPointAdd()
     rckPointCatch();
     for (i = 0; i < RCK_POINT_MAX; i++) {
         l = &RCK->line[no][i];
-        l->len = 0;
-        l->to = -1;
+        l->dist = 0;
+        l->connect = -1;
         l = &RCK->line[i][no];
-        l->len = 0;
-        l->to = -1;
+        l->dist = 0;
+        l->connect = -1;
     }
 }
 
@@ -474,7 +474,7 @@ void rckPointDelete()
     int del;
     int i;
     int j;
-    RckLine* l;
+    RTP_LINE* l;
     RckPoint* pt;
 
     if (RCK->cur == -1) {
@@ -485,18 +485,18 @@ void rckPointDelete()
     RCK->hdr.nSq = RCK->hdr.nPoint * RCK->hdr.nPoint;
     for (i = 0; i < RCK_POINT_MAX; i++) {
         l = &RCK->line[i][RCK->cur];
-        if (l->to != -1) {
-            l->len = 0;
+        if (l->connect != -1) {
+            l->dist = 0;
             del++;
-            l->to = -1;
+            l->connect = -1;
             pt = &RCK->pt[i];
             pt->nLine--;
         }
         l = &RCK->line[RCK->cur][i];
-        if (l->to != -1) {
-            l->len = 0;
+        if (l->connect != -1) {
+            l->dist = 0;
             del++;
-            l->to = -1;
+            l->connect = -1;
             pt = &RCK->pt[RCK->cur];
             pt->nLine--;
         }
@@ -507,8 +507,8 @@ void rckPointDelete()
             RCK->line[i][j] = RCK->line[i][j + 1];
         }
         l = &RCK->line[i][RCK_POINT_MAX - 1];
-        l->len = 0;
-        l->to = -1;
+        l->dist = 0;
+        l->connect = -1;
     }
     for (i = RCK->cur + 1; i < RCK_POINT_MAX; i++) {
         for (j = 0; j < RCK_POINT_MAX; j++) {
@@ -517,8 +517,8 @@ void rckPointDelete()
     }
     for (j = 0; j < RCK_POINT_MAX; j++) {
         l = &RCK->line[RCK_POINT_MAX - 1][j];
-        l->len = 0;
-        l->to = -1;
+        l->dist = 0;
+        l->connect = -1;
     }
     for (i = RCK->cur + 1; i < RCK_POINT_MAX; i++) {
         RCK->pt[i - 1] = RCK->pt[i];
@@ -693,8 +693,8 @@ void rckPointLineEnd()
     RckWork* w;
     int a;
     int b;
-    RckLine* ab;
-    RckLine* ba;
+    RTP_LINE* ab;
+    RTP_LINE* ba;
     RckPoint* pa;
     RckPoint* pb;
 
@@ -715,35 +715,35 @@ void rckPointLineEnd()
     switch (w->editMode) {
     case 1:
     default:
-        if (ab->to == b) {
-            ab->to = -1;
-            ba->to = -1;
+        if (ab->connect == b) {
+            ab->connect = -1;
+            ba->connect = -1;
             pa->nLine--;
             pb->nLine--;
             RCK->hdr.nLine -= 2;
-            ab->len = 0;
-            ba->len = ab->len;
+            ab->dist = 0;
+            ba->dist = ab->dist;
         } else {
-            ab->to = w->near;
-            ba->to = RCK->lineStart;
+            ab->connect = w->near;
+            ba->connect = RCK->lineStart;
             pa->nLine++;
             pb->nLine++;
             RCK->hdr.nLine += 2;
-            ab->len = rckLineLen(pa, pb);
-            ba->len = ab->len;
+            ab->dist = rckLineLen(pa, pb);
+            ba->dist = ab->dist;
         }
         break;
     case 2:
-        if (ab->to == b) {
-            ab->to = -1;
+        if (ab->connect == b) {
+            ab->connect = -1;
             pa->nLine--;
             RCK->hdr.nLine--;
-            ab->len = 0;
+            ab->dist = 0;
         } else {
-            ab->to = w->near;
+            ab->connect = w->near;
             pa->nLine++;
             RCK->hdr.nLine++;
-            ab->len = rckLineLen(pa, pb);
+            ab->dist = rckLineLen(pa, pb);
         }
         break;
     }
@@ -875,12 +875,12 @@ void rckDrawPointLine()
                 continue;
             }
             RckWork* w = RCK;
-            RckLine* lij = &w->line[i][j];
-            if (lij->to == -1) {
+            RTP_LINE* lij = &w->line[i][j];
+            if (lij->connect == -1) {
                 continue;
             }
-            RckLine* l = &w->line[j][i];
-            if (l->to != -1 && i > j) {
+            RTP_LINE* l = &w->line[j][i];
+            if (l->connect != -1 && i > j) {
                 continue;
             }
             RckPoint* p = &w->pt[i];
@@ -899,12 +899,12 @@ void rckDrawPointLine()
             b.z = p->pos.z;
             if (SatMgr.hitCheck(&a, &b, NULL, NULL, 0x6000, 0x3C3070)) {
                 TprimDrawLineFn(v, &colHit, 2);
-            } else if (l->to == -1) {
+            } else if (l->connect == -1) {
                 TprimDrawLineFn(v, &colOne, 2);
             } else {
                 TprimDrawLineFn(v, &colBoth, 2);
             }
-            if (l->to == -1) {
+            if (l->connect == -1) {
                 seg0.x = v[0].x;
                 seg0.y = v[0].y;
                 seg0.z = v[0].z;
@@ -972,8 +972,8 @@ void rckDrawPointLineNow()
     if (w2->near != -1 && w2->near != w2->lineStart) {
         // row pointer `w + (near << 9) + 0xAD4` then `lhax row, ls << 2` (a plain 2-D index folds 0xAD4
         // into the base and sums the two index terms; the u32 sum keeps the row as the first operand)
-        RckLine* row = w2->line[w2->near];
-        if (((RckLine*) ((u32) row + (w2->lineStart << 2)))->to != -1) {
+        RTP_LINE* row = w2->line[w2->near];
+        if (((RTP_LINE*) ((u32) row + (w2->lineStart << 2)))->connect != -1) {
             p = &w2->pt[w2->near];
             v[0].x = p->pos.x;
             v[0].y = p->pos.y;
@@ -1034,13 +1034,13 @@ void rckSetRoute()
         RckPoint* pa = &RCK->pt[i];
 
         for (j = 0; j < RCK->hdr.nPoint; j++) {
-            RckLine* l = &RCK->line[i][j];
+            RTP_LINE* l = &RCK->line[i][j];
 
-            if (l->to != -1) {
+            if (l->connect != -1) {
                 RckPoint* pb;
-                l->to = j;
+                l->connect = j;
                 pb = &RCK->pt[j];
-                l->len = rckLineLen(pa, pb);
+                l->dist = rckLineLen(pa, pb);
             }
         }
     }
@@ -1052,7 +1052,7 @@ void rckSetRoute()
 // Dijkstra from `start`: fills next[start][] with the first hop towards every point.
 void rckSetNextPoint(int start)
 {
-    RckNode node[RCK_POINT_MAX];
+    RTP_CHECK node[RCK_POINT_MAX];
     int i;
     int k;
     int best;
@@ -1060,36 +1060,36 @@ void rckSetNextPoint(int start)
     memclr_asm(node, sizeof(node));
     for (i = 0; i < RCK->hdr.nPoint; i++) {
         node[i].dist = 0xFFFFFFFF;
-        node[i].prev = -1;
+        node[i].pre = -1;
     }
     node[start].dist = 0;
     best = start;
     for (k = 0; k < RCK->hdr.nPoint; k++) {
         u32 min = 0xFFFFFFFF;
-        RckNode* nb;
+        RTP_CHECK* nb;
 
         for (i = 0; i < RCK->hdr.nPoint; i++) {
-            RckNode* n = &node[i];
+            RTP_CHECK* n = &node[i];
 
-            if ((n->done & 1) == 0 && min > n->dist) {
+            if ((n->mark & 1) == 0 && min > n->dist) {
                 min = n->dist;
                 best = i;
             }
         }
         nb = &node[best];
-        nb->done |= 1;
+        nb->mark |= 1;
         for (i = 0; i < RCK->hdr.nPoint; i++) {
-            RckLine* l = &RCK->line[best][i];
+            RTP_LINE* l = &RCK->line[best][i];
 
-            if (l->to != -1) {
-                RckNode* n = &node[i];
+            if (l->connect != -1) {
+                RTP_CHECK* n = &node[i];
 
-                if ((n->done & 1) == 0) {
-                    u32 d = nb->dist + l->len;
+                if ((n->mark & 1) == 0) {
+                    u32 d = nb->dist + l->dist;
 
                     if (n->dist > d) {
                         n->dist = d;
-                        n->prev = best;
+                        n->pre = best;
                     }
                 }
             }
@@ -1098,13 +1098,13 @@ void rckSetNextPoint(int start)
     for (i = 0; i < RCK->hdr.nPoint; i++) {
         if (i == start) {
             RCK->next[start][i] = i;
-        } else if (node[i].prev == -1) {
+        } else if (node[i].pre == -1) {
             RCK->next[start][i] = -1;
         } else {
             int n = i;
 
-            while (node[n].prev != start) {
-                n = node[n].prev;
+            while (node[n].pre != start) {
+                n = node[n].pre;
             }
             RCK->next[start][i] = n;
         }
@@ -1152,9 +1152,9 @@ int rckMakeSaveData(void* buf, u32 size)
     p += RCK->hdr.nPoint * sizeof(RckPoint);
     for (i = 0; i < RCK->hdr.nPoint; i++) {
         for (j = 0; j < RCK->hdr.nPoint; j++) {
-            RckLine* l = &RCK->line[i][j];
+            RTP_LINE* l = &RCK->line[i][j];
 
-            if (l->to != -1) {
+            if (l->connect != -1) {
                 *(u32*) p = *(u32*) l;
                 p += 4;
             }
@@ -1208,14 +1208,14 @@ void rckMakeEditData(void* data)
         RckPoint* pt = &RCK->pt[i];
 
         for (j = 0; j < pt->nLine; j++) {
-            RckLine l;
-            RckLine* d;
+            RTP_LINE l;
+            RTP_LINE* d;
 
             *(u32*) &l = *(u32*) p;
             p += 4;
-            d = &RCK->line[i][l.to];
-            d->to = l.to;
-            d->len = l.len;
+            d = &RCK->line[i][l.connect];
+            d->connect = l.connect;
+            d->dist = l.dist;
         }
     }
     for (i = 0; i < RCK->hdr.nPoint; i++) {

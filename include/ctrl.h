@@ -55,13 +55,13 @@ public:
 };
 
 // ctrl12: per-object timers, counters and TexRender handles.
-struct Ctrl12Work {
-    s16 timer[13];              // 0x00
-    u16 cnt[6];                 // 0x1A
-    u16 flag[1];                // 0x26
-    struct TexRenderMng* tex2b; // 0x28
-    struct TexRenderMng* tex2c; // 0x2C
-    struct TexRenderMng* tex32; // 0x30
+struct CTRL12_FREE {
+    s16 Timer[13];              // 0x00
+    u16 Cnt[6];                 // 0x1A
+    u16 ClrCnt[1];                // 0x26
+    struct TexRenderMng* pMgrEm2b; // 0x28
+    struct TexRenderMng* pMgrEm2c; // 0x2C
+    struct TexRenderMng* pMgrEm32; // 0x30
 };
 
 class cCtrl12 : public cCtrl {

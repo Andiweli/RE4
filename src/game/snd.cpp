@@ -533,13 +533,13 @@ check:
 
 // Enemy SE: finds the loaded enemy block (8..13) whose enemy id matches (family aliases: 0x10 group,
 // 0x11 group, 0x1D group; 0xFF = block 8), applies the random table, and refuses a repeat of the
-// same id / number already in the 32-entry recent history (SndEmHist). Returns 1 to play.
+// same id / number already in the 32-entry recent history (CALL_EXCLUDE). Returns 1 to play.
 int emSeCheck(u16* blk, u16* call_no, int id)
 {
     int i;
     int ret;
-    SndEmHist* h;
-    SndEmHist* free;
+    CALL_EXCLUDE* h;
+    CALL_EXCLUDE* free;
 
     *blk = 0xFFFF;
     for (i = 0; i < 6; i++) {
@@ -588,19 +588,19 @@ int emSeCheck(u16* blk, u16* call_no, int id)
             free = NULL;
             h = pSnd->em_hist;
             for (i = 0; i < 32; i++, h++) {
-                if (h->used == 0) {
+                if (h->be_flag == 0) {
                     free = h;
                     continue;
                 }
-                if (h->id == (u16) id && h->no == *call_no) {
+                if (h->id == (u16) id && h->call_no == *call_no) {
                     return 0;
                 }
             }
             if (free != NULL) {
                 free->id = id;
-                free->used = 1;
-                free->no = *call_no;
-                free->timer = 1;
+                free->be_flag = 1;
+                free->call_no = *call_no;
+                free->interval = 1;
             }
         } else {
             sndCallErr(*blk, *call_no);
@@ -1398,11 +1398,11 @@ void SndWatcher()
     }
 
     for (i = 0; i < 32; i++) {
-        if (pSnd->em_hist[i].used != 0) {
-            SndEmHist* h = &pSnd->em_hist[i];
-            h->timer--;
-            if (h->timer == 0) {
-                memclr_asm(h, sizeof(SndEmHist));
+        if (pSnd->em_hist[i].be_flag != 0) {
+            CALL_EXCLUDE* h = &pSnd->em_hist[i];
+            h->interval--;
+            if (h->interval == 0) {
+                memclr_asm(h, sizeof(CALL_EXCLUDE));
             }
         }
     }

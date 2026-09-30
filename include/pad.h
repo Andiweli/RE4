@@ -60,7 +60,7 @@ void PadRead();
 void KeyStop(u64 un_stop_bit);
 void KeyClear(u64 un_stop_bit);
 void VibControl();
-VibWork* PullVibWork();
+PAD_MOTOR* PullVibWork();
 void VibSet(u32 time, u32 level, u16 delay, u16 flag);
 void VibSetDataCore(VIB_INFO* pInfo, u32 flag);
 void VibSetData(VibDataTbl* t, u32 no, u32 type);

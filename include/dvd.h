@@ -37,19 +37,19 @@ struct DvdHeader {
 };
 
 // Read request parameters handed to cDvd::ReadReq by DvdRead/DvdReadN (`DvdReqWork`, 0x6C).
-struct DvdReq {
-    void* dst;       // 0x00
-    u32 aram;        // 0x04  ARAM destination
-    u16 fileNo;      // 0x08  FileTbl index, 0xFFFF = by name
+struct DVD_REQ_WORK {
+    void* mram_addr;       // 0x00
+    u32 aram_addr;        // 0x04  ARAM destination
+    u16 file_no;      // 0x08  FileTbl index, 0xFFFF = by name
     u16 prio;        // 0x0A  (4)
     u16 mode;        // 0x0C  bit0 sync, bit1 debug heap, bit2 main heap, bit3 type 3 header,
                      //       bit5 0x10, bit6 keep, bit8 interrupt task, bit15 headered file
-    u8 pad_E[2];
-    u32 ofs;         // 0x10
-    u32 length;      // 0x14  0 = whole file
-    char name[0x20]; // 0x18
-    char file[0x30]; // 0x38  __FILE__ of the caller
-    int line;        // 0x68
+    u8 dummy[2];
+    u32 offset;         // 0x10
+    u32 size;      // 0x14  0 = whole file
+    char fname[0x20]; // 0x18
+    char reqfile[0x30]; // 0x38  __FILE__ of the caller
+    int reqline;        // 0x68
 };
 
 // Result block filled by cDvd::readCheckMain for a finished request (0x208 bytes).
@@ -223,7 +223,7 @@ private:
     void DiscReadInfo();
 };
 
-extern DvdReq DvdReqWork;
+extern DVD_REQ_WORK DvdReqWork;
 extern cDvd Dvd;
 extern cAram Aram;
 

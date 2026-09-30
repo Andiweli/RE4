@@ -8,17 +8,17 @@
 struct OSModuleHeader;
 
 // One room of a stage table (St<n>_data_tbl), 0xC bytes.
-struct RoomTblEntry {
-    u8 stat;         // 0x00  1 = the room has a save record
+struct ROOM_DATA {
+    u8 save_flg;         // 0x00  1 = the room has a save record
     u8 pad_1;
-    u16 rel_no;      // 0x02  FileTbl index of the room DLL (0 = none)
-    void (*init)();  // 0x04
-    void (*main)();  // 0x08
+    u16 rel_file;      // 0x02  FileTbl index of the room DLL (0 = none)
+    void (*pInit)();  // 0x04
+    void (*pMain)();  // 0x08
 };
 
 // Room_data_tbl[10]: one row per stage.
 struct StageTbl {
-    RoomTblEntry* tbl;  // 0x00
+    ROOM_DATA* tbl;  // 0x00
     u16 num;            // 0x04
     u16 pad_6;
 };
@@ -92,9 +92,9 @@ public:
 extern cRoomData RoomData;
 
 // game/roomdata.cpp: the per-stage room tables the stage modules' Init fills (StN_data_tbl[no].init = ...).
-extern RoomTblEntry St1_data_tbl[33];
-extern RoomTblEntry St2_data_tbl[46];
-extern RoomTblEntry St3_data_tbl[52];
-extern RoomTblEntry St4_data_tbl[18];
+extern ROOM_DATA St1_data_tbl[33];
+extern ROOM_DATA St2_data_tbl[46];
+extern ROOM_DATA St3_data_tbl[52];
+extern ROOM_DATA St4_data_tbl[18];
 
 #endif

@@ -99,8 +99,8 @@ struct cModelData {
     u8 pad_4[0xC - 0x4];
     void* pClr;      // 0x0C  vertex colour array (GX_VA_CLR0, RGBA8; used when flags bit31 is set)
     void* pTex;      // 0x10  texture coordinate array (GX_VA_TEX0)
-    void* pWeight;   // 0x14  skinning weights (trans MakeWeightPalette: Weight[x18] or WeightExt[x2A])
-    u8 weight_palette_num;  // 0x18  Weight entries of pWeight (trans MakeWeightPalette); <= 1 with nParts == 1: rigid, original arrays
+    void* pWeight;   // 0x14  skinning weights (trans MakeWeightPalette: Weight[x18] or cWeightExt[x2A])
+    u8 weight_palette_num;  // 0x18  cWeight entries of pWeight (trans MakeWeightPalette); <= 1 with nParts == 1: rigid, original arrays
     u8 nParts;       // 0x19  parts count (cModel::setModel copies it into cModel::nParts)
     u16 displist_num;  // 0x1A  primitive (display list) part count (dbmodule DrawObjWireframe)
     struct ModelPart* pParts;  // 0x1C  first part header (0x20 bytes + primitive stream)
@@ -108,7 +108,7 @@ struct cModelData {
     u32 nTex;        // 0x24  texture count (trans: must be <= 0xF7)
     u8 shift;        // 0x28  vertex fixed-point shift (dbmodule: scale = 1 / (1 << shift))
     u8 pad_29;
-    u16 weight_ext_num;  // 0x2A  extended weight entries (> 0xFF: pWeight is a WeightExt table)
+    u16 weight_ext_num;  // 0x2A  extended weight entries (> 0xFF: pWeight is a cWeightExt table)
     u32 shapeOfs;    // 0x2C  offset of the shape (vertex delta) table (shape.cpp)
     void* vtxOrig;   // 0x30  original vertex positions (shape.cpp ResetShape source)
     void* nrmOrig;   // 0x34  original vertex normals

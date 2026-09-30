@@ -137,11 +137,11 @@ struct SndSurWork {
     cUnit* obj;      // 0x2C
 };
 
-struct SndEmHist {
-    u16 used;        // 0x00
+struct CALL_EXCLUDE {
+    u16 be_flag;        // 0x00
     u16 id;          // 0x02
-    u16 timer;       // 0x04
-    u16 no;          // 0x06
+    u16 interval;       // 0x04
+    u16 call_no;          // 0x06
 };
 
 // Game sound work (`Snd`, 0xAE8 bytes, pSnd).
@@ -159,7 +159,7 @@ struct SND_WORK {
     struct SeAt* pSeAtData; // 0x98  its records
     SND_INFO* hdr;         // 0x9C
     SndSurWork sur[48];      // 0xA0
-    SndEmHist em_hist[32];   // 0x9A0
+    CALL_EXCLUDE em_hist[32];   // 0x9A0
     u8* mram_top;            // 0xAA0  MRAM allocation pointer (dvd.cpp)
     u32 aram_base_addr;            // 0xAA4  ARAM allocation pointer (dvd.cpp)
     u8 snd_em_id[8];             // 0xAA8  enemy id per enemy block (6 used)

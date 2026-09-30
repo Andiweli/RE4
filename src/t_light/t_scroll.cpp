@@ -42,20 +42,20 @@ struct ScrRotateWork {
 };
 
 // per-object work of the swinging scroll objects (cObj::work)
-struct ScrSwingWork {
-    f32 start3;  // 0x00
-    f32 range3;  // 0x04
-    f32 speed3;  // 0x08
-    f32 xC;
-    f32 start1;  // 0x10
-    f32 range1;  // 0x14
-    f32 speed1;  // 0x18
-    f32 start2;  // 0x1C
-    f32 range2;  // 0x20
-    f32 speed2;  // 0x24
-    f32 ini1;    // 0x28
-    f32 ini2;    // 0x2C
-    f32 ini3;    // 0x30
+struct OBJ02_FREE_SWING {
+    f32 m_StartZ;  // 0x00
+    f32 m_RangeZ;  // 0x04
+    f32 m_SpeedZ;  // 0x08
+    f32 m_Time;
+    f32 m_StartX;  // 0x10
+    f32 m_RangeX;  // 0x14
+    f32 m_SpeedX;  // 0x18
+    f32 m_StartY;  // 0x1C
+    f32 m_RangeY;  // 0x20
+    f32 m_SpeedY;  // 0x24
+    f32 m_InitAngX;    // 0x28
+    f32 m_InitAngY;    // 0x2C
+    f32 m_InitAngZ;    // 0x30
 };
 
 // one saved record of the .smx file (scroll.h cSmxWork with the colour bytes split)
@@ -849,50 +849,50 @@ static void edit_id_rotate()
 // Swing type: three axes of INI R / START / SPEED / RANGE (the pendulum parameters).
 static void edit_id_swing_rot()
 {
-    ScrSwingWork* w;
+    OBJ02_FREE_SWING* w;
     f32 step;
 
-    w = (ScrSwingWork*) ((cObjScr*) SmdGetGroupObjPtr(pWork->top + pWork->row))->free;
+    w = (OBJ02_FREE_SWING*) ((cObjScr*) SmdGetGroupObjPtr(pWork->top + pWork->row))->free;
     step = (pWork->joy[0].on & 0x100) ? 10.0f : 1.0f;
     switch (pWork->sub2) {
     case 0:
         edit_id_normal();
         break;
     case 1:
-        SWING_EDIT(w->ini1, 10000.0f);
+        SWING_EDIT(w->m_InitAngX, 10000.0f);
         break;
     case 2:
-        SWING_EDIT(w->start1, 10000.0f);
+        SWING_EDIT(w->m_StartX, 10000.0f);
         break;
     case 3:
-        SWING_EDIT(w->speed1, 100000.0f);
+        SWING_EDIT(w->m_SpeedX, 100000.0f);
         break;
     case 4:
-        SWING_EDIT(w->range1, 100000.0f);
+        SWING_EDIT(w->m_RangeX, 100000.0f);
         break;
     case 5:
-        SWING_EDIT(w->ini2, 10000.0f);
+        SWING_EDIT(w->m_InitAngY, 10000.0f);
         break;
     case 6:
-        SWING_EDIT(w->start2, 10000.0f);
+        SWING_EDIT(w->m_StartY, 10000.0f);
         break;
     case 7:
-        SWING_EDIT(w->speed2, 100000.0f);
+        SWING_EDIT(w->m_SpeedY, 100000.0f);
         break;
     case 8:
-        SWING_EDIT(w->range2, 100000.0f);
+        SWING_EDIT(w->m_RangeY, 100000.0f);
         break;
     case 9:
-        SWING_EDIT(w->ini3, 10000.0f);
+        SWING_EDIT(w->m_InitAngZ, 10000.0f);
         break;
     case 10:
-        SWING_EDIT(w->start3, 10000.0f);
+        SWING_EDIT(w->m_StartZ, 10000.0f);
         break;
     case 11:
-        SWING_EDIT(w->speed3, 100000.0f);
+        SWING_EDIT(w->m_SpeedZ, 100000.0f);
         break;
     case 12:
-        SWING_EDIT(w->range3, 100000.0f);
+        SWING_EDIT(w->m_RangeZ, 100000.0f);
         break;
     }
     if (pWork->joy[0].rep & 8) {
@@ -902,18 +902,18 @@ static void edit_id_swing_rot()
         pWork->sub2 = (pWork->sub2 + 13 + 1) % 13;
     }
     printCursor(7, pWork->sub2 + 0xB);
-    eprintf(0x40, 0xA8, 0, 0, "INI R %3.5f", w->ini1);
-    eprintf(0x40, 0xB6, 0, 0, "START %3.5f", w->start1);
-    eprintf(0x40, 0xC4, 0, 0, "SPEED %3.5f", w->speed1);
-    eprintf(0x40, 0xD2, 0, 0, "RANGE %3.5f", w->range1);
-    eprintf(0x40, 0xE0, 0, 0, "INI R %3.5f", w->ini2);
-    eprintf(0x40, 0xEE, 0, 0, "START %3.5f", w->start2);
-    eprintf(0x40, 0xFC, 0, 0, "SPEED %3.5f", w->speed2);
-    eprintf(0x40, 0x10A, 0, 0, "RANGE %3.5f", w->range2);
-    eprintf(0x40, 0x118, 0, 0, "INI R %3.5f", w->ini3);
-    eprintf(0x40, 0x126, 0, 0, "START %3.5f", w->start3);
-    eprintf(0x40, 0x134, 0, 0, "SPEED %3.5f", w->speed3);
-    eprintf(0x40, 0x142, 0, 0, "RANGE %3.5f", w->range3);
+    eprintf(0x40, 0xA8, 0, 0, "INI R %3.5f", w->m_InitAngX);
+    eprintf(0x40, 0xB6, 0, 0, "START %3.5f", w->m_StartX);
+    eprintf(0x40, 0xC4, 0, 0, "SPEED %3.5f", w->m_SpeedX);
+    eprintf(0x40, 0xD2, 0, 0, "RANGE %3.5f", w->m_RangeX);
+    eprintf(0x40, 0xE0, 0, 0, "INI R %3.5f", w->m_InitAngY);
+    eprintf(0x40, 0xEE, 0, 0, "START %3.5f", w->m_StartY);
+    eprintf(0x40, 0xFC, 0, 0, "SPEED %3.5f", w->m_SpeedY);
+    eprintf(0x40, 0x10A, 0, 0, "RANGE %3.5f", w->m_RangeY);
+    eprintf(0x40, 0x118, 0, 0, "INI R %3.5f", w->m_InitAngZ);
+    eprintf(0x40, 0x126, 0, 0, "START %3.5f", w->m_StartZ);
+    eprintf(0x40, 0x134, 0, 0, "SPEED %3.5f", w->m_SpeedZ);
+    eprintf(0x40, 0x142, 0, 0, "RANGE %3.5f", w->m_RangeZ);
 }
 
 // Unused sub menu slot.

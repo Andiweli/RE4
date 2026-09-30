@@ -318,7 +318,7 @@ void VibControl()
 {
     u8 old = Joy[0].motor_state;
     int max = 0;
-    VibWork* v;
+    PAD_MOTOR* v;
     int lvl;
     int i;
 
@@ -327,14 +327,14 @@ void VibControl()
         if (v->time == 0) {
             continue;
         }
-        if (v->wait) {
-            v->wait--;
+        if (v->delay) {
+            v->delay--;
             continue;
         }
         v->time--;
-        v->level += v->add;
+        v->level += v->fade;
         lvl = v->level;
-        if (v->type & 0x8000) {
+        if (v->flag & 0x8000) {
             lvl = (u32) ((Rnd() << 8) + Rnd()) % (lvl + 1);
         }
         if (max < lvl) {
@@ -358,10 +358,10 @@ void VibControl()
 }
 
 // A free rumble slot (time == 0) of the 10, or NULL when vibration is off (pSys->Config_flg 0x08000000).
-VibWork* PullVibWork()
+PAD_MOTOR* PullVibWork()
 {
     int i;
-    VibWork* v = Joy[0].vib;
+    PAD_MOTOR* v = Joy[0].vib;
     if (!CfgFlagChk(pSys, CFG_VIBRATION)) {
         return NULL;
     }
@@ -377,16 +377,16 @@ VibWork* PullVibWork()
 // 0-3 select what VibSetClearType can cancel, 0x8000 = random strength.
 void VibSet(u32 time, u32 level, u16 delay, u16 flag)
 {
-    VibWork* v = PullVibWork();
+    PAD_MOTOR* v = PullVibWork();
     if (v) {
         if (time > 0xFF) {
             time = 0xFF;
         }
-        v->type = flag;
+        v->flag = flag;
         v->time = time;
-        v->wait = delay;
+        v->delay = delay;
         v->level = level << 7;
-        v->add = 0;
+        v->fade = 0;
     }
 }
 
@@ -394,7 +394,7 @@ void VibSet(u32 time, u32 level, u16 delay, u16 flag)
 void VibSetDataCore(VIB_INFO* d, u32 flag)
 {
     u32 i;
-    VibWork* v;
+    PAD_MOTOR* v;
     VIB_DATA* e;
     int lvl;
     int add;
@@ -408,11 +408,11 @@ void VibSetDataCore(VIB_INFO* d, u32 flag)
         e += i;
         lvl = e->s_level << 12;
         add = ((e->e_level - e->s_level) << 12) / e->time;
-        v->type = e->flag | flag;
+        v->flag = e->flag | flag;
         v->time = e->time;
-        v->wait = e->delay;
+        v->delay = e->delay;
         v->level = lvl;
-        v->add = add;
+        v->fade = add;
     }
 }
 
@@ -429,10 +429,10 @@ void VibSetData(VibDataTbl* t, u32 no, u32 type)
 void VibSetClearType(u32 type)
 {
     int i;
-    VibWork* v = Joy[0].vib;
+    PAD_MOTOR* v = Joy[0].vib;
     type &= 0xF;
     for (i = 0; i < 10; i++, v++) {
-        if (v->type & type) {
+        if (v->flag & type) {
             v->time = 0;
         }
     }

@@ -25,27 +25,27 @@
 
 // One weapon (22 bytes): item id, bullet attribute, weapon number/type, bullet item id, magazine size per
 // exclusive tune level (1..7).
-struct WepInfo {
-    u16 id;         // 0x00
-    u8 attr;        // 0x02  cItem::bullet >> 13 this row applies to
-    u8 no;          // 0x03  weapon number (pG->wep_no)
-    u8 type;        // 0x04  weapon type (pG->wep_type)
-    u8 x5;
-    u16 bulletId;   // 0x06
-    u16 charge[7];  // 0x08
+struct ITEM_WEAPON_INFO {
+    u16 weapon_id;         // 0x00
+    u8 bullet_type;        // 0x02  cItem::bullet >> 13 this row applies to
+    u8 weapon_no;          // 0x03  weapon number (pG->wep_no)
+    u8 weapon_type;        // 0x04  weapon type (pG->wep_type)
+    u8 parts_max;
+    u16 bullet_id;   // 0x06
+    u16 charge_num[7];  // 0x08
 };
 
 // Max tune level per type (fire, magazine, speed, exclusive) of a weapon.
-struct WepLevelInfo {
+struct WEAPON_LEVEL {
     u16 id;
-    u8 lv[4];
+    u8 level[4];
 };
 
 // Two items that combine into a third.
-struct CombInfo {
-    u16 a;
-    u16 b;
-    u16 result;
+struct ITEM_COMBINATION {
+    u16 item_A;
+    u16 item_B;
+    u16 item_C;
 };
 
 // Item put into the case by the set_*() presets.
@@ -75,7 +75,7 @@ u16 g_item_order[] = {
 };
 int g_item_order_num = sizeof(g_item_order) / sizeof(g_item_order[0]);
 
-const WepInfo wep_info[] = {
+const ITEM_WEAPON_INFO wep_info[] = {
     {0x23, 0, 0x02, 0, 1, 0x04, {10, 13, 16, 19, 22, 25, 0}},
     {0x24, 0, 0x02, 1, 1, 0x04, {10, 13, 16, 19, 22, 25, 0}},
     {0x25, 0, 0x03, 0, 1, 0x04, {8, 10, 12, 15, 18, 22, 0}},
@@ -121,7 +121,7 @@ const WepInfo wep_info[] = {
     {0x3E, 0, 0x0B, 0, 0, 0x20, {30, 50, 100, 150, 200, 250, 0}},
 };
 
-const WepLevelInfo wep_level_info[] = {
+const WEAPON_LEVEL wep_level_info[] = {
     {0x23, {6, 3, 3, 6}}, {0x24, {6, 3, 3, 6}}, {0x25, {6, 3, 3, 6}}, {0x26, {6, 3, 3, 6}},
     {0x03, {6, 1, 3, 6}}, {0x21, {6, 3, 3, 6}}, {0x22, {6, 3, 3, 6}}, {0x40, {6, 3, 3, 6}},
     {0x27, {6, 3, 3, 6}}, {0x28, {6, 3, 3, 6}}, {0x29, {6, 1, 3, 4}}, {0x2C, {6, 1, 3, 6}},
@@ -132,7 +132,7 @@ const WepLevelInfo wep_level_info[] = {
     {0x2A, {3, 1, 3, 3}}, {0x2B, {3, 1, 3, 3}}, {0x37, {6, 1, 3, 6}},
 };
 
-const CombInfo combination_info[] = {
+const ITEM_COMBINATION combination_info[] = {
     {0x21, 0x3F, 0x22}, {0x23, 0x3F, 0x24}, {0x25, 0x42, 0x26}, {0x27, 0x3F, 0x28},
     {0x30, 0x43, 0x32}, {0x31, 0x43, 0x33}, {0x2E, 0x44, 0x6B}, {0x99, 0x44, 0x6B},
     {0x2E, 0xC5, 0x99}, {0x6B, 0xC5, 0x99}, {0x2F, 0x45, 0x6C}, {0x51, 0x45, 0x6C},
@@ -2243,7 +2243,7 @@ int itemCombineCheck(ITEM_ID id)
     int i;
 
     for (i = 0; i < (int) (sizeof(combination_info) / sizeof(combination_info[0])); i++) {
-        if (id == combination_info[i].a || id == combination_info[i].b) {
+        if (id == combination_info[i].item_A || id == combination_info[i].item_B) {
             return 1;
         }
     }
@@ -2256,14 +2256,14 @@ int itemCombine(ITEM_ID srcA, ITEM_ID srcB, u16* dst)
     int i;
 
     for (i = 0; i < (int) (sizeof(combination_info) / sizeof(combination_info[0])); i++) {
-        if (srcA == combination_info[i].a && srcB == combination_info[i].b) {
-            *dst = combination_info[i].result;
+        if (srcA == combination_info[i].item_A && srcB == combination_info[i].item_B) {
+            *dst = combination_info[i].item_C;
             return 1;
         }
     }
     for (i = 0; i < (int) (sizeof(combination_info) / sizeof(combination_info[0])); i++) {
-        if (srcB == combination_info[i].a && srcA == combination_info[i].b) {
-            *dst = combination_info[i].result;
+        if (srcB == combination_info[i].item_A && srcA == combination_info[i].item_B) {
+            *dst = combination_info[i].item_C;
             return 1;
         }
     }
@@ -2774,8 +2774,8 @@ u16 cItemMgr::bulletNumTotal(int bllt_id)
     int i;
 
     for (i = 0; i < tbl_num; i++) {
-        if (bllt_id == wep_info[i].bulletId) {
-            total += bulletNum(wep_info[i].id);
+        if (bllt_id == wep_info[i].bullet_id) {
+            total += bulletNum(wep_info[i].weapon_id);
         }
     }
     return total;
@@ -3085,8 +3085,8 @@ u16 WeaponNo2WeaponId(u8 wep_no, u8 type)
     int i;
 
     for (i = 0; i < tbl_num; i++) {
-        if (wep_no == wep_info[i].no && type == wep_info[i].type) {
-            return wep_info[i].id;
+        if (wep_no == wep_info[i].weapon_no && type == wep_info[i].weapon_type) {
+            return wep_info[i].weapon_id;
         }
     }
     pLog->err(0, 0, "WeaponNo2WeaponId(): (%d, %d) not found.", wep_no, type);
@@ -3100,8 +3100,8 @@ u8 WeaponId2WeaponNo(ITEM_ID id)
     int i;
 
     for (i = 0; i < tbl_num; i++) {
-        if (id == wep_info[i].id) {
-            return wep_info[i].no;
+        if (id == wep_info[i].weapon_id) {
+            return wep_info[i].weapon_no;
         }
     }
     pLog->err(0, 0, "WeaponId2WeaponNo(): id 0x%02x not found.", id);
@@ -3115,8 +3115,8 @@ u8 WeaponId2WeaponType(ITEM_ID id)
     int i;
 
     for (i = 0; i < tbl_num; i++) {
-        if (id == wep_info[i].id) {
-            return wep_info[i].type;
+        if (id == wep_info[i].weapon_id) {
+            return wep_info[i].weapon_type;
         }
     }
     pLog->err(0, 0, "WeaponId2WeaponType(): id 0x%02x not found.", id);
@@ -3130,8 +3130,8 @@ u16 WeaponId2BulletId(ITEM_ID id, int bllt_type)
     int i;
 
     for (i = 0; i < tbl_num; i++) {
-        if (id == wep_info[i].id && bllt_type == wep_info[i].attr) {
-            return wep_info[i].bulletId;
+        if (id == wep_info[i].weapon_id && bllt_type == wep_info[i].bullet_type) {
+            return wep_info[i].bullet_id;
         }
     }
     pLog->err(0, 0, "WeaponId2BulletId(): id 0x%02x not found.", id);
@@ -3145,8 +3145,8 @@ u16 WeaponId2ChargeNum(ITEM_ID id, int level)
     int i;
 
     for (i = 0; i < tbl_num; i++) {
-        if (id == wep_info[i].id) {
-            return (u8) wep_info[i].charge[level - 1];
+        if (id == wep_info[i].weapon_id) {
+            return (u8) wep_info[i].charge_num[level - 1];
         }
     }
     pLog->err(0, 0, "WeaponId2ChargeNum(): id 0x%02x not found.", id);
@@ -3160,7 +3160,7 @@ int WeaponId2MaxLevel(ITEM_ID id, int type)
 
     for (i = 0; i < (int) (sizeof(wep_level_info) / sizeof(wep_level_info[0])); i++) {
         if (id == wep_level_info[i].id) {
-            return wep_level_info[i].lv[type];
+            return wep_level_info[i].level[type];
         }
     }
     return 1;

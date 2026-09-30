@@ -504,12 +504,12 @@ void SsTermMain::OpeMdtSetNo(int no)
     }
 }
 
-// Resets the op player (TermOpeWork) onto a voice stream number, a TermSeq table and a message
+// Resets the op player (TermOpeWork) onto a voice stream number, a OpeMesSeq table and a message
 // block (MesData slot 2): sequence index / counters to 0, stream not started.
 void SsTermMain::OpeMdtSetSub(int mdtNo, void* seq, void* mes)
 {
     ope.mdtNo = mdtNo;
-    ope.seq = (TermSeq*) seq;
+    ope.seq = (OpeMesSeq*) seq;
     ope.mes = mes;
     MesData.registData(2, (u8*) mes);
     ope.seqIdx = 0;
@@ -520,7 +520,7 @@ void SsTermMain::OpeMdtSetSub(int mdtNo, void* seq, void* mes)
 }
 
 // Runs the op one frame: starts the voice stream (SndStrReq mdtNo) and waits for it to be ready,
-// then plays the talking motions and shows the frame units; fires every TermSeq entry whose time
+// then plays the talking motions and shows the frame units; fires every OpeMesSeq entry whose time
 // has come (OpeSeqMove). B (Key bit 18) skips: the stream stops and A/B step the remaining entries
 // by hand. Returns 1 when the sequence ended (arg == -1 entry).
 int SsTermMain::OpeMesMove()
@@ -559,8 +559,8 @@ int SsTermMain::OpeMesMove()
             ope.flags |= 0x10000000;
         }
         for (;;) {
-            TermSeq* s = &ope.seq[ope.seqIdx];
-            if (!(s->time > ope.seqCnt)) {
+            OpeMesSeq* s = &ope.seq[ope.seqIdx];
+            if (!(s->Frame > ope.seqCnt)) {
                 if (OpeSeqMove(s) == 0) {
                     return 1;
                 }
@@ -581,18 +581,18 @@ int SsTermMain::OpeMesMove()
 
 // Executes one sequence entry: arg -1 ends the op (stream stopped, messages deleted; returns 0),
 // otherwise shows message mesNo for `arg` frames and advances seqIdx.
-int SsTermMain::OpeSeqMove(TermSeq* s)
+int SsTermMain::OpeSeqMove(OpeMesSeq* s)
 {
     TermSub* w = &sub;
 
-    w->x14 = s->x2;
-    w->x18 = s->mesNo;
-    if (s->arg == -1) {
+    w->x14 = s->No;
+    w->x18 = s->NoMes;
+    if (s->Timer == -1) {
         OpeSndStrStop();
         cMes.Clear();
         return 0;
     }
-    OpeMesSet(s->mesNo, s->arg);
+    OpeMesSet(s->NoMes, s->Timer);
     ope.seqIdx++;
     return 1;
 }

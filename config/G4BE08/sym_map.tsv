@@ -6037,8 +6037,8 @@ address	size	section	unit	scope	name	demangled
 0x801A5B94	0x88	.text	game/trans.cpp	global	commonScreenMat__FP6cModel	commonScreenMat
 0x801A5C1C	0x468	.text	game/trans.cpp	global	commonScreenMatSub__FP6cModelP10cModelInfo	commonScreenMatSub
 0x801A6084	0xA8	.text	game/trans.cpp	global	calcWeightMat__FP6cModel	calcWeightMat
-0x801A612C	0x1C8	.text	game/trans.cpp	global	MakeWeightPaletteExt__FP9WeightExti	MakeWeightPaletteExt
-0x801A62F4	0x1F8	.text	game/trans.cpp	global	MakeWeightPalette__FP6Weighti	MakeWeightPalette
+0x801A612C	0x1C8	.text	game/trans.cpp	global	MakeWeightPaletteExt__FP10cWeightExti	MakeWeightPaletteExt
+0x801A62F4	0x1F8	.text	game/trans.cpp	global	MakeWeightPalette__FP7cWeighti	MakeWeightPalette
 0x801A64EC	0x328	.text	game/trans.cpp	global	Render__Fv	Render
 0x801A6814	0x1B8	.text	game/trans.cpp	global	ModelRender__FP6cModel	ModelRender
 0x801A69CC	0xA10	.text	game/trans.cpp	global	commonModelTrans__FP6cModelP10cModelInfoPA3_fi	commonModelTrans

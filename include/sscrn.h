@@ -122,7 +122,7 @@ struct SUB_SCREEN {
     struct SsMapWork* map; // 0x308  Sscrn ss_map work (mark models, camera, viewport; 0x104C bytes)
     SsFileWork* file;      // 0x30C  Sscrn ss_file cursor/page state
     s8* pCapCursor;           // 0x310  Sscrn ss_cap cursor {row, column, row * 6 + column} (MEM_ALLOC(3))
-    struct ShopWork* shop; // 0x314  Sscrn ss_shop list/cursor state (0x48 bytes)
+    struct SSCRN_SHOP* shop; // 0x314  Sscrn ss_shop list/cursor state (0x48 bytes)
     class Merchant* merchant;// 0x318  Sscrn ss_shop: the shop session (game/merchant.cpp Merchant)
     s32 opeMdtNo;                // 0x31C  OpeSetOpenTerm number
     s32 sndId;               // 0x320  SndStrPlayBlock handle

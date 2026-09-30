@@ -33,20 +33,20 @@
 // ss_main.cpp
 
 // Shop screen state (SUB_SCREEN::pShopWk, MEM_ALLOC(0x48)).
-struct ShopWork {
-    int num;         // 0x00  entries of the current list
-    int top;         // 0x04  first entry shown
-    int cursor;      // 0x08
-    int count;       // 0x0C  pieces to sell / buy
-    u16 buyId;       // 0x10
-    cItem buy;    // 0x12  slot template of the item being bought (case placement)
-    int placed;      // 0x20  the bought piece was put on the case
-    cItem* item;  // 0x24  item being sold / tuned
-    int price;       // 0x28  tune-up price
-    int lvType;      // 0x2C  tune type (0 fire, 1 magazine, 2 speed, 3 exclusive, 4 all)
-    int lv[4];       // 0x30  tune levels after the purchase
-    int noRoom;      // 0x40  the bought piece did not fit
-    int coat;        // 0x44  the merchant's coat is open
+struct SSCRN_SHOP {
+    int _list_num;         // 0x00  entries of the current list
+    int m_list_top;         // 0x04  first entry shown
+    int _list_no;      // 0x08
+    int _item_num;       // 0x0C  pieces to sell / buy
+    u16 _item_id;       // 0x10
+    cItem _new_item;    // 0x12  slot template of the item being bought (case placement)
+    int _puzzle;      // 0x20  the bought piece was put on the case
+    cItem* m_p_item;  // 0x24  item being sold / tuned
+    int m_lv_cost;       // 0x28  tune-up price
+    int m_level_type;      // 0x2C  tune type (0 fire, 1 magazine, 2 speed, 3 exclusive, 4 all)
+    int m_level_no[4];       // 0x30  tune levels after the purchase
+    int m_ask_flag;      // 0x40  the bought piece did not fit
+    int m_close_flag;        // 0x44  the merchant's coat is open
 };
 
 // Message / voice stream pair of the merchant's lines.
@@ -375,7 +375,7 @@ void closeCoat(SUB_SCREEN* wk)
 {
     ID_UNIT* u;
 
-    wk->shop->coat = 1;
+    wk->shop->m_close_flag = 1;
     u = IdSub.unitPtr(0xFA, IDC_SSCRN_CKPT_0);
     u->rev_flag |= 0xF;
     u = IdSub.unitPtr(0xFA, IDC_SSCRN_CKPT_1);
@@ -550,9 +550,9 @@ void SsShopMain::init(SUB_SCREEN* wk)
     pieceModelInit(wk);
     {
 #line 578 "D:/Bio4/Prog/ss_shop.cpp"
-        ShopWork* sw = (ShopWork*) MEM_ALLOC(sizeof(ShopWork), 1, 13);
+        SSCRN_SHOP* sw = (SSCRN_SHOP*) MEM_ALLOC(sizeof(SSCRN_SHOP), 1, 13);
         wk->shop = sw;
-        sw->coat = 0;
+        sw->m_close_flag = 0;
     }
     cur = topMenu;
     cur->init(wk);
@@ -591,7 +591,7 @@ void SsShopMain::move(SUB_SCREEN* wk)
     cur = next;
 }
 
-// Frees the pzlPlayer, ShopWork and message buffers, stops the voice stream.
+// Frees the pzlPlayer, SSCRN_SHOP and message buffers, stops the voice stream.
 void SsShopMain::quit(SUB_SCREEN* wk)
 {
     int i;
@@ -716,8 +716,8 @@ void ShopTopMenu::move(SUB_SCREEN* wk)
         break;
     case 1:
         if (IdSub.unitPtr(0x50, IDC_SSCRN_CKPT_2)->anima_state & 1) {
-            if (wk->shop->coat) {
-                wk->shop->coat = 0;
+            if (wk->shop->m_close_flag) {
+                wk->shop->m_close_flag = 0;
                 SndCall(0, 0x17, 0, 0, 0, 0);
             }
             state = 2;
@@ -731,8 +731,8 @@ void ShopTopMenu::move(SUB_SCREEN* wk)
         if (Key.trg & 0x80000000) {
             int ok = 1;
 
-            wk->shop->cursor = 0;
-            wk->shop->top = 0;
+            wk->shop->_list_no = 0;
+            wk->shop->m_list_top = 0;
             if (exit == 0) {
                 switch ((s8) cursor) {
                 case 0:
@@ -868,9 +868,9 @@ END:;
 // (dispPrice 0x80 + row), the cursor row highlighted when `cursor`.
 void dispSellItemList(SUB_SCREEN* wk, int n, int cursor)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
-    int top = sw->top;
+    int top = sw->m_list_top;
     int i;
     int end;
     cItem* item;
@@ -883,7 +883,7 @@ void dispSellItemList(SUB_SCREEN* wk, int n, int cursor)
             IdSub.unitPtr(0x80 + k, IDC_SSCRN_CKPT_1)->be_flag &= ~8;
         }
     }
-    dispScrollBar(top, n, sw->num, IdSub.unitPtr(0xF8, IDC_SSCRN_CKPT_1), IdSub.unitPtr(0xFD, IDC_SSCRN_CKPT_1),
+    dispScrollBar(top, n, sw->_list_num, IdSub.unitPtr(0xF8, IDC_SSCRN_CKPT_1), IdSub.unitPtr(0xFD, IDC_SSCRN_CKPT_1),
                   IdSub.unitPtr(0xFE, IDC_SSCRN_CKPT_1));
     i = top;
     // The LOOP_END note keeps the `add end` below the dispScrollBar call (sched1 hoists a free add).
@@ -917,7 +917,7 @@ void dispSellItemList(SUB_SCREEN* wk, int n, int cursor)
         }
         frame = IdSub.unitPtr(row + 0x40, IDC_SSCRN_CKPT_1);
         text = IdSub.unitPtr(row, IDC_SSCRN_CKPT_1);
-        if (i == sw->cursor) {
+        if (i == sw->_list_no) {
             PSVECAdd(&frame->pParent->pos, &frame->pos0, &IdSub.unitPtr(0x3F, IDC_SSCRN_CKPT_1)->pos0);
         }
         {
@@ -946,7 +946,7 @@ void dispSellItemList(SUB_SCREEN* wk, int n, int cursor)
         cMes.MesSet(id, x, y, 0x200A8, slot, col, 4);
         cMes.MesSetOt(slot, 0x13, 6);
         IdSub.unitPtr(row + 0x80, IDC_SSCRN_CKPT_1)->be_flag &= ~8;
-        if (i == sw->cursor) {
+        if (i == sw->_list_no) {
             if (itemType(pe->id) == 1) {
                 if (item) {
                     weaponLevelDisp(item, item->id, 1, 1);
@@ -981,42 +981,42 @@ void dispSellItemList(SUB_SCREEN* wk, int n, int cursor)
 // Clamps the list cursor to 0..num-1 and keeps it inside the 5-row window (top).
 void listRangeCheck(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
 
-    if (sw->num == 0) {
-        sw->cursor = 0;
+    if (sw->_list_num == 0) {
+        sw->_list_no = 0;
     } else {
-        int c = sw->cursor;
+        int c = sw->_list_no;
         if (c >= 0) {
-            if (c > sw->num - 1) {
-                c = sw->num - 1;
+            if (c > sw->_list_num - 1) {
+                c = sw->_list_num - 1;
             }
         } else {
             c = 0;
         }
-        sw->cursor = c;
+        sw->_list_no = c;
     }
-    if (sw->cursor > sw->top + 4) {
-        sw->top = sw->cursor - 4;
+    if (sw->_list_no > sw->m_list_top + 4) {
+        sw->m_list_top = sw->_list_no - 4;
     }
-    if (sw->cursor < sw->top) {
-        sw->top = sw->cursor;
+    if (sw->_list_no < sw->m_list_top) {
+        sw->m_list_top = sw->_list_no;
     }
-    if (sw->num > 4 && sw->top + 5 > sw->num) {
-        sw->top = sw->num - 5;
+    if (sw->_list_num > 4 && sw->m_list_top + 5 > sw->_list_num) {
+        sw->m_list_top = sw->_list_num - 5;
     }
 }
 
 // Sell list open: the merchant's exercise (buy-up) list, list panel slide-in, the cursor item shown.
 void SellMenuSelect::init(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
     ID_UNIT* u;
     int i;
 
     m->makeList();
-    sw->num = wk->merchant->exerciseItemNum();
+    sw->_list_num = wk->merchant->exerciseItemNum();
     u = IdSub.unitPtr(0xFA, IDC_SSCRN_CKPT_0);
     u->be_flag |= 8;
     u->rev_flag &= 0xF0;
@@ -1027,8 +1027,8 @@ void SellMenuSelect::init(SUB_SCREEN* wk)
         dispPrice(0x80 + i, 0, 0, 0, 0);
     }
     listRangeCheck(wk);
-    if (m->exerciseItemNo(sw->cursor)) {
-        dispItem(m->exerciseItemNo(sw->cursor)->id, 1);
+    if (m->exerciseItemNo(sw->_list_no)) {
+        dispItem(m->exerciseItemNo(sw->_list_no)->id, 1);
     } else {
         dispItem(0xFFFF, 0);
     }
@@ -1040,15 +1040,15 @@ void SellMenuSelect::init(SUB_SCREEN* wk)
 // the panel, 1: A picks the item (sw->item -> SellItemNum), up/down move the cursor.
 void SellMenuSelect::move(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
 
-    if (sw->num > 0) {
+    if (sw->_list_num > 0) {
         moveItem();
-        itemCaption(m->exerciseItemNo(sw->cursor)->id);
+        itemCaption(m->exerciseItemNo(sw->_list_no)->id);
         dispSellItemList(wk, 5, state != 0);
     }
-    if ((Key.trg & 0x40000000) || sw->num == 0) {
+    if ((Key.trg & 0x40000000) || sw->_list_num == 0) {
         transit(1, wk);
         closeCoat(wk);
         SndCall(0, 5, 0, 0, 0, 0);
@@ -1062,27 +1062,27 @@ void SellMenuSelect::move(SUB_SCREEN* wk)
         break;
     case 1:
         if (Key.trg & 0x80000000) {
-            sw->item = m->exerciseItemPtr(sw->cursor);
-            if (sw->item) {
+            sw->m_p_item = m->exerciseItemPtr(sw->_list_no);
+            if (sw->m_p_item) {
                 transit(0, wk);
                 SndCall(0, 4, 0, 0, 0, 0);
                 break;
             }
         }
         {
-            int old = sw->cursor;
+            int old = sw->_list_no;
 
             if (Key.rep & 0x01000000) {
-                sw->cursor = old - 1;
+                sw->_list_no = old - 1;
             }
             if (Key.rep & 0x02000000) {
-                sw->cursor++;
+                sw->_list_no++;
             }
             listRangeCheck(wk);
-            if (old != sw->cursor) {
+            if (old != sw->_list_no) {
                 SndCall(0, 6, 0, 0, 0, 0);
-                if (old != sw->cursor) {
-                    dispItem(m->exerciseItemNo(sw->cursor)->id, 1);
+                if (old != sw->_list_no) {
+                    dispItem(m->exerciseItemNo(sw->_list_no)->id, 1);
                 }
             }
         }
@@ -1096,7 +1096,7 @@ void SellMenuSelect::quit(SUB_SCREEN* wk) {}
 // Sell count entry: starts at 1, hides the panel highlight.
 void SellItemNum::init(SUB_SCREEN* wk)
 {
-    wk->shop->count = 1;
+    wk->shop->_item_num = 1;
     IdSub.unitPtr(0xFA, IDC_SSCRN_CKPT_1)->rev_flag |= 0xF;
     repeat = 0;
     fast = 0;
@@ -1112,7 +1112,7 @@ void SellItemNum::move(SUB_SCREEN* wk)
     // `self`) keeps r24 away from val, which then takes r25; a pin on val itself ties the `val % 10`
     // remainder to r25 (`sub 25,25,0`).
     register SellItemNum* self asm("r24") = this;
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
     ID_UNIT* u;
     int x;
@@ -1134,7 +1134,7 @@ void SellItemNum::move(SUB_SCREEN* wk)
     x = (int) ((u->pos0.x + 320.0f) * 0.8f);
     y = (int) ((240.0f - u->pos0.y) * 0.8f);
     cMes.setLayout(0, LAYOUT_SUBSCRN);
-    cMes.MesSet(sw->item->id, x, y, 0x20088, 0, 0, 4);
+    cMes.MesSet(sw->m_p_item->id, x, y, 0x20088, 0, 0, 4);
     u = IdSub.unitPtr(0, IDC_SSCRN_CKPT_3);
     u->be_flag |= 8;
     u->pos0 = sell_num_pos;
@@ -1146,13 +1146,13 @@ void SellItemNum::move(SUB_SCREEN* wk)
         switch (k) {
         case 0:
             n = 4;
-            val = sw->count;
+            val = sw->_item_num;
             base = 1;
             break;
         case 1:
             n = 7;
             base = 0x11;
-            val = m->buyupPrice(sw->item, sw->count);
+            val = m->buyupPrice(sw->m_p_item, sw->_item_num);
             break;
         }
         for (int i = 0; i < n; i++) {
@@ -1175,10 +1175,10 @@ void SellItemNum::move(SUB_SCREEN* wk)
         }
     }
     {
-        if (itemType(sw->item->id) == 1) {
+        if (itemType(sw->m_p_item->id) == 1) {
             max = 1;
         } else {
-            max = ItemMgr.num(sw->item->id);
+            max = ItemMgr.num(sw->m_p_item->id);
         }
     }
     if (Key.trg & 0x40000000) {
@@ -1186,13 +1186,13 @@ void SellItemNum::move(SUB_SCREEN* wk)
         self->transit(1, wk);
         SndCall(0, 5, 0, 0, 0, 0);
     } else if (Key.trg & 0x80000000) {
-        if (sw->count == 0) {
+        if (sw->_item_num == 0) {
             IdSub.unitPtr(0, IDC_SSCRN_CKPT_3)->be_flag &= ~8;
             self->transit(1, wk);
             SndCall(0, 5, 0, 0, 0, 0);
         } else {
             int msg = 6;
-            int price = m->buyupPrice(sw->item, 1);
+            int price = m->buyupPrice(sw->m_p_item, 1);
 
             if (pG->stage_no > 1) {
                 if (price > 29999) {
@@ -1212,15 +1212,15 @@ void SellItemNum::move(SUB_SCREEN* wk)
             shopStrPlay(wk, shop_msg[msg].str);
         }
     } else {
-        int old = sw->count;
+        int old = sw->_item_num;
 
         if (old == 1 && (Key.trg & 0x02000000)) {
-            sw->count = max;
+            sw->_item_num = max;
         } else {
             int step;
 
-            if (sw->count == max && (Key.trg & 0x01000000)) {
-                sw->count = 1;
+            if (sw->_item_num == max && (Key.trg & 0x01000000)) {
+                sw->_item_num = 1;
             } else {
                 if (Key.on & 0x03000000) {
                     self->repeat++;
@@ -1236,13 +1236,13 @@ void SellItemNum::move(SUB_SCREEN* wk)
                 }
                 step = self->fast ? 8 : 1;
                 if (Key.rep & 0x02000000) {
-                    sw->count -= step;
+                    sw->_item_num -= step;
                 } else if (Key.rep & 0x01000000) {
-                    sw->count += step;
+                    sw->_item_num += step;
                 }
                 {
                     int min = 1;
-                    int c = sw->count;
+                    int c = sw->_item_num;
                     if (c >= min) {
                         if (c > max) {
                             c = max;
@@ -1250,11 +1250,11 @@ void SellItemNum::move(SUB_SCREEN* wk)
                     } else {
                         c = min;
                     }
-                    sw->count = c;
+                    sw->_item_num = c;
                 }
             }
         }
-        if (old != sw->count) {
+        if (old != sw->_item_num) {
             SndCall(0, 0xA, 0, 0, 0, 0);
         }
     }
@@ -1265,7 +1265,7 @@ void SellItemNum::move(SUB_SCREEN* wk)
 // returns to the list.
 void SellConfirm::move(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
     ID_UNIT* u;
     int x;
@@ -1276,7 +1276,7 @@ void SellConfirm::move(SUB_SCREEN* wk)
     x = (int) ((u->pos0.x + 320.0f) * 0.8f);
     y = (int) ((240.0f - u->pos0.y) * 0.8f);
     cMes.setLayout(0, LAYOUT_SUBSCRN);
-    cMes.MesSet(sw->item->id, x, y, 0x20088, 0, 0, 4);
+    cMes.MesSet(sw->m_p_item->id, x, y, 0x20088, 0, 0, 4);
     if (Key.trg & 0x40000000) {
         cMes.Delete(1);
         transit(0, wk);
@@ -1290,12 +1290,12 @@ void SellConfirm::move(SUB_SCREEN* wk)
     switch (result) {
     case 1: {
 
-        m->buyup(sw->item, sw->count, (int*) &pG->peseta);
-        if (itemType(sw->item->id) == 1) {
-            ItemMgr.dumpAll(sw->item);
+        m->buyup(sw->m_p_item, sw->_item_num, (int*) &pG->peseta);
+        if (itemType(sw->m_p_item->id) == 1) {
+            ItemMgr.dumpAll(sw->m_p_item);
         } else {
-            u16 left = (u16) sw->count;
-            u16 id = sw->item->id;
+            u16 left = (u16) sw->_item_num;
+            u16 id = sw->m_p_item->id;
             cItem* p;
             int i;
 
@@ -1337,8 +1337,8 @@ void SellConfirm::quit(SUB_SCREEN* wk)
 void dispBuyItemList(SUB_SCREEN* wk, int n, int cursor)
 {
     Merchant* m = wk->merchant;
-    ShopWork* sw = wk->shop;
-    int top = sw->top;
+    SSCRN_SHOP* sw = wk->shop;
+    int top = sw->m_list_top;
     int i;
     int end;
     PRICE_INFO* pe;
@@ -1350,7 +1350,7 @@ void dispBuyItemList(SUB_SCREEN* wk, int n, int cursor)
             IdSub.unitPtr(0x80 + k, IDC_SSCRN_CKPT_1)->be_flag &= ~8;
         }
     }
-    dispScrollBar(top, n, sw->num, IdSub.unitPtr(0xF8, IDC_SSCRN_CKPT_1), IdSub.unitPtr(0xFD, IDC_SSCRN_CKPT_1),
+    dispScrollBar(top, n, sw->_list_num, IdSub.unitPtr(0xF8, IDC_SSCRN_CKPT_1), IdSub.unitPtr(0xFD, IDC_SSCRN_CKPT_1),
                   IdSub.unitPtr(0xFE, IDC_SSCRN_CKPT_1));
     i = top;
     // The LOOP_END note keeps the `add end` below the dispScrollBar call (sched1 hoists a free add).
@@ -1375,7 +1375,7 @@ void dispBuyItemList(SUB_SCREEN* wk, int n, int cursor)
         }
         frame = IdSub.unitPtr(row + 0x40, IDC_SSCRN_CKPT_1);
         text = IdSub.unitPtr(row, IDC_SSCRN_CKPT_1);
-        if (i == sw->cursor) {
+        if (i == sw->_list_no) {
             PSVECAdd(&frame->pParent->pos, &frame->pos0, &IdSub.unitPtr(0x3F, IDC_SSCRN_CKPT_1)->pos0);
         }
         {
@@ -1405,7 +1405,7 @@ void dispBuyItemList(SUB_SCREEN* wk, int n, int cursor)
         if (pe->id == 0x40) {
             IdSub.unitPtr(row + 0x80, IDC_SSCRN_CKPT_1)->be_flag |= 8;
         }
-        if (i == sw->cursor) {
+        if (i == sw->_list_no) {
             if (itemType(pe->id) == 1) {
                 weaponLevelDisp(0, pe->id, 1, 1);
             } else {
@@ -1441,13 +1441,13 @@ void dispBuyItemList(SUB_SCREEN* wk, int n, int cursor)
 // Buy list open: the merchant's selling list, panel slide-in, the cursor item shown.
 void BuyMenuSelect::init(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
     ID_UNIT* u;
     int i;
 
     m->makeList();
-    sw->num = wk->merchant->sellingItemNum();
+    sw->_list_num = wk->merchant->sellingItemNum();
     u = IdSub.unitPtr(0xFA, IDC_SSCRN_CKPT_0);
     u->be_flag |= 8;
     u->rev_flag &= 0xF0;
@@ -1457,7 +1457,7 @@ void BuyMenuSelect::init(SUB_SCREEN* wk)
     for (i = 0; i < 5; i++) {
         dispPrice(0x80 + i, 0, 0, 0, 0);
     }
-    dispItem(m->sellingItemNo(sw->cursor)->id, 1);
+    dispItem(m->sellingItemNo(sw->_list_no)->id, 1);
     IdSub.unitPtr(0xFA, IDC_SSCRN_CKPT_1)->rev_flag &= 0xF0;
     state = 0;
 }
@@ -1466,11 +1466,11 @@ void BuyMenuSelect::init(SUB_SCREEN* wk)
 // an in-stock item (buyId -> BuyItemNum), up/down move the cursor.
 void BuyMenuSelect::move(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
 
     moveItem();
-    itemCaption(m->sellingItemNo(sw->cursor)->id);
+    itemCaption(m->sellingItemNo(sw->_list_no)->id);
     dispBuyItemList(wk, 5, state != 0);
     if (Key.trg & 0x40000000) {
         transit(1, wk);
@@ -1486,45 +1486,45 @@ void BuyMenuSelect::move(SUB_SCREEN* wk)
         break;
     case 1:
         if (Key.trg & 0x80000000) {
-            u16 id = m->sellingItemNo(sw->cursor)->id;
+            u16 id = m->sellingItemNo(sw->_list_no)->id;
 
             if (wk->merchant->stockNum(id) >= wk->merchant->sellUnit(id)) {
-                sw->buyId = id;
+                sw->_item_id = id;
                 transit(0, wk);
                 break;
             }
         }
         {
-            int old = sw->cursor;
+            int old = sw->_list_no;
 
             if (Key.rep & 0x01000000) {
-                sw->cursor = old - 1;
+                sw->_list_no = old - 1;
             }
             if (Key.rep & 0x02000000) {
-                sw->cursor++;
+                sw->_list_no++;
             }
             {
-                int c = sw->cursor;
+                int c = sw->_list_no;
                 if (c >= 0) {
-                    if (c > sw->num - 1) {
-                        c = sw->num - 1;
+                    if (c > sw->_list_num - 1) {
+                        c = sw->_list_num - 1;
                     }
                 } else {
                     c = 0;
                 }
-                sw->cursor = c;
+                sw->_list_no = c;
             }
-            if (old != sw->cursor) {
+            if (old != sw->_list_no) {
                 SndCall(0, 6, 0, 0, 0, 0);
             }
-            if (sw->cursor > sw->top + 4) {
-                sw->top = sw->cursor - 4;
+            if (sw->_list_no > sw->m_list_top + 4) {
+                sw->m_list_top = sw->_list_no - 4;
             }
-            if (sw->cursor < sw->top) {
-                sw->top = sw->cursor;
+            if (sw->_list_no < sw->m_list_top) {
+                sw->m_list_top = sw->_list_no;
             }
-            if (old != sw->cursor) {
-                dispItem(m->sellingItemNo(sw->cursor)->id, 1);
+            if (old != sw->_list_no) {
+                dispItem(m->sellingItemNo(sw->_list_no)->id, 1);
             }
         }
         break;
@@ -1537,9 +1537,9 @@ void BuyMenuSelect::quit(SUB_SCREEN* wk) {}
 // Buy count entry: count = the item's sell unit, stock from the merchant.
 void BuyItemNum::init(SUB_SCREEN* wk)
 {
-    unit = wk->merchant->sellUnit(wk->shop->buyId);
-    stock = wk->merchant->stockNum(wk->shop->buyId);
-    wk->shop->count = unit;
+    unit = wk->merchant->sellUnit(wk->shop->_item_id);
+    stock = wk->merchant->stockNum(wk->shop->_item_id);
+    wk->shop->_item_num = unit;
     state = 0;
     IdSub.unitPtr(0xFA, IDC_SSCRN_CKPT_1)->rev_flag |= 0xF;
 }
@@ -1550,16 +1550,16 @@ void BuyItemNum::init(SUB_SCREEN* wk)
 // 0 -> BuyConfirm/CaseChange), else buyItem; B / no back to the list.
 void BuyItemNum::move(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
 
     dispBuyItemList(wk, 5, 1);
     switch (state) {
     case 0:
-        if (searchItemPieceData(sw->buyId, piece_info)) {
+        if (searchItemPieceData(sw->_item_id, piece_info)) {
             state = 1;
-            if ((int) pG->peseta >= m->sellPrice(sw->buyId, sw->count)) {
-                switch (sw->buyId) {
+            if ((int) pG->peseta >= m->sellPrice(sw->_item_id, sw->_item_num)) {
+                switch (sw->_item_id) {
                 case 0x3:
                     msg = 0xB;
                     break;
@@ -1607,8 +1607,8 @@ void BuyItemNum::move(SUB_SCREEN* wk)
                 shopStrPlay(wk, shop_msg[msg].str);
             }
         } else {
-            sw->placed = 0;
-            sw->noRoom = 0;
+            sw->_puzzle = 0;
+            sw->m_ask_flag = 0;
             transit(0, wk);
             break;
         }
@@ -1627,7 +1627,7 @@ void BuyItemNum::move(SUB_SCREEN* wk)
             if (result == 0) {
                 break;
             }
-            sw->placed = 0;
+            sw->_puzzle = 0;
             switch (result) {
             case 1: {
                 pzlPlayer* pl;
@@ -1637,10 +1637,10 @@ void BuyItemNum::move(SUB_SCREEN* wk)
                 int x;
                 int y;
 
-                ItemMgr.construct(&sw->buy, sw->buyId);
-                sw->buy.flags |= 1;
-                sw->buy.num = (u16) sw->count;
-                wk->puzzlePlayer->appendExtraPiece(&sw->buy);
+                ItemMgr.construct(&sw->_new_item, sw->_item_id);
+                sw->_new_item.flags |= 1;
+                sw->_new_item.num = (u16) sw->_item_num;
+                wk->puzzlePlayer->appendExtraPiece(&sw->_new_item);
                 wk->puzzlePlayer->inHandExtraPiece();
                 pl = wk->puzzlePlayer;
                 p = pl->pieceExtra();
@@ -1670,7 +1670,7 @@ void BuyItemNum::move(SUB_SCREEN* wk)
                 pl->getPiece(pl->spacePtr());
                 pieceModelSet(wk->puzzlePlayer->pieceExtra());
                 wk->back2 = 1;
-                sw->placed = 1;
+                sw->_puzzle = 1;
                 dispItem(0, 0);
                 transit(2, wk);
                 IdSub.unitPtr(0xFA, IDC_SSCRN_CKPT_0)->rev_flag |= 0xF;
@@ -1721,18 +1721,18 @@ int deleteExtraPiece(SUB_SCREEN* wk)
 // and returns 1 (the caller runs CaseChange). Saves the layout.
 int buyItem(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     int ret = 0;
 
-    wk->merchant->sell(sw->buyId, sw->count, (int*) &pG->peseta);
-    ItemMgr.get(sw->buyId, (u16) sw->count);
-    if (sw->placed) {
+    wk->merchant->sell(sw->_item_id, sw->_item_num, (int*) &pG->peseta);
+    ItemMgr.get(sw->_item_id, (u16) sw->_item_num);
+    if (sw->_puzzle) {
         cItem* p = ItemMgr.newbie();
         if (p) {
-            p->x = sw->buy.x;
-            p->y = sw->buy.y;
-            p->orient = sw->buy.orient;
-            p->board = sw->buy.board;
+            p->x = sw->_new_item.x;
+            p->y = sw->_new_item.y;
+            p->orient = sw->_new_item.orient;
+            p->board = sw->_new_item.board;
             wk->puzzlePlayer->pieceExtra()->item = p;
         }
     } else {
@@ -1766,12 +1766,12 @@ int buyItem(SUB_SCREEN* wk)
 // noRoom) with the merchant's voice.
 void BuyConfirm::init(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
     ID_UNIT* u;
 
-    if (sw->noRoom == 0) {
-        if ((int) pG->peseta >= m->sellPrice(sw->buyId, sw->count)) {
+    if (sw->m_ask_flag == 0) {
+        if ((int) pG->peseta >= m->sellPrice(sw->_item_id, sw->_item_num)) {
             msg = 0xA;
             SndCall(0, 9, 0, 0, 0, 0);
         } else {
@@ -1793,15 +1793,15 @@ void BuyConfirm::init(SUB_SCREEN* wk)
 // 2), no / B drop the extra piece and return to the list; the no-room message only waits for A.
 void BuyConfirm::move(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     int act;
 
-    if (sw->noRoom == 0) {
+    if (sw->m_ask_flag == 0) {
         dispBuyItemList(wk, 5, 1);
     }
     act = 0;
     if (Key.trg & 0x40000000) {
-        if (sw->noRoom == 0) {
+        if (sw->m_ask_flag == 0) {
             act = 1;
         } else {
             act = 3;
@@ -1817,7 +1817,7 @@ void BuyConfirm::move(SUB_SCREEN* wk)
         if (result) {
             switch (result) {
             case 1:
-                if (sw->noRoom == 0) {
+                if (sw->m_ask_flag == 0) {
                     act = 2;
                     SndCall(0, 0x27, 0, 0, 0, 0);
                 } else {
@@ -1826,7 +1826,7 @@ void BuyConfirm::move(SUB_SCREEN* wk)
                 }
                 break;
             case 2:
-                if (sw->noRoom == 0) {
+                if (sw->m_ask_flag == 0) {
                     act = 1;
                     SndCall(0, 5, 0, 0, 0, 0);
                 } else {
@@ -1845,7 +1845,7 @@ void BuyConfirm::move(SUB_SCREEN* wk)
     }
     switch (act) {
     case 1:
-        if (sw->placed) {
+        if (sw->_puzzle) {
             deleteExtraPiece(wk);
             tempSpaceDisp(0);
             Cckpt.lifeMeterFrameIn();
@@ -1882,7 +1882,7 @@ void BuyPuzzleEnd::init(SUB_SCREEN* wk)
 // BuySel link 1); still in the space -> noRoom and back to BuyConfirm (link 0).
 void BuyPuzzleEnd::move(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
 
     if (wk->puzzlePlayer->boardPtr()->search(wk->puzzlePlayer->pieceExtra())) {
         buyItem(wk);
@@ -1890,7 +1890,7 @@ void BuyPuzzleEnd::move(SUB_SCREEN* wk)
         shopStrPlay(wk, shop_msg[21].str);
         SndCall(0, 5, 0, 0, 0, 0);
     } else {
-        sw->noRoom = 1;
+        sw->m_ask_flag = 1;
         transit(0, wk);
         SndCall(0, 9, 0, 0, 0, 0);
     }
@@ -1899,9 +1899,9 @@ void BuyPuzzleEnd::move(SUB_SCREEN* wk)
 // Draws the tune-up weapon list: scroll bar, `n` rows of icon / name, cursor row highlighted.
 void dispLvUpItemList(SUB_SCREEN* wk, int n, int cursor)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
-    int top = sw->top;
+    int top = sw->m_list_top;
     int i;
     int end;
 
@@ -1911,7 +1911,7 @@ void dispLvUpItemList(SUB_SCREEN* wk, int n, int cursor)
             dispPrice(0x80 + k, 0, 0, 0, 0);
         }
     }
-    dispScrollBar(top, n, sw->num, IdSub.unitPtr(0xF8, IDC_SSCRN_CKPT_1), IdSub.unitPtr(0xFD, IDC_SSCRN_CKPT_1),
+    dispScrollBar(top, n, sw->_list_num, IdSub.unitPtr(0xF8, IDC_SSCRN_CKPT_1), IdSub.unitPtr(0xFD, IDC_SSCRN_CKPT_1),
                   IdSub.unitPtr(0xFE, IDC_SSCRN_CKPT_1));
     end = top + n;
     {
@@ -1946,7 +1946,7 @@ void dispLvUpItemList(SUB_SCREEN* wk, int n, int cursor)
         }
         frame = IdSub.unitPtr(row + 0x40, IDC_SSCRN_CKPT_1);
         text = IdSub.unitPtr(row, IDC_SSCRN_CKPT_1);
-        if (i == sw->cursor) {
+        if (i == sw->_list_no) {
             PSVECAdd(&frame->pParent->pos, &frame->pos0, &IdSub.unitPtr(0x3F, IDC_SSCRN_CKPT_1)->pos0);
         }
         {
@@ -1971,7 +1971,7 @@ void dispLvUpItemList(SUB_SCREEN* wk, int n, int cursor)
         if (wk->merchant->levelNew(le->id)) {
             IdSub.unitPtr(row + 0x80, IDC_SSCRN_CKPT_1)->be_flag |= 8;
         }
-        if (i == sw->cursor) {
+        if (i == sw->_list_no) {
             if (itemType(le->id) == 1) {
                 if (item) {
                     weaponLevelDisp(item, le->id, 1, 1);
@@ -1993,7 +1993,7 @@ void levelItemDisp(SUB_SCREEN* wk, int sw)
 {
     // swk before m: `wk` then dies at the m load, which sched1 issues first (weight rule), and the
     // swk load's later slot shortens its live length below sw's (swk r30, sw r29 in global-alloc).
-    ShopWork* swk = wk->shop;
+    SSCRN_SHOP* swk = wk->shop;
     Merchant* m = wk->merchant;
     ID_UNIT* bar = 0;
     ID_UNIT* lvNum = 0;
@@ -2029,7 +2029,7 @@ void levelItemDisp(SUB_SCREEN* wk, int sw)
         return;
     }
     {
-        cItem* item = m->levelupItemPtr(swk->cursor);
+        cItem* item = m->levelupItemPtr(swk->_list_no);
         int type;
         int val[2];
         char tag[2];
@@ -2210,12 +2210,12 @@ void levelItemDisp(SUB_SCREEN* wk, int sw)
 // Tune-up list open: the merchant's levelup list, panel slide-in, the cursor weapon shown.
 void LvUpMenuSelect::init(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
     ID_UNIT* u;
     int i;
 
-    sw->num = m->levelupItemNum();
+    sw->_list_num = m->levelupItemNum();
     for (i = 0; i < 4; i++) {
         IdSub.unitPtr(0x21 + i, IDC_SSCRN_CKPT_0)->be_flag &= ~8;
     }
@@ -2226,7 +2226,7 @@ void LvUpMenuSelect::init(SUB_SCREEN* wk)
     u->be_flag |= 8;
     u->rev_flag &= 0xF0;
     levelItemDisp(wk, 0);
-    dispItem(m->levelupItemNo(sw->cursor)->id, 1);
+    dispItem(m->levelupItemNo(sw->_list_no)->id, 1);
     state = 0;
 }
 
@@ -2234,11 +2234,11 @@ void LvUpMenuSelect::init(SUB_SCREEN* wk)
 // LvUpItemSelect), up/down move the cursor.
 void LvUpMenuSelect::move(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
 
     moveItem();
-    itemCaption(m->levelupItemNo(sw->cursor)->id);
+    itemCaption(m->levelupItemNo(sw->_list_no)->id);
     dispLvUpItemList(wk, 5, state != 0);
     if (Key.trg & 0x40000000) {
         transit(1, wk);
@@ -2254,12 +2254,12 @@ void LvUpMenuSelect::move(SUB_SCREEN* wk)
         break;
     case 1:
         if (Key.trg & 0x80000000) {
-            sw->item = m->levelupItemPtr(sw->cursor);
-            if (sw->item && m->tunable(sw->item)) {
-                if (m->specialTunable(sw->item)) {
-                    sw->lvType = 4;
+            sw->m_p_item = m->levelupItemPtr(sw->_list_no);
+            if (sw->m_p_item && m->tunable(sw->m_p_item)) {
+                if (m->specialTunable(sw->m_p_item)) {
+                    sw->m_level_type = 4;
                 } else {
-                    sw->lvType = 0;
+                    sw->m_level_type = 0;
                 }
                 transit(0, wk);
                 SndCall(0, 4, 0, 0, 0, 0);
@@ -2267,36 +2267,36 @@ void LvUpMenuSelect::move(SUB_SCREEN* wk)
             }
         }
         {
-            int old = sw->cursor;
+            int old = sw->_list_no;
 
             if (Key.rep & 0x01000000) {
-                sw->cursor = old - 1;
+                sw->_list_no = old - 1;
             }
             if (Key.rep & 0x02000000) {
-                sw->cursor++;
+                sw->_list_no++;
             }
             {
-                int c = sw->cursor;
+                int c = sw->_list_no;
                 if (c >= 0) {
-                    if (c > sw->num - 1) {
-                        c = sw->num - 1;
+                    if (c > sw->_list_num - 1) {
+                        c = sw->_list_num - 1;
                     }
                 } else {
                     c = 0;
                 }
-                sw->cursor = c;
+                sw->_list_no = c;
             }
-            if (old != sw->cursor) {
+            if (old != sw->_list_no) {
                 SndCall(0, 6, 0, 0, 0, 0);
             }
-            if (sw->cursor > sw->top + 4) {
-                sw->top = sw->cursor - 4;
+            if (sw->_list_no > sw->m_list_top + 4) {
+                sw->m_list_top = sw->_list_no - 4;
             }
-            if (sw->cursor < sw->top) {
-                sw->top = sw->cursor;
+            if (sw->_list_no < sw->m_list_top) {
+                sw->m_list_top = sw->_list_no;
             }
-            if (old != sw->cursor) {
-                dispItem(m->levelupItemNo(sw->cursor)->id, 1);
+            if (old != sw->_list_no) {
+                dispItem(m->levelupItemNo(sw->_list_no)->id, 1);
             }
         }
         break;
@@ -2354,9 +2354,9 @@ void LvUpItemSelect::init(SUB_SCREEN* wk) {}
 // move lvType over the available rows.
 void LvUpItemSelect::move(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
-    cItem* item = m->levelupItemPtr(sw->cursor);
+    cItem* item = m->levelupItemPtr(sw->_list_no);
     ID_UNIT* u;
     int x;
     int y;
@@ -2368,11 +2368,11 @@ void LvUpItemSelect::move(SUB_SCREEN* wk)
     x = (int) ((u->pos0.x + 320.0f) * 0.8f);
     y = (int) ((240.0f - u->pos0.y) * 0.8f);
     cMes.setLayout(1, LAYOUT_SUBSCRN);
-    if (sw->lvType == 4) {
+    if (sw->m_level_type == 4) {
         cMes.MesSet(specialCaption(item->id), x, y, 0x20081, 1, 0, 3);
     } else {
-        int no = sw->lvType + 0xF;
-        if (item->id == 0x36 && sw->lvType == 0) {
+        int no = sw->m_level_type + 0xF;
+        if (item->id == 0x36 && sw->m_level_type == 0) {
             no = 0x38;
         }
         cMes.MesSet(no, x, y, 0x20081, 1, 0, 3);
@@ -2386,13 +2386,13 @@ void LvUpItemSelect::move(SUB_SCREEN* wk)
         int lv = 0;
         int ok = 0;
 
-        if (m->specialTunable(sw->item)) {
-            if (sw->lvType == 4) {
-                sw->price = ok;
+        if (m->specialTunable(sw->m_p_item)) {
+            if (sw->m_level_type == 4) {
+                sw->m_lv_cost = ok;
                 for (lv = 0; lv < 4; lv++) {
                     int mx = m->levelMax(item->id, lv);
                     if (mx > WeaponId2MaxLevel(item->id, lv)) {
-                        sw->price += m->levelupPrice(sw->item, lv, mx);
+                        sw->m_lv_cost += m->levelupPrice(sw->m_p_item, lv, mx);
                     }
                 }
                 ok = 1;
@@ -2400,7 +2400,7 @@ void LvUpItemSelect::move(SUB_SCREEN* wk)
         } else {
             int mx;
 
-            switch (sw->lvType) {
+            switch (sw->m_level_type) {
             case 0:
                 lv = (item->lv >> 12) + 2;
                 break;
@@ -2414,9 +2414,9 @@ void LvUpItemSelect::move(SUB_SCREEN* wk)
                 lv = (item->lv8[1] & 0xF) + 2;
                 break;
             }
-            mx = m->levelMax(item->id, sw->lvType);
-            sw->price = m->levelupPrice(sw->item, sw->lvType, lv);
-            if (lv <= WeaponId2MaxLevel(item->id, sw->lvType) && lv <= mx) {
+            mx = m->levelMax(item->id, sw->m_level_type);
+            sw->m_lv_cost = m->levelupPrice(sw->m_p_item, sw->m_level_type, lv);
+            if (lv <= WeaponId2MaxLevel(item->id, sw->m_level_type) && lv <= mx) {
                 ok = 1;
             }
         }
@@ -2426,20 +2426,20 @@ void LvUpItemSelect::move(SUB_SCREEN* wk)
         return;
     }
     {
-        int old = sw->lvType;
+        int old = sw->m_level_type;
 
         if (Key.rep & 0x01000000) {
-            sw->lvType = old - 1;
+            sw->m_level_type = old - 1;
         }
         if (Key.rep & 0x02000000) {
-            sw->lvType++;
+            sw->m_level_type++;
         }
-        if (m->specialTunable(sw->item) == 1) {
-            sw->lvType = sw->lvType < 0 ? 0 : (sw->lvType > 4 ? 4 : sw->lvType);
+        if (m->specialTunable(sw->m_p_item) == 1) {
+            sw->m_level_type = sw->m_level_type < 0 ? 0 : (sw->m_level_type > 4 ? 4 : sw->m_level_type);
         } else {
-            sw->lvType = sw->lvType < 0 ? 0 : (sw->lvType > 3 ? 3 : sw->lvType);
+            sw->m_level_type = sw->m_level_type < 0 ? 0 : (sw->m_level_type > 3 ? 3 : sw->m_level_type);
         }
-        if (old != sw->lvType) {
+        if (old != sw->m_level_type) {
             SndCall(0, 6, 0, 0, 0, 0);
         }
     }
@@ -2447,15 +2447,15 @@ void LvUpItemSelect::move(SUB_SCREEN* wk)
     // refs that put it above `item` in global-alloc (x r30 / item r28, then `i` r31 below).
     for (x = 0; x < 5; x++) {
         ID_UNIT* frame = IdSub.unitPtr(0x40 + x, IDC_SSCRN_CKPT_1);
-        if (x == sw->lvType) {
+        if (x == sw->m_level_type) {
             IdSub.unitPtr(0x3F, IDC_SSCRN_CKPT_1)->pos0 = frame->pos0;
         }
     }
     for (i = 0; i < 4; i++) {
         IdSub.unitPtr(0x21 + i, IDC_SSCRN_CKPT_0)->be_flag &= ~8;
     }
-    if (sw->lvType != 4) {
-        IdSub.unitPtr((u8) sw->lvType + 0x21, IDC_SSCRN_CKPT_0)->be_flag |= 8;
+    if (sw->m_level_type != 4) {
+        IdSub.unitPtr((u8) sw->m_level_type + 0x21, IDC_SSCRN_CKPT_0)->be_flag |= 8;
     }
 }
 
@@ -2463,31 +2463,31 @@ void LvUpItemSelect::move(SUB_SCREEN* wk)
 // with the price, or the "cannot afford" / "already max" lines.
 void LvUpConfirm::init(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
     Merchant* m = wk->merchant;
     ID_UNIT* u;
 
-    cur[0] = (sw->item->lv >> 12) + 1;
-    cur[1] = ((sw->item->lv >> 8) & 0xF) + 1;
-    cur[2] = ((sw->item->lv >> 4) & 0xF) + 1;
-    cur[3] = (sw->item->lv8[1] & 0xF) + 1;
-    max[0] = m->levelMax(sw->item->id, 0);
-    max[1] = m->levelMax(sw->item->id, 1);
-    max[2] = m->levelMax(sw->item->id, 2);
-    max[3] = m->levelMax(sw->item->id, 3);
-    sw->lv[0] = cur[0];
-    sw->lv[1] = cur[1];
-    sw->lv[2] = cur[2];
-    sw->lv[3] = cur[3];
-    if (m->specialTunable(sw->item) == 1) {
+    cur[0] = (sw->m_p_item->lv >> 12) + 1;
+    cur[1] = ((sw->m_p_item->lv >> 8) & 0xF) + 1;
+    cur[2] = ((sw->m_p_item->lv >> 4) & 0xF) + 1;
+    cur[3] = (sw->m_p_item->lv8[1] & 0xF) + 1;
+    max[0] = m->levelMax(sw->m_p_item->id, 0);
+    max[1] = m->levelMax(sw->m_p_item->id, 1);
+    max[2] = m->levelMax(sw->m_p_item->id, 2);
+    max[3] = m->levelMax(sw->m_p_item->id, 3);
+    sw->m_level_no[0] = cur[0];
+    sw->m_level_no[1] = cur[1];
+    sw->m_level_no[2] = cur[2];
+    sw->m_level_no[3] = cur[3];
+    if (m->specialTunable(sw->m_p_item) == 1) {
         int i;
         for (i = 0; i < 4; i++) {
-            sw->lv[i] = max[i];
+            sw->m_level_no[i] = max[i];
         }
     } else {
-        sw->lv[sw->lvType] = cur[sw->lvType] + 1;
+        sw->m_level_no[sw->m_level_type] = cur[sw->m_level_type] + 1;
     }
-    if (sw->price <= (int) pG->peseta) {
+    if (sw->m_lv_cost <= (int) pG->peseta) {
         msg = 0x17;
         SndCall(0, 9, 0, 0, 0, 0);
     } else {
@@ -2516,7 +2516,7 @@ struct TuneLevel {
 // stored) with the thanks line, no / B back to the type pick.
 void LvUpConfirm::move(SUB_SCREEN* wk)
 {
-    ShopWork* sw = wk->shop;
+    SSCRN_SHOP* sw = wk->shop;
 
     levelItemDisp(wk, 1);
     if (Key.trg & 0x40000000) {
@@ -2530,11 +2530,11 @@ void LvUpConfirm::move(SUB_SCREEN* wk)
         case 1: {
             TuneLevel* t;
 
-            t = (TuneLevel*) &sw->item->lv;
+            t = (TuneLevel*) &sw->m_p_item->lv;
             // COMPILER-DIFF: 12 (combine). The target keeps `extsb` before `addi -1; clrlwi 24; slwi 12`; our
             // combine strips the sign extension under the u8 truncation when both are one expression.
             {
-                int v = (s8) sw->lv[0];
+                int v = (s8) sw->m_level_no[0];
                 t->fire = (u8) (v - 1);
             }
             // Byte first, item pointer second in every nibble: the `lbz` between the previous `sth`
@@ -2542,28 +2542,28 @@ void LvUpConfirm::move(SUB_SCREEN* wk)
             // qtys apart (all r11; adjacent `sth; lwz` alternates r11/r10), and the LUID puts the
             // `lbz` first where sched2 ties (nibble 4).
             {
-                int v = (s8) sw->lv[1];
-                t = (TuneLevel*) &sw->item->lv;
+                int v = (s8) sw->m_level_no[1];
+                t = (TuneLevel*) &sw->m_p_item->lv;
                 t->mag = v - 1;
             }
             {
-                int v = (s8) sw->lv[2];
-                t = (TuneLevel*) &sw->item->lv;
+                int v = (s8) sw->m_level_no[2];
+                t = (TuneLevel*) &sw->m_p_item->lv;
                 t->speed = v - 1;
             }
             {
-                int v = (s8) sw->lv[3];
-                t = (TuneLevel*) &sw->item->lv;
+                int v = (s8) sw->m_level_no[3];
+                t = (TuneLevel*) &sw->m_p_item->lv;
                 t->ex = v - 1;
             }
-            if (sw->lvType == 3 || sw->lvType == 4) {
-                cItem* item = sw->item;
+            if (sw->m_level_type == 3 || sw->m_level_type == 4) {
+                cItem* item = sw->m_p_item;
                 item->bullet = (item->bullet & 0xE000) | (WeaponId2ChargeNum(item->id, (item->lv8[1] & 0xF) + 1) & 0x1FFF);
             }
-            if (ItemMgr.weapon() == sw->item) {
+            if (ItemMgr.weapon() == sw->m_p_item) {
                 ItemMgr.arm(ItemMgr.weapon());
             }
-            pG->peseta -= sw->price;
+            pG->peseta -= sw->m_lv_cost;
             shopStrPlay(wk, shop_msg[25].str);
             SndCall(0, 0x18, 0, 0, 0, 0);
             break;
