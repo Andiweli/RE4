@@ -8,9 +8,8 @@
 
 // Camera view volume (game/view.cpp `View`, 0x3A4 bytes).
 class VIEW {
-public:
-    u8 pad_0[4];
 private:
+    u32 _flag;
     CAMERA* _p_camera;             // 0x04
     f32 _aspect;               // 0x08
     f32 _fovy;                 // 0x0C
@@ -18,13 +17,15 @@ private:
     f32 _znear;                // 0x14
     f32 _old_fovy;              // 0x18
     f32 _old_zfar;              // 0x1C
+    f32 _old_znear;            // 0x20
 public:
-    u8 pad_20[0x54 - 0x20];
-    GEOM_HEXAHEDRON local;        // 0x054  half-width frustum, camera space
-    GEOM_HEXAHEDRON world;        // 0x114  half-width frustum, world space
-    GEOM_HEXAHEDRON localFull;    // 0x1D4  full frustum, camera space
-    GEOM_HEXAHEDRON worldFull;    // 0x294  full frustum, world space
-    u8 pad_354[0x37C - 0x354];
+    Mtx _mat;                  // 0x24  PS2 has it at 0x30, where Mtx is 4x4
+    GEOM_HEXAHEDRON _l_effect_box;  // 0x054  half-width frustum, camera space
+    GEOM_HEXAHEDRON _effect_box;    // 0x114  half-width frustum, world space
+    GEOM_HEXAHEDRON _l_box;         // 0x1D4  full frustum, camera space
+    GEOM_HEXAHEDRON _box;           // 0x294  full frustum, world space
+    GEOM_SPHERE _l_sphere_inner;    // 0x354  camera space
+    GEOM_SPHERE _sphere_inner;      // 0x368  world space
     GEOM_SPHERE _l_sphere_outer;        // 0x37C  camera space
     GEOM_SPHERE _sphere_outer;   // 0x390  world space
 

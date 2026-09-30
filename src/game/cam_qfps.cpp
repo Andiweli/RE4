@@ -1261,7 +1261,7 @@ void CameraQuasiFPS::move()
         int j;
 
         {
-            GEOM_HEXAHEDRON* vf = &View.localFull;
+            GEOM_HEXAHEDRON* vf = &View._l_box;
             Vec* src;
 
             CameraSetOrientationRoll(&c);

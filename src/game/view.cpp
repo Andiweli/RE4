@@ -80,7 +80,7 @@ void VIEW::initPerspective(f32 fovy, f32 aspect, f32 n, f32 f)
     _zfar = f;
     _znear = n;
     t = sinf(_fovy * 0.5f * 3.1415927f / 180.0f) / cosf(_fovy * 0.5f * 3.1415927f / 180.0f);
-    b = &localFull;
+    b = &_l_box;
     zn = _znear;
     z = -zn;
     h = zn * t;
@@ -145,8 +145,8 @@ void VIEW::initPerspective(f32 fovy, f32 aspect, f32 n, f32 f)
     PSVECCrossProduct(&t1, &t2, &b->normal[5]);
     VECNormalize(&b->normal[5], &b->normal[5]);
 
-    b = &local;
-    *b = localFull;
+    b = &_l_effect_box;
+    *b = _l_box;
     for (i = 0; i < 8; i++) {
         b->vertex[i].x *= 0.5f;
         b->vertex[i].y *= 0.5f;
@@ -184,7 +184,7 @@ void VIEW::initPerspective(f32 fovy, f32 aspect, f32 n, f32 f)
 
     orientation();
 
-    b = &localFull;
+    b = &_l_box;
     q[0].x = b->vertex[0].x;
     q[0].y = b->vertex[0].y;
     q[0].z = b->vertex[0].z;
@@ -253,12 +253,12 @@ void VIEW::orientation()
     u32 i;
 
     for (i = 0; i < 6; i++) {
-        PSMTXMultVecSR(*m, &localFull.normal[i], &worldFull.normal[i]);
-        PSMTXMultVecSR(*m, &local.normal[i], &world.normal[i]);
+        PSMTXMultVecSR(*m, &_l_box.normal[i], &_box.normal[i]);
+        PSMTXMultVecSR(*m, &_l_effect_box.normal[i], &_effect_box.normal[i]);
     }
     for (i = 0; i < 8; i++) {
-        PSMTXMultVec(*m, &localFull.vertex[i], &worldFull.vertex[i]);
-        PSMTXMultVec(*m, &local.vertex[i], &world.vertex[i]);
+        PSMTXMultVec(*m, &_l_box.vertex[i], &_box.vertex[i]);
+        PSMTXMultVec(*m, &_l_effect_box.vertex[i], &_effect_box.vertex[i]);
     }
     _sphere_outer = _l_sphere_outer;
     PSMTXMultVec(*m, &_l_sphere_outer.pos, &_sphere_outer.pos);
