@@ -56,7 +56,7 @@ static void r203_TreasureBoxOpened(int id);
 static void r203_ShelfOpen();
 static void r203_ShelfOpened();
 static void r203_StreamCheck();
-extern "C" void Evt_R203S00_Func(Event* e);
+void Evt_R203S00_Func(Event* e);
 
 // Room init: the Ganado set depends on whether the key item was taken, and without it area 0x8A
 // starts the key pickup wave and the key-carrier's escape. Until Room_flg bit 3, area 3 is the
@@ -344,7 +344,7 @@ static void r203_StreamCheck()
 }
 
 // Event r203s00 callback: light mask 2 on the pl0400 model on its first frame.
-extern "C" void Evt_R203S00_Func(Event* e)
+void Evt_R203S00_Func(Event* e)
 {
     if (e->GetFuncType() == 1 && e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
         void* mod;

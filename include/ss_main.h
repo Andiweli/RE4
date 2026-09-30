@@ -391,7 +391,6 @@ extern cModel* ssWepModel;
 extern cModel* ssPlMotion;
 extern cModel* ssWepModel2;
 
-extern "C" {
 // ss_main.cpp
 void IdSubErase();
 void IdNumErase();
@@ -432,6 +431,5 @@ void clearZbuffer();
 void dispScrollBar(u32 top, u32 n, u32 num, ID_UNIT* bar, ID_UNIT* up, ID_UNIT* down);
 void idMainMenuFade(SUB_SCREEN* wk, int sw);
 void weaponChangeRequest(u16 no, u16 type);
-}
 
 #endif

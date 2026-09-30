@@ -10,14 +10,12 @@
 #include "camera.h"
 #include "main_sub.h"
 
-extern "C" {
 void ss_Draw_tpl(void* tpl, u32 id, int x, int y, int w, int h, int ot, int prio);
 void ss_Draw_tpl_local(TEXPalette* tpl, u32 id, int x, int y, int w, int h);
 void ss_Draw_line3d(Vec* a, Vec* b, u32 color, int width, int blend, int zupd, int ot, int prio);
 void ss_Draw_line3d_local(Vec* a, Vec* b, Mtx mtx, u32 color, u32 blend, int zupd);
 void ss_Draw_tile3d(Vec* a, Vec* b, Vec* c, Vec* d, u32 color, int x34, int blend, int ot, u16 prio);
 void ss_Draw_tile3d_local(Vec* a, Vec* b, Vec* c, Vec* d, Mtx mtx, u32 color, u32 blend, int zupd);
-}
 
 // Ordering-table primitives of the sub screen (drawn from the OT callbacks).
 struct SsTplPrim {
@@ -54,7 +52,6 @@ struct SsTilePrim {
     u16 prio;   // 0x3E
 };
 
-extern "C" {
 static void ss_Draw_tpl_trans(SsTplPrim* p);
 static void ss_Draw_line3d_trans(SsLinePrim* p);
 static void ss_Draw_tile3d_trans(SsTilePrim* p);
@@ -282,7 +279,6 @@ void ss_Draw_tile3d_local(Vec* a, Vec* b, Vec* c, Vec* d, Mtx mtx, u32 color, u3
     GXColor4u8(cr, cg, cb, ca);
     GXPosition3f32(d->x, d->y, d->z);
     GXColor4u8(cr, cg, cb, ca);
-}
 }
 
 // The split object's .rodata is 4 bytes longer than the three pools: the next unit's .rodata (ss_main,

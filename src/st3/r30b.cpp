@@ -79,7 +79,6 @@ static Vec r30b_gotoTbl2[1] = {{-5600.0f, -2000.0f, -4900.0f}};
 // The module's .data tail is 8-aligned in the original (0x23C -> 0x240; st3.cpp's linker word follows).
 asm(".section .data\n\t.balign 8\n\t.text");
 
-extern "C" {
 static void r30b_movedShelf(int no);
 static void r30b_moveShelf(int no);
 void R30bDoorEventEmMove();
@@ -102,7 +101,6 @@ static void R30bEmGotoSet2();
 void SetCatchEm(int no);
 int CkCatchEm(int no);
 static void SceBgmCheck();
-}
 
 
 // Room init (the crane hall), also the s00 callback. With Ashley along area 3 is the s00 escape

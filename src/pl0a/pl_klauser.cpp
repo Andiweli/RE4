@@ -30,7 +30,7 @@ asm(".section .data\n\t.balign 8\n\t.text");   // the module's .data is 8-aligne
 // (pl0aTex, replace type 1) whose render texture id goes into the blend table pl0aTexTbl, spawns
 // the render-target effect (EstSet type 3/0xC on the manager's mask) and sets the model's blend
 // table / ratio 0xFF / blend type 1.
-extern "C" void setTexRender(cModelInfo* info)
+void setTexRender(cModelInfo* info)
 {
     u8* tbl = pl0aTexTbl;
 

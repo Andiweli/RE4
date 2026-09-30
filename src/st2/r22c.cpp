@@ -420,7 +420,6 @@ static void r22c_AshleyCtrl();
 void ScoreInit();
 void ScoreSet(int pt, Vec* pos);
 
-extern "C" {
 void getBonus();
 int r22c_checkGameLevel();
 int r22c_checkGame();
@@ -431,7 +430,6 @@ void scoreRegist();
 void setWepmanKilled();
 void ScoreClear();
 void ScoreMove();
-}
 
 // Room init (the shooting range). The game level (A..D) comes from the room the player came from,
 // since each range entrance is a level.

@@ -27,11 +27,11 @@ struct R215Work {
 
 static R215Work* r215_work;
 
-extern "C" void R215_Event();
+void R215_Event();
 static void r215_succeedAction();
-extern "C" void Evt_R215S00_Func(Event* e);
-extern "C" void Evt_R215S01_Func(Event* e);
-extern "C" void Evt_R215S02_Func(Event* e);
+void Evt_R215S00_Func(Event* e);
+void Evt_R215S01_Func(Event* e);
+void Evt_R215S02_Func(Event* e);
 
 
 // The rooms call Event::FlgOnStatus out of line (event.h has it in-class).
@@ -73,7 +73,7 @@ void R215Main()
 
 // Once (Room_flg bit 0): plays r215s00 (its QTE clears Room_flg[0] bit 31 on success); passed -> r215s01
 // and Leon is placed at the exit facing +X; failed -> the r215s02 death event and the task sleeps forever.
-extern "C" void R215_Event()
+void R215_Event()
 {
     SceEventStart(0);
     SceSleep(1);
@@ -117,7 +117,7 @@ static void r215_succeedAction()
 // Event r215s00 callback: status 3 with cancel cut 9; shadow camera size zeroed on cut 3; cut 0 assigns
 // light masks to the pl0100 / em3700 / evm* event models and be_flag 0x80 to some; cut 0xA and the end
 // modes 2/3 handle the QTE window and cleanup.
-extern "C" void Evt_R215S00_Func(Event* e)
+void Evt_R215S00_Func(Event* e)
 {
     void* mod;
 
@@ -186,7 +186,7 @@ extern "C" void Evt_R215S00_Func(Event* e)
 
 // Event r215s01 callback: shadow camera size zeroed on cut 0x10; scroll objects 0x2C/0x2E hidden during
 // cut 0x11; per-cut light masks / flags on the event models.
-extern "C" void Evt_R215S01_Func(Event* e)
+void Evt_R215S01_Func(Event* e)
 {
     void* mod;
 
@@ -253,6 +253,6 @@ extern "C" void Evt_R215S01_Func(Event* e)
 }
 
 // Event r215s02 callback (the failure event): nothing to do.
-extern "C" void Evt_R215S02_Func(Event* e)
+void Evt_R215S02_Func(Event* e)
 {
 }

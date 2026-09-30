@@ -59,7 +59,6 @@ public:
     virtual void move(SUB_SCREEN* wk);
 };
 
-extern "C" {
 void itemNameDisp(SUB_SCREEN* wk);
 void itemCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 void sscrn_item_out_init(SUB_SCREEN* wk);
@@ -76,7 +75,6 @@ void setCommandId(u8 mode, ID_UNIT** tbl, s8* num);
 void itemMakeInit(SUB_SCREEN* wk);
 void itemMakeMove(SUB_SCREEN* wk);
 void itemMakeDisp(SUB_SCREEN* wk, int x, int y);
-}
 
 static int sscrn_item_out(SUB_SCREEN* wk);
 

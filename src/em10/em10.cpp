@@ -253,9 +253,9 @@ static void plem10KneeKick(cPlayer* pl);
 static void plem10NeckBreak(cPlayer* pl);
 static void plem10Showtay(cPlayer* pl);
 static void em10TradeAction(cEm10* em);
-extern "C" int em10PlRunCk(cEm10* em);
-extern "C" void em10SackSet(cEm10* em);
-extern "C" int em10SearchParasite(cEm10* em);
+int em10PlRunCk(cEm10* em);
+void em10SackSet(cEm10* em);
+int em10SearchParasite(cEm10* em);
 
 // em10ScytheAtkCk / em10SukiAtkCk share one body apart from the weapon kind and the attack routine.
 #define EM10_WEP_ATK_CK(em, w, kind, rtn)                                                          \
@@ -338,7 +338,7 @@ int em10LostHead(cEm10* em, int a, int b);
 void em10BloodSet(cEm10* em, int a);
 int em10SetDmVal(cEm10* em);
 void em10CoreBreak(cEm10* em, int a);
-extern "C" void em10ParasiteGoOut(cEm10* em);
+void em10ParasiteGoOut(cEm10* em);
 int em10FindCk2(cEm10* em);
 void em10KickHitMark(cEm10* em);
 int em10RoofDmCk(cEm10* em);
@@ -360,8 +360,8 @@ void em10FindNotify(cEm10* em);
 void em10WalkRtnSet(cEm10* em);
 void em10HandSet(cEm10* em, int a);
 void em10ActEvtSetTrade(cEm10* em);
-extern "C" void em10ActEvtSetKick(cEm10* em);
-extern "C" void em10ActEvtSetFS(cEm10* em);
+void em10ActEvtSetKick(cEm10* em);
+void em10ActEvtSetFS(cEm10* em);
 int em10AtkRtnCk(cEm10* em, int a);
 void em10SetDashMotion(cEm10* em);
 void em10HeadSet(cEm10* em, int a);
@@ -413,76 +413,76 @@ int em10IgnitionCk(cEm10* em);
 int em10ClawStickCK(cEm10* em);
 int em10FindLostCk(cEm10* em);
 int em10GotoPosCk(cEm10* em);
-extern "C" int em10ReturnPosCk(cEm10* em);
-extern "C" void em10ClothPartsSet(cEm10* em, int on);
-extern "C" void em10GoodsPartsSet(cEm10* em, int on);
-extern "C" int em10AtkDoorCk(cEm10* em);
-extern "C" int em10AtkRackCk(cEm10* em);
-extern "C" void Em10SetSeTbl(cEm10* em, int type);
-extern "C" void em10WeaponSet2(cEm10* em);
-extern "C" int em10CatchSubRtnCk(cEm10* em);
-extern "C" void em10SetRtnFind(cEm10* em);
-extern "C" int em10BullJumpCk(cEm10* em);
-extern "C" cModel* em10SearchTruck(cEm10* em);
-extern "C" void em10CallVoiceSe(cEm10* em, u16 no);
-extern "C" int em10RouteTargetSet(cEm10* em);
-extern "C" int em10SomebodyDamageNowCk(cEm10* em);
-extern "C" int em10TorchFrameAtkCk(cEm10* em);
-extern "C" int em10TorchFrameAtkCkSub(cEm10* em);
-extern "C" void em10PlHeadLost();
-extern "C" f32 em10GetPower(cEm10* em);
-extern "C" void em10WepSeEffSet(cEm10* em, cEmWep* wep, int type);
-extern "C" int em10ThrowScaCk(cEm10* em);
-extern "C" int em10ThrowNearCk(cEm10* em);
-extern "C" int em10WindowCk2(cEm10* em);
-extern "C" int em10ClimbOverCk2(cEm10* em);
-extern "C" void plem10KickCamMove(cPlayer* pl, int a);
+int em10ReturnPosCk(cEm10* em);
+void em10ClothPartsSet(cEm10* em, int on);
+void em10GoodsPartsSet(cEm10* em, int on);
+int em10AtkDoorCk(cEm10* em);
+int em10AtkRackCk(cEm10* em);
+void Em10SetSeTbl(cEm10* em, int type);
+void em10WeaponSet2(cEm10* em);
+int em10CatchSubRtnCk(cEm10* em);
+void em10SetRtnFind(cEm10* em);
+int em10BullJumpCk(cEm10* em);
+cModel* em10SearchTruck(cEm10* em);
+void em10CallVoiceSe(cEm10* em, u16 no);
+int em10RouteTargetSet(cEm10* em);
+int em10SomebodyDamageNowCk(cEm10* em);
+int em10TorchFrameAtkCk(cEm10* em);
+int em10TorchFrameAtkCkSub(cEm10* em);
+void em10PlHeadLost();
+f32 em10GetPower(cEm10* em);
+void em10WepSeEffSet(cEm10* em, cEmWep* wep, int type);
+int em10ThrowScaCk(cEm10* em);
+int em10ThrowNearCk(cEm10* em);
+int em10WindowCk2(cEm10* em);
+int em10ClimbOverCk2(cEm10* em);
+void plem10KickCamMove(cPlayer* pl, int a);
 int em10HideRtnCk2(cEm10* em);
-extern "C" void em10SetAccesory(cEm10* em);
-extern "C" void em10WeaponInit(cEm10* em);
-extern "C" void em10ShieldSet(cEm10* em);
-extern "C" int em10DootAtkCk(cEm10* em);
-extern "C" int em10ScreenInCk(cEm10* em);
-extern "C" int em10SetWanderRoute(cEm10* em);
-extern "C" void em10CamMoveTakeaway(cEm10* em);
-extern "C" void em10CamMoveCri(cEm10* em, u32 no, int shake);
-extern "C" void em10CamMove(cEm10* em, int no, f32 rate, int shake);
-extern "C" void em10SetCampos2(cEm10* em);
+void em10SetAccesory(cEm10* em);
+void em10WeaponInit(cEm10* em);
+void em10ShieldSet(cEm10* em);
+int em10DootAtkCk(cEm10* em);
+int em10ScreenInCk(cEm10* em);
+int em10SetWanderRoute(cEm10* em);
+void em10CamMoveTakeaway(cEm10* em);
+void em10CamMoveCri(cEm10* em, u32 no, int shake);
+void em10CamMove(cEm10* em, int no, f32 rate, int shake);
+void em10SetCampos2(cEm10* em);
 void em10CamMove2(cEm10* em);
-extern "C" void em10SetAtkWait(cEm10* em, int set);
-extern "C" void em10CamMoveAshley(cEm10* em, u32 no);
-extern "C" void em10SetTakeawayPos(cEm10* em);
-extern "C" int em10JumpDownCk2(cEm10* em);
-extern "C" void em10BellAtkCk(cEm10* em, Vec* pos, u32 no);
-extern "C" int em10ShotGatlingCk(cEm10* em);
-extern "C" int em10GoSubStayCk(cEm10* em);
-extern "C" int em10ReturnCk(cEm10* em);
-extern "C" int em10BombThrowScaCk(cEm10* em);
-extern "C" void em10CsawSignSe(cEm10* em);
-extern "C" int em10ShotBowgunCk(cEm10* em);
-extern "C" int em10ThreatCk(cEm10* em);
-extern "C" int em10ClawCriAtkCk(cEm10* em);
-extern "C" void em10SetTakeawayPosUpdate(cEm10* em);
+void em10SetAtkWait(cEm10* em, int set);
+void em10CamMoveAshley(cEm10* em, u32 no);
+void em10SetTakeawayPos(cEm10* em);
+int em10JumpDownCk2(cEm10* em);
+void em10BellAtkCk(cEm10* em, Vec* pos, u32 no);
+int em10ShotGatlingCk(cEm10* em);
+int em10GoSubStayCk(cEm10* em);
+int em10ReturnCk(cEm10* em);
+int em10BombThrowScaCk(cEm10* em);
+void em10CsawSignSe(cEm10* em);
+int em10ShotBowgunCk(cEm10* em);
+int em10ThreatCk(cEm10* em);
+int em10ClawCriAtkCk(cEm10* em);
+void em10SetTakeawayPosUpdate(cEm10* em);
 int em10HideToStepCk(cEm10* em, int a);
-extern "C" int em10ParasiteAtkCk(cEm10* em);
-extern "C" int em10ShieldAtkCk(cEm10* em);
-extern "C" int em10AxeAtkCk(cEm10* em);
-extern "C" int em10SukiAtkCk(cEm10* em);
-extern "C" int em10ScytheAtkCk(cEm10* em);
-extern "C" int em10ClawAtkCk(cEm10* em);
-extern "C" int em10ShotRocketCk(cEm10* em);
-extern "C" int em10ThrowAxeCk(cEm10* em);
-extern "C" int em10CsawAtkCk(cEm10* em);
-extern "C" int em10CatchPLRtnCk(cEm10* em);
-extern "C" int em10BackCk(cEm10* em);
-extern "C" int em10StayCk(cEm10* em);
-extern "C" int em10DashCk(cEm10* em);
-extern "C" int em10HeadLockCk(cEm10* em);
-extern "C" void em10BehindSeCk(cEm10* em);
-extern "C" void em10FallWaterCk(cEm10* em);
-extern "C" void em10BlendMotSet(cEm10* em, void* m0, void* m1, void* m2, int a, int b, int c, int d);
-extern "C" int em10HideRtnCk(cEm10* em);
-extern "C" int em10GatlingHitCk(cEm10* em);
+int em10ParasiteAtkCk(cEm10* em);
+int em10ShieldAtkCk(cEm10* em);
+int em10AxeAtkCk(cEm10* em);
+int em10SukiAtkCk(cEm10* em);
+int em10ScytheAtkCk(cEm10* em);
+int em10ClawAtkCk(cEm10* em);
+int em10ShotRocketCk(cEm10* em);
+int em10ThrowAxeCk(cEm10* em);
+int em10CsawAtkCk(cEm10* em);
+int em10CatchPLRtnCk(cEm10* em);
+int em10BackCk(cEm10* em);
+int em10StayCk(cEm10* em);
+int em10DashCk(cEm10* em);
+int em10HeadLockCk(cEm10* em);
+void em10BehindSeCk(cEm10* em);
+void em10FallWaterCk(cEm10* em);
+void em10BlendMotSet(cEm10* em, void* m0, void* m1, void* m2, int a, int b, int c, int d);
+int em10HideRtnCk(cEm10* em);
+int em10GatlingHitCk(cEm10* em);
 
 
 #define EM10_WINDOW(w) ((w)->pWindow)
@@ -13443,7 +13443,7 @@ static void subem10_TakeAway(cSubChar* sub)
 
 // Take-away camera: installs the work's Camera (Cam) as the cut-in camera looking from Campos at the
 // Ganado carrying Ashley off (em10_R1_TakeAway steps 0x10/0x11).
-extern "C" void em10CamMoveTakeaway(cEm10* em)
+void em10CamMoveTakeaway(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     GLOBAL_WK* g = pG;
@@ -16764,7 +16764,7 @@ void em10RouteCk(cEm10* em)
 
 // Number of other alive, active Ganados (ids 0x10..0x20) currently targeting the partner (work flag
 // 0x08000000); em10RouteTargetSet allows at most two on Ashley.
-extern "C" int em10GetGoSub(cEm10* em)
+int em10GetGoSub(cEm10* em)
 {
     int n = 0;
     u32 i;
@@ -16801,7 +16801,7 @@ extern "C" int em10GetGoSub(cEm10* em)
 // target when absent, held, when this Ganado is a bowgun / type 6 / claw type, while she is up high
 // in rooms 101 / 111 / 400, when two others already chase her; cEm::flag bit6 forces her, else she is
 // taken when already targeted or when she is more than 2000 units nearer along the route.
-extern "C" int em10RouteTargetSet(cEm10* em)
+int em10RouteTargetSet(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
 
@@ -16865,7 +16865,7 @@ extern "C" int em10RouteTargetSet(cEm10* em)
 }
 
 // Random EMI wander point of the room (entries of type 1 sub 3): its index, or -1 when the room has none.
-extern "C" int em10GetWanderRouteEmi(cEm10* em)
+int em10GetWanderRouteEmi(cEm10* em)
 {
     EmiData* emi = pG->pEmi;
     int cnt;
@@ -16911,7 +16911,7 @@ extern "C" int em10GetWanderRouteEmi(cEm10* em)
     return -1;
 }
 
-extern "C" int em10GetWanderRouteEmi(cEm10* em);
+int em10GetWanderRouteEmi(cEm10* em);
 
 // Picks a wander destination for a Ganado that lost the player: an EMI wander point when the room
 // has them, else a random route-check point (one in four times the point nearest to the player).
@@ -16933,7 +16933,7 @@ u32 em10GetWanderRoute(cEm10* em)
 }
 
 // Position of the wander destination Wander_route (EMI entry or route-check point).
-extern "C" void em10GetWanderRoutePos(cEm10* em, Vec* pos)
+void em10GetWanderRoutePos(cEm10* em, Vec* pos)
 {
     FREE_EM10* w = EM10_WK(em);
     EmiData* emi = pG->pEmi;
@@ -16948,10 +16948,10 @@ extern "C" void em10GetWanderRoutePos(cEm10* em, Vec* pos)
     RouteCkGetPoint(w->Wander_route, pos);
 }
 
-extern "C" void em10GetWanderRoutePos(cEm10* em, Vec* pos);
+void em10GetWanderRoutePos(cEm10* em, Vec* pos);
 
 // Keeps wander point `no` while the Ganado is more than 1000 units from it, else picks a new one.
-extern "C" u32 em10WanderRouteUpdate(cEm10* em, int no)
+u32 em10WanderRouteUpdate(cEm10* em, int no)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec pos;
@@ -16973,7 +16973,7 @@ extern "C" u32 em10WanderRouteUpdate(cEm10* em, int no)
 
 // Wander route step for a Ganado that lost the player: updates Wander_route and sets Go_pos / Go_dir /
 // L_go towards it through the route check; 0 when there is no wander point.
-extern "C" int em10SetWanderRoute(cEm10* em)
+int em10SetWanderRoute(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec pos;
@@ -17096,7 +17096,7 @@ int em10AtkRtnCk(cEm10* em, int a)
 // Decides the grab on the player: needs Atk_wait 0, no shield, the player alive and not held, the
 // Ganado bare-handed (or with the dynamite) and in front within range; picks DashCatch (0x39) or the
 // standing Catch (0x33), and at low rank may just Stay instead; also gated by the ctrl12 EM10_ATK lock.
-extern "C" int em10CatchPLRtnCk(cEm10* em)
+int em10CatchPLRtnCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -17182,7 +17182,7 @@ extern "C" int em10CatchPLRtnCk(cEm10* em)
 // Decides the grab on the partner (Ashley): she must be alive, not already carried (Status_flg[1]
 // bit16) and in reach in front with a clear line; sets Catch (0x33) with r_no_0 1. Not for chainsaw /
 // shield / parasite Ganados.
-extern "C" int em10CatchSubRtnCk(cEm10* em)
+int em10CatchSubRtnCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -17742,7 +17742,7 @@ int em10LostHead(cEm10* em, int a, int b)
 
 // Plays voice `no` through the room's ctrl11 SE control with the voice index of the model type
 // (each type has its own voice bank slot), stopping the current voice; resets Breath_se_wait.
-extern "C" void em10CallVoiceSe(cEm10* em, u16 no)
+void em10CallVoiceSe(cEm10* em, u16 no)
 {
     FREE_EM10* w = EM10_WK(em);
     int idx;
@@ -17860,7 +17860,7 @@ void em10BreathSe(cEm10* em)
 
 // Chainsaw Ganado tell: revs the saw (Csaw_sign_wait) or plays the far-away "fake" rev every
 // Csaw_fake_timer frames so the player hears it coming; nothing when the player is dead.
-extern "C" void em10CsawSignSe(cEm10* em)
+void em10CsawSignSe(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
 
@@ -17930,7 +17930,7 @@ int em10ModelInit(cEm10* em)
 }
 // Fills Se_tbl[19] (voice / grunt / damage / death / find / attack ... sound numbers) for the voice
 // set: 0 male villager, 1 female, 2 zealot / soldier, 3 chainsaw.
-extern "C" void Em10SetSeTbl(cEm10* em, int type)
+void Em10SetSeTbl(cEm10* em, int type)
 {
     FREE_EM10* w = EM10_WK(em);
 
@@ -18029,7 +18029,7 @@ extern "C" void Em10SetSeTbl(cEm10* em, int type)
 // Picks the weapon in hand from the cEm::flag bits and the module's motion table, creates it with
 // em10MakeWeapon and attaches it. Flag bit13 means "carried as the spare" (em10WeaponSet2), and the
 // claw and gatling types carry nothing.
-extern "C" void em10WeaponInit(cEm10* em)
+void em10WeaponInit(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
 
@@ -18136,7 +18136,7 @@ extern "C" void em10WeaponInit(cEm10* em)
 // lantern, bucket ... as pCap, glasses as pGlasses) and extra parts (hood, hats, belts as pHood /
 // pWhood / pAccesory[]); the head part is hidden under a hood.
 // Sets up the accessory objects / parts selected by the flags_3C8 bits (per enemy type).
-extern "C" void em10SetAccesory(cEm10* em)
+void em10SetAccesory(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec pos;
@@ -18555,7 +18555,7 @@ void em10WeaponSet(cEm10* em)
 
 // Creates the spare weapon (cEm::flag bit13): the second hatchet / flail / sickle / pitchfork /
 // bowgun / dynamite as pWeapon2 on the back part 0x11, hidden until Pickup takes it.
-extern "C" void em10WeaponSet2(cEm10* em)
+void em10WeaponSet2(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec pos;
@@ -18619,7 +18619,7 @@ extern "C" void em10WeaponSet2(cEm10* em)
 }
 // Damage / hit / fall / throw SEs and hit / water effects of a Ganado weapon by type (torch has its
 // own set, the hoe / scythe / bowgun a different fall SE).
-extern "C" void em10WepSeEffSet(cEm10* em, cEmWep* wep, int type)
+void em10WepSeEffSet(cEm10* em, cEmWep* wep, int type)
 {
     if (!wep) {
         return;
@@ -18677,7 +18677,7 @@ extern "C" void em10WepSeEffSet(cEm10* em, cEmWep* wep, int type)
 
 // Zealot / soldier shield (Ganado 1 / 2 with cEm::flag bit31): creates the cEmShield from the archive
 // (0x163 / 0x164) and attaches it to the off hand (0x10, or 0xA for a left-handed Ganado, flag bit24).
-extern "C" void em10ShieldSet(cEm10* em)
+void em10ShieldSet(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     cEmShield* s;
@@ -18925,7 +18925,7 @@ void em10HeadSet(cEm10* em, int no)
 }
 
 // Type 6 (the robed merchant type): shows (1) / hides (0) the open-coat cloth parts (pCloth).
-extern "C" void em10ClothPartsSet(cEm10* em, int no)
+void em10ClothPartsSet(cEm10* em, int no)
 {
     FREE_EM10* w = EM10_WK(em);
     cModelInfo* info;
@@ -18955,7 +18955,7 @@ extern "C" void em10ClothPartsSet(cEm10* em, int no)
 }
 
 // Type 6: shows / hides the goods parts hanging inside the coat (pGoods).
-extern "C" void em10GoodsPartsSet(cEm10* em, int on)
+void em10GoodsPartsSet(cEm10* em, int on)
 {
     FREE_EM10* w = EM10_WK(em);
 
@@ -18977,7 +18977,7 @@ extern "C" void em10GoodsPartsSet(cEm10* em, int on)
 }
 
 // Chainsaw Ganado: puts the sack over the head (pSack, hides the head part, effect 0x55).
-extern "C" void em10SackSet(cEm10* em)
+void em10SackSet(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     cModelInfo* info;
@@ -19007,7 +19007,7 @@ extern "C" void em10SackSet(cEm10* em)
 
 // Low obstacle test in front (scenario flag 0x20 wall): 0 none, 1 climb over (Target_pos = the landing
 // point behind it), 2 the floor behind is far below (jump down instead). Not for Character 5.
-extern "C" int em10ClimbOverCk2(cEm10* em)
+int em10ClimbOverCk2(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -19121,7 +19121,7 @@ int em10ClimbOverCk(cEm10* em)
 
 // Window / low wall test in front: 0 none, 1 climb through (Target_pos set), 2 drop behind, 3 a window
 // object (pWindow) to smash, 4 a door to bash (em10DootAtkCk).
-extern "C" int em10WindowCk2(cEm10* em)
+int em10WindowCk2(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -19307,7 +19307,7 @@ int em10DoorOpenCk(cEm10* em, int kick)
 }
 
 // Is a bashable door (alive, closed, within 45 deg in front) still there: 1 = yes (DoorAtk's second swing).
-extern "C" int em10AtkDoorCk(cEm10* em)
+int em10AtkDoorCk(cEm10* em)
 {
     u32 i;
     Mtx m;
@@ -19574,7 +19574,7 @@ int em10RackBreakCk(cEm10* em)
 }
 
 // Is a bashable rack still in front: 1 = yes.
-extern "C" int em10AtkRackCk(cEm10* em)
+int em10AtkRackCk(cEm10* em)
 {
     u32 i;
     Mtx inv;
@@ -19884,7 +19884,7 @@ int em10LadderResetCk(cEm10* em)
 
 // Edge test ahead (two probes, shield carriers further out): 0 no drop, 1 a low drop, 2 a drop the
 // Ganado should jump down.
-extern "C" int em10JumpDownCk2(cEm10* em)
+int em10JumpDownCk2(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec n;
@@ -19959,7 +19959,7 @@ found:
     return 0;
 }
 
-extern "C" int em10JumpDownCk2(cEm10* em);
+int em10JumpDownCk2(cEm10* em);
 
 // Jump-down decision: from a roof (cEm::flag bit10) when the floor is below, or em10JumpDownCk2 ->
 // JumpDown (0x43); 1 when a routine was set.
@@ -20054,7 +20054,7 @@ int em10JumpCk(cEm10* em)
 }
 
 // Room 30F: the bulldozer (cObjBull) in front accepts a rider (ckBullRide) -> R30FBullJump (0x67).
-extern "C" int em10BullJumpCk(cEm10* em)
+int em10BullJumpCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     cObjBull* o;
@@ -20112,7 +20112,7 @@ void em10ReturnStartPosCk(cEm10* em)
 // Attack check of the exposed parasite (pParasite / pCore): needs Atk_wait 0, the parasite ready, the
 // player in front within its reach with a clear line; sets ParasiteAtk (0x20) and the ctrl12 attack
 // locks (60 / 30 frames by rank). 1 when set.
-extern "C" int em10ParasiteAtkCk(cEm10* em)
+int em10ParasiteAtkCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -20205,7 +20205,7 @@ extern "C" int em10ParasiteAtkCk(cEm10* em)
 // Attack check of the bowgun Ganado (Wep_type 8): drops the bowgun when out of arrows, side-steps
 // (0x17) when the player is too close (em10ThrowNearCk), else fires (ShotBowgun 0x21) when the shot is
 // clear (em10ThrowScaCk). 1 when a routine was set.
-extern "C" int em10ShotBowgunCk(cEm10* em)
+int em10ShotBowgunCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     int near;
@@ -20255,7 +20255,7 @@ extern "C" int em10ShotBowgunCk(cEm10* em)
 
 // Attack check of the rocket Ganado (Wep_type 0xC): side-step when the player is close, else
 // ShotRocket (0x22) when the shot is clear. 1 when a routine was set.
-extern "C" int em10ShotRocketCk(cEm10* em)
+int em10ShotRocketCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     int near;
@@ -20301,7 +20301,7 @@ extern "C" int em10ShotRocketCk(cEm10* em)
 
 // Attack check of the gatling Ganado (type 2): the player within 45 deg in front, in range, with a
 // clear line from the gun part 10 -> ShotGatling (0x23). 1 when set.
-extern "C" int em10ShotGatlingCk(cEm10* em)
+int em10ShotGatlingCk(cEm10* em)
 {
     Vec pos;
     Vec d;
@@ -20340,7 +20340,7 @@ extern "C" int em10ShotGatlingCk(cEm10* em)
 // Throw check for the hatchet / sickle / bucket / scythe (Wep_type 2/3/5/6): the player at throwing
 // distance and in view, the Ganado facing him, no ctrl12 throw lock, a clear line to his head; more
 // likely when the player looks away -> ThrowAxe (0x24) + the attack locks. 1 when set.
-extern "C" int em10ThrowAxeCk(cEm10* em)
+int em10ThrowAxeCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -20524,7 +20524,7 @@ int em10ThrowBombCk(cEm10* em)
 }
 
 // Melee weapon swing start check (axe / sickle / pitchfork ...): routine 1B (running swing) or 26/28.
-extern "C" int em10AxeAtkCk(cEm10* em)
+int em10AxeAtkCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -20647,7 +20647,7 @@ extern "C" int em10AxeAtkCk(cEm10* em)
 // Attack check of the shield carrier: the player within reach in front (a running player is allowed
 // from further away), a clear line; at low rank may Stay instead; the flail carrier swings the weapon
 // half the time (AxeAtk 0x26) else ShieldAtk (0x27). 1 when set.
-extern "C" int em10ShieldAtkCk(cEm10* em)
+int em10ShieldAtkCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -20754,14 +20754,14 @@ extern "C" int em10ShieldAtkCk(cEm10* em)
 }
 
 // Attack check of the hoe Ganado (Wep_type 1): EM10_WEP_ATK_CK -> SukiAtk (0x29).
-extern "C" int em10SukiAtkCk(cEm10* em)
+int em10SukiAtkCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     EM10_WEP_ATK_CK(em, w, 1, 0x29);
 }
 
 // Attack check of the scythe Ganado (Wep_type 6): EM10_WEP_ATK_CK -> ScytheAtk (0x2A).
-extern "C" int em10ScytheAtkCk(cEm10* em)
+int em10ScytheAtkCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     EM10_WEP_ATK_CK(em, w, 6, 0x2A);
@@ -20769,7 +20769,7 @@ extern "C" int em10ScytheAtkCk(cEm10* em)
 
 // Attack check of the claw Ganado (type 0xA/0xD): the player in front within reach with a clear line
 // -> ClawAtk (0x2B), or StickClaw (0x59) when the claws are still in the ground. 1 when set.
-extern "C" int em10ClawAtkCk(cEm10* em)
+int em10ClawAtkCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -20830,7 +20830,7 @@ extern "C" int em10ClawAtkCk(cEm10* em)
 // Critical claw attack check: after CriAtk_wait ran out and one chance in four, when the way to the
 // player is clear -> ClawCriAtk (0x2D) from further than 3000 units (half the time) or ClawWalkAtk
 // (0x2C). 1 when set.
-extern "C" int em10ClawCriAtkCk(cEm10* em)
+int em10ClawCriAtkCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -20892,7 +20892,7 @@ extern "C" int em10ClawCriAtkCk(cEm10* em)
 // Attack check of the chainsaw Ganado (Wep_type 4): the player in front within reach (further when he
 // runs at it) with a clear line -> C_SawAtk (0x2F) or, 30% of the time, the overhead C_SawCriAtk
 // (0x31); also swings at a door / rack in the way. 1 when set.
-extern "C" int em10CsawAtkCk(cEm10* em)
+int em10CsawAtkCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -20994,7 +20994,7 @@ extern "C" int em10CsawAtkCk(cEm10* em)
 
 // Threat shout check from the walk: an unarmed / plain Ganado facing the player at mid range goes
 // to Threat (0x16) one time in N. 1 when set.
-extern "C" int em10ThreatCk(cEm10* em)
+int em10ThreatCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Mtx m;
@@ -21038,7 +21038,7 @@ extern "C" int em10ThreatCk(cEm10* em)
 
 // Is the player running at this Ganado (player routine 0/3, rank > 3, within 45 deg and a 3000-unit
 // wide lane): the attack checks then accept a longer attack distance.
-extern "C" int em10PlRunCk(cEm10* em)
+int em10PlRunCk(cEm10* em)
 {
     Mtx m;
     Vec v;
@@ -21069,7 +21069,7 @@ extern "C" int em10PlRunCk(cEm10* em)
 // Is the player aiming a gun (not the knife, with ammo) at this Ganado's head: the head part 4 sits
 // inside a 600 x 600 box in front of the player's weapon hand. The village Ganados then guard the
 // head (Guard / GuardWalk); zealots / soldiers never do.
-extern "C" int em10HeadLockCk(cEm10* em)
+int em10HeadLockCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Mtx inv;
@@ -21452,7 +21452,7 @@ int em10FindCk2(cEm10* em)
 }
 
 // 0 while any other active Ganado is playing its Find reaction (R1 0x0D), else 1: staggers the shouts.
-extern "C" int em10SomebodyFindNowCk(cEm10* em)
+int em10SomebodyFindNowCk(cEm10* em)
 {
     u32 i;
 
@@ -21502,7 +21502,7 @@ static int em10FindFloorCk(cEm10* em)
 
 // 1 when another active Ganado nearby (within 3000 units, or 10000 in front) is in its damage or
 // die-lost routine: the others notice the fight (em10FindCk).
-extern "C" int em10SomebodyDamageNowCk(cEm10* em)
+int em10SomebodyDamageNowCk(cEm10* em)
 {
     u32 i;
 
@@ -21761,7 +21761,7 @@ int em10GotoCk(cEm10* em)
 // When the Ganado must keep its distance (Atk_wait running or the ctrl12 NOT_NEAR lock): a close one
 // steps back (Back 0x12, not the chainsaw), a far one Stays (0x1B) unless already staying; Character 2
 // never backs off. 1 when a routine was set.
-extern "C" int em10BackCk(cEm10* em)
+int em10BackCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     int back = 0;
@@ -21904,7 +21904,7 @@ void em10SlopeMove(cEm10* em)
 // Cut-in camera of the catch attacks: eases the work Camera (Cam) towards a viewpoint beside the
 // player (`no` 0 right / 1 left) looking at the Ganado's head, pulled in front of walls
 // (EatMgr.hitCheck), `rate` = ease factor per frame, `shake` adds a quake; installs it as the extra camera.
-extern "C" void em10CamMove(cEm10* em, int no, f32 rate, int shake)
+void em10CamMove(cEm10* em, int no, f32 rate, int shake)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec v;
@@ -21982,7 +21982,7 @@ static CAMERA em10_campos2_cam = { 0 };
 
 // Picks the second cut-in camera position Campos (1300 units left or right of the player at head
 // height, pulled in front of walls) for em10CamMove2 (the NeckHang throw-off).
-extern "C" void em10SetCampos2(cEm10* em)
+void em10SetCampos2(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec pos;
@@ -22079,7 +22079,7 @@ void em10CamMove2(cEm10* em)
 }
 
 // Critical-hit (head burst / kick) cut-in camera: fixed offsets from the player matrix, optional shake.
-extern "C" void em10CamMoveCri(cEm10* em, u32 no, int shake)
+void em10CamMoveCri(cEm10* em, u32 no, int shake)
 {
     FREE_EM10* w = EM10_WK(em);
     CAMERA* c = &pG->Camera;
@@ -22199,7 +22199,7 @@ extern "C" void em10CamMoveCri(cEm10* em, u32 no, int shake)
 
 // Cut-in camera of NeckHang_Ashley (`no` 0..3 = the viewpoints of the hold and the throw-off),
 // pulled in front of walls, installed as the extra camera.
-extern "C" void em10CamMoveAshley(cEm10* em, u32 no)
+void em10CamMoveAshley(cEm10* em, u32 no)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -22755,7 +22755,7 @@ void em10SetDashMotion(cEm10* em)
 // Dash_wait runs; a headless one always dashes, Character 3 stays instead; otherwise when the player
 // is far enough (3500 units, 2000 above rank 6), seen, and (below rank 7) looking away; also no more
 // than N others already dashing. Sets Dash (0x11) and returns 1.
-extern "C" int em10DashCk(cEm10* em)
+int em10DashCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     u32 i;
@@ -22873,7 +22873,7 @@ extern "C" int em10DashCk(cEm10* em)
 // the guard range (Character 0), when the partner-chasers are enough (em10GoSubStayCk), or when too
 // many others are already close to the player (rank-dependent count); the tower rooms (101 / 111 /
 // 400) send it to one of four waiting points instead. Headless / lit-dynamite Ganados dash. 1 when set.
-extern "C" int em10StayCk(cEm10* em)
+int em10StayCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     u32 i;
@@ -22981,7 +22981,7 @@ extern "C" int em10StayCk(cEm10* em)
 
 // For a Ganado chasing the partner (flag 0x08000000): Stay (0x1B) when enough others are already
 // nearer to her (2 / 4 by rank) and it is itself far from her (4000..12000 by count / character). 1 when set.
-extern "C" int em10GoSubStayCk(cEm10* em)
+int em10GoSubStayCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     u32 cnt;
@@ -23401,7 +23401,7 @@ int em10AtkCk(cEm10* em, Vec* a, Vec* b, int no, int parts)
 // One gatling burst from the gun part 10 (muzzle effect / SE): a 50000-unit line with random spread
 // hits the player (PlWepHitCheck2 kind 0xC, Em10AtkTbl[15] damage, blood, vibration, quake) or the
 // scenery (bullet hit effect + EspSetGatling tracer). 1 = the player was hit.
-extern "C" int em10GatlingHitCk(cEm10* em)
+int em10GatlingHitCk(cEm10* em)
 {
     Vec a;
     Vec b;
@@ -23456,7 +23456,7 @@ extern "C" int em10GatlingHitCk(cEm10* em)
 
 // The claw swings (attack 0xD / 0xE) break the church bell object (cObjBell id 0x14) when the sweep
 // point passes within range + 300 of its bell part (room 218).
-extern "C" void em10BellAtkCk(cEm10* em, Vec* pos, u32 no)
+void em10BellAtkCk(cEm10* em, Vec* pos, u32 no)
 {
     ATK_INFO info = Em10AtkTbl[no];
     cObjBell* o;
@@ -23494,7 +23494,7 @@ extern "C" void em10BellAtkCk(cEm10* em, Vec* pos, u32 no)
 
 // Torch swing hit on the player: the flame within Em10AtkTbl[0x11] range in front sets him on fire
 // (plemDmFrame damage routine, ctrl12 NOT_NEAR 30). 1 = hit.
-extern "C" int em10TorchFrameAtkCk(cEm10* em)
+int em10TorchFrameAtkCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Mtx m;
@@ -23523,7 +23523,7 @@ extern "C" int em10TorchFrameAtkCk(cEm10* em)
 }
 
 // Torch swing hit on the partner: registers a burn damage (kind 0x18) on her cDmgInfo. 1 = hit.
-extern "C" int em10TorchFrameAtkCkSub(cEm10* em)
+int em10TorchFrameAtkCkSub(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Mtx inv;
@@ -23805,7 +23805,7 @@ static void plemDmStun(cPlayer* pl)
 // Routine set the moment the Ganado finds the player (em10FindCk): marks him found (setFindPL),
 // re-arms the bowgun / drops the spare, ignition / claw checks, then the Find shout (0x0D, only one
 // Ganado at a time and only when the player looks at it), Turn180 when he is behind, else the walk.
-extern "C" void em10SetRtnFind(cEm10* em)
+void em10SetRtnFind(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     int r;
@@ -24065,7 +24065,7 @@ void cEm10::setSwitch(cModel* sw)
 // Offers the melee action button (kick / suplex ...) on a staggered Ganado: alive, the player facing
 // it within 60 deg at melee range with a clear line; the button kind and reach depend on the player
 // character (Leon / Ada / HUNK / Krauser / Wesker) and on a parasite being out.
-extern "C" void em10ActEvtSetKick(cEm10* em)
+void em10ActEvtSetKick(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -24376,7 +24376,7 @@ static void plem10Kick2(cPlayer* pl)
 
 // Offers the suplex / knee kick action button on a Ganado that is bent over (Dm_Small hit zone /
 // knee): alive, the player behind it within 60 deg at melee range with a clear line.
-extern "C" void em10ActEvtSetFS(cEm10* em)
+void em10ActEvtSetFS(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec a;
@@ -24785,7 +24785,7 @@ static void em10TradeAction(cEm10* em)
 
 // Empty in the shipped build; the 0x28 frame is left by two Vec and two f32 locals of the
 // removed camera move (aggregates get their stack slot at declaration in GCC 2.95).
-extern "C" void plem10KickCamMove(cPlayer* pl, int a)
+void plem10KickCamMove(cPlayer* pl, int a)
 {
     Vec pos;
     Vec rot;
@@ -25143,7 +25143,7 @@ void em10FootSe(cEm10* em)
 
 // 1 when no other active Ganado within 3000 units is already bashing a door / window (R1 0x3D / 0x3F):
 // only one attacks the same door at a time.
-extern "C" int em10DootAtkCk(cEm10* em)
+int em10DootAtkCk(cEm10* em)
 {
     u32 i;
 
@@ -25188,7 +25188,7 @@ extern "C" int em10DootAtkCk(cEm10* em)
 
 // 1 when another active Ganado stands in the throwing lane (500 wide, 3000 high) between this one and
 // the player: the thrower / shooter side-steps instead.
-extern "C" int em10ThrowNearCk(cEm10* em)
+int em10ThrowNearCk(cEm10* em)
 {
     Mtx m;
     Vec v;
@@ -25471,7 +25471,7 @@ void cEm10::setLost()
 // Two-motion blend for the aiming poses (bowgun / rocket / gatling): m0 on the main motion work and
 // m1 / m2 on the blend work (Sub_mot) with the work's Hokan / Frame parameters; Blend weights
 // them (EM10_BOWGUN_AIM_RATE).
-extern "C" void em10BlendMotSet(cEm10* em, void* m0, void* m1, void* m2, int a, int b, int c, int d)
+void em10BlendMotSet(cEm10* em, void* m0, void* m1, void* m2, int a, int b, int c, int d)
 {
     FREE_EM10* w = EM10_WK(em);
     MOTION_INFO* bm;
@@ -25506,7 +25506,7 @@ static Vec em10_hide_ofs_l = { -2000.0f, 0.0f, 0.0f };
 // Looks for an EMI hide point (type 1 entries: sub 0 right / 1 left cover, 2 a bowgun perch) near the
 // Ganado (1500..2500 units) that faces the player from more than 5000 away: takes it and hides there
 // (HideSide 0x18 / SitDown 0x1A). 1 when set.
-extern "C" int em10HideRtnCk(cEm10* em)
+int em10HideRtnCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Mtx m;
@@ -25845,7 +25845,7 @@ void em10BowgunMove(cEm10* em)
 
 // "Behind you" tell: a Ganado within 3000 units in front of itself but behind the player's back,
 // who sees him, plays Se_tbl[16] and locks the tell for 300 frames (ctrl12 BACKSIGN) for all.
-extern "C" void em10BehindSeCk(cEm10* em)
+void em10BehindSeCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
 
@@ -25994,7 +25994,7 @@ int em10SetDmVal(cEm10* em)
 }
 
 // Finds the alive truck enemy (id 0x3B) for the driver (pTruck); returns non-NULL when found.
-extern "C" cModel* em10SearchTruck(cEm10* em)
+cModel* em10SearchTruck(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     u32 i;
@@ -26011,7 +26011,7 @@ extern "C" cModel* em10SearchTruck(cEm10* em)
 }
 
 // Looks for an alive em25 parasite already attached to this Ganado (pParasite); 1 when found.
-extern "C" int em10SearchParasite(cEm10* em)
+int em10SearchParasite(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     u32 i;
@@ -26036,7 +26036,7 @@ extern "C" int em10SearchParasite(cEm10* em)
 }
 
 // Releases the em25 parasite from the dying host (hp 1000, v98 with the die-lost flag) and forgets it.
-extern "C" void em10ParasiteGoOut(cEm10* em)
+void em10ParasiteGoOut(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
 
@@ -26131,7 +26131,7 @@ void em10SetDmWaterEff(cEm10* em, int a)
 
 // Picks the TakeAway exit: the EMI type 5 sub 0 point (state = route id) reachable from here that
 // lies most directly away from the player (else the nearest), into Route_target.
-extern "C" void em10SetTakeawayPos(cEm10* em)
+void em10SetTakeawayPos(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     Vec best;
@@ -26247,7 +26247,7 @@ extern "C" void em10SetTakeawayPos(cEm10* em)
 
 // While carrying Ashley: passing an EMI type 5 sub 1 waypoint (within 4000, same height) redirects
 // Route_target to the exit (sub 0) of the same route state.
-extern "C" void em10SetTakeawayPosUpdate(cEm10* em)
+void em10SetTakeawayPosUpdate(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     u32 i;
@@ -26293,7 +26293,7 @@ extern "C" void em10SetTakeawayPosUpdate(cEm10* em)
 
 // Guard Ganados (Character 1 / 3): reaching an EMI type 0xC "return" point within 3000 units makes
 // them stop there (Stay 0x1B, flag 0x20000000 = returned, Return_ck_pos). 1 when set.
-extern "C" int em10ReturnPosCk(cEm10* em)
+int em10ReturnPosCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
     EmiData* emi;
@@ -26481,7 +26481,7 @@ void em10SetWaterEff(cEm10* em)
 
 // Guard Ganados (Character 1 / 3) with more than half hp: when the player is out of the guard range
 // (L_pl_guard > Guard_r) and far, go back / stand at the post (Stay 0x1B, flag 0x20000000). 1 when set.
-extern "C" int em10ReturnCk(cEm10* em)
+int em10ReturnCk(cEm10* em)
 {
     FREE_EM10* w = EM10_WK(em);
 
@@ -26567,7 +26567,7 @@ void em10BombNeckMove(cEm10* em)
 }
 
 // 1 when the Ganado's root or head is inside the 512 x 448 screen (attacks below rank 4 need it).
-extern "C" int em10ScreenInCk(cEm10* em)
+int em10ScreenInCk(cEm10* em)
 {
     Vec scr;
     Vec pos;
@@ -26585,7 +26585,7 @@ extern "C" int em10ScreenInCk(cEm10* em)
 
 // Is the throw / shot line from the Ganado's chest to the player's chest (at most 5000 units) clear of
 // scenario walls (attribute mask 0x404000): 1 = clear.
-extern "C" int em10ThrowScaCk(cEm10* em)
+int em10ThrowScaCk(cEm10* em)
 {
     Vec a;
     Vec b;
@@ -26609,7 +26609,7 @@ extern "C" int em10ThrowScaCk(cEm10* em)
 
 // Are the two lanes 300 units left / right of the Ganado, 5000 ahead at 2000 height, free of walls
 // (the dynamite arc): 1 = clear.
-extern "C" int em10BombThrowScaCk(cEm10* em)
+int em10BombThrowScaCk(cEm10* em)
 {
     Vec a;
     Vec b;
@@ -26638,7 +26638,7 @@ extern "C" int em10BombThrowScaCk(cEm10* em)
 
 // Attack cooldown by rank (30 / 45 / 75 frames for rank > 3 / <= 3 / <= 1) into Atk_wait; `set`
 // also writes it to the room's ctrl12 slots 6 / 8 (the catch attacks lock everybody).
-extern "C" void em10SetAtkWait(cEm10* em, int set)
+void em10SetAtkWait(cEm10* em, int set)
 {
     FREE_EM10* w = EM10_WK(em);
     int t = 30;
@@ -26756,7 +26756,7 @@ int em10FindLostCk(cEm10* em)
 // The player's head comes off (chainsaw / claw kills): in the overseas versions hides his head model
 // (setHead 0) and spawns it as a cObj01 flying off the neck part 3 with the blood effect; the Japanese
 // version (pSys->eff_country 0) only plays the blood effect and death SE.
-extern "C" void em10PlHeadLost()
+void em10PlHeadLost()
 {
     Vec v;
     Vec ofs;
@@ -27257,7 +27257,7 @@ int cEm10::ckR305BomberEnable()
 
 // During a fall: when the path pos_old -> pos crosses a water surface (EatMgr effect attribute)
 // plays the water entry effect / SE there.
-extern "C" void em10FallWaterCk(cEm10* em)
+void em10FallWaterCk(cEm10* em)
 {
     Vec hit;
     u32 attr;
@@ -27284,7 +27284,7 @@ extern "C" void em10FallWaterCk(cEm10* em)
 
 // Attack strength multiplier of the model type (1.0 for the plain villagers, up to the stronger
 // castle / island types) applied to Em10AtkTbl damage and the strangle drain.
-extern "C" f32 em10GetPower(cEm10* em)
+f32 em10GetPower(cEm10* em)
 {
     f32 p = 1.0f;
 

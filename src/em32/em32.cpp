@@ -105,11 +105,9 @@ static void plemDivide(cPlayer* pl);
 
 // The player callbacks that emwep.h also declares carry C linkage here (the module's own local
 // copies keep the unmangled names in the REL symbol table).
-extern "C" {
 static void plemSit(cPlayer* pl);
 static void plemBackjump(cPlayer* pl);
 static void plemEscape(cPlayer* pl);
-}
 
 #define VIB_TBL ((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore))
 

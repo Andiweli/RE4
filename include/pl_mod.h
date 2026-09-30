@@ -102,7 +102,7 @@ public:
     void transMove();
 };
 
-extern "C" void setTexRender(cModelInfo* info);   // pl0a pl_klauser.cpp
+void setTexRender(cModelInfo* info);   // pl0a pl_klauser.cpp
 
 // pl0d (D:/Bio4/Prog/pl_wesker.cpp): Wesker, the Leon model set with a MemAlloc'd jacket chain.
 class cPlWesker : public cPlayer {

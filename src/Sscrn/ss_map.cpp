@@ -13,7 +13,7 @@
 // inlines are therefore instantiated BEFORE atari.h: LightSetModel2 (the module's second copy,
 // its address is taken in mapModelDisp) and the ~Widget instantiation through `delete`. The
 // .rodata vtable order is unaffected (Widget's vtable still follows SsMapInit's).
-extern "C" inline void LightSetModel2(cModel* m)
+inline void LightSetModel2(cModel* m)
 {
     LightMgr.setModel2(m);
 }
@@ -177,7 +177,6 @@ public:
     virtual void move(SUB_SCREEN* wk);
 };
 
-extern "C" {
 int getStageNo();
 int getAreaNo(u32 room);
 void mapInitViewport(SUB_SCREEN* wk);
@@ -253,7 +252,6 @@ int scf_check_typewriter();
 void sscrn_map_out_init(SUB_SCREEN* wk);
 int mapModeCheck(SUB_SCREEN* wk, s8 no);
 void mapModeChange(SUB_SCREEN* wk, s8 no);
-}
 
 static int sscrn_map_out(SUB_SCREEN* wk);
 static void setViewport(MapViewport* vp);

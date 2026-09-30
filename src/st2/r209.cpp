@@ -205,7 +205,7 @@ static int r209_unused = 0;
 static void r209_LeaderAction();
 static void r209_LeaderPointAtPlayer();
 static void r209_LeaderPointAtPlayerEndProc();
-extern "C" void r209_LeaderMoveToPoint(int no, int flag);
+void r209_LeaderMoveToPoint(int no, int flag);
 static void r209_ToPoint1F();
 static void r209_ToPoint2FOut();
 static void r209_DoorOpen1F(int no);
@@ -232,25 +232,25 @@ static void r209_BridgeAppearCheckEnd();
 static void r209_OpenPicture(int no);
 static void r209_OpenPictureEndProc();
 static void r209_ClosePicture();
-extern "C" void r209_BowgunCtrl();
-extern "C" void r209_BowgunActionSet1(int i, int flag, int pt);
-extern "C" void r209_BowgunActionSet2(int i, int flag, int pt);
-extern "C" void r209_BowgunActionSet3(int i, int flag, int pt);
-extern "C" void r209_BowgunActionSet4(int i, int flag, int pt);
+void r209_BowgunCtrl();
+void r209_BowgunActionSet1(int i, int flag, int pt);
+void r209_BowgunActionSet2(int i, int flag, int pt);
+void r209_BowgunActionSet3(int i, int flag, int pt);
+void r209_BowgunActionSet4(int i, int flag, int pt);
 static void r209_BowgunMove();
 static void Evt_R209S00_Func(Event* evt);
 static void r209_PanelPuzzle();
-extern "C" void r209_PanelRotate(cObj** tbl);
-extern "C" void r209_PanelPazzleEnd();
-extern "C" void r209_PanelPazzleEndEndProc();
+void r209_PanelRotate(cObj** tbl);
+void r209_PanelPazzleEnd();
+void r209_PanelPazzleEndEndProc();
 static void r209_PanelMes(int no);
 static void r209_StrStopReqFunc(int atNo);
 static void r209_RotateDoor(int no);
 static void r209_TreasureBoxOpen(int id);
 static void r209_TreasureBoxOpened(int id);
 static void r209_StrPlayCk();
-extern "C" int r209_InPlaceCheck(cModel* m);
-extern "C" int r209_GanadoSnipeCheck(cEmWrap* w);
+int r209_InPlaceCheck(cModel* m);
+int r209_GanadoSnipeCheck(cEmWrap* w);
 
 // Room init (the gallery): the room doors, the salon key door, the leader chase, the bridge panel
 // puzzle, the item events and the battle stream.
@@ -486,7 +486,7 @@ void R209Main()
 }
 
 // 0 while the model stands inside one of the three "in place" areas.
-extern "C" int r209_InPlaceCheck(cModel* m)
+int r209_InPlaceCheck(cModel* m)
 {
     if (SceAtCheckHitModel(5, m)) {
         return 0;
@@ -498,7 +498,7 @@ extern "C" int r209_InPlaceCheck(cModel* m)
 }
 
 // 1 while the player's laser sight points at the enemy.
-extern "C" int r209_GanadoSnipeCheck(cEmWrap* w)
+int r209_GanadoSnipeCheck(cEmWrap* w)
 {
     if (w->isActive()) {
         cEm* em = w->getPtr();
@@ -597,7 +597,7 @@ static void r209_LeaderPointAtPlayerEndProc()
 }
 
 // Send the leader to r209_leaderPoint[no] with goto mode `flag` (1 run, 8 taunt walk).
-extern "C" void r209_LeaderMoveToPoint(int no, int flag)
+void r209_LeaderMoveToPoint(int no, int flag)
 {
     r209_work->leaderPointNo = no;
     r209_work->leader.setGoto(&r209_leaderPoint[no], flag);
@@ -1483,7 +1483,7 @@ static void r209_ClosePicture()
 // Every frame of the second battle: the bowgun enemies on the balcony are sent to the position
 // facing the area the player stands in (atOn bits 128..131 = the four sides, bits 0/2/4/6 = the
 // near half of each side).
-extern "C" void r209_BowgunCtrl()
+void r209_BowgunCtrl()
 {
     R209Work* wp = r209_work;
     u32 n = wp->snipeCnt;
@@ -1590,7 +1590,7 @@ extern "C" void r209_BowgunCtrl()
 
 // Path of sniper `i` toward position `pt` when the player is on side 0: the corner waypoints
 // (r209_bowgunPos2) are inserted by the side the enemy stands on (atCur bits 8 + i * 8 ..).
-extern "C" void r209_BowgunActionSet1(int i, int flag, int pt)
+void r209_BowgunActionSet1(int i, int flag, int pt)
 {
     R209Em* e = &r209_work->em[r209_work->snipeIdx[i]];
     u32* at;
@@ -1631,7 +1631,7 @@ extern "C" void r209_BowgunActionSet1(int i, int flag, int pt)
 
 // Bowgun Ganado `i` (snipeIdx) gets path variant 2 toward balcony point `pt`: the way points of
 // r209_bowgunPos2 / r209_bowgunPos chosen by which side `pt` is on; the path restarts.
-extern "C" void r209_BowgunActionSet2(int i, int flag, int pt)
+void r209_BowgunActionSet2(int i, int flag, int pt)
 {
     R209Em* e = &r209_work->em[r209_work->snipeIdx[i]];
     int cnt = 0;
@@ -1661,7 +1661,7 @@ extern "C" void r209_BowgunActionSet2(int i, int flag, int pt)
 }
 
 // Bowgun Ganado `i` gets path variant 3 toward `pt` (the other side's way points).
-extern "C" void r209_BowgunActionSet3(int i, int flag, int pt)
+void r209_BowgunActionSet3(int i, int flag, int pt)
 {
     R209Em* e = &r209_work->em[r209_work->snipeIdx[i]];
     u32* at;
@@ -1701,7 +1701,7 @@ extern "C" void r209_BowgunActionSet3(int i, int flag, int pt)
 }
 
 // Bowgun Ganado `i` gets path variant 4 toward `pt`.
-extern "C" void r209_BowgunActionSet4(int i, int flag, int pt)
+void r209_BowgunActionSet4(int i, int flag, int pt)
 {
     R209Em* e = &r209_work->em[r209_work->snipeIdx[i]];
     u32* at;
@@ -1920,7 +1920,7 @@ static void r209_PanelPuzzle()
 }
 
 // Turns the panels of `tbl` half a turn and flips their state.
-extern "C" void r209_PanelRotate(cObj** tbl)
+void r209_PanelRotate(cObj** tbl)
 {
     f32 t = 0.0f;
     u32 i;
@@ -1946,7 +1946,7 @@ extern "C" void r209_PanelRotate(cObj** tbl)
 }
 
 // The solved bridge slides out.
-extern "C" void r209_PanelPazzleEnd()
+void r209_PanelPazzleEnd()
 {
     u32 i;
 
@@ -1973,7 +1973,7 @@ extern "C" void r209_PanelPazzleEnd()
 
 // End of the panel puzzle (also its cancel path): the bridge object snapped to z 14530 with its four
 // panels re-attached, the puzzle areas (0x1E, 0x21, 0x2E..0x31) off.
-extern "C" void r209_PanelPazzleEndEndProc()
+void r209_PanelPazzleEndEndProc()
 {
     u32 i;
 

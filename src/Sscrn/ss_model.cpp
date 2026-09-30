@@ -16,7 +16,6 @@
 #include <stdio.h>
 
 
-extern "C" {
 void wep00Init(int no);
 void wep01Init(int no);
 void wep02Init(int no);
@@ -53,7 +52,6 @@ void wep43Init(int no);
 void wep44Init(int no);
 void wep45Init(int no, int type);
 void wep47Init(int no);
-}
 
 // The player archive (pG->pPlArc) and the weapon data (SUB_SCREEN::x210): both are offset tables.
 #define WEP_ARC(wk, no) SS_ARC_PTR((SsArc*) (wk)->pWepDat, no)

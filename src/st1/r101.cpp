@@ -68,7 +68,7 @@ static const AtEffInfo r101_eff_info = {
 };
 
 static void r101_checkTowerBesieged();
-extern "C" void r101_setFlameBottle(Vec* from, Vec* to);
+void r101_setFlameBottle(Vec* from, Vec* to);
 static void r101_checkEmNum();
 static void r101_Event30_TitleCall();
 static void r101_Event30();
@@ -86,12 +86,12 @@ static void r101_checkDoor102();
 static void r101_DoorDontOpen3();
 static void r101_checkFindPlayer(int mode);
 static void r101_FindPlayer2();
-extern "C" void r101_FindPlayer();
+void r101_FindPlayer();
 static void r101_setChickenFlag();
 static void r101_Event00();
 static void r101_callGanadoVoice();
-extern "C" void Evt_R101S21_Func(Event* e);
-extern "C" void Evt_R101S30_Func(Event* e);
+void Evt_R101S21_Func(Event* e);
+void Evt_R101S30_Func(Event* e);
 
 
 // Clear the death bit of list entry `no` in the loaded enemy list's death words (pG->Em_flg[list]).
@@ -287,7 +287,7 @@ static void r101_checkTowerBesieged()
 }
 
 // A flame bottle (obj 0x01) thrown from `from` to a random point of area 0x15 around `to`.
-extern "C" void r101_setFlameBottle(Vec* from, Vec* to)
+void r101_setFlameBottle(Vec* from, Vec* to)
 {
     const f32 spd = 20.0f;
     Vec dir;
@@ -897,7 +897,7 @@ static void r101_FindPlayer2()
 }
 
 // The fight starts: the doors lock, the three Ganados of the square, the battle stream.
-extern "C" void r101_FindPlayer()
+void r101_FindPlayer()
 {
     RsfSet(G_ROOM_ID, 6);
     ScfFlagOn(pG, SCF_R101_IMPRISON);
@@ -1047,7 +1047,7 @@ static void r101_callGanadoVoice()
 }
 
 // Event r101s21 callback: fetch the etc model et0800 on the first frame (registers it with the event).
-extern "C" void Evt_R101S21_Func(Event* e)
+void Evt_R101S21_Func(Event* e)
 {
     void* mod;
 
@@ -1058,7 +1058,7 @@ extern "C" void Evt_R101S21_Func(Event* e)
 
 // Event r101s30 callback (the church bell rings, the Ganados leave): hides the ladders during the event,
 // hands scroll object 0x39 (scr0000) to the event on cut 0 and puts it back at the end.
-extern "C" void Evt_R101S30_Func(Event* e)
+void Evt_R101S30_Func(Event* e)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};

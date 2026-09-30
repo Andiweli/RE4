@@ -174,7 +174,6 @@ public:
     virtual void move(SUB_SCREEN* wk);
 };
 
-extern "C" {
 void shopClearZ(SUB_SCREEN* wk);
 void setShopMsgQueue(int on);
 void shopStrInit(SUB_SCREEN* wk);
@@ -199,7 +198,6 @@ void setOrientation(int id, cModel* m);
 void dispItem(int id, int sw);
 void screenPos2worldPos(Vec* scr, Vec* out);
 void moveItem();
-}
 
 
 // The shop's own item texture table (ss_item.cpp has the inventory's `itemTexNo`).

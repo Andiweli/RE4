@@ -118,7 +118,6 @@ enum R30F_FLAG {
 
 #define R30F_SAVE_FLAGS (*(u32*) (RoomData.getRoomSavePtr(pG->room_id) + 4))
 
-extern "C" {
 cEm* setem(u8 no, int force);
 void reva_common_move(cObj* obj, f32 lo, f32 hi);
 void EmHitUpdate(cModel* m);
@@ -153,7 +152,6 @@ void addPos_sca(Vec* add, SCE_AT_DATA* at);
 void setLiftMoveAdd(Vec* add);
 static void em_set2();
 static void gate_open();
-}
 
 // Room init (the bulldozer ride). JumpPoint 1..4 skips ahead to that gate, otherwise the ride task
 // starts and the bulldozer (cObjBull, SetBull) is created.

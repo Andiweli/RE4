@@ -18,23 +18,21 @@
 
 // db_port.cpp exports whose prototypes here differ from the definitions (parameter list, order or
 // return type): kept local, the db_port.h prototype would change the call bytes or not compile.
-extern "C" {
-void DB_DrawCursor3D(cEspSeqHead* head, void* seq, f32 size, int col);
-void DB_DrawCross3D(Vec* pos, int col, f32 size);
-void DB_EventCamLoad(int a, int b);
+void DB_DrawCursor3D(cEspSeqHead* head, cEspSeqTbl* gen, int flag, f32 size);
+void DB_DrawCross3D(Vec* pos, Mtx* m, f32 size);
+void DB_EventCamLoad(u8 a, u8 b);
 void DB_GetMouseData(DB_MOUSE* m);
 void EspToolExit(cEspSeqHead* head);
 void EspToolUpdate(DB_KEYBORD* k, u8 no);
 int LightToolExec();
-void sp_sphere(cEspSeqHead* head, void* seq);
-void sp_ctrl01_trans(void* seq);
-void sp_3dgrid_trans(cEspSeqHead* head, void* seq);
-void sp_path_trans(cEspSeqHead* head, void* seq);
-void sp_path_trans2(cEspSeqHead* head, void* seq);
-void sp_nobigenkai_trans(cEspSeqHead* head, void* seq);
-void sp_PosRand_trans(cEspSeqHead* head, void* seq);
-void sp_PosRand_trans_1a(cEspSeqHead* head, void* seq);
-}
+void sp_sphere(cEspSeqHead* head, cEspSeqTbl* seq);
+void sp_ctrl01_trans(cEspSeqTbl* seq);
+void sp_3dgrid_trans(cEspSeqHead* head, cEspSeqTbl* seq);
+void sp_path_trans(cEspSeqHead* head, cEspSeqTbl* seq);
+void sp_path_trans2(cEspSeqHead* head, cEspSeqTbl* seq);
+void sp_nobigenkai_trans(cEspSeqHead* head, cEspSeqTbl* seq);
+void sp_PosRand_trans(cEspSeqHead* head, cEspSeqTbl* seq);
+void sp_PosRand_trans_1a(cEspSeqHead* head, cEspSeqTbl* seq);
 extern void* g_EspToolSeqHedAddr;  // eff_sys.cpp (static there; the REL link resolves the local symbol)
 
 void* __builtin_new(u32 size) { return Debug_alloc(size, 1); }
@@ -6100,7 +6098,7 @@ void DrawPosCursor()
             if (g_pBasePosWin->win->select) col = 1;
             size = 1.0f;
             if (g_pEditActive == g_pEditWin1 && sel->selX == 3) size = 100.0f;
-            DB_DrawCursor3D(g_pSeqHead, g_pEditSeq, size, col);
+            DB_DrawCursor3D(g_pSeqHead, (cEspSeqTbl*) g_pEditSeq, col, size);
         }
     }
     if (g_pEditSeq->id == 0xFE && g_pEditActive == g_pEditWin3 && sel->selX == 0) {
@@ -6198,15 +6196,15 @@ void ToolEspMain()
             DB_ACTIVE_SELECT* sel;
             if (g_pEditSeq->id == 0xE || g_pEditSeq->id == 0x4A || g_pEditSeq->id == 0x45) {
                 DB_ACTIVE_SELECT* s = &WIN_SEL(g_pEditActive);
-                if (g_pEditActive == g_pEditWin3 && s->selX == 0) sp_sphere(g_pSeqHead, g_pEditSeq);
+                if (g_pEditActive == g_pEditWin3 && s->selX == 0) sp_sphere(g_pSeqHead, (cEspSeqTbl*) g_pEditSeq);
             }
             if (g_pEditSeq->genId == 1 || g_pEditSeq->id == 0xE) {
                 DB_ACTIVE_SELECT* s = &WIN_SEL(g_pEditActive);
-                if (g_pEditActive == g_pEditWin3 && s->selX == 2) sp_ctrl01_trans(g_pEditSeq);
+                if (g_pEditActive == g_pEditWin3 && s->selX == 2) sp_ctrl01_trans((cEspSeqTbl*) g_pEditSeq);
             }
-            if (g_pEditSeq->flags & 1) sp_3dgrid_trans(g_pSeqHead, g_pEditSeq);
-            if (g_pEditSeq->id == 6) sp_path_trans(g_pSeqHead, g_pEditSeq);
-            if (g_pEditSeq->genId == 2) sp_path_trans2(g_pSeqHead, g_pEditSeq);
+            if (g_pEditSeq->flags & 1) sp_3dgrid_trans(g_pSeqHead, (cEspSeqTbl*) g_pEditSeq);
+            if (g_pEditSeq->id == 6) sp_path_trans(g_pSeqHead, (cEspSeqTbl*) g_pEditSeq);
+            if (g_pEditSeq->genId == 2) sp_path_trans2(g_pSeqHead, (cEspSeqTbl*) g_pEditSeq);
             {
                 DB_ACTIVE_SELECT* s = &WIN_SEL(g_pIdWin);
                 if (g_pIdWin->win->select && s->selX == 0 && s->selY == 3) sp_tex_trans(g_pEditSeq->tex);
@@ -6215,12 +6213,12 @@ void ToolEspMain()
                 DB_ACTIVE_SELECT* s = &WIN_SEL(g_pColorWin);
                 if (g_pColorWin->win->select && s->selX == 2 && s->selY == 3) sp_tex_trans(g_pEditSeq->maskTex);
             }
-            if (g_pEditSeq->id == 0x14) sp_nobigenkai_trans(g_pSeqHead, g_pEditSeq);
+            if (g_pEditSeq->id == 0x14) sp_nobigenkai_trans(g_pSeqHead, (cEspSeqTbl*) g_pEditSeq);
             sel = &WIN_SEL(g_pEditActive);
-            if (g_pEditActive == g_pEditWin1 && sel->selX == 4) sp_PosRand_trans(g_pSeqHead, g_pEditSeq);
+            if (g_pEditActive == g_pEditWin1 && sel->selX == 4) sp_PosRand_trans(g_pSeqHead, (cEspSeqTbl*) g_pEditSeq);
             if (g_pEditSeq->id == 0x1A) {
                 if ((g_pEditActive == g_pEditWin1 && sel->selX == 3) || (g_pEditActive == g_pEditWin4 && sel->selX == 0)) {
-                    sp_PosRand_trans_1a(g_pSeqHead, g_pEditSeq);
+                    sp_PosRand_trans_1a(g_pSeqHead, (cEspSeqTbl*) g_pEditSeq);
                 }
             }
         }

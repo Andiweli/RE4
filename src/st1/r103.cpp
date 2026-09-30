@@ -58,17 +58,17 @@ static const AtEffInfo r103_eff_info = {
 };
 
 static void r103_getFile();
-extern "C" void r103_openShelf_main(R103Shelf* s, int opened);
-extern "C" void r103_openedShelf(R103Shelf* s);
-extern "C" void r103_openShelf(R103Shelf* s);
-extern "C" void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8, void* m9);
-extern "C" void r103_setSubMissionTarget(u32 objNo);
+void r103_openShelf_main(R103Shelf* s, int opened);
+void r103_openedShelf(R103Shelf* s);
+void r103_openShelf(R103Shelf* s);
+void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8, void* m9);
+void r103_setSubMissionTarget(u32 objNo);
 static void r103_execOpenCover(R103Cesspit* c);
 static void r103_checkCloseCover(R103Cesspit* c);
-extern "C" void r103_checkCesspit0(R103Cesspit* c);
-extern "C" void r103_checkCesspit1(R103Cesspit* c);
-extern "C" void r103_checkCesspit2(R103Cesspit* c);
-extern "C" void r103_initCesspit(R103Cesspit* c);
+void r103_checkCesspit0(R103Cesspit* c);
+void r103_checkCesspit1(R103Cesspit* c);
+void r103_checkCesspit2(R103Cesspit* c);
+void r103_initCesspit(R103Cesspit* c);
 static void r103_BgmStartCheck();
 
 // Room init (in st1_1 and st1_3): the ten corpse models only outside region 0 (Japan hides them and
@@ -125,7 +125,7 @@ static void r103_getFile()
 }
 
 // Open shelf `s` (opened != 0: already open): the two doors turn 110 degrees over 30 frames.
-extern "C" void r103_openShelf_main(R103Shelf* s, int opened)
+void r103_openShelf_main(R103Shelf* s, int opened)
 {
     cObj* a;
     cObj* b;
@@ -170,19 +170,19 @@ extern "C" void r103_openShelf_main(R103Shelf* s, int opened)
 }
 
 // Item-event "already opened": pose shelf `s` open without the animation.
-extern "C" void r103_openedShelf(R103Shelf* s)
+void r103_openedShelf(R103Shelf* s)
 {
     r103_openShelf_main(s, 1);
 }
 
 // Item-event opener: animate shelf `s` open when its item is taken.
-extern "C" void r103_openShelf(R103Shelf* s)
+void r103_openShelf(R103Shelf* s)
 {
     r103_openShelf_main(s, 0);
 }
 
 // The ten corpses: scroll objects with the corpse parts models and a motion, darkened by a third.
-extern "C" void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8, void* m9)
+void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8, void* m9)
 {
     cEm em;
     // The ctor's `this` pseudo (`addi r3, r1, 8; mr r29, r3`) is what the original addresses subArc
@@ -236,7 +236,7 @@ extern "C" void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4,
 }
 
 // The sub-mission target (etc item 0x13) hangs on scroll object `objNo` until it is taken.
-extern "C" void r103_setSubMissionTarget(u32 objNo)
+void r103_setSubMissionTarget(u32 objNo)
 {
     cEmItem* item;
     u16* flg;
@@ -351,7 +351,7 @@ static inline void r103_moveItemModel(SCE_AT_DATA* at, SCE_AT_DATA* at2)
 }
 
 // Cesspit state 0: the cover is still closed; the item found in it moves onto the lid.
-extern "C" void r103_checkCesspit0(R103Cesspit* c)
+void r103_checkCesspit0(R103Cesspit* c)
 {
     SCE_AT_DATA* at;
 
@@ -381,7 +381,7 @@ extern "C" void r103_checkCesspit0(R103Cesspit* c)
 }
 
 // Cesspit state 1: the cover is open; the item area follows the found / taken flags.
-extern "C" void r103_checkCesspit1(R103Cesspit* c)
+void r103_checkCesspit1(R103Cesspit* c)
 {
     SCE_AT_DATA* at;
 
@@ -421,7 +421,7 @@ extern "C" void r103_checkCesspit1(R103Cesspit* c)
 }
 
 // Cesspit state 2: the lid is open; the item found moves onto the lid.
-extern "C" void r103_checkCesspit2(R103Cesspit* c)
+void r103_checkCesspit2(R103Cesspit* c)
 {
     SCE_AT_DATA* at;
 
@@ -438,7 +438,7 @@ extern "C" void r103_checkCesspit2(R103Cesspit* c)
 }
 
 // Cesspit setup from the saved state.
-extern "C" void r103_initCesspit(R103Cesspit* c)
+void r103_initCesspit(R103Cesspit* c)
 {
     SCE_AT_DATA* at;
 

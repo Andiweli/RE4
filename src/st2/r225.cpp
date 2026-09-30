@@ -56,7 +56,7 @@ static void r225_moveGrave(int dir);
 static void r225_checkGrave();
 static void first_cut_exit();
 static void first_cut();
-extern "C" void SceElevator_r225(ElevatorParam* d);
+void SceElevator_r225(ElevatorParam* d);
 
 // Room init: until the crank was turned (Room_flg bit 0) area 4 = the crank with areas 5/6 off and 0xA
 // on, else the raised layout (plate object 0x27 moved); until the key door is open (bit 1) area 0xC =

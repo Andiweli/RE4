@@ -45,14 +45,14 @@ section	offset	size	unit	scope	name	demangled
 .text	0x000054DC	0xE8	t_emlist/t_emlist.cpp	global	emlist_set_fname__FPcii	emlist_set_fname
 .text	0x000055C4	0x394	t_emlist/t_emlist.cpp	global	emlist_EmDir_disp__Fv	emlist_EmDir_disp
 .text	0x00005958	0x168	t_emlist/t_emlist.cpp	global	emlist_catch_em__Fv	emlist_catch_em
-.text	0x00005AC0	0x114	t_emlist/t_emlist.cpp	global	emlist_em_move_to_cursor__Fv	emlist_em_move_to_cursor
+.text	0x00005AC0	0x114	t_emlist/t_emlist.cpp	global	emlist_em_move_to_cursor__Fv__FP9EmListEnt	emlist_em_move_to_cursor
 .text	0x00005BD4	0x60	t_emlist/t_emlist.cpp	global	emlist_get_numof_str__FPPCc	emlist_get_numof_str
 .text	0x00005C34	0x1B8	t_emlist/t_emlist.cpp	global	emlistCameraMove__Fv	emlistCameraMove
 .text	0x00005DEC	0x2A0	t_emlist/t_emlist.cpp	global	emlistCamToPoin__Fv	emlistCamToPoin
 .text	0x0000608C	0xE8	t_emlist/t_emlist.cpp	global	emlistCursorToTarget__Fv	emlistCursorToTarget
 .text	0x00006174	0xBC	t_emlist/t_emlist.cpp	global	countActiveWork__t8cManager1Z6cLight	cManager<cLight>::countActiveWork
 .text	0x00006230	0x158	t_emlist/t_emlist.cpp	global	create__t8cManager1Z6cLighti	cManager<cLight>::create
-.text	0x00006388	0x90	t_emlist/t_prim.cpp	global	TprimInitEnv2D3D__FP9TprimViewPA3_fT1	TprimInitEnv2D3D
+.text	0x00006388	0x90	t_emlist/t_prim.cpp	global	TprimInitEnv2D3D__FPfPA3_fT1	TprimInitEnv2D3D
 .text	0x00006418	0x90	t_emlist/t_prim.cpp	global	TprimDraw2D__FUl	TprimDraw2D
 .text	0x000064A8	0x50	t_emlist/t_prim.cpp	global	TprimDraw3D__FUl	TprimDraw3D
 .text	0x000064F8	0x58	t_emlist/t_prim.cpp	global	TprimSetBlend__FUl	TprimSetBlend

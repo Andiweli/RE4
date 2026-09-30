@@ -111,7 +111,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00007B88	0x90	st2_2/r213.cpp	local	R213EventBridgeDownEnd__Fv	R213EventBridgeDownEnd
 .text	0x00007C18	0x64	st2_2/r213.cpp	local	SceBgmCheck__Fv	SceBgmCheck
 .text	0x00007C7C	0xC0	st2_2/r213.cpp	local	R213Event__Fv	R213Event
-.text	0x00007D3C	0x410	st2_2/r213.cpp	global	Evt_R213S00_Func	Evt_R213S00_Func
+.text	0x00007D3C	0x410	st2_2/r213.cpp	global	Evt_R213S00_Func__FP5Event	Evt_R213S00_Func
 .text	0x0000814C	0x77C	st2_2/r214.cpp	global	R214Init__Fv	R214Init
 .text	0x000088C8	0xD0	st2_2/r214.cpp	global	R214Main__Fv	R214Main
 .text	0x00008998	0x94	st2_2/r214.cpp	local	r214_execEvent00__Fv	r214_execEvent00
@@ -139,11 +139,11 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000ADE4	0x3B8	st2_2/r214.cpp	global	fn_st2_2_ADE4	.
 .text	0x0000B19C	0x124	st2_2/r215.cpp	global	R215Init__Fv	R215Init
 .text	0x0000B2C0	0x4	st2_2/r215.cpp	global	R215Main__Fv	R215Main
-.text	0x0000B2C4	0x188	st2_2/r215.cpp	global	R215_Event	R215_Event
+.text	0x0000B2C4	0x188	st2_2/r215.cpp	global	R215_Event__Fv	R215_Event
 .text	0x0000B44C	0x18	st2_2/r215.cpp	local	r215_succeedAction__Fv	r215_succeedAction
-.text	0x0000B464	0x420	st2_2/r215.cpp	global	Evt_R215S00_Func	Evt_R215S00_Func
-.text	0x0000B884	0x46C	st2_2/r215.cpp	global	Evt_R215S01_Func	Evt_R215S01_Func
-.text	0x0000BCF0	0x4	st2_2/r215.cpp	global	Evt_R215S02_Func	Evt_R215S02_Func
+.text	0x0000B464	0x420	st2_2/r215.cpp	global	Evt_R215S00_Func__FP5Event	Evt_R215S00_Func
+.text	0x0000B884	0x46C	st2_2/r215.cpp	global	Evt_R215S01_Func__FP5Event	Evt_R215S01_Func
+.text	0x0000BCF0	0x4	st2_2/r215.cpp	global	Evt_R215S02_Func__FP5Event	Evt_R215S02_Func
 .text	0x0000BCF4	0x3B8	st2_2/r215.cpp	global	fn_st2_2_BCF4	.
 .text	0x0000C0AC	0x1B8	st2_2/r216.cpp	global	R216Init__Fv	R216Init
 .text	0x0000C264	0x58	st2_2/r216.cpp	global	R216Main__Fv	R216Main
@@ -186,7 +186,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000E640	0x1B4	st2_2/r217.cpp	local	r217_Puzzle_exit__Fv	r217_Puzzle_exit
 .text	0x0000E7F4	0x528	st2_2/r217.cpp	local	r217_Puzzle__Fv	r217_Puzzle
 .text	0x0000ED1C	0x1D0	st2_2/r217.cpp	local	r217_hikkakari_move__Fv	r217_hikkakari_move
-.text	0x0000EEEC	0xC8	st2_2/r217.cpp	global	SwitchExec	SwitchExec
+.text	0x0000EEEC	0xC8	st2_2/r217.cpp	global	SwitchExec__FP4cObjPfiff	SwitchExec
 .text	0x0000EFB4	0x3B8	st2_2/r217.cpp	global	fn_st2_2_EFB4	.
 .text	0x0000F36C	0x2A8	st2_2/r218.cpp	global	R218Init__Fv	R218Init
 .text	0x0000F614	0x4	st2_2/r218.cpp	global	R218Main__Fv	R218Main

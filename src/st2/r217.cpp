@@ -86,7 +86,7 @@ void KakuzaiMove(f32 dy);
 static void r217_Puzzle_exit();
 static void r217_Puzzle();
 static void r217_hikkakari_move();
-extern "C" int SwitchExec(cObj* obj, f32* spd, int no, f32 lim, f32 cur);
+int SwitchExec(cObj* obj, f32* spd, int no, f32 lim, f32 cur);
 
 
 // The scaffold objects keep their scale in the first Vec of the object work.
@@ -561,7 +561,7 @@ static void r217_hikkakari_move()
 }
 
 // Turns the lever's parts towards `lim` with the accelerating speed `*spd`; 1 when it arrived (r10c).
-extern "C" int SwitchExec(cObj* obj, f32* spd, int no, f32 lim, f32 cur)
+int SwitchExec(cObj* obj, f32* spd, int no, f32 lim, f32 cur)
 {
     int dir;
 

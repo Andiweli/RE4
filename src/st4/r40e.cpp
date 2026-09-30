@@ -60,7 +60,7 @@ static void r40e_execEmAppear();
 static void r40e_checkEmDead();
 static void R40EExecEventS00();
 static void gameResult();
-extern "C" void Evt_R40ES00_Func(Event* e);
+void Evt_R40ES00_Func(Event* e);
 void EvtTexRenderCamTrans(Event* e, int cut);
 
 // Room init: the elevator; until the fight is over (Room_flg bit 2) area 4 = the enemy's appearance
@@ -433,7 +433,7 @@ static void gameResult()
 // Event r40es00 callback (Assignment Ada's ending): far clip pushed out, Status_flg[1] 0x800; cut 0
 // sets the pl0d00 / pl0c00 / evmb900 light masks and shows Ada's chained child; cuts 3/5/7 feed the
 // render-to-texture pass with the evmc100 model; the end restores.
-extern "C" void Evt_R40ES00_Func(Event* e)
+void Evt_R40ES00_Func(Event* e)
 {
     void* mod;
 

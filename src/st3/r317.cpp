@@ -121,21 +121,21 @@ static void R317EventS11Action();
 static void R317EventS01Action();
 static void R317EventS03Action();
 void R317SmdAllOn();
-extern "C" void Evt_R317S00_Func(Event* e);
-extern "C" void Evt_R317S01_Func(Event* e);
-extern "C" void Evt_R317S02_Func(Event* e);
-extern "C" void Evt_R317S03_Func(Event* e);
-extern "C" void Evt_R317S04_Func(Event* e);
-extern "C" void Evt_R317S05_Func(Event* e);
-extern "C" void Evt_R317S06_Func(Event* e);
-extern "C" void Evt_R317S07_Func(Event* e);
-extern "C" void Evt_R317S08_Func(Event* e);
-extern "C" void Evt_R317S09_Func(Event* e);
-extern "C" void Evt_R317S10_Func(Event* e);
-extern "C" void Evt_R317S11_Func(Event* e);
-extern "C" void Evt_R317S12_Func(Event* e);
-extern "C" void Evt_R317S13_Func(Event* e);
-extern "C" void Evt_R317S14_Func(Event* e);
+void Evt_R317S00_Func(Event* e);
+void Evt_R317S01_Func(Event* e);
+void Evt_R317S02_Func(Event* e);
+void Evt_R317S03_Func(Event* e);
+void Evt_R317S04_Func(Event* e);
+void Evt_R317S05_Func(Event* e);
+void Evt_R317S06_Func(Event* e);
+void Evt_R317S07_Func(Event* e);
+void Evt_R317S08_Func(Event* e);
+void Evt_R317S09_Func(Event* e);
+void Evt_R317S10_Func(Event* e);
+void Evt_R317S11_Func(Event* e);
+void Evt_R317S12_Func(Event* e);
+void Evt_R317S13_Func(Event* e);
+void Evt_R317S14_Func(Event* e);
 
 // Room init (the Krauser knife fight): hard mode after more than one continue (r_continue_cnt); a larger
 // shadow pool; the two-gear elevator (areas 6/7 up / down); the fifteen event callbacks; the fight chain

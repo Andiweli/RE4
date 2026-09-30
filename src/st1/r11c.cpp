@@ -102,24 +102,24 @@ static inline u32 r11c_emDead(u32 no)
     return v;
 }
 
-extern "C" void r11c_eventInit();
+void r11c_eventInit();
 static void r11c_EventBesiegedStart();
 static void r11c_ThunderMove();
-extern "C" void r11c_initGate();
-extern "C" void r11c_openGate(u32 id);
+void r11c_initGate();
+void r11c_openGate(u32 id);
 static void r11c_closeGate(u32 id);
 static void r11c_moveGear(int dir);
 static void r11c_moveChain(int dir);
 static void r11c_moveLever2(int dir);
-extern "C" void r11c_moveLever(int dir, int noGear);
+void r11c_moveLever(int dir, int noGear);
 static void r11c_selectRoute_end(int sel);
 static void r11c_selectRoute();
 static void r11c_operator();
-extern "C" void setFire();
-extern "C" void deleteFire();
-extern "C" void Evt_R11CS00_Func(Event* e);
-extern "C" void Evt_R11CS10_Func(Event* e);
-extern "C" void Evt_R11CS20_Func(Event* e);
+void setFire();
+void deleteFire();
+void Evt_R11CS00_Func(Event* e);
+void Evt_R11CS10_Func(Event* e);
+void Evt_R11CS20_Func(Event* e);
 
 // Room init: thunder, rain and the four ladders. Until the siege is done (save flags bit 25) area 3
 // starts it and Luis waits outside, afterwards the merchant stock is added and the gates follow the
@@ -269,7 +269,7 @@ void R11cMain()
 // Before the siege: pre-load evd r11cs00 to ARAM and register r11cs10, pre-read enemy modules 0x13 and 3
 // (Luis), mark Ashley as following (Status_flg[3] 0x04000000), init the partner at Leon's position in
 // chase mode, and keep module 3 for the event-data swap.
-extern "C" void r11c_eventInit()
+void r11c_eventInit()
 {
     W->evd0 = DC.setData(EvtMgr.NameChange("evd/r11cs00.evd"));
     W->evd0->setCommand(CMND_ARAM_LOAD, 0, 0);
@@ -684,7 +684,7 @@ static void r11c_ThunderMove()
 }
 
 // The two gates (smd 0x33 left, 0x34 right): up before the siege, then by the chosen route.
-extern "C" void r11c_initGate()
+void r11c_initGate()
 {
     cObj* g0 = SmdGetObjPtr(0x33);
     cObj* g1 = SmdGetObjPtr(0x34);
@@ -717,7 +717,7 @@ extern "C" void r11c_initGate()
 
 // Task: raise gate `id` (smd 0x33 / 0x34) by 3600 units over 80 frames with a rattle, gate effect and
 // sound; sets Room_flg[2] bit 31 (a gate is open).
-extern "C" void r11c_openGate(u32 id)
+void r11c_openGate(u32 id)
 {
     cObj* g = SmdGetObjPtr(id);
     const f32 step = 45.0f;
@@ -874,7 +874,7 @@ static void r11c_moveLever2(int dir)
 }
 
 // The lever is pulled; unless `noGear`, the gear and chain tasks start.
-extern "C" void r11c_moveLever(int dir, int noGear)
+void r11c_moveLever(int dir, int noGear)
 {
     cObj* lv;
     int i;
@@ -1069,7 +1069,7 @@ static void r11c_operator()
 }
 
 // The three bonfires (room archive 0x1F/0x20, motion 0x21).
-extern "C" void setFire()
+void setFire()
 {
     {
         Vec pos = {112339.0f, -522.0f, -61101.0f};
@@ -1116,7 +1116,7 @@ extern "C" void setFire()
 }
 
 // Destroy the three bonfire objects (the s20 event replaces them).
-extern "C" void deleteFire()
+void deleteFire()
 {
     ObjMgr.destroy(W->fire[0]);
     ObjMgr.destroy(W->fire[1]);
@@ -1124,7 +1124,7 @@ extern "C" void deleteFire()
 }
 
 // Event r11cs00 handler: the cabin etc models, the scroll object 0x3F handed to the event.
-extern "C" void Evt_R11CS00_Func(Event* e)
+void Evt_R11CS00_Func(Event* e)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec ang = {0.0f, 0.0f, 0.0f};
@@ -1191,7 +1191,7 @@ extern "C" void Evt_R11CS00_Func(Event* e)
 }
 
 // Event r11cs10 handler: the ladders and the door.
-extern "C" void Evt_R11CS10_Func(Event* e)
+void Evt_R11CS10_Func(Event* e)
 {
     switch (e->GetFuncType()) {
     case 0: {
@@ -1234,7 +1234,7 @@ static inline void r11c_evtEsp(Event* e, u8 no)
 }
 
 // Event r11cs20 handler: the door, the render texture on the two players, the water effects.
-extern "C" void Evt_R11CS20_Func(Event* e)
+void Evt_R11CS20_Func(Event* e)
 {
     // Function scope: the address-taken `door` of a case block is kept until the switch ends, so
     // a second block-local `door` would get its own slot.

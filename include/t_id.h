@@ -137,7 +137,6 @@ struct IdTool {
     u8 markUse[0x100];  // 0x184
 };
 
-extern "C" {
 void toolIdDrawSafeZone(IdTool* w);
 void toolIdSubMenuPosition(IdTool* w);
 void toolIdDataInit(ID_DATA* d);
@@ -177,7 +176,6 @@ void toolIdFocusReset(IdTool* w, ID_DATA* d);
 void toolIdCalcVertex(ID_DATA* d);
 void toolIdMarkUseReset(IdTool* w);
 int DbRandom(IdRandomWork* w, int x, int y);
-}
 
 void ToolInterfaceDesign();
 

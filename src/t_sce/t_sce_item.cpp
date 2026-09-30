@@ -114,7 +114,6 @@ struct SceAtWorkPtr {
 static SCE_AT_ITEM* sceItemCur;
 #define pCur (sceItemCur)
 
-extern "C" {
 void tSceItemInit_base();
 void tSceItemInit();
 static void set_filename();  // duplicated in t_block / t_sce_at: static here (they own the module names)
@@ -156,7 +155,6 @@ void tSceItemPreview_pl_pos();
 static void tSceItemPreview_exit();
 void loadItemIdName(const char* path, char* names, char* names2);
 char* getItemIdStr(u32 id);
-}
 
 #define AREA_NUM 128
 

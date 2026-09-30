@@ -133,7 +133,7 @@ void R31bLightAllOn();
 void R31bLight(int no);
 void R31bKanaamiTrans(u8 room, u8 no, int on);
 void R31bKanaamiRoom03Trans(int no, int on);
-extern "C" void Evt_R31BS00_Func(Event* e);
+void Evt_R31BS00_Func(Event* e);
 
 // Room init for the U-3 cage corridor. Each cage room not yet passed gets its switch and door areas,
 // and a passed one is hidden as fallen (R31bSmdTransOff).

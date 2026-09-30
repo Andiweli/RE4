@@ -49,7 +49,7 @@ static void r316_exitDoorTo317();
 static void r316_checkEmReset();
 static void R316EventS00();
 static void R316EventSXX();
-extern "C" void Evt_R316S00_Func(Event* e);
+void Evt_R316S00_Func(Event* e);
 
 // Room init: until the event has run (Room_flg bit 0) it runs at once, else the wave refills run until
 // the room is left through door 1. Also sets up the heat and falling-item watchers and the furnace.

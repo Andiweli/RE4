@@ -38,7 +38,7 @@ struct R118Work {
 
 static R118Work* r118_work;
 
-extern "C" void r108_initPuzzle(int dial, int coverL, int coverR, int mesNo);
+void r108_initPuzzle(int dial, int coverL, int coverR, int mesNo);
 
 static void r118_execShowView_end();
 static void r118_execShowView();

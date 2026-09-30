@@ -66,16 +66,16 @@ static Vec r11e_rockARot = {0.0f, 0.0f, 0.0f};
 static Vec r11e_rockBPos = {32079.0f, 10069.0f, 32556.0f};
 static Vec r11e_rockBRot = {0.0f, -1.5707964f, 0.0f};
 
-extern "C" void funcAshley(cEm* m);
+void funcAshley(cEm* m);
 static void koya_destroy_check();
-extern "C" void koyaA_destroy();
-extern "C" void koyaB_destroy();
-extern "C" void koyaA_delete();
-extern "C" void koyaB_delete();
-extern "C" void sakuA_destroy();
-extern "C" void sakuB_destroy();
-extern "C" void sakuA_delete();
-extern "C" void sakuB_delete();
+void koyaA_destroy();
+void koyaB_destroy();
+void koyaA_delete();
+void koyaB_delete();
+void sakuA_destroy();
+void sakuB_destroy();
+void sakuA_delete();
+void sakuB_delete();
 static void r11e_move_sasaeki1();
 static void r11e_EmSet_exit();
 static void r11e_EmSet();
@@ -131,7 +131,7 @@ void R11eInit()
 }
 
 // Ashley's escape motions (SetSubAux routine): three motions in a row, turning towards the target.
-extern "C" void funcAshley(cEm* m)
+void funcAshley(cEm* m)
 {
     switch (m->r_no_2) {
     case 0:
@@ -200,7 +200,7 @@ static void koya_destroy_check()
 }
 
 // Hut A is smashed by the giant: crash SE, debris effect, models and collision removed.
-extern "C" void koyaA_destroy()
+void koyaA_destroy()
 {
     Vec pos = {13370.0f, -70.0f, 38135.0f};
     Vec rot = {0.0f, 3.054326f, 0.0f};
@@ -211,7 +211,7 @@ extern "C" void koyaA_destroy()
 }
 
 // Hut B is smashed by the giant (see koyaA_destroy).
-extern "C" void koyaB_destroy()
+void koyaB_destroy()
 {
     Vec pos = {20500.0f, -60.0f, 36273.0f};
     Vec rot = {0.0f, 3.3684855f, 0.0f};
@@ -222,7 +222,7 @@ extern "C" void koyaB_destroy()
 }
 
 // Remove hut A: collision pieces, scroll objects 4/5, item areas 0x80..0x84 off.
-extern "C" void koyaA_delete()
+void koyaA_delete()
 {
     SatMgr.destroy(r11e_work->sat[0]);
     EatMgr.destroy(r11e_work->eat[0]);
@@ -236,7 +236,7 @@ extern "C" void koyaA_delete()
 }
 
 // Remove hut B: collision pieces, scroll objects 6/7, item areas 0x85..0x8B off.
-extern "C" void koyaB_delete()
+void koyaB_delete()
 {
     SatMgr.destroy(r11e_work->sat[1]);
     EatMgr.destroy(r11e_work->eat[1]);
@@ -252,7 +252,7 @@ extern "C" void koyaB_delete()
 }
 
 // Fence A is broken through: crash SE, debris effect, door 0xE breaks toward its target, fence removed.
-extern "C" void sakuA_destroy()
+void sakuA_destroy()
 {
     Vec pos = {1329.0f, 0.0f, 35360.0f};
     Vec rot = {0.0f, -2.3561945f, 0.0f};
@@ -267,7 +267,7 @@ extern "C" void sakuA_destroy()
 }
 
 // Fence B is broken through (door 0xF), see sakuA_destroy.
-extern "C" void sakuB_destroy()
+void sakuB_destroy()
 {
     Vec pos = {44629.0f, 0.0f, 37658.0f};
     Vec rot = {0.0f, -1.5707964f, 0.0f};
@@ -282,7 +282,7 @@ extern "C" void sakuB_destroy()
 }
 
 // Remove fence A: collision pieces, scroll objects 0xE/0xF/0x10.
-extern "C" void sakuA_delete()
+void sakuA_delete()
 {
     SatMgr.destroy(r11e_work->sat[2]);
     EatMgr.destroy(r11e_work->eat[2]);
@@ -292,7 +292,7 @@ extern "C" void sakuA_delete()
 }
 
 // Remove fence B: collision pieces, scroll objects 0x11/0x12/0x13.
-extern "C" void sakuB_delete()
+void sakuB_delete()
 {
     SatMgr.destroy(r11e_work->sat[3]);
     EatMgr.destroy(r11e_work->eat[3]);

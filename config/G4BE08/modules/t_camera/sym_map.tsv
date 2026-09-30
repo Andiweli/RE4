@@ -70,7 +70,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00009B34	0x48C	t_camera/db_light.cpp	local	edit_ambient__Fv	edit_ambient
 .text	0x00009FC0	0x64	t_camera/db_light.cpp	local	edit_fog__Fv	edit_fog
 .text	0x0000A024	0x64	t_camera/db_light.cpp	local	edit_mirror_fog__Fv	edit_mirror_fog
-.text	0x0000A088	0x424	t_camera/db_light.cpp	global	edit_fog_common__FP8LightFog	edit_fog_common
+.text	0x0000A088	0x424	t_camera/db_light.cpp	global	edit_fog_common__FP3FOG	edit_fog_common
 .text	0x0000A4AC	0x2FC	t_camera/db_light.cpp	local	edit_focus__Fv	edit_focus
 .text	0x0000A7A8	0x2F8	t_camera/db_light.cpp	global	draw_tone_curve__Fv	draw_tone_curve
 .text	0x0000AAA0	0x6C4	t_camera/db_light.cpp	local	edit_blur__Fv	edit_blur
@@ -204,7 +204,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0001B474	0x28	t_camera/t_camera_data.cpp	global	tcDrawSphere__FP3VecUlf	tcDrawSphere
 .text	0x0001B49C	0x28	t_camera/t_camera_data.cpp	global	tcDrawPoly__FP3VecUl	tcDrawPoly
 .text	0x0001B4C4	0x40	t_camera/t_camera_data.cpp	global	tcSetBesideFloor__Ff	tcSetBesideFloor
-.text	0x0001B504	0x194	t_camera/t_camera_data.cpp	global	tcSetBesideOffset__FPA2_7QfpsOfsT0	tcSetBesideOffset
+.text	0x0001B504	0x194	t_camera/t_camera_data.cpp	global	tcSetBesideOffset__FPA2_11QFPS_OFFSETT0	tcSetBesideOffset
 .text	0x0001B698	0x22C	t_camera/t_camera_data.cpp	global	tcSetBesideCamera__Fv	tcSetBesideCamera
 .text	0x0001B8C4	0x3B8	t_camera/t_camera_data.cpp	global	fn_t_camera_1B8C4	.
 .text	0x0001BC7C	0xE4	t_camera/t_camera_draw.cpp	global	tcCameraMove__Fv	tcCameraMove
@@ -213,7 +213,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0001BEB8	0x228	t_camera/t_camera_draw.cpp	global	tcMenuSelect__FiiiP6TcMenuiPSc	tcMenuSelect
 .text	0x0001C0E0	0x25C	t_camera/t_camera_draw.cpp	global	tcDrawParametricCurve__Fv	tcDrawParametricCurve
 .text	0x0001C33C	0x3B8	t_camera/t_camera_draw.cpp	global	fn_t_camera_1C33C	.
-.text	0x0001C6F4	0x90	t_camera/t_prim.cpp	global	TprimInitEnv2D3D__FP9TprimViewPA3_fT1	TprimInitEnv2D3D
+.text	0x0001C6F4	0x90	t_camera/t_prim.cpp	global	TprimInitEnv2D3D__FPfPA3_fT1	TprimInitEnv2D3D
 .text	0x0001C784	0x50	t_camera/t_prim.cpp	global	TprimDraw3D__FUl	TprimDraw3D
 .text	0x0001C7D4	0x58	t_camera/t_prim.cpp	global	TprimSetBlend__FUl	TprimSetBlend
 .text	0x0001C82C	0xC0	t_camera/t_prim.cpp	global	set_attr_common__Fv	set_attr_common

@@ -63,14 +63,14 @@ static u8 r11d_hideCnt = 0;
 static void r11d_checkIronDoorKeyUse();
 static void r11d_checkIronDoor();
 static void r11d_checkEmDead();
-extern "C" void r11d_appearBigSister();
-extern "C" void r11d_appearLittleSister();
+void r11d_appearBigSister();
+void r11d_appearLittleSister();
 static void r11d_execEmAppear_end();
 static void r11d_execEmAppear();
-extern "C" void r11d_setEmSister();
+void r11d_setEmSister();
 static void r11d_execShowView_end();
 static void r11d_execShowView();
-extern "C" void r11d_execHide_main(int mode, u32 objId);
+void r11d_execHide_main(int mode, u32 objId);
 static void r11d_execHide0(int mode);
 static void r11d_execHide1(int mode);
 static void r11d_execHide2(int mode);
@@ -194,7 +194,7 @@ static void r11d_checkEmDead()
 }
 
 // The big sister on the balcony object with her glow.
-extern "C" void r11d_appearBigSister()
+void r11d_appearBigSister()
 {
     void* zero = 0;
 
@@ -219,7 +219,7 @@ extern "C" void r11d_appearBigSister()
 }
 
 // The little sister with her own motion; the first time the two flash effects.
-extern "C" void r11d_appearLittleSister()
+void r11d_appearLittleSister()
 {
     if (r11d_work->em1.setEm(0xEC, -1, 0, 1, 1) == 1) {
         cEm* em = r11d_work->em1.getPtr();
@@ -337,7 +337,7 @@ static void r11d_execEmAppear()
 }
 
 // The sisters already met: set them again from the saved flags.
-extern "C" void r11d_setEmSister()
+void r11d_setEmSister()
 {
     if (RsfCheck(G_ROOM_ID, 4) == 0 && !(pG->Room_flg[0] & 0x80000000)) {
         r11d_appearBigSister();
@@ -392,7 +392,7 @@ static void r11d_execShowView()
 }
 
 // The closet door `objId` swings open (mode 0) or closed while Ashley hides.
-extern "C" void r11d_execHide_main(int mode, u32 objId)
+void r11d_execHide_main(int mode, u32 objId)
 {
     cObj* door;
 

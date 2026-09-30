@@ -81,7 +81,6 @@ public:
     virtual void move(SUB_SCREEN* pWk);
 };
 
-extern "C" {
 // ss_pzzl.cpp helpers the shop screen shares
 void puzzleCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 void pieceModelDisp(SUB_SCREEN* wk);
@@ -89,7 +88,6 @@ void pieceModelSet(pzlPiece* p);
 void pzzlCursorDisp(SUB_SCREEN* wk, int sw);
 void caseModelMove(int sw);
 void tempSpaceDisp(int sw);
-}
 // ss_pzzl.cpp debug: piece index / position the debug menu edits (ss_debug.cpp)
 extern int pzzlDbgNo;
 extern f32 pzzlDbgPos;

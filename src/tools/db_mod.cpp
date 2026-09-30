@@ -226,7 +226,6 @@ static DbModMenu dbmodMenu[2][8] = {
 };
 static s8 dbmodMenuNum[3] = {8, 5, 8};   // [2] = rows drawn per page
 
-extern "C" {
 void dbModelInit();
 void dbModelQuit();
 int dbModel(int mode);
@@ -272,7 +271,6 @@ u32 dbModGetViewFlag();
 void dbModUnsetViewFlag(u32 flag);
 void dbModMotionSetSeq(int slot, void* seq, int flag, int no);
 void dbModGetMotFilename(int slot, char* dst);
-}
 int SetToolLight(int no);  // db_light_tools.cpp / db_light_esp.cpp
 
 // Sets viewer flag bits (bit0 parent/child link set, bit1 t_motseq's reverse toggle, bit2 no

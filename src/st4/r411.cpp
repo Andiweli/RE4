@@ -27,7 +27,7 @@ static R411Work* r411_work;
 
 
 static void r411_checkDoorUnlock();
-extern "C" void r411_lockDoor();
+void r411_lockDoor();
 static void r411_checkEmSet1_end();
 static void r411_checkEmSet1();
 static void r411_checkEmSet2();
@@ -79,7 +79,7 @@ static void r411_checkDoorUnlock()
 }
 
 // Close-lock door 1 and enable its area 0xF.
-extern "C" void r411_lockDoor()
+void r411_lockDoor()
 {
     cEmDoor* door;
 

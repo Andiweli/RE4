@@ -71,14 +71,14 @@ static inline void r108_setObj2(cObj*& a, cObj*& b, u32 idA, u32 idB)
 static void r108_execShowView_end();
 static void r108_execShowView();
 static void r108_operator();
-extern "C" void r108_checkEmReset();
+void r108_checkEmReset();
 static void r108_initChurchBell();
 static void r108_checkDoor();
 static void r108_checkBgm();
 static void r108_getItem();
-extern "C" void r108_initPuzzle(int dial, int coverL, int coverR, int mesNo);
-extern "C" void r108_switchSymbol(int n);
-extern "C" void r108_openCover();
+void r108_initPuzzle(int dial, int coverL, int coverR, int mesNo);
+void r108_switchSymbol(int n);
+void r108_openCover();
 static void r108_execPuzzle();
 static void r108_str_check();
 
@@ -154,7 +154,7 @@ static void r108_operator()
 // Ringing the bell: re-create up to three of the outside Ganados when few are left.
 // Called from the module's other rooms: when 7 or fewer Ganados (ids 0x10..0x20) are alive, respawn up to
 // three of the eleven listed ESL entries as reinforcements.
-extern "C" void r108_checkEmReset()
+void r108_checkEmReset()
 {
     int list[11] = {1, 2, 0x2D, 0x47, 0x4B, 0x4D, 0x33, 0x35, 0x3B, 0x67, 0x6A};
     int* tbl = list;
@@ -269,7 +269,7 @@ static void r108_getItem()
 }
 
 // Puzzle setup: the dial and the two cover halves, the item behind them.
-extern "C" void r108_initPuzzle(int dial, int coverL, int coverR, int mesNo)
+void r108_initPuzzle(int dial, int coverL, int coverR, int mesNo)
 {
     u32 i;
     cModel* m;
@@ -297,7 +297,7 @@ extern "C" void r108_initPuzzle(int dial, int coverL, int coverR, int mesNo)
 }
 
 // Turn the dial `n` symbols on (2 pi / 7 each) and toggle the symbol's flag and effect.
-extern "C" void r108_switchSymbol(int n)
+void r108_switchSymbol(int n)
 {
     f32 ang = (f32) (int) r108_symIdx * 0.8975979f;
     int i;
@@ -340,7 +340,7 @@ extern "C" void r108_switchSymbol(int n)
 }
 
 // Slide the two cover halves apart.
-extern "C" void r108_openCover()
+void r108_openCover()
 {
     const f32 step = 10.0f;
     f32 x0 = r108_coverL->pos.x;

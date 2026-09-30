@@ -54,10 +54,10 @@ void Obj18CmfOn(cObj* o, u32 n);   // game/obj18.cpp
 static inline void r106_emSetAng(cEmWrap* em, Vec* ang) { em->setAng(ang); }
 
 static void r106_checkRollingStone();
-extern "C" void r106_setRollingStone();
+void r106_setRollingStone();
 static void r106_ctrlEm0();
 static void r106_ctrlEm1();
-extern "C" void r106_openShelf_main(int type, int opened);
+void r106_openShelf_main(int type, int opened);
 static void r106_openedShelf(int type);
 static void r106_openShelf(int type);
 static void r106_ctrlBgm(int on);
@@ -66,8 +66,8 @@ static void r106_shakeClosetBody(cModel* m);
 static void r106_shakeClosetDoorR(cModel* m);
 static void r106_shakeClosetDoorL(cModel* m);
 static void r106_setCloset();
-extern "C" void Evt_R106S00_Func(Event* ev);
-extern "C" void r106_setEm();
+void Evt_R106S00_Func(Event* ev);
+void r106_setEm();
 
 // Room init. Until Luis is found (Scenario_flg[0] 0x00200000) the closet event and the shaking
 // closet are set up.
@@ -142,7 +142,7 @@ static void r106_checkRollingStone()
 }
 
 // The boulder ("IWA") with its player motions and the three Ganados pushing it.
-extern "C" void r106_setRollingStone()
+void r106_setRollingStone()
 {
     Vec pos;
     Vec rot;
@@ -265,7 +265,7 @@ static void r106_ctrlEm1()
 }
 
 // Open shelf `type` (opened != 0: already open): the two doors turn 110 degrees over 30 frames.
-extern "C" void r106_openShelf_main(int type, int opened)
+void r106_openShelf_main(int type, int opened)
 {
     // b declared first: its `li` is the first insn of block 0 (LUID tie of the two zero inits).
     cObj* b = 0;
@@ -482,7 +482,7 @@ static void r106_setCloset()
 }
 
 // Event r106s00 handler: the closet, the Ganado models in the doorway, the weapon.
-extern "C" void Evt_R106S00_Func(Event* ev)
+void Evt_R106S00_Func(Event* ev)
 {
     void* mod;
 
@@ -553,7 +553,7 @@ extern "C" void Evt_R106S00_Func(Event* ev)
 }
 
 // The six Ganados of the hall.
-extern "C" void r106_setEm()
+void r106_setEm()
 {
     EM_LIST d;
 

@@ -57,7 +57,7 @@ void r200_lockDoor();
 static void r200_checkEmSetEvent();
 static void r200_execTruckEvent_end();
 static void r200_execTruckEvent();
-extern "C" void Evt_R200S00_Func(Event* e);
+void Evt_R200S00_Func(Event* e);
 
 // Room init: JumpPoint 1 skips the view and the s00 event (Room_flg bits 4/2). The show view once (bit
 // 4); until s00 (bit 2): area 4 = the event (pre-loaded, enemies 3/0x12/0x3B pre-read) and, until the
@@ -359,7 +359,7 @@ static void r200_execTruckEvent()
 // Event r200s00 callback (the gate opens, Leon and Ashley enter): funcMode 0 lets the gate objects
 // suspend, drops the room effect and hides the broken etc model 6; per cut the Leon / Ashley models'
 // ot_type and the gate / truck objects are set; the end restores the room.
-extern "C" void Evt_R200S00_Func(Event* e)
+void Evt_R200S00_Func(Event* e)
 {
     switch (e->GetFuncType()) {
     case 0:

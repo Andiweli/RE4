@@ -125,7 +125,7 @@ void playerRunCamDiePassage(cPlayer* pl);
 // COMPILER-DIFF: 1 -- the original's prologue copies `fmr f31,f1` before `mr r28,r6` (FP parameter copy
 // before the trailing int one); ours orders the copies by parameter order, so the definition declares
 // `dist` before `idx` (same argument registers) under the original mangled name as a C symbol.
-extern "C" void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, u32 flagNo, f32 dist, int idx);
+void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, u32 flagNo, f32 dist, int idx);
 #define playerPillarDownCk(robo, smdNo, flagNo, idx, dist) playerPillarDownCk__FP8cObjRoboiUlif(robo, smdNo, flagNo, dist, idx)
 static void playerPillarDownTask(int smdNo);
 
@@ -1423,7 +1423,7 @@ void playerRunCamDiePassage(cPlayer* pl)
 }
 
 // Starts the pillar `smdNo` falling once the player passed it by `dist`.
-extern "C" void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, u32 flagNo, f32 dist, int idx)
+void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, u32 flagNo, f32 dist, int idx)
 {
     FREE_ROBO* rw = ROBO_WK(robo);
 

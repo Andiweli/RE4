@@ -41,7 +41,6 @@ public:
 extern DbModSlot dbModSlot[64];  // Tools .bss 0xE8
 extern DbModState* pDbModState;  // Tools .bss 0x13AAE8
 
-extern "C" {
 void dbModelInit();
 void dbModelQuit();
 int dbModel(int mode);
@@ -67,6 +66,5 @@ int LoadModelSetName(char* name, int motNum, int no);
 void SetLoopFlag(int on, int no);
 void SetTransMode(int mode, int no);
 void SetXFlipFlag(int on, int no);
-}
 
 #endif

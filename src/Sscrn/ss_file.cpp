@@ -40,7 +40,6 @@ struct SsFileWork {
 
 // The widget classes (SsFileInit / SsFileMain / FileSelect / MessageDisplay) are declared in ss_main.h.
 
-extern "C" {
 int getMsgNum(int no);
 u32 getMsgAttr(u32 type);
 int getTplName(int no, u32 page);
@@ -52,7 +51,6 @@ int fileNo(int cat, int no);
 void sscrn_file_out_init(SUB_SCREEN* wk);
 void dispFileList(SUB_SCREEN* wk, int n);
 // ss_main.cpp
-}
 
 // files per category
 int fileNum[3] = {13, 11, 8};

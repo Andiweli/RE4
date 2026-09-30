@@ -43,7 +43,7 @@ static R304Work* r304_work;
 
 static void r304_EnemySet();
 void R304EventS00();
-extern "C" void Evt_R304S00_Func(Event* e);
+void Evt_R304S00_Func(Event* e);
 void EvtTexRenderCamTrans(Event* e, int cut);
 static void r304_DuraluminCaseOpen(int no);
 static void r304_DuraluminCaseOpened(int no);
@@ -145,7 +145,7 @@ void R304EventS00()
 }
 
 // Event r304s00: the three scroll models join the event, the monitors render the event cameras.
-extern "C" void Evt_R304S00_Func(Event* e)
+void Evt_R304S00_Func(Event* e)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec ang = {0.0f, 0.0f, 0.0f};

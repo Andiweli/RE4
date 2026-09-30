@@ -38,8 +38,8 @@ static Vec r22a_plOfs0 = {-158.44f, -2608.9001f, -524.0f};
 static Vec r22a_plOfs1 = {-158.44f, -4911.3799f, 120.060005f};
 
 static void r22a_RopeMove(int side);
-extern "C" void R22A_Event();
-extern "C" void Evt_R22AS00_Func(Event* e);
+void R22A_Event();
+void Evt_R22AS00_Func(Event* e);
 static void r22a_EleDown();
 static void r22a_EleUp();
 
@@ -196,7 +196,7 @@ static void r22a_RopeMove(int side)
 }
 
 // Area 6: the s00 event (end of chapter 2-3 part).
-extern "C" void R22A_Event()
+void R22A_Event()
 {
     SceEventStart(0);
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
@@ -212,7 +212,7 @@ extern "C" void R22A_Event()
 }
 
 // Event r22as00 callback: the knife model wep0200 shown on cut 0 and hidden from cut 1.
-extern "C" void Evt_R22AS00_Func(Event* e)
+void Evt_R22AS00_Func(Event* e)
 {
     void* mod;
 

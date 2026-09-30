@@ -25,7 +25,7 @@
 #include <string.h>
 
 // newlib ctype.h (game/ctype_.c; include/libc/ctype.h does not declare it)
-extern "C" const char _ctype_[];
+extern const char _ctype_[];
 #define _L 02
 #define islower(c) ((_ctype_ + 1)[(int) (c)] & _L)
 

@@ -91,7 +91,6 @@ struct PzzlCursor {
 // The puzzle screen widgets (include/ss_pzzl.h; SsPzzlMain::init creates them, ss_shop.cpp shares
 // PzzlThinking / PieceSelect / CaseChange).
 
-extern "C" {
 void pzzlClearZ(SUB_SCREEN* wk);
 u32 colorRRGGBBAA(u32 r, u32 g, u32 b, u32 a);
 int back2PieceSelect(SUB_SCREEN* wk);
@@ -121,7 +120,6 @@ void closeMsgWindow(SUB_SCREEN* wk);
 void openMsgWindow(SUB_SCREEN* wk, int no);
 int remarkMsgCombine(int a, int b, int* no);
 int itemCommandType(cItem* item);
-}
 static void setCommandId(u8 type, ID_UNIT** tbl, s8* num, int lang);
 
 static int sscrn_pzzl_out(SUB_SCREEN* wk);

@@ -31,11 +31,11 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00005270	0x48C	em32/em32.cpp	local	em32_R1_LongAtk__FP5cEm32	em32_R1_LongAtk
 .text	0x000056FC	0x30	em32/em32.cpp	local	em32SitAction__FP5cEm32	em32SitAction
 .text	0x0000572C	0x40	em32/em32.cpp	local	em32SitUpAction__FP5cEm32	em32SitUpAction
-.text	0x0000576C	0x160	em32/em32.cpp	local	plemSit	plemSit
+.text	0x0000576C	0x160	em32/em32.cpp	local	plemSit__FP7cPlayer	plemSit
 .text	0x000058CC	0x3C	em32/em32.cpp	local	em32BackjumpAction__FP5cEm32	em32BackjumpAction
-.text	0x00005908	0x338	em32/em32.cpp	local	plemBackjump	plemBackjump
+.text	0x00005908	0x338	em32/em32.cpp	local	plemBackjump__FP7cPlayer	plemBackjump
 .text	0x00005C40	0x30	em32/em32.cpp	local	em32EscapeAction__FP5cEm32	em32EscapeAction
-.text	0x00005C70	0x354	em32/em32.cpp	local	plemEscape	plemEscape
+.text	0x00005C70	0x354	em32/em32.cpp	local	plemEscape__FP7cPlayer	plemEscape
 .text	0x00005FC4	0x264	em32/em32.cpp	global	em32EscapeCamMove__FP5cEm32	em32EscapeCamMove
 .text	0x00006228	0x2D4	em32/em32.cpp	local	em32_R1_StepUp__FP5cEm32	em32_R1_StepUp
 .text	0x000064FC	0x11C	em32/em32.cpp	local	em32_R1_StepWait__FP5cEm32	em32_R1_StepWait

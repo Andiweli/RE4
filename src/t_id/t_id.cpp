@@ -3100,12 +3100,10 @@ struct IdSortEnt {
     u8 no;
 };
 
-extern "C" {
 // qsort order of the save: by level, then parent, then slot.
 static int id_cmp(const void* a, const void* b)
 {
     return ((IdSortEnt*) a)->no - ((IdSortEnt*) b)->no;
-}
 }
 
 // Serialises the live elements into the IDSystem data image (header, one IdRec per element sorted

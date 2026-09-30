@@ -31,7 +31,7 @@
 
 // `inline` and defined before ss_main.h so this deferred inline is queued, and output at the end of
 // the file, ahead of the synthesized widget destructors, as in the original (0xD5B4 before ~Widget).
-extern "C" inline void LightSetModel2(cModel* m)
+inline void LightSetModel2(cModel* m)
 {
     LightMgr.setModel2(m);
 }
@@ -49,7 +49,6 @@ extern void (*_dtors[])(void);
 
 // The widget classes (SsExitInit / SsExitMain / SsItemExamine) are declared in ss_main.h.
 
-extern "C" {
 void SubScreenTask();
 void clearZbuffer();
 void sscrnCameraInit(SUB_SCREEN* wk, CAMERA* cam);
@@ -63,7 +62,6 @@ void sscrnModelFree(SUB_SCREEN* wk);
 void weaponChangeRequest(u16 no, u16 type);
 int weaponChangeReadCheck();
 int weaponChangeMoveCheck();
-}
 
 static void weaponChangeTask();
 static void sscrnModelTrans(cModel* m);

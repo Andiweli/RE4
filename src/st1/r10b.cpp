@@ -82,19 +82,19 @@ static inline void r10b_waitEvt()
 // The rooms call Event::FlgOnStatus out of line (event.h has it in-class).
 void EvtFlgOnStatus(Event* e, u32 no) asm("FlgOnStatus__5EventUl");
 
-extern "C" int readEvent(int no, int wait, void** out);
-extern "C" void freeEvent(int no);
+int readEvent(int no, int wait, void** out);
+void freeEvent(int no);
 static void R10b_chkEmDie();
 static void R10b_chkWater();
 static void r10b_GakeEvent();
-extern "C" void Evt_R10BS00_Func(Event* e);
-extern "C" void em2fTentacleMove(cEm* em, Event* e, int mode);
-extern "C" void Evt_R10BS10_Func(Event* e);
-extern "C" void Evt_R10BS20_Func(Event* e);
-extern "C" void Evt_R10BS21_Func(Event* e);
-extern "C" void Evt_R10BS22_Func(Event* e);
-extern "C" void Evt_R10BSXX_Func_Pl0f(Event* e);
-extern "C" void Evt_R10BSXX_Func_Em2f(Event* e);
+void Evt_R10BS00_Func(Event* e);
+void em2fTentacleMove(cEm* em, Event* e, int mode);
+void Evt_R10BS10_Func(Event* e);
+void Evt_R10BS20_Func(Event* e);
+void Evt_R10BS21_Func(Event* e);
+void Evt_R10BS22_Func(Event* e);
+void Evt_R10BSXX_Func_Pl0f(Event* e);
+void Evt_R10BSXX_Func_Em2f(Event* e);
 static void r10b_setEm();
 
 // Room init (the lake, Del Lago): System_flg 0x800, the water-follow task, water hit effects; area 4 =
@@ -205,7 +205,7 @@ static char* r10b_evtName[6] = {
 
 // Loads event `no` (r10b_evtName) through a data unit; with `wait` the data is swapped into the
 // boss module's block and `out` receives its address.
-extern "C" int readEvent(int no, int wait, void** out)
+int readEvent(int no, int wait, void** out)
 {
     if (out != 0) {
         *out = 0;
@@ -247,7 +247,7 @@ fail:
 
 // Release event unit `no`: swap the boss (0x2F) module's archive back over the event data it had been
 // loaded into, pop the effect data swap, and clear the unit.
-extern "C" void freeEvent(int no)
+void freeEvent(int no)
 {
     if (r10b_work->evt[no] != 0) {
         MODULE_DAT* m;
@@ -441,7 +441,7 @@ static void r10b_GakeEvent()
 // updating; cut 0 sets up the boat player and boss stand-ins; cuts 1/3/7 create the binocular view
 // (IdBinocular + FocusAnimation) once per Status_flg[0] 0x400 and point it at the cut's target; the
 // end releases them.
-extern "C" void Evt_R10BS00_Func(Event* e)
+void Evt_R10BS00_Func(Event* e)
 {
     void* mod;
 
@@ -505,7 +505,7 @@ extern "C" void Evt_R10BS00_Func(Event* e)
 
 // The boss's tentacle heads (obj 0x16) on its parts 0x1D..0x22, each with its motion started at a
 // different frame; mode 1 releases them.
-extern "C" void em2fTentacleMove(cEm* em, Event* e, int mode)
+void em2fTentacleMove(cEm* em, Event* e, int mode)
 {
     u32 i;
 
@@ -581,7 +581,7 @@ extern "C" void em2fTentacleMove(cEm* em, Event* e, int mode)
 // Event r10bs10 callback (the boss death / harpoon finish): funcMode 0 optionally clears the boat
 // effects (debug flag); cut 3 parents the kind-1 light to Leon; the tentacle heads are animated by
 // em2fTentacleMove per cut; the end restores the room state.
-extern "C" void Evt_R10BS10_Func(Event* e)
+void Evt_R10BS10_Func(Event* e)
 {
     void* mod;
 
@@ -672,7 +672,7 @@ extern "C" void Evt_R10BS10_Func(Event* e)
 // Event r10bs20 callback (the boss drags the boat: the rope QTE): status 3, cancel cut 9; cut 0 sets the
 // stand-ins and hides Leon's parts 2/6; cut 9 frame 100 starts the action-button prompt 0x29 that the
 // count in W->count scores; the outcome selects s21 (escaped) or s22 (pulled under).
-extern "C" void Evt_R10BS20_Func(Event* e)
+void Evt_R10BS20_Func(Event* e)
 {
     void* mod;
 
@@ -723,7 +723,7 @@ extern "C" void Evt_R10BS20_Func(Event* e)
 
 // Event r10bs21 callback (QTE passed: Leon cuts the rope): boat stand-in setup on cut 0, sea area flag
 // 0x800 restored at the end.
-extern "C" void Evt_R10BS21_Func(Event* e)
+void Evt_R10BS21_Func(Event* e)
 {
     void* mod;
 
@@ -757,7 +757,7 @@ extern "C" void Evt_R10BS21_Func(Event* e)
 
 // Event r10bs22 callback (QTE failed: Leon is pulled into the lake, game over): hides object 0x59, the
 // boat stand-in on cut 0, Leon's parts per cut.
-extern "C" void Evt_R10BS22_Func(Event* e)
+void Evt_R10BS22_Func(Event* e)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -808,7 +808,7 @@ extern "C" void Evt_R10BS22_Func(Event* e)
 }
 
 // The player model of the boat events: no shadow, the parts 3 (the harpoon) hidden.
-extern "C" void Evt_R10BSXX_Func_Pl0f(Event* e)
+void Evt_R10BSXX_Func_Pl0f(Event* e)
 {
     void* mod;
 
@@ -825,7 +825,7 @@ extern "C" void Evt_R10BSXX_Func_Pl0f(Event* e)
 }
 
 // Fetch the boss event model em2f00 (the lookup registers it with the event; the pointer is unused).
-extern "C" void Evt_R10BSXX_Func_Em2f(Event* e)
+void Evt_R10BSXX_Func_Em2f(Event* e)
 {
     void* mod;
 

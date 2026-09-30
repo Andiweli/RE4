@@ -63,14 +63,14 @@ static R11fWork* r11f_work;
 asm(".section .data; .balign 8");
 static int r11f_actOn = 0;
 
-extern "C" void r11f_DoorReplace();
+void r11f_DoorReplace();
 static void r11f_EventS00();
 static void r11f_EventS00_Act();
-extern "C" void Evt_R11FS00_Func(Event* e);
-extern "C" void Evt_R11FS01_Func(Event* e);
-extern "C" void Evt_R11FS02_Func(Event* e);
-extern "C" void Evt_R11FS10_Func(Event* e);
-extern "C" void Evt_R11FS11_Func(Event* e);
+void Evt_R11FS00_Func(Event* e);
+void Evt_R11FS01_Func(Event* e);
+void Evt_R11FS02_Func(Event* e);
+void Evt_R11FS10_Func(Event* e);
+void Evt_R11FS11_Func(Event* e);
 static void r11f_EventS10();
 static void r11f_EventS10CancelEndProc();
 static void r11f_EventS10EndProc();
@@ -138,7 +138,7 @@ void R11fInit()
 }
 
 // Replaces the two barn doors by the four broken-door objects.
-extern "C" void r11f_DoorReplace()
+void r11f_DoorReplace()
 {
     Vec zero = {0, 0, 0};
     cObj* obj;
@@ -222,7 +222,7 @@ static void r11f_EventS00_Act()
 // Event r11fs00 callback (Mendez confronts Leon): funcMode 0 picks the QTE variant (actNo 3 or 4 at
 // random), status 3, cancel cut 0x10, hides objects 1/2; from cut 5 the Mendez / Leon event models
 // evm7000 / evm8300 are swapped in (CMF), later cuts run the action prompt and its pass / fail branches.
-extern "C" void Evt_R11FS00_Func(Event* e)
+void Evt_R11FS00_Func(Event* e)
 {
     void* mod;
     int skip;
@@ -343,7 +343,7 @@ extern "C" void Evt_R11FS00_Func(Event* e)
 
 // Event r11fs01 callback (the QTE dodge variant): hides the barn wall objects 0xD/0xE/0x12 on cuts
 // 2/4/5, shows them otherwise.
-extern "C" void Evt_R11FS01_Func(Event* e)
+void Evt_R11FS01_Func(Event* e)
 {
     if (e->GetFuncType() == 1) {
         if (e->GetNowFrame() == 0) {
@@ -366,7 +366,7 @@ extern "C" void Evt_R11FS01_Func(Event* e)
 
 // Event r11fs02 callback (the other QTE variant): et1200 shown on cut 0, the fire effects re-set on cut
 // 0xB, the knife model wep0200 shown from cut 7.
-extern "C" void Evt_R11FS02_Func(Event* e)
+void Evt_R11FS02_Func(Event* e)
 {
     void* mod;
 
@@ -409,7 +409,7 @@ extern "C" void Evt_R11FS02_Func(Event* e)
 }
 
 // Event r11fs10 callback (Mendez transforms): light mask 2 on evm3500 and evm0600 drawn on cut 0.
-extern "C" void Evt_R11FS10_Func(Event* e)
+void Evt_R11FS10_Func(Event* e)
 {
     void* mod;
 
@@ -430,7 +430,7 @@ extern "C" void Evt_R11FS10_Func(Event* e)
 // Event r11fs11 callback (the escape from the burning barn): cut 2 hides the wall objects and swaps the
 // door objects 0x14 -> 0x15/0x16 (broken), with a fire effect; other cuts show the walls; the end
 // restores.
-extern "C" void Evt_R11FS11_Func(Event* e)
+void Evt_R11FS11_Func(Event* e)
 {
     switch (e->GetFuncType()) {
     case 0:

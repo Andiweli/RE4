@@ -119,9 +119,7 @@ void incResetNum();
 cEm* emset(int no);
 void R300emReset();
 // The original's setTexRender has C linkage (an unmangled local in the .sym).
-extern "C" {
 static void setTexRender();
-}
 static void R300_Event();
 static void Evt_R300S00_Func(Event* e);
 static void r300_em_reset_task();

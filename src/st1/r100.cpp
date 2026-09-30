@@ -44,7 +44,7 @@
 // (s03: the first Ganado kills one, s20: the truck runs the car off the bridge, s40: the ravine).
 
 void Obj18CmfOn(cObj* o, u32 n);        // game/obj18.cpp
-extern "C" void EventCarInit(Event* e);  // st1_0/r120.cpp
+void EventCarInit(Event* e);  // st1_0/r120.cpp
 
 
 struct R100Work {
@@ -78,9 +78,9 @@ static const AtEffInfo r100_eff_info5 = {
     2, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0},
 };
 
-extern "C" int readEvent(int no, int wait, void** out);
-extern "C" void freeEvent(int no, int swap);
-extern "C" void r100_em_set();
+int readEvent(int no, int wait, void** out);
+void freeEvent(int no, int swap);
+void r100_em_set();
 static void r100_GakeEvent(int arg);
 static void r100_StartEvent();
 static void r100_DoorCk();
@@ -90,8 +90,8 @@ static void r100_HouseEvent();
 static void r100_StreanChk();
 static void r100_Sce_look();
 static void r100_Sce_zombi_dead(cEm* em);
-extern "C" void r100_Car_pos_move();
-extern "C" void r100_trap_set();
+void r100_Car_pos_move();
+void r100_trap_set();
 static void r100_MesDoor();
 static void r100_MesTruck();
 static void r100_MesGanado();
@@ -99,10 +99,10 @@ static void r100_MesCar00();
 static void r100_MesCar01();
 static void r100_MesBrige();
 static void r100_EventBrige();
-extern "C" void setTexRender();
-extern "C" void Evt_R100S40_Func(Event* e);
-extern "C" void Evt_R100S20_Func(Event* e);
-extern "C" void Evt_R100S03_Func(Event* e);
+void setTexRender();
+void Evt_R100S40_Func(Event* e);
+void Evt_R100S20_Func(Event* e);
+void Evt_R100S03_Func(Event* e);
 static void r100_mes_gaikotu_bgm();
 static void r100_mes_gaikotu();
 static void r100_mes_gaikotu_bgm_down();
@@ -414,7 +414,7 @@ static char* r100_evtName[10] = {
 
 // Loads event `no` (r100_evtName) through a data unit; with `wait` the data is swapped into the
 // Ganado module's block (events 0, 4, 9) or loaded in place, and `out` receives its address.
-extern "C" int readEvent(int no, int wait, void** out)
+int readEvent(int no, int wait, void** out)
 {
     if (out != 0) {
         *out = 0;
@@ -478,7 +478,7 @@ fail:
 
 // Release event unit `no`; with `swap` (events 0/4/9 live in the Ganado module's block) swap the
 // module's archive back over it and pop the effect data swap.
-extern "C" void freeEvent(int no, int swap)
+void freeEvent(int no, int swap)
 {
     if (W->evt[no] != 0) {
         if (swap != 0 && (no == 0 || no == 4 || no == 9)) {
@@ -493,7 +493,7 @@ extern "C" void freeEvent(int no, int swap)
 }
 
 // The ambush after the officer's death.
-extern "C" void r100_em_set()
+void r100_em_set()
 {
     W->ems[0] = (cEmGanado*) EmSetFromList2(3, 1);
     W->ems[1] = (cEmGanado*) EmSetFromList2(4, 1);
@@ -966,7 +966,7 @@ static void r100_Sce_zombi_dead(cEm* em)
 }
 
 // The car down in the ravine after the s20 event.
-extern "C" void r100_Car_pos_move()
+void r100_Car_pos_move()
 {
     Vec pos;
     Vec rot;
@@ -1024,7 +1024,7 @@ extern "C" void r100_Car_pos_move()
 }
 
 // The trap Ganados of the after state (the three at the fire get their event motions).
-extern "C" void r100_trap_set()
+void r100_trap_set()
 {
     cEm* em;
 
@@ -1197,7 +1197,7 @@ static void r100_EventBrige()
     obj->Refract_ratio = v138;
 
 // The pond surface: a render target blended into the water objects.
-extern "C" void setTexRender()
+void setTexRender()
 {
     cObj* obj;
     u8* tbl = r100_texTbl;
@@ -1220,7 +1220,7 @@ extern "C" void setTexRender()
 // Event r100s40 callback (the officers at the ravine / car): Status_flg[1] 0x02000000 during the event,
 // the car event models set up on the first frame (EventCarInit, r120's); funcMode 3 sets Scenario_flg[1]
 // bit 0x10.
-extern "C" void Evt_R100S40_Func(Event* e)
+void Evt_R100S40_Func(Event* e)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1241,7 +1241,7 @@ extern "C" void Evt_R100S40_Func(Event* e)
 
 // Event r100s20 callback (the truck pushes the car into the ravine): the truck model obm2d00 shown on
 // cut 0; cut 2 keeps ambush Ganados 1/2 updating (unless the debug flag hides them).
-extern "C" void Evt_R100S20_Func(Event* e)
+void Evt_R100S20_Func(Event* e)
 {
     void* mod;
 
@@ -1268,7 +1268,7 @@ extern "C" void Evt_R100S20_Func(Event* e)
 
 // Event r100s03 callback (Leon shoots the first Ganado): the knife model wep0200 is hidden (be_flag 2)
 // on cuts 0..4 and 13..20 and shown on the others.
-extern "C" void Evt_R100S03_Func(Event* e)
+void Evt_R100S03_Func(Event* e)
 {
     void* mod;
 

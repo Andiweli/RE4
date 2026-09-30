@@ -146,7 +146,6 @@ static const char* tSceAtTypeName[21] = {"NORMAL", "DOOR",     "EXEC",      "", 
                                           "JUMP",   "SAVE",     "SHD_DISP",  "DAMAGE",     "SCR_AT",    "VIEW_CTRL", "FIELD_INFO",
                                           "STOOP",  "SMALL_KEY", "LADDER",   "USE",        "HIDE",      "POS_JUMP", "ITEM_PARENT"};
 
-extern "C" {
 void tSceAtInit_base();
 void tSceAtInit();
 void set_filename();
@@ -206,7 +205,6 @@ static void tSceAtPreview_main();
 void tSceAtPreview_pl_pos();
 static void tSceAtPreview_exit();
 int loadMesName(const char* path, char* names);
-}
 
 #define AREA_NUM 128
 #define TYPE_NAME(t) ((u32) (t) <= 0x14 ? tSceAtTypeName[t] : "...no string")

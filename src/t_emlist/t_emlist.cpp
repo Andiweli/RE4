@@ -620,7 +620,7 @@ void emlist_EmDir_disp();
 int emlist_catch_em();
 // The original prototype has no parameter but the body reads the entry pointer from r3 (the
 // caller leaves it there); the definition takes it explicitly under the original's mangled name.
-extern "C" void emlist_em_move_to_cursor__Fv(EmListEnt* p);
+void emlist_em_move_to_cursor__Fv(EmListEnt* p);
 int emlist_get_numof_str(const char** tbl);
 void emlistCameraMove();
 void emlistCamToPoin();
@@ -2695,7 +2695,7 @@ int emlist_catch_em()
 }
 
 // Moves the entry to the cursor's ground position, clamped to the 16-bit cm range.
-extern "C" void emlist_em_move_to_cursor__Fv(EmListEnt* p)
+void emlist_em_move_to_cursor__Fv(EmListEnt* p)
 {
     Vec pos;
     Vec cur;

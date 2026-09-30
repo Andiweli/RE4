@@ -52,8 +52,8 @@ static R10fWork* r10f_work;
 static void r10f_GondolaGetOn(int side);
 static void r10f_GondolaGetOff(int side);
 static void r10f_GondolaEmSet(int idx);
-extern "C" cObj* r10f_setFalseEye();
-extern "C" void r10f_DoorOpen();
+cObj* r10f_setFalseEye();
+void r10f_DoorOpen();
 static void r10f_DoorOpenCamera();
 static void r10f_checkFalseEyeUse();
 static void r10f_DoorClose(u32 no);
@@ -402,7 +402,7 @@ static void r10f_GondolaEmSet(int idx)
 }
 
 // The false eye in Leon's hand for the door.
-extern "C" cObj* r10f_setFalseEye()
+cObj* r10f_setFalseEye()
 {
     Vec pos = {-139.3f, -43.01f, 32.75f};
     Vec rot = {-0.34927526f, -2.473737f, 1.6477758f};
@@ -415,7 +415,7 @@ extern "C" cObj* r10f_setFalseEye()
 }
 
 // The false eye opens the door: Leon walks up, uses it, the camera cuts follow.
-extern "C" void r10f_DoorOpen()
+void r10f_DoorOpen()
 {
     cObj* eye;
     cPlayer* pl;

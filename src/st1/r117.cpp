@@ -99,23 +99,23 @@ static inline void r117_fadeWhite(int no, u32 start, u32 end)
     FadeSet(no, &col.start, &col.end, 5, 0, 0);
 }
 
-extern "C" void r117_MechanismInit();
-extern "C" void r117_LightSet(int n);
-extern "C" void r117_LightDirCalc(int n);
+void r117_MechanismInit();
+void r117_LightSet(int n);
+void r117_LightDirCalc(int n);
 static void r117_EventAshleyFind();
 static void r117_EventSaddlerAppear();
 static void r117_LightMechanism();
 static void r117_LightMechanismInit();
 static void r117_LightMechanismMove();
 static void r117_LightMechanismEndProc(int mode);
-extern "C" void r117_LightRotate(int no, f32 dir);
-extern "C" void r117_MechanismDisarm();
+void r117_LightRotate(int no, f32 dir);
+void r117_MechanismDisarm();
 static void r117_EventChandelier();
 static void r117_ThunderFlagOn();
 static void r117_ThunderFlagOff();
 static void r117_ThunderMove();
-extern "C" void Evt_R117S00_Func(Event* e);
-extern "C" void Evt_R117S10_Func(Event* e);
+void Evt_R117S00_Func(Event* e);
+void Evt_R117S10_Func(Event* e);
 static void R117S0_WhiteFade();
 
 // Room init (the church interior, chapter 2-1). Until Ashley is found (Scenario_flg[0] 0x00100000)
@@ -161,7 +161,7 @@ void R117Init()
 
 // The mechanism state from the room flags: bit 1 = solved, bit 2 = started; bits 3..14 hold the
 // three current quarter turns (4 flags each), bits 15..26 the three object turns.
-extern "C" void r117_MechanismInit()
+void r117_MechanismInit()
 {
     int i;
 
@@ -246,7 +246,7 @@ extern "C" void r117_MechanismInit()
 }
 
 // The three light beams for step n (0 = off, 1..4 = the effect sets 5/13/9 .. 8/16/12).
-extern "C" void r117_LightSet(int n)
+void r117_LightSet(int n)
 {
     u8 type[3];
 
@@ -323,7 +323,7 @@ void R117Main()
 }
 
 // Turn light object n (smd 0x1B / 0x19 / 0x1A) toward its beam.
-extern "C" void r117_LightDirCalc(int n)
+void r117_LightDirCalc(int n)
 {
     Vec dir;
     Vec rot;
@@ -622,7 +622,7 @@ static void r117_LightMechanismEndProc(int mode)
 }
 
 // Turn beam and object `no` a quarter turn in direction `dir` over 10 frames.
-extern "C" void r117_LightRotate(int no, f32 dir)
+void r117_LightRotate(int no, f32 dir)
 {
     f32 step[10] = {1.0f, 3.0f, 6.0f, 10.0f, 15.0f, 20.0f, 25.0f, 6.0f, 3.0f, 1.0f};
     int i;
@@ -643,7 +643,7 @@ extern "C" void r117_LightRotate(int no, f32 dir)
 
 // The lights are solved: areas 9/0xA/0xC/0xD/3/4 off, the gate objects 1/2 hidden (the way up opens),
 // area 5 (the stairs) on.
-extern "C" void r117_MechanismDisarm()
+void r117_MechanismDisarm()
 {
     SceAtSetEnable(9, 0);
     SceAtSetEnable(0xA, 0);
@@ -823,7 +823,7 @@ static void r117_ThunderMove()
 }
 
 // Event r117s00 handler: the etc models, the chandelier rope and the light sources.
-extern "C" void Evt_R117S00_Func(Event* e)
+void Evt_R117S00_Func(Event* e)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -913,7 +913,7 @@ extern "C" void Evt_R117S00_Func(Event* e)
 }
 
 // Event r117s10 handler: the event models' light sets, the ev0101 texture swap, the white fades.
-extern "C" void Evt_R117S10_Func(Event* e)
+void Evt_R117S10_Func(Event* e)
 {
     void* mod;
     void* mod2;

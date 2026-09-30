@@ -108,7 +108,6 @@ struct TBlockWork {
 static TBlockWork* blockWk;
 #define pW (blockWk)
 
-extern "C" {
 void tBlockInit_base();
 void tBlockInit();
 void set_filename();
@@ -138,7 +137,6 @@ static void tBlockDataLoad();
 static void tBlockDataSave();
 void tBlockSaveDataCreate();
 void tBlock_DebugCamera();
-}
 
 
 

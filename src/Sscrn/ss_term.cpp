@@ -58,7 +58,6 @@ void* GetModelInfoAddr(cModelInfo* info, int no);
 
 #define DVD_READ_N(name, dst, a, b, c, mode) DvdReadN(name, dst, a, b, c, mode, __FILE__, __LINE__)
 
-extern "C" {
 u32 MakeCol(f32 r, f32 g, f32 b, f32 a);
 void DbgDrawBoxFill(f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a);
 void partnerDataName(char* name, int no);
@@ -67,7 +66,6 @@ void termMotionSet(void* data, int no);
 void termMotionCancel(void* data, int no);
 void termModelAlloc(SUB_SCREEN* wk);
 void terminalCameraInit(SUB_SCREEN* wk, CAMERA* cam);
-}
 
 // Packs 0..1 float components into an ARGB8 colour word (debug drawing helper).
 u32 MakeCol(f32 r, f32 g, f32 b, f32 a)

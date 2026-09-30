@@ -14,6 +14,6 @@ class cEm10;
 extern void (*EmInitFunc)(cEm* em);
 
 // em10/em10.cpp: picks the Ganado voice table for the model type (the *_set.cpp Set functions call it).
-extern "C" void Em10SetSeTbl(cEm10* em, int type);
+void Em10SetSeTbl(cEm10* em, int type);
 
 #endif

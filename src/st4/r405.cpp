@@ -52,9 +52,9 @@ void st4_initAdaGame();   // st4.cpp
 static void snd_tbl_set();
 void setTexRender();
 static void R405ExecEventS00();
-extern "C" void Evt_R405S00_Func(Event* e);
+void Evt_R405S00_Func(Event* e);
 static void em_set();
-extern "C" cEm* R405_EmSetEvent(EM_LIST* d);
+cEm* R405_EmSetEvent(EM_LIST* d);
 static void em_set3();
 static void r405_StrCheck();
 
@@ -191,7 +191,7 @@ static void R405ExecEventS00()
 }
 
 // Event r405s00 callback: the Ada model pl0c00 gets light mask 1 and its chained child object shown on cut 0.
-extern "C" void Evt_R405S00_Func(Event* e)
+void Evt_R405S00_Func(Event* e)
 {
     void* mod;
 
@@ -257,7 +257,7 @@ static void em_set()
 }
 
 // EmSetEvent that returns the Ganado already alerted (setFindPL).
-extern "C" cEm* R405_EmSetEvent(EM_LIST* d)
+cEm* R405_EmSetEvent(EM_LIST* d)
 {
     cEm* em = EmSetEvent(d);
 

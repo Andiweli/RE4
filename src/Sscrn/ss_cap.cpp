@@ -22,9 +22,7 @@
 
 // The widget classes (SsCapInit / SsCapMain / CapSelect) are declared in ss_main.h.
 
-extern "C" {
 void dispCapList(SUB_SCREEN* wk);
-}
 
 // item ids of the 4 x 6 case grid
 u16 cap_id_tbl[24] = {
