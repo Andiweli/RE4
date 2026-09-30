@@ -4180,13 +4180,13 @@ address	size	section	unit	scope	name	demangled
 0x8012364C	0x34	.text	game/espgen02.cpp	global	Espgen02_Move__FP7cEspgen	Espgen02_Move
 0x80123680	0x2CC	.text	game/espgen02.cpp	global	Espgen02_SetFreeWork__FP7cEspgenP10cEspSeqTblP11cEspSeqHeadP6cModelUsPA2_A3_fP3VecT6P14ESPSEQ_CONTROLi	Espgen02_SetFreeWork
 0x8012394C	0x130	.text	game/espgen10.cpp	global	EspgenDataSet__FP11cEspSeqHeadUlP11cEffectCorePUlP6cModelUsPA2_A3_fP3VecT7P14ESPSEQ_CONTROLi	EspgenDataSet
-0x80123A7C	0x18	.text	game/espgen10.cpp	global	SetEspCore__FP7cEspgeniUlUcPvi	SetEspCore
+0x80123A7C	0x18	.text	game/espgen10.cpp	global	SetEspCore__FP11cEffectCoreiUlUcPvi	SetEspCore
 0x80123A94	0x80	.text	game/espgen10.cpp	global	PullEspEspgen__FPP7cEspgeniiUlPvii	PullEspEspgen
 0x80123B14	0x2B4	.text	game/espgen10.cpp	global	espgen10_Update__FP7cEspgen	espgen10_Update
 0x80123DC8	0x34	.text	game/espgen10.cpp	global	espgen10_Move00__FP7cEspgen	espgen10_Move00
 0x80123DFC	0x20	.text	game/espgen10.cpp	global	espgen10_Move01__FP7cEspgen	espgen10_Move01
 0x80123E1C	0x34	.text	game/espgen10.cpp	global	Espgen10_Move__FP7cEspgen	Espgen10_Move
-0x80123E50	0x4	.text	game/espgen40.cpp	global	Espgen40_Move__FP10cEspSeqTbl	Espgen40_Move
+0x80123E50	0x4	.text	game/espgen40.cpp	global	Espgen40_Move__FP7cEspgen	Espgen40_Move
 0x80123E54	0x70	.text	game/Espgen42.cpp	global	EspWaterInit__Fv	EspWaterInit
 0x80123EC4	0x60C	.text	game/Espgen42.cpp	global	AddWaterPowerSub__FP7cEspgen	AddWaterPowerSub
 0x801244D0	0xB0	.text	game/Espgen42.cpp	global	AddWaterPower__FR3Vecf	AddWaterPower
