@@ -119,7 +119,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000BC60	0x68	Sscrn/ss_main.cpp	global	idMainMenuFade__FP10SUB_SCREENi	idMainMenuFade
 .text	0x0000BCC8	0x150	Sscrn/ss_main.cpp	global	IdSubErase__Fv	IdSubErase
 .text	0x0000BE18	0xAC	Sscrn/ss_main.cpp	global	IdNumErase__Fv	IdNumErase
-.text	0x0000BEC4	0x258	Sscrn/ss_main.cpp	global	clearZbuffer__Fv	clearZbuffer
+.text	0x0000BEC4	0x258	Sscrn/ss_main.cpp	global	clearZbuffer__FPi	clearZbuffer
 .text	0x0000C11C	0x4C	Sscrn/ss_main.cpp	global	sscrnModelClear__FP10SUB_SCREEN	sscrnModelClear
 .text	0x0000C168	0x90	Sscrn/ss_main.cpp	global	sscrnModelFree__FP10SUB_SCREEN	sscrnModelFree
 .text	0x0000C1F8	0x254	Sscrn/ss_main.cpp	global	sscrnLightClear__FP10SUB_SCREEN	sscrnLightClear
@@ -455,10 +455,10 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0002C948	0x60	Sscrn/ss_term.cpp	global	FindButton__10cDbgWindowiiPP10cDbgButton	cDbgWindow::FindButton
 .text	0x0002C9A8	0x188	Sscrn/ss_term.cpp	global	LocalUpdate__10cDbgWindow	cDbgWindow::LocalUpdate
 .text	0x0002CB30	0x1E4	Sscrn/ss_term.cpp	global	LocalDisp__10cDbgWindow	cDbgWindow::LocalDisp
-.text	0x0002CD14	0x4C	Sscrn/ss_term.cpp	global	init__9cFileList	cFileList::init
+.text	0x0002CD14	0x4C	Sscrn/ss_term.cpp	global	init__9cFileListPCcT1	cFileList::init
 .text	0x0002CD60	0x1B4	Sscrn/ss_term.cpp	global	disp__9cFileListiii	cFileList::disp
 .text	0x0002CF14	0x178	Sscrn/ss_term.cpp	global	update__9cFileList	cFileList::update
-.text	0x0002D08C	0x160	Sscrn/ss_term.cpp	global	dir__9cFileListPcT1	cFileList::dir
+.text	0x0002D08C	0x160	Sscrn/ss_term.cpp	global	dir__9cFileListPCcT1	cFileList::dir
 .text	0x0002D1EC	0x3CC	Sscrn/ss_term.cpp	global	OpeMesTblInit__10SsTermMainP10SUB_SCREEN	SsTermMain::OpeMesTblInit
 .text	0x0002D5B8	0x38	Sscrn/ss_term.cpp	global	OpeMdtSet__10SsTermMain	SsTermMain::OpeMdtSet
 .text	0x0002D5F0	0x70	Sscrn/ss_term.cpp	global	OpeMdtSetNo__10SsTermMaini	SsTermMain::OpeMdtSetNo

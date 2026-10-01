@@ -90,8 +90,8 @@ void r101_FindPlayer();
 static void r101_setChickenFlag();
 static void r101_Event00();
 static void r101_callGanadoVoice();
-void Evt_R101S21_Func(Event* e);
-void Evt_R101S30_Func(Event* e);
+void Evt_R101S21_Func(Event* e, u32);
+void Evt_R101S30_Func(Event* e, u32);
 
 
 // Clear the death bit of list entry `no` in the loaded enemy list's death words (pG->Em_flg[list]).
@@ -1047,7 +1047,7 @@ static void r101_callGanadoVoice()
 }
 
 // Event r101s21 callback: fetch the etc model et0800 on the first frame (registers it with the event).
-void Evt_R101S21_Func(Event* e)
+void Evt_R101S21_Func(Event* e, u32)
 {
     void* mod;
 
@@ -1058,7 +1058,7 @@ void Evt_R101S21_Func(Event* e)
 
 // Event r101s30 callback (the church bell rings, the Ganados leave): hides the ladders during the event,
 // hands scroll object 0x39 (scr0000) to the event on cut 0 and puts it back at the end.
-void Evt_R101S30_Func(Event* e)
+void Evt_R101S30_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};

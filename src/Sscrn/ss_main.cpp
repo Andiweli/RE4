@@ -50,7 +50,7 @@ extern void (*_dtors[])(void);
 // The widget classes (SsExitInit / SsExitMain / SsItemExamine) are declared in ss_main.h.
 
 void SubScreenTask();
-void clearZbuffer();
+void clearZbuffer(int*);
 void sscrnCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 int sscrnKey2Game(SUB_SCREEN* wk);
 void dispScrollBar(u32 top, u32 n, u32 num, ID_UNIT* bar, ID_UNIT* up, ID_UNIT* down);
@@ -735,7 +735,7 @@ void IdNumErase()
 
 // Clears the Z buffer with a full screen quad at the far plane (the model screens draw over the 2D
 // background).
-void clearZbuffer()
+void clearZbuffer(int*)
 {
     static f32 clear_z = -0.99999f;
     Mtx44 proj;

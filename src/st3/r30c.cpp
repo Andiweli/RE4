@@ -54,7 +54,7 @@ static R30cWork* r30c_work;
 static void r30c_checkImprisonDoorKeyUse();
 static void r30c_checkImprisonDoor();
 static void R30cEventS00();
-void Evt_R30CS00_Func(Event* e);
+void Evt_R30CS00_Func(Event* e, u32);
 static void r30c_EventCut();
 static void r30c_EventCutEndProc();
 static void r30c_AshleyShout();
@@ -220,7 +220,7 @@ static void R30cEventS00()
 }
 
 // Event r30cs00 callback: the pl0100 model's status flag 0x40 on for cut 0 and off from cut 1.
-void Evt_R30CS00_Func(Event* e)
+void Evt_R30CS00_Func(Event* e, u32)
 {
     if (e->GetFuncType() == 1) {
         switch (e->GetNowCut()) {

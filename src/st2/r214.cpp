@@ -128,7 +128,7 @@ void r214_getTargetPos(Vec* out);
 static void r214_BridgeRotate();
 static void r214_BridgeRotateEndProc();
 static void r214_BridgeRotateCamera();
-void Evt_R214S00_Func(Event* e);
+void Evt_R214S00_Func(Event* e, u32);
 
 static const R214CatapultData r214_catTbl[3] = {
     {0x4E, 4.4505897f, 0xE9},
@@ -1004,7 +1004,7 @@ static void r214_BridgeRotateCamera()
 
 // Event r214s00 callback: scroll object 0x18 hidden; light mask 8 on evma900; cut 0 closes the
 // binocular view if it was up (Status_flg[0] 0x400); later cuts set model flags.
-void Evt_R214S00_Func(Event* e)
+void Evt_R214S00_Func(Event* e, u32)
 {
     void* mod;
 

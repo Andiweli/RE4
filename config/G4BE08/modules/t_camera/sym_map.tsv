@@ -193,7 +193,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0001A67C	0xBC	t_camera/t_camera_data.cpp	global	tcGetFileName__FPcii	tcGetFileName
 .text	0x0001A738	0x538	t_camera/t_camera_data.cpp	global	tcDataExport__FPUc	tcDataExport
 .text	0x0001AC70	0x4DC	t_camera/t_camera_data.cpp	global	tcDataImport__FPUc	tcDataImport
-.text	0x0001B14C	0xC	t_camera/t_camera_data.cpp	global	tcGetFloor__Fv	tcGetFloor
+.text	0x0001B14C	0xC	t_camera/t_camera_data.cpp	global	tcGetFloor__FP3Vec	tcGetFloor
 .text	0x0001B158	0xF4	t_camera/t_camera_data.cpp	global	tcPlayerMove__Fv	tcPlayerMove
 .text	0x0001B24C	0x48	t_camera/t_camera_data.cpp	global	tcCameraDebugMove__Fv	tcCameraDebugMove
 .text	0x0001B294	0x70	t_camera/t_camera_data.cpp	global	tcGameCamera2ToolCamera__Fv	tcGameCamera2ToolCamera

@@ -89,8 +89,8 @@ void r105_EmSet();
 static void r105_StreanChk();
 static void r105_bgmCheck();
 static void r105_checkDoor();
-void Evt_R105S00_Func(Event* e);
-void Evt_R105S10_Func(Event* e);
+void Evt_R105S00_Func(Event* e, u32);
+void Evt_R105S10_Func(Event* e, u32);
 static void r105_execOpenCover();
 static void r105_checkCloseCover();
 void r105_checkCesspit0();
@@ -668,7 +668,7 @@ static void r105_checkDoor()
 
 // Event r105s00 callback: funcMode 0 shows etc model 1; cuts 0xA..0xC toggle model info 3 (a held item)
 // of the Leon model pl0000 off / on.
-void Evt_R105S00_Func(Event* e)
+void Evt_R105S00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -712,7 +712,7 @@ void Evt_R105S00_Func(Event* e)
 // Event r105s10 (and s99) callback, Ashley (pl0200): her model info 5 hidden on cut 0 frame 15 and shown
 // from cut 1; cut 0 shows etc model 1 and evm2500; cuts 0x13/0x14 swap Ashley's parts (the alternate
 // costume model pl8200 when game_costume == 1); funcMode 2 (end) restores etc model 1's display.
-void Evt_R105S10_Func(Event* e)
+void Evt_R105S10_Func(Event* e, u32)
 {
     void* mod;
     cEmWindow* win;

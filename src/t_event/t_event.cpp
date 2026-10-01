@@ -35,10 +35,6 @@
 
 void DbMenuSetExecTool(const char* name);
 
-// cFileList::init really takes the list buffer and the host directory (the symbol keeps the
-// parameterless name).
-int FileListInit(cFileList* l, char* buf, const char* dir) __asm__("init__9cFileList");
-
 // EvtDebug's leading fields: the event name and the header copy the tool fills at load
 struct EvtDebugView {
     char name[0x20];   // 0x00
@@ -351,7 +347,7 @@ ToolEvt::ToolEvt()
     }
     EvtMgr.ToolCoreEvdDel();
     sprintf(path, "%sr%x%02xs??.evd", "x:\\soft\\room\\event\\evd\\", pG->stage_no, pG->room_no);
-    if (FileListInit(&DbgFileList, path, "x:\\soft\\room\\event\\evd\\") == 0) {
+    if (DbgFileList.init(path, "x:\\soft\\room\\event\\evd\\") == 0) {
         EtcFlag |= TefBit(TefExit);
     }
     DbgFlagOn(pG, DBG_EVENT_TOOL);

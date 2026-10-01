@@ -85,7 +85,7 @@ static void r204_EventChandelier1();
 static void r204_EventChandelier2();
 static void r204_EventExec();
 static void r204_openTerm();
-void Evt_R204S00_Func(Event* e);
+void Evt_R204S00_Func(Event* e, u32);
 static void r204_checkEmDead();
 static void door_move();
 
@@ -976,7 +976,7 @@ static void r204_openTerm()
 
 // Event r204s00 callback: cut 0 hides scroll object 0xC and sets the pl0100 / evm6500 / evm0200 models'
 // light mask / draw flags; later cuts hand objects to the event and swap models; the end restores them.
-void Evt_R204S00_Func(Event* e)
+void Evt_R204S00_Func(Event* e, u32)
 {
     void* mod;
     void* mod2;

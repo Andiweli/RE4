@@ -61,7 +61,7 @@ static s16 r330_scrollTbl[5] = {30, 15, 20, 25, 40};
 
 void R330EventS00Main();
 void R330EventS00End();
-void Evt_R330S00_Func(Event* e);
+void Evt_R330S00_Func(Event* e, u32);
 void EvtTexRenderCamTrans(Event* e, int cut);
 
 // Room init: the barred doors 0xA/0xB paired; the s00 callback; until seen (Room_flg bit 0) area 3 =
@@ -211,7 +211,7 @@ void R330EventS00End()
 
 // Event r330s00 callback: the pre-event objects hidden / shown, the two screen render passes fed on
 // their cuts (EvtTexRenderCamTrans), the idR330 HUD driven by the event mode, per-cut model flags.
-void Evt_R330S00_Func(Event* e)
+void Evt_R330S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};

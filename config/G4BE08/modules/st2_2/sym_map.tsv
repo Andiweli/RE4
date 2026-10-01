@@ -55,7 +55,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00002AC0	0x188	st2_2/r212.cpp	local	r212_Puzzle__Fv	r212_Puzzle
 .text	0x00002C48	0x9C	st2_2/r212.cpp	local	r212_PuzzleEndProc__Fv	r212_PuzzleEndProc
 .text	0x00002CE4	0x218	st2_2/r212.cpp	local	r212_EventTrap__Fv	r212_EventTrap
-.text	0x00002EFC	0xE4	st2_2/r212.cpp	global	Evt_R212S00_Func__FP5Event	Evt_R212S00_Func
+.text	0x00002EFC	0xE4	st2_2/r212.cpp	global	Evt_R212S00_Func__FP5EventUl	Evt_R212S00_Func
 .text	0x00002FE0	0x3AC	st2_2/r212.cpp	local	r212_RoofMove__Fv	r212_RoofMove
 .text	0x0000338C	0x360	st2_2/r212.cpp	local	r212_RoofTrapWatcher__Fv	r212_RoofTrapWatcher
 .text	0x000036EC	0x94	st2_2/r212.cpp	local	r212_MesRoofDoor__Fv	r212_MesRoofDoor
@@ -111,7 +111,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00007B88	0x90	st2_2/r213.cpp	local	R213EventBridgeDownEnd__Fv	R213EventBridgeDownEnd
 .text	0x00007C18	0x64	st2_2/r213.cpp	local	SceBgmCheck__Fv	SceBgmCheck
 .text	0x00007C7C	0xC0	st2_2/r213.cpp	local	R213Event__Fv	R213Event
-.text	0x00007D3C	0x410	st2_2/r213.cpp	global	Evt_R213S00_Func__FP5Event	Evt_R213S00_Func
+.text	0x00007D3C	0x410	st2_2/r213.cpp	global	Evt_R213S00_Func__FP5EventUl	Evt_R213S00_Func
 .text	0x0000814C	0x77C	st2_2/r214.cpp	global	R214Init__Fv	R214Init
 .text	0x000088C8	0xD0	st2_2/r214.cpp	global	R214Main__Fv	R214Main
 .text	0x00008998	0x94	st2_2/r214.cpp	local	r214_execEvent00__Fv	r214_execEvent00
@@ -135,15 +135,15 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000A83C	0x1AC	st2_2/r214.cpp	local	r214_BridgeRotate__Fv	r214_BridgeRotate
 .text	0x0000A9E8	0xFC	st2_2/r214.cpp	local	r214_BridgeRotateEndProc__Fv	r214_BridgeRotateEndProc
 .text	0x0000AAE4	0x7C	st2_2/r214.cpp	local	r214_BridgeRotateCamera__Fv	r214_BridgeRotateCamera
-.text	0x0000AB60	0x284	st2_2/r214.cpp	global	Evt_R214S00_Func__FP5Event	Evt_R214S00_Func
+.text	0x0000AB60	0x284	st2_2/r214.cpp	global	Evt_R214S00_Func__FP5EventUl	Evt_R214S00_Func
 .text	0x0000ADE4	0x3B8	st2_2/r214.cpp	global	fn_st2_2_ADE4	.
 .text	0x0000B19C	0x124	st2_2/r215.cpp	global	R215Init__Fv	R215Init
 .text	0x0000B2C0	0x4	st2_2/r215.cpp	global	R215Main__Fv	R215Main
 .text	0x0000B2C4	0x188	st2_2/r215.cpp	global	R215_Event__Fv	R215_Event
 .text	0x0000B44C	0x18	st2_2/r215.cpp	local	r215_succeedAction__Fv	r215_succeedAction
-.text	0x0000B464	0x420	st2_2/r215.cpp	global	Evt_R215S00_Func__FP5Event	Evt_R215S00_Func
-.text	0x0000B884	0x46C	st2_2/r215.cpp	global	Evt_R215S01_Func__FP5Event	Evt_R215S01_Func
-.text	0x0000BCF0	0x4	st2_2/r215.cpp	global	Evt_R215S02_Func__FP5Event	Evt_R215S02_Func
+.text	0x0000B464	0x420	st2_2/r215.cpp	global	Evt_R215S00_Func__FP5EventUl	Evt_R215S00_Func
+.text	0x0000B884	0x46C	st2_2/r215.cpp	global	Evt_R215S01_Func__FP5EventUl	Evt_R215S01_Func
+.text	0x0000BCF0	0x4	st2_2/r215.cpp	global	Evt_R215S02_Func__FP5EventUl	Evt_R215S02_Func
 .text	0x0000BCF4	0x3B8	st2_2/r215.cpp	global	fn_st2_2_BCF4	.
 .text	0x0000C0AC	0x1B8	st2_2/r216.cpp	global	R216Init__Fv	R216Init
 .text	0x0000C264	0x58	st2_2/r216.cpp	global	R216Main__Fv	R216Main

@@ -41,7 +41,7 @@ static void r30a_moveElevator(u32 dir);
 void r30a_initElevator();
 static void r30a_execEvent10();
 static void R30aEventS00();
-void Evt_R30AS00_Func(Event* e);
+void Evt_R30AS00_Func(Event* e, u32);
 
 // Room init: the s00 (and s98) callback. In the escape phase (Scenario_flg[1] 0x800, consumed here):
 // BGM table 3 off and the s00 escape event once (Room_flg bit 0). Otherwise area 3 = the s10 event once
@@ -256,7 +256,7 @@ static void R30aEventS00()
 }
 
 // Events r30as00 / r30as98: the light follows the player model, the fades and the hidden enemy part.
-void Evt_R30AS00_Func(Event* e)
+void Evt_R30AS00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:

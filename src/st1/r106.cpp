@@ -66,7 +66,7 @@ static void r106_shakeClosetBody(cModel* m);
 static void r106_shakeClosetDoorR(cModel* m);
 static void r106_shakeClosetDoorL(cModel* m);
 static void r106_setCloset();
-void Evt_R106S00_Func(Event* ev);
+void Evt_R106S00_Func(Event* ev, u32);
 void r106_setEm();
 
 // Room init. Until Luis is found (Scenario_flg[0] 0x00200000) the closet event and the shaking
@@ -482,7 +482,7 @@ static void r106_setCloset()
 }
 
 // Event r106s00 handler: the closet, the Ganado models in the doorway, the weapon.
-void Evt_R106S00_Func(Event* ev)
+void Evt_R106S00_Func(Event* ev, u32)
 {
     void* mod;
 

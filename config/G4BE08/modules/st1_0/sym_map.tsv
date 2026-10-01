@@ -23,9 +23,9 @@ section	offset	size	unit	scope	name	demangled
 .text	0x000035BC	0x138	st1_0/r100.cpp	local	r100_MesBrige__Fv	r100_MesBrige
 .text	0x000036F4	0x21C	st1_0/r100.cpp	local	r100_EventBrige__Fv	r100_EventBrige
 .text	0x00003910	0x168	st1_0/r100.cpp	global	setTexRender__Fv	setTexRender
-.text	0x00003A78	0x88	st1_0/r100.cpp	global	Evt_R100S40_Func__FP5Event	Evt_R100S40_Func
-.text	0x00003B00	0xF4	st1_0/r100.cpp	global	Evt_R100S20_Func__FP5Event	Evt_R100S20_Func
-.text	0x00003BF4	0xDC	st1_0/r100.cpp	global	Evt_R100S03_Func__FP5Event	Evt_R100S03_Func
+.text	0x00003A78	0x88	st1_0/r100.cpp	global	Evt_R100S40_Func__FP5EventUl	Evt_R100S40_Func
+.text	0x00003B00	0xF4	st1_0/r100.cpp	global	Evt_R100S20_Func__FP5EventUl	Evt_R100S20_Func
+.text	0x00003BF4	0xDC	st1_0/r100.cpp	global	Evt_R100S03_Func__FP5EventUl	Evt_R100S03_Func
 .text	0x00003CD0	0xB0	st1_0/r100.cpp	local	r100_mes_gaikotu_bgm__Fv	r100_mes_gaikotu_bgm
 .text	0x00003D80	0x7C	st1_0/r100.cpp	local	r100_mes_gaikotu__Fv	r100_mes_gaikotu
 .text	0x00003DFC	0x28	st1_0/r100.cpp	local	r100_mes_gaikotu_bgm_down__Fv	r100_mes_gaikotu_bgm_down
@@ -39,8 +39,8 @@ section	offset	size	unit	scope	name	demangled
 .text	0x000040B0	0xBC	st1_0/r120.cpp	global	R120Init__Fv	R120Init
 .text	0x0000416C	0x4	st1_0/r120.cpp	global	R120Main__Fv	R120Main
 .text	0x00004170	0x214	st1_0/r120.cpp	global	R120Event__Fv	R120Event
-.text	0x00004384	0x6AC	st1_0/r120.cpp	global	Evt_R120S00_Func__FP5Event	Evt_R120S00_Func
-.text	0x00004A30	0xA74	st1_0/r120.cpp	global	Evt_R120S01_Func__FP5Event	Evt_R120S01_Func
+.text	0x00004384	0x6AC	st1_0/r120.cpp	global	Evt_R120S00_Func__FP5EventUl	Evt_R120S00_Func
+.text	0x00004A30	0xA74	st1_0/r120.cpp	global	Evt_R120S01_Func__FP5EventUl	Evt_R120S01_Func
 .text	0x000054A4	0x3E4	st1_0/r120.cpp	global	EventCarInit__FP5Event	EventCarInit
 .text	0x00005888	0xE8	st1_0/r120.cpp	global	EvtTexRenderCamTrans__FP5Eventi	EvtTexRenderCamTrans
 .text	0x00005970	0x3B8	st1_0/r120.cpp	global	fn_st1_0_5970	.

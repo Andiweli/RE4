@@ -67,7 +67,7 @@ static void r11b_EmEvent_exit();
 static void r11b_EmEvent();
 static void R11b_Event();
 static void r11b_str_check();
-void Evt_R11BS00_Func(Event* e);
+void Evt_R11BS00_Func(Event* e, u32);
 static void r11b_bort_pos_chk();
 
 // Room init for the lake shore and boat dock. The boat enemy is placed at the pier its return
@@ -474,7 +474,7 @@ static inline void r11b_evtEffDelete()
 // Event r11bs00 callback (two Ganados dump the officer's body in the lake; Del Lago takes them): hides
 // object 0x7C; fade-in on cut 0 unless skipped; per-cut splash / ripple effects (skipped when the event
 // is being skipped) and the water render setup on the player stand-in; the end restores the shore.
-void Evt_R11BS00_Func(Event* e)
+void Evt_R11BS00_Func(Event* e, u32)
 {
     void* mod;
 

@@ -2689,12 +2689,7 @@ void tcDrawRail()
         tcDrawSphere(&c->pos[i], col, r);
         if (pTc->editMode == 1 && pTc->editSel == 1 && i == pTc->curKey && pTc->editCursor == 1) {
             v = c->pos[i];
-            {
-                register Vec* a3 asm("r3");  // COMPILER-DIFF: candidate #18 (struct-return-like address in r3 before a no-argument call)
-                a3 = &v;
-                asm("" : "=m"(v.y) : "r"(a3));
-            }
-            v.y = tcGetFloor();
+            v.y = tcGetFloor(&v);
             tcDrawLine3D(&c->pos[i], &v, 0xFF0000FE);
         }
         col = 0x0000FFFE;
@@ -2710,12 +2705,7 @@ void tcDrawRail()
         tcDrawSphere(&c->at[i], col, r);
         if (pTc->editMode == 1 && pTc->editSel == 1 && i == pTc->curKey && pTc->editCursor == 2) {
             v = c->at[i];
-            {
-                register Vec* a3 asm("r3");  // COMPILER-DIFF: candidate #18 (struct-return-like address in r3 before a no-argument call)
-                a3 = &v;
-                asm("" : "=m"(v.y) : "r"(a3));
-            }
-            v.y = tcGetFloor();
+            v.y = tcGetFloor(&v);
             tcDrawLine3D(&c->at[i], &v, 0xFF0000FE);
         }
         if (pTc->editMode == 1 && pTc->editSel == 1) {

@@ -29,9 +29,9 @@ static R215Work* r215_work;
 
 void R215_Event();
 static void r215_succeedAction();
-void Evt_R215S00_Func(Event* e);
-void Evt_R215S01_Func(Event* e);
-void Evt_R215S02_Func(Event* e);
+void Evt_R215S00_Func(Event* e, u32);
+void Evt_R215S01_Func(Event* e, u32);
+void Evt_R215S02_Func(Event* e, u32);
 
 
 // The rooms call Event::FlgOnStatus out of line (event.h has it in-class).
@@ -117,7 +117,7 @@ static void r215_succeedAction()
 // Event r215s00 callback: status 3 with cancel cut 9; shadow camera size zeroed on cut 3; cut 0 assigns
 // light masks to the pl0100 / em3700 / evm* event models and be_flag 0x80 to some; cut 0xA and the end
 // modes 2/3 handle the QTE window and cleanup.
-void Evt_R215S00_Func(Event* e)
+void Evt_R215S00_Func(Event* e, u32)
 {
     void* mod;
 
@@ -186,7 +186,7 @@ void Evt_R215S00_Func(Event* e)
 
 // Event r215s01 callback: shadow camera size zeroed on cut 0x10; scroll objects 0x2C/0x2E hidden during
 // cut 0x11; per-cut light masks / flags on the event models.
-void Evt_R215S01_Func(Event* e)
+void Evt_R215S01_Func(Event* e, u32)
 {
     void* mod;
 
@@ -253,6 +253,6 @@ void Evt_R215S01_Func(Event* e)
 }
 
 // Event r215s02 callback (the failure event): nothing to do.
-void Evt_R215S02_Func(Event* e)
+void Evt_R215S02_Func(Event* e, u32)
 {
 }

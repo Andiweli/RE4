@@ -114,7 +114,7 @@ void r212_SetSwitchInfo();
 static void r212_Puzzle();
 static void r212_PuzzleEndProc();
 static void r212_EventTrap();
-void Evt_R212S00_Func(Event* e);
+void Evt_R212S00_Func(Event* e, u32);
 static void r212_RoofMove();
 static void r212_RoofTrapWatcher();
 static void r212_MesRoofDoor();
@@ -393,7 +393,7 @@ static void r212_EventTrap()
 
 // Event r212s00 callback (the roof trap closes in): objects 0x1B/0xC shown for the event, light mask
 // 0x40 on pl0100, then hidden again.
-void Evt_R212S00_Func(Event* e)
+void Evt_R212S00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:

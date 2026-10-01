@@ -63,9 +63,9 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00006A68	0x20	st1_2/r119.cpp	global	YaneB_delete__Fv	YaneB_delete
 .text	0x00006A88	0xA8	st1_2/r119.cpp	global	YaneC_delete__Fv	YaneC_delete
 .text	0x00006B30	0xD0	st1_2/r119.cpp	global	koya_init__Fv	koya_init
-.text	0x00006C00	0x738	st1_2/r119.cpp	global	Evt_R119S00_Func__FP5Event	Evt_R119S00_Func
-.text	0x00007338	0x70	st1_2/r119.cpp	global	Evt_R119S10_Func__FP5Event	Evt_R119S10_Func
-.text	0x000073A8	0x3BC	st1_2/r119.cpp	global	Evt_R119S20_Func__FP5Event	Evt_R119S20_Func
+.text	0x00006C00	0x738	st1_2/r119.cpp	global	Evt_R119S00_Func__FP5EventUl	Evt_R119S00_Func
+.text	0x00007338	0x70	st1_2/r119.cpp	global	Evt_R119S10_Func__FP5EventUl	Evt_R119S10_Func
+.text	0x000073A8	0x3BC	st1_2/r119.cpp	global	Evt_R119S20_Func__FP5EventUl	Evt_R119S20_Func
 .text	0x00007764	0x3B8	st1_2/r119.cpp	global	fn_st1_2_7764	.
 .text	0x00007B1C	0xC8	st1_2/r11a.cpp	global	R11aInit__Fv	R11aInit
 .text	0x00007BE4	0x20	st1_2/r11a.cpp	global	R11aMain__Fv	R11aMain
@@ -81,7 +81,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00008AA8	0x4D4	st1_2/r11b.cpp	local	r11b_EmEvent__Fv	r11b_EmEvent
 .text	0x00008F7C	0x11C	st1_2/r11b.cpp	local	R11b_Event__Fv	R11b_Event
 .text	0x00009098	0x128	st1_2/r11b.cpp	local	r11b_str_check__Fv	r11b_str_check
-.text	0x000091C0	0x9AC	st1_2/r11b.cpp	global	Evt_R11BS00_Func__FP5Event	Evt_R11BS00_Func
+.text	0x000091C0	0x9AC	st1_2/r11b.cpp	global	Evt_R11BS00_Func__FP5EventUl	Evt_R11BS00_Func
 .text	0x00009B6C	0x15C	st1_2/r11b.cpp	local	r11b_bort_pos_chk__Fv	r11b_bort_pos_chk
 .text	0x00009CC8	0x3B8	st1_2/r11b.cpp	global	fn_st1_2_9CC8	.
 .text	0x0000A080	0x20	st1_2/st1.cpp	global	set__FiPFv_vT1	set

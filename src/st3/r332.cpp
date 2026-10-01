@@ -129,9 +129,9 @@ static void R332EventS10();
 static void R332EventS20();
 void R332Em32RocketDie(cObj* obj);
 void R332ScrTrans(int on);
-void Evt_R332S00_Func(Event* e);
-void Evt_R332S10_Func(Event* e);
-void Evt_R332S20_Func(Event* e);
+void Evt_R332S00_Func(Event* e, u32);
+void Evt_R332S10_Func(Event* e, u32);
+void Evt_R332S20_Func(Event* e, u32);
 static void setTexRender();
 
 // The room's flag words from pG->flags_174 on, one bit per number (0x40/0x41 are the bits of 0x17C).
@@ -1631,7 +1631,7 @@ void R332ScrTrans(int on)
 
 // Event r332s00 callback (Saddler appears): scroll object 0xA hidden; fades and the evmc200 / pl8200 /
 // evmd100 / Ashley (pl0200) models' flags per cut; the end shows 0xA again.
-void Evt_R332S00_Func(Event* e)
+void Evt_R332S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
@@ -1732,7 +1732,7 @@ void Evt_R332S00_Func(Event* e)
 // Event r332s10 callback (after the kill): the pillar state, the obm3d00 / evma500 / evmb500 / evm9500
 // models per cut, the dead boss models darkened (R332Em32RocketDie), the arena scroll objects swapped;
 // cut 0xD starts the escape count-down (0x1518 frames); the end sets it to 0x127D and restarts it.
-void Evt_R332S10_Func(Event* e)
+void Evt_R332S10_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1860,7 +1860,7 @@ void Evt_R332S10_Func(Event* e)
 }
 
 // Event r332s20 callback (the special rocket is thrown down): per-cut model flags for the rocket case.
-void Evt_R332S20_Func(Event* e)
+void Evt_R332S20_Func(Event* e, u32)
 {
     void* mod;
 

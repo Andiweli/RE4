@@ -94,9 +94,9 @@ void YaneB_smd_delete();
 void YaneB_delete();
 void YaneC_delete();
 void koya_init();
-void Evt_R119S00_Func(Event* e);
-void Evt_R119S10_Func(Event* e);
-void Evt_R119S20_Func(Event* e);
+void Evt_R119S00_Func(Event* e, u32);
+void Evt_R119S10_Func(Event* e, u32);
+void Evt_R119S20_Func(Event* e, u32);
 
 // Third SetTree block: the pRoomArc read goes through the struct view `pG` so the `lwz pG` depends
 // on the preceding pos/rot stores (a plain `pG` load is a fixed scalar that sched2 hoists above them).
@@ -660,7 +660,7 @@ static inline void r119_evtBridgeOn()
 // hands scroll objects 0x21..0x23 (scr0000..scr0300) to the event at the origin; cuts 0xC/0xD swap the
 // gate objects, cuts 0x10/0xE/0x13/0x14/0x17 hide the bridge and hut parts the giant smashes; the end
 // (funcMode 2) restores them via r119_evtBridgeOn.
-void Evt_R119S00_Func(Event* e)
+void Evt_R119S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
@@ -799,7 +799,7 @@ void Evt_R119S00_Func(Event* e)
 }
 
 // Event r119s10 callback: show the giant model em2b00 on its first frame.
-void Evt_R119S10_Func(Event* e)
+void Evt_R119S10_Func(Event* e, u32)
 {
     if (e->GetFuncType() == 1 && e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
         r119_evtSetGiant(e, "em2b00");
@@ -807,7 +807,7 @@ void Evt_R119S10_Func(Event* e)
 }
 
 // Event r119s20 callback (the giant's death): hands scroll object 0x21 (scr0000) to the event on cut 0.
-void Evt_R119S20_Func(Event* e)
+void Evt_R119S20_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};

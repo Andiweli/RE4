@@ -175,10 +175,10 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00015BA0	0x8	t_event/db_toolbase.cpp	global	GetCx__14cDbgWindowBase	cDbgWindowBase::GetCx
 .text	0x00015BA8	0x8	t_event/db_toolbase.cpp	global	GetCy__14cDbgWindowBase	cDbgWindowBase::GetCy
 .text	0x00015BB0	0x4	t_event/db_toolbase.cpp	global	SetCurrentBottomButton__14cDbgWindowBase	cDbgWindowBase::SetCurrentBottomButton
-.text	0x00015BB4	0x4C	t_event/db_filelist.cpp	global	init__9cFileList	cFileList::init
+.text	0x00015BB4	0x4C	t_event/db_filelist.cpp	global	init__9cFileListPCcT1	cFileList::init
 .text	0x00015C00	0x1B4	t_event/db_filelist.cpp	global	disp__9cFileListiii	cFileList::disp
 .text	0x00015DB4	0x178	t_event/db_filelist.cpp	global	update__9cFileList	cFileList::update
-.text	0x00015F2C	0x160	t_event/db_filelist.cpp	global	dir__9cFileListPcT1	cFileList::dir
+.text	0x00015F2C	0x160	t_event/db_filelist.cpp	global	dir__9cFileListPCcT1	cFileList::dir
 .text	0x0001608C	0x4	t_event/db_filelist.cpp	global	__static_initialization_and_destruction_0	__static_initialization_and_destruction_0
 .text	0x00016090	0x2C	t_event/db_filelist.cpp	local	global_constructors_keyed_to_cFileList_init	global constructors keyed to cFileList::init
 .text	0x000160BC	0x2C	t_event/db_filelist.cpp	local	global_destructors_keyed_to_cFileList_init	global destructors keyed to cFileList::init

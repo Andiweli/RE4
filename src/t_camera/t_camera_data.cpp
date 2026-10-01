@@ -359,7 +359,7 @@ int tcDataImport(u8* buf)
 }
 
 // Floor height used by the shoulder camera preview (fixed 100).
-f32 tcGetFloor()
+f32 tcGetFloor(Vec*)
 {
     return 100.0f;
 }

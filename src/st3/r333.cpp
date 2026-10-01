@@ -68,8 +68,8 @@ static R333Work* r333_work;
 
 void R333EventS00();
 void R333EventS10();
-void Evt_R333S00_Func(Event* e);
-void Evt_R333S10_Func(Event* e);
+void Evt_R333S00_Func(Event* e, u32);
+void Evt_R333S10_Func(Event* e, u32);
 static void setTexRender();
 static void exec_no_ret_exit();
 static void exec_no_ret();
@@ -264,7 +264,7 @@ void R333EventS10()
 // Event r333s00 callback (the ride starts): the jet ski object 3 hidden and the count-down remembered;
 // cuts 0/1 set the event flags and the Leon / Ashley (pl0100) models' parts; the end shows the jet ski
 // and restarts the count-down with the event's length subtracted.
-void Evt_R333S00_Func(Event* e)
+void Evt_R333S00_Func(Event* e, u32)
 {
     void* mod;
 
@@ -309,7 +309,7 @@ void Evt_R333S00_Func(Event* e)
 // Event r333s10 callback (the escape from the collapsing island): drops the cave effects 0xC..0x2B,
 // hides the jet ski; per cut the wall object 0xCE, the Leon / Ashley / evm8100 models and the screen
 // capture filter (alpha fading from 230 over 50 frames) on cuts 0xD/0xE; the end leads into the result.
-void Evt_R333S10_Func(Event* e)
+void Evt_R333S10_Func(Event* e, u32)
 {
     static int alpha = 230;
     static int alphaTime = 50;

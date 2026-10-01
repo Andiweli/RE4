@@ -114,8 +114,8 @@ static void r117_EventChandelier();
 static void r117_ThunderFlagOn();
 static void r117_ThunderFlagOff();
 static void r117_ThunderMove();
-void Evt_R117S00_Func(Event* e);
-void Evt_R117S10_Func(Event* e);
+void Evt_R117S00_Func(Event* e, u32);
+void Evt_R117S10_Func(Event* e, u32);
 static void R117S0_WhiteFade();
 
 // Room init (the church interior, chapter 2-1). Until Ashley is found (Scenario_flg[0] 0x00100000)
@@ -823,7 +823,7 @@ static void r117_ThunderMove()
 }
 
 // Event r117s00 handler: the etc models, the chandelier rope and the light sources.
-void Evt_R117S00_Func(Event* e)
+void Evt_R117S00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -913,7 +913,7 @@ void Evt_R117S00_Func(Event* e)
 }
 
 // Event r117s10 handler: the event models' light sets, the ev0101 texture swap, the white fades.
-void Evt_R117S10_Func(Event* e)
+void Evt_R117S10_Func(Event* e, u32)
 {
     void* mod;
     void* mod2;

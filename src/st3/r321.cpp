@@ -39,7 +39,7 @@ static R321Work* r321_work;
 static void r321_heri_down();
 
 
-void Evt_R321S00_Func(Event* e);
+void Evt_R321S00_Func(Event* e, u32);
 void setTexRender();
 void break_heri_set();
 
@@ -87,7 +87,7 @@ static void r321_heri_down()
 // Event r321s00 callback (the helicopter is shot down): scroll object 0x17 hidden; cut 1 parents the
 // kind-1 light to Leon; the helicopter / wreck event models are positioned and swapped per cut; the
 // end restores the room.
-void Evt_R321S00_Func(Event* e)
+void Evt_R321S00_Func(Event* e, u32)
 {
     Vec pos;
     Vec rot;

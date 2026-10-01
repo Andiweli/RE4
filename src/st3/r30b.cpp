@@ -93,7 +93,7 @@ int CalcMovePosDistAdd2(Vec* pos, Vec* target, Vec* vel, f32 max, f32 add);
 static void R30bCraneEnd();
 static void R30bCrane();
 static void R30bEventS00();
-void Evt_R30BS00_Func(Event* e);
+void Evt_R30BS00_Func(Event* e, u32);
 void R30bEmWanderingSet();
 static void R30bEmSitDownSet();
 static void R30bEmGotoSet();
@@ -910,7 +910,7 @@ static void R30bEventS00()
 }
 
 // Event r30bs00: the fade at cut 5.
-void Evt_R30BS00_Func(Event* e)
+void Evt_R30BS00_Func(Event* e, u32)
 {
     if (e->GetFuncType() == 1) {
         switch (e->GetNowCut()) {

@@ -107,7 +107,7 @@ static void R213EventBridgeDownMain();
 static void R213EventBridgeDownEnd();
 static void SceBgmCheck();
 static void R213Event();
-void Evt_R213S00_Func(Event* e);
+void Evt_R213S00_Func(Event* e, u32);
 
 #define R213_EM_ARC(no) ((void*) (pG->pCore->ofs_##no + (u32) pG->pCore))
 
@@ -1037,7 +1037,7 @@ static void R213Event()
 // Event r213s00 callback: sea area flag 0x800 during the event; cut 0 shows the boss model em2d00,
 // drops the room effect and pauses the statue render target; later cuts set the near clip (200) and
 // the models' flags; the end restores the render target.
-void Evt_R213S00_Func(Event* e)
+void Evt_R213S00_Func(Event* e, u32)
 {
     f32 clip = 200.0f;
 

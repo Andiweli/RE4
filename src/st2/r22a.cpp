@@ -39,7 +39,7 @@ static Vec r22a_plOfs1 = {-158.44f, -4911.3799f, 120.060005f};
 
 static void r22a_RopeMove(int side);
 void R22A_Event();
-void Evt_R22AS00_Func(Event* e);
+void Evt_R22AS00_Func(Event* e, u32);
 static void r22a_EleDown();
 static void r22a_EleUp();
 
@@ -212,7 +212,7 @@ void R22A_Event()
 }
 
 // Event r22as00 callback: the knife model wep0200 shown on cut 0 and hidden from cut 1.
-void Evt_R22AS00_Func(Event* e)
+void Evt_R22AS00_Func(Event* e, u32)
 {
     void* mod;
 

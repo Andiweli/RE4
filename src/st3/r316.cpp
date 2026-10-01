@@ -49,7 +49,7 @@ static void r316_exitDoorTo317();
 static void r316_checkEmReset();
 static void R316EventS00();
 static void R316EventSXX();
-void Evt_R316S00_Func(Event* e);
+void Evt_R316S00_Func(Event* e, u32);
 
 // Room init: until the event has run (Room_flg bit 0) it runs at once, else the wave refills run until
 // the room is left through door 1. Also sets up the heat and falling-item watchers and the furnace.
@@ -277,7 +277,7 @@ static void R316EventSXX()
 
 // Event r316s00 callback: swaps the door objects 0x3D/0x3E (closed / open) on cuts 0 and 5/0xB, sets the
 // event models' flags per cut; the end restores the room.
-void Evt_R316S00_Func(Event* e)
+void Evt_R316S00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:

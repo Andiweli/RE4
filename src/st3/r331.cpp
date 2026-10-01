@@ -36,8 +36,8 @@ void st3_checkCountDown();
 
 static void R331ExecEventS00();
 static void R331ExecEventS10();
-void Evt_R331S00_Func(Event* e);
-void Evt_R331S10_Func(Event* e);
+void Evt_R331S00_Func(Event* e, u32);
+void Evt_R331S10_Func(Event* e, u32);
 
 
 // Room init: the s00 / s10 callbacks; until Room_flg bit 0 area 3 = the s00 event (pre-loaded). With
@@ -119,7 +119,7 @@ static void R331ExecEventS10()
 
 // Event r331s00 callback: cut 0 hands scroll object 0x24 (scr0000) to the event; cut 4 fades out unless
 // the event is skipped; the end restores the object.
-void Evt_R331S00_Func(Event* e)
+void Evt_R331S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
@@ -167,7 +167,7 @@ void Evt_R331S00_Func(Event* e)
 // Event r331s10 callback: remembers the count-down at the start; cut 0 hands scroll object 0x24 to the
 // event with a fade-in, cut 2 fades out; the end restores the object and restarts the count-down with
 // the event's length subtracted.
-void Evt_R331S10_Func(Event* e)
+void Evt_R331S10_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};

@@ -271,26 +271,23 @@ public:
     // Empty: the file-scope instance below gives the unit its (empty) static init/destroy pair.
     cFileList() {}
     ~cFileList() {}
-    void init();
+    int init(const char* d, const char* f);
     char* disp(int x, int y, int rows);
     int update();
-    void dir(char* d, char* f);
+    void dir(const char* d, const char* f);
 };
 
-// Host file list start: default directory (\bio4\data\*.*) and a first read (dir() reads two
-// uninitialised locals here, as the original does).
-void cFileList::init()
+// Host file list start: search pattern d (NULL: \bio4\data\*.*), prefix f stripped from every name;
+// returns the first read's result.
+int cFileList::init(const char* d, const char* f)
 {
-    char* d;
-    char* f;
-
     text = 0;
     list = 0;
     cursor = 0;
     pattern = 0;
     filter = 0;
     dir(d, f);
-    update();
+    return update();
 }
 
 // Scrolling list display at (x, y) with `rows` visible lines: up/down (fast repeat) move the
@@ -384,7 +381,7 @@ int cFileList::update()
 
 // Sets the search pattern `d` and name prefix `f` (copied, backslashes converted); d == 0 gives the
 // defaults \bio4\data\*.* and /bio4/data/.
-void cFileList::dir(char* d, char* f)
+void cFileList::dir(const char* d, const char* f)
 {
     if (pattern) {
         Debug_free(pattern);
@@ -411,7 +408,7 @@ void cFileList::dir(char* d, char* f)
                 *p = '/';
             }
         } else {
-            filter = f;
+            filter = (char*) f;
         }
     }
 }

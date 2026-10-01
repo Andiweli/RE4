@@ -52,7 +52,7 @@ void st4_initAdaGame();   // st4.cpp
 static void snd_tbl_set();
 void setTexRender();
 static void R405ExecEventS00();
-void Evt_R405S00_Func(Event* e);
+void Evt_R405S00_Func(Event* e, u32);
 static void em_set();
 cEm* R405_EmSetEvent(EM_LIST* d);
 static void em_set3();
@@ -191,7 +191,7 @@ static void R405ExecEventS00()
 }
 
 // Event r405s00 callback: the Ada model pl0c00 gets light mask 1 and its chained child object shown on cut 0.
-void Evt_R405S00_Func(Event* e)
+void Evt_R405S00_Func(Event* e, u32)
 {
     void* mod;
 

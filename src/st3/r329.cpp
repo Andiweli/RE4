@@ -41,7 +41,7 @@ static inline void setVec(Vec* v, f32 x, f32 y, f32 z)
 }
 
 static void R329EventS00();
-void Evt_R329S00_Func(Event* e);
+void Evt_R329S00_Func(Event* e, u32);
 
 // Room init: the s00 (and s99) callback. Before the reunion (Room_flg bit 0): r329s00 pre-loaded with
 // the enemy of ESL 0x95, Ashley marked as following, the event task (unless debug trigger 1), the
@@ -149,7 +149,7 @@ static void R329EventS00()
 // Event r329s00 callback: Status_flg[1] 0x800 and the pre-event object set at start; per cut the Leon
 // model's flags, the et1200 / et1210 etc models (CMF on) and hand-offs of scroll objects; the end
 // restores the room.
-void Evt_R329S00_Func(Event* e)
+void Evt_R329S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};

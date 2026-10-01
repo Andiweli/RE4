@@ -34,8 +34,8 @@ struct R120Work {
 static R120Work* r120_work;
 
 void R120Event();
-void Evt_R120S00_Func(Event* e);
-void Evt_R120S01_Func(Event* e);
+void Evt_R120S00_Func(Event* e, u32);
+void Evt_R120S01_Func(Event* e, u32);
 void EventCarInit(Event* e);
 void EvtTexRenderCamTrans(Event* e, int cut);
 
@@ -127,7 +127,7 @@ static inline void r120_setTrans(int on)
 
 // Per-frame callback of event r120s00 (the drive to the village, Leon in the back of the police car).
 // The first frame of cut 0 fades in unless the event was skipped (StatusFlag 0x40000000).
-void Evt_R120S00_Func(Event* e)
+void Evt_R120S00_Func(Event* e, u32)
 {
     void* lmod;
     void* mod;
@@ -258,7 +258,7 @@ void Evt_R120S00_Func(Event* e)
 
 // Per-frame callback of event r120s01 (the car stops at the village road and Leon gets out).
 // funcMode 3 sets Scenario_flg[1] bit 0x10, which marks the intro as seen.
-void Evt_R120S01_Func(Event* e)
+void Evt_R120S01_Func(Event* e, u32)
 {
     void* mod;
     int skip;

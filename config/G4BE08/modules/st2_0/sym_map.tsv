@@ -52,7 +52,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x000038C0	0x1E4	st2_0/r200.cpp	local	r200_checkEmSetEvent__Fv	r200_checkEmSetEvent
 .text	0x00003AA4	0x248	st2_0/r200.cpp	local	r200_execTruckEvent_end__Fv	r200_execTruckEvent_end
 .text	0x00003CEC	0x274	st2_0/r200.cpp	local	r200_execTruckEvent__Fv	r200_execTruckEvent
-.text	0x00003F60	0x628	st2_0/r200.cpp	global	Evt_R200S00_Func__FP5Event	Evt_R200S00_Func
+.text	0x00003F60	0x628	st2_0/r200.cpp	global	Evt_R200S00_Func__FP5EventUl	Evt_R200S00_Func
 .text	0x00004588	0x77C	st2_0/r201.cpp	global	R201Init__Fv	R201Init
 .text	0x00004D04	0x4	st2_0/r201.cpp	global	R201Main__Fv	R201Main
 .text	0x00004D08	0x184	st2_0/r201.cpp	global	r201_openShelf_main__Fii	r201_openShelf_main
@@ -135,7 +135,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000B570	0x38	st2_0/r203.cpp	local	r203_ShelfOpen__Fv	r203_ShelfOpen
 .text	0x0000B5A8	0x38	st2_0/r203.cpp	local	r203_ShelfOpened__Fv	r203_ShelfOpened
 .text	0x0000B5E0	0x11C	st2_0/r203.cpp	local	r203_StreamCheck__Fv	r203_StreamCheck
-.text	0x0000B6FC	0x6C	st2_0/r203.cpp	global	Evt_R203S00_Func__FP5Event	Evt_R203S00_Func
+.text	0x0000B6FC	0x6C	st2_0/r203.cpp	global	Evt_R203S00_Func__FP5EventUl	Evt_R203S00_Func
 .text	0x0000B768	0x3B8	st2_0/r203.cpp	global	fn_st2_0_B768	.
 .text	0x0000BB20	0x62C	st2_0/r207.cpp	global	R207Init__Fv	R207Init
 .text	0x0000C14C	0x1BC	st2_0/r207.cpp	global	R207Main__Fv	R207Main

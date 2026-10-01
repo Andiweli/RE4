@@ -100,9 +100,9 @@ static void r100_MesCar01();
 static void r100_MesBrige();
 static void r100_EventBrige();
 void setTexRender();
-void Evt_R100S40_Func(Event* e);
-void Evt_R100S20_Func(Event* e);
-void Evt_R100S03_Func(Event* e);
+void Evt_R100S40_Func(Event* e, u32);
+void Evt_R100S20_Func(Event* e, u32);
+void Evt_R100S03_Func(Event* e, u32);
 static void r100_mes_gaikotu_bgm();
 static void r100_mes_gaikotu();
 static void r100_mes_gaikotu_bgm_down();
@@ -1220,7 +1220,7 @@ void setTexRender()
 // Event r100s40 callback (the officers at the ravine / car): Status_flg[1] 0x02000000 during the event,
 // the car event models set up on the first frame (EventCarInit, r120's); funcMode 3 sets Scenario_flg[1]
 // bit 0x10.
-void Evt_R100S40_Func(Event* e)
+void Evt_R100S40_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1241,7 +1241,7 @@ void Evt_R100S40_Func(Event* e)
 
 // Event r100s20 callback (the truck pushes the car into the ravine): the truck model obm2d00 shown on
 // cut 0; cut 2 keeps ambush Ganados 1/2 updating (unless the debug flag hides them).
-void Evt_R100S20_Func(Event* e)
+void Evt_R100S20_Func(Event* e, u32)
 {
     void* mod;
 
@@ -1268,7 +1268,7 @@ void Evt_R100S20_Func(Event* e)
 
 // Event r100s03 callback (Leon shoots the first Ganado): the knife model wep0200 is hidden (be_flag 2)
 // on cuts 0..4 and 13..20 and shown on the others.
-void Evt_R100S03_Func(Event* e)
+void Evt_R100S03_Func(Event* e, u32)
 {
     void* mod;
 

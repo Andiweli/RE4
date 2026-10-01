@@ -19,10 +19,10 @@ public:
     // Empty: the file-scope instance gives the unit its (empty) static init/destroy pair.
     cFileList() {}
     ~cFileList() {}
-    void init();
+    int init(const char* d, const char* f);
     char* disp(int x, int y, int rows);
     int update();
-    void dir(char* d, char* f);
+    void dir(const char* d, const char* f);
 };
 
 extern cFileList DbgFileList;

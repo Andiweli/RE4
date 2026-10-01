@@ -82,7 +82,7 @@ static void R20bDoorEventMain();
 static void R20bDoorEventEnd();
 static void setTexRender();
 static void R20bEventS00();
-void Evt_R20BS00_Func(Event* e);
+void Evt_R20BS00_Func(Event* e, u32);
 void EvtTexRenderCamTrans(Event* e, int cut);
 
 // Room init for the great hall. Until the s00 event has played, the room is pre-loaded with its
@@ -693,7 +693,7 @@ static void R20bEventS00()
 // cuts after 0x21 (and back), the evm9300 palette per cut, feeds the two render-to-texture passes on
 // cuts 0x21 / 0x24 (TexRenderModSet on the stand-in models, released after), and sets the event models'
 // flags per cut; the end restores the palettes.
-void Evt_R20BS00_Func(Event* e)
+void Evt_R20BS00_Func(Event* e, u32)
 {
     void* mod;
     void* bin;

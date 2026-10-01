@@ -117,9 +117,9 @@ static void r11c_selectRoute();
 static void r11c_operator();
 void setFire();
 void deleteFire();
-void Evt_R11CS00_Func(Event* e);
-void Evt_R11CS10_Func(Event* e);
-void Evt_R11CS20_Func(Event* e);
+void Evt_R11CS00_Func(Event* e, u32);
+void Evt_R11CS10_Func(Event* e, u32);
+void Evt_R11CS20_Func(Event* e, u32);
 
 // Room init: thunder, rain and the four ladders. Until the siege is done (save flags bit 25) area 3
 // starts it and Luis waits outside, afterwards the merchant stock is added and the gates follow the
@@ -1124,7 +1124,7 @@ void deleteFire()
 }
 
 // Event r11cs00 handler: the cabin etc models, the scroll object 0x3F handed to the event.
-void Evt_R11CS00_Func(Event* e)
+void Evt_R11CS00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec ang = {0.0f, 0.0f, 0.0f};
@@ -1191,7 +1191,7 @@ void Evt_R11CS00_Func(Event* e)
 }
 
 // Event r11cs10 handler: the ladders and the door.
-void Evt_R11CS10_Func(Event* e)
+void Evt_R11CS10_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0: {
@@ -1234,7 +1234,7 @@ static inline void r11c_evtEsp(Event* e, u8 no)
 }
 
 // Event r11cs20 handler: the door, the render texture on the two players, the water effects.
-void Evt_R11CS20_Func(Event* e)
+void Evt_R11CS20_Func(Event* e, u32)
 {
     // Function scope: the address-taken `door` of a case block is kept until the switch ends, so
     // a second block-local `door` would get its own slot.

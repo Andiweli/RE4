@@ -133,7 +133,7 @@ void R31bLightAllOn();
 void R31bLight(int no);
 void R31bKanaamiTrans(u8 room, u8 no, int on);
 void R31bKanaamiRoom03Trans(int no, int on);
-void Evt_R31BS00_Func(Event* e);
+void Evt_R31BS00_Func(Event* e, u32);
 
 // Room init for the U-3 cage corridor. Each cage room not yet passed gets its switch and door areas,
 // and a passed one is hidden as fallen (R31bSmdTransOff).
@@ -2047,7 +2047,7 @@ void R31bKanaamiRoom03Trans(int no, int on)
 
 // Event r31bs00 callback (U-3 breaks in): the entrance effect dropped and scroll objects 0x82/0x6B/0xF4
 // swapped; pl0010 (Leon) ot_type 2 and evma300's light mask on cut 0.
-void Evt_R31BS00_Func(Event* e)
+void Evt_R31BS00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:

@@ -18,7 +18,7 @@ struct R22bWork {
 static R22bWork* r22b_work;
 
 void R22bEventS00();
-void Evt_R22bS00_Func(Event* e);
+void Evt_R22bS00_Func(Event* e, u32);
 
 
 // Room init: registers the s00 callback and, unless Room_flg bit 0 (seen), pre-loads r22bs00 and starts the event task.
@@ -51,7 +51,7 @@ void R22bEventS00()
 }
 
 // Event r22bs00 callback: fade-outs / fade-ins at fixed frames of cuts 0 and 1 (skipped when the event is skipped).
-void Evt_R22bS00_Func(Event* e)
+void Evt_R22bS00_Func(Event* e, u32)
 {
     if (e->GetFuncType() == 1) {
         switch (e->GetNowCut()) {

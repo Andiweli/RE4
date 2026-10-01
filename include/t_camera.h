@@ -142,7 +142,7 @@ LERP_DATA* tcLdatPtr(int area_from, int cam_from, int area_to, int cam_to);
 void tcGetFileName(char* path, int no, int flag);
 int tcDataExport(u8* buf);
 int tcDataImport(u8* buf);
-f32 tcGetFloor();
+f32 tcGetFloor(Vec* pos);
 void tcPlayerMove();
 void tcCameraDebugMove();
 void tcGameCamera2ToolCamera();

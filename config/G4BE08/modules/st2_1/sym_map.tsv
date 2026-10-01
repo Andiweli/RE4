@@ -56,7 +56,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00003BBC	0x60C	st2_1/r204.cpp	local	r204_EventChandelier2__Fv	r204_EventChandelier2
 .text	0x000041C8	0xE4	st2_1/r204.cpp	local	r204_EventExec__Fv	r204_EventExec
 .text	0x000042AC	0x60	st2_1/r204.cpp	local	r204_openTerm__Fv	r204_openTerm
-.text	0x0000430C	0x2FC	st2_1/r204.cpp	global	Evt_R204S00_Func__FP5Event	Evt_R204S00_Func
+.text	0x0000430C	0x2FC	st2_1/r204.cpp	global	Evt_R204S00_Func__FP5EventUl	Evt_R204S00_Func
 .text	0x00004608	0xD8	st2_1/r204.cpp	local	r204_checkEmDead__Fv	r204_checkEmDead
 .text	0x000046E0	0x130	st2_1/r204.cpp	local	door_move__Fv	door_move
 .text	0x00004810	0xBC	st2_1/r204.cpp	global	countActiveWork__t8cManager1Z6cLight	cManager<cLight>::countActiveWork
@@ -202,7 +202,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00012FF0	0x58	st2_1/r20b.cpp	local	R20bDoorEventEnd__Fv	R20bDoorEventEnd
 .text	0x00013048	0x19C	st2_1/r20b.cpp	global	setTexRender_13048	setTexRender
 .text	0x000131E4	0xB8	st2_1/r20b.cpp	local	R20bEventS00__Fv	R20bEventS00
-.text	0x0001329C	0xD60	st2_1/r20b.cpp	global	Evt_R20BS00_Func__FP5Event	Evt_R20BS00_Func
+.text	0x0001329C	0xD60	st2_1/r20b.cpp	global	Evt_R20BS00_Func__FP5EventUl	Evt_R20BS00_Func
 .text	0x00013FFC	0x164	st2_1/r20b.cpp	global	EvtTexRenderCamTrans__FP5Eventi	EvtTexRenderCamTrans
 .text	0x00014160	0x3B8	st2_1/r20b.cpp	global	fn_st2_1_14160	.
 .text	0x00014518	0x31C	st2_1/r20c.cpp	global	R20cInit__Fv	R20cInit
