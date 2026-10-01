@@ -8791,7 +8791,7 @@ static void em10_R1_Trade(cEm10* em)
         MotionSetCore(em, &em->Motion, PL_ARC_PTR(em->subArc, 0xA7), 0, 10, 1, 0);
         SndCall(8, 0x86, &em->pos, em->id, 0, em);
         w->Seid_voice = SndCall(8, 0x9A, &em->pos, em->id, 0, em);
-        pG->Stop_flg &= 0x7FFFFFFF; // load stays below the x5B8 store
+        SpfFlagOff(pG, SPF_KEY); // load stays below the x5B8 store
         em->r_no_2++;
     case 4:
         if (em->Motion.Seq_frame > 33.7f && em->Motion.Seq_frame < 34.3f) {

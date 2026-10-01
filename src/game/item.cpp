@@ -1197,7 +1197,7 @@ void cItemMgr::gameInit()
 {
     clear();
     roomInit();
-    if (!((s32) pG->System_flg < 0) && !(pG->System_flg & 0x40000000)) {
+    if (!SysFlagChk(pG, SYS_OMAKE_ADA_GAME) && !SysFlagChk(pG, SYS_OMAKE_ETC_GAME)) {
         if (pG->pl_type == 1) {
             m_char = 0;
         }

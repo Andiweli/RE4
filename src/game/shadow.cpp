@@ -271,7 +271,7 @@ void ShadowTrans()
 
     g_Shd_num = 0;
     g_SelfShdNum = 0;
-    if (pG->Disp_flg & 0x02000000) {
+    if (DpfFlagChk(pG, DPF_SHADOW)) {
         return;
     }
     if (DpfFlagChk(pG, DPF_SELF_SHADOW)) {

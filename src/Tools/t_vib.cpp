@@ -130,7 +130,7 @@ void tvibInit()
     TaskSuspend(0);
     TaskSleep(1);
     TutilInitDefault();
-    pG->Stop_flg |= 0x800000;
+    SpfFlagOn(pG, SPF_SCE);
     CfgFlagOn(pSys, CFG_VIBRATION);
     wp = (TvibWork*) Debug_alloc(sizeof(TvibWork), 1);
     if (wp == NULL) {
@@ -149,7 +149,7 @@ void tvibInit()
 // Frees the work, restores the flags, ends the task.
 void tvibExit()
 {
-    pG->Stop_flg &= ~0x800000;
+    SpfFlagOff(pG, SPF_SCE);
     TutilQuitDefault();
     TaskSignal(0);
     TaskExit();

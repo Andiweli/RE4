@@ -47,8 +47,8 @@ void TutilInitDefault()
         memcpy(debug_flg_bak, debug, sizeof(debug_flg_bak));
     }
     memcpy(status_flg_bak, &pG->Status_flg[0], sizeof(status_flg_bak));
-    pG->Stop_flg |= 0x200;
-    pG->Stop_flg |= 0x80;
+    SpfFlagOn(pG, SPF_BLOCK);
+    SpfFlagOn(pG, SPF_DATAREAD_AT);
     DbgFlagOn(pG, DBG_CINESCO_OFF);
     DbgFlagOn(pG, DBG_NO_DEATH);
     DbgFlagOff(pG, DBG_FOG_FAR_GREEN);

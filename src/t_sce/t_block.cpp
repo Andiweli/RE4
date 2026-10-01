@@ -216,20 +216,20 @@ void tBlockInit_base()
 {
     pG->debug_mode = 0x11;
     DbgFlagOn(pG, DBG_BACK_CLIP);
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x8000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
-    pG->Stop_flg |= 0x200;
-    pG->Disp_flg |= 0x20000000;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
-    pG->Disp_flg |= 0x4000000;
-    pG->Disp_flg |= 0x2000000;
-    pG->Disp_flg |= 0x100000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_ESP);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
+    SpfFlagOn(pG, SPF_BLOCK);
+    DpfFlagOn(pG, DPF_SUBCHAR);
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
+    DpfFlagOn(pG, DPF_ESP);
+    DpfFlagOn(pG, DPF_SHADOW);
+    DpfFlagOn(pG, DPF_FILTER);
     DbgFlagOn(pG, DBG_DBG_CAM);
     SetToolLight(1);
 }

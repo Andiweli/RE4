@@ -170,7 +170,7 @@ void init(AtariToolWork* w)
     w->satSel = 0;
     w->count = 0;
     set_at(w, satTbl0);
-    pG->Disp_flg |= 0x08000000;
+    DpfFlagOn(pG, DPF_SCR);
     TaskSleep(4);
     w->polyNo = 0;
     w->x4F0 = 0;
@@ -449,7 +449,7 @@ static void option(AtariToolWork* w)
 static void quit(AtariToolWork* w)
 {
     DbgFlagOff(pG, DBG_TEST_MODE);
-    pG->Disp_flg &= ~0x08000000;
+    DpfFlagOff(pG, DPF_SCR);
     TaskSignal(0);
     TaskExit();
 }

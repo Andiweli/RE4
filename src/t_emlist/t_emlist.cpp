@@ -657,12 +657,12 @@ void emlist_init()
     TaskSuspend(0);
     TaskSleep(1);
     TutilInitDefault();
-    pG->Stop_flg |= 0x200000;
-    pG->Disp_flg |= 0x1000000;
-    pG->Disp_flg |= 0x800000;
+    SpfFlagOn(pG, SPF_CCHG);
+    DpfFlagOn(pG, DPF_WATER);
+    DpfFlagOn(pG, DPF_MIRROR);
     DbgFlagOn(pG, DBG_TEST_MODE);
     DbgFlagOn(pG, DBG_BACK_CLIP);
-    pG->Stop_flg |= 0x800000;
+    SpfFlagOn(pG, SPF_SCE);
     DbgFlagOn(pG, DBG_DBG_CAM);
     EmListCtrl* ctl = &EmList;
 
@@ -710,11 +710,11 @@ void emlist_init()
 // Restores the flags, frees the work and ends the task.
 void emlist_exit()
 {
-    pG->Stop_flg &= ~0x200000;
-    pG->Disp_flg &= ~0x1000000;
-    pG->Disp_flg &= ~0x800000;
+    SpfFlagOff(pG, SPF_CCHG);
+    DpfFlagOff(pG, DPF_WATER);
+    DpfFlagOff(pG, DPF_MIRROR);
     DbgFlagOff(pG, DBG_TEST_MODE);
-    pG->Stop_flg &= ~0x800000;
+    SpfFlagOff(pG, SPF_SCE);
     DbgFlagOff(pG, DBG_DBG_CAM);
     TutilQuitDefault();
     TaskSignal(0);

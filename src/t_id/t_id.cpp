@@ -112,7 +112,7 @@ void toolIdInit(IdTool* w)
     DbgFlagOn(pG, DBG_DBG_CAM);
     DbgFlagOff(pG, DBG_PROC_BAR);
     DbgFlagOff(pG, DBG_COCKPIT_TOOL);
-    pG->System_flg &= ~0x800;
+    SysFlagOff(pG, SYS_SCISSOR_ON);
     DbgFlagOn(pG, DBG_CINESCO_OFF);
     DbgFlagOn(pG, DBG_ID_TOOL);
     toolIdSetCamera(w);
@@ -175,7 +175,7 @@ static void toolIdQuit(IdTool* w)
     DbgFlagOff(pG, DBG_TEST_MODE);
     DbgFlagOff(pG, DBG_DBG_CAM);
     DbgFlagOn(pG, DBG_PROC_BAR);
-    pG->System_flg |= 0x800;
+    SysFlagOn(pG, SYS_SCISSOR_ON);
     DbgFlagOff(pG, DBG_CINESCO_OFF);
     DbgFlagOff(pG, DBG_ID_TOOL);
     pG->Camera = w->camSave;

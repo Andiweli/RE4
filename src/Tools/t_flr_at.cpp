@@ -133,17 +133,17 @@ void flrAtInit()
 
     TutilInitDefault();
     pW->saveStop = pG->Stop_flg;
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
     pW->saveDisp = pG->Disp_flg;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
-    pG->Disp_flg |= 0x2000000;
-    pG->Disp_flg |= 0x100000;
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
+    DpfFlagOn(pG, DPF_SHADOW);
+    DpfFlagOn(pG, DPF_FILTER);
     DbgFlagOn(pG, DBG_DBG_CAM);
     SetToolLight(1);
     pW->x0 = 0x2D;
@@ -1262,9 +1262,9 @@ static void flrAtPreview()
 static void preview_init()
 {
     pW->dispType = -1;
-    pG->Stop_flg &= ~0x10000000;
-    pG->Disp_flg &= ~0x40000000;
-    pG->Disp_flg &= ~0x80000000;
+    SpfFlagOff(pG, SPF_PL);
+    DpfFlagOff(pG, DPF_PL);
+    DpfFlagOff(pG, DPF_EM);
     DbgFlagOff(pG, DBG_DBG_CAM);
     pFlrSys = &pW->flrSys;
     pFlrSys->pHead = &pW->head;
@@ -1293,14 +1293,14 @@ static void preview_main()
 // Restores the tool flags, back to the sub menu.
 static void preview_exit()
 {
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
     DbgFlagOn(pG, DBG_DBG_CAM);
     pW->dispGroup = -1;
     pW->mode = 5;

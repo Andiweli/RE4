@@ -444,8 +444,8 @@ void tp_pl_weapon()
 
     switch (pT->rno[2]) {
     case 0:
-        pG->Disp_flg |= 0x40000000;
-        pG->Disp_flg |= 0x10000000;
+        DpfFlagOn(pG, DPF_PL);
+        DpfFlagOn(pG, DPF_OBJ);
         TaskSleep(1);
         TaskSuspend(0);
         TaskSleep(1);
@@ -626,8 +626,8 @@ void tp_pl_weapon()
     eprintf(280, 112, 0, 0, "RELOAD Lv.%d", pG->weapon_lv_reload + 1);
     if (pT->joy[0].rep & JOY_B) {
         int zero = 0;  // callee-saved zero reused as setRno's stack argument
-        (pG->Disp_flg &= ~0x40000000);
-        pG->Disp_flg &= ~0x10000000;
+        DpfFlagOff(pG, DPF_PL);
+        DpfFlagOff(pG, DPF_OBJ);
         TaskSignal(0);
         pT->setRno(1, 0, 0, 0, 0, 0, 0, zero);
         pT->cursor = 1;
@@ -787,10 +787,10 @@ void tp_scr_flag()
             }
             break;
         case 2:
-            if (pG->Disp_flg & 0x4000) {
-                pG->Disp_flg &= ~0x4000;
+            if (DpfFlagChk(pG, DPF_FOG)) {
+                DpfFlagOff(pG, DPF_FOG);
             } else {
-                pG->Disp_flg |= 0x4000;
+                DpfFlagOn(pG, DPF_FOG);
             }
             break;
         case 3:
@@ -836,27 +836,27 @@ void tp_scr_view()
         chg = 1;
     }
     if (chg) {
-        pG->Disp_flg |= 0x8000000;
+        DpfFlagOn(pG, DPF_SCR);
         DbgFlagOff(pG, DBG_SAT_DISP);
         DbgFlagOff(pG, DBG_EAT_DISP);
         switch (pT->cursor) {
         case 0:
-            pG->Disp_flg &= ~0x8000000;
+            DpfFlagOff(pG, DPF_SCR);
             break;
         case 1:
-            pG->Disp_flg |= 0x8000000;
+            DpfFlagOn(pG, DPF_SCR);
             DbgFlagOn(pG, DBG_SAT_DISP);
             break;
         case 2:
-            pG->Disp_flg |= 0x8000000;
+            DpfFlagOn(pG, DPF_SCR);
             DbgFlagOn(pG, DBG_EAT_DISP);
             break;
         case 3:
-            pG->Disp_flg &= ~0x8000000;
+            DpfFlagOff(pG, DPF_SCR);
             DbgFlagOn(pG, DBG_SAT_DISP);
             break;
         case 4:
-            pG->Disp_flg &= ~0x8000000;
+            DpfFlagOff(pG, DPF_SCR);
             DbgFlagOn(pG, DBG_EAT_DISP);
             break;
         case 5:

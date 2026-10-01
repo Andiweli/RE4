@@ -172,10 +172,10 @@ void msqToolInit()
     EprintfSetCurrentNo(0);
     StaFlagOn(pG, STA_BG_OFF);
     DbgFlagOn(pG, DBG_DBG_CAM);
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x00800000;
-    pG->Disp_flg |= 0x02000000;
-    pG->Disp_flg |= 0x00800000;
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_SCE);
+    DpfFlagOn(pG, DPF_SHADOW);
+    DpfFlagOn(pG, DPF_MIRROR);
     memclr_asm(MSQ, sizeof(MsqWork));
     for (i = 0; i < 1; i++) {
         MSQ->seq[i].x1090 = 0;
@@ -215,7 +215,7 @@ void msqToolInit()
     TprimInitEnv2D(rect);
     SetToolLight(2);
     dbModelInit();
-    pG->Stop_flg |= 0x40000000;
+    SpfFlagOn(pG, SPF_CAMERA);
     msqSetMode(0);
 }
 
@@ -877,16 +877,16 @@ static void msq_R0_QuitCk()
 static void msq_R0_Quit()
 {
     dbModelQuit();
-    pG->Stop_flg &= ~0x40000000;
+    SpfFlagOff(pG, SPF_CAMERA);
     DbgFlagOff(pG, DBG_TEST_MODE);
     ToolWorkPop(0);
     bio4_GXSetCopyClear(g_sysBgColor, 0xFFFFFF);
     DbgFlagOff(pG, DBG_DBG_CAM);
     StaFlagOff(pG, STA_BG_OFF);
-    pG->Stop_flg &= ~0x10000000;
-    pG->Stop_flg &= ~0x00800000;
-    pG->Disp_flg &= ~0x00800000;
-    pG->Disp_flg &= ~0x02000000;
+    SpfFlagOff(pG, SPF_PL);
+    SpfFlagOff(pG, SPF_SCE);
+    DpfFlagOff(pG, DPF_MIRROR);
+    DpfFlagOff(pG, DPF_SHADOW);
     TutilQuitDefault();
     TaskExit();
 }

@@ -301,19 +301,19 @@ void tSceAtInit_base()
 {
     pG->debug_mode = 0x11;
     DbgFlagOn(pG, DBG_BACK_CLIP);
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x8000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
-    pG->Disp_flg |= 0x20000000;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
-    pG->Disp_flg |= 0x4000000;
-    pG->Disp_flg |= 0x2000000;
-    pG->Disp_flg |= 0x100000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_ESP);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
+    DpfFlagOn(pG, DPF_SUBCHAR);
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
+    DpfFlagOn(pG, DPF_ESP);
+    DpfFlagOn(pG, DPF_SHADOW);
+    DpfFlagOn(pG, DPF_FILTER);
     DbgFlagOn(pG, DBG_DBG_CAM);
     pW->light = 1;
     SetToolLight(1);
@@ -1127,7 +1127,7 @@ void tSceAtDataInput_door_PosSet()
             PSVECAdd(&pPL->pos, &d, &pPL->pos);
             Draw_pos(&pPL->pos, 2000);
         } else {
-            pG->Stop_flg &= ~0x80000000;
+            SpfFlagOff(pG, SPF_KEY);
             DbgFlagOff(pG, DBG_PL_NOHIT);
         }
         TaskSleep(1);
@@ -2609,9 +2609,9 @@ static void tSceAtPreview()
 // Un-pauses the player and HUD (Stop / Disp / Debug flag bits) for the preview.
 static void tSceAtPreview_init()
 {
-    pG->Stop_flg &= ~0x10000000;
-    pG->Disp_flg &= ~0x40000000;
-    pG->Disp_flg &= ~0x80000000;
+    SpfFlagOff(pG, SPF_PL);
+    DpfFlagOff(pG, DPF_PL);
+    DpfFlagOff(pG, DPF_EM);
     DbgFlagOff(pG, DBG_DBG_CAM);
     pW->sub = 1;
     pW->step = 0;
@@ -2677,15 +2677,15 @@ void tSceAtPreview_pl_pos()
 // Restores the tool flags and returns to the main menu.
 static void tSceAtPreview_exit()
 {
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x8000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_ESP);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
     DbgFlagOn(pG, DBG_DBG_CAM);
     MODE_RESET();
 }

@@ -346,7 +346,7 @@ static void em18_R1_Trade(cEm18* em)
         MotionSetCore(em, &em->Motion, ARC(EM18_MOT_TRADE_017), 0, 10, 1, 0);
         SndCall(8, 0xA, &em->pos, em->id, 0, 0);
         w->Seid_voice = SndCall(8, 7, &em->pos, em->id, 0, 0);
-        pG->Stop_flg &= 0x7FFFFFFF;
+        SpfFlagOff(pG, SPF_KEY);
         em->r_no_2++;
     case 4:
         if (em->Motion.Seq_frame > 33.7f && em->Motion.Seq_frame < 34.3f) {
