@@ -78,7 +78,7 @@ void R229Main()
 
 // Dead-stripped by the original link (its strings survive after R229Init's): the s00 event setup
 // the room never registered.
-extern "C" void Evt_R229S00_Func(Event* e);
+void Evt_R229S00_Func(Event* e, u32);
 // Pre-load r229s00 and register its callback (unused by the room's Init in this build).
 static void r229_evtSetup()
 {
