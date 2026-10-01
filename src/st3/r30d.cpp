@@ -377,7 +377,7 @@ static void R30dShutterFrontEvent()
     }
     SceAtSetEnable(0x18, 0);
     R30D_SAVE_FLAGS |= 0x08000000;
-    KyfFlagOn(pG, KYF_ST1_09);
+    KyfFlagOn(pG, KYF_ST3_09);
     pSUB->dmg.m_Timer = 0x80;
     SubCharMoveTo(2670.0f, 0.0f, 15200.0f, 0.0f, 0);
     while ((SubCharGetStatus() & 0x00800000) == 0) {
@@ -626,7 +626,7 @@ static void R30dCoopSwitch()
                             SndCall(6, 9, 0, 0, 0, 0);
                         }
                         KyfFlagOn(pG, KYF_R30D_TO_R30F_DOOR);
-                        KyfFlagOn(pG, KYF_ST1_10);
+                        KyfFlagOn(pG, KYF_ST3_10);
                         SceUpCut(3, 6, 4, 0);
                         COOP_ACTIVE(c) = zero;
                         break;

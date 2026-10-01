@@ -372,10 +372,10 @@ void R31cInit()
         r31c_work->door8->setCloseLock();
         SceAtDataSet_exec(0x11, 0x12, 0, (TaskFunc) r31c_Krauser1stBattle, 0, 1);
         EstSet(r31c_work->door8, -1, 0, 0, EFF_ROOM, 0x17, 1, ESP_CORE_KIND_ROOM01, 0, 0);
-        KyfFlagOff(pG, KYF_ST1_23);
+        KyfFlagOff(pG, KYF_ST3_22);
     } else {
         EstSet(r31c_work->door8, -1, 0, 0, EFF_ROOM, 0x18, 1, ESP_CORE_KIND_NONE, 0, 0);
-        KyfFlagOn(pG, KYF_ST1_23);
+        KyfFlagOn(pG, KYF_ST3_22);
     }
     SceExec(0x12, (TaskFunc) r31c_SeekerFirstSet, 0, 0, 2, 0);
     if (RsfCheck(G_ROOM_ID, 0x14) == 0) {
@@ -936,7 +936,7 @@ static void r31c_TimerDoorCountDown()
     SceSleep(10);
     EffectDelete(1, ESP_CORE_KIND_ROOM01);
     EstSet(r31c_work->door8, -1, 0, 0, EFF_ROOM, 0x18, 1, ESP_CORE_KIND_NONE, 0, 0);
-    KyfFlagOn(pG, KYF_ST1_23);
+    KyfFlagOn(pG, KYF_ST3_22);
     RoomSeCall(0x12, 0, 0, 0, 0);
     SceMesSet(3, 0x20, 1, 0x64, 0x150 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
     while (CamCtrl.IsMotionEnd() == 0) {

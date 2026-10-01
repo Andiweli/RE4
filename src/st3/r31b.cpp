@@ -295,7 +295,7 @@ void R31bInit()
             r31b_work->eat[12]->setCoord(&obj->pos, &obj->ang);
         }
     }
-    KyfFlagOn(pG, KYF_ST1_16);
+    KyfFlagOn(pG, KYF_ST3_15);
     SceAtDataSet_exec(0xF, 0x12, 0, (TaskFunc) R31bExecGondolaMain, (void*) 0, 1);
     SceAtDataSet_exec(0x10, 0x12, 0, (TaskFunc) R31bExecGondolaMain, (void*) 1, 1);
     obj = SmdGetObjPtr(0xA3);
@@ -1416,7 +1416,7 @@ static void R31bExecRoom03U3Main()
         void* zero = 0;
 
         RsfSet(G_ROOM_ID, 0x1C);
-        KyfFlagOff(pG, KYF_ST1_16);
+        KyfFlagOff(pG, KYF_ST3_15);
         StaFlagOn(pG, STA_ESP_COMPULSION_NOSUSPEND);
         SceEventStart(0);
         StaFlagOn(pG, STA_LIT_NO_UPDATE);
@@ -1569,8 +1569,8 @@ void R31bExecRoom03U3DieEnd()
         door->setNormal();
     }
     SceAtSetEnable(0x24, 0);
-    KyfFlagOn(pG, KYF_ST1_15);
-    KyfFlagOn(pG, KYF_ST1_16);
+    KyfFlagOn(pG, KYF_ST3_14);
+    KyfFlagOn(pG, KYF_ST3_15);
     pPL->setPos(55080.0f, 4266.0f, 13710.0f);
     pPL->setAng(0.0f, -2.718f, 0.0f);
     pPL->matUpdate();

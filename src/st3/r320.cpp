@@ -1691,7 +1691,7 @@ void gate1_open(int no)
 {
     cObj* o;
 
-    KyfFlagOn(pG, KYF_ST1_20);
+    KyfFlagOn(pG, KYF_ST3_19);
     scr_set();
     o = SmdGetObjPtr(0x2A);
     o->be_flag |= 0x20;
@@ -1742,7 +1742,7 @@ void gate2_open()
 {
     cObj* o;
 
-    KyfFlagOn(pG, KYF_ST1_19);
+    KyfFlagOn(pG, KYF_ST3_18);
     RmfFlagOn(pG, RMF_GATE2_OPEN);
     SceEventStart(1);
     CamCtrl.CutCall(0x16);
@@ -2485,7 +2485,7 @@ static void door_open()
     int zero = 0;
     u32 i;
 
-    KyfFlagOn(pG, KYF_ST1_21);
+    KyfFlagOn(pG, KYF_ST3_20);
     R320_SAVE_FLAGS |= 0x200;
     EffectEspDelete(1, ESP_CORE_KIND_ROOM04, 0, 0);
     EffectEspgenDelete(1, ESP_CORE_KIND_ROOM04, 0);

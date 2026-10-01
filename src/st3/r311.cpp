@@ -606,7 +606,7 @@ static void r311_throwIronBall()
                 SceSleep(1);
             }
             R311_SAVE_FLAGS |= 0x40000000;
-            KyfFlagOn(pG, KYF_ST1_08);
+            KyfFlagOn(pG, KYF_ST3_08);
             r311_work->resetCnt = 0;
             SceAtSetEnable(2, 0);
             SceAtSetEnable(0, 1);

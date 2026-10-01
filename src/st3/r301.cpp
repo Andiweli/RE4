@@ -159,7 +159,7 @@ static void r301_execContinuePoint()
     case 1:
     default: {
         RsfSet(G_ROOM_ID, 5);
-        KyfFlagOn(pG, KYF_ST1_01);
+        KyfFlagOn(pG, KYF_ST3_01);
         SceAtSetEnable(0xF, 0);
         r301_work->espKind = 0;
         r301_work->sndId = 0;

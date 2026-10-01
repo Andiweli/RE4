@@ -225,14 +225,14 @@ void R332Init()
         EvtMgr.EvtReadAram("event/evd/r332s00.evd", (u8) GetEmIdFromList(0xA9), 0, 0, size);
         SceAtSetEnable(0, 0);
         SceAtSetEnable(9, 1);
-        KyfFlagOff(pG, KYF_ST1_24);
+        KyfFlagOff(pG, KYF_ST3_23);
         SmdSetTrans(7, 0);
     } else {
         SceExec(0x12, (TaskFunc) R332EmSetMain, 0, 0, 2, 0);
         st3_startCountDown();
         SceAtSetEnable(0, 1);
         SceAtSetEnable(9, 0);
-        KyfFlagOn(pG, KYF_ST1_24);
+        KyfFlagOn(pG, KYF_ST3_23);
         SmdSetTrans(0xA, 1);
         SndBgmTblSet(0x332, 1);
         SndRoomStrStart(1, 0, 1);
@@ -1516,7 +1516,7 @@ static void R332EventS10()
     ScfFlagOn(pG, SCF_R332_BOSS_DIE);
     SceAtSetEnable(0, 1);
     SceAtSetEnable(9, 0);
-    KyfFlagOn(pG, KYF_ST1_24);
+    KyfFlagOn(pG, KYF_ST3_23);
     SceAtSetEnable(1, 0);
     SceAtSetEnable(2, 0);
     SceSleep(1);
