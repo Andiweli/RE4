@@ -176,7 +176,7 @@ void R204Init()
                         r204_work->esp[i] = EspPullCoreKind();
                         EstSet(r204_work->head[i], -1, 0, 0, EFF_CORE, 0x2D, 0x801, r204_work->esp[i], 0, 0);
                     } else {
-                        r204_work->head[i] = SetObj00(ROOM_ARC_PTR(pG->pCore, 8), ROOM_ARC_PTR(pG->pCore, 9), &ofs, &rot);
+                        r204_work->head[i] = SetObj00(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &ofs, &rot);
                         r204_work->head[i]->setNoSuspend(1);
                         OyaSetObj00(r204_work->head[i], r204_work->em[i].getPtr(), 2);
                         r204_work->esp[i] = EspPullCoreKind();

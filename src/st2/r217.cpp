@@ -113,7 +113,7 @@ void R217Init()
     RsfSet(G_ROOM_ID, 3);
     for (u32 i = 0; i < 5; i++) {
         if (RsfCheck(G_ROOM_ID, i + 2) == 0) {
-            r217_work->hit[i] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+            r217_work->hit[i] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                          &SmdGetObjPtr(0x83 + i)->pos, &SmdGetObjPtr(0x83 + i)->ang, 0);
             YarareInitCube(r217_work->hit[i], 0.0f, r217_cubeY[0], r217_cubeZ[0], r217_cubeW[0], r217_cubeH[0], r217_cubeD[0], 0, YAT_FLAG_ON);
         } else {

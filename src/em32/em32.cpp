@@ -109,7 +109,7 @@ static void plemSit(cPlayer* pl);
 static void plemBackjump(cPlayer* pl);
 static void plemEscape(cPlayer* pl);
 
-#define VIB_TBL ((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore))
+#define VIB_TBL ((VibDataTbl*) CORE_ARC(CORE_VIBRATION))
 
 
 // COMPILER-DIFF #12 (cse path knowledge): in a `case` arm reached through the switch's once-used label

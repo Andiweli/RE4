@@ -5030,7 +5030,7 @@ int em2cAtkCk(cEm2c* em, int no, int parts)
         }
         QuakeExec(0, 0, 5, 22.0f, 2);
         SndCall(8, 0xD, &em->pos, em->id, 0, em);
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         return 1;
     }
     return 0;

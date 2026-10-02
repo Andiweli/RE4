@@ -728,7 +728,7 @@ void emWep_R1_Throw(cEmWep* pEm)
         SndStop(w->seid_throw, 0);
     } else if (w->pAtk) {
         if (EmAtkHitCk(w->pAtk, &pEm->pos, &pEm->pos_old, 0)) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
                 SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
             }
@@ -809,7 +809,7 @@ void emWep_R1_ThrowScythe(cEmWep* pEm)
         SndStop(w->seid_throw, 0);
     } else if (w->pAtk) {
         if (EmAtkHitCk(w->pAtk, &pEm->pos, &pEm->pos_old, 0)) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
                 SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
             }
@@ -920,7 +920,7 @@ void emWep_R1_Shot(cEmWep* pEm)
     if (w->pAtk) {
         part = EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0);
         if (part) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
                 SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
             }
@@ -964,7 +964,7 @@ void emWep_R1_Shot(cEmWep* pEm)
         }
         part = EmAtkLineHitCkSub(&pEm->pos_old, &pEm->pos, &hitPos, &nrm);
         if (part) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
                 SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
             }
@@ -1098,7 +1098,7 @@ void emWep_R1_ShotArrow(cEmWep* pEm)
     if (w->pAtk) {
         part = EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hit, &nrm, 0);
         if (part) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
                 SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
             }
@@ -1117,7 +1117,7 @@ void emWep_R1_ShotArrow(cEmWep* pEm)
             if (part == 0) {
                 goto fly;
             }
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
                 SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
             }

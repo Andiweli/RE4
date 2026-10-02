@@ -629,7 +629,7 @@ int em34AtkCk(cEm34* em, int no, int parts)
                 w->Atk_ck = 1;
             }
             QuakeExec(0, 0, 5, 22.0f, 2);
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             return 1;
         }
     }

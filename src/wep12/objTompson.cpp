@@ -64,7 +64,7 @@ void cObjTompson::moveFire()
         SndCall(2, 0x15, &pos, 0, 0, 0);
         StaFlagOn(pG, STA_PL_FIRE);
         setCartridge();
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xA, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xA, 1);
         r_no_1 = 1;
     }
 }

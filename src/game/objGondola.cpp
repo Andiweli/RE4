@@ -540,14 +540,14 @@ void cObjGondola::setGetOffEm(cEm* em)
 void cObjGondola::setDamage()
 {
     QuakeExec(0, 0, 5, 22.0f, 2);
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
 }
 
 // Break feedback: a 10-frame quake and vibration.
 void cObjGondola::setBreak()
 {
     QuakeExec(0, 0, 10, 30.0f, 2);
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
     r_no_0 = 4;
     r_no_1 = 0;
     r_no_2 = 0;
@@ -645,6 +645,6 @@ void cObjGondola::setVib()
         pMotionB->Brate = 1.0f;
         pMotionB->Mot_flag |= 0x80000000;
         QuakeExec(0, 0, 10, 30.0f, 2);
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
     }
 }

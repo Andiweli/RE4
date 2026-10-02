@@ -5,50 +5,15 @@
 #include "vec.h"
 #include "camera.h"
 #include "flag.h"
+#include "arc/core.h"
 
-// Archive header at pG->pCore: a table of file offsets to the sub-files. Only the entries that
-// matched units use are named.
-struct ArcFile {
-    u8 pad_0[0x10];
-    u32 ofs_10;   // 0x10  specular data (read: CoreDataRead -> SpecularInit)
-    u32 ofs_14;   // 0x14  core effect data (eff_sys: EspDataLoad owner 0)
-    u32 ofs_18;   // 0x18  room texture data (room_tex)
-    u32 ofs_1C;   // 0x1C  vibration pattern table (pl_dmg: VibSetData)
-    u32 ofs_20;   // 0x20  obstacle model bin (obj20 SetObaModel)
-    u32 ofs_24;   // 0x24  obstacle model tpl
-    u32 ofs_28;   // 0x28  message tables (mes: MesData.m_Data[0..2])
-    u32 ofs_2C;   // 0x2C  core light data (game: cLightMgr::roomInit core cLit)
-    u32 ofs_30;   // 0x30  core camera data (game: CameraControl::CoreDataRead)
-    u32 ofs_34;   // 0x34
-    u32 ofs_38;   // 0x38
-    u32 ofs_3C;   // 0x3C  light path data (game: cLightMgr::initPath)
-    u32 ofs_40;   // 0x40  global illumination texture (read: CoreDataRead -> GlobalIlmTexInit)
-    u32 ofs_44;   // 0x44  specular data 2..4 (SpecularInit)
-    u32 ofs_48;   // 0x48
-    u32 ofs_4C;   // 0x4C
-    u32 ofs_50;   // 0x50  debug effect data (eff_sys: EspDataLoad owner 0xD1)
-    u32 ofs_54;   // 0x54  message table type 3 (mes: MesData.m_Data[3])
-    u32 ofs_58;   // 0x58  item examine light cuts 0..4 (examine ItemExamine::init)
-    u32 ofs_5C;   // 0x5C
-    u32 ofs_60;   // 0x60
-    u32 ofs_64;   // 0x64
-    u32 ofs_68;   // 0x68
-    u32 ofs_6C;   // 0x6C  system message table (dvd: MesData.m_Data[4])
-    u32 ofs_70;   // 0x70  TV-mode message table (tv_mode)
-    u32 ofs_74;   // 0x74  HUD id textures (cockpit: IdTexDataLoad(.., 4))
-    u32 ofs_78;   // 0x78
-    u32 ofs_7C;   // 0x7C  life meter id data (cockpit, type 0x21)
-    u32 ofs_80;   // 0x80  action button id data (cockpit, type 0x20)
-    u32 ofs_84;   // 0x84  count-down id data (cockpit, type 0x23)
-    u32 ofs_88;   // 0x88  HUD id data type 0x30 (cockpit)
-    u32 ofs_8C;   // 0x8C
-    u32 ofs_90;   // 0x90
-    u32 ofs_94;   // 0x94  message window id data (cockpit, type 0x2F)
-    u32 ofs_98;   // 0x98  bullet icon id data (cockpit, type 0x32)
-    u32 ofs_9C;   // 0x9C  sub-mission widget id data (stage)
-};
-// Sub-file `field` (an ofs_NN member) of the current archive.
-#define ARC_PTR(field) ((void*) (pG->pCore->field + (u32) pG->pCore))
+// Core archive BODY data. Keep its format opaque: the word slots include the four-word
+// header, then the sub-file offsets (slot 8 / byte 0x20 is sub-file 4, not sub-file 8).
+struct ArcFile;
+// Offset first, then the archive base: preserve the target's 32-bit integer arithmetic.
+// As with PL_ARC_PTR, arc is evaluated twice and must have no side effects.
+#define CORE_ARC_PTR(arc, no) ((void*) (((u32*) (arc))[(no)] + (u32) (arc)))
+#define CORE_ARC(no) CORE_ARC_PTR(pG->pCore, no)
 
 // Player archive at pG->pPlArc: a table of byte offsets to the player's sub-files (models, textures,
 // motions, faces...). The pl_* units index it directly; the pointer is `ofs + (u32) arc`.

@@ -259,7 +259,7 @@ void gameInit()
     Cckpt.gameInit();
     ObjMgr.warnDiv = 100;
     LightMgr.init(LightFuncTbl);
-    LightMgr.initPath((LightPathHeader*) (pG->pCore->ofs_3C + (u32) pG->pCore));
+    LightMgr.initPath((LightPathHeader*) CORE_ARC(CORE_LIGHT_PATH));
     ScenarioInit();
     PlayerInit();
     pG->ashley_life = 600;
@@ -410,10 +410,10 @@ void gameRoomInit()
     EspgenArrayAlloc(ConsGetRoomValue(CONS_R_NESPGEN));
     CtrlMgr.roomInit();
     CtrlMgr.arrayAlloc(ConsGetRoomValue(CONS_R_NCTRL));
-    LightMgr.roomInit((cLit*) (pG->pCore->ofs_2C + (u32) pG->pCore), (cLit*) GetDataExt(pG->pRoom, "LIT", 0),
+    LightMgr.roomInit((cLit*) CORE_ARC(CORE_LIGHT), (cLit*) GetDataExt(pG->pRoom, "LIT", 0),
                       (cLit*) GetDataExt(pG->pRoom, "LIT", 1));
     LightMgr.arrayAlloc(ConsGetRoomValue(CONS_R_NLIGHT));
-    LightMgr.initPath((LightPathHeader*) (pG->pCore->ofs_3C + (u32) pG->pCore));
+    LightMgr.initPath((LightPathHeader*) CORE_ARC(CORE_LIGHT_PATH));
     ShadowRoomInit();
     DmgMgr.roomInit();
     DmgMgr.arrayAlloc(20);
@@ -499,7 +499,7 @@ void gameRoomInit()
     } else {
         pG->pCamRoom = p;
     }
-    CamCtrl.CoreDataRead((u8*) (pG->pCore->ofs_30 + (u32) pG->pCore));
+    CamCtrl.CoreDataRead((u8*) CORE_ARC(CORE_CAMERA));
     CamCtrl.roomInit();
     View.roomInit();
     p = GetDataExt(pG->pRoom, "BLK", 0);
@@ -1758,7 +1758,7 @@ void gameDebugDisp()
         DrawRoomWireframe();
     }
     if (DbgFlagChk(pG, DBG_UNDER_CONST)) {
-        DrawTpl((TEXPalette*) (pG->pCore->ofs_90 + (u32) pG->pCore), 0x118, 0x186, 0xDC, 0x1E);
+        DrawTpl((TEXPalette*) CORE_ARC(CORE_UNDER_CONSTRUCTION_TEXTURE), 0x118, 0x186, 0xDC, 0x1E);
     }
 }
 

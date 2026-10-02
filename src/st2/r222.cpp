@@ -97,7 +97,7 @@ void em_reset();
 // RTX_UNCHANGING_P from an inlined body's pool loads, which then wait for the `hit[no]` store (cost 2);
 // as pool MEMs of the function itself the YarareInitCube constants are `mem/u` and issue before it.
 #define r222_setHit(no, objId)                                                                                  \
-    r222_work->hit[no] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &SmdGetObjPtr(objId)->pos, &SmdGetObjPtr(objId)->ang, 1); \
+    r222_work->hit[no] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &SmdGetObjPtr(objId)->pos, &SmdGetObjPtr(objId)->ang, 1); \
     YarareInitCube(r222_work->hit[no], 0.0f, -3500.0f, 0.0f, 550.0f, 1300.0f, 550.0f, 0, YAT_FLAG_ON)
 
 // Room init (the dragon hall). Room_flg bits 0/1/2 mark the fallen dragons. A fallen dragon sets up

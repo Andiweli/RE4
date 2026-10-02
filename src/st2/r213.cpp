@@ -109,7 +109,7 @@ static void SceBgmCheck();
 static void R213Event();
 void Evt_R213S00_Func(Event* e, u32);
 
-#define R213_EM_ARC(no) ((void*) (pG->pCore->ofs_##no + (u32) pG->pCore))
+// The hit models below use the shared core archive.
 
 // The collision pieces are set up in R213Init itself.
 void R213Init()
@@ -227,7 +227,7 @@ void R213SuInit()
             cObj* o = SmdGetObjPtr(0x12);
 
             if (o) {
-                r213_work->hit[0] = SetEmHit(R213_EM_ARC(20), R213_EM_ARC(24), &o->pos, 0, 1);
+                r213_work->hit[0] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &o->pos, 0, 1);
             if (r213_work->hit[0]) {
                 cEmHit* hit = r213_work->hit[0];
 
@@ -567,7 +567,7 @@ void R213StatusSetChain(int mode, int no, u32 objId, int hitNo, int flagNo)
         cObj* obj = SmdGetObjPtr(objId);
 
         if (obj) {
-            r213_work->hit[hitNo] = SetEmHit(R213_EM_ARC(20), R213_EM_ARC(24), &obj->pos, 0, 1);
+            r213_work->hit[hitNo] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &obj->pos, 0, 1);
             if (r213_work->hit[hitNo]) {
                 cEmHit* hit = r213_work->hit[hitNo];
 

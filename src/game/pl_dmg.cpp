@@ -334,10 +334,10 @@ void Pl_R0_Die(cPlayer* pEm)
         pEm->m_Work0 = no;
     case 1:
         if (pEm->Motion.Seq_frame > 39.7f && pEm->Motion.Seq_frame < 40.3f) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 3, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 3, 1);
         }
         if (pEm->Motion.Seq_frame > 69.7f && pEm->Motion.Seq_frame < 70.3f) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 3, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 3, 1);
         }
         if (pEm->motionMove()) {
             pEm->r_no_1 = 2;

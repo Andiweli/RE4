@@ -540,7 +540,7 @@ void emTree_R1_Throw(cEmTree* pEm)
         SndStop(w->seid_throw, 0);
     } else if (w->pAtk) {
         if (EmAtkHitCk(w->pAtk, &pEm->pos, &pEm->pos_old, 1)) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
                 SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
             }
@@ -644,7 +644,7 @@ void emTree_R1_Shot(cEmTree* pEm)
         pEm->partsWorldCalc();
         pEm->r_no_2 = 2;
     } else if (w->pAtk && (part = EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0)) != 0) {
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
             SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
         }

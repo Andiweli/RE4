@@ -45,8 +45,8 @@ cObj* SetObj08(cModel* parent, void* bin, void* tpl, Vec* pos, Vec* rot, int fla
     w = OBJ08_WK((cObj08*) obj);
     obj->id = 8;
     if (bin == 0) {
-        if (obj->modelInit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore),
-                           (void*) (pG->pCore->ofs_24 + (u32) pG->pCore)) == 0) {
+        if (obj->modelInit(CORE_ARC(CORE_DUMMY_BIN),
+                           CORE_ARC(CORE_DUMMY_TPL)) == 0) {
             ObjMgr.destroy(obj);
             return 0;
         }
@@ -348,7 +348,7 @@ int obj08ToPlHitCk(cObj08* pObj)
                     }
                     SndCall(w->blk_no, w->call_no, &pObj->pos, id, 0, 0);
                 }
-                VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+                VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             }
             w->be_flag &= ~0x20;
             return 1;

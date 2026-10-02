@@ -1291,7 +1291,7 @@ static void playerRunMoveBridge(cPlayer* pl)
 // or the bridge (which 1) via SetPlDamage.
 void playerRunDieSet(cEm* em, int which)
 {
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
     QuakeExec(0, 0, 5, 22.0f, 2);
     if (which == 0) {
         SetPlDamage(em, playerRunDiePassage);

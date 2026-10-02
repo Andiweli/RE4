@@ -91,7 +91,7 @@ void R21bInit()
         mot[8] = ROOM_ARC_PTR(pG->pRoom, 0x29);
         wp->trolley->setMotion(mot);
     }
-    r21b_work->hit[0] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &pos, 0, 1);
+    r21b_work->hit[0] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &pos, 0, 1);
     r21b_work->hit[0]->setParent(SmdGetObjPtr(0xC8), 0, 0);
     YarareInit(r21b_work->hit[0], 0.0f, 0.0f, 0.0f, 400.0f, 0.0f, 0, YAT_FLAG_ON);
     if (RsfCheck(G_ROOM_ID, 0)) {
@@ -189,7 +189,7 @@ static void r21b_HalfWayGanadoSet()
     while (r21b_work->trolley->ckStop() == 0) {
         SceSleep(1);
     }
-    r21b_work->hit[1] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &pos, 0, 1);
+    r21b_work->hit[1] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &pos, 0, 1);
     r21b_work->hit[1]->setParent(SmdGetObjPtr(0xC9), 0, 0);
     YarareInit(r21b_work->hit[1], 0.0f, 0.0f, 0.0f, 400.0f, 0.0f, 0, YAT_FLAG_ON);
     while (r21b_work->trolley->ckStop() == 1) {

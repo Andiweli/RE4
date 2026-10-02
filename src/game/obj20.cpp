@@ -23,8 +23,8 @@ cObj* SetObaModel(cObj* parent, int partsNo, Vec* ofs, f32 rad, f32 h, u8 type)
         return 0;
     }
     w = OBAMODEL_WK((cObjObaModel*) obj);
-    if (obj->modelInit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore),
-                       (void*) (pG->pCore->ofs_24 + (u32) pG->pCore)) == 0) {
+    if (obj->modelInit(CORE_ARC(CORE_DUMMY_BIN),
+                       CORE_ARC(CORE_DUMMY_TPL)) == 0) {
         pLog->err(0, 0, "SetObaModel() failed.");
         ObjMgr.destroy(obj);
         return 0;

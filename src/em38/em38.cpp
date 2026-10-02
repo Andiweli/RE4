@@ -686,7 +686,7 @@ static void em38_R1_br_Atk(cEm38* em)
         w->atkHit = 0;
         em38AtkCk(em, 3, 0x19);
         if (w->atkHit) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xD, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xD, 1);
             EmRoutineSetW(em, 1, 4, 0, 0);
             pPL->dmg.m_Timer = 0x80;
             em->dmg.m_Timer = 0x80;
@@ -1394,7 +1394,7 @@ static void plem38_CatchHit(cPlayer* pl)
         } else if (pl->Motion.Seq_frame > 87.7f && pl->Motion.Seq_frame < 88.3f) {
             PlSetDamageSe(0);
             SndCall(5, 5, &pl->pos, 0, 0, pl);
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
         }
         break;
     case 2:
@@ -2227,7 +2227,7 @@ int em38AtkCk2(cEm38* em, u32 no, Vec* a, Vec* b)
             }
         }
         QuakeExec(0, 0, 5, 22.0f, 2);
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
         return 1;
     }
     return 0;

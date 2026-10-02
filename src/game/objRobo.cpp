@@ -144,7 +144,7 @@ void cObjRobo::R0Init(cObjRobo* pObj)
         Vec pos2 = { 0.0f, 0.0f, 0.0f };
         Vec rot2 = { 0.0f, 0.0f, 0.0f };
 
-        smd = SetObjSmd((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        smd = SetObjSmd(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                         &pos2, &rot2, 0x10, 1);
         w->pObjScr[i] = smd;
         if (smd) {
@@ -186,7 +186,7 @@ void cObjRobo::R0Init(cObjRobo* pObj)
 
     for (i = 0; i < HitNoMax; i++) {
         w->pEmHitTbl[i] = 0;
-        hit = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), 0, 0, 1);
+        hit = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), 0, 0, 1);
         if (hit) {
             hit->setParent(pObj, tbl[i].parts, 0);
             if (tbl[i].parts == 0x15 || tbl[i].parts == 0x16) {

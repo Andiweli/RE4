@@ -114,7 +114,7 @@ static void r326_setCorpseBag()
         Vec hpos = {300.0f, 0.0f, 0.0f};
         Vec hrot = {0.0f, 0.0f, 1.5707964f};
 
-        r326_work->hit = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r326_work->hit = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                       &hpos, &hrot, 0);
     }
     r326_work->hit->setParent(r326_work->bag, 0, 0);

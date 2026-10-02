@@ -101,7 +101,7 @@ void R20cInit()
     r20c_work = (R20cWork*) MEM_CALLOC(sizeof(R20cWork), 1, 0xd);
     obj = SmdGetObjPtr(8);
     if (obj) {
-        r20c_work->hit = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &obj->pos, 0, 1);
+        r20c_work->hit = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &obj->pos, 0, 1);
         if (r20c_work->hit) {
             YarareInitCube(r20c_work->hit, 0.0f, -100.0f, 0.0f, 100.0f, 200.0f, 100.0f, 0, YAT_FLAG_ON);
         }
@@ -553,11 +553,11 @@ void R20cExecShootInit()
         SceAtDataSet_exec(9, SCE_LEVEL10, 0, (TaskFunc) R20cExecShootKaigaOpenMain, 0, 1);
         obj = SmdGetObjPtr(7);
         if (obj) {
-            r20c_work->kaigaHit[0] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &obj->pos, 0, 1);
+            r20c_work->kaigaHit[0] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &obj->pos, 0, 1);
             if (r20c_work->kaigaHit[0]) {
                 YarareInitCube(r20c_work->kaigaHit[0], 0.0f, 0.0f, -300.0f, 150.0f, 450.0f, 200.0f, 0, YAT_FLAG_ON);
             }
-            r20c_work->kaigaHit[1] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &obj->pos, 0, 1);
+            r20c_work->kaigaHit[1] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &obj->pos, 0, 1);
             if (r20c_work->kaigaHit[1]) {
                 YarareInitCube(r20c_work->kaigaHit[1], 0.0f, -850.0f, 0.0f, 50.0f, 1700.0f, 1100.0f, 0, YAT_FLAG_ON);
             }

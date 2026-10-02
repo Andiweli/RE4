@@ -937,7 +937,7 @@ int emBarrelRollHitCk(cEmBarrel* pEm)
     }
     LifeDownSet(pPL, 600, 0);
     PlSetDamage(PL_DM_AUTO, 0, 0);
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
     QuakeExec(0, 0, 5, 22.0f, 2);
     return 1;
 }

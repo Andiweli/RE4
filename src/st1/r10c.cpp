@@ -958,13 +958,13 @@ static void SetEmHitAtari()
     spdB = 0.05f;
     spdC = 0.06f;
     if (RsfCheck(G_ROOM_ID, 14) == 0) {
-        r10c_work->hit[0][0] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r10c_work->hit[0][0] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                           &SmdGetObjPtr(0x61)->pos, &SmdGetObjPtr(0x61)->ang, 0);
         YarareInitCube(r10c_work->hit[0][0], 0.0f, 0.0f, 0.0f, 750.0f, 1500.0f, 750.0f, 0, YAT_FLAG_ON);
-        r10c_work->hit[0][1] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r10c_work->hit[0][1] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                           &SmdGetObjPtr(0x61)->pos, &SmdGetObjPtr(0x61)->ang, 0);
         YarareInitCube(r10c_work->hit[0][1], 0.0f, 1500.0f, 0.0f, 100.0f, 1800.0f, 100.0f, 0, YAT_FLAG_ON);
-        r10c_work->hit[0][2] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r10c_work->hit[0][2] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                           &SmdGetObjPtr(0x61)->pos, &SmdGetObjPtr(0x61)->ang, 0);
         YarareInitCube(r10c_work->hit[0][2], 0.0f, 450.0f, 0.0f, 500.0f, 1500.0f, 500.0f, 0, YAT_FLAG_ON);
     } else {
@@ -978,13 +978,13 @@ static void SetEmHitAtari()
         obj->pos.z = 32568.0f;
     }
     if (RsfCheck(G_ROOM_ID, 15) == 0) {
-        r10c_work->hit[1][0] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r10c_work->hit[1][0] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                           &SmdGetObjPtr(0x62)->pos, &SmdGetObjPtr(0x62)->ang, 0);
         YarareInitCube(r10c_work->hit[1][0], 0.0f, 0.0f, 0.0f, 750.0f, 1500.0f, 750.0f, 0, YAT_FLAG_ON);
-        r10c_work->hit[1][1] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r10c_work->hit[1][1] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                           &SmdGetObjPtr(0x62)->pos, &SmdGetObjPtr(0x61)->ang, 0);
         YarareInitCube(r10c_work->hit[1][1], 0.0f, 1500.0f, 0.0f, 100.0f, 1800.0f, 100.0f, 0, YAT_FLAG_ON);
-        r10c_work->hit[1][2] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r10c_work->hit[1][2] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                           &SmdGetObjPtr(0x62)->pos, &SmdGetObjPtr(0x61)->ang, 0);
         YarareInitCube(r10c_work->hit[1][2], 0.0f, 450.0f, 0.0f, 500.0f, 1500.0f, 500.0f, 0, YAT_FLAG_ON);
     } else {
@@ -998,13 +998,13 @@ static void SetEmHitAtari()
         obj->pos.z = 42216.0f;
     }
     if (RsfCheck(G_ROOM_ID, 16) == 0) {
-        r10c_work->hit[2][0] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r10c_work->hit[2][0] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                           &SmdGetObjPtr(0x63)->pos, &SmdGetObjPtr(0x63)->ang, 0);
         YarareInitCube(r10c_work->hit[2][0], 0.0f, 0.0f, 0.0f, 750.0f, 1500.0f, 750.0f, 0, YAT_FLAG_ON);
-        r10c_work->hit[2][1] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r10c_work->hit[2][1] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                           &SmdGetObjPtr(0x63)->pos, &SmdGetObjPtr(0x61)->ang, 0);
         YarareInitCube(r10c_work->hit[2][1], 0.0f, 1500.0f, 0.0f, 100.0f, 1800.0f, 100.0f, 0, YAT_FLAG_ON);
-        r10c_work->hit[2][2] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r10c_work->hit[2][2] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                           &SmdGetObjPtr(0x63)->pos, &SmdGetObjPtr(0x61)->ang, 0);
         YarareInitCube(r10c_work->hit[2][2], 0.0f, 450.0f, 0.0f, 500.0f, 1500.0f, 500.0f, 0, YAT_FLAG_ON);
     } else {

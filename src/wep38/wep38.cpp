@@ -112,7 +112,7 @@ void cObjRuger::moveFire()
             break;
         }
         setCartridge();
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0, 1);
         r_no_1 = 1;
     }
     if (MotionGetState(this)) {

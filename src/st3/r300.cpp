@@ -299,7 +299,7 @@ void R300Init()
         const f32 h = 450.0f;
 
         EstSet(SmdGetObjPtr(0x37), -1, 0, 0, EFF_ROOM, 6, 1, ESP_CORE_KIND_ROOM00, 0, 0);
-        r300_work->hit = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+        r300_work->hit = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                     &SmdGetObjPtr(0x37)->pos, &SmdGetObjPtr(0x37)->ang, 0);
         YarareInitCube(r300_work->hit, 0.0f, w, 0.0f, h, h, h, 0, YAT_FLAG_ON);
     } else {

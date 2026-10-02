@@ -74,7 +74,7 @@ void cObjHkSniper::moveFire()
         SndCall(2, 0, &pList->world, 0, 0, 0);
         SndCall(2, 4, &pList->world, 0, 0, 0);
         StaFlagOn(pG, STA_PL_FIRE);
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0, 1);
         r_no_1 = 1;
     }
 }

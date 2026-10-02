@@ -93,7 +93,7 @@ static void subBoatR10dIn();
 static void subBoatR10eIn();
 static void subBoatR10eIn2();
 
-#define VIB_TBL ((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore))
+#define VIB_TBL ((VibDataTbl*) CORE_ARC(CORE_VIBRATION))
 // The lake boat player `pl` rides (cPlayer::m_pBoat; pl0e reads the same field as its jet ski, PL_JETSKI).
 #define PL_BOAT(pl) ((cPl0f*) (pl)->m_pBoat)
 #define ROPE(w) ((cObj*) (w)->pRope)

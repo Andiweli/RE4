@@ -1433,7 +1433,7 @@ int em25AtkCk(cEm25* em, int no, int parts)
                 SndCall(8, 0x21, &em->pos, em->id, 0, em);
             }
             QuakeExec(0, 0, 5, 22.0f, 2);
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         }
         if (hit & 2) {
             if (pSUB) {
@@ -1529,7 +1529,7 @@ int em25CatchCk(cEm25* em)
     }
     pPL->dmg.set(0, 2);
     em->dmg.set(0, 2);
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
     return 1;
 }
 

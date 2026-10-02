@@ -228,7 +228,7 @@ static f32 em31ClothMax3[18] = {
     0.3f, 0.6f, 0.9f, 1.0f, 0.3f, 0.6f, 0.9f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0.3f, 0.6f, 0.9f, 1.0f, 1.0f,
 };
 
-#define VIB_TBL ((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore))
+#define VIB_TBL ((VibDataTbl*) CORE_ARC(CORE_VIBRATION))
 
 
 

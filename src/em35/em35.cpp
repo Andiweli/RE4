@@ -108,7 +108,7 @@ static void em35_R0_Die(cEm35* em);
 static void em35_R1_Die_Normal(cEm35* em);
 static void em35_R1_Die_Pose(cEm35* em);
 
-#define VIB_TBL ((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore))
+#define VIB_TBL ((VibDataTbl*) CORE_ARC(CORE_VIBRATION))
 
 
 

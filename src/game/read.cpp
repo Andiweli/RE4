@@ -198,9 +198,9 @@ void CoreDataRead()
 #line 219 "D:/Bio4/Prog/read.cpp"
     req = DVD_READ(3, CORE_DATA_ADDR, 0, 0, 0, 0x8001);
     Dvd.ReadCheck(req, &info);
-    SpecularInit((TEXPalette*) ARC_PTR(ofs_10), (TEXPalette*) ARC_PTR(ofs_44), (TEXPalette*) ARC_PTR(ofs_48),
-                 (TEXPalette*) ARC_PTR(ofs_4C));
-    GlobalIlmTexInit((TEXPalette*) ARC_PTR(ofs_40));
+    SpecularInit((TEXPalette*) CORE_ARC(CORE_SPECULAR_0), (TEXPalette*) CORE_ARC(CORE_SPECULAR_1), (TEXPalette*) CORE_ARC(CORE_SPECULAR_2),
+                 (TEXPalette*) CORE_ARC(CORE_SPECULAR_3));
+    GlobalIlmTexInit((TEXPalette*) CORE_ARC(CORE_GLOBAL_ILLUMINATION));
     if (info.read_size[0][0] > CORE_DATA_MAX) {
         pLog->err(0, 0, "CORE_DATA IS TOO LARGE(%d/%d)", 0, CORE_DATA_MAX);
         TaskSleep(60);

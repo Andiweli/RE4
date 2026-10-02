@@ -180,6 +180,16 @@ several entries ends in the index, and an entry with no evidence is only the ind
 (`EM1E_BIN_1E7`). To rename one, edit its `#define` and the uses; a rerun of the tool keeps the
 header's names. They are defines rather than enums because a macro never reaches the compiler.
 
+Core archive accesses use `CORE_ARC(slot)` and `CORE_ARC_PTR(arc, slot)` with the same BODY-word
+numbering as `ARC` and `PL_ARC`: the four header words are included, so word slot 8 (byte 0x20)
+is sub-file 4. `GetDataExt` in `game/read.cpp` and `tools/motion/archive.py` describe that layout.
+`include/arc/core.h` names the used slots from their consumers, cited beside each define; these are
+our descriptive names, not recovered vendor identifiers. The dummy BIN/TPL names also have literal
+`etc/core/dummy.bin` and `etc/core/dummy.tpl` paths in `Event::ExeBeginEvt`. The core type is opaque;
+the accessor loads a `u32` offset and adds the base as a `u32`, in that order, without assuming an
+archive length. Its archive argument must be side-effect-free because it is evaluated twice.
+Player, weapon, room and other archive formats retain their existing accessors.
+
 ## Style: the vendor's spelling is kept
 
 Names taken from the vendor are kept exactly as the vendor wrote them: `m_Pos`, `Wall_norm`, `Rno0`,

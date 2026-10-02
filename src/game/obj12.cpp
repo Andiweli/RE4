@@ -489,7 +489,7 @@ void cObj12::throwMove()
         w->be_flag &= ~0x100;
         setFall(0, 0);
     } else if (EmAtkHitCk(&obj12Atk, &pos, &pos_old, 1)) {
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         w->be_flag &= ~0x100;
         setFall(0, 0);
     }

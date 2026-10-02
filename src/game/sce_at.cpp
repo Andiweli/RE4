@@ -4109,8 +4109,8 @@ void sceAtSetItem(SCE_AT_ITEM* w)
     if (it->pModel == 0) {
         ok2 = ItemGetBinTplAddr(it->item_id, &bin, &tpl) ? 1 : 0;
         if (ok2 == 0) {
-            bin = (void*) (pG->pCore->ofs_20 + (u32) pG->pCore);
-            tpl = (void*) (pG->pCore->ofs_24 + (u32) pG->pCore);
+            bin = CORE_ARC(CORE_DUMMY_BIN);
+            tpl = CORE_ARC(CORE_DUMMY_TPL);
         }
         if (it->ctrl_flag & 0x10) {
             SceAtSetShootDownItem(w, bin, tpl);

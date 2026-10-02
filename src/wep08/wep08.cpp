@@ -87,7 +87,7 @@ void cObjStriker::moveFire()
         MotionSetCore(this, &this->Motion, WEP_ARC_PTR(0x30), 0, 0, 0, 0);
         SndCall(2, 0, &pos, 0, 0, 0);
         SndCall(2, 4, &pos, 0, 0, 0);
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0, 1);
         StaFlagOn(pG, STA_PL_FIRE);
         EstSet(this, -1, 0, 0, EFF_WEP08, 0, 0, ESP_CORE_KIND_PL_WEP, 0, 0);
         r_no_1 = 1;

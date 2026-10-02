@@ -44,8 +44,8 @@
 // stage_prev/room_prev written as one u16 through a plain pointer (aliases pG like G_ROOM_ID).
 #define G_ROOM_ID_PREV (*(u16*) &pG->stage_prev)
 
-// Sub-file of the core archive (pG->pCore): `ofs + (u32) arc` (integer arithmetic, ofs first).
-#define G_ARC_PTR(field) ((void*) (pG->pCore->field + (u32) pG->pCore))
+// Core sub-files use CORE_ARC from global.h; title-screen data below has its own archive.
+
 
 // Fade colours: word constants passed by address (see sscrn.cpp).
 union FadeColor {
@@ -572,7 +572,7 @@ void titleMain(TITLE_WORK* w)
             } else {
                 w->se_id = SndCall(6, 2, 0, 0, 0, 0);
             }
-            VibSetData((VibDataTbl*) G_ARC_PTR(ofs_1C), 0x10, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0x10, 1);
             c0.w = 0x00000000;
             c1.w = 0x000000FF;
             FadeSet(0, &c0.c, &c1.c, 90, 0, 0);
@@ -610,9 +610,9 @@ void titleMain(TITLE_WORK* w)
             IdTexRelease(TEX_OWNER_ID_TITLE);
             IdSys.kill(0xFF, IDC_TITLE);
             IdSys.kill(0xFF, IDC_TITLE_MENU);
-            MesData.registData(2, (u8*) G_ARC_PTR(ofs_28));
+            MesData.registData(2, (u8*) CORE_ARC(CORE_MESSAGE));
             OptScrn.init(1);
-            IdTexDataLoad(G_ARC_PTR(ofs_74), TEX_OWNER_ID_COCKPIT);
+            IdTexDataLoad(CORE_ARC(CORE_COCKPIT_TEXTURE), TEX_OWNER_ID_COCKPIT);
             IdTexDataLoad(TITLE_ARC_PTR(w->pIdDat, 0xC), TEX_OWNER_ID_EVENT);
             IdSys.set((ID_FILE_HEADER*) TITLE_ARC_PTR(w->pIdDat, 0xD), 0xFF, IDC_EVENT, 0x13, 5, 0);
             w->counter_bak = w->counter;
@@ -650,7 +650,7 @@ void titleMain(TITLE_WORK* w)
             } else {
                 w->se_id = SndCall(6, 2, 0, 0, 0, 0);
             }
-            VibSetData((VibDataTbl*) G_ARC_PTR(ofs_1C), 0x10, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0x10, 1);
             c0.w = 0x00000000;
             c1.w = 0x000000FF;
             FadeSet(0, &c0.c, &c1.c, 90, 0, 0);

@@ -261,7 +261,7 @@ static void wep09_r3_fire00(cPlayer* pl)
     if (pG->weapon_no == 9) {
         SndCall(2, 0, &pl->getPartsPtr(4)->world, 0, 0, 0);
     }
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0, 1);
     pl->m_Work4 = 0;
     if (pG->weapon_no == 0xA) {
         obj = pl->Wep->m_pWep;

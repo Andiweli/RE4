@@ -554,7 +554,7 @@ int em24AtkCk(cEm24* em, Vec* a, Vec* b, int no)
             if (hit & 1) {
                 EmPlBloodSet2(em, a, 1, 0x1C, 6);
                 QuakeExec(0, 0, 5, 22.0f, 2);
-                VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+                VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
                 return 1;
             }
         }

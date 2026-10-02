@@ -121,7 +121,7 @@ void R21aInit()
         if (obj) {
             for (int k = 0; k < 4; k++) {
                 R21aRoof* r = &r21a_roofTbl[k];
-                cEmHit* hit = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), 0, 0, 1);
+                cEmHit* hit = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), 0, 0, 1);
 
                 if (hit) {
                     hit->setParent(obj, 0, 0);

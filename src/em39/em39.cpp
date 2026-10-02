@@ -2935,7 +2935,7 @@ static void em39_R1_AtkDoor(cEm39* em)
 static void em39_R1_br_KnifeCatch(cEm39* em)
 {
     if (em->hp > 0 && (em->Motion.Seq_old.Free & 2) && em39CatchCk(em)) {
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         EmRoutineSetW(em, 1, 0x1B, 0, 0);
     }
 }
@@ -3160,7 +3160,7 @@ static void plem39_KnifeHit(cPlayer* pl)
             MotionSetCore(pl, &pl->Motion, PL_ARC_PTR(pl->subArc, 0x11A), 0, 5, 1, 0);
             EstSet(pl, -1, 0, 0, EFF_EM39, 0x2A, 0, ESP_CORE_KIND_NONE, pl, 0);
         }
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
         pl->r_no_2++;
     case 3:
         if (MotionMove(pl, 0) && (s16) pG->pl_life > 0) {
@@ -3505,7 +3505,7 @@ static void plem39_Knife4Atk(cPlayer* pl)
             MotionSetCore(pl, &pl->Motion, PL_ARC_PTR(pl->subArc, 0x119), 0, 0, 1, 0);
             EstSet(pl, -1, 0, 0, EFF_EM39, 0x28, 0, ESP_CORE_KIND_NONE, pl, 0);
         }
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
         pl->m_Work0 = 10;
         pl->r_no_2++;
     case 9:
@@ -5166,7 +5166,7 @@ static void plemBackjump(cPlayer* pl)
 static void em39_R1_br_T_Kick(cEm39* em)
 {
     if (em->hp > 0 && (em->Motion.Seq_old.Free & 2) && em39KickHitCk(em)) {
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         SndCall(8, 0x38, &pPL->pos, em->id, 0, pPL);
         if (em39GetCliffPos(em)) {
             LifeDownSet2(pPL, 500, 0, 1);
@@ -5280,7 +5280,7 @@ static void em39_R1_T_Kick(cEm39* em)
 static void em39_R1_br_T_LowKick(cEm39* em)
 {
     if (em->hp > 0 && (em->Motion.Seq_old.Free & 2) && em39KickHitCk(em)) {
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         LifeDownSet2(pPL, 500, 0, 1);
         SndCall(8, 0x38, &pPL->pos, em->id, 0, pPL);
         EmRoutineSetW(em, 1, 0x2D, 0, 0);
@@ -5495,7 +5495,7 @@ static void plem39_LowKickHit(cPlayer* pl)
             SndCall(5, 5, &pl->pos, 0, 0, pl);
         }
         if (PL_FRAME_IN(pl, 43.7f, 44.3f)) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xD, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xD, 1);
         }
         if (PL_FRAME_IN(pl, 78.7f, 79.3f)) {
             if (pG->pl_type == 2) {
@@ -5632,10 +5632,10 @@ static void em39_R1_T_CliffAtk(cEm39* em)
             em39SetVoice(em, 0x52);
         }
         if (em->Motion.Seq_frame > 48.7f && em->Motion.Seq_frame < 49.3f) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         }
         if (em->Motion.Seq_frame > 139.7f && em->Motion.Seq_frame < 140.3f) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
         }
         break;
     case 2:
@@ -6551,7 +6551,7 @@ int em39GunHitCk(cEm39* em)
     SndCall(8, 0xC, &em->pos, em->id, 0, em);
     part = EmAtkLineHitCk(&from, &to, &hit, &nrm, 0);
     if (part) {
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         SndCall(6, 0x15, &pPL->pos, 0, 0, pPL);
         QuakeExec(0, 0, 5, 22.0f, 2);
         EmPlBloodSet2(em, &from, 1, 0x2F, 0x2C);
@@ -6833,7 +6833,7 @@ int em39AtkCk2(cEm39* em, int no, Vec* a, Vec* b)
                 }
             }
         }
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         return 1;
     }
     return 0;
@@ -7666,7 +7666,7 @@ void em39WepSet(cEm39* em, int no)
     }                                                                                              \
     pPL->dmg.set(0, 2);                                                                            \
     (em)->dmg.set(0, 2);                                                                           \
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);                           \
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);                           \
     return 1;
 
 // The knife grab test (em39_R1_br_KnifeCatch): a live, free player in a 1.6 m wide box up to 1.7 m

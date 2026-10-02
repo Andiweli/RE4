@@ -205,7 +205,7 @@ void r11d_appearBigSister()
         Vec rot = {0.0f, 0.0f, 0.0f};
         cObj* obj;
 
-        obj = SetObj00((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &pos, &rot);
+        obj = SetObj00(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &pos, &rot);
         OyaSetObj00(obj, r11d_work->em0.getPtr(), 2);
         obj->setNoSuspend(1);
         r11d_work->mi = ModInfoMgr.create(ROOM_ARC_PTR(pG->pRoom, 0x21), ROOM_ARC_PTR(pG->pRoom, 0x22));

@@ -107,7 +107,7 @@ void cObjMauser::moveFire()
         StaFlagOn(pG, STA_PL_FIRE);
         EstSet(this, -1, 0, 0, EFF_WEP02, 0, 0, ESP_CORE_KIND_PL_WEP, 0, 0);
         setCartridge();
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0, 1);
         r_no_1 = 1;
     }
     if (MotionGetState(this)) {

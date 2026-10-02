@@ -279,8 +279,8 @@ void EspRoomInit()
         pt->owner = EFF_NONE;
         pt++;
     }
-    EspDataLoad(pG->pCore->ofs_14 + (u32) pG->pCore, EFF_CORE, 0);
-    EspDataLoad(pG->pCore->ofs_50 + (u32) pG->pCore, EFF_ITM, 0);
+    EspDataLoad((u32) CORE_ARC(CORE_EFFECT), EFF_CORE, 0);
+    EspDataLoad((u32) CORE_ARC(CORE_ITEM_EFFECT), EFF_ITM, 0);
     g_nLoop = 200;
     sys->pEspBufSave = NULL;
     EspEvModList.Clear();

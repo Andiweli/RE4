@@ -391,7 +391,7 @@ static void em2a_R1_Trap1Bite(cEm2a* em)
         EmCatchPLSet(em, 0.0f, 0, 34.69f, 0.0f, 250.42f, plem2a_Trap1Bite);
         w->camTimer = 120;
         w->biteTimer = 10;
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         l->set = 2;
         em->r_no_2++;
     case 1:

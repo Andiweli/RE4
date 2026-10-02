@@ -277,7 +277,7 @@ void R332Init()
             // The reference-view store keeps the following `pG` load below it (r30c PSetPtr).
 #line 372 "D:/Bio4/Prog/r332.cpp"
             (crane->Motion.pAttachCam = (ATTACH_CAMERA*) MEM_ALLOC(0x98, 1, 0xd));
-            R332_ARR_SET(hit[0], i * 4, SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), 0, 0, 1));
+            R332_ARR_SET(hit[0], i * 4, SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), 0, 0, 1));
             if (r332_work->hit[i]) {
                 r332_work->hit[i]->setParent(crane, 4, 0);
             }

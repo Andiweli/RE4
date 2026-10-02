@@ -1051,7 +1051,7 @@ int obj16AtkCk(cObj16* obj, u32 atk_type, int parts_no)
             if (obj->type == 0xB && w->pEm) {
                 SndCall(8, 0x12, &w->pEm->pos, w->pEm->id, 0, 0);
             }
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             QuakeExec(0, 0, 5, 22.0f, 2);
             if (w->Mot_pl_dm && (s16) pG->pl_life > 0 && w->pOya) {
                 if (obj->type == 2) {
@@ -1090,7 +1090,7 @@ int obj16AtkCk(cObj16* obj, u32 atk_type, int parts_no)
             if (obj->type == 0xB && w->pEm) {
                 SndCall(8, 0x12, &w->pEm->pos, w->pEm->id, 0, 0);
             }
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             QuakeExec(0, 0, 5, 22.0f, 2);
             if (obj->type == 2) {
                 EstSet(obj, -1, 0, 0, EFF_EM10, 0x73, 0, ESP_CORE_KIND_NONE, obj, 0);
@@ -1111,7 +1111,7 @@ int obj16AtkCk(cObj16* obj, u32 atk_type, int parts_no)
             if (obj->type == 0xB && w->pEm) {
                 SndCall(8, 0x12, &w->pEm->pos, w->pEm->id, 0, 0);
             }
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             QuakeExec(0, 0, 5, 22.0f, 2);
             if (obj->type == 2) {
                 EstSet(obj, -1, 0, 0, EFF_EM10, 0x73, 0, ESP_CORE_KIND_NONE, obj, 0);
@@ -1119,7 +1119,7 @@ int obj16AtkCk(cObj16* obj, u32 atk_type, int parts_no)
             break;
         case 3:
             obj16PlHeadLost(obj);
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             QuakeExec(0, 0, 5, 22.0f, 2);
             break;
         }

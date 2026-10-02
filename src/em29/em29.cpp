@@ -682,7 +682,7 @@ static void em29_R1_AtkRush(cEm29* em)
                 cParts* p = GetPartsAddr(em->pList, 2);
 
                 EmPlBloodSet(em, &p->world, 1, 0xFF, 0xFF);
-                VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xA, 1);
+                VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xA, 1);
             }
             if ((s16) pG->pl_life <= 0) {
                 PlSetDamage(PL_DM_UP_FRONT, 0, 0);
@@ -1273,7 +1273,7 @@ int em29AtkCk(cEm29* em, int no)
             EmSubBloodSet(em, &p->world, 1, 0xFF, 0xFF);
             w->atkHit = 1;
         }
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         return 1;
     }
     return 0;

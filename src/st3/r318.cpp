@@ -684,7 +684,7 @@ void R318LaserEspInit(int n, int type, int kind)
 static inline void LaserHit()
 {
     BitOn(pG->Room_flg[0], 0x00040000);
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
     QuakeExec(0, 0, 5, 22.0f, 2);
     SetPlDamage(0, playerDie);
 }
@@ -1066,7 +1066,7 @@ static void playerEscape03(cPlayer* pl)
         }
         if (MotionMove(pl, 0) || r318_work->escFrame > 0x3E) {
             pG->Room_flg[0] |= 0x00040000;
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             QuakeExec(0, 0, 5, 22.0f, 2);
             SetPlDamage(0, playerDie);
         }

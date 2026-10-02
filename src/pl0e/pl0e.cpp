@@ -67,7 +67,7 @@ static void subBoatCrash();
 static void subBoatSink();
 static void subBoatJumpMiss();
 
-#define VIB_TBL ((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore))
+#define VIB_TBL ((VibDataTbl*) CORE_ARC(CORE_VIBRATION))
 // The jet ski player `pl` rides (cPlayer::m_pBoat; pl0f reads the same field as its lake boat, PL_BOAT).
 #define PL_JETSKI(pl) ((cPl0e*) (pl)->m_pBoat)
 
@@ -222,7 +222,7 @@ static void pl0e_R0_Init(cPl0e* em)
     w->spdX = 0.0f;
     w->floorY0 = em->pos.y;
     w->floorY1 = em->pos.y;
-    w->pWave = SetObj00((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), 0, 0);
+    w->pWave = SetObj00(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), 0, 0);
     w->espKind = EspPullCoreKind();
     em->r_no_1 = 0;
     em->r_no_2 = 0;
@@ -1297,7 +1297,7 @@ void cPl0e::setRail(void* path)
 {
     Pl0eWork* w = PL0E_WK(this);
 
-    w->pRailObj = SetObj00((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), 0, 0);
+    w->pRailObj = SetObj00(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), 0, 0);
     if (w->pRailObj) {
         w->seg = 0;
         w->dist = 0.0f;

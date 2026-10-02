@@ -1630,7 +1630,7 @@ int em3cAtkCk(cEm3c* em, Vec* pos, int no)
                 EmSubBloodSet(em, &p->world, 1, 0x31, 0xA);
             }
         }
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         SndCall(8, 9, &em->pos, em->id, 0, em);
         return 1;
     }

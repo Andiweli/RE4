@@ -509,11 +509,11 @@ void objPillarAtkCk(cObjPillar* pObj, Vec* pPos)
             QuakeExec(0, 0, 5, 22.0f, 2);
             SndCall(8, 0x25, &pPL->pos, 0x31, 0, pPL);
             w->Act_ck = 1;
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         }
         if (hit & 2) {
             QuakeExec(0, 0, 5, 22.0f, 2);
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
         }
     }
 }

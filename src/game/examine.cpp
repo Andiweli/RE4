@@ -553,7 +553,7 @@ void ItemExamine::idSet()
     switch (m_scrn_flag) {
     case 0:
     case 1:
-        m_pIdSys->set((ID_FILE_HEADER*) (pG->pCore->ofs_78 + (u32) pG->pCore), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) CORE_ARC(CORE_EXAMINE_ID), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
         break;
     case 2:
         m_pIdSys->set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pExam, 7), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
@@ -564,7 +564,7 @@ void ItemExamine::idSet()
 // Starts examining `model_` of item `id_` in mode `mode_`: saves the model's flags/pos/ang/ot and
 // its root parts, recentres the root on the model bound centre, applies the exam_info rotation
 // (degrees), builds the id overlay, sets the treasure camera (mode 2), creates the three lights of
-// the exam light set (pArc ofs_58..68 by ITEM_EXAMINE_INFO::light) and starts the item's est (owner 0xD1).
+// the exam light set (CORE_EXAMINE_LIGHT_0..4 by ITEM_EXAMINE_INFO::light) and starts the item's est (owner 0xD1).
 void ItemExamine::init(u16 id, cModel* p_model, u8 scrn_flag)
 {
     static f32 c0 = -0.5f;
@@ -647,26 +647,26 @@ void ItemExamine::init(u16 id, cModel* p_model, u8 scrn_flag)
         g_rad_x = 0.0f;
     } else {
         arc = pG->pCore;
-        lit = (cLit*) (arc->ofs_58 + (u32) arc);
+        lit = (cLit*) CORE_ARC_PTR(arc, CORE_EXAMINE_LIGHT_0);
         if (m_pInfo) {
             switch (m_pInfo->light_no) {
             case 0:
-                lit = (cLit*) (arc->ofs_58 + (u32) arc);
+                lit = (cLit*) CORE_ARC_PTR(arc, CORE_EXAMINE_LIGHT_0);
                 break;
             case 1:
-                lit = (cLit*) (arc->ofs_5C + (u32) arc);
+                lit = (cLit*) CORE_ARC_PTR(arc, CORE_EXAMINE_LIGHT_1);
                 break;
             case 2:
-                lit = (cLit*) (arc->ofs_60 + (u32) arc);
+                lit = (cLit*) CORE_ARC_PTR(arc, CORE_EXAMINE_LIGHT_2);
                 break;
             case 3:
-                lit = (cLit*) (arc->ofs_64 + (u32) arc);
+                lit = (cLit*) CORE_ARC_PTR(arc, CORE_EXAMINE_LIGHT_3);
                 break;
             case 4:
-                lit = (cLit*) (arc->ofs_68 + (u32) arc);
+                lit = (cLit*) CORE_ARC_PTR(arc, CORE_EXAMINE_LIGHT_4);
                 break;
             default:
-                lit = (cLit*) (pG->pCore->ofs_58 + (u32) pG->pCore);
+                lit = (cLit*) CORE_ARC(CORE_EXAMINE_LIGHT_0);
                 break;
             }
         }

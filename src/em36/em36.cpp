@@ -192,7 +192,7 @@ static Vec em36_weak_rot[5] = {
     { 0.0f, 0.0f, 0.0f },
 };
 
-#define VIB_TBL ((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore))
+#define VIB_TBL ((VibDataTbl*) CORE_ARC(CORE_VIBRATION))
 
 
 

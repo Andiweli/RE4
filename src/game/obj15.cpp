@@ -80,17 +80,17 @@ cObjGatling* SetObjGatling(void* bin, void* tpl, Vec* pos, Vec* rot)
         hrot.x = 0.0f;
         hrot.y = 0.0f;
         hrot.z = 0.0f;
-        w->pHit[0] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &hpos, &hrot, 1);
+        w->pHit[0] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &hpos, &hrot, 1);
         if (w->pHit[0]) {
             w->pHit[0]->setParent(obj, 0, 0);
             YarareInitCube(w->pHit[0], 430.0f, 0.0f, 520.0f, 300.0f, 1600.0f, 50.0f, 1, YAT_FLAG_ON);
         }
-        w->pHit[1] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &hpos, &hrot, 1);
+        w->pHit[1] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &hpos, &hrot, 1);
         if (w->pHit[1]) {
             w->pHit[1]->setParent(obj, 0, 0);
             YarareInitCube(w->pHit[1], -430.0f, 0.0f, 520.0f, 300.0f, 1600.0f, 50.0f, 1, YAT_FLAG_ON);
         }
-        w->pHit[2] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &hpos, &hrot, 1);
+        w->pHit[2] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &hpos, &hrot, 1);
         if (w->pHit[2]) {
             w->pHit[2]->setParent(obj, 0, 0);
             YarareInitCube(w->pHit[2], 0.0f, 0.0f, 0.0f, 300.0f, 1600.0f, 300.0f, 1, YAT_FLAG_ON);
@@ -365,7 +365,7 @@ int obj15GunHitck(cObjGatling* pObj)
         }
         return 0;
     }
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
     SndCall(6, 0x15, &pPL->pos, 0, 0, 0);
     QuakeExec(0, 0, 5, 22.0f, 2);
     EmPlBloodSet2(pObj, &pObj->pos, 1, 1, 0x1C);

@@ -134,7 +134,7 @@ int ShdInit(ShdHeader* data)
                 e->shdCol = 0xFF;
             }
         }
-        if (obj->modelInit((u8*) ofsTbl + ofsTbl[e->model], (void*) (pG->pCore->ofs_10 + (u32) pG->pCore)) == 0) {
+        if (obj->modelInit((u8*) ofsTbl + ofsTbl[e->model], CORE_ARC(CORE_SPECULAR_0)) == 0) {
             ObjMgr.destroy(obj);
             continue;
         }

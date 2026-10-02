@@ -1617,7 +1617,7 @@ int cDvd::ErrCheck(int disc_new, int proc)
                     Sofdec.PlayPause(1);
                 }
                 if (pG->IsMessageInit == 1) {
-                    pMes[4] = (u8*) (pG->pCore->ofs_6C + (u32) pG->pCore);
+                    pMes[4] = (u8*) CORE_ARC(CORE_SYSTEM_MESSAGE);
                     cMes.setLayout(0xF, LAYOUT_SYSTEM);
                 }
                 systemVISetBlack(0);

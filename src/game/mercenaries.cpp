@@ -195,7 +195,7 @@ int MercSysInitRoom(MercSysInitWork* pMInit)
     wk->mes[7] = pMInit->mes[7];
     wk->mes[8] = pMInit->mes[8];
     wk->mes[9] = pMInit->mes[9];
-    smd = SetObjSmd(ARC_PTR(ofs_20), ARC_PTR(ofs_24), &pMInit->pos, &pMInit->rot, 0x10, 0);
+    smd = SetObjSmd(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &pMInit->pos, &pMInit->rot, 0x10, 0);
     wk->smd = smd;
     if (smd == NULL) {
         pLog->err(0, 0, "St4ResultInitRoom : DummyModel no create");

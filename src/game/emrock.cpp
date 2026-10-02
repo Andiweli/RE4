@@ -1071,7 +1071,7 @@ int emRockRollHitCk(cEmRock* pEm)
         w->Radius * w->Radius) {
         return 0;
     }
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
     QuakeExec(0, 0, 5, 22.0f, 2);
     pG->pl_life = 0;
     PlSetDamage(PL_DM_AUTO, 0, 0);
@@ -2108,7 +2108,7 @@ int emRockAtkCk(cEmRock* em, ATK_INFO* atk, f32 r, int type)
         a = *atk;
         a.radius = w->Radius;
         if (EmAtkHitCk(&a, &em->pos, &em->pos_old, 1)) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
                 SndCall(w->seHit[0], w->seHit[1], &em->pos, w->seHit[2], 0, em);
             }

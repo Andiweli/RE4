@@ -333,7 +333,7 @@ static void wep13_r3_fire00(cPlayer* pl)
     obj = pl->Wep->m_pWep;
     obj->r_no_0 = 2;
     obj->r_no_1 = 0;
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0, 1);
     pitch = m3r;
     PlWepLockRand(pl, 2, &pitch, &pl->m_Fwork0);
     m3r = pitch;

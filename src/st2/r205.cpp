@@ -175,7 +175,7 @@ void R205Init()
         Vec pos = {0.0f, -425.0f, 0.0f};
 
         for (i = 0; i < 4; i++) {
-            r205_work->hit[i] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore),
+            r205_work->hit[i] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL),
                                          &pos, 0, 1);
             r205_work->hit[i]->setParent(r205_work->pend[i].obj, 0, 0);
             YarareInitCube(r205_work->hit[i], 0.0f, -400.0f, 0.0f, 1700.0f, 1300.0f, 100.0f, 0, YAT_FLAG_ON);

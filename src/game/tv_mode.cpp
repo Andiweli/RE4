@@ -106,7 +106,7 @@ void tvModeMenu_progressive(TV_MODE* pTv)
 
     switch (pTv->Rno1) {
     case 0:
-        MesData.registData(pTv->Rno1, (u8*) (pG->pCore->ofs_70 + (u32) pG->pCore));
+        MesData.registData(pTv->Rno1, (u8*) CORE_ARC(CORE_TV_MODE_MESSAGE));
         cMes.setLayout(0, LAYOUT_SYSTEM);
         cMes.MesSet(0, 100, 220, 0x1000051, 0, 0, 1);
         timer = 0;

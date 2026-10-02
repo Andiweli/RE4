@@ -702,9 +702,9 @@ static void track_move()
         SndCall(6, 0x12, &r30f_work->lift->pList->pList->world, 0, 0x80000000, 0);
     }
     frames = (u32) MotionGetMaxFrame(&r30f_work->lift->Motion);
-    r30f_work->hit[0] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &r30f_work->lift->pos, &r30f_work->lift->ang, 1);
+    r30f_work->hit[0] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &r30f_work->lift->pos, &r30f_work->lift->ang, 1);
     YarareInitCube(r30f_work->hit[0], hit0_x, hit0_y, hit0_z, hit0_w, hit0_h, hit0_d, 0, YAT_FLAG_ON);
-    r30f_work->hit[1] = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore), (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &r30f_work->lift->pos, &r30f_work->lift->ang, 1);
+    r30f_work->hit[1] = SetEmHit(CORE_ARC(CORE_DUMMY_BIN), CORE_ARC(CORE_DUMMY_TPL), &r30f_work->lift->pos, &r30f_work->lift->ang, 1);
     YarareInitCube(r30f_work->hit[1], hit1_x, hit1_y, hit1_z, hit1_w, hit1_h, hit1_d, 0, YAT_FLAG_ON);
     r30f_work->truckLife = 0x1F4;
     if (pG->Game_level > 8) {

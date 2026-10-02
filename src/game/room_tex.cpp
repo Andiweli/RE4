@@ -24,7 +24,7 @@ void RoomTexRoomInit()
 #line 41
     g_pRoomTexSys = (cTexSys*) MEM_ALLOC(sizeof(cTexSys), 1, 0xD);
     g_pRoomTexSys->Init("RoomTex", 256);
-    RoomTexDataLoad((TexData*) (pG->pCore->ofs_18 + (u32) pG->pCore), 1);
+    RoomTexDataLoad((TexData*) CORE_ARC(CORE_ROOM_TEXTURE), 1);
 }
 
 // Registers a texture data block with the room texture system under `owner` (freed per owner).

@@ -2367,7 +2367,7 @@ static void em2b_R1_Catch(cEm2b* em)
                     pPL->dmg.m_Timer = 2;
                     SetPlDamage(em, plem2b_CatchHand);
                     SndCall(8, 0x24, &p->world, em->id, 0, em);
-                    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+                    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
                     w->Atk_ck = 1;
                 }
             }
@@ -2592,7 +2592,7 @@ static void plem2b_Strangle(cPlayer* pl)
         pl->r_no_2 = pPL->pEmCatch->r_no_2;
         if (pl->Motion.Seq_frame > 77.6999969f && pl->Motion.Seq_frame < 78.3000031f) {
             pl->m_Work0 = SndCall(8, 0x28, &pl->getPartsPtr(0)->world, pl->pEmCatch->id, 0, pl);
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xC, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xC, 1);
         }
         break;
     case 2: {
@@ -2643,7 +2643,7 @@ static void plem2b_Strangle(cPlayer* pl)
     case 5:
         MotionMove(pl, 0);
         if (pl->Motion.Seq_frame > 63.7000008f && pl->Motion.Seq_frame < 64.3000031f) {
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
         }
         break;
     }
@@ -2957,7 +2957,7 @@ static void em2b_R1_HoleAtk(cEm2b* em)
                 pG->pl_life = 0;
                 SetPlDamage(em, plem2b_CatchHand);
                 SndCall(8, 0x24, &hp->world, em->id, 0, em);
-                VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+                VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
                 w->Atk_ck = 1;
             }
         }
@@ -2979,7 +2979,7 @@ void em2bPlFallCK(cEm2b* em)
     if (pPL->pos.y < em->pos.y + 2000.0f) {
         return;
     }
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 7, 1);
     pPL->ang.y = GetXZAngle(&pPL->pos, &em->pos);
     SetPlDamage(em, plem2bDmFall);
 }
@@ -3015,7 +3015,7 @@ static void plem2bDmFall(cPlayer* pl)
             if (pl->pos.y < y) {
                 pl->pos.y = y;
                 if (pl->Motion.Seq_frame > 63.7000008f && pl->Motion.Seq_frame < 64.3000031f) {
-                    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+                    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
                 }
                 MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM2B_MOT_PL_DM_FALL_0E9), 0, 3, 1, 0);
                 MotionMove(pl, 0);
@@ -3634,7 +3634,7 @@ static void plem2b_AtkParasite(cPlayer* pl)
             } else {
                 PlSetDamageSe(0xA);
             }
-            VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+            VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
         }
         if (MotionMove(pl, 0) && (s16) pG->pl_life > 0) {
             if (em2bCatchObj.p) {
@@ -4230,14 +4230,14 @@ int em2bAtkCk(cEm2b* em, Vec* a, Vec* b, int no)
                 }
                 QuakeExec(0, 0, 5, 22.0f, 2);
                 SndCall(8, 0x32, &em->pos, em->id, 0, em);
-                VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+                VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
                 return 1;
             }
             if (hit & 2) {
                 w->Atk_ck = 1;
                 QuakeExec(0, 0, 5, 22.0f, 2);
                 SndCall(8, 0x32, &em->pos, em->id, 0, em);
-                VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+                VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
                 return 1;
             }
         }
@@ -4928,7 +4928,7 @@ int em2bTreeAtkCk(cEm2b* em)
     em->ang.y = LIMIT_ANGLE(em->ang.y);
     SndCall(8, 0xF, &pPL->pos, em->id, 0, pPL);
     SndCall(8, 0x32, &pPL->pos, em->id, 0, pPL);
-    VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+    VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
     SetPlDamage(em, plem2bDmBlow);
     return 1;
 }
@@ -5294,7 +5294,7 @@ static void plem2bDmBlow(cPlayer* pl)
         EstSet(pl, -1, 0, 0, w->Eff, 6, 0, ESP_CORE_KIND_NONE, pl, 0);
         SndCall(8, 0x1A, &pl->pos, pl->pEmCatch->id, 0, pl);
         SndCall(1, 9, &pl->pos, 0, 0, pl);
-        VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 0xB, 1);
+        VibSetData((VibDataTbl*) CORE_ARC(CORE_VIBRATION), 0xB, 1);
         pl->r_no_2++;
     case 3:
         em2bBlowCamMove((cEm2b*)pl->pEmCatch, 0.300000012f);

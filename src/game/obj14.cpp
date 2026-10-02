@@ -73,8 +73,8 @@ cObj* SetObjBell(void* bin, void* tpl, Vec* pos, Vec* rot)
     p1.x = 0.0f;
     p1.y = 0.0f;
     p1.z = 0.0f;
-    w->pHit = SetEmHit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore),
-                         (void*) (pG->pCore->ofs_24 + (u32) pG->pCore), &p0, &p1, 1);
+    w->pHit = SetEmHit(CORE_ARC(CORE_DUMMY_BIN),
+                         CORE_ARC(CORE_DUMMY_TPL), &p0, &p1, 1);
     if (w->pHit) {
         w->pHit->setParent(obj, 1, 0);
         YarareInit(w->pHit, 0.0f, -650.0f, 0.0f, 300.0f, 50.0f, 1, YAT_FLAG_ON);

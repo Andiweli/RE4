@@ -1143,7 +1143,7 @@ void cCard::exit()
             }
         }
         pG->CardStatus &= ~0x7FFFFFF8;
-        MesData.registData(0, (u8*) (pG->pCore->ofs_28 + (u32) pG->pCore));
+        MesData.registData(0, (u8*) CORE_ARC(CORE_MESSAGE));
         exitFlag = 1;
         break;
     }

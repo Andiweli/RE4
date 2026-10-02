@@ -27,8 +27,8 @@ static cObj* SetObj26(cObj* parent, Vec* scale)
     if (obj == 0) {
         return 0;
     }
-    if (obj->modelInit((void*) (pG->pCore->ofs_20 + (u32) pG->pCore),
-                       (void*) (pG->pCore->ofs_24 + (u32) pG->pCore)) == 0) {
+    if (obj->modelInit(CORE_ARC(CORE_DUMMY_BIN),
+                       CORE_ARC(CORE_DUMMY_TPL)) == 0) {
         pLog->err(0, 0, "SetObj26() failed.");
         ObjMgr.destroy(obj);
         return 0;
