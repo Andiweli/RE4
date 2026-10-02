@@ -81,8 +81,8 @@ extern "C" f32 re4_acosf(f32 x);
 
 // ---- include/model.h / motion.h / cam_ctrl.h subset ---------------------------------------------
 
-struct MotionSeqKey {
-    u16 frame;
+struct SEQUENCE_DATA {
+    u16 Frame;
     u8 Se;
     u8 Free;
 };
@@ -92,7 +92,7 @@ struct MotionData {
     u8 nParts;
 };
 
-struct AttachCamera {
+struct ATTACH_CAMERA {
     u8 parts[5];
     u8 type;
     u8 frame;
@@ -103,10 +103,10 @@ struct AttachCamera {
     u16 history[5][3];
 };
 
-struct MotionWorkSub {
+struct MOTION_INFO {
     MotionData* pMot;
     u32* pHermite_data;   // u32 key pointers: the motion image lives in the low 4 GB (MAP_32BIT)
-    u16 Key_hist[2][2][3];
+    u16 Key_hist[4][3];
     f32 Mot_frame_max;
     f32 Mot_frame;
     f32 Mot_frame_sav;
@@ -128,10 +128,10 @@ struct MotionWorkSub {
     Vec Ang;
     Vec Ang_old;
     Vec Ang_dist;
-    MotionSeqKey* pSeq_top;
-    MotionSeqKey Seq;
-    MotionSeqKey Seq_old;
-    MotionSeqKey Seq_old2;
+    SEQUENCE_DATA* pSeq_top;
+    SEQUENCE_DATA Seq;
+    SEQUENCE_DATA Seq_old;
+    SEQUENCE_DATA Seq_old2;
     f32 Seq_frame;
     u16 Seq_frame_num;
     u8 pad_BE[2];
@@ -140,13 +140,7 @@ struct MotionWorkSub {
     u8 Hokan_cnt;
     u8 pad_C6[2];
     f32 Brate;
-    AttachCamera* pAttachCam;
-};
-
-struct MotionWork : public MotionWorkSub {
-    MotionWorkSub* blend;
-    u16* flip;
-    u16* blendTbl;
+    ATTACH_CAMERA* pAttachCam;
 };
 
 typedef u16 HERMITE_KEY[3];
@@ -163,13 +157,13 @@ struct MotionParts {
     u32 flags;
 };
 
-struct HermitePrm {
-    f32 frame;
-    f32 maxFrame;
-    u32 flags;
-    u8 type;
+struct HERMITE_SET {
+    f32 Frame;
+    f32 Frame_max;
+    u32 Attr;
+    u8 Data_fmt;
     u8 pad_D[3];
-    u8* key;
+    u8* pData;
 };
 
 class cCoord {
@@ -199,7 +193,10 @@ public:
     u8 id;
     u8 nParts;
     u8 kindid;
-    MotionWork Motion;
+    MOTION_INFO Motion;
+    MOTION_INFO* pMotionB;
+    u16* pXFlip;
+    u16* pDblJnt;
     Mtx lt_inv_mat;   // cParts members (include/model.h)
     MotionParts motParts;
     f32 length;
@@ -256,8 +253,8 @@ struct Log {
 extern Log* pLog;
 
 struct CamCtrlStub {
-    void registAttachCamera(AttachCamera* cam, cModel* m);
-    void deleteAttachCamera(AttachCamera* cam, cModel* m);
+    void registAttachCamera(ATTACH_CAMERA* cam, cModel* m);
+    void deleteAttachCamera(ATTACH_CAMERA* cam, cModel* m);
 };
 extern CamCtrlStub CamCtrl;
 
@@ -294,11 +291,11 @@ void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst);
 void PSMTXMultVecSR(const Mtx m, const Vec* src, Vec* dst);
 void C_QUATMtx(Quaternion* q, const Mtx m);
 void C_QUATSlerp(const Quaternion* p, const Quaternion* q, Quaternion* r, f32 t);
-void IKInit(cModel* m, MotionWorkSub* w);
+void IKInit(cModel* m, MOTION_INFO* w);
 void InverseKinematics(cModel* m, int flag);
 void ikCalc(cParts* root, cParts* joint, cParts* eff);
 void cModel_matBlend(cModel* m, f32 rate);
-int HermiteInterpolation(HermitePrm* prm, Vec* out, u16* hist);
+int HermiteInterpolation(HERMITE_SET* prm, Vec* out, u16* hist);
 int Fcc_next_axis_addr(int type, int n);
 void PartsWorldPosCalc(cModel* m);
 void MotionBlendOff(cModel* m);
@@ -306,17 +303,17 @@ void MotionPause(cModel* m);
 void MotionClear(cModel* m, int flag);
 struct CAMERA;   // camera.h; MotionMove / MotionMoveCore take a CAMERA* the host passes as NULL
 u32 MotionMove(cModel* m, CAMERA* pCamera);
-u16 MotionMoveSub(cModel* m, MotionWorkSub* w);
-void MotionMoveCore(cModel* m, MotionWorkSub* w, CAMERA* pCamera);
-void MotionHokan(cModel* m, MotionWorkSub* w);
-void MotionGetSpeed(cModel* m, MotionWorkSub* w, int flag, Vec* pos, Vec* rot);
-void MotionAddSpeed(cModel* m, MotionWorkSub* w, Vec* pos, Vec* rot);
+u16 MotionMoveSub(cModel* m, MOTION_INFO* w);
+void MotionMoveCore(cModel* m, MOTION_INFO* w, CAMERA* pCamera);
+void MotionHokan(cModel* m, MOTION_INFO* w);
+void MotionGetSpeed(cModel* m, MOTION_INFO* w, int flag, Vec* pos, Vec* rot);
+void MotionAddSpeed(cModel* m, MOTION_INFO* w, Vec* pos, Vec* rot);
 void MotionGetPosition(cModel* m, Vec* pos, Vec* rot);
-u16 MotionSequenceCtrl(MotionWorkSub* w);
+u16 MotionSequenceCtrl(MOTION_INFO* w);
 u16 FcvGetMaxFrame(u16* data);
-f32 MotionGetMaxFrame(MotionWorkSub* w);
-f32 MotionGetCurrentFrame(MotionWorkSub* w);
-int MotionCheckCrossFrame(MotionWorkSub* w, f32 frame);
+f32 MotionGetMaxFrame(MOTION_INFO* w);
+f32 MotionGetCurrentFrame(MOTION_INFO* w);
+int MotionCheckCrossFrame(MOTION_INFO* w, f32 frame);
 int MotionGetState(cModel* m);
 void eprintf(int x, int y, int a, int b, const char* fmt, ...);
 }
@@ -326,7 +323,7 @@ void ScaleMatrix(Mtx m, Vec* scale);
 void SetOrientationZX(Vec* z, Vec* x, Mtx m);
 void SetOrientationZY(Vec* z, Vec* y, Mtx m);
 f32 VecAngle(Vec* a, Vec* b);
-void VecRadLimit(Vec* v);
+void VecRadLimit(f32* v);
 void VecLinearCombination(Vec* a, f32 s, Vec* b, f32 t, Vec* out);   // include/math_sub.h
 f32 LIMIT_ANGLE(f32 x);
 f32 SQRTF(f32 x);

@@ -16,10 +16,10 @@ import re
 import sys
 
 
-# motion.cpp addresses the root key history by its 32-bit byte offset in MotionWork
-# (Key_hist at 0x08, [flip][rot/pos][axis]); the host layout has 64-bit pointers before it.
+# motion.cpp addresses the root key history by its 32-bit byte offset in MOTION_INFO
+# (Key_hist at 0x08, [2 * flip + rot/pos][axis]); the host layout has 64-bit pointers before it.
 MOT_HIST_GAME = '#define MOT_HIST(w, flip, n) ((u16*) ((u8*) (w) + ((flip) * 12 + 8 + (n) * 6)))'
-MOT_HIST_HOST = '#define MOT_HIST(w, flip, n) ((w)->Key_hist[flip][n])'
+MOT_HIST_HOST = '#define MOT_HIST(w, flip, n) ((w)->Key_hist[2 * (flip) + (n)])'
 
 
 def host_text(text):

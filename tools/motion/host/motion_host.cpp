@@ -46,8 +46,8 @@ void Log::err(int, int, const char* fmt, ...)
     g_errors++;
 }
 
-void CamCtrlStub::registAttachCamera(AttachCamera*, cModel*) {}
-void CamCtrlStub::deleteAttachCamera(AttachCamera*, cModel*) {}
+void CamCtrlStub::registAttachCamera(ATTACH_CAMERA*, cModel*) {}
+void CamCtrlStub::deleteAttachCamera(ATTACH_CAMERA*, cModel*) {}
 
 // No scenario collision on the host: "no floor" (InverseKinematics keeps the key target).
 f32 SatMgrStub::getFloor(Vec*, u32*, f32, f32, int) { return -100000.0f; }
@@ -165,7 +165,7 @@ API void mot_model_destroy(HostModel* h)
 // (NULL to clear). MotionMove applies it after the IK.
 API void mot_model_blend_table(HostModel* h, u16* tbl)
 {
-    h->model.Motion.blendTbl = tbl;
+    h->model.pDblJnt = tbl;
 }
 
 // MotionSetCore(m, &m->Motion, image, seq 0, hokan 0, flags, frame 0). ik 0: Mot_flag 0x10000000
