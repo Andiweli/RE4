@@ -59,7 +59,6 @@ public:
     void setEff(u8 eff_id);
 };
 
-extern "C" {
 cEmBarrel* SetBarrel(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo);
 cEmBarrel* SetR227Barrel(Vec* pPos, Vec* pAng);
 void emBarrelDmCk(cEmBarrel* pEm);
@@ -77,6 +76,5 @@ void emBarrelSetBomb2(cEmBarrel* pEm);
 void emBarrelEatSet(cEmBarrel* pEm);
 int emBarrelRollHitCk(cEmBarrel* pEm);
 void emBarrelRunDownCk(cEmBarrel* pEm);
-}
 
 #endif

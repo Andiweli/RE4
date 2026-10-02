@@ -24,9 +24,7 @@
 #include "sce_sys.h"
 #include "yz2code.h"
 
-extern "C" {
 extern void* EmInitFunc;                  // game/em.cpp (set by the enemy dll prolog)
-}
 
 
 
@@ -54,34 +52,32 @@ struct DataExtHeader {
     u32 ofs[1];   // 0x10
 };
 
-extern "C" {
 void decodeData();
 static void* readEm(int id, void* addr, u32 size);
 static int checkAshleyId(int id);
 void ReadAreaData();
 void CoreDataRead();
 void OptionDataRead();
-void InitModule(ReadModule* m);
-int readEmData(ReadModule* m, int id, void* addr, u32 size);
-void setEmModule(ReadModule* m, int id);
+void InitModule(MODULE_DAT* m);
+int readEmData(MODULE_DAT* m, int id, void* addr, u32 size);
+void setEmModule(MODULE_DAT* m, int id);
 void EmReadInit();
 void* EmReadSearch(int id, void* addr, u32 size);
-ReadModule* pullEmModule();
+MODULE_DAT* pullEmModule();
 void ReadPlayerData(int type, int costume);
 void ReleasePlData();
 void ReleaseWepData();
 void ReadWepData(u32 no, u32 type);
 void ContinueWepData();
-}
 void* GetDataExt(void* arc, const char* tag, int no);
 
 static void* in_data_addr;
 u32 out_data_size;
 u8 oldWepId;
 
-ReadModule EmReadModule[4] __attribute__((aligned(32)));
-ReadModule PlReadModule __attribute__((aligned(32)));
-ReadModule WepReadModule __attribute__((aligned(32)));
+MODULE_DAT EmReadModule[4] __attribute__((aligned(32)));
+MODULE_DAT PlReadModule __attribute__((aligned(32)));
+MODULE_DAT WepReadModule __attribute__((aligned(32)));
 
 // HALT() (db_log.h) is a plain block, not do/while(0): the loop notes of a do/while are a sched1
 // barrier, and the original's argument order around HALT (`lwz r4` / `addi r4,r31,__FILE__` before
@@ -125,7 +121,7 @@ void decodeData()
     char buf[64];
     u32 used;
 
-    out_data_size = Yz2DecodeSet((char*) in_data_addr, (void*) (MemGetHeapEndAddr(MemGetCurrentHeap()) - READ_BUFF_OFS));
+    out_data_size = Yz2DecodeSet((char*) in_data_addr, (void*) ((u32) MemGetHeapEndAddr(MemGetCurrentHeap()) - READ_BUFF_OFS));
 #line 59 "D:/Bio4/Prog/read.cpp"
     (pG->pRoom = MEM_ALLOC(ROOM_ARC_SIZE, 1, 0xD));
     used = (u32) pG->pRoom - (u32) pG->pStFnt;
@@ -165,7 +161,7 @@ void ReadAreaData()
     } else {
         StopwatchStart();
 #line 147 "D:/Bio4/Prog/read.cpp"
-        req = DVD_READ_N(name, (void*) (MemGetHeapEndAddr(MemGetCurrentHeap()) - READ_BUFF_OFS), 0, 0, 0, 0x8120);
+        req = DVD_READ_N(name, (void*) ((u32) MemGetHeapEndAddr(MemGetCurrentHeap()) - READ_BUFF_OFS), 0, 0, 0, 0x8120);
         while (Dvd.ReadCheck(req, 0, 0, &in_data_addr) != 1) {
             TaskSleep(1);
         }
@@ -195,7 +191,7 @@ void ReadAreaData()
 // specular / illumination textures from it.
 void CoreDataRead()
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     int req;
 
     pG->pCore = (ArcFile*) CORE_DATA_ADDR;
@@ -205,7 +201,7 @@ void CoreDataRead()
     SpecularInit((TEXPalette*) ARC_PTR(ofs_10), (TEXPalette*) ARC_PTR(ofs_44), (TEXPalette*) ARC_PTR(ofs_48),
                  (TEXPalette*) ARC_PTR(ofs_4C));
     GlobalIlmTexInit((TEXPalette*) ARC_PTR(ofs_40));
-    if (info.size[0][0] > CORE_DATA_MAX) {
+    if (info.read_size[0][0] > CORE_DATA_MAX) {
         pLog->err(0, 0, "CORE_DATA IS TOO LARGE(%d/%d)", 0, CORE_DATA_MAX);
         TaskSleep(60);
     }
@@ -215,7 +211,7 @@ void CoreDataRead()
 // OPTION_DATA_ADDR (pG->pOption).
 void OptionDataRead()
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     char name[64];
     const char* lang[12] = { "jpn", "eng", "eng", "ger", "fra", "esp", "ita", "eng" };
     int req;
@@ -225,7 +221,7 @@ void OptionDataRead()
 #line 262 "D:/Bio4/Prog/read.cpp"
     req = DVD_READ_N(name, OPTION_DATA_ADDR, 0, 0, 0, 0x11);
     Dvd.ReadCheck(req, &info);
-    if (info.size[0][0] > OPTION_DATA_MAX) {
+    if (info.read_size[0][0] > OPTION_DATA_MAX) {
         pLog->err(0, 0, "OPTION_DAT IS TOO LARGE(%d/%d)", 0, OPTION_DATA_MAX);
         TaskSleep(60);
     }
@@ -233,22 +229,22 @@ void OptionDataRead()
 
 // Frees a loaded module slot: unlinks the REL (flag bit1), frees the archive (bit2; debug heap
 // when bit3) and the separately copied module (bit0), clears the slot.
-void InitModule(ReadModule* m)
+void InitModule(MODULE_DAT* m)
 {
-    if (m->pModule != NULL && m->ctrl_flag.check(MODULE_CTRL_DLL_LINK)) {
-        DLL_Unlink(m->pModule);
+    if (m->pDll != NULL && m->ctrl_flag.check(MODULE_CTRL_DLL_LINK)) {
+        DLL_Unlink(m->pDll);
     }
-    if (m->pArc != NULL && m->ctrl_flag.check(MODULE_CTRL_DATA_MALLOC)) {
+    if (m->pData != NULL && m->ctrl_flag.check(MODULE_CTRL_DATA_MALLOC)) {
         if (m->ctrl_flag.check(MODULE_CTRL_DATA_DMALLOC)) {
-            Debug_free(m->pArc);
+            Debug_free(m->pData);
         } else {
-            Mem_free(m->pArc);
+            Mem_free(m->pData);
         }
     }
-    if (m->pModule != NULL && m->ctrl_flag.check(MODULE_CTRL_DLL_MALLOC)) {
-        Mem_free(m->pModule);
+    if (m->pDll != NULL && m->ctrl_flag.check(MODULE_CTRL_DLL_MALLOC)) {
+        Mem_free(m->pDll);
     }
-    memclr_asm(m, sizeof(ReadModule));
+    memclr_asm(m, sizeof(MODULE_DAT));
 }
 
 // Loads enemy module `id` into a free slot (all display flags forced on during the load): reads
@@ -256,7 +252,7 @@ void InitModule(ReadModule* m)
 static void* readEm(int id, void* data_addr, u32 malloc_size)
 {
     u32 flags = pG->Disp_flg;
-    ReadModule* m;
+    MODULE_DAT* m;
 
     pG->Disp_flg = 0xFFFFFFFF;
     DpfFlagOff(pG, DPF_MESSAGE);
@@ -270,7 +266,7 @@ static void* readEm(int id, void* data_addr, u32 malloc_size)
     }
     setEmModule(m, id);
     pG->Disp_flg = flags;
-    return m->pArc;
+    return m->pData;
 }
 
 ReadFile EmFileTbl[64] = {
@@ -350,9 +346,9 @@ ReadFile EmFileTbl_Klauser[64] = {
 // become "em*.drs"): to `addr`, or to a new allocation (grown to `size` if smaller) when addr is
 // NULL; the REL part after the data offset at +4 is copied out when it does not fit. Sleeps on the
 // scenario task if inside it. Fills `m`; returns 1 on success.
-int readEmData(ReadModule* m, int id, void* addr, u32 size)
+int readEmData(MODULE_DAT* m, int id, void* addr, u32 size)
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     u32 len;
     ReadFile* e;
     char* name;
@@ -418,10 +414,10 @@ int readEmData(ReadModule* m, int id, void* addr, u32 size)
             TaskSleep(1);
         }
     }
-    len = info.size[0][0];
+    len = info.read_size[0][0];
     if (addr == NULL) {
         m->ctrl_flag.on(MODULE_CTRL_DATA_MALLOC);
-        pArc = (void*) info.addr[0][0];
+        pArc = (void*) info.start_addr[0][0];
         if (len < size) {
             void* old = pArc;
             newSize = size;
@@ -455,16 +451,16 @@ int readEmData(ReadModule* m, int id, void* addr, u32 size)
         } while (0);
     }
     m->id = id;
-    m->pArc = pArc;
-    m->size = newSize;
-    m->pModule = (OSModuleHeader*) pModule;
-    m->bssSize = bssSize;
+    m->pData = pArc;
+    m->DataSize = newSize;
+    m->pDll = (OSModuleHeader*) pModule;
+    m->DllSize = bssSize;
     return 1;
 }
 
 // Links the module's REL (once, flag bit1; hangs with "BSS SIZE OVER" when its bss exceeds
 // DLL_BSS_MAX), runs its prolog and takes the EmInitFunc it registered.
-void setEmModule(ReadModule* m, int id)
+void setEmModule(MODULE_DAT* m, int id)
 {
     ReadFile* e;
     void* bss;
@@ -481,13 +477,13 @@ void setEmModule(ReadModule* m, int id)
         e = &EmFileTbl_Klauser[id];
         break;
     }
-    if (m->pModule != NULL) {
+    if (m->pDll != NULL) {
         if (!m->ctrl_flag.check(MODULE_CTRL_DLL_LINK)) {
             bss = NULL;
-            if (m->pModule->bssSize != 0) {
+            if (m->pDll->bssSize != 0) {
                 bss = m;
             }
-            if (m->pModule->bssSize > DLL_BSS_MAX) {
+            if (m->pDll->bssSize > DLL_BSS_MAX) {
                 for (;;) {
                     eprintf(100, 100, 0, 0, "BSS SIZE OVER!!!");
                     if (e->dll != 0) {
@@ -498,15 +494,15 @@ void setEmModule(ReadModule* m, int id)
                     TaskSleep(1);
                 }
             }
-            DLL_Link(m->pModule, bss);
+            DLL_Link(m->pDll, bss);
             m->ctrl_flag.on(MODULE_CTRL_DLL_LINK);
         }
-        DLL_PROLOG(m->pModule)();
-        m->pInitFunc = EmInitFunc;
+        DLL_PROLOG(m->pDll)();
+        m->EmInitFunc = EmInitFunc;
     } else {
-        m->pModule = NULL;
+        m->pDll = NULL;
         m->ctrl_flag.off(MODULE_CTRL_DLL_LINK);
-        m->pInitFunc = NULL;
+        m->EmInitFunc = NULL;
     }
 }
 
@@ -537,21 +533,21 @@ static int checkAshleyId(int id)
 // loads it (readEm).
 void* EmReadSearch(int id, void* data_addr, u32 malloc_size)
 {
-    ReadModule* m;
+    MODULE_DAT* m;
 
     id = checkAshleyId(id);
     m = SearchEmModule(id);
     if (m != NULL) {
-        EmInitFunc = m->pInitFunc;
-        return m->pArc;
+        EmInitFunc = m->EmInitFunc;
+        return m->pData;
     }
     return readEm(id, data_addr, malloc_size);
 }
 
 // The loaded slot for enemy module `id`, or NULL.
-ReadModule* SearchEmModule(int id)
+MODULE_DAT* SearchEmModule(int id)
 {
-    ReadModule* m;
+    MODULE_DAT* m;
     int i;
 
     id = checkAshleyId(id);
@@ -564,12 +560,12 @@ ReadModule* SearchEmModule(int id)
 }
 
 // A free enemy module slot (pArc NULL), or NULL when all four are used.
-ReadModule* pullEmModule()
+MODULE_DAT* pullEmModule()
 {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (EmReadModule[i].pArc == NULL) {
+        if (EmReadModule[i].pData == NULL) {
             return &EmReadModule[i];
         }
     }
@@ -581,7 +577,7 @@ ReadModule* pullEmModule()
 // 0xB4 + DLL; HUNK / Krauser / Wesker with their DLLs), links the character REL when there is one.
 void ReadPlayerData(int type, int costume)
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     int req;
     int ret;
     int file;
@@ -664,7 +660,7 @@ void ReadPlayerData(int type, int costume)
         }
         TaskSleep(1);
     }
-    total = info.size[0][0] + info.size[0][1];
+    total = info.read_size[0][0] + info.read_size[0][1];
     if (type == 0) {
         max = 0x118000;
     } else {
@@ -703,18 +699,18 @@ void ReadPlayerData(int type, int costume)
         }
     }
     PlReadModule.id = file;
-    PlReadModule.pArc = pArc;
-    PlReadModule.size = size;
-    PlReadModule.pModule = pModule;
-    PlReadModule.bssSize = bssSize;
+    PlReadModule.pData = pArc;
+    PlReadModule.DataSize = size;
+    PlReadModule.pDll = pModule;
+    PlReadModule.DllSize = bssSize;
 }
 
 // Frees the player module slot.
 void ReleasePlData()
 {
-    if (PlReadModule.pArc != NULL) {
+    if (PlReadModule.pData != NULL) {
         InitModule(&PlReadModule);
-        PlReadModule.pArc = NULL;
+        PlReadModule.pData = NULL;
     }
 }
 
@@ -805,7 +801,7 @@ ReadFile wep_data_klauser[46] = {
 // Krauser), links the REL and runs its prolog (which registers WeaponInitFunc). pG->pWep = data.
 void ReadWepData(u32 no, u32 type)
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
     int req;
     int ret;
     u8* data;
@@ -935,13 +931,13 @@ void ReadWepData(u32 no, u32 type)
         }
         TaskSleep(1);
     }
-    total = info.size[0][0] + info.size[0][1];
+    total = info.read_size[0][0] + info.read_size[0][1];
     if (total > WEP_DATA_MAX) {
         pLog->err(0, 0, "WEAPON_DATA IS TOO LARGE (DATA)");
 #line 1560 "D:/Bio4/Prog/read.cpp"
         HALT();
     }
-    pG->pWep = (PlArc*) info.addr[0][0];
+    pG->pWep = (PlArc*) info.start_addr[0][0];
     pModule = (OSModuleHeader*) (*(u32*) (data + 4) + (u32) data);
     size = (u32) pModule - (u32) data;
     bssSize = total - size;
@@ -962,11 +958,11 @@ void ReadWepData(u32 no, u32 type)
     } else {
         pModule = NULL;
     }
-    WepReadModule.bssSize = bssSize;
+    WepReadModule.DllSize = bssSize;
     WepReadModule.id = no;
-    WepReadModule.size = size;
-    WepReadModule.pModule = pModule;
-    WepReadModule.pArc = data;
+    WepReadModule.DataSize = size;
+    WepReadModule.pDll = pModule;
+    WepReadModule.pData = data;
     pG->pWep = (PlArc*) data;
 }
 

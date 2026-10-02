@@ -8,9 +8,10 @@ class cModel;
 class cParts;
 struct CLOTH_AT_SET;
 
-// Pendulum / cloth chain work (game/pendulum.cpp), 0x60 bytes (same object as pl_cloth.h's
-// PlCloth). Field meanings from obj14ClothSet; the rest is zeroed there. Every link is one
-// model parts; the u8 tables give the parts index per link and its neighbours (0xFF = none).
+// Pendulum / cloth chain work (game/pendulum.cpp, game/pl_cloth.cpp), 0x60 bytes: the player and
+// enemy cloth accessories (pl_cloth.h's globals, the em*.h Cloth members) are this same struct.
+// Field meanings from obj14ClothSet; the rest is zeroed there. Every link is one model parts; the
+// u8 tables give the parts index per link and its neighbours (0xFF = none).
 struct CLOTH_INFO {
     int Num;             // 0x00  number of chain links
     const u8* pCloth;    // 0x04  parts index per link
@@ -39,28 +40,27 @@ struct CLOTH_INFO {
 };
 
 // One collision volume in world space (penClothAtMake), 0x84 bytes.
-struct PenAt {
-    int type;            // 0x00  0 sphere, 1 cylinder
-    Mtx mat;             // 0x04  cylinder space -> world
-    Mtx inv;             // 0x34  world -> cylinder space
-    Vec p0;              // 0x64  sphere centre / cylinder start
-    Vec p1;              // 0x70  cylinder end
-    f32 r;               // 0x7C  radius
-    f32 len;             // 0x80  cylinder length
+struct CLOTH_AT_DATA {
+    int Type;            // 0x00  0 sphere, 1 cylinder
+    Mtx m;             // 0x04  cylinder space -> world
+    Mtx im;             // 0x34  world -> cylinder space
+    Vec Pos;              // 0x64  sphere centre / cylinder start
+    Vec Pos2;              // 0x70  cylinder end
+    f32 R;               // 0x7C  radius
+    f32 Len;             // 0x80  cylinder length
 };
 
 // Collision volume list built per frame in the locked cache (0xE0000000).
 struct PenAtWork {
     int num;             // 0x00
-    PenAt* pAt;          // 0x04
-    PenAt at[1];         // 0x08
+    CLOTH_AT_DATA* pAt;          // 0x04
+    CLOTH_AT_DATA at[1];         // 0x08
 };
 
 // Wind of the pendulum system (PenWindSet; light.cpp cPenWind::set)
 extern Vec GlobalWind;
 extern f32 GlobalWindAdd;
 
-extern "C" {
 void PenClothSet(cModel* m, CLOTH_INFO* pInfo, f32 min_len);
 void PenClothFixSet(cModel* m, CLOTH_INFO* pInfo, int no, Vec* pos);
 void PenClothFixClear(cModel* m, CLOTH_INFO* pInfo, int no);
@@ -73,6 +73,5 @@ int penClothAtCkBorder(Vec* pos, Vec* up, PenAtWork* wk);
 void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk);
 // global wind: direction (radians), strength, x (cPenWind::set in light.cpp)
 void PenWindSet(f32 dir, f32 power, f32 x);
-}
 
 #endif

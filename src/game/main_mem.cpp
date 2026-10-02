@@ -18,26 +18,26 @@
 
 
 // Fixed memory map of the debug build.
-struct SystemMemMap {
-    u32 x0;         // 0x00
-    u32 elf_end;    // 0x04
-    u32 dvd;        // 0x08
-    u32 sound;      // 0x0C
-    u32 fifo;       // 0x10
-    u32 xfb;        // 0x14
-    u32 core;       // 0x18
-    u32 option;     // 0x1C
-    u32 player;     // 0x20
-    u32 weapon;     // 0x24  start of the main heap
-    u32 heap_end;   // 0x28
-    u32 arena_lo;   // 0x2C  OSGetArenaLo() at boot
-    u32 usb;        // 0x30
-    u32 debug;      // 0x34
+struct SYS_MEM_TBL {
+    u32 Fst_addr;       // 0x00
+    u32 Dvdread_addr;   // 0x04
+    u32 Sound_addr;     // 0x08
+    u32 Fifo_addr;      // 0x0C
+    u32 Xfb_addr;       // 0x10
+    u32 Core_addr;      // 0x14
+    u32 Option_addr;    // 0x18
+    u32 Player_addr;    // 0x1C
+    u32 Weapon_addr;    // 0x20
+    u32 Heap_addr;      // 0x24  start of the main heap
+    u32 Heap_end_addr;  // 0x28
+    u32 Elf_end_addr;   // 0x2C  OSGetArenaLo() at boot
+    u32 Debug_usb_addr; // 0x30
+    u32 Debug_addr;     // 0x34
 };
 
 
 HEAP_TBL Heap[MEM_HEAP_NUM];
-static SystemMemMap SysMem;
+static SYS_MEM_TBL SysMem;
 OSHeapDescriptor heap_backup[MEM_HEAP_NUM];  // OSAlloc descriptors of suspended heaps
 
 OSHeapCell* cell_main = NULL;
@@ -84,28 +84,28 @@ void operator delete[](void* p)
 // tagged "_reset_keep_" that survives soft resets).
 void SystemMemInit()
 {
-    SysMem.heap_end = 0x817F4000;
-    SysMem.elf_end = 0x80350000;
-    SysMem.dvd = 0x80370000;
-    SysMem.sound = 0x803F0000;
-    SysMem.fifo = 0x80460000;
-    SysMem.xfb = 0x80578000;
-    SysMem.core = 0x807AC000;
-    SysMem.option = 0x807EC000;
-    SysMem.player = 0x80904000;
-    SysMem.weapon = 0x80974000;
-    SysMem.usb = 0x81800000;
-    SysMem.debug = 0x8181FB00;
-    SysMem.arena_lo = (u32) OSGetArenaLo();
-    if (SysMem.arena_lo > 0x8034FFFF) {
+    SysMem.Heap_end_addr = 0x817F4000;
+    SysMem.Dvdread_addr = 0x80350000;
+    SysMem.Sound_addr = 0x80370000;
+    SysMem.Fifo_addr = 0x803F0000;
+    SysMem.Xfb_addr = 0x80460000;
+    SysMem.Core_addr = 0x80578000;
+    SysMem.Option_addr = 0x807AC000;
+    SysMem.Player_addr = 0x807EC000;
+    SysMem.Weapon_addr = 0x80904000;
+    SysMem.Heap_addr = 0x80974000;
+    SysMem.Debug_usb_addr = 0x81800000;
+    SysMem.Debug_addr = 0x8181FB00;
+    SysMem.Elf_end_addr = (u32) OSGetArenaLo();
+    if (SysMem.Elf_end_addr > 0x8034FFFF) {
         OSReport("ELF size overflow\n");
 #line 100 "D:/Bio4/Prog/main_mem.cpp"
         HALT();
     }
-    arenaLo = SysMem.weapon;
+    arenaLo = SysMem.Heap_addr;
     arenaHi = (u32) OSGetArenaHi();
-    if (SysMem.heap_end > arenaHi) {
-        arenaHi = SysMem.heap_end;
+    if (SysMem.Heap_end_addr > arenaHi) {
+        arenaHi = SysMem.Heap_end_addr;
     }
     arenaLo = (arenaLo + 0x1F) & ~0x1F;
     arenaHi &= ~0x1F;
@@ -114,7 +114,7 @@ void SystemMemInit()
     OSSetArenaLo((void*) arenaLo);
     OSSetArenaHi((void*) arenaHi);
     memInitHeapTbl();
-    MemCreateHeap(0, arenaLo, SysMem.heap_end);
+    MemCreateHeap(0, (void*) arenaLo, (void*) SysMem.Heap_end_addr);
     MemSetCurrentHeap(0);
     pMemTile = NULL;
 #line 145
@@ -218,13 +218,13 @@ u8 MemGetCurrentDbgHeap()
 }
 
 // Start address of heap no.
-u32 MemGetHeapStartAddr(int heap_no)
+void* MemGetHeapStartAddr(int heap_no)
 {
     return Heap[heap_no].start;
 }
 
 // End address of heap no.
-u32 MemGetHeapEndAddr(int heap_no)
+void* MemGetHeapEndAddr(int heap_no)
 {
     return Heap[heap_no].end;
 }
@@ -262,7 +262,7 @@ u32 MemCheckHeapEnd(int heap_no)
 }
 
 // Creates (or recreates) heap no over [start, end).
-int MemCreateHeap(int no, u32 start, u32 end)
+int MemCreateHeap(int no, void* start, void* end)
 {
     if (!memCheckHeapActive(no)) {
         return 0;
@@ -271,7 +271,7 @@ int MemCreateHeap(int no, u32 start, u32 end)
         MemDestroyHeap(no);
     }
     OSReport("-- MemCreateHeap %d %08x - %08x  ", no, start, end);
-    Heap[no].handle = OSCreateHeap((void*) start, (void*) end);
+    Heap[no].handle = OSCreateHeap(start, end);
     if (Heap[no].handle >= 0) {
         Heap[no].start = start;
         Heap[no].end = end;
@@ -332,16 +332,16 @@ int MemReplaceHeap(int old_heap, int new_heap)
     }
     if (Heap[old_heap].handle >= 0) {
         start = MemCheckHeapEnd(old_heap);
-        end = Heap[old_heap].end;
+        end = (u32) Heap[old_heap].end;
         MemDestroyHeap(old_heap);
     } else {
-        start = Heap[new_heap].start;
-        end = Heap[new_heap].end;
+        start = (u32) Heap[new_heap].start;
+        end = (u32) Heap[new_heap].end;
     }
     if (start == 0) {
         return 0;
     }
-    return MemCreateHeap(new_heap, start, end);
+    return MemCreateHeap(new_heap, (void*) start, (void*) end);
 }
 
 // Destroys every heap (soft reset).
@@ -600,10 +600,10 @@ void MemCheckUsedHeap()
     if (rest >= 0) {
         end = MemCheckHeapEnd(CurrentHeap);
     } else {
-        end = SysMem.heap_end;
+        end = SysMem.Heap_end_addr;
     }
-    start = Heap[CurrentHeap].start;
-    heapEnd = Heap[CurrentHeap].end;
+    start = (u32) Heap[CurrentHeap].start;
+    heapEnd = (u32) Heap[CurrentHeap].end;
     eprintf2(8, 16, 440, 404, 0, 0, "%X", rest);
     r = OSCheckHeap(Heap[CurrentDbgHeap].handle);
     if (r >= 0) {
@@ -819,23 +819,23 @@ void MemCheckUsedHeap()
         }
         AddPrim(&MainOt[1], (u32*) mt);
     }
-    eprintf2(10, 16, 30, 0x38, 0, 4, "elf_end   %8x", SysMem.arena_lo);
-    eprintf2(10, 16, 30, 0x58, 0, 4, "DVD       %8x", SysMem.elf_end);
-    eprintf2(10, 16, 30, 0x68, 0, 4, "SOUND     %8x", SysMem.dvd);
-    eprintf2(10, 16, 30, 0x78, 0, 4, "FIFO      %8x", SysMem.sound);
-    eprintf2(10, 16, 30, 0x88, 0, 4, "XFB       %8x", SysMem.fifo);
-    eprintf2(10, 16, 30, 0x98, 0, 4, "CORE      %8x", SysMem.xfb);
-    eprintf2(10, 16, 30, 0xA8, 0, 4, "OPTION    %8x", SysMem.core);
-    eprintf2(10, 16, 30, 0xB8, 0, 4, "PLAYER    %8x", SysMem.option);
-    eprintf2(10, 16, 30, 0xC8, 0, 4, "WEAPON    %8x", SysMem.player);
-    eprintf2(10, 16, 30, 0xD8, 0, 4, "HEAP_TOP  %8x", SysMem.weapon);
-    eprintf2(10, 16, 30, 0xE8, 0, 4, "HEAP_SIZE %x", SysMem.heap_end - SysMem.weapon);
+    eprintf2(10, 16, 30, 0x38, 0, 4, "elf_end   %8x", SysMem.Elf_end_addr);
+    eprintf2(10, 16, 30, 0x58, 0, 4, "DVD       %8x", SysMem.Dvdread_addr);
+    eprintf2(10, 16, 30, 0x68, 0, 4, "SOUND     %8x", SysMem.Sound_addr);
+    eprintf2(10, 16, 30, 0x78, 0, 4, "FIFO      %8x", SysMem.Fifo_addr);
+    eprintf2(10, 16, 30, 0x88, 0, 4, "XFB       %8x", SysMem.Xfb_addr);
+    eprintf2(10, 16, 30, 0x98, 0, 4, "CORE      %8x", SysMem.Core_addr);
+    eprintf2(10, 16, 30, 0xA8, 0, 4, "OPTION    %8x", SysMem.Option_addr);
+    eprintf2(10, 16, 30, 0xB8, 0, 4, "PLAYER    %8x", SysMem.Player_addr);
+    eprintf2(10, 16, 30, 0xC8, 0, 4, "WEAPON    %8x", SysMem.Weapon_addr);
+    eprintf2(10, 16, 30, 0xD8, 0, 4, "HEAP_TOP  %8x", SysMem.Heap_addr);
+    eprintf2(10, 16, 30, 0xE8, 0, 4, "HEAP_SIZE %x", SysMem.Heap_end_addr - SysMem.Heap_addr);
     eprintf2(10, 16, 30, 0x108, 0, 4, "NOW_HEAP  %8x", start);
     eprintf2(10, 16, 30, 0x118, 0, 4, " SIZE     %x", size);
     eprintf2(10, 16, 30, 0x128, 0, 4, " REST     %x", rest);
     eprintf2(10, 16, 30, 0x148, 0, 4, "FST_SIZE  %x", DvdView.freeSize);
-    eprintf2(10, 16, 30, 0x168, 0, 4, "USB       %8x", SysMem.usb);
-    eprintf2(10, 16, 30, 0x178, 0, 4, "DEBUG     %8x", SysMem.debug);
+    eprintf2(10, 16, 30, 0x168, 0, 4, "USB       %8x", SysMem.Debug_usb_addr);
+    eprintf2(10, 16, 30, 0x178, 0, 4, "DEBUG     %8x", SysMem.Debug_addr);
     if (Joy[0].rep2 & 0x400000) {
         _epy_base -= 16;
     }

@@ -21,13 +21,11 @@
 
 int GetDrawTmpBufType();        // game/TmpBuf.cpp (C++ linkage)
 
-extern "C" {
 void EspCommonTransShimmer(cEsp* esp, int type, u32 blur);
 void EspCommonTransNega(cEsp* esp, u32 type);
 int EspEstSetSelect(int owner, int id, int no, cEsp** out, int bNoSuspend);
 void GetPosXY(Vec* p0, Vec* p1, Vec* p2, Vec* p3, f32 u, f32 v, Vec* out);
 void Esp1b_SpTrans(cEsp* esp);
-}
 
 
 // The effect code converts with 3.14, not PI.
@@ -440,10 +438,10 @@ void EspCommonTransShimmer(cEsp* esp, int u_pow, u32 Blur_type)
     oy = (f32) anm->Cy;
     z = 1.0f;
     zero = 0.0f;
-    if (ox == zero) {
+    if (ox == 0.0f) {
         ox = -anm->Width * 0.5f;
     }
-    if (oy == zero) {
+    if (oy == 0.0f) {
         oy = anm->Height * 0.5f;
     }
     x0 = ox * sx / anm->Width;
@@ -493,7 +491,7 @@ void EspCommonTransShimmer(cEsp* esp, int u_pow, u32 Blur_type)
         GXLoadTexMtxImm(tm, 0x1E, 1);
         GXSetTexCoordGen(texGens, 1, 0, 0x1E);
     } else {
-        C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
+        C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
         PSMTXConcat(pm, esp->m_Mat, tm);
         GXLoadTexMtxImm(tm, 0x1E, 0);
         GXSetTexCoordGen(texGens, 0, 0, 0x1E);
@@ -518,14 +516,14 @@ void EspCommonTransShimmer(cEsp* esp, int u_pow, u32 Blur_type)
             p = esp->m_Pos;
         }
         cam = &pG->Camera;
-        dir.x = cam->param.at.x - cam->param.pos.x;
-        dir.y = cam->param.at.y - cam->param.pos.y;
-        dir.z = cam->param.at.z - cam->param.pos.z;
+        dir.x = cam->param.Target.x - cam->param.Campos.x;
+        dir.y = cam->param.Target.y - cam->param.Campos.y;
+        dir.z = cam->param.Target.z - cam->param.Campos.z;
 #line 865 "D:/Bio4/Prog/esp_sub.cpp"
         VECNormalize(&dir, &dir);
-        d.x = p.x - cam->param.pos.x;
-        d.y = p.y - cam->param.pos.y;
-        d.z = p.z - cam->param.pos.z;
+        d.x = p.x - cam->param.Campos.x;
+        d.y = p.y - cam->param.Campos.y;
+        d.z = p.z - cam->param.Campos.z;
         dot = PSVECDotProduct(&dir, &d);
     }
     if (dot < 1500.0f) {
@@ -723,10 +721,10 @@ void EspCommonTransNega(cEsp* esp, u32 type)
     oy = (f32) anm->Cy;
     z = 1.0f;
     zero = 0.0f;
-    if (ox == zero) {
+    if (ox == 0.0f) {
         ox = -anm->Width * 0.5f;
     }
-    if (oy == zero) {
+    if (oy == 0.0f) {
         oy = anm->Height * 0.5f;
     }
     x0 = ox * sx / anm->Width;
@@ -757,7 +755,7 @@ void EspCommonTransNega(cEsp* esp, u32 type)
         Mtx tm;
         Mtx pm;
 
-        C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
+        C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
         PSMTXConcat(pm, esp->m_Mat, tm);
         GXLoadTexMtxImm(tm, 0x1E, 0);
         GXSetTexCoordGen(0, 0, 0, 0x1E);
@@ -982,7 +980,7 @@ int cEsp::ChannelSet()
         GXSetTevOp(0, 0);
         GXSetTevColorIn(0, 0xF, 8, 0xA, 0xF);
         GXSetTevColorOp(0, 0, 0, 2, 1, 0);
-        commonEspLightSet(sys->EspLightEnv.p, sys->EspLightEnv.num);
+        commonEspLightSet(sys->EspLightEnv.LightData, sys->EspLightEnv.Light_num);
     } else {
         GXSetTevOp(0, 0);
         if (m_Tool_flg & 0x80) {
@@ -1022,14 +1020,14 @@ int cEsp::ChannelSet()
             p = m_Pos;
         }
         cam = &pG->Camera;
-        dir.x = cam->param.at.x - cam->param.pos.x;
-        dir.y = cam->param.at.y - cam->param.pos.y;
-        dir.z = cam->param.at.z - cam->param.pos.z;
+        dir.x = cam->param.Target.x - cam->param.Campos.x;
+        dir.y = cam->param.Target.y - cam->param.Campos.y;
+        dir.z = cam->param.Target.z - cam->param.Campos.z;
 #line 1798 "D:/Bio4/Prog/esp_sub.cpp"
         VECNormalize(&dir, &dir);
-        d.x = p.x - cam->param.pos.x;
-        d.y = p.y - cam->param.pos.y;
-        d.z = p.z - cam->param.pos.z;
+        d.x = p.x - cam->param.Campos.x;
+        d.y = p.y - cam->param.Campos.y;
+        d.z = p.z - cam->param.Campos.z;
         dot = PSVECDotProduct(&dir, &d);
         if (dot < m_Del_far * 10.0f) {
             f32 rate = 1.0f - (m_Del_far * 10.0f - dot) / ((m_Del_far - m_Del_near) * 10.0f);
@@ -1153,7 +1151,7 @@ int EspSeqSet(cEspSeqTbl* pSeq, cEffectCore* pCore, u32* pRand_seed, cModel* pMo
     cParts* parts;
 
     if ((u8) (pSeq->Id + 4) <= 3) {
-        EfmSeqSet(pSeq, (EfmCore*) pCore, pRand_seed, pMod, *pMat, 0, 0.0f, pOffset);
+        EfmSeqSet(pSeq, pCore, pRand_seed, pMod, *pMat, 0, 0.0f, pOffset);
         *ppEsp = EspGetDmyPtr();
         return 1;
     }

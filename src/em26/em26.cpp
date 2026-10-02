@@ -145,9 +145,9 @@ void em26DmCk(cEm26* em)
             CAMERA* cam = &pG->Camera;
             cParts* p = em->getPartsPtr(0);
 
-            if ((cam->param.pos.x - p->world.x) * (cam->param.pos.x - p->world.x)
-                    + (cam->param.pos.y - p->world.y) * (cam->param.pos.y - p->world.y)
-                    + (cam->param.pos.z - p->world.z) * (cam->param.pos.z - p->world.z) < 4000000.0f) {
+            if ((cam->param.Campos.x - p->world.x) * (cam->param.Campos.x - p->world.x)
+                    + (cam->param.Campos.y - p->world.y) * (cam->param.Campos.y - p->world.y)
+                    + (cam->param.Campos.z - p->world.z) * (cam->param.Campos.z - p->world.z) < 4000000.0f) {
                 EmDmBloodSet2(em, 0x1E, 7, 0, 0, 0);
             } else {
                 EmDmBloodSet2(em, 0x1E, 1, 0, 0, 0);
@@ -219,7 +219,7 @@ static u16 em26_flip_tbl[32] = {
 };
 
 // Bite attack (em26AtkCk): range, type, damage, ...
-static EmAtkInfo em26_atk_info = { 600.0f, PL_DM_AUTO, 0x12C, 4, 0xA, 0 };
+static ATK_INFO em26_atk_info = { 600.0f, PL_DM_AUTO, 0x12C, 4, 0xA, 0 };
 
 // Per-frame update: damage check, clears the per-frame flags, the R0 table (Init / Move / Damage /
 // Die), then the collision and scenario check and the breath SE.
@@ -252,7 +252,6 @@ void cEm26::move()
 static void em26_R0_Init(cEm26* em)
 {
     Em26Work* w = EM26_WK(em);
-    int zero;
 
     switch (em->type) {
     case 0:
@@ -272,7 +271,7 @@ static void em26_R0_Init(cEm26* em)
         break;
     }
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
-    em->Motion.flip = em26_flip_tbl;
+    em->pXFlip = em26_flip_tbl;
     if (Rnd() & 1) {
         w->flags |= 0x10;
     } else {
@@ -291,7 +290,6 @@ static void em26_R0_Init(cEm26* em)
         }
     }
     AtariInit(&em->atari, 0.0f, 750.0f, 650.0f, 350.0f, 1250.0f, 1250.0f, 750.0f, 0, 2, 0);   // COMPILER-DIFF: #1
-    zero = 0;
     em->setStatus(EM_STATUS_IK_OFF);
     em->setStatus(EM_STATUS_LOCKOFF);
     em->atari.m_flag &= ~0x100;
@@ -300,19 +298,19 @@ static void em26_R0_Init(cEm26* em)
     YarareAdd(em, &w->hit[0], 0.0f, -50.0f, -100.0f, 300.0f, 350.0f, 5, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[1], 0.0f, 0.0f, -200.0f, 100.0f, 200.0f, 0x18, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     EspDataLoad((u32) ARC(EM26_EFF_007), EFF_EM26, 0);
-    w->flags = zero;
-    w->sndId = zero;
+    w->flags = 0;
+    w->sndId = 0;
     w->breathTimer = Rnd() % 60 + 30;
     w->estTimer = Rnd() % 20 + 10;
     w->pCtrl11 = GetCtrlCtrl11();
     w->pCtrl12 = GetCtrlCtrl12();
-    w->x194 = zero;
+    w->x194 = 0;
     em->setStatus(EM_STATUS_ACTIVE);
-    em->setRno(1, zero, zero, zero);
+    em->setRno(1, 0, 0, 0);
     if (w->flags & 0x10) {
-        MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 0x41, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM26_MOT_008), 0, 0, 0x41, 0);
     } else {
-        MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM26_MOT_008), 0, 0, 1, 0);
     }
     MotionMove(em, 0);
     em26_R0_Move(em);
@@ -334,9 +332,9 @@ static void em26_R1_Wait(cEm26* em)
     switch (em->r_no_2) {
     case 0:
         if (w->flags & 0x10) {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 0x45, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_008), 0, 0, 0x45, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_008), 0, 0, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_008), 0, 0, 5, 0);
         }
         em->r_no_2++;
     case 1:
@@ -348,9 +346,9 @@ static void em26_R1_Wait(cEm26* em)
         break;
     case 2:
         if (w->flags & 0x10) {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_WAIT), 0, 0, 0x41, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_WAIT), 0, 0, 0x41, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_WAIT), 0, 0, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_WAIT), 0, 0, 1, 0);
         }
         SndStop(w->sndId, 0);
         w->sndId = SndCall(8, 4, &em->pos, em->id, 0, em);
@@ -393,9 +391,9 @@ static void em26_R1_Atk(cEm26* em)
             mode = 0x41;
         }
         if (ang < 0.0f) {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_ATK_00E), ARC(EM26_SEQ_ATK_016), 0, mode, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_ATK_00E), ARC(EM26_SEQ_ATK_016), 0, mode, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_ATK_00F), ARC(EM26_SEQ_ATK_017), 0, mode, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_ATK_00F), ARC(EM26_SEQ_ATK_017), 0, mode, 0);
         }
         w->atkHit = 0;
         em->r_no_2++;
@@ -450,17 +448,17 @@ static void em26_R1_Dm_Small(cEm26* em)
         switch ((u32) kind) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_00A), 0, 0, mode, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DM_SMALL_00A), 0, 0, mode, 0);
             break;
         case 1:
             if (Rnd() & 1) {
-                MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_00B), 0, 0, mode, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DM_SMALL_00B), 0, 0, mode, 0);
             } else {
-                MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_010), 0, 0, mode, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DM_SMALL_010), 0, 0, mode, 0);
             }
             break;
         case 2:
-            MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DM_SMALL_00C), 0, 0, mode, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DM_SMALL_00C), 0, 0, mode, 0);
             break;
         }
         em->r_no_2++;
@@ -519,7 +517,7 @@ static void em26_R1_Die_Normal(cEm26* em)
         if (w->flags & 0x10) {
             mode = 0x41;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM26_MOT_DIE_NORMAL), seq, 0, mode, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM26_MOT_DIE_NORMAL), seq, 0, mode, 0);
         em->atari.m_flag &= ~0x200;
         SndStop(w->sndId, 0);
         w->sndId = SndCall(8, 8, &em->pos, em->id, 0, em);
@@ -573,7 +571,7 @@ int em26AtkCk(cEm26* em)
         return 0;
     }
     {
-        EmAtkInfo* atk = &em26_atk_info;
+        ATK_INFO* atk = &em26_atk_info;
         cParts* p = em->getPartsPtr(4);
         int hit = EmAtkHitCk(atk, &p->world, &p->world_old, 0);
 

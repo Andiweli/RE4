@@ -37,14 +37,14 @@ static inline int IdBitChk(u32* tbl, u8 n) { return FlagChkVar(tbl, (u32) n) ? 1
 #define ID_UNIT(i) ((ID_UNIT*) ((i) * sizeof(ID_UNIT) + (u32) m_IdUnit))
 
 // Allocates the pool of n IdUnits (memory group 13) and clears it.
-void IDSystem::gameInit(int n)
+void IDSystem::gameInit(int maxId)
 {
 #line 66 "D:/Bio4/Prog/id_sys.cpp"
-    m_IdUnit = (ID_UNIT*) MEM_ALLOC(n * sizeof(ID_UNIT), 1, 0xD);
-    m_maxId = n;
+    m_IdUnit = (ID_UNIT*) MEM_ALLOC(maxId * sizeof(ID_UNIT), 1, 0xD);
+    m_maxId = maxId;
     if (m_IdUnit == 0) {
         m_maxId = 0;
-        if (n != 0) {
+        if (maxId != 0) {
             pLog->err(0, 0, "IDSystem::gameInit() malloc failed");
         }
     }
@@ -74,14 +74,14 @@ void IDSystem::free()
 }
 
 // 1 when a table of class `type` is currently set (m_set_flag bit).
-int IDSystem::setCk(int classNo)
+int IDSystem::setCk(ID_CLASS classNo)
 {
     u8 t = classNo;
     return IdBitChk(m_set_flag, t);
 }
 
-// Shows (sw 1) or hides (sw 0) every unit of class `type` at draw time (m_disp_off bit).
-void IDSystem::dispSw(int classNo, int sw)
+// Shows (sw 1) or hides (sw 0) every unit of class `classNo` at draw time (m_disp_off bit).
+void IDSystem::dispSw(ID_CLASS classNo, int sw)
 {
     switch (sw) {
     case 1:
@@ -94,25 +94,25 @@ void IDSystem::dispSw(int classNo, int sw)
 }
 
 // Frees a unit (and, for a group, all its children); warns when it is still queued in the OT.
-void IDSystem::unitPush(ID_UNIT* u)
+void IDSystem::unitPush(ID_UNIT* pIdUnit)
 {
     int i;
 
-    if (u->be_flag == 0xFF) {
+    if (pIdUnit->be_flag == 0xFF) {
         return;
     }
-    if (u->type == 1) {
+    if (pIdUnit->type == 1) {
         for (i = 0; i < m_maxId; i++) {
             ID_UNIT* c = ID_UNIT(i);
-            if (c->be_flag != 0xFF && u == c->pParent) {
+            if (c->be_flag != 0xFF && pIdUnit == c->pParent) {
                 unitPush(c);
             }
         }
     }
-    if (u->be_flag & 0x10) {
-        pLog->err(0, 0, "unitPush(0x%p):[%02x,%02x] ID_UNIT wait for being Drawn.", u, u->classNo, u->unitNo);
+    if (pIdUnit->be_flag & 0x10) {
+        pLog->err(0, 0, "unitPush(0x%p):[%02x,%02x] ID_UNIT wait for being Drawn.", pIdUnit, pIdUnit->classNo, pIdUnit->unitNo);
     }
-    u->be_flag = 0xFF;
+    pIdUnit->be_flag = 0xFF;
     m_nId--;
 }
 
@@ -157,25 +157,25 @@ void IDSystem::unitLevel(ID_UNIT* u, u8 level)
 }
 
 // Links child under parent and renumbers its level.
-void IDSystem::unitParent(ID_UNIT* parent, ID_UNIT* child)
+void IDSystem::unitParent(ID_UNIT* pParent, ID_UNIT* pChild)
 {
-    child->pParent = parent;
-    unitLevel(child, parent->levelNo + 1);
+    pChild->pParent = pParent;
+    unitLevel(pChild, pParent->levelNo + 1);
 }
 
-// Finds the live unit with mark id `id` of class `type`; logs and returns a static dummy when absent.
-ID_UNIT* IDSystem::unitPtr(u8 id, int type)
+// Finds the live unit with mark id `markNo` of class `classNo`; logs and returns a static dummy when absent.
+ID_UNIT* IDSystem::unitPtr(u8 markNo, ID_CLASS classNo)
 {
     static ID_UNIT tmpId;
     int i;
     ID_UNIT* u = m_IdUnit;
 
     for (i = 0; i < m_maxId; i++, u++) {
-        if (u->be_flag != 0xFF && id == u->markNo && (u8) type == u->classNo) {
+        if (u->be_flag != 0xFF && markNo == u->markNo && (u8) classNo == u->classNo) {
             return u;
         }
     }
-    pLog->err(0, 0, "IDSystem::unitPtr(m[%02x],c[%02x]): Not found.", id, type);
+    pLog->err(0, 0, "IDSystem::unitPtr(m[%02x],c[%02x]): Not found.", markNo, classNo);
     return &tmpId;
 }
 
@@ -198,9 +198,9 @@ int cmp_id_no(ID_DATA_V2* p_id_v2, u8 dst_no, int attr)
 
 // Instantiates the units of id table `data` whose id matches (`id` 0xFF for all) as class `type`.
 // It reads both 1.x and 2.x tables, and mode 1 is the recursive pass over a v2 id's children.
-void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
+void IDSystem::set(ID_FILE_HEADER* data, u8 markNo, ID_CLASS classNo, u8 otType, u8 otNo, u32 Attr)
 {
-    IdDataHeader* hdr = (IdDataHeader*) data;
+    ID_FILE_HEADER* hdr = data;
     ID_DATA_V2* p2 = (ID_DATA_V2*) ((u8*) data + 8);
     ID_DATA_V1* p1 = (ID_DATA_V1*) ((u8*) data + 8);
     int ver;
@@ -211,8 +211,8 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
     ID_UNIT* c;
     u32 a;
 
-    setCk(type);
-    FlagOnVar(m_set_flag, (u32) ((u8) type));
+    setCk(classNo);
+    FlagOnVar(m_set_flag, (u32) ((u8) classNo));
 
     ver = (int) (f32) strtod((char*) data, 0);
     sysVer = (int) (f32) strtod("2.00", 0);
@@ -220,13 +220,13 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
         OSReport("IDSystem::set(): Dat ver.%d < Sys ver.%d\n", ver, sysVer);
     }
 
-    for (i = 0; i < hdr->num; i++) {
+    for (i = 0; i < hdr->UnitNum; i++) {
         switch (ver) {
         case 1:
-            if (id == 0xFF || p1->id == id) {
+            if (markNo == 0xFF || p1->id == markNo) {
                 u = unitPull();
                 if (u == 0) {
-                    pLog->err(0, 0, "IDSystem::set() work full (0x%02x miss)", hdr->num - i);
+                    pLog->err(0, 0, "IDSystem::set() work full (0x%02x miss)", hdr->UnitNum - i);
                 } else {
                     u->be_flag = p1->flags;
                     u->markNo = p1->id;
@@ -276,25 +276,25 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
                     }
                     a = p1->ofs[2];
                     if (a) {
-                        u->curve[0] = (Hermite1*) (a + (u32) data);
+                        u->curve[0] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[0] = 0;
                     }
                     a = p1->ofs[3];
                     if (a) {
-                        u->curve[1] = (Hermite1*) (a + (u32) data);
+                        u->curve[1] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[1] = 0;
                     }
                     a = p1->ofs[4];
                     if (a) {
-                        u->curve[2] = (Hermite1*) (a + (u32) data);
+                        u->curve[2] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[2] = 0;
                     }
                     a = p1->ofs[5];
                     if (a) {
-                        u->curve[3] = (Hermite1*) (a + (u32) data);
+                        u->curve[3] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[3] = 0;
                     }
@@ -320,9 +320,9 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
                             u->path0 = 0;
                         }
                     }
-                    u->classNo = type;
-                    u->otType = ot;
-                    u->otNo = prio;
+                    u->classNo = classNo;
+                    u->otType = otType;
+                    u->otNo = otNo;
                     if (p1->level > m_levelMax) {
                         m_levelMax = p1->level;
                     }
@@ -331,10 +331,10 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
             p1++;
             break;
         case 2:
-            if (id == 0xFF || cmp_id_no(p2, id, mode) != 0) {
+            if (markNo == 0xFF || cmp_id_no(p2, markNo, Attr) != 0) {
                 u = unitPull();
                 if (u == 0) {
-                    pLog->err(0, 0, "IDSystem::set() work full (0x%02x miss)", hdr->num - i);
+                    pLog->err(0, 0, "IDSystem::set() work full (0x%02x miss)", hdr->UnitNum - i);
                 } else {
                     u->be_flag = p2->flags;
                     u->markNo = p2->id;
@@ -384,25 +384,25 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
                     }
                     a = p2->ofs[2];
                     if (a) {
-                        u->curve[0] = (Hermite1*) (a + (u32) data);
+                        u->curve[0] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[0] = 0;
                     }
                     a = p2->ofs[3];
                     if (a) {
-                        u->curve[1] = (Hermite1*) (a + (u32) data);
+                        u->curve[1] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[1] = 0;
                     }
                     a = p2->ofs[4];
                     if (a) {
-                        u->curve[2] = (Hermite1*) (a + (u32) data);
+                        u->curve[2] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[2] = 0;
                     }
                     a = p2->ofs[5];
                     if (a) {
-                        u->curve[3] = (Hermite1*) (a + (u32) data);
+                        u->curve[3] = (HERMITE_1_PTR*) (a + (u32) data);
                     } else {
                         u->curve[3] = 0;
                     }
@@ -428,14 +428,14 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
                             u->path0 = 0;
                         }
                     }
-                    u->classNo = type;
-                    u->otType = ot;
-                    u->otNo = prio;
+                    u->classNo = classNo;
+                    u->otType = otType;
+                    u->otNo = otNo;
                     if (p2->level > m_levelMax) {
                         m_levelMax = p2->level;
                     }
-                    if (id != 0xFF) {
-                        set(data, p2->no, type, ot, prio, 1);
+                    if (markNo != 0xFF) {
+                        set(data, p2->no, classNo, otType, otNo, 1);
                     }
                 }
             }
@@ -444,7 +444,7 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
         }
     }
 
-    if (mode != 1) {
+    if (Attr != 1) {
         for (i = 0; i < m_maxId; i++) {
             ID_UNIT* c = &m_IdUnit[i];
             if (c->be_flag != 0xFF && (c->be_flag & 0x2)) {
@@ -456,7 +456,7 @@ void IDSystem::set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode)
 
 // Frees the units of class `type` with mark id `id` (0xFF = whole class; type 0xFF = everything)
 // and clears the class set bit.
-void IDSystem::kill(u8 id, int type)
+void IDSystem::kill(u8 markNo, ID_CLASS classNo)
 {
     int i;
     ID_UNIT* u = m_IdUnit;
@@ -465,17 +465,17 @@ void IDSystem::kill(u8 id, int type)
         if (u->be_flag == 0xFF) {
             continue;
         }
-        if (type == 0xFF) {
+        if (classNo == 0xFF) {
             unitPush(u);
-        } else if ((u8) type == u->classNo) {
-            if (id == 0xFF) {
+        } else if ((u8) classNo == u->classNo) {
+            if (markNo == 0xFF) {
                 unitPush(u);
-            } else if (id == u->markNo) {
+            } else if (markNo == u->markNo) {
                 unitPush(u);
             }
         }
     }
-    FlagOffVar(m_set_flag, (u32) ((u8) type));
+    FlagOffVar(m_set_flag, (u32) ((u8) classNo));
 }
 
 // Rewinds every live unit's four timers by one step against their direction (holds the animation
@@ -526,7 +526,7 @@ void IDSystem::move()
         return;
     }
     Vec v = { 0.0f, 0.0f, 1.0f };
-    f32 dist = 240.0 / tan(pG->Camera.param.fovy * 0.5f * (PI / 180.0f));
+    f32 dist = 240.0 / tan(pG->Camera.param.Fovy * 0.5f * (PI / 180.0f));
     PSMTXIdentity(m_scrn_mat);
     PSVECScale(&v, &v, -dist);
     m_scrn_mat[0][3] = v.x;
@@ -551,7 +551,7 @@ void IDSystem::move()
 }
 
 // Starts (1) or freezes (0) the animation of a unit and its children (be_flag 0x4).
-void IDSystem::beMove(ID_UNIT* u, int on_off)
+void IDSystem::beMove(ID_UNIT* pParent, int on_off)
 {
     int i;
     ID_UNIT* c = m_IdUnit;
@@ -560,22 +560,22 @@ void IDSystem::beMove(ID_UNIT* u, int on_off)
         if (c->be_flag == 0xFF || !(c->be_flag & 0x1)) {
             continue;
         }
-        if (u == c->pParent) {
+        if (pParent == c->pParent) {
             beMove(c, on_off);
         }
     }
     switch (on_off) {
     case 1:
-        u->be_flag |= 0x4;
+        pParent->be_flag |= 0x4;
         break;
     case 0:
-        u->be_flag &= ~0x4;
+        pParent->be_flag &= ~0x4;
         break;
     }
 }
 
 // Sets all four curve timers of a unit and its children to `time` (frames).
-void IDSystem::setTime(ID_UNIT* u, s16 time)
+void IDSystem::setTime(ID_UNIT* pParent, s16 time)
 {
     int i;
     ID_UNIT* c = m_IdUnit;
@@ -584,29 +584,29 @@ void IDSystem::setTime(ID_UNIT* u, s16 time)
         if (c->be_flag == 0xFF || !(c->be_flag & 0x1)) {
             continue;
         }
-        if (u == c->pParent) {
+        if (pParent == c->pParent) {
             setTime(c, time);
         }
     }
-    u->timer[3] = time;
-    u->timer[2] = time;
-    u->timer[1] = time;
-    u->timer[0] = time;
+    pParent->timer[3] = time;
+    pParent->timer[2] = time;
+    pParent->timer[1] = time;
+    pParent->timer[0] = time;
 }
 
 // Recomputes the position of a unit and its children immediately (idSysMove00).
-void IDSystem::movePos(ID_UNIT* u)
+void IDSystem::movePos(ID_UNIT* pParent)
 {
     int i;
     ID_UNIT* c;
 
-    idSysMove00(u);
+    idSysMove00(pParent);
     c = m_IdUnit;
     for (i = 0; i < m_maxId; i++, c++) {
         if (c->be_flag == 0xFF || !(c->be_flag & 0x1)) {
             continue;
         }
-        if (u == c->pParent) {
+        if (pParent == c->pParent) {
             movePos(c);
         }
     }
@@ -645,12 +645,12 @@ void idSysMove00(ID_UNIT* u)
 
     if (u->path0 != 0 && ((u8*) u->path0)[7] != 0) {
         int num;
-        if (u->curve[0] != 0 && (num = u->curve[0]->num) != -1) {
+        if (u->curve[0] != 0 && (num = u->curve[0]->nPoint) != -1) {
             t = Hermite_1CurveCalc(u->curve[0], (f32) (s16) u->timer[0]);
             u->anima_state &= ~0x1;
             if (!(u->rev_flag & 0x1)) {
                 u->timer[0]++;
-                f32 endT = u->curve[0]->key[num - 1].t;
+                f32 endT = u->curve[0]->Point[num - 1].T;
                 if ((f32) (s16) u->timer[0] >= endT) {
                     if (u->loop_flag & 0x1) {
                         u->timer[0] = 0;
@@ -663,7 +663,7 @@ void idSysMove00(ID_UNIT* u)
                 u->timer[0]--;
                 if ((s16) u->timer[0] <= 0) {
                     if (u->loop_flag & 0x1) {
-                        u->timer[0] = (u16) u->curve[0]->key[num - 1].t;
+                        u->timer[0] = (u16) u->curve[0]->Point[num - 1].T;
                     } else {
                         u->anima_state |= 0x1;
                         u->timer[0] = 0;
@@ -767,14 +767,14 @@ void idSysMove01(ID_UNIT* u)
     int i;
     int num;
 
-    if (u->curve[1] == 0 || (num = u->curve[1]->num) == 0) {
+    if (u->curve[1] == 0 || (num = u->curve[1]->nPoint) == 0) {
         return;
     }
     s = Hermite_1CurveCalc(u->curve[1], (f32) (s16) u->timer[1]);
     u->anima_state &= ~0x2;
     if (!(u->rev_flag & 0x2)) {
         u->timer[1]++;
-        f32 endT = u->curve[1]->key[num - 1].t;
+        f32 endT = u->curve[1]->Point[num - 1].T;
         if ((f32) (s16) u->timer[1] >= endT) {
             if (u->loop_flag & 0x2) {
                 u->timer[1] = 0;
@@ -787,7 +787,7 @@ void idSysMove01(ID_UNIT* u)
         u->timer[1]--;
         if ((s16) u->timer[1] <= 0) {
             if (u->loop_flag & 0x2) {
-                u->timer[1] = (u16) u->curve[1]->key[num - 1].t;
+                u->timer[1] = (u16) u->curve[1]->Point[num - 1].T;
             } else {
                 u->anima_state |= 0x2;
                 u->timer[1] = 0;
@@ -816,7 +816,7 @@ void idSysMove02(ID_UNIT* u)
     f32 r;
     int num;
 
-    if (u->curve[2] != 0 && (num = u->curve[2]->num) != 0) {
+    if (u->curve[2] != 0 && (num = u->curve[2]->nPoint) != 0) {
         r = Hermite_1CurveCalc(u->curve[2], (f32) (s16) u->timer[2]);
         if (*(u32*) u->col1 != 0) {
             u->col[0] = (1.0f - r) * u->col0[0] + r * u->col1[0];
@@ -856,7 +856,7 @@ void idSysMove02(ID_UNIT* u)
         u->anima_state &= ~0x3;
         if (!(u->rev_flag & 0x4)) {
             u->timer[2]++;
-            f32 endT = u->curve[2]->key[num - 1].t;
+            f32 endT = u->curve[2]->Point[num - 1].T;
             if ((f32) (s16) u->timer[2] >= endT) {
                 if (u->loop_flag & 0x4) {
                     u->timer[2] = 0;
@@ -869,7 +869,7 @@ void idSysMove02(ID_UNIT* u)
             u->timer[2]--;
             if ((s16) u->timer[2] <= 0) {
                 if (u->loop_flag & 0x4) {
-                    u->timer[2] = (u16) u->curve[2]->key[num - 1].t;
+                    u->timer[2] = (u16) u->curve[2]->Point[num - 1].T;
                 } else {
                     u->anima_state |= 0x3;
                     u->timer[2] = 0;
@@ -900,12 +900,12 @@ void idSysMove03(ID_UNIT* u)
     int num;
 
     u->rot = u->rot0;
-    if (u->curve[3] != 0 && (num = u->curve[3]->num) != 0) {
+    if (u->curve[3] != 0 && (num = u->curve[3]->nPoint) != 0) {
         a = Hermite_1CurveCalc(u->curve[3], (f32) (s16) u->timer[3]);
         u->anima_state &= ~0x4;
         if (!(u->rev_flag & 0x8)) {
             u->timer[3]++;
-            f32 endT = u->curve[3]->key[num - 1].t;
+            f32 endT = u->curve[3]->Point[num - 1].T;
             if ((f32) (s16) u->timer[3] >= endT) {
                 if (u->loop_flag & 0x8) {
                     u->timer[3] = 0;
@@ -918,7 +918,7 @@ void idSysMove03(ID_UNIT* u)
             u->timer[3]--;
             if ((s16) u->timer[3] <= 0) {
                 if (u->loop_flag & 0x8) {
-                    u->timer[3] = (u16) u->curve[3]->key[num - 1].t;
+                    u->timer[3] = (u16) u->curve[3]->Point[num - 1].T;
                 } else {
                     u->anima_state |= 0x4;
                     u->timer[3] = 0;
@@ -1019,7 +1019,7 @@ void IDSystem::trans()
 }
 
 // Queues a unit (and, for groups, its children first) into the OT with IdGeneralTrans.
-void IDSystem::unitTrans(ID_UNIT* u)
+void IDSystem::unitTrans(ID_UNIT* pIdUnit)
 {
     ID_UNIT* c = m_IdUnit; // declared before i: decides the r25/r26 split of the i+1 / c+1 loop temps
     int i;
@@ -1030,9 +1030,9 @@ void IDSystem::unitTrans(ID_UNIT* u)
             continue;
         }
         if (c->be_flag & 0x8) {
-            switch (u->type) {
+            switch (pIdUnit->type) {
             case 1:
-                if (u == c->pParent) {
+                if (pIdUnit == c->pParent) {
                     unitTrans(c);
                 }
                 break;
@@ -1048,9 +1048,9 @@ void IDSystem::unitTrans(ID_UNIT* u)
             }
         }
     }
-    if (u != 0) {
-        u->be_flag |= 0x10;
-        AddOtDirect(u->otType, u, (void (*)()) IdGeneralTrans, u->otNo, 0x1000, 0, 0.0f);
+    if (pIdUnit != 0) {
+        pIdUnit->be_flag |= 0x10;
+        AddOtDirect(pIdUnit->otType, pIdUnit, (void (*)()) IdGeneralTrans, pIdUnit->otNo, 0x1000, 0, 0.0f);
     }
 }
 
@@ -1213,7 +1213,7 @@ void IdNegativeTrans(ID_UNIT* u, u32 pow)
     Mtx tm2;
     Mtx pm;
     Mtx tm;
-    C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
+    C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
     PSMTXConcat(IDSystem::m_scrn_mat, u->mat, tm);
     PSMTXConcat(pm, tm, tm2);
     GXLoadTexMtxImm(tm2, 0x1E, 0);
@@ -1323,7 +1323,7 @@ void IdShimmerTrans(ID_UNIT* u, int u_pow, int Refract_type)
     Mtx tm2;
     Mtx pm;
     Mtx tm;
-    C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
+    C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
     PSMTXConcat(IDSystem::m_scrn_mat, u->mat, tm);
     PSMTXConcat(pm, tm, tm2);
     GXLoadTexMtxImm(tm2, 0x1E, 0);

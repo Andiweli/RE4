@@ -43,7 +43,7 @@ struct R40eWork {
     cSceObj elv;         // 0x000  the elevator mover
     TexRenderMng* tex;   // 0x0F8  event render target
     u8 texTbl[0x80];     // 0x0FC  blend table of the render target
-    TexRenderCam cam;    // 0x17C  event render camera
+    TexRenderEvtCamStruct cam;    // 0x17C  event render camera
     u32 str;             // 0x480  SndStrReq handle of the show-view event
 };
 
@@ -60,7 +60,7 @@ static void r40e_execEmAppear();
 static void r40e_checkEmDead();
 static void R40EExecEventS00();
 static void gameResult();
-extern "C" void Evt_R40ES00_Func(Event* e);
+void Evt_R40ES00_Func(Event* e, u32);
 void EvtTexRenderCamTrans(Event* e, int cut);
 
 // Room init: the elevator; until the fight is over (Room_flg bit 2) area 4 = the enemy's appearance
@@ -184,7 +184,7 @@ static void r40e_moveElevator(u32 dir)
             obj->pModelInfo->uvScrollU = -0.05f;
         }
     }
-    SceExec(0x12, (TaskFunc) r40e_setElvCamera, dir, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r40e_setElvCamera, (void*) dir, 0, SCE_PRIO_DEF_2, 0);
     if (dir <= 1) {
         cPlayer* pl = pPL;
         cSceObj* elv = &r40e_work->elv;
@@ -433,7 +433,7 @@ static void gameResult()
 // Event r40es00 callback (Assignment Ada's ending): far clip pushed out, Status_flg[1] 0x800; cut 0
 // sets the pl0d00 / pl0c00 / evmb900 light masks and shows Ada's chained child; cuts 3/5/7 feed the
 // render-to-texture pass with the evmc100 model; the end restores.
-extern "C" void Evt_R40ES00_Func(Event* e)
+void Evt_R40ES00_Func(Event* e, u32)
 {
     void* mod;
 

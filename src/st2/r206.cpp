@@ -72,7 +72,7 @@ void r206_die_event();
 static void r206_gouryuu_event();
 static void item_chk();
 void r206_openTerm();
-SceAtWork* GetKeyItemAtari();
+SCE_AT_DATA* GetKeyItemAtari();
 static void r206_auto_door_ck();
 static void Evt_R206S00_Func(Event* e);
 static void Evt_R206S10_Func(Event* e);
@@ -228,13 +228,13 @@ void r206_openTerm()
 }
 
 // The area of the key item (type 3, item 0xA3).
-SceAtWork* GetKeyItemAtari()
+SCE_AT_DATA* GetKeyItemAtari()
 {
-    SceAtWork* p;
+    SCE_AT_DATA* p;
 
     p = sceAtSetOtStart();
     while ((p = sceAtGetOtAddr(p)) != NULL) {
-        if (p->type == 3 && p->item.id == 0xA3) {
+        if (p->id == 3 && ((SCE_AT_ITEM*) p)->item.item_id == 0xA3) {
             return p;
         }
     }
@@ -556,7 +556,7 @@ static void r206_snipe()
     cEmHit* subHit0;
     cEmHit* subHit1;
     cEmBarred* gate;
-    SceAtWork* at;
+    SCE_AT_DATA* at;
     int done;
     int moved;
     int wave;
@@ -611,16 +611,14 @@ static void r206_snipe()
         r206_work->timer--;
         if (r206_work->timer == 0) {
             u32 rsf;
-            u32 zero;
 
             r206_work->timer = (u32) (fRand0_1() * 60.0f) + 0x3C;
             rsf = RsfCheck(*(u16*) &pG->stage_no, 6);
-            zero = 0;
             if (rsf) {
                 r206_work->cnt++;
             }
             if (r206_work->cnt > 8) {
-                r206_work->cnt = zero;
+                r206_work->cnt = 0;
                 r206_work->snd = SndCall(6, 5, &pSUB->pos, 0, 0, 0);
             } else {
                 r206_work->snd = SndCall(6, 6, &pSUB->pos, 0, 0, 0);
@@ -861,7 +859,7 @@ wave_done:
     }
     at = GetKeyItemAtari();
     if (at != NULL) {
-        SubCharMoveTo(at->item.pos.x, at->item.pos.y, at->item.pos.z, 193.0f, 0);
+        SubCharMoveTo(((SCE_AT_ITEM*) at)->item.item_pos.x, ((SCE_AT_ITEM*) at)->item.item_pos.y, ((SCE_AT_ITEM*) at)->item.item_pos.z, 193.0f, 0);
     } else {
         pLog->err(0, 0, "KEY ATARI NOT FOUND!!");
     }
@@ -1057,7 +1055,6 @@ void luis_set()
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    f32 zero;
     int lit = 4;
 
     obj = SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x32), ROOM_ARC_PTR(pG->pRoom, 0x33), &pos, &rot, 0x10, 1);
@@ -1066,8 +1063,7 @@ void luis_set()
     obj->addModel(ModInfoMgr.create(ROOM_ARC_PTR(pG->pRoom, 0x38), ROOM_ARC_PTR(pG->pRoom, 0x39)));
     obj->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3D), 0xA, 0, 1, 0);
     obj->be_flag |= 0x1000;
-    zero = 0.0f;
-    obj->Motion.Seq_speed = zero;
+    obj->Motion.Seq_speed = 0.0f;
     obj->setNoSuspend(1);
     obj->LightInfo.EnableMask = lit;
     obj->be_flag |= 0x10;
@@ -1075,7 +1071,7 @@ void luis_set()
     obj = SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x3A), ROOM_ARC_PTR(pG->pRoom, 0x3B), &pos, &rot, 0x10, 1);
     obj->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3C), 0xA, 0, 1, 0);
     obj->be_flag |= 0x1000;
-    obj->Motion.Seq_speed = zero;
+    obj->Motion.Seq_speed = 0.0f;
     obj->setNoSuspend(1);
     obj->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3E), 0xA, 0, 1, 0);
     obj->LightInfo.EnableMask = lit;
@@ -1123,7 +1119,7 @@ static void r206_openedShelf(int no)
 // After the reunion: disable the key item's area (it was taken in Ashley's section).
 static void destroy_key_atari()
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     SceSleep(1);
     at = GetKeyItemAtari();

@@ -81,8 +81,8 @@ extern "C" f32 re4_acosf(f32 x);
 
 // ---- include/model.h / motion.h / cam_ctrl.h subset ---------------------------------------------
 
-struct MotionSeqKey {
-    u16 frame;
+struct SEQUENCE_DATA {
+    u16 Frame;
     u8 Se;
     u8 Free;
 };
@@ -106,7 +106,7 @@ struct ATTACH_CAMERA {
 struct MOTION_INFO {
     MotionData* pMot;
     u32* pHermite_data;   // u32 key pointers: the motion image lives in the low 4 GB (MAP_32BIT)
-    u16 Key_hist[2][2][3];
+    u16 Key_hist[4][3];
     f32 Mot_frame_max;
     f32 Mot_frame;
     f32 Mot_frame_sav;
@@ -128,10 +128,10 @@ struct MOTION_INFO {
     Vec Ang;
     Vec Ang_old;
     Vec Ang_dist;
-    MotionSeqKey* pSeq_top;
-    MotionSeqKey Seq;
-    MotionSeqKey Seq_old;
-    MotionSeqKey Seq_old2;
+    SEQUENCE_DATA* pSeq_top;
+    SEQUENCE_DATA Seq;
+    SEQUENCE_DATA Seq_old;
+    SEQUENCE_DATA Seq_old2;
     f32 Seq_frame;
     u16 Seq_frame_num;
     u8 pad_BE[2];
@@ -141,12 +141,6 @@ struct MOTION_INFO {
     u8 pad_C6[2];
     f32 Brate;
     ATTACH_CAMERA* pAttachCam;
-};
-
-struct MotionWork : public MOTION_INFO {
-    MOTION_INFO* blend;
-    u16* flip;
-    u16* blendTbl;
 };
 
 typedef u16 HERMITE_KEY[3];
@@ -163,13 +157,13 @@ struct MotionParts {
     u32 flags;
 };
 
-struct HermitePrm {
-    f32 frame;
-    f32 maxFrame;
-    u32 flags;
-    u8 type;
+struct HERMITE_SET {
+    f32 Frame;
+    f32 Frame_max;
+    u32 Attr;
+    u8 Data_fmt;
     u8 pad_D[3];
-    u8* key;
+    u8* pData;
 };
 
 class cCoord {
@@ -199,7 +193,10 @@ public:
     u8 id;
     u8 nParts;
     u8 kindid;
-    MotionWork Motion;
+    MOTION_INFO Motion;
+    MOTION_INFO* pMotionB;
+    u16* pXFlip;
+    u16* pDblJnt;
     Mtx lt_inv_mat;   // cParts members (include/model.h)
     MotionParts motParts;
     f32 length;
@@ -298,7 +295,7 @@ void IKInit(cModel* m, MOTION_INFO* w);
 void InverseKinematics(cModel* m, int flag);
 void ikCalc(cParts* root, cParts* joint, cParts* eff);
 void cModel_matBlend(cModel* m, f32 rate);
-int HermiteInterpolation(HermitePrm* prm, Vec* out, u16* hist);
+int HermiteInterpolation(HERMITE_SET* prm, Vec* out, u16* hist);
 int Fcc_next_axis_addr(int type, int n);
 void PartsWorldPosCalc(cModel* m);
 void MotionBlendOff(cModel* m);
@@ -326,7 +323,7 @@ void ScaleMatrix(Mtx m, Vec* scale);
 void SetOrientationZX(Vec* z, Vec* x, Mtx m);
 void SetOrientationZY(Vec* z, Vec* y, Mtx m);
 f32 VecAngle(Vec* a, Vec* b);
-void VecRadLimit(Vec* v);
+void VecRadLimit(f32* v);
 void VecLinearCombination(Vec* a, f32 s, Vec* b, f32 t, Vec* out);   // include/math_sub.h
 f32 LIMIT_ANGLE(f32 x);
 f32 SQRTF(f32 x);

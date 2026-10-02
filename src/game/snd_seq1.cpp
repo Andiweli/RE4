@@ -6,8 +6,8 @@
 // sequence (status bit4) for that many milliseconds; a reset request ends them all.
 void Snd_midi_sequencer(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
-    SND_SEQ_WORK* seq;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
+    SND_SEQ* seq;
     u32 i;
     u32 t0;
     u32 t1;
@@ -15,16 +15,16 @@ void Snd_midi_sequencer(void)
     if (ctrl->reset_flag & 0x1) {
         ctrl->reset_flag |= 0x40;
     }
-    t0 = ctrl->seq_tick / 1000;
-    ctrl->seq_tick += 4995;
-    t1 = ctrl->seq_tick / 1000;
-    ctrl->seq_msec = t1 - t0;
-    if (ctrl->seq_tick == 999000) {
-        ctrl->seq_tick = 0;
+    t0 = ctrl->seq_adjust / 1000;
+    ctrl->seq_adjust += 4995;
+    t1 = ctrl->seq_adjust / 1000;
+    ctrl->seq_proc = t1 - t0;
+    if (ctrl->seq_adjust == 999000) {
+        ctrl->seq_adjust = 0;
     }
     for (i = 0; i < SND_SEQ_MAX; i++) {
         seq = &Snd_seq_work[i];
-        if (seq->status & 0x10) {
+        if (seq->be_flag & 0x10) {
             seq_player(ctrl, seq);
         }
     }
@@ -32,7 +32,7 @@ void Snd_midi_sequencer(void)
 
 // One audio frame of a sequence: reset check, track overrides, requests, fade step, then the MIDI
 // events for each elapsed millisecond, and the master volume update.
-void seq_player(SND_CTRL_WORK* ctrl, SND_SEQ_WORK* seq)
+void seq_player(SND_CTRL* ctrl, SND_SEQ* seq)
 {
     u32 i;
 
@@ -44,14 +44,14 @@ void seq_player(SND_CTRL_WORK* ctrl, SND_SEQ_WORK* seq)
     if (seq_fade_check(seq) != 0) {
         return;
     }
-    for (i = 0; i < ctrl->seq_msec; i++) {
+    for (i = 0; i < ctrl->seq_proc; i++) {
         seq_one_msec(ctrl, seq);
     }
     seq_play_update(seq);
 }
 
 // During a driver reset the sequence is ended (returns 1).
-int seq_reset_check(SND_SEQ_WORK* seq)
+int seq_reset_check(SND_SEQ* seq)
 {
     if ((Snd_ctrl_work.reset_flag & 0x40) == 0) {
         return 0;
@@ -62,7 +62,7 @@ int seq_reset_check(SND_SEQ_WORK* seq)
 
 // Applies the queued per-track parameter changes (kind 8 = volume CC 7, else pan CC 10) to the
 // channels in each entry's mask.
-void seq_tpr_check(SND_SEQ_WORK* seq)
+void seq_tpr_check(SND_SEQ* seq)
 {
     int i;
     u16 mask;
@@ -75,19 +75,19 @@ void seq_tpr_check(SND_SEQ_WORK* seq)
         return;
     }
     for (i = 0; i < seq->tpr_num; i++) {
-        mask = seq->tpr_mask[i];
-        if (seq->tpr_kind[i] == 8) {
+        mask = seq->tpr_track[i];
+        if (seq->tpr_para[i] == 8) {
             cc = 7;
         } else {
             cc = 10;
         }
-        val = seq->tpr_val[i];
+        val = seq->tpr_value[i];
         for (ch = 0; ch < 16; ch++) {
             if (mask & 0x1) {
                 if (cc == 7) {
-                    seq->ch_vol[ch] = val;
+                    seq->vol[ch] = val;
                 } else {
-                    seq->ch_pan[ch] = val;
+                    seq->pan[ch] = val;
                 }
                 status = (u8) ch | 0xB0;
                 SYNMidiInput(&seq->synth, &status);
@@ -99,76 +99,76 @@ void seq_tpr_check(SND_SEQ_WORK* seq)
 }
 
 // Executes one pending request: set volume (bit2), fade (bit0), quick stop (bit1: 50-step fade to 0).
-void seq_req_check(SND_SEQ_WORK* seq)
+void seq_req_check(SND_SEQ* seq)
 {
-    if (seq->req == 0) {
+    if (seq->req_flag == 0) {
         return;
     }
-    if (seq->req & 0x4) {
-        seq->req &= ~0x4;
+    if (seq->req_flag & 0x4) {
+        seq->req_flag &= ~0x4;
         seq_req_vol_set(seq);
         return;
     }
-    if (seq->req & 0x1) {
-        seq->req &= ~0x1;
-        seq_req_fade_set(seq, seq->fade_time, seq->fade_vol);
+    if (seq->req_flag & 0x1) {
+        seq->req_flag &= ~0x1;
+        seq_req_fade_set(seq, seq->req_fade_time, seq->req_fade_end);
         return;
     }
-    if (seq->req & 0x2) {
-        seq->req &= ~0x2;
+    if (seq->req_flag & 0x2) {
+        seq->req_flag &= ~0x2;
         seq_req_fade_set(seq, 50, 0);
     }
 }
 
 // Volume set at once (vol2 = vol << 8, refresh flagged).
-void seq_req_vol_set(SND_SEQ_WORK* seq)
+void seq_req_vol_set(SND_SEQ* seq)
 {
-    seq->vol2 = seq->vol << 8;
-    seq->flag |= 0x1;
+    seq->now_vol = seq->req_vol << 8;
+    seq->update |= 0x1;
 }
 
 // Starts a fade of the 8.8 volume to `vol` in `time` steps (at least 1 per step); status 0x100.
-void seq_req_fade_set(SND_SEQ_WORK* seq, s16 time, s16 vol)
+void seq_req_fade_set(SND_SEQ* seq, s16 time, s16 vol)
 {
     s16 diff;
 
-    seq->fade_target = vol << 8;
-    diff = seq->fade_target - seq->vol2;
-    seq->fade_step = diff / time;
-    if (seq->fade_step == 0) {
+    seq->nml_fade_end = vol << 8;
+    diff = seq->nml_fade_end - seq->now_vol;
+    seq->nml_fade_spd = diff / time;
+    if (seq->nml_fade_spd == 0) {
         if (diff > 0) {
-            seq->fade_step = 1;
+            seq->nml_fade_spd = 1;
         } else {
-            seq->fade_step = -1;
+            seq->nml_fade_spd = -1;
         }
     }
-    seq->status |= 0x100;
+    seq->be_flag |= 0x100;
 }
 
 // One fade step; when the target is reached the fade ends, and a target of 0 ends the sequence
 // (returns 1).
-int seq_fade_check(SND_SEQ_WORK* seq)
+int seq_fade_check(SND_SEQ* seq)
 {
-    if (seq->status & 0x100) {
-        if (seq->vol2 == seq->fade_target) {
-            seq->status &= ~0x100;
-            if (seq->vol2 == 0) {
+    if (seq->be_flag & 0x100) {
+        if (seq->now_vol == seq->nml_fade_end) {
+            seq->be_flag &= ~0x100;
+            if (seq->now_vol == 0) {
                 seq_play_end(seq);
                 return 1;
             }
         } else {
-            seq_fade_new_vol_set(seq, seq->fade_step, seq->fade_target);
+            seq_fade_new_vol_set(seq, seq->nml_fade_spd, seq->nml_fade_end);
         }
     }
     return 0;
 }
 
 // Moves vol2 by `step` toward `target`, flags the refresh.
-void seq_fade_new_vol_set(SND_SEQ_WORK* seq, s16 step, s16 target)
+void seq_fade_new_vol_set(SND_SEQ* seq, s16 step, s16 target)
 {
     int v;
 
-    v = seq->vol2 + step;
+    v = seq->now_vol + step;
     if (step > 0) {
         if (v > target) {
             v = target;
@@ -178,79 +178,79 @@ void seq_fade_new_vol_set(SND_SEQ_WORK* seq, s16 step, s16 target)
             v = target;
         }
     }
-    seq->vol2 = v;
-    seq->flag |= 0x1;
+    seq->now_vol = v;
+    seq->update |= 0x1;
 }
 
 // One millisecond of sequence time: counts the delta down by `division` and plays every event
 // that comes due (delta = next delta time x tempo).
-void seq_one_msec(SND_CTRL_WORK* ctrl, SND_SEQ_WORK* seq)
+void seq_one_msec(SND_CTRL* ctrl, SND_SEQ* seq)
 {
     while (1) {
-        if (seq->delta == 0) {
+        if (seq->time == 0) {
             seq_one_msec_main(ctrl, seq);
-            if ((seq->status & 0x10) == 0) {
+            if ((seq->be_flag & 0x10) == 0) {
                 return;
             }
-            seq->delta = Snd_seq_get_delta(seq) * seq->tempo;
+            seq->time = Snd_seq_get_delta(seq) * seq->tempo;
         } else {
-            seq->delta -= seq->division;
-            if (seq->delta > 0) {
+            seq->time -= seq->tpm;
+            if (seq->time > 0) {
                 break;
             }
-            seq->delta = 0;
+            seq->time = 0;
         }
     }
 }
 
 // Reads the next 3-byte MIDI message at seq_pos and dispatches it (Snd_seq_midi_message).
-void seq_one_msec_main(SND_CTRL_WORK* ctrl, SND_SEQ_WORK* seq)
+void seq_one_msec_main(SND_CTRL* ctrl, SND_SEQ* seq)
 {
     u8* p;
 
-    p = seq->seq_pos;
-    ctrl->midi_msg[0] = *p++;
-    ctrl->midi_msg[1] = *p++;
-    ctrl->midi_msg[2] = *p++;
-    ctrl->midi_type = ctrl->midi_msg[0] & 0xF0;
-    ctrl->midi_ch = ctrl->midi_msg[0] & 0x0F;
+    p = seq->now_seq_ptr;
+    ctrl->seq_data[0] = *p++;
+    ctrl->seq_data[1] = *p++;
+    ctrl->seq_data[2] = *p++;
+    ctrl->code = ctrl->seq_data[0] & 0xF0;
+    ctrl->track = ctrl->seq_data[0] & 0x0F;
     Snd_seq_midi_message(ctrl, seq);
 }
 
 // Ends the sequence: volume 0, note-off for every voice work it owns, status bit4 off.
-void seq_play_end(SND_SEQ_WORK* seq)
+void seq_play_end(SND_SEQ* seq)
 {
-    SND_VOICE_WORK* voice;
+    SND_VOICE* voice;
     int i;
 
-    if (seq->vol2 != 0) {
-        seq->vol2 = 0;
-        seq->flag |= 0x1;
+    if (seq->now_vol != 0) {
+        seq->now_vol = 0;
+        seq->update |= 0x1;
     }
     for (i = 0; i < SND_VOICE_MAX; i++) {
         voice = &Snd_voice_work[i];
-        if (voice->status == 0) {
+        if (voice->be_flag == 0) {
             continue;
         }
-        if (voice->type != 2) {
+        if (voice->play_type != 2) {
             continue;
         }
-        if ((s16) voice->seq_no != seq->no) {
+        if ((s16) voice->seq_id != seq->work_id) {
             continue;
         }
-        Snd_send_midi(&seq->synth, voice->seq_ch | (s8) 0x90, voice->seq_note, 0);
-        voice->status = 0;
+        Snd_send_midi(&seq->synth, voice->track | (s8) 0x90, voice->note, 0);
+        voice->be_flag = 0;
     }
-    seq->status &= ~0x10;
-    seq->flag = 0;
+    seq->be_flag &= ~0x10;
+    seq->update = 0;
 }
 
 // Pushes a changed volume (flag bit0) to the synth master volume.
-void seq_play_update(SND_SEQ_WORK* seq)
+void seq_play_update(SND_SEQ* seq)
 {
-    if (seq->flag & 0x1) {
+    if (seq->update & 0x1) {
         Snd_seq_work_calc_ax_vol(seq);
         SYNSetMasterVolume(&seq->synth, seq->ax_vol);
     }
-    seq->flag = 0;
+    seq->update = 0;
 }

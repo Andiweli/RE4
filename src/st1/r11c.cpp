@@ -52,8 +52,8 @@ void Obj18CmfOn(cObj* o, u32 n);   // game/obj18.cpp
 
 
 struct R11cWork {
-    ReadModule* mod3;        // 0x00  enemy module 3 (Luis; the s00 event data is swapped into its archive)
-    ReadModule* mod4;        // 0x04  enemy module 4 (Ashley; the s10 event data)
+    MODULE_DAT* mod3;        // 0x00  enemy module 3 (Luis; the s00 event data is swapped into its archive)
+    MODULE_DAT* mod4;        // 0x04  enemy module 4 (Ashley; the s10 event data)
     u8 pad_8[0x30 - 0x08];
     cDataUnit* evd0;         // 0x30  evd/r11cs00.evd
     cDataUnit* evd1;         // 0x34  evd/r11cs10.evd
@@ -102,24 +102,24 @@ static inline u32 r11c_emDead(u32 no)
     return v;
 }
 
-extern "C" void r11c_eventInit();
+void r11c_eventInit();
 static void r11c_EventBesiegedStart();
 static void r11c_ThunderMove();
-extern "C" void r11c_initGate();
-extern "C" void r11c_openGate(u32 id);
+void r11c_initGate();
+void r11c_openGate(u32 id);
 static void r11c_closeGate(u32 id);
 static void r11c_moveGear(int dir);
 static void r11c_moveChain(int dir);
 static void r11c_moveLever2(int dir);
-extern "C" void r11c_moveLever(int dir, int noGear);
+void r11c_moveLever(int dir, int noGear);
 static void r11c_selectRoute_end(int sel);
 static void r11c_selectRoute();
 static void r11c_operator();
-extern "C" void setFire();
-extern "C" void deleteFire();
-extern "C" void Evt_R11CS00_Func(Event* e);
-extern "C" void Evt_R11CS10_Func(Event* e);
-extern "C" void Evt_R11CS20_Func(Event* e);
+void setFire();
+void deleteFire();
+void Evt_R11CS00_Func(Event* e, u32);
+void Evt_R11CS10_Func(Event* e, u32);
+void Evt_R11CS20_Func(Event* e, u32);
 
 // Room init: thunder, rain and the four ladders. Until the siege is done (save flags bit 25) area 3
 // starts it and Luis waits outside, afterwards the merchant stock is added and the gates follow the
@@ -269,7 +269,7 @@ void R11cMain()
 // Before the siege: pre-load evd r11cs00 to ARAM and register r11cs10, pre-read enemy modules 0x13 and 3
 // (Luis), mark Ashley as following (Status_flg[3] 0x04000000), init the partner at Leon's position in
 // chase mode, and keep module 3 for the event-data swap.
-extern "C" void r11c_eventInit()
+void r11c_eventInit()
 {
     W->evd0 = DC.setData(EvtMgr.NameChange("evd/r11cs00.evd"));
     W->evd0->setCommand(CMND_ARAM_LOAD, 0, 0);
@@ -287,7 +287,7 @@ extern "C" void r11c_eventInit()
 static void r11c_EventBesiegedStart()
 {
     cEmDoor* door;
-    ReadModule* mod;
+    MODULE_DAT* mod;
     int err;
 
     ScfFlagOn(pG, SCF_R11C_BESIEGED_EVENT);
@@ -325,7 +325,7 @@ static void r11c_EventBesiegedStart()
             ang.z = 0.0f;
             pl->setAng(&ang);
         }
-    } else if (W->evd0->getSize() > mod->size) {
+    } else if (W->evd0->getSize() > mod->DataSize) {
         pLog->err(0, 0, "r11c_Event00 data size over");
         {
             Vec pos = {109264.0f, 4.0f, -50575.0f};
@@ -341,14 +341,14 @@ static void r11c_EventBesiegedStart()
             pl->setAng(&ang);
         }
     } else {
-        MemorySwap(mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
-        EvtMgr.SetEvt(mod->pArc, (u32*) 0);
+        MemorySwap(mod->pData, W->evd0->getAddr(), W->evd0->getSize());
+        EvtMgr.SetEvt(mod->pData, 0);
         SceSleep(2);
         SceSleep(2);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
+        MemorySwap(mod->pData, W->evd0->getAddr(), W->evd0->getSize());
     }
     W->evd0->setCommand(CMND_DEL_DATA, 0, 0);
     SysFlagOn(pG, SYS_SCREEN_STOP);
@@ -396,7 +396,7 @@ static void r11c_EventBesiegedStart()
     int i;
     int kill;
     int t;
-    ReadModule* mod2;
+    MODULE_DAT* mod2;
     int err2;
 
     W->evd1->setCommand(CMND_ARAM_LOAD, 0, 0);
@@ -557,17 +557,17 @@ static void r11c_EventBesiegedStart()
     InitModule(W->mod4);
     mod2 = SearchEmModule(0x13);
     if (err2 != 1) {
-        if (W->evd1->getSize() > mod2->size) {
+        if (W->evd1->getSize() > mod2->DataSize) {
             pLog->err(0, 0, "r11c_Event10 exec error");
         } else {
-            MemorySwap(mod2->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
-            if (EvtMgr.SetEvt(mod2->pArc, (u32*) &ev)) {
+            MemorySwap(mod2->pData, W->evd1->getAddr(), W->evd1->getSize());
+            if (EvtMgr.SetEvt(mod2->pData, &ev)) {
                 ev->FlgOnStatus(EvtStfFadeOut);
             }
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
                 SceSleep(1);
             }
-            MemorySwap(mod2->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
+            MemorySwap(mod2->pData, W->evd1->getAddr(), W->evd1->getSize());
         }
     }
     W->evd1->setCommand(CMND_DEL_DATA, 0, 0);
@@ -620,7 +620,7 @@ static void r11c_EventBesiegedStart()
     }
     {
         // The zero for EstSet's two stack arguments is born at the top of the block (it crosses the
-        // calls below, so sched1 may hoist it): a block-local, as in r111.
+        // calls below, so sched1 may hoist it): a block-local.
         void* zero = 0;
 
         ScfFlagOn(pG, SCF_R11C_BESIEGED_END_EVENT);
@@ -629,7 +629,7 @@ static void r11c_EventBesiegedStart()
         SceAtSetEnable(8, 0);
         SceAtSetEnable(9, 0);
         SmdGetObjPtr(0x3F)->be_flag &= ~2;
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_NONE, zero, 0);
     }
     RmfFlagOff(pG, RMF_BESIEGEDING);
     SceSetChapterEnd(CHAPTER_2_2, -1);
@@ -684,7 +684,7 @@ static void r11c_ThunderMove()
 }
 
 // The two gates (smd 0x33 left, 0x34 right): up before the siege, then by the chosen route.
-extern "C" void r11c_initGate()
+void r11c_initGate()
 {
     cObj* g0 = SmdGetObjPtr(0x33);
     cObj* g1 = SmdGetObjPtr(0x34);
@@ -717,7 +717,7 @@ extern "C" void r11c_initGate()
 
 // Task: raise gate `id` (smd 0x33 / 0x34) by 3600 units over 80 frames with a rattle, gate effect and
 // sound; sets Room_flg[2] bit 31 (a gate is open).
-extern "C" void r11c_openGate(u32 id)
+void r11c_openGate(u32 id)
 {
     cObj* g = SmdGetObjPtr(id);
     const f32 step = 45.0f;
@@ -874,7 +874,7 @@ static void r11c_moveLever2(int dir)
 }
 
 // The lever is pulled; unless `noGear`, the gear and chain tasks start.
-extern "C" void r11c_moveLever(int dir, int noGear)
+void r11c_moveLever(int dir, int noGear)
 {
     cObj* lv;
     int i;
@@ -903,8 +903,8 @@ extern "C" void r11c_moveLever(int dir, int noGear)
         SceSleep(1);
     }
     if (noGear == 0) {
-        W->gear = SceExec(0x12, (TaskFunc) r11c_moveGear, dir, 0, SCE_PRIO_DEF_2, 0);
-        W->chain = SceExec(0x12, (TaskFunc) r11c_moveChain, dir, 0, SCE_PRIO_DEF_2, 0);
+        W->gear = SceExec(0x12, (TaskFunc) r11c_moveGear, (void*) dir, 0, SCE_PRIO_DEF_2, 0);
+        W->chain = SceExec(0x12, (TaskFunc) r11c_moveChain, (void*) dir, 0, SCE_PRIO_DEF_2, 0);
     }
 }
 
@@ -996,9 +996,9 @@ static void r11c_selectRoute()
     case 1:
         if ((r11c_save()->flags & 0x40000000) && !(r11c_save()->flags & 0x20000000)) {
             r11c_moveLever(-1, 1);
-            SceExec(0x12, (TaskFunc) r11c_moveLever2, -1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r11c_moveLever2, (void*) -1, 0, SCE_PRIO_DEF_2, 0);
         } else {
-            SceSetEventCancel(1, (TaskFunc) r11c_selectRoute_end, -1, 3, 1);
+            SceSetEventCancel(1, (TaskFunc) r11c_selectRoute_end, (void*) -1, 3, 1);
             r11c_moveLever(-1, 0);
             CamCtrl.CutCall(4);
             while (CamCtrl.IsMotionEnd() == 0) {
@@ -1011,12 +1011,12 @@ static void r11c_selectRoute()
             CamCtrl.CutCall(6);
             r11c_openGate(0x33);
             if (r11c_save()->flags & 0x40000000) {
-                W->closeGate = SceExec(0x12, (TaskFunc) r11c_closeGate, 0x34, 0, SCE_PRIO_DEF_2, 0);
+                W->closeGate = SceExec(0x12, (TaskFunc) r11c_closeGate, (void*) 0x34, 0, SCE_PRIO_DEF_2, 0);
             }
             while (CamCtrl.IsMotionEnd() == 0) {
                 SceSleep(1);
             }
-            SceExec(0x12, (TaskFunc) r11c_moveLever2, -1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r11c_moveLever2, (void*) -1, 0, SCE_PRIO_DEF_2, 0);
             SceSetEventCancel(0, 0, 0, -1, 1);
             r11c_selectRoute_end(-1);
             return;
@@ -1025,9 +1025,9 @@ static void r11c_selectRoute()
     case 2:
         if ((r11c_save()->flags & 0x40000000) && (r11c_save()->flags & 0x20000000)) {
             r11c_moveLever(1, 1);
-            SceExec(0x12, (TaskFunc) r11c_moveLever2, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r11c_moveLever2, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         } else {
-            SceSetEventCancel(1, (TaskFunc) r11c_selectRoute_end, 1, 3, 1);
+            SceSetEventCancel(1, (TaskFunc) r11c_selectRoute_end, (void*) 1, 3, 1);
             r11c_moveLever(1, 0);
             CamCtrl.CutCall(4);
             while (CamCtrl.IsMotionEnd() == 0) {
@@ -1040,12 +1040,12 @@ static void r11c_selectRoute()
             CamCtrl.CutCall(7);
             r11c_openGate(0x34);
             if (r11c_save()->flags & 0x40000000) {
-                W->closeGate = SceExec(0x12, (TaskFunc) r11c_closeGate, 0x33, 0, SCE_PRIO_DEF_2, 0);
+                W->closeGate = SceExec(0x12, (TaskFunc) r11c_closeGate, (void*) 0x33, 0, SCE_PRIO_DEF_2, 0);
             }
             while (CamCtrl.IsMotionEnd() == 0) {
                 SceSleep(1);
             }
-            SceExec(0x12, (TaskFunc) r11c_moveLever2, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r11c_moveLever2, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
             SceSetEventCancel(0, 0, 0, -1, 1);
             r11c_selectRoute_end(1);
             return;
@@ -1069,7 +1069,7 @@ static void r11c_operator()
 }
 
 // The three bonfires (room archive 0x1F/0x20, motion 0x21).
-extern "C" void setFire()
+void setFire()
 {
     {
         Vec pos = {112339.0f, -522.0f, -61101.0f};
@@ -1116,7 +1116,7 @@ extern "C" void setFire()
 }
 
 // Destroy the three bonfire objects (the s20 event replaces them).
-extern "C" void deleteFire()
+void deleteFire()
 {
     ObjMgr.destroy(W->fire[0]);
     ObjMgr.destroy(W->fire[1]);
@@ -1124,7 +1124,7 @@ extern "C" void deleteFire()
 }
 
 // Event r11cs00 handler: the cabin etc models, the scroll object 0x3F handed to the event.
-extern "C" void Evt_R11CS00_Func(Event* e)
+void Evt_R11CS00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec ang = {0.0f, 0.0f, 0.0f};
@@ -1146,7 +1146,7 @@ extern "C" void Evt_R11CS00_Func(Event* e)
                 EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
                 EffectEspgenDelete(0x2001, ESP_CORE_KIND_ROOM01, 0);
                 EffectEfmDelete(0x2001, ESP_CORE_KIND_ROOM01, 0);
-                EstSet(0, -1, 0, 0, EFF_ROOM, 0xD, 0x2001, ESP_CORE_KIND_ROOM01, (void*) frame, (void*) frame);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 0xD, 0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
                 o = SmdGetObjPtr(0x3F);
                 if (o) {
                     e->SetMod("scr0000", o, 5, 0, 2, 0);
@@ -1172,14 +1172,14 @@ extern "C" void Evt_R11CS00_Func(Event* e)
         }
         break;
     case 2: {
-        SmdWork* w;
+        cSmdWork* w;
 
         SmdSetTrans(0x3F, 1);
         w = SmdGetWorkPtr(0x3F);
         o = SmdGetObjPtr(0x3F);
         if (o && w) {
-            o->setPos(&w->pos);
-            o->setAng(&w->rot);
+            o->setPos(&w->Pos);
+            o->setAng(&w->Ang);
         }
         setRoomEtcDisp(0, 1, 1);
         setRoomEtcDisp(0x16, 1, 1);
@@ -1191,7 +1191,7 @@ extern "C" void Evt_R11CS00_Func(Event* e)
 }
 
 // Event r11cs10 handler: the ladders and the door.
-extern "C" void Evt_R11CS10_Func(Event* e)
+void Evt_R11CS10_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0: {
@@ -1234,7 +1234,7 @@ static inline void r11c_evtEsp(Event* e, u8 no)
 }
 
 // Event r11cs20 handler: the door, the render texture on the two players, the water effects.
-extern "C" void Evt_R11CS20_Func(Event* e)
+void Evt_R11CS20_Func(Event* e, u32)
 {
     // Function scope: the address-taken `door` of a case block is kept until the switch ends, so
     // a second block-local `door` would get its own slot.

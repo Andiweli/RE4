@@ -131,14 +131,12 @@ public:
 
 extern cSofdec Sofdec;
 
-extern "C" {
-void ADXM_ExecMain();
+extern "C" void ADXM_ExecMain();   // CRI library
 void SofdecInit();
 void UsrSfcnt2time(int sf, int ncnt, int* hh, int* mm, int* ss, int* ff);
 void disp_info(AP_OBJ* app);
 void setTevPrm(int mapY, int mapUV);
 void restoreTevPrm();
 void ap_mwply_err_func(void* obj, const char* errmsg);
-}
 
 #endif

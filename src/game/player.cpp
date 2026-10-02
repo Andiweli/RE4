@@ -26,7 +26,6 @@
 #include "read.h"
 #include "shape.h"
 
-extern "C" {
 int fanceWidthCheck(cPlayer* pl);
 void fanceAdjust(cPlayer* pl);
 int fallCheck(cPlayer* pl);
@@ -54,7 +53,6 @@ void pl_R1_Fance(cPlayer* pl);
 void pl_R1_Fall(cPlayer* pl);
 void pl_R0_Dijection(cPlayer* pl);
 void pl_R1_BoatDrive(cPlayer* pl);
-}
 void Pl_R0_Damage(cPlayer* pl);   // game/pl_dmg.cpp
 void Pl_R0_Die(cPlayer* pl);
 
@@ -255,7 +253,7 @@ void cPlayer::init1()
     YarareAdd(this, &m_Yarare[1], 0.0f, 0.0f, 0.0f, 120.0f, 80.0f, 5, YAT_FLAG_ON);
     YarareAdd(this, &m_Yarare[2], -20.0f, -300.0f, 0.0f, 170.0f, 300.0f, 0x13, YAT_FLAG_ON);
     YarareAdd(this, &m_Yarare[3], 20.0f, -300.0f, 0.0f, 170.0f, 300.0f, 0x17, YAT_FLAG_ON);
-    MOTION(this)->flip = pl00_mirror;
+    this->pXFlip = pl00_mirror;
     m_BbtnCnt = 0;
     invisible_factor = 1.0f;
     m_Flag = 0;
@@ -965,7 +963,7 @@ void pl_R1_Crouch(cPlayer* pEm)
             pEm->ang.y += cPlayer::SPEED_WALK_TURN;
             pEm->pList->ang.y -= cPlayer::SPEED_WALK_TURN;
         }
-        MotionGetSpeed(pEm, MOTION(pEm), 0, &spd, &rot);
+        MotionGetSpeed(pEm, &pEm->Motion, 0, &spd, &rot);
         pEm->pList->ang.y += rot.y;
         if (pEm->motionMove()) {
             pEm->motionSet(PL_ARC_PTR(pG->pPlayer, 0x5B), 3, 0, 5, 0);
@@ -982,7 +980,7 @@ void pl_R1_Crouch(cPlayer* pEm)
             pEm->ang.y += cPlayer::SPEED_WALK_TURN;
             pEm->pList->ang.y -= cPlayer::SPEED_WALK_TURN;
         }
-        MotionGetSpeed(pEm, MOTION(pEm), 0, &spd, &rot);
+        MotionGetSpeed(pEm, &pEm->Motion, 0, &spd, &rot);
         pEm->pList->ang.y += rot.y;
         if (pEm->motionMove()) {
             pEm->motionSet(PL_ARC_PTR(pG->pPlayer, 0x5B), 3, 0, 5, 0);
@@ -993,7 +991,7 @@ void pl_R1_Crouch(cPlayer* pEm)
     case 0x14:
         pEm->motionMove();
         pEm->pList->ang.y *= 0.5f;
-        if (MotionCheckCrossFrame(MOTION(pEm), endFrame)) {
+        if (MotionCheckCrossFrame(&pEm->Motion, endFrame)) {
             pEm->pList->ang.y = 0.0f;
             pEm->setRno(0, 0, 2, 0);
         }
@@ -1019,7 +1017,7 @@ void pl_R1_JumpFall(cPlayer* pEm)
     pEm->stat.off(cPlayer::F_LANDING).off(cPlayer::F_FALLING);
     switch (pEm->r_no_2) {
     case 0:
-        MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x5E), PL_ARC_PTR(pG->pPlayer, 0x60), 3, 0x201, 0);
+        MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x5E), PL_ARC_PTR(pG->pPlayer, 0x60), 3, 0x201, 0);
         pEm->Neck->clear();
         pEm->atari.off();
         pEm->Shd_color = 0xFF;
@@ -1034,7 +1032,7 @@ void pl_R1_JumpFall(cPlayer* pEm)
         }
         if (pEm->Motion.Seq_frame >= 7.0f) {
             if (fallCheck(pEm)) {
-                MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x5F), PL_ARC_PTR(pG->pPlayer, 0x61), 3, 0x201, 0);
+                MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x5F), PL_ARC_PTR(pG->pPlayer, 0x61), 3, 0x201, 0);
                 pEm->dmg.clear();
                 pEm->atari.on();
                 pEm->r_no_2 = 2;
@@ -1061,7 +1059,7 @@ void pl_R1_Whistle(cPlayer* pEm)
         pEm->Neck->clear();
         pEm->r_no_2 = 1;
     case 1:
-        if (MotionCheckCrossFrame(MOTION(pEm), 20.0f)) {
+        if (MotionCheckCrossFrame(&pEm->Motion, 20.0f)) {
             SndCall(1, 0xE, &pEm->pList->world, 0, 0, 0);
             StaFlagOn(pG, STA_PL_FIRE);
         }
@@ -1099,7 +1097,7 @@ void pl_R1_LevelUp(cPlayer* pEm)
             m0 = pEm->m_MotTbl2[8];
             m1 = pEm->m_MotTbl2[9];
         }
-        MotionSetCore(pEm, MOTION(pEm), m0, m1, 6, 5, 0);
+        MotionSetCore(pEm, &pEm->Motion, m0, m1, 6, 5, 0);
         pEm->Neck->clear();
         PSVECScale(&pEm->m_ActNorm, &pos, 400.0f);
         PSVECAdd(&pos, &pEm->m_ActCross, &pos);
@@ -1107,7 +1105,7 @@ void pl_R1_LevelUp(cPlayer* pEm)
         rot.x = 0.0f;
         rot.y = pEm->m_Fwork0;
         rot.z = 0.0f;
-        pEm->MotBase->set((cMotModel*) (cModel*) pEm, &pos, &rot, 10);
+        pEm->MotBase->set(pEm, &pos, &rot, 10);
         pEm->r_no_2 = 1;
     }
     case 1:
@@ -1131,7 +1129,7 @@ void pl_R1_LevelDown(cPlayer* pEm)
     case 0:
         pEm->stat.off(cPlayer::F_SHADOW);
         pEm->atari.off();
-        MotionSetCore(pEm, MOTION(pEm), pEm->m_MotTbl2[10], pEm->m_MotTbl2[11], 6, 5, 0);
+        MotionSetCore(pEm, &pEm->Motion, pEm->m_MotTbl2[10], pEm->m_MotTbl2[11], 6, 5, 0);
         pEm->Neck->clear();
         PSVECScale(&pEm->m_ActNorm, &pos, 400.0f);
         PSVECAdd(&pos, &pEm->m_ActCross, &pos);
@@ -1139,7 +1137,7 @@ void pl_R1_LevelDown(cPlayer* pEm)
         rot.x = 0.0f;
         rot.y = pEm->m_Fwork0;
         rot.z = 0.0f;
-        pEm->MotBase->set((cMotModel*) (cModel*) pEm, &pos, &rot, 10);
+        pEm->MotBase->set(pEm, &pos, &rot, 10);
         pEm->r_no_2 = 1;
     case 1:
         if (pEm->motionMove()) {
@@ -1161,7 +1159,7 @@ void pl_R1_ObjPush(cPlayer* pEm)
     switch (pEm->r_no_2) {
     case 0:
         CamCtrl.startPushObject();
-        MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x20), 0, 6, 5, 0);
+        MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x20), 0, 6, 5, 0);
         pEm->Neck->clear();
         pEm->m_Work0 = 0;
         pEm->r_no_2 = 1;
@@ -1179,7 +1177,7 @@ void pl_R1_ObjPush(cPlayer* pEm)
         break;
     case 0x14:
         pEm->Push->pushTargetInit(0);
-        MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x21), 0, 0, 5, 0);
+        MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x21), 0, 0, 5, 0);
         SndCall(6, 0x55, &pEm->getPartsPtr(0)->world, 0, 0, 0);
         pEm->m_Work0 = 0;
         pEm->r_no_2 = 0x15;
@@ -1192,7 +1190,7 @@ void pl_R1_ObjPush(cPlayer* pEm)
             SndCall(6, 0x55, &pEm->getPartsPtr(0)->world, 0, 0, 0);
         }
         if (pEm->Push->pushTarget()) {
-            MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x31), 0, 3, 5, 0);
+            MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x31), 0, 3, 5, 0);
             pEm->r_no_2 = 0x16;
         }
         break;
@@ -1205,13 +1203,13 @@ void pl_R1_ObjPush(cPlayer* pEm)
     case 0x28:
         CamCtrl.endPushObject();
         pEm->stat.off(cPlayer::F_OBJPUSH);
-        MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x22), 0, 5, 5, 0);
+        MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x22), 0, 5, 5, 0);
         pEm->setRno(0, 0, 2, 0);
         break;
     case 0x32:
         CamCtrl.endPushObject();
         pEm->stat.off(cPlayer::F_OBJPUSH);
-        MotionSetCore(pEm, MOTION(pEm), pEm->m_MotTbl[0], 0, 0xF, 5, 0);
+        MotionSetCore(pEm, &pEm->Motion, pEm->m_MotTbl[0], 0, 0xF, 5, 0);
         pEm->setRno(0, 0, 2, 0);
         break;
     }
@@ -1231,13 +1229,13 @@ void pl_R1_Fance(cPlayer* pEm)
         pEm->atari.offSca();
         pEm->atari.setPriority(PRI_LV2);
         if (pG->pl_type == 1 || pG->pl_type == 2 || pG->pl_type == 4) {
-            MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x53), PL_ARC_PTR(pG->pPlayer, 0x54), 3, 5, 0);
+            MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x53), PL_ARC_PTR(pG->pPlayer, 0x54), 3, 5, 0);
         } else if (pEm->r_no_3 & 4) {
-            MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x55), PL_ARC_PTR(pG->pPlayer, 0x56), 3, 5, 0);
+            MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x55), PL_ARC_PTR(pG->pPlayer, 0x56), 3, 5, 0);
         } else if ((pEm->r_no_3 & 2) || fanceWidthCheck(pEm)) {
-            MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x53), PL_ARC_PTR(pG->pPlayer, 0x54), 3, 5, 0);
+            MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x53), PL_ARC_PTR(pG->pPlayer, 0x54), 3, 5, 0);
         } else {
-            MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x55), PL_ARC_PTR(pG->pPlayer, 0x56), 3, 5, 0);
+            MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x55), PL_ARC_PTR(pG->pPlayer, 0x56), 3, 5, 0);
         }
         pEm->Neck->clear();
         if (PlFanceFlag & 1) {
@@ -1256,7 +1254,7 @@ void pl_R1_Fance(cPlayer* pEm)
             rot.y = pEm->m_Fwork0;
             rot.z = 0.0f;
         }
-        pEm->MotBase->set((cMotModel*) (cModel*) pEm, &pos, &rot, 10);
+        pEm->MotBase->set(pEm, &pos, &rot, 10);
         PlFanceFlag = 0;
         pEm->r_no_2 = 1;
     case 1:
@@ -1403,7 +1401,7 @@ void pl_R1_Fall(cPlayer* pEm)
     }
     switch (pEm->r_no_2) {
     case 0:
-        MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x2D), PL_ARC_PTR(pG->pPlayer, 0x2E), 3, 5, 0);
+        MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x2D), PL_ARC_PTR(pG->pPlayer, 0x2E), 3, 5, 0);
         pEm->atari.off();
         pEm->Neck->clear();
         pEm->atari.setPriority(PRI_LV2);
@@ -1418,7 +1416,7 @@ void pl_R1_Fall(cPlayer* pEm)
         rot.x = 0.0f;
         rot.y = pEm->m_Fwork0;
         rot.z = 0.0f;
-        pEm->MotBase->set((cMotModel*) (cModel*) pEm, &pos, &rot, 10);
+        pEm->MotBase->set(pEm, &pos, &rot, 10);
         pEm->r_no_2 = 3;
     case 3:
         if (pEm->Motion.Seq_frame <= adjustFrame) {
@@ -1463,7 +1461,7 @@ void pl_R1_Fall(cPlayer* pEm)
                 EstSet(pEm, -1, 0, 0, EFF_PL00, ChkWaterEffectEnable(&pEm->pos) ? 0x12 : 0x11, 0, ESP_CORE_KIND_NONE, pEm, 0);
             }
             pEm->pos.y = SatMgr.getFloor(&pEm->pos, 0, 600.0f, 100000.0f, 0);
-            MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x2F), PL_ARC_PTR(pG->pPlayer, 0x30), 0, 5, 0);
+            MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x2F), PL_ARC_PTR(pG->pPlayer, 0x30), 0, 5, 0);
             pEm->motionMove();
             pEm->r_no_2 = 4;
             pEm->stat.on(cPlayer::F_SHADOW);
@@ -1487,10 +1485,10 @@ void pl_R0_Dijection(cPlayer* pEm)
     if (pEm->r_no_1 == 0) {
         pEm->endCamera();
         pEm->Body->setKnife(false);
-        MotionSetCore(pEm, MOTION(pEm), PL_ARC_PTR(pG->pPlayer, 0x57), PL_ARC_PTR(pG->pPlayer, 0x58), 3, 1, 0);
+        MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x57), PL_ARC_PTR(pG->pPlayer, 0x58), 3, 1, 0);
         pEm->r_no_1 = 1;
     }
-    if (MotionCheckCrossFrame(MOTION(pEm), 60.0f)) {
+    if (MotionCheckCrossFrame(&pEm->Motion, 60.0f)) {
         SndCall(1, 0x45, &pEm->pList->world, 0, 0, 0);
     }
     pEm->motionMove();

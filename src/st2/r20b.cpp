@@ -50,7 +50,7 @@ struct R20bWork {
     TexRenderMng* tex2;   // 0x0E4
     u8 tbl0[0x80];        // 0x0E8
     u8 tbl1[0x80];        // 0x168
-    TexRenderCam cam;     // 0x1E8
+    TexRenderEvtCamStruct cam;     // 0x1E8
     u8 pad_4EC[0x7F0 - 0x4EC];
     void* tpl9300;        // 0x7F0  original texture palette of evm9300
     u32 str;              // 0x7F4  SndStrReq handle of the entry camera
@@ -82,7 +82,7 @@ static void R20bDoorEventMain();
 static void R20bDoorEventEnd();
 static void setTexRender();
 static void R20bEventS00();
-extern "C" void Evt_R20BS00_Func(Event* e);
+void Evt_R20BS00_Func(Event* e, u32);
 void EvtTexRenderCamTrans(Event* e, int cut);
 
 // Room init for the great hall. Until the s00 event has played, the room is pre-loaded with its
@@ -93,7 +93,6 @@ void R20bInit()
     cEmDoor* door1;
     cEmDoor* door;
     cModel* item;
-    int zero;
 
 #line 60 "D:/Bio4/Prog/r20b.cpp"
     r20b_work = (R20bWork*) MEM_CALLOC(sizeof(R20bWork), 1, 0xd);
@@ -141,12 +140,11 @@ void R20bInit()
         SceAtSetEnable(5, 0);
         SmdSetTrans(0x8F, 0);
     }
-    SceSetItemEvent(0x12, 0x86, 0xD, 6, OpenBoxTreasure, OpenedBoxTreasure, 0x86, 0);
-    zero = 0;
-    SceSetItemEvent(0x13, 0x89, 0xE, 9, OpenBoxTreasure, OpenedBoxTreasure, 0x89, 0);
-    SceSetItemEvent(0x14, 0x84, 0xF, 8, OpenBoxTreasure, OpenedBoxTreasure, 0x84, 0);
-    SceSetItemEvent(0x15, 0x87, 0x10, 7, OpenBoxTreasure, OpenedBoxTreasure, 0x87, 0);
-    SceSetItemEvent(0x18, 0x8D, 0x13, 0xB, OpenBoxTreasure, OpenedBoxTreasure, 0x8D, 0);
+    SceSetItemEvent(0x12, 0x86, 0xD, 6, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x86, 0);
+    SceSetItemEvent(0x13, 0x89, 0xE, 9, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x89, 0);
+    SceSetItemEvent(0x14, 0x84, 0xF, 8, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x84, 0);
+    SceSetItemEvent(0x15, 0x87, 0x10, 7, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x87, 0);
+    SceSetItemEvent(0x18, 0x8D, 0x13, 0xB, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x8D, 0);
     if (RsfCheck(G_ROOM_ID, 17) == 0) {
         SceAtDataSet_exec(0x16, SCE_LEVEL10, 0, (TaskFunc) R20bOpenTerm, 0, 1);
     }
@@ -154,7 +152,7 @@ void R20bInit()
         SceExec(0x12, (TaskFunc) R20bStartCameraMain, 0, 0, SCE_PRIO_DEF_2, 0);
     }
     if (!StaFlagChk(pG, STA_SUB_ASHLEY)) {
-        r20b_work->cnt = zero;
+        r20b_work->cnt = 0;
         SceExec(0x12, (TaskFunc) R20bEmSetMain, 0, 0, SCE_PRIO_DEF_2, 0);
         SceExec(0x12, (TaskFunc) SceBgmCheck, 0, 0, SCE_PRIO_DEF_2, 0);
     }
@@ -163,7 +161,7 @@ void R20bInit()
     TexRenderInit(&r20b_work->tex2, 0xE0, 2);
     SmdSetTrans(0xA1, 0);
     SetSstAddAreaFlag(0x800);
-    r20b_work->str = zero;
+    r20b_work->str = 0;
 }
 
 // Per frame: switch between the upper and lower floor object sets (Room_flg[0] bit 31) from the
@@ -695,7 +693,7 @@ static void R20bEventS00()
 // cuts after 0x21 (and back), the evm9300 palette per cut, feeds the two render-to-texture passes on
 // cuts 0x21 / 0x24 (TexRenderModSet on the stand-in models, released after), and sets the event models'
 // flags per cut; the end restores the palettes.
-extern "C" void Evt_R20BS00_Func(Event* e)
+void Evt_R20BS00_Func(Event* e, u32)
 {
     void* mod;
     void* bin;

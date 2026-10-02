@@ -5,6 +5,7 @@
 // compiled by ProDG/GCC; shares the dolphin/gx/GXStruct.h guard so both can coexist.
 
 #include "types.h"
+#include <dolphin/vi/vitypes.h>
 
 #ifndef _DOLPHIN_GX_GXSTRUCT_H_
 #define _DOLPHIN_GX_GXSTRUCT_H_
@@ -30,7 +31,7 @@ typedef struct {
 } GXLightObj;  // 0x40
 
 typedef struct {
-    int viTVmode;               // 0x00
+    VITVMode viTVmode;          // 0x00
     u16 fbWidth;                // 0x04
     u16 efbHeight;              // 0x06
     u16 xfbHeight;              // 0x08
@@ -38,7 +39,7 @@ typedef struct {
     u16 viYOrigin;              // 0x0C
     u16 viWidth;                // 0x0E
     u16 viHeight;               // 0x10
-    int xFBmode;                // 0x14
+    VIXFBMode xFBmode;          // 0x14
     u8 field_rendering;         // 0x18
     u8 aa;                      // 0x19
     u8 sample_pattern[12][2];   // 0x1A

@@ -10,24 +10,19 @@
 
 class Event;
 class cLightTool;
-struct DbSctrlWork;
+struct _DB_SCTRL;
+typedef struct _DB_SCTRL DB_SCTRL;
 
-// One Hermite curve of the fog / focus data (64 keys), as game/event.cpp has it.
-struct EvtCurve {
-    s32 num;
-    HermiteKey key[64];
+struct DatFog {
+    HERMITE_1_FIX ScurveStart;    // 0x000
+    HERMITE_1_FIX ScurveEnd;      // 0x404
 };
 
-struct EvtFogData {
-    EvtCurve start;    // 0x000
-    EvtCurve end;      // 0x404
-};
-
-struct EvtFocusData {
-    EvtCurve near_;    // 0x000
-    EvtCurve far_;     // 0x404
-    f32 nearLevel;     // 0x808
-    f32 farLevel;      // 0x80C
+struct DatFocus {
+    HERMITE_1_FIX ScurveNear;    // 0x000
+    HERMITE_1_FIX ScurveFar;     // 0x404
+    f32 LevelNear;     // 0x808
+    f32 LevelFar;      // 0x80C
 };
 
 // Message list of the event (the tool's work, 0x964 bytes inside a 1,000,000-byte block): the
@@ -110,9 +105,9 @@ private:
     cLightTool* pTl;  // 0x98
     JOY* pJoy1;           // 0x9C  &Joy[0] (&Joy[2] while a sub tool runs)
     JOY* pJoy2;           // 0xA0  &Joy[1] (&Joy[3])
-    EvtFogData DatFogWk;       // 0xA4
-    EvtFocusData DatFocusWk;   // 0x8AC
-    DbSctrlWork* PDatDbSctrl;  // 0x10BC  (1,000,000 bytes)
+    DatFog DatFogWk;       // 0xA4
+    DatFocus DatFocusWk;   // 0x8AC
+    DB_SCTRL* PDatDbSctrl;  // 0x10BC  (1,000,000 bytes)
 public:
     u32 x10C0[8];         // 0x10C0
     u8 pad_10E0[0x28];
@@ -157,7 +152,7 @@ private:
     void SubToolMessInit(ToolEvt* t, int sw);
     void SubToolMessMove(ToolEvt* t, Event* ev);
     void SubToolIn(ToolEvt* t, int sw, int bit);
-    void SctrlToolInit(ToolEvt* t, Hermite1* curve, f32 xMax, f32 yMax);
+    void SctrlToolInit(ToolEvt* t, HERMITE_1_PTR* curve, f32 xMax, f32 yMax);
 };
 
 void ToolEvent();

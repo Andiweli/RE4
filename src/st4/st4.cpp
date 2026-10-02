@@ -50,8 +50,8 @@ void R411Main();
 // Store one room's Init/Main pair into the DOL's St4_data_tbl (index = room number & 0xFF).
 void set(int no, void (*init)(), void (*main)())
 {
-    St4_data_tbl[no].init = init;
-    St4_data_tbl[no].main = main;
+    St4_data_tbl[no].pInit = init;
+    St4_data_tbl[no].pMain = main;
 }
 
 // Fill the stage table with every room this module compiles (missing indices are rooms that do not exist).

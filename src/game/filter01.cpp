@@ -28,11 +28,9 @@ LensEffectWork g_LeLit;
 
 static const f32 level_tbl1[11] = { 0.0f, 0.6f, 1.5f, 2.6f, 1.5f, 1.6f, 1.6f, 2.5f, 2.6f, 4.5f, 6.6f };
 
-extern "C" {
 void Filter01Render(LensEffectWork* w);
-void Filter01SetParam(int mode, int z, u8 type, f32 level);
-void Filter01SetParam_CamZ(int mode, u8 type, f32 level, f32 camz);
-}
+void Filter01SetParam(int mode, f32 level, int z, u8 type);
+void Filter01SetParam_CamZ(int mode, f32 level, f32 camz, u8 type);
 
 // Boot: focus off in the light environment and both near/far works.
 void Filter01Init()
@@ -315,12 +313,12 @@ static void Filter01SetParam_ScrZ(int mode, u8 type, f32 level, f32 z)
     static f32 Zoffset = 1.0f;
 
     z = (1.0f - z) * Zscale + Zoffset;
-    Filter01SetParam(mode, (u32) (z * 65535.0f), type, level);
+    Filter01SetParam(mode, level, (u32) (z * 65535.0f), type);
 }
 
 // Sets a focus from a camera-space distance (units): converts through the projection to the 16-bit
 // screen Z. Used by the event focus curves.
-void Filter01SetParam_CamZ(int mode, u8 type, f32 level, f32 camz)
+void Filter01SetParam_CamZ(int mode, f32 level, f32 camz, u8 type)
 {
     static f32 Zscale = 1.0f;
     static f32 Zoffset = 1.0f;
@@ -333,12 +331,12 @@ void Filter01SetParam_CamZ(int mode, u8 type, f32 level, f32 camz)
     camz = -camz;
     inv = 1.0f / (ZFAR - ZNEAR);
     zv = (-(ZFAR * ZNEAR) * inv + (-ZNEAR * inv) * camz) * Zscale;
-    Filter01SetParam(mode, (u32) (((1.0f / -camz) * zv + Zoffset) * 65535.0f), type, level);
+    Filter01SetParam(mode, level, (u32) (((1.0f / -camz) * zv + Zoffset) * 65535.0f), type);
 }
 
 // Requests this frame's near (mode 0) or far (mode 1) blur at screen depth z (0..65535) with the
 // given type and level.
-void Filter01SetParam(int mode, int z, u8 type, f32 level)
+void Filter01SetParam(int mode, f32 level, int z, u8 type)
 {
     if (mode == 0) {
         g_LeNear.on = 1;

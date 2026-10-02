@@ -5,12 +5,14 @@
 #include "vec.h"
 
 // Position/target/roll/fov set that the camera system interpolates and copies around
-// (0x20 bytes; the compiler copies it with a 0x18-stride loop + 8 bytes).
-struct CameraParam {
-    Vec pos;   // 0x00
-    Vec at;    // 0x0C
-    f32 roll;  // 0x18
-    f32 fovy;  // 0x1C
+// (0x20 bytes here; the compiler copies it with a 0x18-stride loop + 8 bytes). PS2's own,
+// unrelated CAMERA_POINT (game/cam_qfps.h's struct is really PS2's QFPS_OFFSET) uses the
+// 16-byte SIMD Point3d for Campos/Target, so its copy of this struct is 0x30 bytes there.
+struct CAMERA_POINT {
+    Vec Campos; // 0x00
+    Vec Target; // 0x0C
+    f32 Roll;   // 0x18
+    f32 Fovy;   // 0x1C
 };
 
 // Camera state block used by camera.cpp / cam_sys.cpp (0xF8 bytes). Only the fields the
@@ -20,7 +22,7 @@ struct CAMERA {
     Mtx v_mat;        // 0x30 look-at matrix (C_MTXLookAt)
     u8 pad_60[4];
     Mtx44 ProjMat;      // 0x64 projection matrix
-    CameraParam param;  // 0xA4 (pos 0xA4, at 0xB0, roll 0xBC, fovy 0xC0)
+    CAMERA_POINT param;  // 0xA4 (Campos 0xA4, Target 0xB0, Roll 0xBC, Fovy 0xC0)
     Vec Up;             // 0xC4 up vector (C_MTXLookAt)
     Vec Look;            // 0xD0 pos - at, normalised (matrix column 2)
     Vec Right;          // 0xDC up x dir (matrix column 0)
@@ -28,7 +30,6 @@ struct CAMERA {
     f32 Distance;           // 0xF4 |pos - at| (db_cam keeps it current for the debug camera)
 };
 
-extern "C" {
 // game/cam_sys.cpp
 void CameraSetOrientationUp(CAMERA* pCam);
 void CameraSetOrientationRoll(CAMERA* pCam);
@@ -46,12 +47,11 @@ int CameraGetProjection();
 void CameraGameInit();
 void CameraRoomInit();
 void CameraMove();
-struct ViewFrustum* CameraViewFrustumPtr(CAMERA* cam);
+struct GEOM_HEXAHEDRON* CameraViewFrustumPtr(CAMERA* cam);
 void CameraGetUpVec(CAMERA* pCam, Vec* up);
 void CameraGetLookVec(CAMERA* pCam, Vec* look);
 void CameraGetLookVecInverse(CAMERA* pCam, Vec* look_inv);
 void CamPos2ScrnVec(f32 sX, f32 sY, Vec* vec);
-}
 // game/camera.cpp (C++ linkage): loads the current projection matrix into GX
 void CameraCurrentProjection();
 extern int ProjType;   // current projection type (db_cam.cpp toggles it)

@@ -37,7 +37,6 @@ extern OtMirrorWork g_OtMirrirWk[2];
 extern f32 OT_MUL;
 extern int g_NowExecOtType;
 
-extern "C" {
 void InitOt();
 void ClearOt();
 void clearOtWork(OtWork* w);
@@ -73,6 +72,5 @@ int ExecOt(int type);
 u16 OtGetPrevKind();
 void CrearOtMirrorWork();
 void DeleteOtData(u32 type, u32 no);
-}
 
 #endif

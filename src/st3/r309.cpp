@@ -74,14 +74,14 @@ void R309Init()
         }
     } else {
         if (r309_emDead(0x34) == 0) {
-            SceExec(0x12, (TaskFunc) r309_setEffOnEm, 0x34, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) r309_setEffOnEm, (void*) 0x34, 0, 2, 0);
         } else {
             EmListSetAlive(0x34, 0);
         }
     }
     SceExec(0x12, (TaskFunc) r309_checkBgm, 0, 0, 2, 0);
     SceSetItemEvent(2, 0x81, 0, 4, r309_openShelf, r309_openedShelf, 0, 0);
-    SceSetItemEvent(4, 0x85, 3, 5, r309_openShelf, r309_openedShelf, 1, 0);
+    SceSetItemEvent(4, 0x85, 3, 5, r309_openShelf, r309_openedShelf, (void*) 1, 0);
     if (RsfCheck(G_ROOM_ID, 4) == 0) {
         SceExec(0x12, (TaskFunc) r309_checkBgmTblRewrite, 0, 0, 2, 0);
     }
@@ -122,7 +122,7 @@ static void r309_execEmAppear_end()
     if (r309_work->em.isAlive() == 0) {
         r309_work->em.setEm(0x34, -1, 1, 1, 1);
         r309_work->em.setFlag(1);
-        SceExec(0x12, (TaskFunc) r309_setEffOnEm, 0x34, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) r309_setEffOnEm, (void*) 0x34, 0, 2, 0);
     } else {
         r309_work->em.setNoSuspend(0);
     }
@@ -155,7 +155,7 @@ static void r309_execEmAppear()
     r309_work->em.setEm(0x34, -1, 1, 1, 1);
     r309_work->em.setFlag(1);
     r309_work->em.setNoSuspend(1);
-    SceExec(0x12, (TaskFunc) r309_setEffOnEm, 0x34, 0, 2, 0);
+    SceExec(0x12, (TaskFunc) r309_setEffOnEm, (void*) 0x34, 0, 2, 0);
     while (CamCtrl.IsMotionEnd() == 0) {
         SceSleep(1);
     }

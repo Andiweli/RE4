@@ -11,9 +11,7 @@
 #include "global.h"
 #include "motion.h"
 
-extern "C" {
 void objYagura_R0_Set(cObjYagura* obj);
-}
 
 void (*ObjYagura_R0_move_tbl[1])(cObjYagura*) = { objYagura_R0_Set };
 

@@ -56,7 +56,7 @@ static void r203_TreasureBoxOpened(int id);
 static void r203_ShelfOpen();
 static void r203_ShelfOpened();
 static void r203_StreamCheck();
-extern "C" void Evt_R203S00_Func(Event* e);
+void Evt_R203S00_Func(Event* e, u32);
 
 // Room init: the Ganado set depends on whether the key item was taken, and without it area 0x8A
 // starts the key pickup wave and the key-carrier's escape. Until Room_flg bit 3, area 3 is the
@@ -77,10 +77,10 @@ void R203Init()
             SceExec(0x12, (TaskFunc) r203_GanadoWandering, 0, 0, SCE_PRIO_DEF_2, 0);
         }
         if (r203_work->em[1].setEm(0x35, 2, 0, 1, 0) == 1) {
-            SceExec(0x12, (TaskFunc) r203_GanadoWandering, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r203_GanadoWandering, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         }
         if (r203_work->em[2].setEm(0x36, 2, 0, 1, 0) == 1) {
-            SceExec(0x12, (TaskFunc) r203_GanadoWandering, 2, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r203_GanadoWandering, (void*) 2, 0, SCE_PRIO_DEF_2, 0);
         }
     } else {
         u32 i;
@@ -107,7 +107,7 @@ void R203Init()
         EvtMgr.SetFunc("evt_r203s00_func", (void*) Evt_R203S00_Func);
     }
     SceExec(0x12, (TaskFunc) r203_StreamCheck, 0, 0, SCE_PRIO_DEF_2, 0);
-    SceSetItemEvent(7, 0x8A, 4, 3, r203_TreasureBoxOpen, r203_TreasureBoxOpened, 0x17, 0);
+    SceSetItemEvent(7, 0x8A, 4, 3, r203_TreasureBoxOpen, r203_TreasureBoxOpened, (void*) 0x17, 0);
     SceSetItemEvent(8, 0x88, 6, 4, (void (*)(int)) r203_ShelfOpen, (void (*)(int)) r203_ShelfOpened, 0, 0);
 }
 
@@ -231,18 +231,18 @@ static void r203_EventMeetAgain()
     Vec pos = {-27823.0f, 4155.0f, -7863.0f};
     Vec ang;
     Vec* pa = &ang;
-    ReadModule* m;
+    MODULE_DAT* m;
 
     RsfSet(G_ROOM_ID, 3);
     m = SearchEmModule(0x11);
     SceEventStart(0);
     if (r203_work->data->waitLoadOk() == 1) {
-        MemorySwap(m->pArc, (u32) r203_work->data->getAddr(), r203_work->data->getSize());
-        EvtMgr.SetEvt(m->pArc, 0);
+        MemorySwap(m->pData, r203_work->data->getAddr(), r203_work->data->getSize());
+        EvtMgr.SetEvt(m->pData, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r203_work->data->getAddr(), r203_work->data->getSize());
+        MemorySwap(m->pData, r203_work->data->getAddr(), r203_work->data->getSize());
         r203_work->data->setCommand(CMND_DEL_DATA, 0, 0);
     }
     {
@@ -344,7 +344,7 @@ static void r203_StreamCheck()
 }
 
 // Event r203s00 callback: light mask 2 on the pl0400 model on its first frame.
-extern "C" void Evt_R203S00_Func(Event* e)
+void Evt_R203S00_Func(Event* e, u32)
 {
     if (e->GetFuncType() == 1 && e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
         void* mod;

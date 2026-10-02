@@ -49,7 +49,7 @@ CameraAttachedToMotion::~CameraAttachedToMotion()
 // from the model's frame into the world; rebuilds the orientation with roll.
 void CameraAttachedToMotion::move()
 {
-    ATTACH_CAMERA* ac = MOTION(m_pModel)->pAttachCam;
+    ATTACH_CAMERA* ac = m_pModel->Motion.pAttachCam;
     Vec hit;
     Vec nrm;
     Vec pos;
@@ -63,35 +63,35 @@ void CameraAttachedToMotion::move()
         return;
     }
     if (ac->parts[0] != 0xFF) {
-        param.pos = ac->camera_data[0];
-        PSMTXMultVec(*ac->p_mat, &param.pos, &param.pos);
+        param.Campos = ac->camera_data[0];
+        PSMTXMultVec(*ac->p_mat, &param.Campos, &param.Campos);
     }
     if (ac->parts[1] != 0xFF) {
-        param.at = ac->camera_data[1];
-        PSMTXMultVec(*ac->p_mat, &param.at, &param.at);
+        param.Target = ac->camera_data[1];
+        PSMTXMultVec(*ac->p_mat, &param.Target, &param.Target);
     }
     if (ac->parts[2] != 0xFF) {
-        param.roll = ac->camera_data[2].y;
+        param.Roll = ac->camera_data[2].y;
     }
     if (ac->parts[3] != 0xFF) {
-        param.fovy = ac->camera_data[3].y * 180.0f / PI;
+        param.Fovy = ac->camera_data[3].y * 180.0f / PI;
     }
-    if (!(MOTION(m_pModel)->Mot_attr & 0x200)) {
+    if (!(m_pModel->Motion.Mot_attr & 0x200)) {
         PSMTXInverse(m_pModel->mat, inv);
-        PSMTXMultVec(inv, &param.pos, &pos);
-        PSMTXMultVec(inv, &param.at, &at);
+        PSMTXMultVec(inv, &param.Campos, &pos);
+        PSMTXMultVec(inv, &param.Target, &at);
         // Frame order hit, nrm, pos, at, d, inv, to, from; the model-space test is at.z > 0 && pos.z < 0
         // and the hit check runs from the transformed `at` copy to the `pos` copy.
         if (at.z > 0.0f && pos.z < 0.0f) {
             PSVECSubtract(&at, &pos, &d);
             PSVECScale(&d, &d, -pos.z / d.z);
             PSVECAdd(&pos, &d, &to);
-            PSMTXMultVec(m_pModel->mat, &to, &param.at);
+            PSMTXMultVec(m_pModel->mat, &to, &param.Target);
         }
-        to = param.at;
-        from = param.pos;
+        to = param.Target;
+        from = param.Campos;
         if (cameraHitCheck(&hit, &nrm, &to, &from)) {
-            param.pos = hit;
+            param.Campos = hit;
         }
     }
     CameraSetOrientationRoll(this);
@@ -167,7 +167,7 @@ void FocusAnimation::move(int anim_flag)
         } else {
             cnt = m_counter;
         }
-        Filter01SetParam(1, 100, 1, level_max * (f32) cnt / m_focus_frame);
+        Filter01SetParam(1, level_max * (f32) cnt / m_focus_frame, 100, 1);
         filter0a_mask_alpha = 0;
     }
 }
@@ -253,15 +253,15 @@ CameraScope::CameraScope(Vec* pos, Vec* at)
         break;
     }
     f32 zero = 0.0f;
-    param.fovy = 45.0f;
+    param.Fovy = 45.0f;
     angle_min = -70.0f * 3.1415927f / 180.0f;
     angle_max = 70.0f * 3.1415927f / 180.0f;
-    param.roll = zero;
-    m_zoom_ratio = zero;
-    angle_x = zero;
-    m_rnd.x = zero;
-    m_rnd.y = zero;
-    m_rnd.z = zero;
+    param.Roll = 0.0f;
+    m_zoom_ratio = 0.0f;
+    angle_x = 0.0f;
+    m_rnd.x = 0.0f;
+    m_rnd.y = 0.0f;
+    m_rnd.z = 0.0f;
     m_id.init(&type);
     m_focus.init(0x9A);
 }
@@ -335,7 +335,7 @@ void CameraScope::move()
     Vec ofs;
     Vec yure2;
 
-    param.fovy = 45.0f;
+    param.Fovy = 45.0f;
     if (Key.on & 0x10) { // low word bit 4 (the target masks the low half of the u64)
         f32 sy = (f32) Joy[0].substickY;
         if (sy != 0.0f) {
@@ -354,7 +354,7 @@ void CameraScope::move()
             limit = ZOOM_LIMIT_1;
             break;
         }
-        param.fovy = m_zoom_ratio * (limit - param.fovy) + param.fovy;
+        param.Fovy = m_zoom_ratio * (limit - param.Fovy) + param.Fovy;
     }
     gain = m_zoom_ratio * -0.9f + 1.0f;
     if (Key.on & 0x10) {
@@ -418,8 +418,8 @@ void CameraScope::move()
         cModel* pl = pPL; // held in r30 across the four calls, `&pl->worldMat` in r29
         pl->matCalc();
     }
-    PSMTXMultVec(pPL->mat, &pos_ofs, &param.pos);
-    PSMTXMultVec(pPL->mat, &ofs, &param.at);
+    PSMTXMultVec(pPL->mat, &pos_ofs, &param.Campos);
+    PSMTXMultVec(pPL->mat, &ofs, &param.Target);
     CameraSetOrientationZeroRoll(this);
     m_id.move(&m_zoom_ratio);
     if (old_zoom != m_zoom_ratio) {
@@ -440,13 +440,13 @@ void IdScope::init(void* type)
     IdTexDataLoad(WEP_ARC_PTR(4), TEX_OWNER_ID_SCOPE);
     switch (t) {
     case 0:
-        IdSys.set(WEP_ARC_PTR(5), 0xFF, IDC_SCOPE, 0x13, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) WEP_ARC_PTR(5), 0xFF, IDC_SCOPE, 0x13, 6, 0);
         break;
     case 1:
-        IdSys.set(WEP_ARC_PTR(6), 0xFF, IDC_SCOPE, 0x13, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) WEP_ARC_PTR(6), 0xFF, IDC_SCOPE, 0x13, 6, 0);
         break;
     case 2:
-        IdSys.set(WEP_ARC_PTR(7), 0xFF, IDC_SCOPE, 0x13, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) WEP_ARC_PTR(7), 0xFF, IDC_SCOPE, 0x13, 6, 0);
         break;
     }
 }
@@ -522,7 +522,7 @@ void IdScope::quit(void*)
 
 // Frame order c 0x8, up 0x18, inv 0x28 (declaration order); the else arm keeps the getPartsPtr
 // results in cModel* locals and writes this->up through a `Vec* u`. OPEN (17 words): the else arm's
-// gcse copies of `&param.pos`/`&param.at` (`addi r30,r31,164; addi r29,r31,176; mr r26; mr r25`) sit
+// gcse copies of `&param.Campos`/`&param.Target` (`addi r30,r31,164; addi r29,r31,176; mr r26; mr r25`) sit
 // before the first getPartsPtr call in the target and after the second one in ours.
 CameraBinocular::CameraBinocular(Vec* pos, Vec* at, void* a, void* b)
 {
@@ -534,8 +534,8 @@ CameraBinocular::CameraBinocular(Vec* pos, Vec* at, void* a, void* b)
     id_b = b;
     if (pos && at) {
         m_flag = 0;
-        param.pos = *pos;
-        param.at = *at;
+        param.Campos = *pos;
+        param.Target = *at;
         this->Up.x = 0.0f;
         this->Up.y = 1.0f;
         this->Up.z = 0.0f;
@@ -550,8 +550,8 @@ CameraBinocular::CameraBinocular(Vec* pos, Vec* at, void* a, void* b)
         up.x = pPL->mat[0][2];
         up.y = pPL->mat[1][2];
         up.z = pPL->mat[2][2];
-        param.pos = c;
-        PSVECAdd(&c, &up, &param.at);
+        param.Campos = c;
+        PSVECAdd(&c, &up, &param.Target);
         {
             cPlayer* pl = pPL;
             Vec* u = &this->Up;
@@ -561,12 +561,12 @@ CameraBinocular::CameraBinocular(Vec* pos, Vec* at, void* a, void* b)
             u->z = pl->mat[2][1];
         }
     }
-    param.fovy = 45.0f;
+    param.Fovy = 45.0f;
     CameraSetOrientationUp(this);
     if (m_flag != 0) {
         PSMTXInverse(pPL->mat, inv);
-        PSMTXMultVec(inv, &param.pos, &m_campos);
-        PSMTXMultVec(inv, &param.at, &m_target);
+        PSMTXMultVec(inv, &param.Campos, &m_campos);
+        PSMTXMultVec(inv, &param.Target, &m_target);
         PSMTXMultVecSR(inv, &this->Up, &m_up_vec);
     }
     // Store order pinned by the dying-store rule (the last use of each constant is issued first).
@@ -612,12 +612,12 @@ void CameraBinocular::move()
     f32 ang;
 
     if (m_flag != 0) {
-        param.pos = m_campos;
-        param.at = m_target;
+        param.Campos = m_campos;
+        param.Target = m_target;
         Up = m_up_vec;
         CameraSetOrientationUp(this);
     }
-    param.fovy = 45.0f;
+    param.Fovy = 45.0f;
     {
         f32 sy = (f32) Joy[0].substickY;
         if (sy != 0.0f) {
@@ -629,7 +629,7 @@ void CameraBinocular::move()
         f32 zoom = (m_zoom_ratio < 0.0f) ? 0.0f : (m_zoom_ratio > 1.0f) ? 1.0f : m_zoom_ratio;
         m_zoom_ratio = zoom;
         if (zoom != 0.0f) {
-            param.fovy = zoom * (zoom_limit - param.fovy) + param.fovy;
+            param.Fovy = zoom * (zoom_limit - param.Fovy) + param.Fovy;
         }
     }
     gain = m_zoom_ratio * -0.9f + 1.0f;
@@ -648,7 +648,7 @@ void CameraBinocular::move()
         } else if (ang + add > m_rad_up.y) {
             add = m_rad_up.y - ang;
         }
-        CameraRotAxisPosRad(this, &axis, &param.pos, add);
+        CameraRotAxisPosRad(this, &axis, &param.Campos, add);
         m_rad.y = m_rad.y + add;
     }
     if (Joy[0].stickY != 0 || (Joy[0].on & 0xC)) {
@@ -672,11 +672,11 @@ void CameraBinocular::move()
         m_rad.x = m_rad.x + add;
     }
     if (m_flag != 0) {
-        m_campos = param.pos;
-        m_target = param.at;
+        m_campos = param.Campos;
+        m_target = param.Target;
         m_up_vec = Up;
-        PSMTXMultVec(pPL->mat, &m_campos, &param.pos);
-        PSMTXMultVec(pPL->mat, &m_target, &param.at);
+        PSMTXMultVec(pPL->mat, &m_campos, &param.Campos);
+        PSMTXMultVec(pPL->mat, &m_target, &param.Target);
         PSMTXMultVecSR(pPL->mat, &m_up_vec, &Up);
     }
     CameraSetOrientationUp(this); // unconditional: mode 0 jumps to it
@@ -703,7 +703,7 @@ void IdBinocular::init(CAMERA* cam, void* a, void* b)
     SpfFlagOn(pG, SPF_ACTBTN);
     IdTexRelease(TEX_OWNER_ID_COCKPIT);
     IdTexDataLoad(a, TEX_OWNER_ID_COCKPIT);
-    IdSys.set(b, 0xFF, IDC_BINOCULAR, 0x13, 5, 0);
+    IdSys.set((ID_FILE_HEADER*) b, 0xFF, IDC_BINOCULAR, 0x13, 5, 0);
     m_pos0_L = IdSys.unitPtr(1, IDC_BINOCULAR)->pos0;
     m_pos0_C = IdSys.unitPtr(2, IDC_BINOCULAR)->pos0;
     m_pos0_R = IdSys.unitPtr(3, IDC_BINOCULAR)->pos0;
@@ -711,7 +711,7 @@ void IdBinocular::init(CAMERA* cam, void* a, void* b)
         IdSys.unitPtr(0x30, IDC_BINOCULAR)->be_flag &= ~8;
         IdSys.unitPtr(0x1B, IDC_BINOCULAR)->be_flag &= ~8;
     }
-    m_fovy_old = cam->param.fovy;
+    m_fovy_old = cam->param.Fovy;
     u = IdSys.unitPtr(0x35, IDC_BINOCULAR);
     m_meter_pos0 = u->pos0;
     m_meter_h0 = u->size_H;
@@ -843,7 +843,7 @@ void IdBinocular::move(void* p)
         f32 t0[2] = {1.0f, 16.0f};
         f32 t1[2] = {45.0f, 3.0f};
         int d;
-        dist = (int) ((t0[1] - t0[0]) * (cam->param.fovy - t1[0]) / (t1[1] - t1[0]) + t0[0]);
+        dist = (int) ((t0[1] - t0[0]) * (cam->param.Fovy - t1[0]) / (t1[1] - t1[0]) + t0[0]);
         d = dist * 10;
         for (i = 0; i < 4; i++) {
             digit[i] = d % 10;
@@ -875,12 +875,12 @@ void IdBinocular::move(void* p)
     }
     IdSys.unitPtr(0x1C, IDC_BINOCULAR)->be_flag &= ~8;
     IdSys.unitPtr(0x1D, IDC_BINOCULAR)->be_flag &= ~8;
-    if (cam->param.fovy > m_fovy_old) {
+    if (cam->param.Fovy > m_fovy_old) {
         IdSys.unitPtr(0x1D, IDC_BINOCULAR)->be_flag |= 8;
-    } else if (cam->param.fovy < m_fovy_old) {
+    } else if (cam->param.Fovy < m_fovy_old) {
         IdSys.unitPtr(0x1C, IDC_BINOCULAR)->be_flag |= 8;
     }
-    m_fovy_old = cam->param.fovy;
+    m_fovy_old = cam->param.Fovy;
 }
 
 // Removes the binocular HUD ids (unit 0x24), releases the pause stop flag and the mask texture.
@@ -986,19 +986,19 @@ void CameraPushObject::move()
     ofs[7] = default_ofs[7];
     PSMTXMultVec(inv, (Vec*) &ofs[0], (Vec*) &ofs[0]);
     PSMTXMultVec(inv, (Vec*) &ofs[3], (Vec*) &ofs[3]);
-    param.pos = *(Vec*) &ofs[0];
-    param.at = *(Vec*) &ofs[3];
-    param.roll = ofs[6];
-    param.fovy = ofs[7];
+    param.Campos = *(Vec*) &ofs[0];
+    param.Target = *(Vec*) &ofs[3];
+    param.Roll = ofs[6];
+    param.Fovy = ofs[7];
     {
         Vec hit;
         Vec nrm;
         Vec from;
         Vec to;
-        from = param.at;
-        to = param.pos;
+        from = param.Target;
+        to = param.Campos;
         if (cameraHitCheck(&hit, &nrm, &from, &to)) {
-            param.pos = hit;
+            param.Campos = hit;
         }
     }
 }
@@ -1019,14 +1019,14 @@ CameraLookAt::CameraLookAt(CAMERA* cam)
     } else {
         m_target_parts = pPL->getPartsPtr(2);
     }
-    param.pos = cam->param.pos;
-    param.at = cam->param.at;
-    param.roll = cam->param.roll;
-    param.fovy = cam->param.fovy;
-    from = param.at;
-    to = param.pos;
+    param.Campos = cam->param.Campos;
+    param.Target = cam->param.Target;
+    param.Roll = cam->param.Roll;
+    param.Fovy = cam->param.Fovy;
+    from = param.Target;
+    to = param.Campos;
     if (cameraHitCheck(&hit, &nrm, &from, &to)) {
-        param.pos = hit;
+        param.Campos = hit;
     }
 }
 
@@ -1045,11 +1045,11 @@ void CameraLookAt::move()
     Vec from;
     Vec to;
 
-    param.at = m_target_parts->world;
-    from = param.at;
-    to = param.pos;
+    param.Target = m_target_parts->world;
+    from = param.Target;
+    to = param.Campos;
     if (cameraHitCheck(&hit, &nrm, &from, &to)) {
-        param.pos = hit;
+        param.Campos = hit;
     }
 }
 
@@ -1060,10 +1060,10 @@ void CameraLookAt::move()
 CameraLookDownEm::CameraLookDownEm(void* e, Vec* pos)
 {
     m_target_parts = ((cModel*) e)->getPartsPtr(2);
-    param.pos = *pos;
-    param.at = m_target_parts->world;
-    param.roll = 0.0f;
-    param.fovy = 45.0f;
+    param.Campos = *pos;
+    param.Target = m_target_parts->world;
+    param.Roll = 0.0f;
+    param.Fovy = 45.0f;
 }
 
 // Poisons the object.

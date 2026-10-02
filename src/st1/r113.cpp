@@ -36,7 +36,7 @@ struct R113Work {
 };
 
 // r103's cesspit table (r103_initCesspit)
-struct R113Cesspit {
+typedef struct _DATA_WORK {
     u32 cover;
     u32 lid;
     int itemAt;
@@ -44,20 +44,20 @@ struct R113Cesspit {
     int at10;
     int at14;
     int at18;
-};
+} DATA_WORK;
 
-struct R113Shelf {
+typedef struct _SHELF_SMD {
     u8 door[2];
-};
+} SHELF_SMD;
 
 static R113Work* r113_work;
 
 // The original's .data is 8-aligned (r105 has the same).
 asm(".section .data; .balign 8");
-static R113Cesspit r113_cesspit = {0x52, 0x53, 0x81, 0x9F, 6, 5, 7};
-static R113Shelf r113_shelf0 = {{0x57, 0x58}};
-static R113Shelf r113_shelf1 = {{0x59, 0x5A}};
-static R113Shelf r113_shelf2 = {{0x5B, 0x5C}};
+static DATA_WORK r113_cesspit = {0x52, 0x53, 0x81, 0x9F, 6, 5, 7};
+static SHELF_SMD r113_shelf0 = {{0x57, 0x58}};
+static SHELF_SMD r113_shelf1 = {{0x59, 0x5A}};
+static SHELF_SMD r113_shelf2 = {{0x5B, 0x5C}};
 
 // Hit effects of attribute type 4
 static const AtEffInfo r113_eff_info = {
@@ -65,10 +65,10 @@ static const AtEffInfo r113_eff_info = {
 };
 
 // r103.cpp (the same module)
-extern "C" void r103_initCesspit(R113Cesspit* c);
-extern "C" void r103_setSubMissionTarget(u32 objNo);
-extern "C" void r103_openedShelf(R113Shelf* s);
-extern "C" void r103_openShelf(R113Shelf* s);
+void r103_initCesspit(DATA_WORK* c);
+void r103_setSubMissionTarget(u32 objNo);
+void r103_openedShelf(SHELF_SMD* s);
+void r103_openShelf(SHELF_SMD* s);
 
 static void r113_getFile();
 static void r113_execHide(int mode);
@@ -84,29 +84,28 @@ static void r113_ThunderMove();
 void R113Init()
 {
     cEmRack* rack;
-    void* zero = 0;
 
 #line 73 "D:/Bio4/Prog/r113.cpp"
     r113_work = (R113Work*) MEM_CALLOC(sizeof(R113Work), 1, 0xd);
 
     SceExec(0x12, (TaskFunc) r113_ThunderMove, 0, 0, SCE_PRIO_DEF_2, 0);
-    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 4, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 3, 0x800, ESP_CORE_KIND_NONE, zero, zero);
+    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 4, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 3, 0x800, ESP_CORE_KIND_NONE, 0, 0);
     StaFlagOn(pG, STA_ROOM_RAIN);
     SceAtDataSet_exec(2, SCE_LEVEL10, 0, (TaskFunc) r113_DoorCheck, 0, 1);
     if (!KyfFlagChk(pG, KYF_R113_TO_R11C_DOOR) && StaFlagChk(pG, STA_SUB_ASHLEY)) {
         SceAtDataSet_exec(3, SCE_LEVEL10, 0, (TaskFunc) r113_checkAshleyPos, 0, 1);
     }
     EatMgr.registEffInfo(EAT_ET_ROOM0, (AtEffInfo*) &r113_eff_info);
-    SceExec(0x12, (TaskFunc) r103_initCesspit, (int) &r113_cesspit, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r103_initCesspit, &r113_cesspit, 0, SCE_PRIO_DEF_2, 0);
     r103_setSubMissionTarget(8);
     if (getRoomEtcRack(6, &rack, 1)) {
         rack->setRange(0.0f, 3000.0f, 0.0f, 3000.0f);
     }
-    SceSetItemEvent(8, 0x8E, 0, 0xA, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r113_shelf0, 0);
-    SceSetItemEvent(9, 0x8F, 1, 0xB, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r113_shelf1, 0);
-    SceSetItemEvent(0xA, 0x8B, 2, 9, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r113_shelf2, 0);
+    SceSetItemEvent(8, 0x8E, 0, 0xA, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, &r113_shelf0, 0);
+    SceSetItemEvent(9, 0x8F, 1, 0xB, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, &r113_shelf1, 0);
+    SceSetItemEvent(0xA, 0x8B, 2, 9, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, &r113_shelf2, 0);
     SceAtDataSet_hide(4, r113_execHide);
     FlrAtSetDefVal(0, 0, 3);
     if (!ItfFlagChk(pG, ITF_R103_FILE)) {

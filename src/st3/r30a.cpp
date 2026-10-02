@@ -34,14 +34,14 @@ struct R30aWork {
 static R30aWork* r30a_work;
 
 // game/EtcModel.cpp (Bio4.sym marks it local; the room imports it): break-object display on/off.
-extern "C" int setRoomEtcBreakDisp(int no, int on, int flag);
+int setRoomEtcBreakDisp(int no, int on, int flag);
 
 static void r30a_setElvCamera(u32 mode);
 static void r30a_moveElevator(u32 dir);
 void r30a_initElevator();
 static void r30a_execEvent10();
 static void R30aEventS00();
-extern "C" void Evt_R30AS00_Func(Event* e);
+void Evt_R30AS00_Func(Event* e, u32);
 
 // Room init: the s00 (and s98) callback. In the escape phase (Scenario_flg[1] 0x800, consumed here):
 // BGM table 3 off and the s00 escape event once (Room_flg bit 0). Otherwise area 3 = the s10 event once
@@ -120,7 +120,7 @@ static void r30a_moveElevator(u32 dir)
             obj->pModelInfo->uvScrollU = -0.05f;
         }
     }
-    SceExec(0x12, (TaskFunc) r30a_setElvCamera, dir, 0, 2, 0);
+    SceExec(0x12, (TaskFunc) r30a_setElvCamera, (void*) dir, 0, 2, 0);
     {
         cPlayer* pl = pPL;
         cSceObj* elv = &r30a_work->elv;
@@ -256,7 +256,7 @@ static void R30aEventS00()
 }
 
 // Events r30as00 / r30as98: the light follows the player model, the fades and the hidden enemy part.
-extern "C" void Evt_R30AS00_Func(Event* e)
+void Evt_R30AS00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:

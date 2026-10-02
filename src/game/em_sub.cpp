@@ -31,7 +31,7 @@
 
 // Entry `n` of a target list written index first: the sum is formed with the index as the base
 // register (`add r9, r9, r31` / `stwx r29, r9, r31`) instead of the pointer.
-#define WEP_LIST(n) ((WepTarget*) ((n) * sizeof(WepTarget) + (u32) list))
+#define WEP_LIST(n) ((TARGET_WK*) ((n) * sizeof(TARGET_WK) + (u32) list))
 
 // Position offset by the trolley / bulldozer movement (adjust_add_set / VehicleAdjust).
 static Vec adjust_add = {0.0f, 0.0f, 0.0f};
@@ -928,7 +928,7 @@ int emLinePolyCrossCk(Vec* pPos, Vec* pPos2, Vec* pRect, Vec* pCross)
 
 // Hit boxes of `em` touched by the sphere (pos, r): the one best facing the pos2 -> pos direction
 // (or the nearest when pos2 is at pos); rad = squared distance centre -> pos.
-YARARE_INFO* emSphereAtCk(cEm* em, Vec* pos, Vec* pos2, f32 r, int flag, f32 r2)
+YARARE_INFO* emSphereAtCk(cEm* em, Vec* pos, Vec* pos2, f32 r, f32 r2, int flag)
 {
     Vec pTop;
     Vec pBtm;
@@ -1066,7 +1066,7 @@ YARARE_INFO* emSphereAtCk(cEm* em, Vec* pos, Vec* pos2, f32 r, int flag, f32 r2)
 }
 
 // Enemies hit by the melee box: up to `max` entries, the farthest replaced when the list is full.
-u32 GetWepTargetList(Vec* box, Vec* pos, WepTarget* list, u32 max, int flag)
+u32 GetWepTargetList(Vec* box, Vec* pos, TARGET_WK* list, u32 max, int flag)
 {
     u32 cnt = 0;
     u32 i;
@@ -1075,7 +1075,7 @@ u32 GetWepTargetList(Vec* box, Vec* pos, WepTarget* list, u32 max, int flag)
     cEm* em;
     YARARE_INFO* part;
     YARARE_INFO* q;
-    WepTarget* wp;
+    TARGET_WK* wp;
     f32 wr;
 
     i = 0;
@@ -1106,17 +1106,17 @@ u32 GetWepTargetList(Vec* box, Vec* pos, WepTarget* list, u32 max, int flag)
         }
         part->flag &= ~0x4000;
         if (cnt < max) {
-            WEP_LIST(cnt)->part = part;
-            WEP_LIST(cnt)->em = em;
+            WEP_LIST(cnt)->pAt = part;
+            WEP_LIST(cnt)->pEm = em;
             cnt++;
             continue;
         }
         worst = 0;
-        wr = WEP_LIST(0)->part->len;
+        wr = WEP_LIST(0)->pAt->len;
         for (j = 1; j < max; j++) {
-            q = WEP_LIST(j)->part;
+            q = WEP_LIST(j)->pAt;
             if (q->c_dis <= 250000.0f) {
-                if (WEP_LIST(worst)->part->c_dis > 250000.0f) {
+                if (WEP_LIST(worst)->pAt->c_dis > 250000.0f) {
                     continue;
                 }
                 if (q->len < wr) {
@@ -1125,7 +1125,7 @@ u32 GetWepTargetList(Vec* box, Vec* pos, WepTarget* list, u32 max, int flag)
                 wr = q->len;
                 worst = j;
             } else {
-                if (WEP_LIST(worst)->part->c_dis <= 250000.0f && WEP_LIST(worst)->part->c_dis > q->c_dis) {
+                if (WEP_LIST(worst)->pAt->c_dis <= 250000.0f && WEP_LIST(worst)->pAt->c_dis > q->c_dis) {
                     continue;
                 }
                 wr = q->len;
@@ -1137,23 +1137,23 @@ u32 GetWepTargetList(Vec* box, Vec* pos, WepTarget* list, u32 max, int flag)
         // copy from the first `slwi` survives as `mr r10,r0` (the first `slwi` is block-local and
         // local-alloc gives it r0, which the `stwx` index cannot use).
         wp = WEP_LIST(worst);
-        if (wp->part->c_dis <= 250000.0f) {
+        if (wp->pAt->c_dis <= 250000.0f) {
             if (part->c_dis > 250000.0f) {
                 continue;
             }
-            if (wp->part->len < part->len) {
+            if (wp->pAt->len < part->len) {
                 continue;
             }
-            wp->part = part;
-            WEP_LIST(worst)->em = em;
+            wp->pAt = part;
+            WEP_LIST(worst)->pEm = em;
         } else {
             if (part->c_dis <= 250000.0f) {
-                if (wp->part->c_dis < part->c_dis) {
+                if (wp->pAt->c_dis < part->c_dis) {
                     continue;
                 }
             }
-            wp->part = part;
-            WEP_LIST(worst)->em = em;
+            wp->pAt = part;
+            WEP_LIST(worst)->pEm = em;
         }
         } while (++i < EmMgr.getArrayNum());
     }
@@ -1163,7 +1163,7 @@ u32 GetWepTargetList(Vec* box, Vec* pos, WepTarget* list, u32 max, int flag)
 // Enemies crossed by the shot line p0-p1 (stopped at the scenario hit), nearest first; the
 // hit-only 0x41/0x4E enemies are added last. Returns the count; `hit` / `nrm` / `attr` receive the
 // scenario hit (nrm zero when an enemy was hit).
-u32 GetWepTargetList2(Vec* p0, Vec* p1, WepTarget* list, u32 max, Vec* hit, Vec* nrm, u32* attr, int type,
+u32 GetWepTargetList2(Vec* p0, Vec* p1, TARGET_WK* list, u32 max, Vec* hit, Vec* nrm, u32* attr, int type,
                       int flag)
 {
     Mtx m;
@@ -1350,39 +1350,39 @@ u32 GetWepTargetList2(Vec* p0, Vec* p1, WepTarget* list, u32 max, Vec* hit, Vec*
             }
         }
         if ((int) cnt < (int) max) {
-            list[cnt].part = part;
-            list[cnt].em = em;
+            list[cnt].pAt = part;
+            list[cnt].pEm = em;
             cnt++;
             continue;
         }
         worst = 0;
         for (j = 1; j < (int) max; j++) {
-            if (list[worst].part->len <= list[j].part->len) {
+            if (list[worst].pAt->len <= list[j].pAt->len) {
                 worst = j;
             }
         }
-        if (list[worst].part->len > part->len) {
-            list[worst].part = part;
-            list[worst].em = em;
+        if (list[worst].pAt->len > part->len) {
+            list[worst].pAt = part;
+            list[worst].pEm = em;
         }
         } while (++i < (int) EmMgr.getArrayNum());
     }
     for (i = 0; i < (int) cnt - 1; i++) {
         for (j = i + 1; j < (int) cnt; j++) {
-            if (list[i].part->len > list[j].part->len) {
-                em = list[i].em;
-                part2 = list[i].part;
-                list[i].part = list[j].part;
-                list[i].em = list[j].em;
-                list[j].part = part2;
-                list[j].em = em;
+            if (list[i].pAt->len > list[j].pAt->len) {
+                em = list[i].pEm;
+                part2 = list[i].pAt;
+                list[i].pAt = list[j].pAt;
+                list[i].pEm = list[j].pEm;
+                list[j].pAt = part2;
+                list[j].pEm = em;
             }
         }
     }
     if (bestPart) {
         if ((int) cnt <= (int) max - 1 || cnt == 0) {
-            list[cnt].part = bestPart;
-            list[cnt].em = bestEm;
+            list[cnt].pAt = bestPart;
+            list[cnt].pEm = bestEm;
             cnt++;
         }
     }
@@ -1395,7 +1395,7 @@ u32 GetWepTargetList2(Vec* p0, Vec* p1, WepTarget* list, u32 max, Vec* hit, Vec*
 }
 
 // Enemies inside the blast sphere (pos, r), nearest first.
-int GetWepTargetListBomb(Vec* pPos, f32 radius, WepTarget* list, int num, int wep_no, int flag)
+int GetWepTargetListBomb(Vec* pPos, f32 radius, TARGET_WK* list, int num, int wep_no, int flag)
 {
     Vec center;
     Vec bottom;
@@ -1488,7 +1488,7 @@ int GetWepTargetListBomb(Vec* pPos, f32 radius, WepTarget* list, int num, int we
             }
             break;
         }
-        part = emSphereAtCk(em, pPos, pPos, rr, wep_no, r2);
+        part = emSphereAtCk(em, pPos, pPos, rr, r2, wep_no);
         if (part == 0) {
             continue;
         }
@@ -1532,32 +1532,32 @@ int GetWepTargetListBomb(Vec* pPos, f32 radius, WepTarget* list, int num, int we
             }
         }
         if (cnt < num) {
-            list[cnt].part = part;
-            list[cnt].em = em;
+            list[cnt].pAt = part;
+            list[cnt].pEm = em;
             cnt++;
             continue;
         }
         worst = 0;
         for (j = 1; j < num; j++) {
-            if (list[worst].part->len <= list[j].part->len) {
+            if (list[worst].pAt->len <= list[j].pAt->len) {
                 worst = j;
             }
         }
-        if (list[worst].part->len > part->len) {
-            list[worst].part = part;
-            list[worst].em = em;
+        if (list[worst].pAt->len > part->len) {
+            list[worst].pAt = part;
+            list[worst].pEm = em;
         }
         } while (++i < (int) EmMgr.getArrayNum());
     }
     for (i = 0; i < cnt - 1; i++) {
         for (j = i + 1; j < cnt; j++) {
-            if (list[i].part->len > list[j].part->len) {
-                em = list[i].em;
-                part2 = list[i].part;
-                list[i].part = list[j].part;
-                list[i].em = list[j].em;
-                list[j].part = part2;
-                list[j].em = em;
+            if (list[i].pAt->len > list[j].pAt->len) {
+                em = list[i].pEm;
+                part2 = list[i].pAt;
+                list[i].pAt = list[j].pAt;
+                list[i].pEm = list[j].pEm;
+                list[j].pAt = part2;
+                list[j].pEm = em;
             }
         }
     }
@@ -2055,7 +2055,7 @@ void PlSetDamage(int damage_type, int damage_val, int flag)
         p->r_no_2 = 0;
         p->r_no_3 = 0;
     } else {
-        pPL->setDamage((u8) damage_type, 0, 123.0f, 0, 0xFF);
+        pPL->setDamage((u8) damage_type, 0, 0, 0xFF, 123.0f);
     }
 }
 
@@ -2067,7 +2067,7 @@ static void EmSubDead0(f32* p)
 
 // Attack sphere of `info` at a (from b) against the player (and the partner unless noSub):
 // bit0 player hit, bit1 partner hit.
-int EmAtkHitCk(EmAtkInfo* info, Vec* pPos, Vec* pPosOld, int noSub)
+int EmAtkHitCk(ATK_INFO* info, Vec* pPos, Vec* pPosOld, int noSub)
 {
     int ret = 0;
     int hit;
@@ -2080,7 +2080,7 @@ int EmAtkHitCk(EmAtkInfo* info, Vec* pPos, Vec* pPosOld, int noSub)
         if (info->flag & 4) {
             keep = 1;
         }
-        LifeDownSet2(pPL, info->dmg, 0, keep);
+        LifeDownSet2(pPL, info->power, 0, keep);
         if (info->flag & 8) {
             pG->pl_life = 0;
         }
@@ -2100,7 +2100,7 @@ int EmAtkHitCk(EmAtkInfo* info, Vec* pPos, Vec* pPosOld, int noSub)
 
 // Attack sphere against the player: 0 = miss, else the damage motion type + 1 (front/back, and the
 // height: 4 low, 2 middle).
-int EmAtkHitCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
+int EmAtkHitCk2(ATK_INFO* pAtk, Vec* pPos, Vec* pPosOld)
 {
     Vec d;
     Vec fwd;
@@ -2110,7 +2110,7 @@ int EmAtkHitCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
     f32 dy;
 
     if (DbgFlagChk(pG, DBG_YARARE_DISP)) {
-        Draw_sphere(pPos, pAtk->range, 0xFFFF00FF, 1, 1);
+        Draw_sphere(pPos, pAtk->radius, 0xFFFF00FF, 1, 1);
     }
     if ((s16) pG->pl_life <= 0) {
         return 0;
@@ -2122,7 +2122,7 @@ int EmAtkHitCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
     if (EatMgr.hitCheck(&parts->world, pPos, 0, 0, 0, 0) != 0) {
         return 0;
     }
-    part = emSphereAtCk(pPL, pPos, pPosOld, pAtk->range, 0x18, pAtk->range);
+    part = emSphereAtCk(pPL, pPos, pPosOld, pAtk->radius, pAtk->radius, 0x18);
     if (part == 0) {
         return 0;
     }
@@ -2147,9 +2147,9 @@ int EmAtkHitCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
     return ret + 1;
 }
 
-// Line a-b against the scenario and the player's hit boxes: the hit box (as the emhit.h cEm* view),
-// with the scenario hit in `hit` / `nrm` / `attr`.
-cEm* EmAtkLineHitCk(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm, u32* pAttr)
+// Line a-b against the scenario and the player's hit boxes: the hit box, with the scenario hit in
+// `hit` / `nrm` / `attr`.
+YARARE_INFO* EmAtkLineHitCk(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm, u32* pAttr)
 {
     Mtx m;
     Vec d;
@@ -2211,7 +2211,7 @@ cEm* EmAtkLineHitCk(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm, u32* pAttr)
         return 0;
     }
     part->flag |= YAT_FLAG_DMPOS;
-    return (cEm*) part;
+    return part;
 }
 
 // EmAtkLineHitCk for the partner.
@@ -2279,7 +2279,7 @@ YARARE_INFO* EmAtkLineHitCkSub(Vec* pPos, Vec* pPos2, Vec* pCross, Vec* pNorm)
 }
 
 // Damage from a line attack that hit the player's box `part`: life loss and the damage motion.
-void EmAtkSetDamagePL(cEm* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
+void EmAtkSetDamagePL(YARARE_INFO* pAt, ATK_INFO* pAtk, Vec* pPos, Vec* pPos2)
 {
     Vec d;
     Vec fwd;
@@ -2287,7 +2287,7 @@ void EmAtkSetDamagePL(cEm* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
     int keep;
     f32 dy;
 
-    pPL->dmg.m_pDamageYarare = (YARARE_INFO*) pAt;
+    pPL->dmg.m_pDamageYarare = pAt;
     if ((pPos->x - pPos2->x) * (pPos->x - pPos2->x) + (pPos->z - pPos2->z) * (pPos->z - pPos2->z) < 10000.0f) {
         PSVECSubtract(&pPL->pos, pPos, &d);
     } else {
@@ -2308,7 +2308,7 @@ void EmAtkSetDamagePL(cEm* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
     if (pAtk->flag & 4) {
         keep = 1;
     }
-    LifeDownSet2(pPL, pAtk->dmg, 0, keep);
+    LifeDownSet2(pPL, pAtk->power, 0, keep);
     if (pAtk->flag & 8) {
         pG->pl_life = 0;
     }
@@ -2316,7 +2316,7 @@ void EmAtkSetDamagePL(cEm* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
 }
 
 // Damage from a line attack that hit the partner's box `part`.
-void EmAtkSetDamageSub(YARARE_INFO* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
+void EmAtkSetDamageSub(YARARE_INFO* pAt, ATK_INFO* pAtk, Vec* pPos, Vec* pPos2)
 {
     if (pSUB) {
         pSUB->dmg.set(0, 10, 0x18, pPos, pAt->len, pAt);
@@ -2324,13 +2324,13 @@ void EmAtkSetDamageSub(YARARE_INFO* pAt, EmAtkInfo* pAtk, Vec* pPos, Vec* pPos2)
 }
 
 // Attack sphere against the partner: the hit box or NULL.
-YARARE_INFO* EmAtkHitSubCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
+YARARE_INFO* EmAtkHitSubCk2(ATK_INFO* pAtk, Vec* pPos, Vec* pPosOld)
 {
     cParts* parts;
     YARARE_INFO* part;
 
     if (DbgFlagChk(pG, DBG_YARARE_DISP)) {
-        Draw_sphere(pPos, pAtk->range, 0xFFFF00FF, 1, 1);
+        Draw_sphere(pPos, pAtk->radius, 0xFFFF00FF, 1, 1);
     }
     if (pSUB == 0) {
         return 0;
@@ -2345,7 +2345,7 @@ YARARE_INFO* EmAtkHitSubCk2(EmAtkInfo* pAtk, Vec* pPos, Vec* pPosOld)
     if (EatMgr.hitCheck(&parts->world, pPos, 0, 0, 0, 0) != 0) {
         return 0;
     }
-    part = emSphereAtCk(pSUB, pPos, pPosOld, pAtk->range, 0x18, pAtk->range);
+    part = emSphereAtCk(pSUB, pPos, pPosOld, pAtk->radius, pAtk->radius, 0x18);
     if (part == 0) {
         return 0;
     }

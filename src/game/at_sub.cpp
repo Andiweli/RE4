@@ -265,7 +265,7 @@ void AtCubeDisp(Mtx m, Vec* pos, f32 sx, f32 sy, f32 sz, u32 color)
 // tests, then the attribute filter (flag bits 0x400..0x8000 skip polygon classes 0x40 / 0x400 /
 // 0x4000 / 0x8000 / 0x400000 / 0x800000, `mask` bits skip directly). Returns the polygon's
 // attribute word (never 0 on a hit) and the hit point in *out; 0 when missed.
-u32 At_poly_line_ck(AtPolyData* atp, Vec* cross, AtPoly* polygon, Vec* vert0, Vec* vert1, u32 flag, u32 mask)
+u32 At_poly_line_ck(cSat* atp, Vec* cross, SAT_POLY* poly, Vec* vert0, Vec* vert1, u32 flag, u32 mask)
 {
     Vec d0;
     Vec d1;
@@ -273,10 +273,10 @@ u32 At_poly_line_ck(AtPolyData* atp, Vec* cross, AtPoly* polygon, Vec* vert0, Ve
     Vec a;
     Vec b;
     Vec* vtx = atp->vtx;
-    Vec* v0 = &vtx[polygon->v[0]];
+    Vec* v0 = &vtx[poly->v[0]];
     Vec* v1;
     Vec* v2;
-    Vec* nrm = &atp->nrm[polygon->n];
+    Vec* nrm = &atp->norm_p[poly->m_Normal];
     f32 dp0;
     f32 dp1;
     f32 t;
@@ -297,21 +297,21 @@ u32 At_poly_line_ck(AtPolyData* atp, Vec* cross, AtPoly* polygon, Vec* vert0, Ve
     if (dp0 * dp1 > 0.0f) {
         return 0;
     }
-    v1 = &vtx[polygon->v[1]];
+    v1 = &vtx[poly->v[1]];
     PSVECSubtract(vert1, vert0, &a);
     PSVECSubtract(vert0, v0, &b);
-    PSVECCrossProduct(&atp->edge[polygon->e[0]], &a, &c);
+    PSVECCrossProduct(&atp->edge_p[poly->e[0]], &a, &c);
     if (PSVECDotProduct(&c, &b) < 0.0f) {
         return 0;
     }
-    v2 = &vtx[polygon->v[2]];
+    v2 = &vtx[poly->v[2]];
     PSVECSubtract(vert0, v1, &b);
-    PSVECCrossProduct(&atp->edge[polygon->e[1]], &a, &c);
+    PSVECCrossProduct(&atp->edge_p[poly->e[1]], &a, &c);
     if (PSVECDotProduct(&c, &b) < 0.0f) {
         return 0;
     }
     PSVECSubtract(vert0, v2, &b);
-    PSVECCrossProduct(&atp->edge[polygon->e[2]], &a, &c);
+    PSVECCrossProduct(&atp->edge_p[poly->e[2]], &a, &c);
     if (PSVECDotProduct(&c, &b) < 0.0f) {
         return 0;
     }
@@ -328,7 +328,7 @@ u32 At_poly_line_ck(AtPolyData* atp, Vec* cross, AtPoly* polygon, Vec* vert0, Ve
     } else if (cross) {
         *cross = *vert1;
     }
-    attr = Get_poly_attr(polygon);
+    attr = Get_poly_attr(poly);
     if (SEck == 0) {
         if ((flag & SAT_TYPE_PL) && (attr & SAT_ATTR_PL_NOHIT)) {
             return 0;
@@ -372,25 +372,25 @@ static f32 At_line_rate(f32 a, f32 b)
 }
 
 // Gathers the triangle's vertices / normal / attribute and runs At_poly_sphere_ck2.
-u32 At_poly_sphere_ck(AtPolyData* atp, AtPoly* polygon, Vec* pos0, Vec* pos1, f32 r, u32 flag, u32 mask)
+u32 At_poly_sphere_ck(cSat* atp, SAT_POLY* poly, Vec* pos0, Vec* pos1, f32 r, u32 flag, u32 mask)
 {
     Vec tri[3];
     Vec n;
     u32 attr;
 
-    tri[0].x = atp->vtx[polygon->v[0]].x;
-    tri[0].y = atp->vtx[polygon->v[0]].y;
-    tri[0].z = atp->vtx[polygon->v[0]].z;
-    tri[1].x = atp->vtx[polygon->v[1]].x;
-    tri[1].y = atp->vtx[polygon->v[1]].y;
-    tri[1].z = atp->vtx[polygon->v[1]].z;
-    tri[2].x = atp->vtx[polygon->v[2]].x;
-    tri[2].y = atp->vtx[polygon->v[2]].y;
-    tri[2].z = atp->vtx[polygon->v[2]].z;
-    n.x = atp->nrm[polygon->n].x;
-    n.y = atp->nrm[polygon->n].y;
-    n.z = atp->nrm[polygon->n].z;
-    attr = Get_poly_attr(polygon);
+    tri[0].x = atp->vtx[poly->v[0]].x;
+    tri[0].y = atp->vtx[poly->v[0]].y;
+    tri[0].z = atp->vtx[poly->v[0]].z;
+    tri[1].x = atp->vtx[poly->v[1]].x;
+    tri[1].y = atp->vtx[poly->v[1]].y;
+    tri[1].z = atp->vtx[poly->v[1]].z;
+    tri[2].x = atp->vtx[poly->v[2]].x;
+    tri[2].y = atp->vtx[poly->v[2]].y;
+    tri[2].z = atp->vtx[poly->v[2]].z;
+    n.x = atp->norm_p[poly->m_Normal].x;
+    n.y = atp->norm_p[poly->m_Normal].y;
+    n.z = atp->norm_p[poly->m_Normal].z;
+    attr = Get_poly_attr(poly);
     return At_poly_sphere_ck2(tri, &n, attr, pos0, pos1, r, flag, mask);
 }
 
@@ -531,10 +531,10 @@ static f32 At_zero_one(f64 a)
     return (f32) a;
 }
 
-// The 24-bit attribute word of a polygon (attrHi << 16 | attrLo).
-u32 Get_poly_attr(AtPoly* poly)
+// The attribute word of a polygon, read as two u16 halves (SAT_POLY::m_Status).
+u32 Get_poly_attr(SAT_POLY* poly)
 {
-    return (poly->attrHi << 16) | poly->attrLo;
+    return (((u16*) poly)[8] << 16) | ((u16*) poly)[9];
 }
 
 // 1 when `p` is inside the XZ quadrilateral rect[0..3] (edge cross products from corners 0 and 2).

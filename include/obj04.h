@@ -4,10 +4,11 @@
 #include "types.h"
 #include "vec.h"
 #include "obj.h"
+#include "esp.h"
 
 // Effect model work (game/obj04.cpp `Efm04`): a thrown/falling particle-like model.
 struct OBJ04_FREE {
-    EfmCore Eff_core;       // 0x00
+    cEffectCore Eff_core;   // 0x00
     f32 D_speed;            // 0x0C  speed *= D_speed every frame
     Vec Speed_plus;         // 0x10  added to speed every frame
     Vec Ang_plus;           // 0x1C  added to rot every frame

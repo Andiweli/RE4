@@ -80,7 +80,7 @@ void R211Init()
         }
     } else {
         SceAtDataSet_exec(5, SCE_LEVEL10, 0, (TaskFunc) r211_InspectStatue, (void*) 1, 1);
-        SceExec(0x12, (TaskFunc) r211_CheckUseCup, 1, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r211_CheckUseCup, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         if (ItemMgr.num(0x6F)) {
             pG->Room_flg[0] |= 0x40000000;
         }
@@ -99,7 +99,7 @@ void R211Init()
         setEm(0xAF, -1, 0, 1, 0);
     }
     SceSetItemEvent(7, 0x80, 3, 6, r211_ShelfOpen, r211_ShelfOpened, 0, 0);
-    SceSetItemEvent(8, 0x84, 4, 5, r211_ShelfOpen, r211_ShelfOpened, 1, 0);
+    SceSetItemEvent(8, 0x84, 4, 5, r211_ShelfOpen, r211_ShelfOpened, (void*) 1, 0);
 }
 
 // Per-frame room main: nothing.

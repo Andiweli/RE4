@@ -15,7 +15,7 @@ struct FREE_EM18 {
     YARARE_INFO hit[9];     // 0x00C (0x3EC)  extra hit boxes (YarareAdd)
     u8 pad_1E0[0x258 - 0x1E0];
     f32 Neck_dir_y;          // 0x258 (0x638)  smoothed neck yaw (em18NeckMove)
-    PlCloth Cloth;        // 0x25C (0x63C)  Em18ClothSet / Em18ClothMove
+    CLOTH_INFO Cloth;        // 0x25C (0x63C)  Em18ClothSet / Em18ClothMove
     cModelInfo* pRHand;   // 0x2BC (0x69C)  em18HandSet (ARC 0x12)
     cModelInfo* pLHand;   // 0x2C0 (0x6A0)  em18HandSet (ARC 0x13)
     cModelInfo* pCloth;   // 0x2C4 (0x6A4)  em18ClothPartsSet

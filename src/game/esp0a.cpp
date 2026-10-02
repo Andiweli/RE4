@@ -27,10 +27,8 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 void Esp0a_Trans(cEsp0a* esp);
 void Esp0a_Trans2(cEsp* esp);
-}
 
 
 // Reference read of the world parent: an unflagged MEM that stays below the stores through e.

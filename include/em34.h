@@ -28,8 +28,8 @@ struct FREE_EM34 {
     Vec Go_pos;        // 0x248 (0x628)  chosen target position (R1_Walk / R1_Atk turn to it)
     cEm* pEm;         // 0x254 (0x634)  pPL or pSUB
     f32 Neck_dir_y;          // 0x258 (0x638)  smoothed neck yaw (em34NeckMove)
-    PlCloth Cloth1;       // 0x25C (0x63C)  Em34ClothSet1 / Em37HairSet / Em33ClothSet
-    PlCloth Cloth2;       // 0x2BC (0x69C)  Em34ClothSet2 / Em37CoatSet / Em33ClothSet2
+    CLOTH_INFO Cloth1;       // 0x25C (0x63C)  Em34ClothSet1 / Em37HairSet / Em33ClothSet
+    CLOTH_INFO Cloth2;       // 0x2BC (0x69C)  Em34ClothSet2 / Em37CoatSet / Em33ClothSet2
     cModelInfo* pShoulder;   // 0x31C (0x6FC)  em34 extra models (ARC 5, 6, 7)
     cModelInfo* pHead;   // 0x320 (0x700)
     cModelInfo* pHand;   // 0x324 (0x704)

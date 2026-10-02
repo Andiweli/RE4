@@ -42,12 +42,12 @@ void tcDrawArea();
 void tcEdit_camera();
 void tcDrawOffset();
 void tcDrawRail();
-TcCdat* tcNextCdatPtr(s8 no, int dir);
-TcAdat* tcNextAdatPtr(s8 area, s8 cam, int dir);
+TC_CAMERA_DATA* tcNextCdatPtr(s8 no, int dir);
+TC_AREA_DATA* tcNextAdatPtr(s8 area, s8 cam, int dir);
 int head_suffix(s8 area);
 int tail_suffix(s8 area);
 int next_suffix(s8 cam, int dir);
-void tcCameraPullPoint(TcCdat* c);
+void tcCameraPullPoint(TC_CAMERA_DATA* c);
 void tcToolCameraMove(CAMERA* cam);
 void tcPreviewOnOff(int on);
 
@@ -58,9 +58,9 @@ const char* tcOnOff[2] = {"OFF", "ON"};
 // menu positions: {x, y} in 8 / 14 pixel units for the main menu, sub menu, edit header, ...
 int tcMenuPos[12] = {3, 2, 0x12, 0x11, 0x1C, 0x14, 0x28, 5, 0x28, 7, 0x1B, 0x12};
 u8 tcTypeTbl[64][16];
-TcAdat tcAdat[0x60];
-TcCdat tcCdat[0x40];
-TcLdat tcLdat[0x40];
+TC_AREA_DATA tcAdat[0x60];
+TC_CAMERA_DATA tcCdat[0x40];
+LERP_DATA tcLdat[0x40];
 TcWork tcWork;
 TcWork* pTc = &tcWork;
 static void (*tcRoutineTbl[6])() = {tcInit, tcMenu, tcEdit, tcLoad, tcSave, tcQuit};
@@ -87,7 +87,7 @@ void ToolCamera()
                     tcCameraDebugMove();
                 } else {
                     tcDataExport((u8*) g_pToolCamData);
-                    CamCtrl.RoomDataRead((CameraDataHeader*) g_pToolCamData);
+                    CamCtrl.RoomDataRead((u8*) g_pToolCamData);
                     CamCtrl.Check();
                     tcPlayerMove();
                     CameraMove();
@@ -138,7 +138,7 @@ void tcDataInitialize()
         tcCdat[i].enable = 0xFF;
     }
     for (i = 0x3F; i >= 0; i--) {
-        tcLdat[i].enable = 0xFF;
+        tcLdat[i].Be_flag = 0xFF;
     }
     pTc->adatNum = 0;
     pTc->cdatNum = 0;
@@ -234,7 +234,7 @@ static void tcMenu()
 // (perspective / ortho); left/right set, A applies, START/B close.
 void tcSubMenu()
 {
-    TcMenu menu[6] = {{1, "PREVIEW    :"}, {1, "LIGHT TOOL :"}, {1, "VIEW MODE  :"},
+    TC_TOOL_MENU menu[6] = {{1, "PREVIEW    :"}, {1, "LIGHT TOOL :"}, {1, "VIEW MODE  :"},
                       {1, "AREA DETAIL:"}, {1, "BATTLE CAM :"}, {1, "PROJECTION :"}};
     int x = tcMenuPos[2];
     int y = tcMenuPos[3];
@@ -367,7 +367,7 @@ static void tcEdit()
     case 1:
         if (TC_ON & 0x10) {
             if (w->editSel == 1) {
-                TcCdat* c = tcCdatPtr(w->cdatNo);
+                TC_CAMERA_DATA* c = tcCdatPtr(w->cdatNo);
                 if (TC_REP & 0x1) {
                     c = tcNextCdatPtr(pTc->cdatNo, -1);
                 }
@@ -407,7 +407,7 @@ static void tcEdit()
             if (pTc->editSel == 1 && (s8) pTc->viewMode == 0) {
                 static s8 lastCam = 0;
                 if (lastCam != pTc->cdatNo) {
-                    TcAdat* a;
+                    TC_AREA_DATA* a;
                     int no;
                     s8 n;
                     lastCam = pTc->cdatNo;
@@ -444,7 +444,7 @@ static void tcEdit()
 // link editor (selMode 2) and the camera attribute editor (selMode 3)
 void tcEdit_select()
 {
-    TcMenu menu[3] = {{1, "FLAG"}, {1, "COPY"}, {1, "DELETE"}};
+    TC_TOOL_MENU menu[3] = {{1, "FLAG"}, {1, "COPY"}, {1, "DELETE"}};
     static s8 cursor = 0;   // column: 0 camera, 1 attribute, 2 link, 3.. area suffix
     static s8 no = 0;       // row: camera / area number
     static s8 blink = 8;
@@ -466,8 +466,8 @@ void tcEdit_select()
     s8 j;
     s8 dst;
     s8 dstSfx;
-    TcCdat* c;
-    TcAdat* a;
+    TC_CAMERA_DATA* c;
+    TC_AREA_DATA* a;
 
     if (keyMode != 0) {
         if (TC_REP & 0x8) {
@@ -681,15 +681,15 @@ void tcEdit_select()
             if (TC_TRG & 0x100) {
                 if (sel == 0) {
                     if (dst != pTc->cdatNo) {
-                        TcCdat* src = tcCdatPtr(pTc->cdatNo);
-                        TcCdat* n = tcCdatNew();
+                        TC_CAMERA_DATA* src = tcCdatPtr(pTc->cdatNo);
+                        TC_CAMERA_DATA* n = tcCdatNew();
                         *n = *src;
                         n->cam_no = dstNo;
                     }
                 } else if (sel == 1) {
                     if (dst != pTc->adatNo || dstSfx != pTc->adatSuffix) {
-                        TcAdat* src = tcAdatPtr(pTc->adatNo, pTc->adatSuffix);
-                        TcAdat* n = tcAdatNew();
+                        TC_AREA_DATA* src = tcAdatPtr(pTc->adatNo, pTc->adatSuffix);
+                        TC_AREA_DATA* n = tcAdatNew();
                         if (pTc->adatTypeNum[dst] != 0) {
                             tcTypeTbl[dst][0] = 3;
                         }
@@ -750,14 +750,14 @@ void tcEdit_select()
                 break;
             }
             if (TC_REP & 0x1) {
-                pTc->pLdat->frame--;
+                pTc->pLdat->InterFrame--;
             }
             if (TC_REP & 0x2) {
-                pTc->pLdat->frame++;
+                pTc->pLdat->InterFrame++;
             }
-            pTc->pLdat->frame = pTc->pLdat->frame < 0 ? 0 : (pTc->pLdat->frame > 0x708 ? 0x708 : pTc->pLdat->frame);
+            pTc->pLdat->InterFrame = pTc->pLdat->InterFrame < 0 ? 0 : (pTc->pLdat->InterFrame > 0x708 ? 0x708 : pTc->pLdat->InterFrame);
             if (TC_TRG & 0x100) {
-                if (pTc->pLdat->frame == 0) {
+                if (pTc->pLdat->InterFrame == 0) {
                     tcLdatDel(pTc->pLdat);
                 }
                 pTc->selMode = 0;
@@ -772,12 +772,12 @@ void tcEdit_select()
         eprintf(x * 8, y * 14, 0, 0, "%02d-%1d", pTc->adatNo, pTc->adatSuffix);
         x += 6;
         for (i = 0; i < 0x40; i++) {
-            if (tcLdat[i].enable != 0xFF) {
-                TcLdat* l = &tcLdat[i];
-                if (pTc->adatNo == l->area_from) {
-                    if (pTc->adatSuffix == l->cam_from) {
-                        eprintf(x * 8, y * 14, 0, 0, "%02d-%1d", l->area_to, l->cam_to, tcLdat[i].frame);
-                        eprintf((x + 7) * 8, y * 14, 0, 0, "%3d", tcLdat[i].frame);
+            if (tcLdat[i].Be_flag != 0xFF) {
+                LERP_DATA* l = &tcLdat[i];
+                if (pTc->adatNo == l->SrcNo) {
+                    if (pTc->adatSuffix == l->SrcSuffix) {
+                        eprintf(x * 8, y * 14, 0, 0, "%02d-%1d", l->DstNo, l->DstSuffix, tcLdat[i].InterFrame);
+                        eprintf((x + 7) * 8, y * 14, 0, 0, "%3d", tcLdat[i].InterFrame);
                         if (pTc->pLdat == l) {
                             if (pTc->selStep == 0) {
                                 eprintf((x - 1) * 8, y * 14, 0, 0, ">");
@@ -855,7 +855,7 @@ void tcEdit_select()
     x++;
     for (i = top; i < top + 5; i++) {
         int on = 0;
-        TcCdat* c = tcCdatPtr(i);
+        TC_CAMERA_DATA* c = tcCdatPtr(i);
         if (c) {
             switch (c->enable) {
             case 0:
@@ -886,7 +886,7 @@ void tcEdit_select()
         for (j = 0; j < 7; j++) {
             int on = 0;
             int xa = x + 0x15;
-            TcAdat* a = tcAdatPtr(i, j);
+            TC_AREA_DATA* a = tcAdatPtr(i, j);
             if (a) {
                 switch (a->enable) {
                 case 0:
@@ -942,7 +942,7 @@ void tcEdit_select()
 }
 
 // Allocates a free camera cut record (enable 0xFF = free); 0 when the 64 are used.
-TcCdat* tcCdatNew()
+TC_CAMERA_DATA* tcCdatNew()
 {
     int i;
 
@@ -957,7 +957,7 @@ TcCdat* tcCdatNew()
 }
 
 // Frees a camera cut record.
-void tcCdatDel(TcCdat* c)
+void tcCdatDel(TC_CAMERA_DATA* c)
 {
     c->enable = 0xFF;
     pTc->cdatNum--;
@@ -965,7 +965,7 @@ void tcCdatDel(TcCdat* c)
 
 // New cut `cam_no`: type 2 (TRACK), aim offset (0, 1000, 0), one key at the tool camera's
 // pos / at / roll / fovy, frames 0.
-void tcCdatInit(TcCdat* c, int cam_no)
+void tcCdatInit(TC_CAMERA_DATA* c, int cam_no)
 {
     CAMERA* cam = &pTc->cam;
     int i;
@@ -978,10 +978,10 @@ void tcCdatInit(TcCdat* c, int cam_no)
     c->aim_ofs.z = 0.0f;
     c->num = 1;
     for (i = 0; i < 2; i++) {
-        c->at[i] = cam->param.at;
-        c->pos[i] = cam->param.pos;
-        c->roll[i] = cam->param.roll;
-        c->fovy[i] = cam->param.fovy;
+        c->at[i] = cam->param.Target;
+        c->pos[i] = cam->param.Campos;
+        c->roll[i] = cam->param.Roll;
+        c->fovy[i] = cam->param.Fovy;
     }
     for (i = 25; i >= 0; i--) {
         c->frame[i] = 0;
@@ -989,12 +989,12 @@ void tcCdatInit(TcCdat* c, int cam_no)
 }
 
 // The live cut record with camera number `cam_no`, 0 when none.
-TcCdat* tcCdatPtr(int cam_no)
+TC_CAMERA_DATA* tcCdatPtr(int cam_no)
 {
     int i;
 
     for (i = 0; i < 0x40; i++) {
-        TcCdat* c = &tcCdat[i];
+        TC_CAMERA_DATA* c = &tcCdat[i];
         if (c->enable != 0xFF && cam_no == c->cam_no) {
             return c;
         }
@@ -1003,7 +1003,7 @@ TcCdat* tcCdatPtr(int cam_no)
 }
 
 // Allocates a free camera area record; 0 when the 96 are used.
-TcAdat* tcAdatNew()
+TC_AREA_DATA* tcAdatNew()
 {
     int i;
 
@@ -1018,7 +1018,7 @@ TcAdat* tcAdatNew()
 }
 
 // Frees a camera area record.
-void tcAdatDel(TcAdat* a)
+void tcAdatDel(TC_AREA_DATA* a)
 {
     a->enable = 0xFF;
     pTc->adatNum--;
@@ -1026,7 +1026,7 @@ void tcAdatDel(TcAdat* a)
 
 // New area (area_no, suffix cam_no): a 4000 x 4000 square around the tool camera target, height
 // 1000, identity matrix, default attributes.
-void tcAdatInit(TcAdat* a, int area_no, int cam_no)
+void tcAdatInit(TC_AREA_DATA* a, int area_no, int cam_no)
 {
     Mtx m;
     Vec axis = {0.0f, 1.0f, 0.0f};
@@ -1069,10 +1069,10 @@ void tcAdatInit(TcAdat* a, int area_no, int cam_no)
 }
 
 // The live area record (area_no, cam_no), 0 when none.
-TcAdat* tcAdatPtr(int area_no, int cam_no)
+TC_AREA_DATA* tcAdatPtr(int area_no, int cam_no)
 {
     int i;
-    TcAdat* a = tcAdat;
+    TC_AREA_DATA* a = tcAdat;
 
     for (i = 0; i < 0x60; i++, a++) {
         if (a->enable != 0xFF && area_no == a->area_no && cam_no == a->cam_no) {
@@ -1083,13 +1083,13 @@ TcAdat* tcAdatPtr(int area_no, int cam_no)
 }
 
 // Allocates a free camera lerp (link) record; 0 when the 64 are used.
-TcLdat* tcLdatNew()
+LERP_DATA* tcLdatNew()
 {
     int i;
 
     for (i = 0; i < 0x40; i++) {
-        if (tcLdat[i].enable == 0xFF) {
-            tcLdat[i].enable = 1;
+        if (tcLdat[i].Be_flag == 0xFF) {
+            tcLdat[i].Be_flag = 1;
             pTc->ldatNum++;
             return &tcLdat[i];
         }
@@ -1098,55 +1098,55 @@ TcLdat* tcLdatNew()
 }
 
 // Frees a lerp record.
-void tcLdatDel(TcLdat* l)
+void tcLdatDel(LERP_DATA* l)
 {
-    l->enable = 0xFF;
+    l->Be_flag = 0xFF;
     pTc->ldatNum--;
 }
 
 // New lerp: from (area, cam) to (area, cam) over `frame` frames.
-void tcLdatInit(TcLdat* l, int area_from, int cam_from, int area_to, int cam_to, int frame)
+void tcLdatInit(LERP_DATA* l, int area_from, int cam_from, int area_to, int cam_to, int frame)
 {
-    l->area_from = area_from;
-    l->cam_from = cam_from;
-    l->area_to = area_to;
-    l->cam_to = cam_to;
-    l->frame = frame;
+    l->SrcNo = area_from;
+    l->SrcSuffix = cam_from;
+    l->DstNo = area_to;
+    l->DstSuffix = cam_to;
+    l->InterFrame = frame;
 }
 
 // The live lerp record for the given transition, 0 when none.
-TcLdat* tcLdatPtr(int area_from, int cam_from, int area_to, int cam_to)
+LERP_DATA* tcLdatPtr(int area_from, int cam_from, int area_to, int cam_to)
 {
     int i;
-    TcLdat* l = tcLdat;
+    LERP_DATA* l = tcLdat;
 
     for (i = 0; i < 0x40; i++, l++) {
-        if (l->enable != 0xFF && area_from == l->area_from && cam_from == l->cam_from && area_to == l->area_to &&
-            cam_to == l->cam_to) {
+        if (l->Be_flag != 0xFF && area_from == l->SrcNo && cam_from == l->SrcSuffix && area_to == l->DstNo &&
+            cam_to == l->DstSuffix) {
             return l;
         }
     }
     return 0;
 }
 
-void tcAreaMoveVertex(TcAdat* a, int mode);
-void tcAreaSelectVertex(TcAdat* a);
-void tcAreaSelectSide(TcAdat* a);
-void tcAreaInsertVertex(TcAdat* a);
-void tcAreaDeleteVertex(TcAdat* a);
+void tcAreaMoveVertex(TC_AREA_DATA* a, int mode);
+void tcAreaSelectVertex(TC_AREA_DATA* a);
+void tcAreaSelectSide(TC_AREA_DATA* a);
+void tcAreaInsertVertex(TC_AREA_DATA* a);
+void tcAreaDeleteVertex(TC_AREA_DATA* a);
 
 // area editor: vertex / floor / height / attribute / direction / character / address / camera link
 void tcEdit_area()
 {
-    TcMenu menu[2] = {{1, "INS VERTEX:"}, {1, "DEL VERTEX:"}};
+    TC_TOOL_MENU menu[2] = {{1, "INS VERTEX:"}, {1, "DEL VERTEX:"}};
     static int vtxSave = 0;
     static const char* areaMenuName[8] = {"Vertex", "Floor", "Height", "Attrib", "Direct", "Char", "Address", "Edit-->"};
     static const char* attrLong[8] = {"NORMAL   ", "BATTLE   ", "EVENT    ", "DOOR     ", "ONCE     ", "AHEAD    ",
                                       "DIRECTION", "DIS LIGHT"};
     static const char* charName[8] = {"LEON", "LEON_ASHLEY", "ASHLEY", "ADA", "WESKER", "HUNK", "KLAUSER", "???????????"};
     static const char* addrName[8] = {"NORMAL", "HIGH", "GRENADE", "???????", "???????", "???????", "???????", "???????"};
-    TcAdat* a = tcAdatPtr(pTc->adatNo, pTc->adatSuffix);
-    TcAdat* ad;
+    TC_AREA_DATA* a = tcAdatPtr(pTc->adatNo, pTc->adatSuffix);
+    TC_AREA_DATA* ad;
     TcPoly* p;
     int x;
     int x2;
@@ -1352,7 +1352,7 @@ static f32 tcVertexStep = 200.0f;
 
 // Area editor d-pad: mode 0 moves the current vertex (or the whole polygon when curVtx == -1) on
 // the XZ plane, 1 moves the base height (base_y, every vertex's y), 2 changes the area height.
-void tcAreaMoveVertex(TcAdat* a, int mode)
+void tcAreaMoveVertex(TC_AREA_DATA* a, int mode)
 {
     Vec d = {0.0f, 0.0f, 0.0f};
     TcPoly* p = &a->poly;
@@ -1412,7 +1412,7 @@ void tcAreaMoveVertex(TcAdat* a, int mode)
 }
 
 // Left/right (repeat) cycle the current vertex of the area polygon.
-void tcAreaSelectVertex(TcAdat* a)
+void tcAreaSelectVertex(TC_AREA_DATA* a)
 {
     if (TC_REP & 0x1) {
         pTc->curVtx--;
@@ -1424,7 +1424,7 @@ void tcAreaSelectVertex(TcAdat* a)
 }
 
 // Left/right cycle the current side (for vertex insertion).
-void tcAreaSelectSide(TcAdat* a)
+void tcAreaSelectSide(TC_AREA_DATA* a)
 {
     if (TC_REP & 0x1) {
         pTc->curSide--;
@@ -1436,7 +1436,7 @@ void tcAreaSelectSide(TcAdat* a)
 }
 
 // Inserts a vertex at the middle of the current side (up to 16).
-void tcAreaInsertVertex(TcAdat* a)
+void tcAreaInsertVertex(TC_AREA_DATA* a)
 {
     TcPoly* p = &a->poly;
     Vec v;
@@ -1464,7 +1464,7 @@ void tcAreaInsertVertex(TcAdat* a)
 }
 
 // Deletes the current vertex (a polygon keeps at least 3).
-void tcAreaDeleteVertex(TcAdat* a)
+void tcAreaDeleteVertex(TC_AREA_DATA* a)
 {
     TcPoly* p = &a->poly;
     int i;
@@ -1487,7 +1487,7 @@ void tcDrawArea()
     static s8 rad = 60;
     u32 col = 0;
     u32 col2 = -1;
-    TcAdat* ad;
+    TC_AREA_DATA* ad;
     TcPoly* p;
     int i;
     int j;
@@ -1517,14 +1517,14 @@ void tcDrawArea()
             }
             break;
         }
-        tcDrawNgon((TcNgon*) p, col);
+        tcDrawNgon((TC_NGON*) p, col);
         if (pTc->areaDetail != 0) {
             poly = *p;
             for (j = 0; j < p->num; j++) {
                 poly.pt[j].y += ad->height;
                 tcDrawLine3D(&poly.pt[j], &p->pt[j], col);
             }
-            tcDrawNgon((TcNgon*) &poly, col);
+            tcDrawNgon((TC_NGON*) &poly, col);
         }
     }
     if (pTc->preview == 0) {
@@ -1543,7 +1543,7 @@ void tcDrawArea()
         }
         p = &ad->poly;
         if (pTc->editMode == 1 && pTc->editSel == 0) {
-            tcFillNgon((TcNgon*) p, col2 & 0x808080FF);
+            tcFillNgon((TC_NGON*) p, col2 & 0x808080FF);
         }
         for (i = 0; i < p->num; i++) {
             if (pTc->editMode == 0 && pTc->editSel == 0 && pTc->selMode == 1 && pTc->vtxMenuCursor == 0) {
@@ -1573,7 +1573,7 @@ void tcDrawArea()
             poly.pt[i].y += ad->height;
             tcDrawLine3D(&poly.pt[i], &p->pt[i], col);
         }
-        tcDrawNgon((TcNgon*) &poly, col2);
+        tcDrawNgon((TC_NGON*) &poly, col2);
         for (i = 0; i < p->num; i++) {
             f32 r = 60.0f;
             if (pTc->editMode == 1 && pTc->editSel == 0) {
@@ -1616,7 +1616,7 @@ void tcDrawArea()
 
 void tcEdit_camera_qfps();
 void tcEdit_camera_rail();
-void fix_camera_dat(TcCdat* c);
+void fix_camera_dat(TC_CAMERA_DATA* c);
 void edit_rail_figure();
 void edit_rail_point();
 void edit_frame_no();
@@ -1628,7 +1628,7 @@ void tcMoveOffsetPoint();
 // moved with the tool camera (tcCameraPullPoint) in the working view.
 void tcEdit_camera()
 {
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
 
     if (pTc->typeEdit != 0) {
         if (TC_ON & 0x100) {
@@ -1663,7 +1663,7 @@ void tcEdit_camera_qfps()
     static const char* qfpsMenuName[8] = {"TYPE   ", "", "", "", "", "", "Attrib ", "Edit-->"};
     static const char* qfpsAttrName[8] = {"OFFSET", "????", "RAIL_EDGE", "RAIL_1WAY", "QFPS_BOTH", "QFPS_READY", "????",
                                           "????"};
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
     int ret;
     int x;
     int y;
@@ -1773,7 +1773,7 @@ void tcEdit_camera_qfps()
 // fixed / pan / track / rail camera editor: point editing, preview, attributes, offset, area link
 void tcEdit_camera_rail()
 {
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
     int size;
     int x;
     int y;
@@ -1858,9 +1858,9 @@ void tcEdit_camera_rail()
         if (pTc->selMode != 0) {
             tcDataExport((u8*) g_pToolCamData);
             if (pTc->coreData != 0) {
-                CamCtrl.CoreDataRead((CameraDataHeader*) g_pToolCamData);
+                CamCtrl.CoreDataRead((u8*) g_pToolCamData);
             } else {
-                CamCtrl.RoomDataRead((CameraDataHeader*) g_pToolCamData);
+                CamCtrl.RoomDataRead((u8*) g_pToolCamData);
             }
             CameraMove();
             LightMgr.move();
@@ -1906,7 +1906,7 @@ void tcEdit_camera_rail()
                                           "Edit-->"};
     static const char* railAttrName[8] = {"OFFSET", "????", "RAIL_EDGE", "RAIL_1WAY", "BESIDE_FWD", "????", "????",
                                           "????"};
-    CamCtrl.RoomDataRead((CameraDataHeader*) g_pToolCamData);
+    CamCtrl.RoomDataRead((u8*) g_pToolCamData);
     Parametrize(CamCtrl.DataSearch(pTc->cdatNo), &CamBSpline);
     x = tcMenuPos[0];
     y = tcMenuPos[1];
@@ -1984,12 +1984,12 @@ void tcEdit_camera_rail()
 }
 
 // The next (dir 1) / previous live cut after camera number `no`, wrapping; 0 with no cuts.
-TcCdat* tcNextCdatPtr(s8 no, int dir)
+TC_CAMERA_DATA* tcNextCdatPtr(s8 no, int dir)
 {
     int i;
 
     for (i = 0; i < 0x40; i++) {
-        TcCdat* c;
+        TC_CAMERA_DATA* c;
         no = (s8) (no + dir);
         no = (no + 0x40) % 0x40;
         c = tcCdatPtr(no);
@@ -2002,7 +2002,7 @@ TcCdat* tcNextCdatPtr(s8 no, int dir)
 
 // The next / previous live area after (area, suffix): steps the suffix within the area first, then
 // the area number.
-TcAdat* tcNextAdatPtr(s8 area, s8 cam, int dir)
+TC_AREA_DATA* tcNextAdatPtr(s8 area, s8 cam, int dir)
 {
     int suffix = next_suffix(cam, dir);
 
@@ -2076,17 +2076,17 @@ int next_suffix(s8 cam, int dir)
     return 0;
 }
 
-void tcCameraSetPoint(TcCdat* c);
-void tcCameraMovePoint(TcCdat* c, int mode);
-void tcCameraSelectPoint(TcCdat* c);
-void tcCameraSelectSegment(TcCdat* c);
-void tcCameraInsertPoint(TcCdat* c);
-void tcCameraSelectLR(TcCdat* c);
-void tcCameraCopyPoint(TcCdat* c);
-void tcCameraDeletePoint(TcCdat* c);
+void tcCameraSetPoint(TC_CAMERA_DATA* c);
+void tcCameraMovePoint(TC_CAMERA_DATA* c, int mode);
+void tcCameraSelectPoint(TC_CAMERA_DATA* c);
+void tcCameraSelectSegment(TC_CAMERA_DATA* c);
+void tcCameraInsertPoint(TC_CAMERA_DATA* c);
+void tcCameraSelectLR(TC_CAMERA_DATA* c);
+void tcCameraCopyPoint(TC_CAMERA_DATA* c);
+void tcCameraDeletePoint(TC_CAMERA_DATA* c);
 
 // after a camera type change: give the cut the data its type needs
-void fix_camera_dat(TcCdat* c)
+void fix_camera_dat(TC_CAMERA_DATA* c)
 {
     int dummy[1];
     int i;
@@ -2145,7 +2145,7 @@ void fix_camera_dat(TcCdat* c)
 // point editing of the campos / target / roll / fovy rows
 void edit_rail_figure()
 {
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
 
     if (c == 0) {
         return;
@@ -2189,8 +2189,8 @@ void edit_rail_figure()
 // point insert / copy / delete menu of the rail editor
 void edit_rail_point()
 {
-    TcMenu menu[2] = {{1, "INS: POINT"}, {1, "DEL: POINT"}};
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_TOOL_MENU menu[2] = {{1, "INS: POINT"}, {1, "DEL: POINT"}};
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
 
     if (c == 0) {
         return;
@@ -2222,7 +2222,7 @@ void edit_rail_point()
 // key frame numbers of the rail / motion cameras
 void edit_frame_no()
 {
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
 
     if (c == 0) {
         return;
@@ -2289,8 +2289,8 @@ void tcMoveOffsetPoint()
             TcWork* w = pTc;
             CAMERA* cam = &w->cam;
             cPlayer* pl = pPL;
-            PSMTXMultVec(pl->mat, &tcCdatPtr(pTc->cdatNo)->aim_ofs, &cam->param.pos);
-            PSMTXMultVec(pl->mat, &tcCdatPtr(pTc->cdatNo)->u44.dir, &cam->param.at);
+            PSMTXMultVec(pl->mat, &tcCdatPtr(pTc->cdatNo)->aim_ofs, &cam->param.Campos);
+            PSMTXMultVec(pl->mat, &tcCdatPtr(pTc->cdatNo)->u44.dir, &cam->param.Target);
             CameraSetOrientationUp(cam);
         }
     } else {
@@ -2321,7 +2321,7 @@ void tcMoveOffsetPoint()
 }
 
 // a pan / track cut edited with one key gets its second key from the first
-static inline void tcCdatFixPan(TcCdat* c)
+static inline void tcCdatFixPan(TC_CAMERA_DATA* c)
 {
     switch (c->type) {
     case 1:
@@ -2338,19 +2338,19 @@ static inline void tcCdatFixPan(TcCdat* c)
 }
 
 // tool camera -> current key (and the automatic frame number of a new key)
-void tcCameraSetPoint(TcCdat* c)
+void tcCameraSetPoint(TC_CAMERA_DATA* c)
 {
     if (pTc->viewMode != 0) {
         return;
     }
     if ((pTc->editCursor == 1 || pTc->editCursor == 2) && (TC_TRG & 0x100)) {
-        c->pos[pTc->curKey] = pTc->cam.param.pos;
-        c->at[pTc->curKey] = pTc->cam.param.at;
+        c->pos[pTc->curKey] = pTc->cam.param.Campos;
+        c->at[pTc->curKey] = pTc->cam.param.Target;
         tcCdatFixPan(c);
     }
     if ((pTc->editCursor == 3 || pTc->editCursor == 4) && (TC_ON & 0x500)) {
-        pTc->cam.param.roll = c->roll[pTc->curKey];
-        pTc->cam.param.fovy = c->fovy[pTc->curKey];
+        pTc->cam.param.Roll = c->roll[pTc->curKey];
+        pTc->cam.param.Fovy = c->fovy[pTc->curKey];
     }
     CameraSetOrientationRoll(&pTc->cam);
     if ((c->type == 6 || c->type == 7) && (TC_TRG & 0x100)) {
@@ -2370,7 +2370,7 @@ void tcCameraSetPoint(TcCdat* c)
 }
 
 // move the current key by the pad: mode 0 campos, 1 target, 2 roll, 3 fovy
-void tcCameraMovePoint(TcCdat* c, int mode)
+void tcCameraMovePoint(TC_CAMERA_DATA* c, int mode)
 {
     CAMERA* cam = &pTc->cam;
     Vec d = {0.0f, 0.0f, 0.0f};
@@ -2470,24 +2470,24 @@ void tcCameraMovePoint(TcCdat* c, int mode)
 }
 
 // tool camera <- current key
-void tcCameraPullPoint(TcCdat* c)
+void tcCameraPullPoint(TC_CAMERA_DATA* c)
 {
     if (c->num == 0) {
         return;
     }
     if (c->type != 8) {
         pTc->curKey = pTc->curKey < 0 ? c->num - 1 : (pTc->curKey > c->num - 1 ? 0 : pTc->curKey);
-        pTc->cam.param.pos = c->pos[pTc->curKey];
-        pTc->cam.param.at = c->at[pTc->curKey];
-        pTc->cam.param.roll = c->roll[pTc->curKey];
-        pTc->cam.param.fovy = c->fovy[pTc->curKey];
+        pTc->cam.param.Campos = c->pos[pTc->curKey];
+        pTc->cam.param.Target = c->at[pTc->curKey];
+        pTc->cam.param.Roll = c->roll[pTc->curKey];
+        pTc->cam.param.Fovy = c->fovy[pTc->curKey];
     }
     CameraSetOrientationRoll(&pTc->cam);
 }
 
 // Left/right cycle the current key point of the cut; in the normal view the tool camera jumps to
 // it.
-void tcCameraSelectPoint(TcCdat* c)
+void tcCameraSelectPoint(TC_CAMERA_DATA* c)
 {
     int old = pTc->curKey;
 
@@ -2512,7 +2512,7 @@ void tcCameraSelectPoint(TcCdat* c)
 }
 
 // Left/right cycle the current segment between key points (insert position).
-void tcCameraSelectSegment(TcCdat* c)
+void tcCameraSelectSegment(TC_CAMERA_DATA* c)
 {
     if (TC_REP & 0x1) {
         pTc->curSeg--;
@@ -2524,7 +2524,7 @@ void tcCameraSelectSegment(TcCdat* c)
 }
 
 // insert a key in the middle of the selected segment
-void tcCameraInsertPoint(TcCdat* c)
+void tcCameraInsertPoint(TC_CAMERA_DATA* c)
 {
     Vec v;
     int i;
@@ -2552,7 +2552,7 @@ void tcCameraInsertPoint(TcCdat* c)
 }
 
 // Left/right choose the copy side (0 left / 1 right) for the point copy operation.
-void tcCameraSelectLR(TcCdat* c)
+void tcCameraSelectLR(TC_CAMERA_DATA* c)
 {
     int x = tcMenuPos[8];
     int y = tcMenuPos[9];
@@ -2572,7 +2572,7 @@ void tcCameraSelectLR(TcCdat* c)
 }
 
 // duplicate the current key to its left or right (the side is picked from the screen side of the neighbour)
-void tcCameraCopyPoint(TcCdat* c)
+void tcCameraCopyPoint(TC_CAMERA_DATA* c)
 {
     Vec v;
     int i;
@@ -2626,7 +2626,7 @@ void tcCameraCopyPoint(TcCdat* c)
 }
 
 // Deletes the current key point (pos / at / roll / fovy / frame shift down; at least 2 keys stay).
-void tcCameraDeletePoint(TcCdat* c)
+void tcCameraDeletePoint(TC_CAMERA_DATA* c)
 {
     int i;
 
@@ -2647,12 +2647,12 @@ void tcCameraDeletePoint(TcCdat* c)
 void tcDrawOffset()
 {
     CameraControl* cc = &CamCtrl;
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
 
     if (c) {
         Vec a;
         Vec b;
-        cc->CalcAim((CameraCut*) c);
+        cc->CalcAim((CAMERA_DATA*) c);
         a = cc->Aim;
         a.y = 0.0f;
         b = cc->Aim;
@@ -2665,7 +2665,7 @@ void tcDrawOffset()
 // key points of the current cut: campos / target spheres, floor lines, the selected segment
 void tcDrawRail()
 {
-    TcCdat* c = tcCdatPtr(pTc->cdatNo);
+    TC_CAMERA_DATA* c = tcCdatPtr(pTc->cdatNo);
     static s8 rad = 60;
     int i;
 
@@ -2689,12 +2689,7 @@ void tcDrawRail()
         tcDrawSphere(&c->pos[i], col, r);
         if (pTc->editMode == 1 && pTc->editSel == 1 && i == pTc->curKey && pTc->editCursor == 1) {
             v = c->pos[i];
-            {
-                register Vec* a3 asm("r3");  // COMPILER-DIFF: candidate #18 (struct-return-like address in r3 before a no-argument call)
-                a3 = &v;
-                asm("" : "=m"(v.y) : "r"(a3));
-            }
-            v.y = tcGetFloor();
+            v.y = tcGetFloor(&v);
             tcDrawLine3D(&c->pos[i], &v, 0xFF0000FE);
         }
         col = 0x0000FFFE;
@@ -2710,12 +2705,7 @@ void tcDrawRail()
         tcDrawSphere(&c->at[i], col, r);
         if (pTc->editMode == 1 && pTc->editSel == 1 && i == pTc->curKey && pTc->editCursor == 2) {
             v = c->at[i];
-            {
-                register Vec* a3 asm("r3");  // COMPILER-DIFF: candidate #18 (struct-return-like address in r3 before a no-argument call)
-                a3 = &v;
-                asm("" : "=m"(v.y) : "r"(a3));
-            }
-            v.y = tcGetFloor();
+            v.y = tcGetFloor(&v);
             tcDrawLine3D(&c->at[i], &v, 0xFF0000FE);
         }
         if (pTc->editMode == 1 && pTc->editSel == 1) {
@@ -2738,7 +2728,7 @@ void tcDrawRail()
 // file menu of the load screen: FILE #0..2 / CORE, yes-no confirmation, HD read
 static void tcLoad()
 {
-    TcMenu menu[4] = {{1, "FILE #0:"}, {1, "FILE #1:"}, {1, "FILE #2:"}, {1, "CORE   :"}};
+    TC_TOOL_MENU menu[4] = {{1, "FILE #0:"}, {1, "FILE #1:"}, {1, "FILE #2:"}, {1, "CORE   :"}};
     static int yesNo = 0;
     static int flags = 0;
     static int failTimer = 0;
@@ -2806,9 +2796,9 @@ static void tcLoad()
         if (HDRead(path, g_pToolCamData) != 0) {
             if (cameraDataVersion((char*) g_pToolCamData) > 1) {
                 if (pTc->coreData != 0) {
-                    CamCtrl.CoreDataRead((CameraDataHeader*) g_pToolCamData);
+                    CamCtrl.CoreDataRead((u8*) g_pToolCamData);
                 } else {
-                    CamCtrl.RoomDataRead((CameraDataHeader*) g_pToolCamData);
+                    CamCtrl.RoomDataRead((u8*) g_pToolCamData);
                 }
                 tcDataInitialize();
                 tcDataImport((u8*) g_pToolCamData);
@@ -2843,7 +2833,7 @@ static void tcLoad()
 // (y:) or local (x:); exports the pools (tcDataExport) and writes the file; FAILED!! on error.
 static void tcSave()
 {
-    TcMenu menu[4] = {{1, "FILE #0:"}, {1, "FILE #1:"}, {1, "FILE #2:"}, {1, "CORE   :"}};
+    TC_TOOL_MENU menu[4] = {{1, "FILE #0:"}, {1, "FILE #1:"}, {1, "FILE #2:"}, {1, "CORE   :"}};
     static int yesNo = 0;
     static int flags = 0;
     static int failTimer = 0;
@@ -2913,9 +2903,9 @@ static void tcSave()
         size = tcDataExport((u8*) g_pToolCamData);
         ret = HDWrite(path, g_pToolCamData, size);
         if (pTc->coreData != 0) {
-            CamCtrl.CoreDataRead((CameraDataHeader*) g_pToolCamData);
+            CamCtrl.CoreDataRead((u8*) g_pToolCamData);
         } else {
-            CamCtrl.RoomDataRead((CameraDataHeader*) g_pToolCamData);
+            CamCtrl.RoomDataRead((u8*) g_pToolCamData);
         }
         if (ret != size) {
             pTc->selMode = 3;
@@ -2950,7 +2940,7 @@ static void tcQuit()
 {
     if (*(u16*) &pTc->cdatNum != 0) {
         tcDataExport((u8*) g_pToolCamData);
-        CamCtrl.RoomDataRead((CameraDataHeader*) g_pToolCamData);
+        CamCtrl.RoomDataRead((u8*) g_pToolCamData);
         CamCtrl.m_system_flag = (CamCtrl.m_system_flag & ~1) | 0x10;
     }
     DbgFlagOff(pG, DBG_TEST_MODE);
@@ -3020,9 +3010,9 @@ void tcToolCameraMove(CAMERA* cam)
     if (pTc->joy.stickX) {
         Vec axis = {0.0f, 1.0f, 0.0f};
         if (pTc->distTarget) {
-            CameraRotAxisPosRad(cam, &axis, &cam->param.pos, (f32) pTc->joy.stickX / 20.0f * 0.017453292f);
+            CameraRotAxisPosRad(cam, &axis, &cam->param.Campos, (f32) pTc->joy.stickX / 20.0f * 0.017453292f);
         } else {
-            CameraRotAxisPosRad(cam, &axis, &cam->param.at, (f32) pTc->joy.stickX / 20.0f * 0.017453292f);
+            CameraRotAxisPosRad(cam, &axis, &cam->param.Target, (f32) pTc->joy.stickX / 20.0f * 0.017453292f);
         }
     }
     if (pTc->joy.stickY) {

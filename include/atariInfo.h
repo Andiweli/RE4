@@ -47,7 +47,7 @@ public:
     void init(f32 ox, f32 oy, f32 oz, f32 rs, f32 ro, f32 ra, f32 h, int pno, int flags, int hokan);
     void setPriority(int pri);  // flags bits 3-4
     // mode < 0: rect = (100, 100), rect2 = a/b, cnt = -mode; mode == 0: rect = rect2 = a/b; > 0: rect2 only, cnt = mode
-    void set(int mode, f32 a, f32 b);
+    void set(f32 a, f32 b, int mode);
     void move();
     // World position (`getPos`) and the positions before/after this frame's move (`getSpeedVector`).
     void getSpeedVector(cModel* m, Vec* oldPos, Vec* pos);

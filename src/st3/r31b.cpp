@@ -133,7 +133,7 @@ void R31bLightAllOn();
 void R31bLight(int no);
 void R31bKanaamiTrans(u8 room, u8 no, int on);
 void R31bKanaamiRoom03Trans(int no, int on);
-extern "C" void Evt_R31BS00_Func(Event* e);
+void Evt_R31BS00_Func(Event* e, u32);
 
 // Room init for the U-3 cage corridor. Each cage room not yet passed gets its switch and door areas,
 // and a passed one is hidden as fallen (R31bSmdTransOff).
@@ -295,7 +295,7 @@ void R31bInit()
             r31b_work->eat[12]->setCoord(&obj->pos, &obj->ang);
         }
     }
-    KyfFlagOn(pG, KYF_ST1_16);
+    KyfFlagOn(pG, KYF_ST3_15);
     SceAtDataSet_exec(0xF, 0x12, 0, (TaskFunc) R31bExecGondolaMain, (void*) 0, 1);
     SceAtDataSet_exec(0x10, 0x12, 0, (TaskFunc) R31bExecGondolaMain, (void*) 1, 1);
     obj = SmdGetObjPtr(0xA3);
@@ -340,7 +340,7 @@ void R31bInit()
         SceAtDataSet_exec(0x25, 0x12, 0, (TaskFunc) R31bStartCameraMain, 0, 1);
     }
     r31b_work->switchCount = 0;
-    EstSet(0, -1, 0, 0, EFF_ROOM, 3, 0x2001, ESP_CORE_KIND_ROOM01, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 3, 0x2001, ESP_CORE_KIND_ROOM01, zero, 0);
     r31b_work->str = 0;
     Vec pos;
     Vec rot;
@@ -515,7 +515,7 @@ void R31bExecSwitchMainSub(int no, int flagNo, int count, int atNo, int cut)
         SceAtSetEnable(atNo, 0);
         r31b_work->switchCount++;
         SceEventStart(1);
-        SceSetEventCancel(1, (TaskFunc) R31bExecSwitchEnd, no, -1, 1);
+        SceSetEventCancel(1, (TaskFunc) R31bExecSwitchEnd, (void*) no, -1, 1);
         r31b_work->snd = 0;
         if (cut != -1) {
             CamCtrl.CutCall((s8) cut);
@@ -593,7 +593,7 @@ void R31bExecSwitchEndSub(int no, int room, int flagNo, int count, int emMode, i
         EffectEspDelete(1, (u8) smdOff, 0, 0);
         EffectEspgenDelete(1, (u8) smdOff, 0);
         EffectEfmDelete(1, (u8) smdOff, 0);
-        SceExec(0x12, (TaskFunc) R31bExecDeathTimerMain, room, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) R31bExecDeathTimerMain, (void*) room, 0, 2, 0);
     }
     em = (cEm32*) r31b_work->em.getPtr();
     if (em) {
@@ -676,7 +676,7 @@ void R31bExecShutterOpenMainSub(int no, int flagNo, u32 objId, int satNo, u32 la
         }
         if (RsfCheck(G_ROOM_ID, 0x1D) == 0) {
             SceEventStart(1);
-            SceSetEventCancel(1, (TaskFunc) R31bExecShutterOpenEnd, no, -1, 1);
+            SceSetEventCancel(1, (TaskFunc) R31bExecShutterOpenEnd, (void*) no, -1, 1);
         }
         if (RsfCheck(G_ROOM_ID, 0x1D) == 0 && cut != -1) {
             CamCtrl.CutCall((s8) cut);
@@ -797,7 +797,7 @@ void R31bExecDeathTimerMainSub(int no, int light, int frames)
         over = Cckpt.isZeroCountDownTimer();
         if (over == 1) {
             pG->Room_flg[0] |= 0x80000000;
-            SceExec(0x12, (TaskFunc) R31bExecFallMain, no, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R31bExecFallMain, (void*) no, 0, 2, 0);
             return;
         }
         if (frame == frame / 90 * 90) {
@@ -839,7 +839,7 @@ void R31bExecDoorMainSub(int no, int flagOpen, int flagDoor, int doorFlag, int a
             }
             SceEventStart(0);
             pG->Room_flg[0] &= ~0x20000000;
-            SceSetEventCancel(1, (TaskFunc) R31bExecDoorEnd, no, 2, 1);
+            SceSetEventCancel(1, (TaskFunc) R31bExecDoorEnd, (void*) no, 2, 1);
             if (cut != -1) {
                 CamCtrl.CutCall((s8) cut);
             }
@@ -971,7 +971,7 @@ void R31bExecDoorEndSub(int no, int emMode, int light, u32 objId0, u32 objId1, i
             R31bExecFallEnd(no);
             return;
         }
-        SceExec(0x12, (TaskFunc) R31bExecFallMain, no, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) R31bExecFallMain, (void*) no, 0, 2, 0);
     }
     pPL->setNoSuspend(0);
     CamCtrl.Comeback(0);
@@ -999,7 +999,7 @@ void R31bExecFallMainSub(int no, int flagNo, int cut)
     if (RsfCheck(G_ROOM_ID, flagNo) == 0) {
         RsfSet(G_ROOM_ID, flagNo);
         SceEventStart(0);
-        SceSetEventCancel(1, (TaskFunc) R31bExecFallEnd, no, -1, 1);
+        SceSetEventCancel(1, (TaskFunc) R31bExecFallEnd, (void*) no, -1, 1);
         if (pG->Room_flg[0] & 0x80000000) {
             SndCall(6, 0x10, 0, 0, 0, 0);
             pPL->beginEvent(0);
@@ -1410,13 +1410,13 @@ static void R31bExecRoom03U3Main()
     if (RsfCheck(G_ROOM_ID, 0x1C) == 0) {
         cEm32* em;
         cObj* obj;
-        // The player EstSet's two zero words come from `zero` in its own callee-saved register, as in
-        // the target. The dead `zero = em` below keeps cse from merging `zero` into the known-zero
-        // `andi.` result, and flow deletes it before local-alloc.
+        // No EstSet argument reads `zero`, but dropping it (or the dead `zero = em` below) changes the
+        // registers of the player EstSet's zero stores. The dead assignment keeps cse from merging `zero`
+        // into the known-zero `andi.` result, and flow deletes it before local-alloc.
         void* zero = 0;
 
         RsfSet(G_ROOM_ID, 0x1C);
-        KyfFlagOff(pG, KYF_ST1_16);
+        KyfFlagOff(pG, KYF_ST3_15);
         StaFlagOn(pG, STA_ESP_COMPULSION_NOSUSPEND);
         SceEventStart(0);
         StaFlagOn(pG, STA_LIT_NO_UPDATE);
@@ -1436,7 +1436,7 @@ static void R31bExecRoom03U3Main()
         r31b_work->em.setFlag(1);
         r31b_work->em.setNoSuspend(1);
         if (pPL) {
-            EstSet(pPL, -1, 0, 0, EFF_ROOM, 0xB, 0x2001, ESP_CORE_KIND_ROOM06, zero, zero);
+            EstSet(pPL, -1, 0, 0, EFF_ROOM, 0xB, 0x2001, ESP_CORE_KIND_ROOM06, 0, 0);
         }
         if (em) {
             EstSet(em, -1, 0, 0, EFF_ROOM, 0xC, 0x2001, ESP_CORE_KIND_ROOM06, 0, 0);
@@ -1569,8 +1569,8 @@ void R31bExecRoom03U3DieEnd()
         door->setNormal();
     }
     SceAtSetEnable(0x24, 0);
-    KyfFlagOn(pG, KYF_ST1_15);
-    KyfFlagOn(pG, KYF_ST1_16);
+    KyfFlagOn(pG, KYF_ST3_14);
+    KyfFlagOn(pG, KYF_ST3_15);
     pPL->setPos(55080.0f, 4266.0f, 13710.0f);
     pPL->setAng(0.0f, -2.718f, 0.0f);
     pPL->matUpdate();
@@ -1609,7 +1609,7 @@ static void R31bExecGondolaMain(int dir)
         SceAtSetEnable(0x10, 0);
     }
     SceEventStart(0);
-    SceSetEventCancel(1, (TaskFunc) R31bExecGondolaEnd, dir, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) R31bExecGondolaEnd, (void*) dir, -1, 1);
     r31b_work->snd = 0;
     faded = 0;
     obj->setNoSuspend(1);
@@ -1865,7 +1865,7 @@ void R31bKoushiSatCk2(int no, int flagNo, int koushiNo)
     if (RsfCheck(G_ROOM_ID, flagNo) == 0) {
         if (r31b_work->koushi[koushiNo] && r31b_work->koushi[koushiNo]->ckStatus() == 1) {
             SndCall(6, 8, &r31b_work->koushi[koushiNo]->pos, 0, 0, 0);
-            SceExec(0x12, (TaskFunc) R31bExecShutterOpenMain, no, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R31bExecShutterOpenMain, (void*) no, 0, 2, 0);
         }
     }
 }
@@ -2047,7 +2047,7 @@ void R31bKanaamiRoom03Trans(int no, int on)
 
 // Event r31bs00 callback (U-3 breaks in): the entrance effect dropped and scroll objects 0x82/0x6B/0xF4
 // swapped; pl0010 (Leon) ot_type 2 and evma300's light mask on cut 0.
-void Evt_R31BS00_Func(Event* e)
+void Evt_R31BS00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:

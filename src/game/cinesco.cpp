@@ -9,19 +9,17 @@
 #include "main_mem.h"
 #include "cinesco.h"
 
-CineWork cine_work;
+CINE_WORK cine_work;
 
-extern "C" {
-void cine_polling(CineWork* w);
-void cine_on_move(CineWork* w);
-void cine_off_move(CineWork* w);
-}
+void cine_polling(CINE_WORK* w);
+void cine_on_move(CINE_WORK* w);
+void cine_off_move(CINE_WORK* w);
 
 // Per-frame: marks the letterbox request bit (Status_flg[0] 0x1000000; the room / event code
 // clears it to turn the bars off) and runs the fade state (0 polling, 1 fading in, 2 fading out).
 void CinescoMove(void)
 {
-    static void (*cine_tbl[])(CineWork*) = {
+    static void (*cine_tbl[])(CINE_WORK*) = {
         cine_polling,
         cine_on_move,
         cine_off_move,
@@ -32,7 +30,7 @@ void CinescoMove(void)
 }
 
 // Rno0 == 0: watches the request bit and starts a 15 frame fade in / out when it changes.
-void cine_polling(CineWork* cp)
+void cine_polling(CINE_WORK* cp)
 {
     int on;
 
@@ -54,7 +52,7 @@ void cine_polling(CineWork* cp)
 }
 
 // Rno0 == 1: alpha ramps 0 -> 255 over 15 frames.
-void cine_on_move(CineWork* cp)
+void cine_on_move(CINE_WORK* cp)
 {
     cp->timer0 -= 1.0f;
     cp->alpha = (u8) ((15.0f - cp->timer0) / 15.0f * 255.0f);
@@ -65,7 +63,7 @@ void cine_on_move(CineWork* cp)
 }
 
 // Rno0 == 2: alpha ramps 255 -> 0 over 15 frames.
-void cine_off_move(CineWork* cp)
+void cine_off_move(CINE_WORK* cp)
 {
     cp->timer0 -= 1.0f;
     cp->alpha = (u8) (cp->timer0 / 15.0f * 255.0f);
@@ -131,5 +129,5 @@ void Draw_cinesco(void)
 // Clears the letterbox state.
 void CinescoInit(void)
 {
-    memclr_asm(&cine_work, sizeof(CineWork));
+    memclr_asm(&cine_work, sizeof(CINE_WORK));
 }

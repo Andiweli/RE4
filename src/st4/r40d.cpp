@@ -103,7 +103,7 @@ void R40dInit()
         }
         SceAtDataSet_exec(7, SCE_LEVEL10, 0, (TaskFunc) r40d_getItem, 0, 1);
     }
-    SceSetItemEvent(8, 0x83, 6, 5, r40d_openShelf, r40d_openedShelf, 1, 0);
+    SceSetItemEvent(8, 0x83, 6, 5, r40d_openShelf, r40d_openedShelf, (void*) 1, 0);
 }
 
 // Per-frame room main: nothing.
@@ -318,10 +318,8 @@ void r40d_setDoorEff(int no, int on)
     if (on == 1) {
         EstSet(0, -1, 0, 0, EFF_ROOM, a, 1, (u8) eff, 0, 0);
     } else {
-        void* zero = 0;
-
-        EstSet(0, -1, 0, 0, EFF_ROOM, b, 1, (u8) eff, zero, zero);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, (u8) r40d_work->eff[2], zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, b, 1, (u8) eff, 0, 0);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, (u8) r40d_work->eff[2], 0, 0);
     }
 }
 

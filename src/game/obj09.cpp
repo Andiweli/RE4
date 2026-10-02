@@ -9,13 +9,11 @@
 #include "math_sub.h"
 #include "player.h"
 
-extern "C" {
 void AddForce(cObj* obj, Vec* point, Vec* force);
 void dwdt(Vec* w, Vec* t, Vec* moment, Vec* out);
 void Calc(cObj* obj, f32 dt);
 f32 lu(f32 a[][3], int* ip);
 f32 LinerEquation3(f32 a[][3], f32* b, f32* x);
-}
 
 f32 grav = 400.0f;
 f32 sprg = 100.0f;

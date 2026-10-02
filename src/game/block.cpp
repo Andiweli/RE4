@@ -509,7 +509,7 @@ int cBlockUnit::checkBlockLoadToMramSet()
             if (p == 0) {
                 return 1;
             }
-            pData->setCommand(CMND_MRAM_LOAD, (u32) p, arg);
+            pData->setCommand(CMND_MRAM_LOAD, p, arg);
         }
     case COND_MRAM_OK:
     case COND_ARAM_TO_MRAM:

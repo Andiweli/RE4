@@ -28,12 +28,10 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 void Esp07_ChkGnd(cEsp07* esp, f32 floorY);
 void Esp07_HitGndLight(cEsp07* esp);
 void Esp07_HitGnd(cEsp07* esp);
 void Esp07_HitWall(cEsp07* esp);
-}
 
 // EspCreateTbl[0x07] factory.
 cEsp* Esp07_Create()
@@ -60,7 +58,7 @@ void Esp07_ChkGnd(cEsp07* pEsp, f32 height)
             Vec d;
             f32 dist;
 
-            PSVECSubtract(&pG->Camera.param.pos, &pEsp->m_Pos, &d);
+            PSVECSubtract(&pG->Camera.param.Campos, &pEsp->m_Pos, &d);
             dist = PSVECMag(&d);
             if (w->SeType == 3 || dist < 8000.0f) {
                 EspCallSeType(w->SeType, &pEsp->m_Pos);
@@ -103,11 +101,11 @@ void Esp07_ChkGnd(cEsp07* pEsp, f32 height)
 void Esp07_HitGndLight(cEsp07* pEsp)
 {
     ESP07_WK* w = &pEsp->m_Free;
-    u32 attr;
+    Vec* pNorm;
 
     if (!(w->Flg & 2)) {
         w->Flg |= 2;
-        w->GndHeight = SatMgr.getFloor(&pEsp->m_Pos, &attr, 600.0f, 100000.0f, 0);
+        w->GndHeight = SatMgr.getFloor(&pEsp->m_Pos, &pNorm, 600.0f, 100000.0f, 0);
     }
     Esp07_ChkGnd(pEsp, w->GndHeight);
 }
@@ -115,9 +113,9 @@ void Esp07_HitGndLight(cEsp07* pEsp)
 // HitType 1: probes the floor under the sprite every frame (600 up / 100000 down) and checks it.
 void Esp07_HitGnd(cEsp07* pEsp)
 {
-    u32 attr;
+    Vec* pNorm;
 
-    Esp07_ChkGnd(pEsp, SatMgr.getFloor(&pEsp->m_Pos, &attr, 600.0f, 100000.0f, 0));
+    Esp07_ChkGnd(pEsp, SatMgr.getFloor(&pEsp->m_Pos, &pNorm, 600.0f, 100000.0f, 0));
 }
 
 // HitType 2: casts pos -> pos + speed against the scenery; on a hit moves onto the surface,

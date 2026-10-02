@@ -25,11 +25,11 @@ public:
 // Light path follower kept in cLight::work.
 class cLightPath {
 public:
-    cLightPathData* pStart;  // 0x00
-    cLightPathData* pCur;    // 0x04  next brightness byte (0..200, 0xFF = end)
-    u8 Flag;                 // 0x08  bit0: stop at the end, bit1: invert (200 - v)
+    u8* pBase;  // 0x00
+    u8* pPtr;   // 0x04  next brightness byte (0..200, 0xFF = end)
+    u8 Flag;    // 0x08  bit0: stop at the end, bit1: invert (200 - v)
 
-    int setPath(cLightPathData* pPath, u8 flag);
+    int setPath(u8* pPath, u8 flag);
     int movePath();
 };
 

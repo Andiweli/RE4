@@ -55,7 +55,7 @@ void cEsp0b::move()
             } else {
                 wpos = m_Pos;
             }
-            PSVECSubtract(&wpos, &cam->param.pos, &look);
+            PSVECSubtract(&wpos, &cam->param.Campos, &look);
             if (look.x == 0.0f && look.y == 0.0f && look.z == 0.0f) {
                 pLog->warn(0, 0, "Esp0b : look vec is ZERO");
                 look.x = look.y = look.z = 0.0f;
@@ -81,7 +81,7 @@ void cEsp0b::move()
 
 // EspTransTbl[0x0B]: for Core_flg 0x8000 effects computes the jitter here, draws with the offset
 // applied and removes it again; otherwise a plain EspCommonTrans.
-extern "C" void Esp0b_Trans(cEsp0b* esp)
+void Esp0b_Trans(cEsp0b* esp)
 {
     Vec look;
     Vec up;
@@ -99,7 +99,7 @@ extern "C" void Esp0b_Trans(cEsp0b* esp)
         } else {
             wpos = esp->m_Pos;
         }
-        PSVECSubtract(&wpos, &cam->param.pos, &look);
+        PSVECSubtract(&wpos, &cam->param.Campos, &look);
         if (look.x == 0.0f && look.y == 0.0f && look.z == 0.0f) {
             pLog->warn(0, 0, "Esp0b : look vec is ZERO");
             look.x = look.y = look.z = 0.0f;

@@ -165,7 +165,6 @@ extern StockEntry stock_r11c_after_event[];
 extern LevelEntry level_r200[];
 extern LevelEntry level_null[];
 
-extern "C" {
 void merchant_stage1_full();
 void merchant_stage2_full();
 void merchant_stage3_full();
@@ -182,6 +181,5 @@ void levelDataInit(MERCHANT_DATA* p_data);
 void levelDataAdd(MERCHANT_DATA* d, LevelEntry* tbl);
 int checkSellingItem(ITEM_ID id);
 int checkExerciseItem(ITEM_ID id);
-}
 
 #endif

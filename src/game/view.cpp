@@ -28,20 +28,20 @@ void VIEW::roomInit()
 // Builds the frustum for the camera's fovy with the default near / far planes and orients it.
 void VIEW::init()
 {
-    initPerspective(_p_camera->param.fovy, VIEW_ASPECT, ZNEAR, ZFAR);
+    initPerspective(_p_camera->param.Fovy, VIEW_ASPECT, ZNEAR, ZFAR);
     orientation();
-    _old_fovy = _p_camera->param.fovy;
+    _old_fovy = _p_camera->param.Fovy;
     _old_zfar = _zfar;
 }
 
 // Per frame: rebuilds the frustum when the fovy or far plane changed, then orients it to the camera.
 void VIEW::move()
 {
-    if (_old_fovy != _p_camera->param.fovy || _old_zfar != _zfar) {
-        initPerspective(_p_camera->param.fovy, VIEW_ASPECT, ZNEAR, _zfar);
+    if (_old_fovy != _p_camera->param.Fovy || _old_zfar != _zfar) {
+        initPerspective(_p_camera->param.Fovy, VIEW_ASPECT, ZNEAR, _zfar);
     }
     orientation();
-    _old_fovy = _p_camera->param.fovy;
+    _old_fovy = _p_camera->param.Fovy;
     _old_zfar = _zfar;
 }
 
@@ -60,8 +60,8 @@ void VIEW::initPerspective(f32 fovy, f32 aspect, f32 n, f32 f)
     Vec t2;
     Vec t3;
     Vec q[4];
-    ViewFrustum* b;
-    ViewSphere* s;
+    GEOM_HEXAHEDRON* b;
+    GEOM_SPHERE* s;
     f32 t;
     f32 h;
     f32 w;
@@ -80,123 +80,123 @@ void VIEW::initPerspective(f32 fovy, f32 aspect, f32 n, f32 f)
     _zfar = f;
     _znear = n;
     t = sinf(_fovy * 0.5f * 3.1415927f / 180.0f) / cosf(_fovy * 0.5f * 3.1415927f / 180.0f);
-    b = &localFull;
+    b = &_l_box;
     zn = _znear;
     z = -zn;
     h = zn * t;
     w = h * aspect;
-    b->point[0].z = z;
-    b->point[0].x = w;
-    b->point[0].y = h;
-    b->point[1].z = z;
-    b->point[1].x = -w;
-    b->point[1].y = h;
-    b->point[2].z = z;
-    b->point[2].x = -w;
-    b->point[2].y = -h;
-    b->point[3].z = z;
-    b->point[3].x = w;
-    b->point[3].y = -h;
+    b->vertex[0].z = z;
+    b->vertex[0].x = w;
+    b->vertex[0].y = h;
+    b->vertex[1].z = z;
+    b->vertex[1].x = -w;
+    b->vertex[1].y = h;
+    b->vertex[2].z = z;
+    b->vertex[2].x = -w;
+    b->vertex[2].y = -h;
+    b->vertex[3].z = z;
+    b->vertex[3].x = w;
+    b->vertex[3].y = -h;
     zf = _zfar;
     h2 = zf * t;
     z = -zf;
     w = h2 * aspect;
-    b->point[4].z = z;
-    b->point[4].x = w;
-    b->point[4].y = h2;
-    b->point[5].z = z;
-    b->point[5].x = -w;
-    b->point[5].y = h2;
-    b->point[6].z = z;
-    b->point[6].x = -w;
-    b->point[6].y = -h2;
-    b->point[7].z = z;
-    b->point[7].x = w;
-    b->point[7].y = -h2;
+    b->vertex[4].z = z;
+    b->vertex[4].x = w;
+    b->vertex[4].y = h2;
+    b->vertex[5].z = z;
+    b->vertex[5].x = -w;
+    b->vertex[5].y = h2;
+    b->vertex[6].z = z;
+    b->vertex[6].x = -w;
+    b->vertex[6].y = -h2;
+    b->vertex[7].z = z;
+    b->vertex[7].x = w;
+    b->vertex[7].y = -h2;
 
 #line 190 "D:/Bio4/Prog/view.cpp"
-    PSVECSubtract(&b->point[1], &b->point[0], &t1);
-    PSVECSubtract(&b->point[3], &b->point[0], &t2);
+    PSVECSubtract(&b->vertex[1], &b->vertex[0], &t1);
+    PSVECSubtract(&b->vertex[3], &b->vertex[0], &t2);
     PSVECCrossProduct(&t1, &t2, &b->normal[0]);
     VECNormalize(&b->normal[0], &b->normal[0]);
 
-    PSVECSubtract(&b->point[3], &b->point[0], &t1);
-    PSVECSubtract(&b->point[4], &b->point[0], &t2);
+    PSVECSubtract(&b->vertex[3], &b->vertex[0], &t1);
+    PSVECSubtract(&b->vertex[4], &b->vertex[0], &t2);
     PSVECCrossProduct(&t1, &t2, &b->normal[1]);
     VECNormalize(&b->normal[1], &b->normal[1]);
 
-    PSVECSubtract(&b->point[4], &b->point[0], &t1);
-    PSVECSubtract(&b->point[1], &b->point[0], &t2);
+    PSVECSubtract(&b->vertex[4], &b->vertex[0], &t1);
+    PSVECSubtract(&b->vertex[1], &b->vertex[0], &t2);
     PSVECCrossProduct(&t1, &t2, &b->normal[2]);
     VECNormalize(&b->normal[2], &b->normal[2]);
 
-    PSVECSubtract(&b->point[5], &b->point[1], &t1);
-    PSVECSubtract(&b->point[2], &b->point[1], &t2);
+    PSVECSubtract(&b->vertex[5], &b->vertex[1], &t1);
+    PSVECSubtract(&b->vertex[2], &b->vertex[1], &t2);
     PSVECCrossProduct(&t1, &t2, &b->normal[3]);
     VECNormalize(&b->normal[3], &b->normal[3]);
 
-    PSVECSubtract(&b->point[6], &b->point[2], &t1);
-    PSVECSubtract(&b->point[3], &b->point[2], &t2);
+    PSVECSubtract(&b->vertex[6], &b->vertex[2], &t1);
+    PSVECSubtract(&b->vertex[3], &b->vertex[2], &t2);
     PSVECCrossProduct(&t1, &t2, &b->normal[4]);
     VECNormalize(&b->normal[4], &b->normal[4]);
 
-    PSVECSubtract(&b->point[7], &b->point[4], &t1);
-    PSVECSubtract(&b->point[5], &b->point[4], &t2);
+    PSVECSubtract(&b->vertex[7], &b->vertex[4], &t1);
+    PSVECSubtract(&b->vertex[5], &b->vertex[4], &t2);
     PSVECCrossProduct(&t1, &t2, &b->normal[5]);
     VECNormalize(&b->normal[5], &b->normal[5]);
 
-    b = &local;
-    *b = localFull;
+    b = &_l_effect_box;
+    *b = _l_box;
     for (i = 0; i < 8; i++) {
-        b->point[i].x *= 0.5f;
-        b->point[i].y *= 0.5f;
+        b->vertex[i].x *= 0.5f;
+        b->vertex[i].y *= 0.5f;
     }
 #line 236 "D:/Bio4/Prog/view.cpp"
-    PSVECSubtract(&b->point[1], &b->point[0], &t1);
-    PSVECSubtract(&b->point[3], &b->point[0], &t3);
+    PSVECSubtract(&b->vertex[1], &b->vertex[0], &t1);
+    PSVECSubtract(&b->vertex[3], &b->vertex[0], &t3);
     PSVECCrossProduct(&t1, &t3, &b->normal[0]);
     VECNormalize(&b->normal[0], &b->normal[0]);
 
-    PSVECSubtract(&b->point[3], &b->point[0], &t1);
-    PSVECSubtract(&b->point[4], &b->point[0], &t3);
+    PSVECSubtract(&b->vertex[3], &b->vertex[0], &t1);
+    PSVECSubtract(&b->vertex[4], &b->vertex[0], &t3);
     PSVECCrossProduct(&t1, &t3, &b->normal[1]);
     VECNormalize(&b->normal[1], &b->normal[1]);
 
-    PSVECSubtract(&b->point[4], &b->point[0], &t1);
-    PSVECSubtract(&b->point[1], &b->point[0], &t3);
+    PSVECSubtract(&b->vertex[4], &b->vertex[0], &t1);
+    PSVECSubtract(&b->vertex[1], &b->vertex[0], &t3);
     PSVECCrossProduct(&t1, &t3, &b->normal[2]);
     VECNormalize(&b->normal[2], &b->normal[2]);
 
-    PSVECSubtract(&b->point[5], &b->point[1], &t1);
-    PSVECSubtract(&b->point[2], &b->point[1], &t3);
+    PSVECSubtract(&b->vertex[5], &b->vertex[1], &t1);
+    PSVECSubtract(&b->vertex[2], &b->vertex[1], &t3);
     PSVECCrossProduct(&t1, &t3, &b->normal[3]);
     VECNormalize(&b->normal[3], &b->normal[3]);
 
-    PSVECSubtract(&b->point[6], &b->point[2], &t1);
-    PSVECSubtract(&b->point[3], &b->point[2], &t3);
+    PSVECSubtract(&b->vertex[6], &b->vertex[2], &t1);
+    PSVECSubtract(&b->vertex[3], &b->vertex[2], &t3);
     PSVECCrossProduct(&t1, &t3, &b->normal[4]);
     VECNormalize(&b->normal[4], &b->normal[4]);
 
-    PSVECSubtract(&b->point[7], &b->point[4], &t1);
-    PSVECSubtract(&b->point[5], &b->point[4], &t3);
+    PSVECSubtract(&b->vertex[7], &b->vertex[4], &t1);
+    PSVECSubtract(&b->vertex[5], &b->vertex[4], &t3);
     PSVECCrossProduct(&t1, &t3, &b->normal[5]);
     VECNormalize(&b->normal[5], &b->normal[5]);
 
     orientation();
 
-    b = &localFull;
-    q[0].x = b->point[0].x;
-    q[0].y = b->point[0].y;
-    q[0].z = b->point[0].z;
-    q[1].x = b->point[4].x;
-    q[1].y = b->point[4].y;
-    q[1].z = b->point[4].z;
-    q[2].x = b->point[5].x;
-    q[2].y = b->point[5].y;
-    q[2].z = b->point[5].z;
-    q[3].x = b->point[6].x;
-    q[3].y = b->point[6].y;
-    q[3].z = b->point[6].z;
+    b = &_l_box;
+    q[0].x = b->vertex[0].x;
+    q[0].y = b->vertex[0].y;
+    q[0].z = b->vertex[0].z;
+    q[1].x = b->vertex[4].x;
+    q[1].y = b->vertex[4].y;
+    q[1].z = b->vertex[4].z;
+    q[2].x = b->vertex[5].x;
+    q[2].y = b->vertex[5].y;
+    q[2].z = b->vertex[5].z;
+    q[3].x = b->vertex[6].x;
+    q[3].y = b->vertex[6].y;
+    q[3].z = b->vertex[6].z;
     det = (q[1].x - q[0].x) * (q[2].y - q[1].y) * (q[3].z - q[2].z) + (q[2].x - q[1].x) * (q[3].y - q[2].y) * (q[1].z - q[0].z) +
           (q[3].x - q[2].x) * (q[1].y - q[0].y) * (q[2].z - q[1].z) - (q[1].x - q[0].x) * (q[3].y - q[2].y) * (q[2].z - q[1].z) -
           (q[2].x - q[1].x) * (q[1].y - q[0].y) * (q[3].z - q[2].z) - (q[3].x - q[2].x) * (q[2].y - q[1].y) * (q[1].z - q[0].z);
@@ -204,34 +204,34 @@ void VIEW::initPerspective(f32 fovy, f32 aspect, f32 n, f32 f)
     d1 = PSVECSquareMag(&q[1]) - PSVECSquareMag(&q[2]);
     d2 = PSVECSquareMag(&q[2]) - PSVECSquareMag(&q[3]);
     s = &_l_sphere_outer;
-    s->center.x = (d0 * ((q[3].y - q[2].y) * (q[2].z - q[1].z) - (q[2].y - q[1].y) * (q[3].z - q[2].z)) +
+    s->pos.x = (d0 * ((q[3].y - q[2].y) * (q[2].z - q[1].z) - (q[2].y - q[1].y) * (q[3].z - q[2].z)) +
                        d1 * ((q[1].y - q[0].y) * (q[3].z - q[2].z) - (q[3].y - q[2].y) * (q[1].z - q[0].z)) +
                        d2 * ((q[2].y - q[1].y) * (q[1].z - q[0].z) - (q[1].y - q[0].y) * (q[2].z - q[1].z))) /
                       (2.0f * det);
-    s->center.y = (d0 * ((q[3].z - q[2].z) * (q[2].x - q[1].x) - (q[2].z - q[1].z) * (q[3].x - q[2].x)) +
+    s->pos.y = (d0 * ((q[3].z - q[2].z) * (q[2].x - q[1].x) - (q[2].z - q[1].z) * (q[3].x - q[2].x)) +
                        d1 * ((q[1].z - q[0].z) * (q[3].x - q[2].x) - (q[3].z - q[2].z) * (q[1].x - q[0].x)) +
                        d2 * ((q[2].z - q[1].z) * (q[1].x - q[0].x) - (q[1].z - q[0].z) * (q[2].x - q[1].x))) /
                       (2.0f * det);
-    s->center.z = (d0 * ((q[3].x - q[2].x) * (q[2].y - q[1].y) - (q[2].x - q[1].x) * (q[3].y - q[2].y)) +
+    s->pos.z = (d0 * ((q[3].x - q[2].x) * (q[2].y - q[1].y) - (q[2].x - q[1].x) * (q[3].y - q[2].y)) +
                        d1 * ((q[1].x - q[0].x) * (q[3].y - q[2].y) - (q[3].x - q[2].x) * (q[1].y - q[0].y)) +
                        d2 * ((q[2].x - q[1].x) * (q[1].y - q[0].y) - (q[1].x - q[0].x) * (q[2].y - q[1].y))) /
                       (2.0f * det);
-    s->radius = PSVECDistance(&s->center, &q[0]);
+    s->radius = PSVECDistance(&s->pos, &q[0]);
 }
 
 // Never called: the original linker dead-stripped the bodies (STRIP_UNUSED) and kept the two
 // constant pools after initPerspective's (`.rodata` 0x48..0x7f: DF 0.0, 1.0f, 0.0f; then 0.0f, the
 // signed int->f32 magic, 2*pi, 12.0f, the unsigned int->f32 magic, 1/1024, pi/2).
-static void viewSphereReset(ViewSphere* sp, f64 r)
+static void viewSphereReset(GEOM_SPHERE* sp, f64 r)
 {
     if (r > 0.0) {
         sp->radius = 1.0f;
     }
-    sp->x10 = 0.0f;
+    sp->color = 0.0f;
 }
 
 // Dead-stripped debug helper: a point on the sphere's ring.
-static void viewSphereRing(ViewSphere* sp, Vec* out, int div, u32 col)
+static void viewSphereRing(GEOM_SPHERE* sp, Vec* out, int div, u32 col)
 {
     Vec* p;
     f32 a;
@@ -241,8 +241,8 @@ static void viewSphereRing(ViewSphere* sp, Vec* out, int div, u32 col)
     p->y = 0.0f;
     a = (f32) div * 6.2831855f / 12.0f;
     c = (f32) col * 0.0009765625f;
-    p->x = sp->center.x + sp->radius * (a + 1.5707964f);
-    p->z = sp->center.z + sp->radius * c;
+    p->x = sp->pos.x + sp->radius * (a + 1.5707964f);
+    p->z = sp->pos.z + sp->radius * c;
 }
 
 // Transforms the camera-space planes / points / sphere of both frustums into world space with the
@@ -253,13 +253,13 @@ void VIEW::orientation()
     u32 i;
 
     for (i = 0; i < 6; i++) {
-        PSMTXMultVecSR(*m, &localFull.normal[i], &worldFull.normal[i]);
-        PSMTXMultVecSR(*m, &local.normal[i], &world.normal[i]);
+        PSMTXMultVecSR(*m, &_l_box.normal[i], &_box.normal[i]);
+        PSMTXMultVecSR(*m, &_l_effect_box.normal[i], &_effect_box.normal[i]);
     }
     for (i = 0; i < 8; i++) {
-        PSMTXMultVec(*m, &localFull.point[i], &worldFull.point[i]);
-        PSMTXMultVec(*m, &local.point[i], &world.point[i]);
+        PSMTXMultVec(*m, &_l_box.vertex[i], &_box.vertex[i]);
+        PSMTXMultVec(*m, &_l_effect_box.vertex[i], &_effect_box.vertex[i]);
     }
     _sphere_outer = _l_sphere_outer;
-    PSMTXMultVec(*m, &_l_sphere_outer.center, &_sphere_outer.center);
+    PSMTXMultVec(*m, &_l_sphere_outer.pos, &_sphere_outer.pos);
 }

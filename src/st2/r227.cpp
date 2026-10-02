@@ -137,7 +137,7 @@ void R227Init()
     r227_initCargoElv();
     PlRegistMotion(ROOM_ARC_PTR(pG->pRoom, 0x22), ROOM_ARC_PTR(pG->pRoom, 0x23), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     SceSetItemEvent(0x11, 0x86, 4, 9, r227_openShelf, r227_openedShelf, 0, 0);
-    SceSetItemEvent(0x12, 0x85, 5, 0xA, r227_openShelf, r227_openedShelf, 1, 0);
+    SceSetItemEvent(0x12, 0x85, 5, 0xA, r227_openShelf, r227_openedShelf, (void*) 1, 0);
 }
 
 // Per-frame room main: nothing.
@@ -835,31 +835,31 @@ static void r227_execEvent00()
         SmdGetObjPtr(0x9B)->be_flag &= ~2;
     }
     if (r227_work->evd[0]->waitLoadOk() != 0) {
-        u32 key0;
+        Event* evt0;
 
-        EvtMgr.SetEvt(r227_work->evd[0]->getAddr(), &key0);
-        ((Event*) key0)->FlgOnStatus(EvtStfPlPosNoSet);
+        EvtMgr.SetEvt(r227_work->evd[0]->getAddr(), &evt0);
+        evt0->FlgOnStatus(EvtStfPlPosNoSet);
         r227_waitEvt();
         SysFlagOn(pG, SYS_SCREEN_STOP);
         r227_work->evd[0]->setCommand(CMND_DEL_DATA, 0, 0);
         if (pG->Room_flg[0] & 0x80000000) {
             if (r227_work->evd[1]->waitLoadOk() != 0) {
-                u32 key1;
+                Event* evt1;
 
                 r227_work->evd[1]->setCommand(CMND_MRAM_LOAD, 0, 1);
-                if (EvtMgr.SetEvt(r227_work->evd[1]->getAddr(), &key1)) {
-                    ((Event*) key1)->FlgOnStatus(EvtStfPlPosNoSet);
+                if (EvtMgr.SetEvt(r227_work->evd[1]->getAddr(), &evt1)) {
+                    evt1->FlgOnStatus(EvtStfPlPosNoSet);
                 }
                 r227_waitEvt();
             }
         } else {
             if (r227_work->evd[2]->waitLoadOk() != 0) {
-                u32 key2;
+                Event* evt2;
 
                 r227_work->evd[2]->setCommand(CMND_MRAM_LOAD, 0, 1);
-                if (EvtMgr.SetEvt(r227_work->evd[2]->getAddr(), &key2)) {
-                    ((Event*) key2)->FlgOnStatus(EvtStfEndSleepOrder);
-                    ((Event*) key2)->FlgOnStatus(EvtStfDiedemo);
+                if (EvtMgr.SetEvt(r227_work->evd[2]->getAddr(), &evt2)) {
+                    evt2->FlgOnStatus(EvtStfEndSleepOrder);
+                    evt2->FlgOnStatus(EvtStfDiedemo);
                 }
                 r227_waitEvt();
                 SceExit();
@@ -1047,15 +1047,15 @@ static void Evt_R227S01_Func(Event* e)
         }
         break;
     case 2: {
-        SmdWork* w;
+        cSmdWork* w;
 
         SmdSetTrans(0xA, 1);
         SmdSetTrans(0xF8, 0);
         w = SmdGetWorkPtr(0xA);
         mod = SmdGetObjPtr(0xA);
         if (mod && w) {
-            ((cModel*) mod)->setPos(&w->pos);
-            ((cModel*) mod)->setAng(&w->rot);
+            ((cModel*) mod)->setPos(&w->Pos);
+            ((cModel*) mod)->setAng(&w->Ang);
         }
         break;
     }

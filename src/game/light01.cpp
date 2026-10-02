@@ -4,11 +4,6 @@
 #include "light.h"
 #include "rnd.h"
 
-struct Light01Work {
-    u8 pad_0[4];
-    s8 range;  // 0x04 random brightness range (+-)
-};
-
 // Nothing beyond the cLight constructor.
 cLight01::cLight01()
 {
@@ -19,12 +14,12 @@ cLight01::cLight01()
 // Flicker light: adds a random offset in [-range, range) to every color channel.
 void Light01_Move(cLight* pLi)
 {
-    Light01Work* w = (Light01Work*)pLi->work;
+    LIT01_MOVE_FREE* w = (LIT01_MOVE_FREE*)pLi->work;
     int r;
     int c;
 
-    if (w->range != 0) {
-        r = Rnd() % (w->range + w->range) - w->range;
+    if (w->ColFlick != 0) {
+        r = Rnd() % (w->ColFlick + w->ColFlick) - w->ColFlick;
     } else {
         r = 0;
     }

@@ -54,10 +54,10 @@ void Obj18CmfOn(cObj* o, u32 n);   // game/obj18.cpp
 static inline void r106_emSetAng(cEmWrap* em, Vec* ang) { em->setAng(ang); }
 
 static void r106_checkRollingStone();
-extern "C" void r106_setRollingStone();
+void r106_setRollingStone();
 static void r106_ctrlEm0();
 static void r106_ctrlEm1();
-extern "C" void r106_openShelf_main(int type, int opened);
+void r106_openShelf_main(int type, int opened);
 static void r106_openedShelf(int type);
 static void r106_openShelf(int type);
 static void r106_ctrlBgm(int on);
@@ -66,8 +66,8 @@ static void r106_shakeClosetBody(cModel* m);
 static void r106_shakeClosetDoorR(cModel* m);
 static void r106_shakeClosetDoorL(cModel* m);
 static void r106_setCloset();
-extern "C" void Evt_R106S00_Func(Event* ev);
-extern "C" void r106_setEm();
+void Evt_R106S00_Func(Event* ev, u32);
+void r106_setEm();
 
 // Room init. Until Luis is found (Scenario_flg[0] 0x00200000) the closet event and the shaking
 // closet are set up.
@@ -89,7 +89,7 @@ void R106Init()
         door->setLock(ROOM_ARC_PTR(pG->pRoom, 0x32), ROOM_ARC_PTR(pG->pRoom, 0x33), 0, 0);
     }
     SceSetItemEvent(6, 0x85, 0, 6, r106_openShelf, r106_openedShelf, 0, 0);
-    SceSetItemEvent(7, 0x86, 1, 7, r106_openShelf, r106_openedShelf, 1, 0);
+    SceSetItemEvent(7, 0x86, 1, 7, r106_openShelf, r106_openedShelf, (void*) 1, 0);
     if (!ScfFlagChk(pG, SCF_R106_EVENT)) {
         SceAtDataSet_exec(2, SCE_LEVEL10, 0, (TaskFunc) r106_Event, 0, 1);
         r106_work->evd = DC.setData(EvtMgr.NameChange("evd/r106s00.evd"));
@@ -142,7 +142,7 @@ static void r106_checkRollingStone()
 }
 
 // The boulder ("IWA") with its player motions and the three Ganados pushing it.
-extern "C" void r106_setRollingStone()
+void r106_setRollingStone()
 {
     Vec pos;
     Vec rot;
@@ -265,7 +265,7 @@ static void r106_ctrlEm1()
 }
 
 // Open shelf `type` (opened != 0: already open): the two doors turn 110 degrees over 30 frames.
-extern "C" void r106_openShelf_main(int type, int opened)
+void r106_openShelf_main(int type, int opened)
 {
     // b declared first: its `li` is the first insn of block 0 (LUID tie of the two zero inits).
     cObj* b = 0;
@@ -361,7 +361,7 @@ static void r106_Event()
     if (r106_work->evd->waitLoadOk()) {
         EventMgr* evt;
 
-        if (EvtMgr.SetEvt(r106_work->evd->getAddr(), (u32*) &ev)) {
+        if (EvtMgr.SetEvt(r106_work->evd->getAddr(), &ev)) {
             ev->FlgOnStatus(EvtStfFadeOut);
         }
         evt = &EvtMgr;
@@ -471,9 +471,9 @@ static void r106_setCloset()
             Vec sp = {157059.0f, -9245.0f, -43597.0f};
 
             SndCall(6, 4, &sp, 0, 0, 0);
-            SceExec(0x12, (TaskFunc) r106_shakeClosetBody, (int) body, 0, SCE_PRIO_DEF_2, 0);
-            SceExec(0x12, (TaskFunc) r106_shakeClosetDoorR, (int) doorR, 0, SCE_PRIO_DEF_2, 0);
-            SceExec(0x12, (TaskFunc) r106_shakeClosetDoorL, (int) doorL, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r106_shakeClosetBody, body, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r106_shakeClosetDoorR, doorR, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r106_shakeClosetDoorL, doorL, 0, SCE_PRIO_DEF_2, 0);
             cnt = ((Rnd() >> 2) & 0xFF) + 5;
         }
         cnt--;
@@ -482,7 +482,7 @@ static void r106_setCloset()
 }
 
 // Event r106s00 handler: the closet, the Ganado models in the doorway, the weapon.
-extern "C" void Evt_R106S00_Func(Event* ev)
+void Evt_R106S00_Func(Event* ev, u32)
 {
     void* mod;
 
@@ -553,7 +553,7 @@ extern "C" void Evt_R106S00_Func(Event* ev)
 }
 
 // The six Ganados of the hall.
-extern "C" void r106_setEm()
+void r106_setEm()
 {
     EM_LIST d;
 

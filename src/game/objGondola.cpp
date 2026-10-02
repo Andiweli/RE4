@@ -20,16 +20,7 @@
 #include "motion.h"
 #include "game.h"
 
-// motion.h declares MotionMove with one argument; the object units call it with two. Only the
-// two blend fields of MotionWork are touched here.
-struct GondolaMotWork {
-    u8 pad_0[0x44];
-    u32 flags2;           // 0x44
-    u8 pad_48[0xC8 - 0x48];
-    f32 blendRate;        // 0xC8
-};
-
-extern "C" {
+// motion.h declares MotionMove with one argument; the object units call it with two.
 void objGondola_R0_Set(cObjGondola* obj);
 void objGondola_R0_Move(cObjGondola* obj);
 void objGondola_R0_Down(cObjGondola* obj);
@@ -38,7 +29,6 @@ void objGondola_R0_Break(cObjGondola* obj);
 void objGondolaSatClear(cObjGondola* obj);
 void objGondolaSatSet(cObjGondola* obj);
 void objGondolaRideEmAdjust(cObjGondola* obj, Vec* pVec);
-}
 
 static void (*ObjGondola_R0_move_tbl[5])(cObjGondola*) = {
     objGondola_R0_Set, objGondola_R0_Move, objGondola_R0_Down, objGondola_R0_Up, objGondola_R0_Break,
@@ -270,18 +260,18 @@ void objGondola_R0_Break(cObjGondola* pObj)
         v.y = 0.0f;
         v.z = -1115.0f;
         PSMTXMultVec(parts->mat, &v, &v);
-        ObjGondolaCam.param.pos = v;
+        ObjGondolaCam.param.Campos = v;
         parts = pObj->getPartsPtr(1);
         v.x = 0.0f;
         v.y = -2757.0f;
         v.z = 0.0f;
         PSMTXMultVec(parts->mat, &v, &v);
-        ObjGondolaCam.param.at = v;
-        cp = &ObjGondolaCam.param.pos;
-        ca = &ObjGondolaCam.param.at;
+        ObjGondolaCam.param.Target = v;
+        cp = &ObjGondolaCam.param.Campos;
+        ca = &ObjGondolaCam.param.Target;
         ObjGondolaCam.Up.x = 0.0f;
         ObjGondolaCam.Up.z = 0.0f;
-        ObjGondolaCam.param.fovy = 50.0f;
+        ObjGondolaCam.param.Fovy = 50.0f;
         ObjGondolaCam.Up.y = 1.0f;
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         ObjGondolaCam.Distance = SQRTF(len);
@@ -291,12 +281,12 @@ void objGondola_R0_Break(cObjGondola* pObj)
             w->Timer--;
             if (w->Timer == 0) {
                 if (w->pMot_info && w->Sub_mot2) {
-                    ((GondolaMotWork*) w->pMot_info)->flags2 |= 0x10000000;
+                    w->pMot_info->Mot_flag |= 0x10000000;
                     MotionSetCore(pObj, w->pMot_info, w->Sub_mot2, 0, 0, 0, 0);
-                    ((GondolaMotWork*) w->pMot_info)->flags2 &= ~0x10000000;
-                    pObj->Motion.blend = w->pMot_info;
-                    ((GondolaMotWork*) pObj->Motion.blend)->blendRate = 1.0f;
-                    ((GondolaMotWork*) pObj->Motion.blend)->flags2 |= 0x80000000;
+                    w->pMot_info->Mot_flag &= ~0x10000000;
+                    pObj->pMotionB = w->pMot_info;
+                    pObj->pMotionB->Brate = 1.0f;
+                    pObj->pMotionB->Mot_flag |= 0x80000000;
                 }
             }
         }
@@ -632,8 +622,8 @@ void cObjGondola::setGetOffPL()
     r_no_3 = 0;
 }
 
-// Installs the secondary MotionWork with the shake and break motions blended over the travel motion.
-void cObjGondola::setSubMotion(MotionWork* work, void* mot, void* breakMot)
+// Installs the secondary motion work with the shake and break motions blended over the travel motion.
+void cObjGondola::setSubMotion(MOTION_INFO* work, void* mot, void* breakMot)
 {
     FREE_GONDOLA* w = GONDOLA_WK(this);
 
@@ -648,12 +638,12 @@ void cObjGondola::setVib()
     FREE_GONDOLA* w = GONDOLA_WK(this);
 
     if (w->pMot_info && w->Sub_mot1) {
-        ((GondolaMotWork*) w->pMot_info)->flags2 |= 0x10000000;
+        w->pMot_info->Mot_flag |= 0x10000000;
         MotionSetCore(this, w->pMot_info, w->Sub_mot1, 0, 0, 0, 0);
-        ((GondolaMotWork*) w->pMot_info)->flags2 &= ~0x10000000;
-        Motion.blend = w->pMot_info;
-        ((GondolaMotWork*) Motion.blend)->blendRate = 1.0f;
-        ((GondolaMotWork*) Motion.blend)->flags2 |= 0x80000000;
+        w->pMot_info->Mot_flag &= ~0x10000000;
+        pMotionB = w->pMot_info;
+        pMotionB->Brate = 1.0f;
+        pMotionB->Mot_flag |= 0x80000000;
         QuakeExec(0, 0, 10, 30.0f, 2);
         VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
     }

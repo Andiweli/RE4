@@ -69,17 +69,16 @@ static f32 r30b_spd = 100.0f;
 static f32 r30b_accel = 5.0f;
 static Vec r30b_patrolTbl0[2] = {{-11900.0f, -2000.0f, -6500.0f}, {-7000.0f, -2000.0f, -5000.0f}};
 static Vec r30b_patrolTbl1[2] = {{-11500.0f, -2000.0f, -600.0f}, {-7400.0f, -2000.0f, -200.0f}};
-static EmControlPoint r30b_sitTbl0[1] = {{{-6870.0f, -2000.0f, -3900.0f}, 0xE}};
-static EmControlPoint r30b_sitTbl1[2] = {{{-11590.0f, 1000.0f, -12800.0f}, 8}, {{-8790.0f, -2000.0f, -2610.0f}, 0xE}};
-static EmControlPoint r30b_sitTbl3[1] = {{{-6000.0f, -2000.0f, -1200.0f}, 0xE}};
-static EmControlPoint r30b_sitTbl2[2] = {{{-11590.0f, 1000.0f, -12800.0f}, 8}, {{-7480.0f, -2000.0f, 1400.0f}, 0xE}};
-static EmControlPoint r30b_sitTbl2b[1] = {{{-7480.0f, -2000.0f, 1400.0f}, 0xE}};
+static TarWork r30b_sitTbl0[1] = {{{-6870.0f, -2000.0f, -3900.0f}, 0xE}};
+static TarWork r30b_sitTbl1[2] = {{{-11590.0f, 1000.0f, -12800.0f}, 8}, {{-8790.0f, -2000.0f, -2610.0f}, 0xE}};
+static TarWork r30b_sitTbl3[1] = {{{-6000.0f, -2000.0f, -1200.0f}, 0xE}};
+static TarWork r30b_sitTbl2[2] = {{{-11590.0f, 1000.0f, -12800.0f}, 8}, {{-7480.0f, -2000.0f, 1400.0f}, 0xE}};
+static TarWork r30b_sitTbl2b[1] = {{{-7480.0f, -2000.0f, 1400.0f}, 0xE}};
 static Vec r30b_gotoTbl[3] = {{-5600.0f, -2000.0f, -4900.0f}, {-5780.0f, 1000.0f, -14700.0f}, {-10000.0f, 1000.0f, -14700.0f}};
 static Vec r30b_gotoTbl2[1] = {{-5600.0f, -2000.0f, -4900.0f}};
 // The module's .data tail is 8-aligned in the original (0x23C -> 0x240; st3.cpp's linker word follows).
 asm(".section .data\n\t.balign 8\n\t.text");
 
-extern "C" {
 static void r30b_movedShelf(int no);
 static void r30b_moveShelf(int no);
 void R30bDoorEventEmMove();
@@ -94,7 +93,7 @@ int CalcMovePosDistAdd2(Vec* pos, Vec* target, Vec* vel, f32 max, f32 add);
 static void R30bCraneEnd();
 static void R30bCrane();
 static void R30bEventS00();
-void Evt_R30BS00_Func(Event* e);
+void Evt_R30BS00_Func(Event* e, u32);
 void R30bEmWanderingSet();
 static void R30bEmSitDownSet();
 static void R30bEmGotoSet();
@@ -102,7 +101,6 @@ static void R30bEmGotoSet2();
 void SetCatchEm(int no);
 int CkCatchEm(int no);
 static void SceBgmCheck();
-}
 
 
 // Room init (the crane hall), also the s00 callback. With Ashley along area 3 is the s00 escape
@@ -193,7 +191,7 @@ void R30bInit()
     } else {
         R30bDoorOpened(0);
     }
-    SceSetItemEvent(5, 0x80, 1, 4, r30b_moveShelf, r30b_movedShelf, 0x80, 0);
+    SceSetItemEvent(5, 0x80, 1, 4, r30b_moveShelf, r30b_movedShelf, (void*) 0x80, 0);
 }
 
 // Per-frame room main: nothing.
@@ -912,7 +910,7 @@ static void R30bEventS00()
 }
 
 // Event r30bs00: the fade at cut 5.
-void Evt_R30BS00_Func(Event* e)
+void Evt_R30BS00_Func(Event* e, u32)
 {
     if (e->GetFuncType() == 1) {
         switch (e->GetNowCut()) {

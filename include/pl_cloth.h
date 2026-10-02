@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "vec.h"
+#include "pendulum.h"
 
 class cModel;
 
@@ -18,62 +19,33 @@ struct CLOTH_AT_SET {
     Vec Ofs2;          // 0x18
 };
 
-// Cloth / pendulum chain work of one accessory (game/pl_cloth.cpp, game/pendulum.cpp), 0x60 bytes.
-// pendulum.h's CLOTH_INFO is the same object with the obj units' field names.
-struct PlCloth {
-    int Num;             // 0x00  number of chain links
-    u8* pCloth;          // 0x04  model parts index per link
-    u8* pLeft;           // 0x08  left neighbour per link (0xFF = none)
-    u8* pRight;          // 0x0C  right neighbour
-    u8* pUpLeft;         // 0x10  (Ada dress)
-    u32 pUpRight;             // 0x14
-    u8* pParent;             // 0x18  upper neighbour per link
-    u8* pChild;           // 0x1C  lower neighbour per link
-    u32 pGravity;             // 0x20
-    f32* pRate;          // 0x24  per-link rate (em_cloth: em18ClothRate, em37HairRate, ...)
-    f32* pMax;           // 0x28  max swing per link
-    f32* pWindSin;         // 0x2C  wind phase per link
-    f32* pWindRate;         // 0x30  wind rate per link
-    CLOTH_AT_SET* pAtset;      // 0x34  collision volumes
-    int At_num;             // 0x38
-    f32 Gravity;             // 0x3C  link length
-    f32 Rate;             // 0x40
-    int Bundle_num;             // 0x44
-    f32 WindSin;             // 0x48
-    f32 Stretchy;             // 0x4C
-    f32 Move_rate;             // 0x50  gravity / stiffness rate (skirt: 0.9 under water, 0.5 otherwise)
-    u32 pPtbl;             // 0x54
-    cModel* pModel;      // 0x58  (AdaRibbonSet)
-    u32 Flag;           // 0x5C  0x100 / 0x200 / 0x302
-};
-
 // The player units pass these in this order; PlClothSet*/Move* use them as (jacket, holster, hair)
 // and (skirt, hair, sweater) respectively (the original naming does not match the use).
-extern PlCloth leonHair;
-extern PlCloth leonJacket;
-extern PlCloth leonHolster;
-extern PlCloth girlHair;
-extern PlCloth girlSkirt;
-extern PlCloth girlSweater;
+extern CLOTH_INFO leonHair;
+extern CLOTH_INFO leonJacket;
+extern CLOTH_INFO leonHolster;
+extern CLOTH_INFO girlHair;
+extern CLOTH_INFO girlSkirt;
+extern CLOTH_INFO girlSweater;
 
-extern PlCloth luisHair;
-extern PlCloth adaDress;
-extern PlCloth adaHair;
-extern PlCloth adaRibbon;
+extern CLOTH_INFO luisHair;
+extern CLOTH_INFO adaDress;
+extern CLOTH_INFO adaHair;
+extern CLOTH_INFO adaRibbon;
 
 // Chain object (game/obj1d.cpp, obj1d.h).
 class cObjChain;
 cObjChain* SetChain(void* bin, void* tpl, Vec* pos, Vec* rot);
 
-void PlClothSetLeon(cModel* pl, PlCloth* pCloth1, PlCloth* pCloth2, PlCloth* pCloth3);
-void PlClothMoveLeon(cModel* pl, PlCloth* pCloth1, PlCloth* pCloth2, PlCloth* pCloth3);
-void PlClothSetGirl(cModel* pl, PlCloth* pCloth1, PlCloth* pCloth2, PlCloth* pCloth3, int mode);
-void PlClothMoveGirl(cModel* pl, PlCloth* pCloth1, PlCloth* pCloth2, PlCloth* pCloth3);
-void PlClothSetLuis(cModel* pl, PlCloth* pCloth1);
-void PlClothMoveLuis(cModel* pl, PlCloth* pCloth1);
-void PlClothSetAda(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair, int evt);
-void PlClothMoveAda(cModel* pl, PlCloth* ribbon, PlCloth* dress, PlCloth* hair);
-cObjChain* AdaRibbonSet(cModel* pl, PlCloth* ribbon, void* bin, void* tpl);
+void PlClothSetLeon(cModel* pl, CLOTH_INFO* pCloth1, CLOTH_INFO* pCloth2, CLOTH_INFO* pCloth3);
+void PlClothMoveLeon(cModel* pl, CLOTH_INFO* pCloth1, CLOTH_INFO* pCloth2, CLOTH_INFO* pCloth3);
+void PlClothSetGirl(cModel* pl, CLOTH_INFO* pCloth1, CLOTH_INFO* pCloth2, CLOTH_INFO* pCloth3, int mode);
+void PlClothMoveGirl(cModel* pl, CLOTH_INFO* pCloth1, CLOTH_INFO* pCloth2, CLOTH_INFO* pCloth3);
+void PlClothSetLuis(cModel* pl, CLOTH_INFO* pCloth1);
+void PlClothMoveLuis(cModel* pl, CLOTH_INFO* pCloth1);
+void PlClothSetAda(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair, int evt);
+void PlClothMoveAda(cModel* pl, CLOTH_INFO* ribbon, CLOTH_INFO* dress, CLOTH_INFO* hair);
+cObjChain* AdaRibbonSet(cModel* pl, CLOTH_INFO* ribbon, void* bin, void* tpl);
 
 // game/pl_cloth.cpp: Ada's hair chain parameters (pl02 builds its costume-2 hair from them).
 extern f32 adaHairMax[14];

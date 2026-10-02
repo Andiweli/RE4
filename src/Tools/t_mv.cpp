@@ -84,25 +84,25 @@ static int mvInit()
     GXColor bg;
     u8 zero = 0;
 
-    pG->Stop_flg |= 0x10000000;
-    pG->Disp_flg |= 0x2000000;
-    pG->Stop_flg |= 0x800000;
-    pG->System_flg &= ~0x800;
+    SpfFlagOn(pG, SPF_PL);
+    DpfFlagOn(pG, DPF_SHADOW);
+    SpfFlagOn(pG, SPF_SCE);
+    SysFlagOff(pG, SYS_SCISSOR_ON);
     DbgFlagOn(pG, DBG_DBG_CAM);
     ToolArrayPush(0);
     bg.r = bg.g = bg.b = 0x30;
-    bg.a = zero;
+    bg.a = 0;
     bio4_GXSetCopyClear(bg, 0xFFFFFF);
     {
         CAMERA* cam = &pG->Camera;
 
-        cam->param.at.x = 0.0f;
-        cam->param.at.y = 1000.0f;
-        cam->param.at.z = 0.0f;
-        cam->param.pos.x = 0.0f;
-        cam->param.pos.y = 1000.0f;
-        cam->param.pos.z = 3000.0f;
-        cam->param.roll = 0.0f;
+        cam->param.Target.x = 0.0f;
+        cam->param.Target.y = 1000.0f;
+        cam->param.Target.z = 0.0f;
+        cam->param.Campos.x = 0.0f;
+        cam->param.Campos.y = 1000.0f;
+        cam->param.Campos.z = 3000.0f;
+        cam->param.Roll = 0.0f;
         CameraSetOrientationRoll(cam);
     }
     TutilInitDefault();
@@ -179,7 +179,7 @@ static int mvMain()
         cModel* m = dbModSlot[pMv->model].pModel;
 
         if (m) {
-            MotionWork* Motion = &m->Motion;
+            MOTION_INFO* Motion = &m->Motion;
 
             eprintf(0xD8, 0x1A4, 0, 0, "[%3d/%3d]", (int) Motion->Seq_frame - 1, Motion->Seq_frame_num);
         }
@@ -198,10 +198,10 @@ static int mvQuit()
     ToolWorkPop(0);
     bg = g_sysBgColor;
     bio4_GXSetCopyClear(bg, 0xFFFFFF);
-    pG->Stop_flg &= ~0x10000000;
-    pG->Disp_flg &= ~0x2000000;
-    pG->Stop_flg &= ~0x800000;
-    pG->System_flg |= 0x800;
+    SpfFlagOff(pG, SPF_PL);
+    DpfFlagOff(pG, DPF_SHADOW);
+    SpfFlagOff(pG, SPF_SCE);
+    SysFlagOn(pG, SYS_SCISSOR_ON);
     DbgFlagOff(pG, DBG_DBG_CAM);
     DbgFlagOff(pG, DBG_TEST_MODE);
     SetToolLight(-1);

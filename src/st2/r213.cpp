@@ -107,7 +107,7 @@ static void R213EventBridgeDownMain();
 static void R213EventBridgeDownEnd();
 static void SceBgmCheck();
 static void R213Event();
-extern "C" void Evt_R213S00_Func(Event* e);
+void Evt_R213S00_Func(Event* e, u32);
 
 #define R213_EM_ARC(no) ((void*) (pG->pCore->ofs_##no + (u32) pG->pCore))
 
@@ -144,9 +144,9 @@ void R213Init()
         R213EmSet();
     }
     R213SuInit();
-    SceSetItemEvent(0xA, 0x81, 9, 9, OpenBoxTreasure, OpenedBoxTreasure, 0x81, 0);
-    SceSetItemEvent(0xB, 0x84, 0xA, 0xC, OpenBoxTreasure, OpenedBoxTreasure, 0x84, 0);
-    SceSetItemEvent(0xC, 0x90, 0xB, 0xD, OpenBoxTreasure, OpenedBoxTreasure, 0x90, 0);
+    SceSetItemEvent(0xA, 0x81, 9, 9, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x81, 0);
+    SceSetItemEvent(0xB, 0x84, 0xA, 0xC, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x84, 0);
+    SceSetItemEvent(0xC, 0x90, 0xB, 0xD, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x90, 0);
     R213BridgeInit();
     SceExec(0x12, (TaskFunc) SceBgmCheck, 0, 0, SCE_PRIO_DEF_2, 0);
     SetSstAddAreaFlag(0x800);
@@ -632,7 +632,7 @@ static void R213BridgeManager()
                         which = 1;
                     }
                 }
-                SceExec(0x12, (TaskFunc) R213EventChainBreakMove, which, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) R213EventChainBreakMove, (void*) which, 0, SCE_PRIO_DEF_2, 0);
             }
             if (RsfCheck(G_ROOM_ID, 3) && RsfCheck(G_ROOM_ID, 4)) {
                 break;
@@ -1037,7 +1037,7 @@ static void R213Event()
 // Event r213s00 callback: sea area flag 0x800 during the event; cut 0 shows the boss model em2d00,
 // drops the room effect and pauses the statue render target; later cuts set the near clip (200) and
 // the models' flags; the end restores the render target.
-extern "C" void Evt_R213S00_Func(Event* e)
+void Evt_R213S00_Func(Event* e, u32)
 {
     f32 clip = 200.0f;
 
@@ -1082,7 +1082,7 @@ extern "C" void Evt_R213S00_Func(Event* e)
                 StaFlagOff(pG, STA_EVENT);
                 SstSet(EFF_ROOM, 0xFFFF, ESP_CORE_KIND_SST, 0, 0x2F, 0);
                 if (r213_work->tex) {
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0, r213_work->tex->GetCoreFlg() | 1, ESP_CORE_KIND_ROOM00, (void*) frame, (void*) frame);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0, r213_work->tex->GetCoreFlg() | 1, ESP_CORE_KIND_ROOM00, 0, 0);
                 }
                 StaFlagOn(pG, STA_EVENT);
                 SpfFlagOff(pG, SPF_ESP_AREA);
@@ -1112,7 +1112,7 @@ extern "C" void Evt_R213S00_Func(Event* e)
         StaFlagOff(pG, STA_EVENT);
         SstSet(EFF_ROOM, 0xFFFF, ESP_CORE_KIND_SST, 0, 0x2F, 0);
         if (r213_work->tex) {
-            EstSet(0, -1, 0, 0, EFF_ROOM, 0, r213_work->tex->GetCoreFlg() | 1, ESP_CORE_KIND_ROOM00, (void*) frame, (void*) frame);
+            EstSet(0, -1, 0, 0, EFF_ROOM, 0, r213_work->tex->GetCoreFlg() | 1, ESP_CORE_KIND_ROOM00, (void*) frame, 0);
         }
         StaFlagOn(pG, STA_EVENT);
         SpfFlagOff(pG, SPF_ESP_AREA);

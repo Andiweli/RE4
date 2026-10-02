@@ -21,24 +21,14 @@
 #include "game.h"
 #include "est.h"
 #include "read.h"
+#include "em_sub.h"
 
-// GetWepTargetList entry (em_sub.cpp).
-struct WepTarget {
-    cEm* em;
-    YARARE_INFO* part;
-};
-
-extern "C" {
-u32 GetWepTargetListBomb(Vec* pos, WepTarget* list, u32 prio, int type, int flag, f32 len);  // game/em_sub.cpp (defined with another parameter list; this unit's prototype stays)
-u32 GetWepTargetList2(Vec* p0, Vec* p1, WepTarget* list, u32 prio, Vec* hit, Vec* nrm, u32* attr, int type,
-                      int flag, f32 len);
 f32 rangeDist(Vec* pos, cEm* em, f32 range);
 int lockEmCk(cEm* em, Vec* pos);
 cEm* searchLockEm(Vec* pos, cEm* skip, f32 range);
 int cnCkSub(Vec* pos, Vec* nrm, f32 len, Vec* outA, Vec* outB);
 void wepSetWaterShot(Vec* p0, Vec* p1, u8 type);
 void setWaterShot(Vec* pos);
-}
 
 void (*WeaponInitFunc)(cModel*) = 0;
 u8 lockCtr;
@@ -207,7 +197,7 @@ static f32 wepRate(cPlWep* w)
 u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, f32 radius)
 {
     cPlayer* pl = (cPlayer*) pPl;
-    WepTarget list[20];
+    TARGET_WK list[20];
     Vec hit;
     Vec nrm;
     u32 attr;
@@ -331,15 +321,15 @@ u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, 
     case 0x17:
     case 0x29:
     case 0x2D:
-        n = GetWepTargetListBomb(pPos, list, prio, weapon_no, f4, radius);
+        n = GetWepTargetListBomb(pPos, radius, list, prio, weapon_no, f4);
         break;
     default:
-        n = GetWepTargetList2(pPos, pPos2, list, prio, &hit, &nrm, &attr, weapon_no, f4, radius);
+        n = GetWepTargetList2(pPos, pPos2, list, prio, &hit, &nrm, &attr, weapon_no, f4);
         break;
     }
     for (i = 0; i < n; i++) {
-        cEm* em = list[i].em;
-        YARARE_INFO* part = list[i].part;
+        cEm* em = list[i].pEm;
+        YARARE_INFO* part = list[i].pAt;
         cDmgInfo* dmg = &em->dmg;
 
         switch (weapon_no) {
@@ -361,7 +351,7 @@ u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, 
                 dmg->m_Flag |= 0x20;
             }
         }
-        if (list[i].em->id == 0x38) {
+        if (list[i].pEm->id == 0x38) {
             break;
         }
     }
@@ -472,18 +462,18 @@ u32 PlWepHitCheck2(cModel* pPl, Vec* pPos, Vec* pPos2, int weapon_no, u32 flag, 
 
 // Radius damage at `pos` without a shooter: every enemy within `len` gets dmg.set(type) at the
 // given priority (max 0x14). Ashley is spared by 0x14, Ashley / Luis by the bow types unless first.
-u32 PlWepHitCheck3(Vec* pos, int type, u32 prio, f32 len)
+u32 PlWepHitCheck3(Vec* pos, int type, f32 len, u32 prio)
 {
-    WepTarget list[20];
+    TARGET_WK list[20];
     u32 n;
     u32 i;
 
     if (prio > 0x14) {
         prio = 0x14;
     }
-    n = GetWepTargetListBomb(pos, list, prio, type, 0, len);
+    n = GetWepTargetListBomb(pos, len, list, prio, type, 0);
     for (i = 0; i < n; i++) {
-        cEm* em = list[i].em;
+        cEm* em = list[i].pEm;
         cDmgInfo* dmg = &em->dmg;
 
         switch (type) {
@@ -499,7 +489,7 @@ u32 PlWepHitCheck3(Vec* pos, int type, u32 prio, f32 len)
             }
             break;
         }
-        YARARE_INFO* part = list[i].part;
+        YARARE_INFO* part = list[i].pAt;
         if (!(dmg->m_Flag & 1)) {
             dmg->set(0, 10, type, pos, part->len, part);
         }
@@ -667,7 +657,7 @@ void cPlWep::lockMove()
         m_LockTime = 0;
     }
     if (pl->m_pEm && m_LockTime != 0 && (CfgFlagChk(pSys, CFG_LOCK_ON))) {
-        PlWepAutoTrack(pl, 0, 1.0f);
+        PlWepAutoTrack(pl, 1.0f, 0);
     }
 }
 
@@ -1024,7 +1014,7 @@ rand:
     PlWepLockRand(pl, moved, &tmp, &pl->m_Fwork0);
     m3r = tmp;
     if (DbgFlagChk(pG, DBG_PL_LOCK_FOLLOW) && lockCtr != 0) {
-        PlWepAutoTrack(pl, 1, 0.03f);
+        PlWepAutoTrack(pl, 0.03f, 1);
     }
     m3r.move();
     mot3.move(m3r);
@@ -1076,7 +1066,7 @@ void PlWepLockRand(cModel* pEm, int mflag, f32* ang_x, f32* ang_y)
 
 // Turns the aim toward the locked enemy's lock point: yaw by at most 30 degrees * rate (mode 1
 // moves the waist within 12 degrees, else the body), pitch blend by at most 0.05 per frame.
-void PlWepAutoTrack(cModel* plm, int mode, f32 rate)
+void PlWepAutoTrack(cModel* plm, f32 rate, int mode)
 {
     cPlayer* pl = (cPlayer*) plm;
     Vec* hand;

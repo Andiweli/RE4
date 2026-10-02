@@ -14,7 +14,6 @@ class DB_KEYBORD;
 
 extern int db_modelNo;   // model viewer slot the tool edits (the BasePos "WorKNo" numeric)
 
-extern "C" {
 u8 DB_GetStageNo();
 u8 DB_GetRoomNo();
 int LoadData(const char* path, void* buf);
@@ -45,7 +44,6 @@ void EspToolCameraMode();
 void CoreEstSet(u8 id);
 void SeqSet(cEspSeqHead* head, int mode);
 void sp_tex_trans(int no);
-}
 
 void EspToolInit(bool& out, u8& stage, u8& cut);
 

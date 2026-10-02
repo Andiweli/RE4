@@ -50,7 +50,6 @@ public:
 // bin/tpl of the model, start position, initial speed (NULL: a random forward throw), type.
 cEmMine* SetMine(void* bin, void* tpl, Vec* pos, Vec* spd, int type);
 
-extern "C" {
 void emMineDmCk(cEmMine* pEm);
 void emMine_R0_Init(cEmMine* pEm);
 void emMine_R0_Move(cEmMine* pEm);
@@ -66,6 +65,5 @@ void emMine_R1_BombWait2(cEmMine* pEm);
 void emMine_R1_Fall(cEmMine* pEm);
 void emMine_R1_Lost(cEmMine* pEm);
 int emMineHitCk(cEmMine* pEm);
-}
 
 #endif

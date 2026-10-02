@@ -86,18 +86,18 @@ static void r10c_StrCheck();
 static void r10c_ThunderFlagOn();
 static void r10c_ThunderFlagOff();
 static void r10c_ThunderMove();
-extern "C" void setTexRender();
-extern "C" int SwitchExec(cObj* obj, f32* spd, int no, f32 lim, f32 cur);
+void setTexRender();
+int SwitchExec(cObj* obj, f32* spd, int no, f32 lim, f32 cur);
 static void chkSwitchA_exit();
 static void chkSwitchA();
 static void r10c_EmSet_exit();
 static void r10c_EmSet();
 static void moveWheel();
-extern "C" void EmHitUpdate(cEm* em);
+void EmHitUpdate(cEm* em);
 static void SetEmHitAtari();
 static void hako_down(cObj* obj);
 static void r10c_ItemGet();
-extern "C" void eat_swap();
+void eat_swap();
 
 // Room init: the pool with its drain switch, the ladders between the banks, the axe-thrower event and
 // the key item. Once drained (Room_flg bit 8 / bit 5) it uses the drained layout with an ambush.
@@ -492,7 +492,7 @@ static void r10c_ThunderMove()
     obj->Refract_ratio = v138;
 
 // The water surface: a render target blended into the water objects.
-extern "C" void setTexRender()
+void setTexRender()
 {
     cObj* obj;
     u8* tbl = r10c_texTbl;
@@ -524,7 +524,7 @@ extern "C" void setTexRender()
 }
 
 // Turns the switch lever's parts towards `lim` with the accelerating speed `*spd`; 1 when it arrived.
-extern "C" int SwitchExec(cObj* obj, f32* spd, int no, f32 lim, f32 cur)
+int SwitchExec(cObj* obj, f32* spd, int no, f32 lim, f32 cur)
 {
     int dir;
 
@@ -675,7 +675,7 @@ static void chkSwitchA()
         EffectEspDelete(0, ESP_CORE_KIND_ROOM_AREA01, 0, 0);
         EffectEspgenDelete(0, ESP_CORE_KIND_ROOM_AREA01, 0);
         EffectEfmDelete(0, ESP_CORE_KIND_ROOM_AREA01, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0x2001, ESP_CORE_KIND_ROOM04, z, z); // COMPILER-DIFF: candidate #17 (both 0, see `z`)
+        EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0x2001, ESP_CORE_KIND_ROOM04, z, 0); // COMPILER-DIFF: candidate #17 (both 0, see `z`)
         CamCtrl.CutCall(0x19);
         while (CamCtrl.IsMotionEnd() == 0) {
             SceSleep(1);
@@ -893,7 +893,7 @@ static void moveWheel()
 }
 
 // Recomputes a hit box's matrices after its position was set by hand.
-extern "C" void EmHitUpdate(cEm* em)
+void EmHitUpdate(cEm* em)
 {
     RotMatrix(em->mat, &em->ang);
     TransMatrix(em->mat, &em->pos);
@@ -971,7 +971,7 @@ static void SetEmHitAtari()
         cObj* obj;
 
         SmdSetTrans(0x6A, 0);
-        SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x61), 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x61), 0, SCE_PRIO_DEF_2, 0);
         obj = SmdGetObjPtr(0x61);
         obj->pos.x = 93412.0f;
         obj->pos.y = -16601.0f;
@@ -991,7 +991,7 @@ static void SetEmHitAtari()
         cObj* obj;
 
         SmdSetTrans(0x6B, 0);
-        SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x62), 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x62), 0, SCE_PRIO_DEF_2, 0);
         obj = SmdGetObjPtr(0x62);
         obj->pos.x = 93412.0f;
         obj->pos.y = -16601.0f;
@@ -1011,7 +1011,7 @@ static void SetEmHitAtari()
         cObj* obj;
 
         SmdSetTrans(0x6C, 0);
-        SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x63), 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x63), 0, SCE_PRIO_DEF_2, 0);
         obj = SmdGetObjPtr(0x63);
         obj->pos.x = 93412.0f;
         obj->pos.y = -16601.0f;
@@ -1105,7 +1105,7 @@ static void SetEmHitAtari()
                 SmdSetTrans(0x6A, 0);
                 SndCall(6, 1, &SmdGetObjPtr(0x61)->pos, 0, 0, 0);
                 EstSet(0, -1, &SmdGetObjPtr(0x61)->pos, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
-                SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x61), 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x61), 0, SCE_PRIO_DEF_2, 0);
                 RsfSet(G_ROOM_ID, 14);
             }
         }
@@ -1118,7 +1118,7 @@ static void SetEmHitAtari()
                 SmdSetTrans(0x6B, 0);
                 SndCall(6, 1, &SmdGetObjPtr(0x62)->pos, 0, 0, 0);
                 EstSet(0, -1, &SmdGetObjPtr(0x62)->pos, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
-                SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x62), 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x62), 0, SCE_PRIO_DEF_2, 0);
                 RsfSet(G_ROOM_ID, 15);
             }
         }
@@ -1131,7 +1131,7 @@ static void SetEmHitAtari()
                 SmdSetTrans(0x6C, 0);
                 SndCall(6, 1, &SmdGetObjPtr(0x63)->pos, 0, 0, 0);
                 EstSet(0, -1, &SmdGetObjPtr(0x63)->pos, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
-                SceExec(0x12, (TaskFunc) hako_down, (int) SmdGetObjPtr(0x63), 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) hako_down, SmdGetObjPtr(0x63), 0, SCE_PRIO_DEF_2, 0);
                 RsfSet(G_ROOM_ID, 16);
             }
         }
@@ -1280,7 +1280,7 @@ static void r10c_ItemGet()
 }
 
 // Swaps the pool's water attribute for the drained one.
-extern "C" void eat_swap()
+void eat_swap()
 {
     if (!(pG->Room_flg[0] & 0x02000000)) {
         pG->Room_flg[0] |= 0x02000000;

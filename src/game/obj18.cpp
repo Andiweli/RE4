@@ -11,9 +11,7 @@
 #include <string.h>
 #include "em_cloth.h"
 
-extern "C" {
 void obj18SetOya(cObj18* obj);
-}
 
 // Unused work-size error message.
 // Never called: the original keeps the message of this unused inline in .rodata.
@@ -22,22 +20,22 @@ static inline void obj18FreeSizeErr(int size)
     pLog->err(0, 0, "SetObj18 freeSize failed : %d", size);
 }
 
-PlCloth Obj18Cloth1;
-PlCloth Obj18Cloth2;
-static PlCloth Obj18Cloth3;
-PlCloth Obj18Cloth4;
-static PlCloth Obj18Cloth5;
-PlCloth Obj18Cloth6;
-static PlCloth Evt_leonHair;
-PlCloth Evt_leonJacket;
-PlCloth Evt_leonHolster;
-PlCloth Evt_girlHair;
-static PlCloth Evt_girlSkirt;
-PlCloth Evt_girlSweater;
-PlCloth Evt_adaRibbon;
-PlCloth Evt_adaDress;
-static PlCloth Evt_adaHair;
-static PlCloth Evt_luisHair;
+CLOTH_INFO Obj18Cloth1;
+CLOTH_INFO Obj18Cloth2;
+static CLOTH_INFO Obj18Cloth3;
+CLOTH_INFO Obj18Cloth4;
+static CLOTH_INFO Obj18Cloth5;
+CLOTH_INFO Obj18Cloth6;
+static CLOTH_INFO Evt_leonHair;
+CLOTH_INFO Evt_leonJacket;
+CLOTH_INFO Evt_leonHolster;
+CLOTH_INFO Evt_girlHair;
+static CLOTH_INFO Evt_girlSkirt;
+CLOTH_INFO Evt_girlSweater;
+CLOTH_INFO Evt_adaRibbon;
+CLOTH_INFO Evt_adaDress;
+static CLOTH_INFO Evt_adaHair;
+static CLOTH_INFO Evt_luisHair;
 
 // Creates the body (back of the pool) with the light class of its type, a bound-box light volume,
 // no parent, and sets up the type's cloth (loading the ribbon / rope child models from the event
@@ -52,7 +50,7 @@ cObj* SetObj18(void* bin, void* tpl, Vec* pos, Vec* rot, int type)
     void* cbin;
     void* ctpl;
     cModelInfo* info;
-    ModelBound* b;
+    cBoundingBox* b;
 
     obj = ObjMgr.createBack(cObjMgr::ID_EVENT);
     if (obj == 0) {
@@ -159,7 +157,7 @@ cObj* SetObj18(void* bin, void* tpl, Vec* pos, Vec* rot, int type)
     sz.x = b->size.x;
     sz.y = b->size.y;
     sz.z = b->size.z;
-    PSVECSubtract(&info->bound.center, &obj->pList->pos, &ofs);
+    PSVECSubtract(&info->bound.offset, &obj->pList->pos, &ofs);
     obj->LightInfo.init2(2, 1, &ofs, &sz, lightFlag);
     if (pos) {
         obj->pos = *pos;
@@ -290,7 +288,7 @@ void cObj18::move()
         }
     }
     obj18SetOya(this);
-    if (Motion.blendTbl == 0) {
+    if (pDblJnt == 0) {
         partsMatCalc();
         partsWorldCalc();
     }

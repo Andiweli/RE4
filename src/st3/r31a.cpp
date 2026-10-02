@@ -17,28 +17,11 @@ struct R31aWork {
     u8 dummy;
 };
 
-// sce_com.cpp SceElevatorData
-struct SceElevatorData {
-    s32 dir;
-    u32 objId;
-    Vec pos;
-    Vec plPos;
-    Vec plRot;
-    s32 cut;
-    u16 pad_30;
-    u16 seStart;
-    u16 pad_34;
-    u16 seStop;
-    Vec jumpPos;
-    Vec jumpRot;
-    u16 room;
-};
-
 
 static R31aWork* r31a_work;
 
-static SceElevatorData r31a_elvArrive = {2, 0, {3250.0f, -578.0f, 0.0f}, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 1, 0, 2, 0, 1, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 0x318};
-static SceElevatorData r31a_elvLeave = {3, 0, {3250.0f, -578.0f, 0.0f}, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 1, 0, 0, 0, 1, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 0x318};
+static ElevatorParam r31a_elvArrive = {Ele1FArrival, 0, {3250.0f, -578.0f, 0.0f}, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 1, 0, 2, 0, 1, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 0x318};
+static ElevatorParam r31a_elvLeave = {Ele1FStarting, 0, {3250.0f, -578.0f, 0.0f}, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 1, 0, 0, 0, 1, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 0x318};
 
 // Room init: no water splashes; area 0 = the elevator back down to r318 (SceElevator, action colour);
 // arriving from r318 by a normal transition plays the elevator's arrival ride.
@@ -50,7 +33,7 @@ void R31aInit()
     SceAtDataSet_exec(0, 0x12, 0, (TaskFunc) SceElevator, &r31a_elvLeave, 1);
     SceAtSetActColor(0, 1);
     if (SysFlagChk(pG, SYS_LOAD_GAME) == 0 && pG->room_id_prev == 0x318) {
-        SceExec(0x12, (TaskFunc) SceElevator, (int) &r31a_elvArrive, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) SceElevator, &r31a_elvArrive, 0, 2, 0);
     }
 }
 

@@ -418,10 +418,10 @@ private:
 };
 
 // Enemy module the manager loaded for an event (EventMgr::readEm[8], 4 bytes).
-struct EvtReadEm {
-    u8 em;       // 0x00  enemy id (0 = none)
-    u8 swapped;  // 0x01  1 = its data was swapped into the module block
-    u8 pad_2[2];
+struct ReadWork {
+    u8 EmId;       // 0x00  enemy id (0 = none)
+    u8 SwapFlag;  // 0x01  1 = its data was swapped into the module block
+    u8 dummy[2];
 };
 
 // EventMgr::EvtReadExec `evtReadFlag` bits (PS2 EvtReadFlag): how the event is read and started.
@@ -447,7 +447,7 @@ public:
 private:
     char NowExeEvtName[0x30];  // 0x34  name of the running event ("" = none)
 private:
-    EvtReadEm ReadWkTbl[8];   // 0x64  enemy modules loaded per read slot
+    ReadWork ReadWkTbl[8];   // 0x64  enemy modules loaded per read slot
     char NameTmp[0x20];    // 0x84  NameChange result
     u32 pUnit[0x20];         // 0xA4  cleared by myRoomInit
     public: u8 pad_124[0x144 - 0x124];
@@ -488,7 +488,7 @@ private:
     int EvtFree(char* name);
     void ToolCoreEvdDel();
     // Starts the loaded event data ("even" "t" header); `key` (optional) receives its key.
-    int SetEvt(void* data, u32* key);
+    int SetEvt(void* data, Event** ppEvt);
     int SetEvt(char* name, Event** out);
     int GetEvt(const char* pName, void** ppEvt);
     int DelEvt(void* evt, int a);
@@ -564,7 +564,7 @@ private:
 public:
     ModelFiles* PMod; // 0xE0  0x60 entries
 private:
-    u32 FlagEtc;             // 0xE4  FlagEtcFlag bits (tool switches)
+    FlagEtcFlag FlagEtc[1];  // 0xE4  tool switches: bit FlagEtcFlag of the word
 
 public:
     EventDebug();
@@ -572,17 +572,17 @@ public:
     int myRoomInit();          // room start (game gameRoomInit)
     bool FlagCkEtc(u32 no)
     {
-        u32* f = &FlagEtc;
+        u32* f = (u32*) FlagEtc;
         return (f[no >> 5] & (0x80000000 >> (no & 0x1F))) != 0;
     }
     void FlagOnEtc(u32 no)
     {
-        u32* f = &FlagEtc;
+        u32* f = (u32*) FlagEtc;
         f[no >> 5] |= 0x80000000 >> (no & 0x1F);
     }
     void FlagOffEtc(u32 no)
     {
-        u32* f = &FlagEtc;
+        u32* f = (u32*) FlagEtc;
         f[no >> 5] &= ~(0x80000000 >> (no & 0x1F));
     }
     int GetStfStrTimer() { return StfStrTimer; }
@@ -658,10 +658,8 @@ public:
 
 extern EventDebug EvtDebug;
 
-// game/event.cpp (C linkage): streamed sound blocks of the running event
-extern "C" {
+// game/event.cpp: streamed sound blocks of the running event
 int SndStrPlayBlock(int blk, int no, f32 s_time);
 void SndStrStopBlock(int sndId);
-}
 
 #endif

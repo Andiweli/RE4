@@ -175,7 +175,7 @@ static void r216_BattleStart()
     CamCtrl.CutCall(1);
     pG->Room_flg[0] &= ~0x20000000;
     SceSetEventCancel(1, (TaskFunc) r216_BattleStartEndProc, 0, 2, 1);
-    EstSet(0, -1, NULL, NULL, EFF_ROOM, 6, 1, ESP_CORE_KIND_ROOM03, 0, mdl);
+    EstSet(0, -1, NULL, NULL, EFF_ROOM, 6, 1, ESP_CORE_KIND_ROOM03, 0, (ESPSEQ_CONTROL*) mdl);
     r216_work->door.setClose();
     while (r216_work->door.getStatus() != 0) {
         SceSleep(1);

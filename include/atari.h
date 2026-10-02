@@ -30,7 +30,7 @@ public:
     u16 m_nSlope;          // 0x0E
     u16 m_nWall;          // 0x10
     u16 m_nBlock;         // 0x12
-    // 0x14: Vec vtx[nVertex]; Vec nrm[nNormal]; Vec edge[nEdge]; AtPoly poly[nPoly]; cSatBlock blocks
+    // 0x14: Vec vtx[nVertex]; Vec nrm[nNormal]; Vec edge[nEdge]; SAT_POLY poly[nPoly]; cSatBlock blocks
 
     Vec* getVertexPtr();
     int dataCheck();
@@ -74,10 +74,10 @@ public:
         FLAG_ENABLE = 2,   // takes part in the collision checks
     };
 
-    Vec* vtx;        // 0x0C  (the three table pointers double as the AtPolyData the at_sub checks take)
+    Vec* vtx;        // 0x0C
     Vec* norm_p;        // 0x10
     Vec* edge_p;       // 0x14
-    AtPoly* poly_p;    // 0x18
+    SAT_POLY* poly_p;    // 0x18
     u16 vertex_num;     // 0x1C
     u16 polygon_num;       // 0x1E
     u16 floor_num;          // 0x20
@@ -139,11 +139,11 @@ public:
     cSat* create(void* data, int flag, Vec* pos, Vec* rot, u8 type);
     // Ray from `top` down to `bottom`; returns the hit attribute, hit point in `hit`; `attr`
     // receives the address of the hit polygon's normal (in the piece's space).
-    int hitCheck2(Vec* top, Vec* bottom, Vec* pCross, u32* ppNorm, int flag, int mask);
+    int hitCheck2(Vec* top, Vec* bottom, Vec* pCross, Vec** ppNorm, int flag, int mask);
     // Line segment `a`-`b` against the scenario; hit point and normal out. Returns 0 when nothing was hit.
     int hitCheck(Vec* pos0, Vec* pos1, Vec* pCross, Vec* pNorm, int flag, int mask);
     // Floor height under `pos`, searching `up` above and `down` below it.
-    f32 getFloor(Vec* pos, u32* ppNorm, f32 above_limit, f32 below_limit, int mask);
+    f32 getFloor(Vec* pos, Vec** ppNorm, f32 above_limit, f32 below_limit, int mask);
     // Sphere of radius `r` moving from `a` to `b` against the scenario; `b` is pushed out of the
     // polygons (cLight::hitAdjust). Returns 1 when the sphere was adjusted.
     int polySphereCk(Vec* a, Vec* b, f32 radius, int flag, Vec* pNorm, int mask);
@@ -190,9 +190,7 @@ private:
 
 extern cEatMgr EatMgr;
 
-extern "C" {
 // Effect type of a hitCheck attribute word (game/at_sub.cpp).
 int EatGetEffectType(u32 rgba);
-}
 
 #endif

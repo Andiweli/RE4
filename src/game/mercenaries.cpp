@@ -30,9 +30,7 @@
 #include "ref_access.h"
 #include <string.h>
 
-extern "C" {
 static void IdSetColLoop(IDSystem* id, int no, u8 type, int on);
-}
 
 #define DATA_PTR(d, ofs) ((void*) (*(u32*) ((u8*) (d) + (ofs)) + (u32) (d)))
 #define DVD_READ_N(name, dst, a, b, c, mode) DvdReadN(name, dst, a, b, c, mode, __FILE__, __LINE__)
@@ -130,7 +128,7 @@ static inline u32 MercStrReq(int no)
 // Krauser 3, Wesker 4), copies the room's message/motion parameters, creates the intro dummy model
 // (SetObjSmd) at the start position, puts the player there, starts the MercSysMoveMain scenario
 // task, the mode's BGM stream and the id graphics (id400.dat).
-int MercSysInitRoom(MercInit* pMInit)
+int MercSysInitRoom(MercSysInitWork* pMInit)
 {
     MercSysWork* wk = &MercSysWk;
     cObj* smd;
@@ -213,7 +211,7 @@ int MercSysInitRoom(MercInit* pMInit)
     pPL->setAng(&pMInit->rot);
     pPL->matUpdate();
     CamCtrl.Comeback(0);
-    SceExec(0x12, (TaskFunc) MercSysMoveMain, (int) wk, 4, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) MercSysMoveMain, wk, 4, SCE_PRIO_DEF_2, 0);
     {
         int strTbl[5] = {0x3F, 0x40, 0x41, 0x42, 0x3D};
 
@@ -250,7 +248,7 @@ int MercSysMoveStart(MercSysWork* wk)
         switch (st[1]) {
         case 0:
             if (smd != NULL) {
-                MotionSetCore(smd, MOTION(smd), wk->smdMot, 0, 0, 0x200, 0);
+                MotionSetCore(smd, &smd->Motion, wk->smdMot, 0, 0, 0x200, 0);
             }
             st[1]++;
             break;
@@ -259,10 +257,10 @@ int MercSysMoveStart(MercSysWork* wk)
             if (!FlagChkVar(EXT_FLAG_TBL, extFlagTbl[wk->stage])) {
                 SceMesSet(wk->mesA8, 0x20, 1, 100, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
             } else {
-                MercSaveWork save;
+                MercSysSaveWork save;
 
                 MercSysGetSaveWork(&save);
-                if (save.rank[wk->mode][wk->stage] <= 4) {
+                if (save.rank[wk->mode][wk->stage] <= MercSysRankIdA) {
                     SceMesSet(wk->mesAC, 0x20, 1, 100, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
                 }
             }
@@ -406,7 +404,7 @@ int MercSysMoveScore(MercSysWork* pWk)
         pWk->flags &= ~MF_ADD_TIME;
         min = pWk->addTime / 60;
         sec = pWk->addTime % 60;
-        cs = zero;
+        cs = 0;
         pWk->addTime = zero;
         IdSetTrans(MID, 0x10, IDC_GAUGE, 1);
         IdSetAnmStart(MID, 0x10, IDC_GAUGE, 1);
@@ -492,8 +490,8 @@ int MercSysMoveMain(MercSysWork* pWk)
     int zero = 0;
     pWk->flags &= ~(MF_BONUS_ON | MF_BONUS_OFF);
     IdSetTrans(&mercId._idSys, 0x40, IDC_GAUGE, 0);
-    pWk->combo = zero;
-    pWk->comboTimer = zero;
+    pWk->combo = 0;
+    pWk->comboTimer = 0;
     pWk->bonusTimer = zero;
     SndCall(6, 0x7A, 0, 0, 0, 0);
     MercSysResultMove(pWk);
@@ -505,7 +503,7 @@ int MercSysMoveMain(MercSysWork* pWk)
 // the unlock_flg bit), and the all-5-stars unlock (20 ranks of 5 -> unlock_flg 0x20000000).
 int MercSysResultInit(MercSysWork* pWk)
 {
-    MercSaveWork save;
+    MercSysSaveWork save;
     int min;
     int sec;
     int cs;
@@ -542,7 +540,7 @@ int MercSysResultInit(MercSysWork* pWk)
         save.stage[pWk->stage].newFlag = 0;
     }
     if (save.rank[pWk->rslt.mode][pWk->stage] < pWk->rslt.rank) {
-        save.rank[pWk->rslt.mode][pWk->stage] = pWk->rslt.rank;
+        save.rank[pWk->rslt.mode][pWk->stage] = (MercSysRankIdEnum) pWk->rslt.rank;
     }
     MercSysSetSaveWork(&save);
     pWk->rslt.hiScore = save.stage[pWk->stage].score;
@@ -561,7 +559,7 @@ int MercSysResultInit(MercSysWork* pWk)
 
         for (k = 0; k < 4; k++) {
             for (j = 0; j < 5; j++) {
-                if (save.rank[j][k] > 4) {
+                if (save.rank[j][k] > MercSysRankIdA) {
                     cnt++;
                 }
             }
@@ -675,7 +673,7 @@ int MercSysResultMove(MercSysWork* pWk)
 
 // Unpacks the Mercenaries records from the system save: per stage the high score (x10, 28 bits),
 // mode (3 bits) and new flag, and the 3-bit rank per (character, stage) from merc_rank.
-void MercSysGetSaveWork(MercSaveWork* pSaveWk)
+void MercSysGetSaveWork(MercSysSaveWork* pSaveWk)
 {
     int i;
     int j;
@@ -705,13 +703,13 @@ void MercSysGetSaveWork(MercSaveWork* pSaveWk)
             if (FlagChkVar(pSys->MercSysRank, (u32) (i * 15 + j * 3 + 2))) {
                 r |= 1;
             }
-            pSaveWk->rank[j][i] = r;
+            pSaveWk->rank[j][i] = (MercSysRankIdEnum) r;
         }
     }
 }
 
 // Packs the records back into the system save words.
-void MercSysSetSaveWork(MercSaveWork* pSaveWk)
+void MercSysSetSaveWork(MercSysSaveWork* pSaveWk)
 {
     int i;
     int j;
@@ -835,7 +833,7 @@ int MercSysSetBonusTime(int time)
 // Shows/hides id unit (no, type).
 void IdSetTrans(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 {
-    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, (ID_CLASS) idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetTrans : pIdUnit is NULL");
@@ -851,7 +849,7 @@ void IdSetTrans(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 // Restarts an id unit's animation forwards (on) or backwards.
 void IdSetAnmStart(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 {
-    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, (ID_CLASS) idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetAnmStart : pIdUnit is NULL");
@@ -868,7 +866,7 @@ void IdSetAnmStart(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 // Resets an id unit to opaque white with no colour curve.
 void IdSetColInit(IDSystem* pIdSys, int idmNo, u8 idcNo)
 {
-    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, (ID_CLASS) idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetColInit : pIdUnit is NULL");
@@ -884,7 +882,7 @@ void IdSetColInit(IDSystem* pIdSys, int idmNo, u8 idcNo)
 // Sets/clears the colour curve loop bit of an id unit (flashing).
 static void IdSetColLoop(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 {
-    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, (ID_CLASS) idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetColInit : pIdUnit is NULL");
@@ -900,8 +898,8 @@ static void IdSetColLoop(IDSystem* pIdSys, int idmNo, u8 idcNo, int flag)
 // Copies the colour curve and colours of unit src onto unit no and restarts it.
 void IdSetColStart(IDSystem* pIdSys, int idmNo0, int idmNo1, u8 idcNo)
 {
-    ID_UNIT* u = pIdSys->unitPtr(idmNo0, idcNo);
-    ID_UNIT* s = pIdSys->unitPtr(idmNo1, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo0, (ID_CLASS) idcNo);
+    ID_UNIT* s = pIdSys->unitPtr(idmNo1, (ID_CLASS) idcNo);
 
     if (u == NULL || s == NULL) {
         pLog->err(0, 0, "IdSetColStart : pIdUnit is NULL");
@@ -936,7 +934,7 @@ void IdSetNum(IDSystem* pIdSys, int idmNo, u8 idcNo, int num, int max, int keta,
     }
     show = mode;
     for (i = keta - 1; i >= 0; i--) {
-        ID_UNIT* u = pIdSys->unitPtr(idmNo + i, idcNo);
+        ID_UNIT* u = pIdSys->unitPtr(idmNo + i, (ID_CLASS) idcNo);
 
         if (u == NULL) {
             pLog->err(0, 0, "IdSetNum : pIdUnit is NULL");
@@ -956,7 +954,7 @@ void IdSetNum(IDSystem* pIdSys, int idmNo, u8 idcNo, int num, int max, int keta,
 // Sets an id unit's texture frame (held).
 void IdSetTexNo(IDSystem* pIdSys, int idmNo, u8 idcNo, int texNo)
 {
-    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, (ID_CLASS) idcNo);
 
     if (u == NULL) {
         pLog->err(0, 0, "IdSetTexNo : pIdUnit is NULL");
@@ -969,7 +967,7 @@ void IdSetTexNo(IDSystem* pIdSys, int idmNo, u8 idcNo, int texNo)
 // 1 when the unit's position or size curve has ended.
 int IdIsAnimEnd(IDSystem* pIdSys, int idmNo, u8 idcNo)
 {
-    ID_UNIT* u = pIdSys->unitPtr(idmNo, idcNo);
+    ID_UNIT* u = pIdSys->unitPtr(idmNo, (ID_CLASS) idcNo);
 
     if (u != NULL) {
         return (u->anima_state & 3) ? 1 : 0;
@@ -995,7 +993,7 @@ void MercID::init(int num)
     pIdStart = DATA_PTR(pData, 0x18);
     pIdTimeUp = DATA_PTR(pData, 0x1C);
     set();
-    _idSys.set(pIdMain, 0xFF, IDC_GAUGE, 0x13, 5, 0);
+    _idSys.set((ID_FILE_HEADER*) pIdMain, 0xFF, IDC_GAUGE, 0x13, 5, 0);
     IdSetTrans(&_idSys, 0x20, IDC_GAUGE, 0);
     IdSetTrans(&_idSys, 0x60, IDC_GAUGE, 0);
     IdSetTrans(&_idSys, 0, IDC_GAUGE, 0);
@@ -1022,14 +1020,14 @@ void MercID::kill()
 // Shows the "mission start" id animation with its sound.
 void MercID::dispMissionStart()
 {
-    _idSys.set(pIdStart, 0xFF, IDC_EVENT, 0x13, 4, 0);
+    _idSys.set((ID_FILE_HEADER*) pIdStart, 0xFF, IDC_EVENT, 0x13, 4, 0);
     SndCall(6, 0x7C, 0, 0, 0, 0);
 }
 
 // Shows the "time up" id animation with its sound.
 void MercID::dispTimeUp()
 {
-    _idSys.set(pIdTimeUp, 0xFF, IDC_EVENT, 0x13, 4, 0);
+    _idSys.set((ID_FILE_HEADER*) pIdTimeUp, 0xFF, IDC_EVENT, 0x13, 4, 0);
     SndCall(6, 0x7E, 0, 0, 0, 0);
 }
 
@@ -1058,7 +1056,7 @@ int MercResult::init(MercSysWork* pWk)
     pIdExtra = DATA_PTR(omk_addr, 0x28);
     pIdEnd = DATA_PTR(omk_addr, 0x2C);
     IdTexDataLoad(pTex, TEX_OWNER_ID_TITLE);
-    IdSys.set(pIdRank[pWk->rslt.mode], 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) pIdRank[pWk->rslt.mode], 0xFF, IDC_TITLE, 0x13, 6, 0);
     _rno0 = 0;
     _rno1 = 0;
     _rno2 = 0;
@@ -1113,7 +1111,7 @@ int MercResult::move(MercSysWork* pWk)
         }
         FadeSetW(0x80000002, 10, 0, 0);
         IdSys.kill(0xFF, IDC_TITLE);
-        IdSys.set(pIdExtra, 0xFF, IDC_TITLE, 0x13, 4, 0);
+        IdSys.set((ID_FILE_HEADER*) pIdExtra, 0xFF, IDC_TITLE, 0x13, 4, 0);
         for (int i = 0; i < 4; i++) {
             int on = 0;
 
@@ -1155,7 +1153,7 @@ int MercResult::move(MercSysWork* pWk)
         }
         FadeSetW(0x80000002, 10, 0, 0);
         IdSys.kill(0xFF, IDC_TITLE);
-        IdSys.set(pIdEnd, 0xFF, IDC_TITLE, 0x13, 4, 0);
+        IdSys.set((ID_FILE_HEADER*) pIdEnd, 0xFF, IDC_TITLE, 0x13, 4, 0);
         _rno1 = 0;
         _rno0++;
         break;
@@ -1202,7 +1200,7 @@ void AdaResult::init()
     pTex = DATA_PTR(omk_addr, 0x10);
     pId = DATA_PTR(omk_addr, 0x14);
     IdTexDataLoad(pTex, TEX_OWNER_ID_TITLE);
-    IdSys.set(pId, 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) pId, 0xFF, IDC_TITLE, 0x13, 6, 0);
     _rno0 = 0;
     _rno1 = 0;
     _rno2 = 0;
@@ -1217,7 +1215,7 @@ int AdaResult::move(int messNo)
     switch (_rno0) {
     case 0:
         FadeSetW(0x80000002, 10, 0, 0);
-        IdSys.set(pId, 0xFF, IDC_TITLE, 0x13, 4, 0);
+        IdSys.set((ID_FILE_HEADER*) pId, 0xFF, IDC_TITLE, 0x13, 4, 0);
         _rno1 = 0;
         _rno0++;
         break;

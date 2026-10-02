@@ -277,13 +277,11 @@ FileTblEntry FileTbl[] = {
 #include "eprintf.h"
 #include "gx.h"
 
-extern "C" {
-void ADXGC_SetupDvdFs(int mode);   // lib/adx_sugc.c (the CRI headers are not in include/)
+extern "C" void ADXGC_SetupDvdFs(int mode);   // lib/adx_sugc.c (the CRI headers are not in include/)
 void trans2aram_cb(u32 req);
 void dvdread_callback(s32 result, DVDFileInfo* fi);
 void aram_cb(u32 req);
 void readcancel_cb(s32 result, DVDCommandBlock* cb);
-}
 
 
 #include <dolphin/os.h>
@@ -319,7 +317,7 @@ struct DvdSndStrWork {
     u8 cancel;    // 0x25
     u8 pad_26[0x14C - 0x26];
 };
-extern "C" DvdSndStrWork Snd_str_work[4];   // game/snd_ram.cpp SND_STR_WORK Snd_str_work[SND_STR_MAX], seen through the view struct above
+extern DvdSndStrWork Snd_str_work[4];   // game/snd_ram.cpp SND_STR Snd_str_work[SND_STR_MAX], seen through the view struct above
 
 #define DVD_BUFF ((void*) 0x80350000)
 #define DVD_BUFF2 ((void*) 0x80360000)
@@ -334,7 +332,7 @@ enum {
 };
 
 
-DvdReq DvdReqWork;
+DVD_REQ_WORK DvdReqWork;
 cDvd Dvd;
 cAram Aram;
 static u8 header_buff[0x800] __attribute__((aligned(32)));
@@ -347,18 +345,18 @@ static DvdHeader* pFilehead_save[2];
 // Returns the request number for ReadCheck.
 int DvdRead(int fileNo, void* dst, u32 aram, u32 ofs, u32 length, int mode, const char* file, int line)
 {
-    DvdReq* w = &DvdReqWork;
+    DVD_REQ_WORK* w = &DvdReqWork;
 
-    memclr_asm(w, sizeof(DvdReq));
-    w->dst = dst;
-    w->fileNo = fileNo;
-    w->aram = aram;
-    w->ofs = ofs;
-    w->length = length;
+    memclr_asm(w, sizeof(DVD_REQ_WORK));
+    w->mram_addr = dst;
+    w->file_no = fileNo;
+    w->aram_addr = aram;
+    w->offset = ofs;
+    w->size = length;
     w->prio = 4;
     w->mode = mode;
-    sprintf(w->file, "%s", file);
-    w->line = line;
+    sprintf(w->reqfile, "%s", file);
+    w->reqline = line;
     return Dvd.ReadReq();
 }
 
@@ -366,25 +364,25 @@ int DvdRead(int fileNo, void* dst, u32 aram, u32 ofs, u32 length, int mode, cons
 // through the data controller, 0x11 debug heap). Every unit's DVD_READ_N / DvdReadN goes here.
 int DvdReadN(const char* name, void* dst, int a, int b, int c, int mode, const char* file, int line)
 {
-    DvdReq* w = &DvdReqWork;
+    DVD_REQ_WORK* w = &DvdReqWork;
 
-    memclr_asm(w, sizeof(DvdReq));
-    sprintf(w->name, "%s", name);
-    w->dst = dst;
-    w->fileNo = 0xFFFF;
-    w->aram = a;
-    w->ofs = b;
-    w->length = c;
+    memclr_asm(w, sizeof(DVD_REQ_WORK));
+    sprintf(w->fname, "%s", name);
+    w->mram_addr = dst;
+    w->file_no = 0xFFFF;
+    w->aram_addr = a;
+    w->offset = b;
+    w->size = c;
     w->prio = 4;
     w->mode = mode;
-    sprintf(w->file, "%s", file);
-    w->line = line;
+    sprintf(w->reqfile, "%s", file);
+    w->reqline = line;
     return Dvd.ReadReq();
 }
 
 // Exchanges `size` bytes between MRAM and ARAM in 64 KB pieces through the DVD scratch buffers
 // (synchronous DMAs), after letting a running read finish its current piece.
-void MemorySwap(void* mram, u32 aram, u32 size)
+void MemorySwap(void* mram, void* aram, u32 size)
 {
     u8* p;
     u32 q;
@@ -397,7 +395,7 @@ void MemorySwap(void* mram, u32 aram, u32 size)
         }
     }
     rest = ALIGN32(size);
-    q = aram;
+    q = (u32) aram;
     OSReport("MemorySwap Mram:%08x Aram:%08x Size:%08x\n", mram, q, size);
     p = (u8*) mram;
     DCFlushRange(mram, size);
@@ -854,27 +852,27 @@ int cDvdQueue::Read()
 // heap, keep).
 void cDvdQueue::Initialize()
 {
-    DvdReq* w = &DvdReqWork;
+    DVD_REQ_WORK* w = &DvdReqWork;
     char buf[0x40];
     int hed;
     int pc;
 
-    if (w->fileNo != 0xFFFF) {
-        entrynum = FileTbl[w->fileNo].entrynum;
-        sprintf(m_Name, "%s", FileTbl[w->fileNo].name);
+    if (w->file_no != 0xFFFF) {
+        entrynum = FileTbl[w->file_no].entrynum;
+        sprintf(m_Name, "%s", FileTbl[w->file_no].name);
     } else {
-        entrynum = DVDConvertPathToEntrynum(w->name);
-        sprintf(m_Name, "%s", w->name);
+        entrynum = DVDConvertPathToEntrynum(w->fname);
+        sprintf(m_Name, "%s", w->fname);
     }
     if (SysFlagChk(pG, SYS_SN_PC_READ)) {
         sprintf(buf, "d:\\bio4/data/%s", m_Name);
         sprintf(m_Name, "%s", buf);
     }
-    m_FileNo = w->fileNo;
-    pBuff = w->dst;
-    aram = w->aram;
-    m_Offset = w->ofs;
-    length = w->length;
+    m_FileNo = w->file_no;
+    pBuff = w->mram_addr;
+    aram = w->aram_addr;
+    m_Offset = w->offset;
+    length = w->size;
     m_Prio = w->prio;
     hed = w->mode & 0x8;
     if (hed) {
@@ -902,8 +900,8 @@ void cDvdQueue::Initialize()
     if (w->mode & 0x40) {
         SetFlag(0x20000000);
     }
-    sprintf(reqfile, "%s", w->file);
-    reqline = w->line;
+    sprintf(reqfile, "%s", w->reqfile);
+    reqline = w->reqline;
     pc = 1;
     if (SysFlagChk(pG, SYS_SN_PC_READ) == 0) {
         pc = 0;
@@ -1458,30 +1456,30 @@ cDvdQueue* cDvd::pullReadQueue()
 // pointers, the slot released unless kept), 0 while reading, negative on cancel / error.
 int cDvd::ReadCheck(int id, int* mram_size, int* aram_size, void** addr)
 {
-    DvdReadInfo info;
+    DVD_READINFO info;
 
     if (readCheckMain(id, &info) == 1) {
         if (mram_size) {
-            *mram_size = info.mramSize;
+            *mram_size = info.mram_readsize;
         }
         if (aram_size) {
-            *aram_size = info.aramSize;
+            *aram_size = info.aram_readsize;
         }
         if (addr) {
-            *addr = (void*) info.addr[0][0];
+            *addr = (void*) info.start_addr[0][0];
         }
     }
 }
 
-// Poll variant used by read.cpp that also fills a DvdReadInfo.
-int cDvd::ReadCheck(int id, DvdReadInfo* pInfo)
+// Poll variant used by read.cpp that also fills a DVD_READINFO.
+int cDvd::ReadCheck(int id, DVD_READINFO* pInfo)
 {
     return readCheckMain(id, pInfo);
 }
 
 // The poll: by slot status (READ pending, COMPLETE copies the part address / size tables and
 // releases, CANCEL / ERROR release with a negative result).
-int cDvd::readCheckMain(int id, DvdReadInfo* pInfo)
+int cDvd::readCheckMain(int id, DVD_READINFO* pInfo)
 {
     cDvdQueue* q;
     int ret = 0;
@@ -1495,10 +1493,10 @@ int cDvd::readCheckMain(int id, DvdReadInfo* pInfo)
             case ST_COMPLETE:
                 if (q->CkFlag(0x800) == 1) {
                     if (pInfo) {
-                        memcpy(pInfo->addr, q->addrTbl, sizeof(pInfo->addr));
-                        memcpy(pInfo->size, q->sizeTbl, sizeof(pInfo->size));
-                        pInfo->mramSize = q->mramSize;
-                        pInfo->aramSize = q->aramSize;
+                        memcpy(pInfo->start_addr, q->addrTbl, sizeof(pInfo->start_addr));
+                        memcpy(pInfo->read_size, q->sizeTbl, sizeof(pInfo->read_size));
+                        pInfo->mram_readsize = q->mramSize;
+                        pInfo->aram_readsize = q->aramSize;
                     }
                     ret = 1;
                     q->PushQueue();
@@ -1553,11 +1551,11 @@ int cDvd::ErrCheck(int disc_new, int proc)
     int discNo = GetDiscNo();
     int shown = 0;
     u8** pMes = MesData.m_Data;
-    SndPlayWork* pStr = Snd.str_state;
+    BGM_STAT* pStr = Snd.str_state;
     int paused = 0;
     int msg;
     int stat;
-    SndPlayWork* str;
+    BGM_STAT* str;
 
     do {
         stat = DVDGetDriveStatus();
@@ -1628,9 +1626,9 @@ int cDvd::ErrCheck(int disc_new, int proc)
                 ScreenReSize(0x200, 0x1C0);
                 str = pStr;
                 do {
-                    if (str->used == 1 && str->blk == 1) {
-                        if (SndStrStatusCk(str->id, 0x10)) {
-                            SndStrReq(str->id, 8, 0, 0);
+                    if (str->busy == 1 && str->play_blk == 1) {
+                        if (SndStrStatusCk(str->play_id, 0x10)) {
+                            SndStrReq(str->play_id, 8, 0, 0);
                         }
                     }
                 } while (++str <= &pStr[3]);

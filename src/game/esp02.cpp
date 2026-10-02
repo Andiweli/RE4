@@ -25,10 +25,8 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 void EspStrip02_setup(cEsp02* esp);
 void esp02Trans_sub(cEsp02* esp);
-}
 
 // EspCreateTbl[0x02] factory.
 cEsp* Esp02_Create()
@@ -74,7 +72,7 @@ void cEsp02::move()
 }
 
 // EspTransTbl[0x02]: GX setup then the strip geometry.
-extern "C" void Esp02_Trans(cEsp02* esp)
+void Esp02_Trans(cEsp02* esp)
 {
     EspStrip02_setup(esp);
     esp02Trans_sub(esp);

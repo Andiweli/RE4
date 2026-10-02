@@ -54,7 +54,7 @@
 
 // Scenario trigger areas: the room's AEV (areas) and ITA (items) records plus the areas created at
 // run time, checked against the player, the partner and the enemies every frame. Each record is a
-// SceAtWork whose `type` selects its handler in sceAtFunc_tbl.
+// SCE_AT_DATA whose `type` selects its handler in sceAtFunc_tbl.
 
 int DbMenuActiveCheck();                                 // game/db_menu.cpp
 cObj* setItemObj(void* bin, void* tpl, Vec* pos, Vec* rot);  // game/obj19.cpp
@@ -99,12 +99,12 @@ static inline u32* flags51BC()
 {
     return &pG->Scenario_flg[0];
 }
-// Door unlock bits (SceAtDoor lockFlag).
+// Door unlock bits (SCE_AT_DATA_DOOR key_flg).
 static inline u32* doorUnlock()
 {
     return pG->Key_flg;
 }
-// Global ITEM_SET flags (SceAtItem flagNo): the item was taken.
+// Global ITEM_SET flags (SCE_AT_DATA_ITEM flagNo): the item was taken.
 static inline u32* itemFlags()
 {
     return pG->Item_flg;
@@ -170,7 +170,7 @@ struct SceAtSysWork {
     u8 m_use_tool_data;        // 0x11C  pAtData was allocated by the tool (t_sce_at) (PS2 m_use_tool_data)
     u8 m_use_tool_data_i;      // 0x11D  (PS2 m_use_tool_data_i)
     u8 pad_11E[2];
-    SceAtCamCtrl* pCamAt;      // 0x120  camera control area in effect
+    SCE_AT_DATA_CAM_CTRL* pCamAt;      // 0x120  camera control area in effect
 };
 
 struct SceAtReleaseModel {
@@ -186,7 +186,7 @@ struct SceAtFileHead {
     u16 version;      // 0x04
     u16 num;          // 0x06
     u8 pad_8[8];
-    SceAtWork work[1];  // 0x10
+    SCE_AT_DATA work[1];  // 0x10
 };
 
 // AreaViewCheck's cone scratch: the original frame reserves 0x40 bytes for it (frame 0xC8 with the
@@ -196,7 +196,7 @@ struct SceAtViewCone {
 };
 
 struct SceAtFuncTbl {
-    int (*func)(SceAtWork* w, cModel* m);
+    int (*func)(SCE_AT_DATA* w, cModel* m);
     u32 exclusive;    // 1 = only one such area fires per check
 };
 
@@ -206,29 +206,28 @@ static SceAtReleaseModel releaseModelTbl[8];
 static cModel* p_imodel_bak = NULL;
 static void* lbl_80314D6C = NULL;
 
-extern "C" {
-int sceAtFunc_normal(SceAtWork* w, cModel* m);
-int sceAtFunc_door(SceAtWork* w, cModel* m);
-static int sceAtFunc_exec(SceAtWork* w, cModel* m);
-int sceAtFunc_item(SceAtWork* w, cModel* m);
-int sceAtFunc_flg(SceAtWork* w, cModel* m);
-int sceAtFunc_mes(SceAtWork* w, cModel* m);
-int sceAtFunc_save(SceAtWork* w, cModel* m);
-static int sceAtFunc_shd_disp(SceAtWork* w, cModel* m);
-int sceAtFunc_damage(SceAtWork* w, cModel* m);
-int sceAtFunc_scr_at(SceAtWork* w, cModel* m);
-int sceAtFunc_field_info(SceAtWork* w, cModel* m);
-int sceAtFunc_stoop(SceAtWork* w, cModel* m);
-int sceAtFunc_skey(SceAtWork* w, cModel* m);
-int sceAtFunc_ladder(SceAtWork* w, cModel* m);
-int sceAtFunc_use(SceAtWork* w, cModel* m);
-int sceAtFunc_hide(SceAtWork* w, cModel* m);
-int sceAtFunc_pos_jump(SceAtWork* w, cModel* m);
-void sceInLock(SceAtWork* w);
-static void sceAtSkey(SceAtWork* w);
-void sceAtGetItem(SceAtWork* w);
-void sceAtGetItem_NoModel(SceAtWork* w);
-static void sceAtDeleteItem(SceAtWork* w);
+int sceAtFunc_normal(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_door(SCE_AT_DATA* w, cModel* m);
+static int sceAtFunc_exec(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_item(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_flg(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_mes(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_save(SCE_AT_DATA* w, cModel* m);
+static int sceAtFunc_shd_disp(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_damage(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_scr_at(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_field_info(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_stoop(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_skey(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_ladder(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_use(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_hide(SCE_AT_DATA* w, cModel* m);
+int sceAtFunc_pos_jump(SCE_AT_DATA* w, cModel* m);
+void sceInLock(SCE_AT_DATA* w);
+static void sceAtSkey(SCE_AT_DATA* w);
+void sceAtGetItem(SCE_AT_ITEM* w);
+void sceAtGetItem_NoModel(SCE_AT_ITEM* w);
+static void sceAtDeleteItem(SCE_AT_ITEM* w);
 void initReleaseModelTbl();
 void setReleaseModelTbl(void* bin, void* tpl);
 void checkReleaseModelTbl();
@@ -236,7 +235,6 @@ void sceAtCamCtrlCheck();
 void sceAtDebugDisp();
 void sceAtItemFindCheck();
 static void sceAtDataLoopInit();
-}
 
 static SceAtFuncTbl sceAtFunc_tbl[21] = {
     {sceAtFunc_normal, 0},      // 0x00
@@ -292,9 +290,9 @@ void SceAtInit(void* pHeader, void* pHeader_i)
             pS->pAtData = pHeader;
             pS->pAtWork = (u32) ((u8*) pHeader + 0x10);
             for (i = ((SceAtFileHead*) pS->pAtData)->num - 1; i >= 0; i--) {
-                SceAtWork* w = (SceAtWork*) (i * sizeof(SceAtWork) + pS->pAtWork);
+                SCE_AT_DATA* w = (SCE_AT_DATA*) (i * sizeof(SCE_AT_DATA) + pS->pAtWork);
 
-                AddPrim(&pS->ot[w->otNo], (u32*) w);
+                AddPrim(&pS->ot[w->priority], (u32*) w);
             }
         }
     }
@@ -307,29 +305,29 @@ void SceAtInit(void* pHeader, void* pHeader_i)
             pS->pItemData = pHeader_i;
             pS->pItemWork = (u32) ((u8*) pHeader_i + 0x10);
             for (i = ((SceAtFileHead*) pS->pItemData)->num - 1; i >= 0; i--) {
-                SceAtWork* w;
+                SCE_AT_DATA* w;
 
-                ((SceAtWork*) (i * sizeof(SceAtWork) + pS->pItemWork))->no += 0x80;
-                w = (SceAtWork*) (i * sizeof(SceAtWork) + pS->pItemWork);
-                AddPrim(&pS->ot[w->otNo], (u32*) w);
+                ((SCE_AT_DATA*) (i * sizeof(SCE_AT_DATA) + pS->pItemWork))->no += 0x80;
+                w = (SCE_AT_DATA*) (i * sizeof(SCE_AT_DATA) + pS->pItemWork);
+                AddPrim(&pS->ot[w->priority], (u32*) w);
             }
         }
     }
 }
 
 // Iteration start for sceAtGetOtAddr: the ordering table head (ot[15]).
-SceAtWork* sceAtSetOtStart()
+SCE_AT_DATA* sceAtSetOtStart()
 {
-    return (SceAtWork*) &pS->ot[15];
+    return (SCE_AT_DATA*) &pS->ot[15];
 }
 
 // Next area record in the ordering table after `p` (skips the table's own entries); 0 at the end.
-SceAtWork* sceAtGetOtAddr(SceAtWork* p)
+SCE_AT_DATA* sceAtGetOtAddr(SCE_AT_DATA* p)
 {
     u32 v;
 
-    while ((v = p->next) != 0xFFFFFFFF) {
-        p = (SceAtWork*) (v | 0x80000000);
+    while ((v = p->tag) != 0xFFFFFFFF) {
+        p = (SCE_AT_DATA*) (v | 0x80000000);
         if ((s32) v < 0) {
             return p;
         }
@@ -377,13 +375,13 @@ void SceAtWorkLoopInit()
 // Per frame: empties the hit-model lists of the enabled type 0 (normal) areas.
 static void sceAtDataLoopInit()
 {
-    SceAtWork* w = sceAtSetOtStart();
+    SCE_AT_DATA* w = sceAtSetOtStart();
 
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (bitOff(w->flag)) {
+        if (bitOff(w->be_flg)) {
             continue;
         }
-        if (w->type == SCEAT_ID_NORMAL) {
+        if (w->id == SCEAT_ID_NORMAL) {
             memclr_asm(w->data, sizeof(w->data));
         }
     }
@@ -474,7 +472,7 @@ int sceAtCheck_main(cEm* em, int target_type)
     Vec front;
     char name[21] = {'N', 'D', 'E', 'I', 'F', 'M', 'P', 'J', 'T', 'S', 'd', 's', ' ', 'f', 'C', 'K', 'L', 'U', 'H', ' ', ' '};
     ITEM_INFO info;
-    SceAtWork* w;
+    SCE_AT_DATA* w;
     int col = 0;
     int cnt = 0;
     int flag = 1;
@@ -503,42 +501,42 @@ int sceAtCheck_main(cEm* em, int target_type)
     hit = 0;
     w = sceAtSetOtStart();
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (bitOff(w->flag)) {
+        if (bitOff(w->be_flg)) {
             continue;
         }
-        if (!(w->checkType & target_type)) {
+        if (!(w->target_type & target_type)) {
             continue;
         }
         if (sceAtHitCheck(w, em, &front, &pos) == 0) {
-            if (w->type == SCEAT_ID_SHD_DISP) {
+            if (w->id == SCEAT_ID_SHD_DISP) {
                 sceAtFunc_shd_disp_reverse(w);
             }
             continue;
         }
         SceAtSetHitFlg(w->no);
-        if (w->trigger & 1) {
+        if (w->trg_type & 1) {
             col = 6;
-        } else if (w->trigger & 2) {
+        } else if (w->trg_type & 2) {
             col = 4;
-        } else if (w->trigger & 4) {
+        } else if (w->trg_type & 4) {
             col = 0;
         }
-        eprintf2(8, 0x10, cnt * 8 + 0x168, 8, col, 0, "%c", name[w->type]);
+        eprintf2(8, 0x10, cnt * 8 + 0x168, 8, col, 0, "%c", name[w->id]);
         cnt++;
         cnt &= 7;
-        t = w->type;
-        if (t == SCEAT_ID_EXEC && w->func == 0) {
+        t = w->id;
+        if (t == SCEAT_ID_EXEC && w->pFunc == 0) {
             continue;
         }
         ft = SCEAT_ID_EXEC;
-        if (w->func == 0) {
+        if (w->pFunc == 0) {
             ft = t;
         }
-        if (w->trigger & 8) {
+        if (w->trg_type & 8) {
             c = 0;
-            kind = w->actBtnKind;
-            if (w->actBtnColor != 0) {
-                c = (w->actBtnColor == 1) << 7;
+            kind = w->act_type;
+            if (w->act_color != 0) {
+                c = (w->act_color == 1) << 7;
             }
             if (t == SCEAT_ID_DOOR) {
                 c |= ACTCTR_DOOR_COLOR;
@@ -560,23 +558,23 @@ int sceAtCheck_main(cEm* em, int target_type)
                     continue;
                 }
                 if (RouteCkPosToPosDis(&pPL->pos, &pSUB->pos) < 5000.0f) {
-                    ActBtn.set(kind, w->otNo, (void*) sceAtFunc_tbl[SCEAT_ID_HIDE].func, w, ACTCTR_WEP_SET_IGNORE, DISP_X, ACT_FUNC_SCE_AT, (int) em);
+                    ActBtn.set(kind, w->priority, (void*) sceAtFunc_tbl[SCEAT_ID_HIDE].func, w, ACTCTR_WEP_SET_IGNORE, DISP_X, ACT_FUNC_SCE_AT, (void*) em);
                 }
                 continue;
             case SCEAT_ID_ITEM:
                 if (pG->shooting_mode != 0) {
-                    itemInfo(w->item.id, &info);
+                    itemInfo(((SCE_AT_ITEM*) w)->item.item_id, &info);
                     if (info.type != 7) {
                         continue;
                     }
                 }
                 break;
             }
-            ActBtn.set(kind, w->otNo, (void*) sceAtFunc_tbl[ft].func, w, c, DISP_A_NORMAL, ACT_FUNC_SCE_AT, (int) em);
+            ActBtn.set(kind, w->priority, (void*) sceAtFunc_tbl[ft].func, w, c, DISP_A_NORMAL, ACT_FUNC_SCE_AT, (void*) em);
             continue;
         }
-        if (!(t == 1 && w->func == 0 && (w->trigger & 2) && (flag & 4))) {
-            if (!(w->trigger & flag)) {
+        if (!(t == 1 && w->pFunc == 0 && (w->trg_type & 2) && (flag & 4))) {
+            if (!(w->trg_type & flag)) {
                 continue;
             }
         }
@@ -590,8 +588,8 @@ int sceAtCheck_main(cEm* em, int target_type)
         if (sceAtFunc_tbl[ft].func(w, em) == 1) {
             hit = 1;
         }
-        if (w->trigger & 0x80) {
-            if (ft == 2 && w->func == 0) {
+        if (w->trg_type & 0x80) {
+            if (ft == 2 && w->pFunc == 0) {
                 continue;
             }
             SceAtSetEnable(w->no, 0);
@@ -603,7 +601,7 @@ int sceAtCheck_main(cEm* em, int target_type)
 // The area of `w` in world space: its parent's matrix applied (rotation ignored with flag bit3).
 // The area in world space: the record's area moved (and rotated unless flag bit3) by the parent
 // model / parts matrix when the area follows a parent.
-void sceAtGetArea(AREA_HIT_DATA* ret_area, SceAtWork* w)
+void sceAtGetArea(AREA_HIT_DATA* ret_area, SCE_AT_DATA* w)
 {
     Mtx mat;
     Mtx pmat;
@@ -612,12 +610,12 @@ void sceAtGetArea(AREA_HIT_DATA* ret_area, SceAtWork* w)
     if (w->pParent == 0) {
         return;
     }
-    if (w->parentParts >= 0) {
-        MTX_COPY_LATE_DST(w->pParent->getPartsPtr(w->parentParts)->mat, pmat);
+    if (w->parts_no >= 0) {
+        MTX_COPY_LATE_DST(w->pParent->getPartsPtr(w->parts_no)->mat, pmat);
     } else {
         MTX_COPY_LATE_DST(w->pParent->mat, pmat);
     }
-    if (w->flag & 8) {
+    if (w->be_flg & 8) {
         Vec zero = { 0.0f, 0.0f, 0.0f };
         low_RotMatrix(mat, &zero);
         mat[0][3] = pmat[0][3];
@@ -668,7 +666,7 @@ void sceAtGetArea(AREA_HIT_DATA* ret_area, SceAtWork* w)
 // Is `m` in area `w`? Eye areas (area type 3) test the view cone and the screen; the others test
 // `front` (checkFlag bit0) or `pos`, then the facing angle within angleRange (checkFlag bit1) and,
 // for item areas, the item's own hit box.
-int sceAtHitCheck(SceAtWork* w, cModel* pModel, Vec* pos_f, Vec* pos)
+int sceAtHitCheck(SCE_AT_DATA* w, cModel* pModel, Vec* pos_f, Vec* pos)
 {
     AREA_HIT_DATA area;
     f32 ang;
@@ -676,15 +674,15 @@ int sceAtHitCheck(SceAtWork* w, cModel* pModel, Vec* pos_f, Vec* pos)
     f32 ry;
 
     sceAtGetArea(&area, w);
-    ang = (f32) (w->angle * 2) * (PI / 180.0f);
+    ang = (f32) (w->hit_dir_ang * 2) * (PI / 180.0f);
     if (w->pParent != 0) {
         // `rot.y` read in both arms: the cross-jumped `lfs` lands ahead of the flag test.
-        if (w->parentParts >= 0) {
-            ry = w->pParent->getPartsPtr(w->parentParts)->ang.y;
+        if (w->parts_no >= 0) {
+            ry = w->pParent->getPartsPtr(w->parts_no)->ang.y;
         } else {
             ry = w->pParent->ang.y;
         }
-        if (!(w->flag & 8)) {
+        if (!(w->be_flg & 8)) {
             ang = LIMIT_ANGLE(ang + ry);
         }
     }
@@ -703,7 +701,7 @@ int sceAtHitCheck(SceAtWork* w, cModel* pModel, Vec* pos_f, Vec* pos)
         }
     } else {
         // Both arms written out (cross-jumped `AreaHitCheck` tail, the null test stays per arm).
-        if (w->checkFlag & 1) {
+        if (w->hit_type & 1) {
             if (pos_f != 0 && AreaHitCheck(&area, pos_f) == 1) {
                 ret = 1;
             }
@@ -712,16 +710,16 @@ int sceAtHitCheck(SceAtWork* w, cModel* pModel, Vec* pos_f, Vec* pos)
                 ret = 1;
             }
         }
-        if (pModel != 0 && (w->checkFlag & 2) && ret == 1) {
+        if (pModel != 0 && (w->hit_type & 2) && ret == 1) {
             f32 d = LIMIT_ANGLE(ang - pModel->ang.y);
-            int r = w->angleRange;
+            int r = w->hit_open_ang;
 
             if (d < (f32) (-r * 2) * (PI / 180.0f) || d > (f32) (r * 2) * (PI / 180.0f)) {
                 ret = 0;
             }
         }
-        if (w->type == SCEAT_ID_ITEM && ret == 1) {
-            if (SceAtItemHitCheck(w, 0) == 0) {
+        if (w->id == SCEAT_ID_ITEM && ret == 1) {
+            if (SceAtItemHitCheck((SCE_AT_ITEM*) w, 0) == 0) {
                 ret = 0;
             }
         }
@@ -730,13 +728,13 @@ int sceAtHitCheck(SceAtWork* w, cModel* pModel, Vec* pos_f, Vec* pos)
 }
 
 // Type 0 / 6 / 7 / 0xC / 0x14 handler: records `m` in the area's hitModel list (SceAtCheckHitModel).
-int sceAtFunc_normal(SceAtWork* w, cModel* pModel)
+int sceAtFunc_normal(SCE_AT_DATA* w, cModel* pModel)
 {
     u32 i;
 
     for (i = 0; i < 16; i++) {
-        if (w->hitModel[i] == 0) {
-            w->hitModel[i] = pModel;
+        if (w->normal.pModel[i] == 0) {
+            w->normal.pModel[i] = pModel;
             break;
         }
     }
@@ -745,28 +743,28 @@ int sceAtFunc_normal(SceAtWork* w, cModel* pModel)
 
 // Task for a locked door: the locked SE and message 0xA ("locked") or 0xB ("unlocked with the
 // key", lockType 2 sets the unlock bit); then re-enables the area and restores Stop_flg.
-void sceInLock(SceAtWork* w)
+void sceInLock(SCE_AT_DATA* w)
 {
-    switch (w->lockType) {
+    switch (w->door.key_id) {
     case 1:
-        SndCall(6, (s8) w->doorSe, &pPL->pos, 0, 0, 0);
+        SndCall(6, (s8) w->door.key_se, &pPL->pos, 0, 0, 0);
         SceMesSet(0xA, 0x11, 1, 0x64, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
         while (cMes.GetMesStatus(0) & 1) {
             TaskSleep(1);
         }
         break;
     case 2:
-        SndCall(6, (s8) w->doorSe, &pPL->pos, 0, 0, 0);
+        SndCall(6, (s8) w->door.key_se, &pPL->pos, 0, 0, 0);
         SceMesSet(0xB, 0x11, 1, 0x64, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
         while (cMes.GetMesStatus(0) & 1) {
             TaskSleep(1);
         }
-        FlagOn(doorUnlock(), w->lockFlag);
+        FlagOn(doorUnlock(), w->door.key_flg);
         break;
     }
     SceAtStopSemiautoCheck();
     pG->Stop_flg = pS->m_stop_flag_backup;
-    w->flag |= 1;
+    w->be_flg |= 1;
     TaskExit();
 }
 
@@ -800,7 +798,7 @@ int CheckDoorJumpWithAshley()
 // its unlock bit clear) runs sceInLock; else hands the door function to SceSys and sets the next
 // room (NextPos / NextY, next_stage / next_room_no / next_point, door_no) and the game routine 4
 // (room change).
-int sceAtFunc_door(SceAtWork* w, cModel* pModel)
+int sceAtFunc_door(SCE_AT_DATA* w, cModel* pModel)
 {
     u8 lt;
 
@@ -814,32 +812,32 @@ int sceAtFunc_door(SceAtWork* w, cModel* pModel)
     pS->m_stop_flag_backup = pG->Stop_flg;
     KeyStop(0xEFCF0000);
     pG->Stop_flg = -1;
-    lt = w->lockType;
-    if (lt != 0 && !(doorUnlock()[w->lockFlag >> 5] & (0x80000000 >> (w->lockFlag & 31)))) {
+    lt = w->door.key_id;
+    if (lt != 0 && !(doorUnlock()[w->door.key_flg >> 5] & (0x80000000 >> (w->door.key_flg & 31)))) {
         switch (lt) {
         case 1:
         case 2:
-            TaskExec(1, (TaskFunc) sceInLock, (int) w);
-            w->flag &= ~1;
+            TaskExec(1, (TaskFunc) sceInLock, w);
+            w->be_flg &= ~1;
             return 1;
         }
     }
-    if (w->doorFunc != 0) {
-        SceSys.pDoorFunc = w->doorFunc;
-        SceSys.pDoorParam = w->doorArg;
-        w->doorFunc = 0;
+    if (w->door.pExitFunc != 0) {
+        SceSys.pDoorFunc = w->door.pExitFunc;
+        SceSys.pDoorParam = w->door.pExitParam;
+        w->door.pExitFunc = 0;
     }
-    SceSys.m_door_fade_eff = w->doorFadeEff;
-    pG->NextPos.x = w->dstPos.x;
-    pG->NextPos.y = w->dstPos.y;
-    pG->NextPos.z = w->dstPos.z;
-    pG->NextY = w->dstAngle;
+    SceSys.m_door_fade_eff = w->door.fade_eff;
+    pG->NextPos.x = w->door.next_pos.x;
+    pG->NextPos.y = w->door.next_pos.y;
+    pG->NextPos.z = w->door.next_pos.z;
+    pG->NextY = w->door.next_ang_y;
     pG->room_id_prev = pG->room_id;
     pG->Part_old = pG->Part;
-    pG->Stage_next = w->dstStage;
-    pG->Room_next = w->dstRoom;
-    pG->Part_next = w->dstPart;
-    pG->door_se = w->doorNo;
+    pG->Stage_next = w->door.next_stage_no;
+    pG->Room_next = w->door.next_room_no;
+    pG->Part_next = w->door.next_part_no;
+    pG->door_se = w->door.open_se;
     pG->Rno0 = 4;
     pG->Rno1 = 0;
     pG->Rno2 = 0;
@@ -851,16 +849,16 @@ int sceAtFunc_door(SceAtWork* w, cModel* pModel)
 
 // Type 2 handler: runs the area's func — directly with `arg` when prio is 0, else as a scenario
 // task (SceExec at prio / otNo with the model).
-static int sceAtFunc_exec(SceAtWork* w, cModel* pModel)
+static int sceAtFunc_exec(SCE_AT_DATA* w, cModel* pModel)
 {
-    if (w->func == 0) {
+    if (w->pFunc == 0) {
         return 0;
     }
-    if (w->prio == 0) {
+    if (w->task_level == 0) {
         SetTaskModelPtr(pModel, 0);
-        ((void (*)(int)) w->func)(w->arg);
+        ((void (*)(void*)) w->pFunc)(w->pParam);
     } else {
-        SceExec(w->prio, w->func, w->arg, w->execFlag, w->otNo, pModel);
+        SceExec(w->task_level, w->pFunc, w->pParam, w->kind, w->priority, pModel);
     }
     return 1;
 }
@@ -917,9 +915,9 @@ void checkReleaseModelTbl()
 // Prepares the pick-up zoom of an item area: loads the item's model from disc (the treasure map
 // items 0x95 / 0x97 replace their existing model) into a setItemObj object attached to the area.
 // Returns 0 on a load failure.
-int itemZoom(SceAtWork* w)
+int itemZoom(SCE_AT_ITEM* w)
 {
-    SceAtItem* it = &w->item;
+    SCE_AT_DATA_ITEM* it = &w->item;
     char name[0x20];
     char name2[0x20];
     void* bin;
@@ -927,16 +925,16 @@ int itemZoom(SceAtWork* w)
     cObj* obj;
     int ret;
 
-    if (it->id == 0x95 || it->id == 0x97) {
+    if (it->item_id == 0x95 || it->item_id == 0x97) {
         if (it->pModel != 0) {
             p_imodel_bak = it->pModel;
             it->pModel = 0;
-            w->item.flag |= 8;
+            w->item.pos_set |= 8;
         }
     }
     if (it->pModel == 0) {
-        sprintf(name, "SS/cmn/itm%02x.bin", it->id);
-        sprintf(name2, "SS/cmn/itm%02x.tpl", it->id);
+        sprintf(name, "SS/cmn/itm%02x.bin", it->item_id);
+        sprintf(name2, "SS/cmn/itm%02x.tpl", it->item_id);
         bin = 0;
         tpl = 0;
 #line 1008 "D:/Bio4/Prog/sce_at.cpp"
@@ -956,7 +954,7 @@ int itemZoom(SceAtWork* w)
         }
         obj = setItemObj(bin, tpl, (Vec*) &vecZero, (Vec*) &vecZero);
         if (obj == 0) {
-            pLog->err(0, 0, "Item %d set faild!", it->id);
+            pLog->err(0, 0, "Item %d set faild!", it->item_id);
             if (bin != 0) {
                 Mem_free(bin);
             }
@@ -966,16 +964,16 @@ int itemZoom(SceAtWork* w)
             return 0;
         }
         SceAtSetItemModel(w, obj);
-        w->item.flag |= 2;
+        w->item.pos_set |= 2;
     }
     return 1;
 }
 
 // Undoes itemZoom: destroys the zoom model (its buffers freed later) and restores a replaced model
 // (hidden unless `keep`).
-void releaseModel(SceAtWork* w, int disp_flg)
+void releaseModel(SCE_AT_ITEM* w, int disp_flg)
 {
-    if ((w->item.flag & 2) && w->item.pModel != 0) {
+    if ((w->item.pos_set & 2) && w->item.pModel != 0) {
         cObj* obj = (cObj*) w->item.pModel;
         void* bin = obj->pModelInfo->model_addr;
         void* tpl = obj->pModelInfo->tpl_addr;
@@ -983,12 +981,12 @@ void releaseModel(SceAtWork* w, int disp_flg)
         ObjMgr.destroy(obj);
         setReleaseModelTbl(bin, tpl);
         w->item.pModel = 0;
-        w->item.flag &= ~2;
+        w->item.pos_set &= ~2;
     }
-    if (w->item.flag & 8) {
+    if (w->item.pos_set & 8) {
         w->item.pModel = p_imodel_bak;
         p_imodel_bak = 0;
-        w->item.flag &= ~8;
+        w->item.pos_set &= ~8;
         if (disp_flg == 0) {
             w->item.pModel->be_flag &= ~2;
         }
@@ -999,9 +997,9 @@ void releaseModel(SceAtWork* w, int disp_flg)
     {                                                     \
         itemExam.reset();                                 \
         it->pModel->setNoSuspend(0);                      \
-        if (it->flag & 4) {                               \
+        if (it->pos_set & 4) {                            \
             it->pModel->be_flag &= ~2;                    \
-            it->flag &= ~4;                               \
+            it->pos_set &= ~4;                            \
         }                                                 \
         releaseModel(w, 1);                               \
         StaFlagOff(pG, STA_ITEM_GET);                        \
@@ -1013,12 +1011,12 @@ void releaseModel(SceAtWork* w, int disp_flg)
 
 // Scenario task of an item pick-up with a model (SceExec 5 from sceAtFunc_item): adds the item,
 // shows the "got X" message with the item zoom, and opens the sub screen when the case is full.
-void sceAtGetItem(SceAtWork* w)
+void sceAtGetItem(SCE_AT_ITEM* w)
 {
     static int disp_flag_bak;
     static int sub_screen_open;
     static int swep_flag;
-    SceAtItem* it = &w->item;
+    SCE_AT_DATA_ITEM* it = &w->item;
     cModel* model = w->item.pModel;
     int fh = cMes.getFontHeight(0);
     int ls = cMes.getLineGap(0);
@@ -1037,15 +1035,15 @@ void sceAtGetItem(SceAtWork* w)
     SceUpCutStart();
     swep_flag = 0;
     SpfFlagOn(pG, SPF_CAMERA);
-    itemInfo(it->id, &info);
+    itemInfo(it->item_id, &info);
     switch (info.type) {
     case 0:
     case 4:
     case 5:
     case 7:
     case 0xC:
-        put = ItemMgr.get(it->id, it->num);
-        itemInfo(it->id, &info);
+        put = ItemMgr.get(it->item_id, it->item_num);
+        itemInfo(it->item_id, &info);
         switch (info.type) {
         case 7:
             SndCall(0, 0, 0, 0, 0, 0);
@@ -1056,8 +1054,8 @@ void sceAtGetItem(SceAtWork* w)
             break;
         }
         cMes.MesSet(0x15, 0x64, y, 0x11, 0, 0, 4);
-        cMes.SetItemName(0, it->id);
-        itemInfo(it->id, &info);
+        cMes.SetItemName(0, it->item_id);
+        itemInfo(it->item_id, &info);
         if (info.type == 7) {
             cMes.SetBttnWait(0, 0x1E);
         }
@@ -1068,11 +1066,11 @@ void sceAtGetItem(SceAtWork* w)
         // original's r29 settles the other two (it r31, the ItemMgr high r30).
         register u32 money asm("r29") = pG->peseta;
 
-        put = ItemMgr.get(it->id, it->num);
-        if (it->id == 0x73) {
+        put = ItemMgr.get(it->item_id, it->item_num);
+        if (it->item_id == 0x73) {
             cMes.MesSetNumber(0, ItemMgr.m_bonus_time, 0);
             cMes.MesSet(0x94, 0x64, y, 0x10000011, 0, 0, 4);
-        } else if (it->id == 0x75) {
+        } else if (it->item_id == 0x75) {
             cMes.MesSetNumber(0, ItemMgr.m_bonus_point, 0);
             cMes.MesSet(0x95, 0x64, y, 0x10000011, 0, 0, 4);
         } else {
@@ -1094,15 +1092,15 @@ void sceAtGetItem(SceAtWork* w)
     case 9:
         mes = 1;
         cMes.MesSet(0x11, 0x64, y, 0x111, 0, 0, 4);
-        cMes.SetItemName(0, it->id);
+        cMes.SetItemName(0, it->item_id);
         break;
     case 2:
         cMes.MesSet(0x13, 0x64, y, 0x211, 0, 0, 4);
-        cMes.SetItemName(0, it->id);
-        if (it->num != 0) {
-            cMes.MesSetNumber(0, it->num, 0);
+        cMes.SetItemName(0, it->item_id);
+        if (it->item_num != 0) {
+            cMes.MesSetNumber(0, it->item_num, 0);
         } else {
-            itemInfo(it->id, &info);
+            itemInfo(it->item_id, &info);
             cMes.MesSetNumber(0, info.defNum, 0);
         }
         mes = 1;
@@ -1110,10 +1108,10 @@ void sceAtGetItem(SceAtWork* w)
     case 0xE:
         cMes.MesSet(0x11, 0x64, y, 0x411, 0, 0, 4);
         mes = 1;
-        cMes.SetItemName(0, it->id);
+        cMes.SetItemName(0, it->item_id);
         break;
     case 6:
-        switch (it->id) {
+        switch (it->item_id) {
         case 5:
         case 6:
         case 8:
@@ -1135,14 +1133,14 @@ void sceAtGetItem(SceAtWork* w)
             cMes.MesSet(0x11, 0x64, y, 0x411, 0, 0, 4);
             break;
         }
-        cMes.SetItemName(0, it->id);
+        cMes.SetItemName(0, it->item_id);
         mes = 1;
         break;
     case 0xA:
         if (SubScreenOpen(SS_OPEN_FILE, 0) == 0) {
             SceSleep(1);
         }
-        SubScreenWk.get_item_id = it->id;
+        SubScreenWk.get_item_id = it->item_id;
         sub_screen_open = put;
         SubScreenWk.get_item_num = put;
         break;
@@ -1151,7 +1149,7 @@ void sceAtGetItem(SceAtWork* w)
     SceSleep(1);
     if (it->pModel->isTrans() == 0) {
         it->pModel->be_flag |= 2;
-        it->flag |= 4;
+        it->pos_set |= 4;
     }
     sel = 0;
     cancel = 0;
@@ -1162,7 +1160,7 @@ void sceAtGetItem(SceAtWork* w)
     DpfFlagOff(pG, DPF_ESP);
     DpfFlagOff(pG, DPF_ID_SYSTEM);
     DpfFlagOff(pG, DPF_MESSAGE);
-    itemExam.init(w->item.id, model, 0);
+    itemExam.init(w->item.item_id, model, 0);
     LightMgr.offScr(0x20);
     LightMgr.create(0, 9, -2, 0);
     sub_screen_open = sel;
@@ -1185,23 +1183,23 @@ void sceAtGetItem(SceAtWork* w)
 
             sel = res;
             if (sel == 1) {
-                put = PutInCase(it->id, it->num, (s8) SubScreenWk.board_size);
+                put = PutInCase(it->item_id, it->item_num, (s8) SubScreenWk.board_size);
                 if (put != 1) {
                     if (SubScreenOpen(SS_OPEN_PZZL, 0) == 0) {
                         SceSleep(1);
                     }
-                    SubScreenWk.get_item_id = it->id;
-                    SubScreenWk.get_item_num = it->num;
+                    SubScreenWk.get_item_id = it->item_id;
+                    SubScreenWk.get_item_num = it->item_num;
                     sub_screen_open = sel;
                 }
             } else if (res == 2) {
                 put = 0;
             } else {
-                u16 n = it->num;
+                u16 n = it->item_num;
 
-                tmp.id = it->id;
+                tmp.id = it->item_id;
                 if (n == 0) {
-                    itemInfo(it->id, &info);
+                    itemInfo(it->item_id, &info);
                     tmp.num = info.defNum;
                 } else {
                     tmp.num = n;
@@ -1234,7 +1232,7 @@ void sceAtGetItem(SceAtWork* w)
         while (SubScreenWk.close_flag == 0) {
             SceSleep(1);
         }
-        if (SubScreenWk.model_flag == 0) {
+        if (SubScreenWk.item_get_flag == 0) {
             ITEM_CANCEL();
         }
     } else {
@@ -1248,10 +1246,10 @@ void sceAtGetItem(SceAtWork* w)
     }
     SceAtSetEnable(w->no, 0);
     releaseModel(w, 0);
-    if ((w->item.flag2 & 8) && w->item.saveNo >= 0) {
-        memclr_asm(&pG->item_save[w->item.saveNo], sizeof(ITEM_SAVE_WORK));
+    if ((w->item.ctrl_flag & 8) && w->item.save_no >= 0) {
+        memclr_asm(&pG->item_save[w->item.save_no], sizeof(ITEM_SAVE_WORK));
     }
-    if (w->flag & 4) {
+    if (w->be_flg & 4) {
         Mem_free(w);
         DelPrim(&pS->ot[15], (u32*) w);
     }
@@ -1271,11 +1269,11 @@ void sceAtGetItem(SceAtWork* w)
 
 // The same pick-up sequence without a model to zoom (the item's model failed to load or is a
 // no-model item): messages, case placement (PutInCase) or the sub screen, flags and clean-up.
-void sceAtGetItem_NoModel(SceAtWork* w)
+void sceAtGetItem_NoModel(SCE_AT_ITEM* w)
 {
     static int sub_screen_open;
     static int swep_flag;
-    SceAtItem* it = &w->item;
+    SCE_AT_DATA_ITEM* it = &w->item;
     int fh = cMes.getFontHeight(0);
     int ls = cMes.getLineGap(0);
     int y = 0x129 - fh - ls;
@@ -1294,15 +1292,15 @@ void sceAtGetItem_NoModel(SceAtWork* w)
     pPL->setNoSuspend(1);
     DpfFlagOff(pG, DPF_PL);
     swep_flag = 0;
-    itemInfo(it->id, &info);
+    itemInfo(it->item_id, &info);
     switch (info.type) {
     case 0:
     case 4:
     case 5:
     case 7:
     case 0xC:
-        put = ItemMgr.get(it->id, it->num);
-        itemInfo(it->id, &info);
+        put = ItemMgr.get(it->item_id, it->item_num);
+        itemInfo(it->item_id, &info);
         switch (info.type) {
         case 7:
             SndCall(0, 0, 0, 0, 0, 0);
@@ -1313,8 +1311,8 @@ void sceAtGetItem_NoModel(SceAtWork* w)
             break;
         }
         cMes.MesSet(0x15, 0x64, y, 0x11, 0, 0, 4);
-        cMes.SetItemName(0, it->id);
-        itemInfo(it->id, &info);
+        cMes.SetItemName(0, it->item_id);
+        itemInfo(it->item_id, &info);
         if (info.type == 7) {
             cMes.SetBttnWait(0, 0x1E);
         }
@@ -1323,11 +1321,11 @@ void sceAtGetItem_NoModel(SceAtWork* w)
     case 8: {
         u32 money = pG->peseta;
 
-        put = ItemMgr.get(it->id, it->num);
-        if (it->id == 0x73) {
+        put = ItemMgr.get(it->item_id, it->item_num);
+        if (it->item_id == 0x73) {
             cMes.MesSetNumber(0, ItemMgr.m_bonus_time, 0);
             cMes.MesSet(0x94, 0x64, y, 0x10000011, 0, 0, 4);
-        } else if (it->id == 0x75) {
+        } else if (it->item_id == 0x75) {
             cMes.MesSetNumber(0, ItemMgr.m_bonus_point, 0);
             cMes.MesSet(0x95, 0x64, y, 0x10000011, 0, 0, 4);
         } else {
@@ -1349,15 +1347,15 @@ void sceAtGetItem_NoModel(SceAtWork* w)
     case 9:
         mes = 1;
         cMes.MesSet(0x11, 0x64, y, 0x111, 0, 0, 4);
-        cMes.SetItemName(0, it->id);
+        cMes.SetItemName(0, it->item_id);
         break;
     case 2:
         cMes.MesSet(0x13, 0x64, y, 0x211, 0, 0, 4);
-        cMes.SetItemName(0, it->id);
-        if (it->num != 0) {
-            cMes.MesSetNumber(0, it->num, 0);
+        cMes.SetItemName(0, it->item_id);
+        if (it->item_num != 0) {
+            cMes.MesSetNumber(0, it->item_num, 0);
         } else {
-            itemInfo(it->id, &info);
+            itemInfo(it->item_id, &info);
             cMes.MesSetNumber(0, info.defNum, 0);
         }
         mes = 1;
@@ -1365,10 +1363,10 @@ void sceAtGetItem_NoModel(SceAtWork* w)
     case 0xE:
         cMes.MesSet(0x11, 0x64, y, 0x411, 0, 0, 4);
         mes = 1;
-        cMes.SetItemName(0, it->id);
+        cMes.SetItemName(0, it->item_id);
         break;
     case 6:
-        switch (it->id) {
+        switch (it->item_id) {
         case 5:
         case 6:
         case 8:
@@ -1390,14 +1388,14 @@ void sceAtGetItem_NoModel(SceAtWork* w)
             cMes.MesSet(0x11, 0x64, y, 0x411, 0, 0, 4);
             break;
         }
-        cMes.SetItemName(0, it->id);
+        cMes.SetItemName(0, it->item_id);
         mes = 1;
         break;
     case 0xA:
         if (SubScreenOpen(SS_OPEN_FILE, 0) == 0) {
             SceSleep(1);
         }
-        SubScreenWk.get_item_id = it->id;
+        SubScreenWk.get_item_id = it->item_id;
         sub_screen_open = put;
         SubScreenWk.get_item_num = put;
         break;
@@ -1421,23 +1419,23 @@ void sceAtGetItem_NoModel(SceAtWork* w)
 
             sel = res;
             if (sel == 1) {
-                put = PutInCase(it->id, it->num, (s8) SubScreenWk.board_size);
+                put = PutInCase(it->item_id, it->item_num, (s8) SubScreenWk.board_size);
                 if (put != 1) {
                     if (SubScreenOpen(SS_OPEN_PZZL, 0) == 0) {
                         SceSleep(1);
                     }
-                    SubScreenWk.get_item_id = it->id;
-                    SubScreenWk.get_item_num = it->num;
+                    SubScreenWk.get_item_id = it->item_id;
+                    SubScreenWk.get_item_num = it->item_num;
                     sub_screen_open = sel;
                 }
             } else if (res == 2) {
                 ITEM_CANCEL_NOMODEL();
             } else {
-                u16 n = it->num;
+                u16 n = it->item_num;
 
-                tmp.id = it->id;
+                tmp.id = it->item_id;
                 if (n == 0) {
-                    itemInfo(it->id, &info);
+                    itemInfo(it->item_id, &info);
                     tmp.num = info.defNum;
                 } else {
                     tmp.num = n;
@@ -1456,7 +1454,7 @@ void sceAtGetItem_NoModel(SceAtWork* w)
         while (SubScreenWk.close_flag == 0) {
             SceSleep(1);
         }
-        if (SubScreenWk.model_flag == 0) {
+        if (SubScreenWk.item_get_flag == 0) {
             ITEM_CANCEL_NOMODEL();
         }
     } else {
@@ -1469,10 +1467,10 @@ void sceAtGetItem_NoModel(SceAtWork* w)
         PlReloadBullet();
     }
     SceAtSetEnable(w->no, 0);
-    if ((w->item.flag2 & 8) && w->item.saveNo >= 0) {
-        memclr_asm(&pG->item_save[w->item.saveNo], sizeof(ITEM_SAVE_WORK));
+    if ((w->item.ctrl_flag & 8) && w->item.save_no >= 0) {
+        memclr_asm(&pG->item_save[w->item.save_no], sizeof(ITEM_SAVE_WORK));
     }
-    if (w->flag & 4) {
+    if (w->be_flg & 4) {
         Mem_free(w);
         DelPrim(&pS->ot[15], (u32*) w);
     }
@@ -1484,23 +1482,23 @@ void sceAtGetItem_NoModel(SceAtWork* w)
 
 // Type 3 handler (item): keys blocked, the item model prepared (itemZoom) and the pick-up task
 // started (sceAtGetItem or the no-model variant); SceSys.m_item_get = 1 while it runs.
-int sceAtFunc_item(SceAtWork* w, cModel* m)
+int sceAtFunc_item(SCE_AT_DATA* w, cModel* m)
 {
-    SceAtItem* it = &w->item;
+    SCE_AT_DATA_ITEM* it = &((SCE_AT_ITEM*) w)->item;
     int ret;
     SCE_TASK* p;
 
     KeyClear(0xEFCF0000);
-    ret = itemZoom(w);
+    ret = itemZoom((SCE_AT_ITEM*) w);
     if (ret == 1) {
-        p = SceExec(5, (TaskFunc) sceAtGetItem, (int) w, 0, SCE_PRIO_15, 0);
+        p = SceExec(5, (TaskFunc) sceAtGetItem, w, 0, SCE_PRIO_15, 0);
         if (p != 0) {
             SceSys.m_item_get = ret;
             p->setNoSuspend(1);
             it->pModel->setNoSuspend(1);
         }
     } else {
-        p = SceExec(5, (TaskFunc) sceAtGetItem_NoModel, (int) w, 0, SCE_PRIO_15, 0);
+        p = SceExec(5, (TaskFunc) sceAtGetItem_NoModel, w, 0, SCE_PRIO_15, 0);
         if (p != 0) {
             SceSys.m_item_get = 1;
             p->setNoSuspend(1);
@@ -1540,28 +1538,28 @@ static inline void RsfClear(u16 room, int no)
 
 // Type 4 handler (flag): sets or clears (flg.off) flag `no` of kind 0 event flags (Room_flg),
 // 1 room save flags, 2 Scenario_flg[0].
-int sceAtFunc_flg(SceAtWork* w, cModel* pModel)
+int sceAtFunc_flg(SCE_AT_DATA* w, cModel* pModel)
 {
-    SceAtFlg* f = &w->flg;
+    SCE_AT_DATA_FLG* f = &w->flg;
 
-    switch (f->kind) {
+    switch (f->flg_id) {
     case 0:
-        if (f->off == 0) {
-            FlagOn(eventFlags(), f->no);
+        if (f->flg_act == 0) {
+            FlagOn(eventFlags(), f->flg_no);
         } else {
-            FlagOff(eventFlags(), f->no);
+            FlagOff(eventFlags(), f->flg_no);
         }
         break;
     case 1: {
-        u8 off = f->off;
+        u8 off = f->flg_act;
 
         if (off == 0) {
-            u16 no = f->no;
+            u16 no = f->flg_no;
             u16 room = pG->room_id;
 
             RsfSet(room, no);
         } else {
-            u16 no = f->no;
+            u16 no = f->flg_no;
             u16 room = pG->room_id;
 
             RsfClear(room, no);
@@ -1569,10 +1567,10 @@ int sceAtFunc_flg(SceAtWork* w, cModel* pModel)
         break;
     }
     case 2:
-        if (f->off == 0) {
-            FlagOn(flags51BC(), f->no);
+        if (f->flg_act == 0) {
+            FlagOn(flags51BC(), f->flg_no);
         } else {
-            FlagOff(flags51BC(), f->no);
+            FlagOff(flags51BC(), f->flg_no);
         }
         break;
     }
@@ -1581,12 +1579,12 @@ int sceAtFunc_flg(SceAtWork* w, cModel* pModel)
 
 // Type 5 handler (message): shows the message at once, or as a scenario task when a camera cut is
 // requested.
-int sceAtFunc_mes(SceAtWork* w, cModel* pModel)
+int sceAtFunc_mes(SCE_AT_DATA* w, cModel* pModel)
 {
-    SceAtMesData* d = &w->mes;
+    SCE_AT_DATA_MES* d = &w->mes;
 
-    if (d->camCut != 0) {
-        SceExec(5, (TaskFunc) SceAtSetMes, (int) d, 0, SCE_PRIO_DEF_2, 0);
+    if (d->cam_no != 0) {
+        SceExec(5, (TaskFunc) SceAtSetMes, d, 0, SCE_PRIO_DEF_2, 0);
     } else {
         SceAtSetMes(d);
     }
@@ -1596,34 +1594,34 @@ int sceAtFunc_mes(SceAtWork* w, cModel* pModel)
 // Shows a message request: optional up-cut camera (camCut - 1), message `no` (type 0 plain, else
 // flag bit0), optional SE (block 6 or 0), then waits for the message and returns the camera unless
 // flag bit2.
-void SceAtSetMes(SceAtMesData* pMes)
+void SceAtSetMes(SCE_AT_DATA_MES* pMes)
 {
     u32 flags = 0x10;
 
-    if (pMes->camCut != 0) {
+    if (pMes->cam_no != 0) {
         SceUpCutStart();
-        CamCtrl.CutCall((s8) (pMes->camCut - 1));
+        CamCtrl.CutCall((s8) (pMes->cam_no - 1));
         flags = 0x30;
     }
-    if (pMes->no >= 0) {
-        if (pMes->type == 0) {
-            SceMesSet(pMes->no, flags, 1, 0x64, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
+    if (pMes->mes_no >= 0) {
+        if (pMes->mes_type == 0) {
+            SceMesSet(pMes->mes_no, flags, 1, 0x64, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
         } else {
-            SceMesSet(pMes->no, flags | 1, 1, 0x64, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
+            SceMesSet(pMes->mes_no, flags | 1, 1, 0x64, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
         }
     }
-    if (pMes->se != 0) {
-        if (pMes->seBlk == 0) {
-            SndCall(6, pMes->se - 1, 0, 0, 0, 0);
+    if (pMes->se_no != 0) {
+        if (pMes->se_type == 0) {
+            SndCall(6, pMes->se_no - 1, 0, 0, 0, 0);
         } else {
-            SndCall(0, pMes->se - 1, 0, 0, 0, 0);
+            SndCall(0, pMes->se_no - 1, 0, 0, 0, 0);
         }
     }
-    if (pMes->camCut != 0) {
-        if (pMes->no >= 0) {
+    if (pMes->cam_no != 0) {
+        if (pMes->mes_no >= 0) {
             SceMesWait();
         }
-        if (!(pMes->flag & 4)) {
+        if (!(pMes->attr & 4)) {
             CamCtrl.Comeback(0);
         }
         SceUpCutEnd();
@@ -1632,86 +1630,86 @@ void SceAtSetMes(SceAtMesData* pMes)
 
 // Type 8 handler (typewriter): saves to the memory card (CardSave, slot `value`), refused with
 // message 0x97 while Ashley is carried / away.
-int sceAtFunc_save(SceAtWork* w, cModel* pModel)
+int sceAtFunc_save(SCE_AT_DATA* w, cModel* pModel)
 {
     if (pSUB != 0 && (StaFlagChk(pG, STA_SUB_CATCHED) || (SubCharGetStatus() & 0x02000000))) {
         cMes.MesSet(0x97, 0x64, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1, 1, 0, 0, 4);
     } else {
-        CardSave(w->value, 1);
+        CardSave(w->save.term_no, 1);
     }
     return 1;
 }
 
 // Type 9 handler (shadow display): turns shadow object `no` on / off (be_flag 0x80) once while the
 // model is inside (`done`).
-static int sceAtFunc_shd_disp(SceAtWork* w, cModel* pModel)
+static int sceAtFunc_shd_disp(SCE_AT_DATA* w, cModel* pModel)
 {
-    SceAtShdDisp* s = &w->shd;
+    SCE_AT_DATA_SHD_DISP* s = &w->shd_disp;
 
-    if (s->done == 1) {
+    if (s->set_flg == 1) {
         return 0;
     }
-    if (s->on == 1) {
-        ShdGetObjPtr(w->shd.no)->be_flag |= 0x80;
+    if (s->disp_flg == 1) {
+        ShdGetObjPtr(w->shd_disp.shd_no)->be_flag |= 0x80;
     } else {
-        ShdGetObjPtr(w->shd.no)->be_flag &= ~0x80;
+        ShdGetObjPtr(w->shd_disp.shd_no)->be_flag &= ~0x80;
     }
-    s->done = 1;
+    s->set_flg = 1;
     return 0;
 }
 
 // Leaving a shadow display area restores the shadow object's previous state.
-void sceAtFunc_shd_disp_reverse(SceAtWork* w)
+void sceAtFunc_shd_disp_reverse(SCE_AT_DATA* w)
 {
-    SceAtShdDisp* s = &w->shd;
+    SCE_AT_DATA_SHD_DISP* s = &w->shd_disp;
 
-    if (s->done != 0) {
-        if (s->on == 1) {
-            ShdGetObjPtr(w->shd.no)->be_flag &= ~0x80;
+    if (s->set_flg != 0) {
+        if (s->disp_flg == 1) {
+            ShdGetObjPtr(w->shd_disp.shd_no)->be_flag &= ~0x80;
         } else {
-            ShdGetObjPtr(w->shd.no)->be_flag |= 0x80;
+            ShdGetObjPtr(w->shd_disp.shd_no)->be_flag |= 0x80;
         }
-        s->done = 0;
+        s->set_flg = 0;
     }
 }
 
 // Type 0xA handler (damage area): damages the player (checkType bit0) / partner (bit3) through
 // setDamage(kind, arg, power or 123 = no direction, flags bit0, time) when alive and not already
 // dying, and registers a DmgMgr area of the same shape for the enemies (bit1).
-int sceAtFunc_damage(SceAtWork* w, cModel* pModel)
+int sceAtFunc_damage(SCE_AT_DATA* w, cModel* pModel)
 {
     Vec pt[4];
     Vec c;
-    int time = w->dmg.time;
+    int time = w->damage.dmg_timer;
 
     if (time == 0) {
         time = 1;
     }
-    if (w->checkType & 1) {
+    if (w->target_type & 1) {
         int dead = 1;
 
         if (!pPL->dmg.m_Flag && !pPL->dmg.m_Timer) {
             dead = 0;
         }
         if (dead == 0 && (s16) pG->pl_life > 0) {
-            u8 fl = w->dmg.flags;
+            u8 fl = w->damage.dmg_ctrl;
             int a = 0;
             int b = 0xFF;
 
             if (fl & 1) {
                 a = 1;
             }
-            if (w->dmg.time != 0) {
-                b = (u8) w->dmg.time;
+            if (w->damage.dmg_timer != 0) {
+                b = (u8) w->damage.dmg_timer;
             }
             if (fl & 2) {
-                pPL->setDamage(w->dmg.kind, w->dmg.arg, w->dmg.power, a, b);
+                pPL->setDamage(w->damage.dmg_type, w->damage.dmg_vol, a, b, w->damage.dmg_ang);
             } else {
-                pPL->setDamage(w->dmg.kind, w->dmg.arg, 123.0f, a, b);
+                pPL->setDamage(w->damage.dmg_type, w->damage.dmg_vol, a, b, 123.0f);
             }
         }
     }
-    if (w->checkType & 8) {
+    if (w->target_type & 8) {
         if (pSUB != 0) {
             int dead = 1;
 
@@ -1719,25 +1717,25 @@ int sceAtFunc_damage(SceAtWork* w, cModel* pModel)
                 dead = 0;
             }
             if (dead == 0 && (s16) pG->ashley_life > 0) {
-                u8 fl = w->dmg.flags;
+                u8 fl = w->damage.dmg_ctrl;
                 int a = 0;
                 int b = 0xFF;
 
                 if (fl & 1) {
                     a = 1;
                 }
-                if (w->dmg.time != 0) {
-                    b = (u8) w->dmg.time;
+                if (w->damage.dmg_timer != 0) {
+                    b = (u8) w->damage.dmg_timer;
                 }
                 if (fl & 2) {
-                    SUB_CHAR()->setDamage(w->dmg.kind, w->dmg.arg, w->dmg.power, a, b);
+                    SUB_CHAR()->setDamage(w->damage.dmg_type, w->damage.dmg_vol, a, b, w->damage.dmg_ang);
                 } else {
-                    SUB_CHAR()->setDamage(w->dmg.kind, w->dmg.arg, 123.0f, a, b);
+                    SUB_CHAR()->setDamage(w->damage.dmg_type, w->damage.dmg_vol, a, b, 123.0f);
                 }
             }
         }
     }
-    if (w->checkType & 2) {
+    if (w->target_type & 2) {
         switch (w->area.type) {
         case 1:
             pt[0].x = w->area.xz4.p[0].x;
@@ -1752,13 +1750,13 @@ int sceAtFunc_damage(SceAtWork* w, cModel* pModel)
             pt[3].x = w->area.xz4.p[1].x;
             pt[3].y = w->area.xz4.floor;
             pt[3].z = w->area.xz4.p[1].z;
-            DmgMgr.set(w->dmg.kind, time, pt, w->area.xz4.height);
+            DmgMgr.set(w->damage.dmg_type, time, pt, w->area.xz4.height);
             break;
         case 2:
             c.x = w->area.cylinder.x;
             c.y = w->area.cylinder.floor;
             c.z = w->area.cylinder.z;
-            DmgMgr.set(w->dmg.kind, time, &c, w->area.cylinder.radius, w->area.cylinder.height);
+            DmgMgr.set(w->damage.dmg_type, time, &c, w->area.cylinder.radius, w->area.cylinder.height);
             break;
         }
     }
@@ -1766,39 +1764,39 @@ int sceAtFunc_damage(SceAtWork* w, cModel* pModel)
 }
 
 // Type 0xB (runtime scenario collision) has no trigger action.
-int sceAtFunc_scr_at(SceAtWork* w, cModel* pModel)
+int sceAtFunc_scr_at(SCE_AT_DATA* w, cModel* pModel)
 {
     return 0;
 }
 
 // Type 0xD handler (field info): value 0 flags the model inside (State in-room flag, dark area).
-int sceAtFunc_field_info(SceAtWork* w, cModel* pModel)
+int sceAtFunc_field_info(SCE_AT_DATA* w, cModel* pModel)
 {
-    if (w->field.value == 0) {
+    if (w->field.id == 0) {
         ((cEm*) pModel)->State.SetInRoom(1);
     }
     return 0;
 }
 
 // Type 0xE handler (stoop): the player crouches (low passage).
-int sceAtFunc_stoop(SceAtWork* w, cModel* pModel)
+int sceAtFunc_stoop(SCE_AT_DATA* w, cModel* pModel)
 {
     PlSetCrouch();
     return 0;
 }
 
 // Type 0xF handler (special key): stops the game and shows the "needs a key" message task.
-int sceAtFunc_skey(SceAtWork* w, cModel* pModel)
+int sceAtFunc_skey(SCE_AT_DATA* w, cModel* pModel)
 {
     pS->m_stop_flag_backup = pG->Stop_flg;
     KeyStop(0xEFCF0000);
     pG->Stop_flg = -1;
-    TaskExec(1, (TaskFunc) sceAtSkey, (int) w);
+    TaskExec(1, (TaskFunc) sceAtSkey, w);
     return 0;
 }
 
 // Task: message 0xC, then restores Stop_flg.
-static void sceAtSkey(SceAtWork* w)
+static void sceAtSkey(SCE_AT_DATA* w)
 {
     cMes.MesSet(0xC, 0x64, 336 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1, 1, 0, 0, 4);
     while (cMes.GetMesStatus(0) & 1) {
@@ -1810,20 +1808,20 @@ static void sceAtSkey(SceAtWork* w)
 
 // Ladder camera task: plays the area's up to three camera cuts, waits until the player has left
 // the ladder routine, returns the camera. SceSys.pLadderTask is cleared at the end.
-void sceAtLadder(SceAtWork* w)
+void sceAtLadder(SCE_AT_DATA* w)
 {
-    CamCtrl.CutCall((s8) (w->ladder.cut1 - 1));
+    CamCtrl.CutCall((s8) (w->ladder.cam_no - 1));
     while (CamCtrl.IsMotionEnd() == 0) {
         SceSleep(1);
     }
-    if (w->ladder.cut2 != 0) {
-        CamCtrl.CutCall((s8) (w->ladder.cut2 - 1));
+    if (w->ladder.cam_no2 != 0) {
+        CamCtrl.CutCall((s8) (w->ladder.cam_no2 - 1));
         while (CamCtrl.IsMotionEnd() == 0) {
             SceSleep(1);
         }
     }
-    if (w->ladder.cut3 != 0) {
-        CamCtrl.CutCall((s8) (w->ladder.cut3 - 1));
+    if (w->ladder.cam_no3 != 0) {
+        CamCtrl.CutCall((s8) (w->ladder.cam_no3 - 1));
         while (CamCtrl.IsMotionEnd() == 0) {
             SceSleep(1);
         }
@@ -1837,38 +1835,38 @@ void sceAtLadder(SceAtWork* w)
 
 // Type 0x10 handler (ladder): puts the player on the ladder (PlSetLadder at the area's foot
 // position / angle / level) and starts the camera task when cut1 is set.
-int sceAtFunc_ladder(SceAtWork* w, cModel* pModel)
+int sceAtFunc_ladder(SCE_AT_DATA* w, cModel* pModel)
 {
     Vec pos;
     f32 ang;
 
     sceAtGetLadderPos(&w->ladder, &pos, &ang);
-    PlSetLadder(&pos, w->ladder.level, ang);
-    if (w->ladder.cut1 != 0) {
-        SceSys.pLadderTask = SceExec(5, (TaskFunc) sceAtLadder, (int) w, 0, SCE_PRIO_DEF_2, 0);
+    PlSetLadder(&pos, ang, w->ladder.height);
+    if (w->ladder.cam_no != 0) {
+        SceSys.pLadderTask = SceExec(5, (TaskFunc) sceAtLadder, w, 0, SCE_PRIO_DEF_2, 0);
     }
     return 0;
 }
 
 // Where the player stands to use the ladder: 300 in front of the ladder record, facing it.
-void sceAtGetLadderPos(SceAtLadder* ladder, Vec* pos, f32* ladder_ang)
+void sceAtGetLadderPos(SCE_AT_DATA_LADDER* ladder, Vec* pos, f32* ladder_ang)
 {
     Vec ofs = {0.0f, 0.0f, 300.0f};
     Vec rot;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     Mtx mat;
 
-    tmp.y = ladder->angle;
+    tmp.y = ladder->ang_y;
     rot = tmp;
     low_RotMatrix(mat, &rot);
     TransMatrix(mat, &ladder->pos);
     PSMTXMultVec(mat, &ofs, pos);
-    *ladder_ang = ladder->angle + PI;
+    *ladder_ang = ladder->ang_y + PI;
     *ladder_ang = LIMIT_ANGLE(*ladder_ang);
 }
 
 // 1 when another enemy (id <= 0x20) stands within 500 of the ladder's foot (someone is using it).
-int sceAtCheckLadderUp(SceAtLadder* ladder, cModel* pEm)
+int sceAtCheckLadderUp(SCE_AT_DATA_LADDER* ladder, cModel* pEm)
 {
     AREA_HIT_DATA area;
     Vec pos;
@@ -1876,7 +1874,7 @@ int sceAtCheckLadderUp(SceAtLadder* ladder, cModel* pEm)
     u32 i;
 
     sceAtGetLadderPos(ladder, &pos, &ang);
-    AreaDataInit(&area, &pos, 2, 500.0f, 2000.0f);
+    AreaDataInit(&area, &pos, 500.0f, 2000.0f, 2);
     for (i = 0; i < EmMgr.getArrayNum(); i++) {
         cEm* em = EmMgr.fastAt(i);
 
@@ -1891,18 +1889,18 @@ int sceAtCheckLadderUp(SceAtLadder* ladder, cModel* pEm)
 
 // Type 0x11 handler (use item): the item useItem[1] becomes usable from the inventory while the
 // player stands here (ItemMgr.available).
-int sceAtFunc_use(SceAtWork* w, cModel* pModel)
+int sceAtFunc_use(SCE_AT_DATA* w, cModel* pModel)
 {
-    ItemMgr.available(w->useItem[1]);
+    ItemMgr.available(w->use.use_id);
     return 0;
 }
 
 // Type 0x12 handler (hide spot, action button): sends Ashley to hide at hide.pos (SubCharCtrlHide
 // with hide.mode), starts the hide sequence (step 1) with its SE.
-int sceAtFunc_hide(SceAtWork* w, cModel* pModel)
+int sceAtFunc_hide(SCE_AT_DATA* w, cModel* pModel)
 {
-    SubCharCtrlHide(&w->hide.pos, w->hide.mode);
-    w->hide.step = 1;
+    SubCharCtrlHide(&w->hide.pos, w->hide.type);
+    w->hide.status = 1;
     SndCall(6, 0x5E, 0, 0, 0, 0);
     return 0;
 }
@@ -1911,11 +1909,11 @@ int sceAtFunc_hide(SceAtWork* w, cModel* pModel)
 // when called back).
 void SceAtDataSet_hide(int no, void (*func)(int))
 {
-    SceAtWork* w = SceAtPtr(no);
+    SCE_AT_DATA* w = SceAtPtr(no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtDataSet_hide(): AT NOT FOUND");
-    } else if (w->type != SCEAT_ID_HIDE) {
+    } else if (w->id != SCEAT_ID_HIDE) {
         pLog->err(0, 0, "SceAtDataSet_hide(): ID is not HIDE");
     } else {
         w->hide.func = func;
@@ -1938,20 +1936,20 @@ int SceAtCheckHideActive()
 void SceAtCheckHideProc()
 {
     static int timer;
-    SceAtWork* w = sceAtSetOtStart();
+    SCE_AT_DATA* w = sceAtSetOtStart();
     int off;
     u8 step;
     SCE_TASK* p;
 
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        off = !(w->flag & 1);
+        off = !(w->be_flg & 1);
         if (off) {
             continue;
         }
-        if (w->type != SCEAT_ID_HIDE) {
+        if (w->id != SCEAT_ID_HIDE) {
             continue;
         }
-        step = w->hide.step;
+        step = w->hide.status;
         if (step != 0) {
             goto FOUND;
         }
@@ -1967,13 +1965,13 @@ FOUND:
                 SceKill(w->hide.func);
                 SceExec(0x12, (TaskFunc) w->hide.func, 0, 0, SCE_PRIO_DEF_2, 0);
             }
-            w->hide.step++;
+            w->hide.status++;
             pS->hideActive = step;
         }
         break;
     case 2:
         if (PlSetWhistle() != 0) {
-            w->hide.step++;
+            w->hide.status++;
             KeyStop(0xEFCF0000);
             timer = 0x19;
         }
@@ -1983,11 +1981,11 @@ FOUND:
             p = 0;
             if (w->hide.func != 0) {
                 SceKill(w->hide.func);
-                p = SceExec(0x12, (TaskFunc) w->hide.func, 1, 0, SCE_PRIO_DEF_2, 0);
+                p = SceExec(0x12, (TaskFunc) w->hide.func, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
             }
             SpfFlagOff(pG, SPF_KEY);
             SubCharCtrlHide(&pPL->pos, 0);
-            if (w->hide.cut != 0) {
+            if (w->hide.cam_no != 0) {
                 SceUpCutStart();
                 DpfFlagOff(pG, DPF_SUBCHAR);
                 pSUB->setNoSuspend(1);
@@ -1995,10 +1993,10 @@ FOUND:
                 if (p != 0) {
                     p->setNoSuspend(1);
                 }
-                CamCtrl.CutCall((s8) (w->hide.cut - 1));
-                w->hide.step++;
+                CamCtrl.CutCall((s8) (w->hide.cam_no - 1));
+                w->hide.status++;
             } else {
-                w->hide.step = off;
+                w->hide.status = off;
                 pS->hideActive = off;
             }
         }
@@ -2009,7 +2007,7 @@ FOUND:
             pSUB->setNoSuspend(0);
             SceUpCutEnd();
             CamCtrl.Comeback(0);
-            w->hide.step = off;
+            w->hide.status = off;
             pS->hideActive = off;
         }
         break;
@@ -2020,7 +2018,7 @@ FOUND:
 // swapped: local-alloc qty priority); store orders, chains and a zero local tried.
 // Type 0x13 handler (position jump): teleports the player to jumpPos / dstAngle and re-seats the
 // quasi-FPS camera.
-int sceAtFunc_pos_jump(SceAtWork* w, cModel* pModel)
+int sceAtFunc_pos_jump(SCE_AT_DATA* w, cModel* pModel)
 {
     Vec rot;
     // COMPILER-DIFF: #13. The original's 0.0 is a reload-materialised constant (f13, the FPR after
@@ -2030,8 +2028,8 @@ int sceAtFunc_pos_jump(SceAtWork* w, cModel* pModel)
     register f32 a asm("fr0");
     f32 z;
 
-    pPL->setPos(&w->jumpPos);
-    a = w->dstAngle;
+    pPL->setPos(&w->pos_jump.dest_pos);
+    a = w->door.next_ang_y;
     z = 0.0f;
     rot.y = a;
     rot.x = z;
@@ -2054,79 +2052,79 @@ void SceAtStopSemiautoCheck()
 // 0x24), and disables the areas excluded for the current language (country).
 void SceAtRoomSet()
 {
-    SceAtWork* w = sceAtSetOtStart();
+    SCE_AT_DATA* w = sceAtSetOtStart();
 
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        u8 t = w->type;
+        u8 t = w->id;
 
         switch (t) {
         case 0xB:
-            if (w->flag & 1) {
+            if (w->be_flg & 1) {
                 sceAtSetScrAt(w);
             }
             break;
         case 1:
-            if (bitOff(w->trigger) && !(w->trigger & 8)) {
-                w->actBtnColor = 1;
-                w->actBtnKind = 0x10;
-                w->trigger = (w->trigger & 0x80) | 8;
-                w->otNo = 2;
+            if (bitOff(w->trg_type) && !(w->trg_type & 8)) {
+                w->act_color = 1;
+                w->act_type = 0x10;
+                w->trg_type = (w->trg_type & 0x80) | 8;
+                w->priority = 2;
             }
             break;
         case 5:
-            if (!(w->trigger & 8)) {
-                w->actBtnKind = 1;
-                w->trigger = (w->trigger & 0x80) | 8;
-                w->otNo = 2;
+            if (!(w->trg_type & 8)) {
+                w->act_type = 1;
+                w->trg_type = (w->trg_type & 0x80) | 8;
+                w->priority = 2;
             }
             break;
         case 0xE:
-            if (!(w->trigger & 8)) {
-                w->actBtnKind = 0x13;
-                w->trigger = (w->trigger & 0x80) | 8;
-                w->otNo = 5;
+            if (!(w->trg_type & 8)) {
+                w->act_type = 0x13;
+                w->trg_type = (w->trg_type & 0x80) | 8;
+                w->priority = 5;
             }
             break;
         case 8:
-            if (!(w->trigger & 8)) {
-                w->actBtnKind = 0x2F;
-                w->trigger = (w->trigger & 0x80) | 8;
-                w->otNo = 5;
+            if (!(w->trg_type & 8)) {
+                w->act_type = 0x2F;
+                w->trg_type = (w->trg_type & 0x80) | 8;
+                w->priority = 5;
             }
             break;
         case 0x10:
-            if (!(w->trigger & 8)) {
-                w->trigger = (w->trigger & 0x80) | 8;
-                if (w->ladder.level > 0) {
-                    w->actBtnKind = 8;
+            if (!(w->trg_type & 8)) {
+                w->trg_type = (w->trg_type & 0x80) | 8;
+                if (w->ladder.height > 0) {
+                    w->act_type = 8;
                 } else {
-                    w->actBtnKind = 9;
+                    w->act_type = 9;
                 }
-                w->otNo = 5;
+                w->priority = 5;
             }
             break;
         case 0x12:
-            if (!(w->trigger & 8)) {
-                w->actBtnKind = 0x20;
-                w->trigger = (w->trigger & 0x80) | 8;
-                w->otNo = 5;
+            if (!(w->trg_type & 8)) {
+                w->act_type = 0x20;
+                w->trg_type = (w->trg_type & 0x80) | 8;
+                w->priority = 5;
             }
             break;
         case 0x11:
-            w->trigger = 1;
+            w->trg_type = 1;
             break;
         }
     }
     w = sceAtSetOtStart();
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (bitOff(w->flag)) {
+        if (bitOff(w->be_flg)) {
             continue;
         }
-        if (w->type == SCEAT_ID_ITEM) {
-            if (w->item.id == 0x1000) {
+        if (w->id == SCEAT_ID_ITEM) {
+            if (((SCE_AT_ITEM*) w)->item.item_id == 0x1000) {
                 EmReadSearch(0x24, 0, 0);
             }
-            sceAtSetItem(w);
+            sceAtSetItem((SCE_AT_ITEM*) w);
         }
         if (pG->game_country == 0) {
             if (w->country.check(SCEAT_COUNTRY_JPN)) {
@@ -2143,7 +2141,7 @@ void SceAtRoomSet()
 // Creates the scenario (SatMgr, unless scr.flags bit1; attribute 0x40 added unless bit2) and
 // effect (EatMgr, unless bit0) collision pieces of a type 0xB area from its quad (scaled and placed
 // by the parent when it has one).
-void sceAtSetScrAt(SceAtWork* w)
+void sceAtSetScrAt(SCE_AT_DATA* w)
 {
     Vec pos;
     f32 h;
@@ -2151,7 +2149,7 @@ void sceAtSetScrAt(SceAtWork* w)
     if (w->area.type != 1) {
         return;
     }
-    if (w->scr.created != 0) {
+    if (w->scr_at.set_flg != 0) {
         return;
     }
     Vec rot = { 0.0f, 0.0f, 0.0f };
@@ -2190,62 +2188,62 @@ void sceAtSetScrAt(SceAtWork* w)
         poly[3].z = w->area.xz4.p[3].z - w->area.xz4.p[0].z;
     }
     h = w->area.xz4.height;
-    if (!(w->scr.flags & 2)) {
-        if (!(w->scr.flags & 4)) {
-            w->scr.attr |= 0x40;
+    if (!(w->scr_at.ctrl_flag & 2)) {
+        if (!(w->scr_at.ctrl_flag & 4)) {
+            w->scr_at.sat_attr |= 0x40;
         }
-        w->scr.pSat = SatMgr.create(&pos, &rot, poly, h, w->scr.attr, w->scr.flag);
+        w->scr_at.pSat = SatMgr.create(&pos, &rot, poly, h, w->scr_at.sat_attr, w->scr_at.sat_flag);
     }
-    if (bitOff(w->scr.flags)) {
-        w->scr.pEat = EatMgr.create(&pos, &rot, poly, h, w->scr.attr2, w->scr.flag);
+    if (bitOff(w->scr_at.ctrl_flag)) {
+        w->scr_at.pEat = EatMgr.create(&pos, &rot, poly, h, w->scr_at.eat_attr, w->scr_at.sat_flag);
     }
-    w->scr.created = 1;
+    w->scr_at.set_flg = 1;
 }
 
 // Destroys the collision pieces created by sceAtSetScrAt.
-void sceAtDeleteScrAt(SceAtWork* w)
+void sceAtDeleteScrAt(SCE_AT_DATA* w)
 {
-    if (w->scr.created == 1) {
-        if (!(w->scr.flags & 2)) {
-            SatMgr.destroy(w->scr.pSat);
+    if (w->scr_at.set_flg == 1) {
+        if (!(w->scr_at.ctrl_flag & 2)) {
+            SatMgr.destroy(w->scr_at.pSat);
         }
-        if (bitOff(w->scr.flags)) {
-            EatMgr.destroy(w->scr.pEat);
+        if (bitOff(w->scr_at.ctrl_flag)) {
+            EatMgr.destroy(w->scr_at.pEat);
         }
-        w->scr.pSat = 0;
-        w->scr.pEat = 0;
-        w->scr.created = 0;
+        w->scr_at.pSat = 0;
+        w->scr_at.pEat = 0;
+        w->scr_at.set_flg = 0;
     }
 }
 
 // Per frame (stage move): parented type 0xB collision pieces follow their parent's position / yaw.
 void SceAtCheckMoveScrAt()
 {
-    SceAtWork* w = sceAtSetOtStart();
+    SCE_AT_DATA* w = sceAtSetOtStart();
 
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (bitOff(w->flag)) {
+        if (bitOff(w->be_flg)) {
             continue;
         }
-        if (w->type != SCEAT_ID_SCR_AT) {
+        if (w->id != SCEAT_ID_SCR_AT) {
             continue;
         }
         if (w->pParent == 0) {
             continue;
         }
-        if (w->scr.pSat != 0) {
-            w->scr.pSat->setCoord(&w->pParent->pos, &w->pParent->ang);
+        if (w->scr_at.pSat != 0) {
+            w->scr_at.pSat->setCoord(&w->pParent->pos, &w->pParent->ang);
         }
-        if (w->scr.pEat != 0) {
-            w->scr.pEat->setCoord(&w->pParent->pos, &w->pParent->ang);
+        if (w->scr_at.pEat != 0) {
+            w->scr_at.pEat->setCoord(&w->pParent->pos, &w->pParent->ang);
         }
     }
 }
 
 // The area record numbered `no` (ITA items are 0x80 + index), or 0.
-SceAtWork* SceAtPtr(int at_no)
+SCE_AT_DATA* SceAtPtr(int at_no)
 {
-    SceAtWork* w = sceAtSetOtStart();
+    SCE_AT_DATA* w = sceAtSetOtStart();
 
     while ((w = sceAtGetOtAddr(w)) != 0) {
         if (w->no == at_no) {
@@ -2260,7 +2258,7 @@ SceAtWork* SceAtPtr(int at_no)
 int sceAtPullAtNo(u8* out)
 {
     u32 used[8];
-    SceAtWork* w;
+    SCE_AT_DATA* w;
     u32 i;
 
     memclr_asm(used, sizeof(used));
@@ -2280,13 +2278,13 @@ int sceAtPullAtNo(u8* out)
 // Room: the function SceSys runs after door `no` has been taken (hand-over to the next room).
 void SceAtSetDoorFunc(int no, TaskFunc func, void* arg)
 {
-    SceAtWork* w = SceAtPtr(no);
+    SCE_AT_DATA* w = SceAtPtr(no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtSetDoorFunc(): AT NOT FOUND");
     } else {
-        w->doorFunc = func;
-        w->doorArg = arg;
+        w->door.pExitFunc = func;
+        w->door.pExitParam = arg;
     }
 }
 
@@ -2295,77 +2293,77 @@ void SceAtSetDoorFunc(int no, TaskFunc func, void* arg)
 // prioBak). For special-key areas (0xF) fills the skey payload instead.
 void SceAtDataSet_exec(int no, int prio, int a, TaskFunc func, void* obj, int b)
 {
-    SceAtWork* w = SceAtPtr(no);
+    SCE_AT_DATA* w = SceAtPtr(no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtDataSet_exec(): AT NOT FOUND");
         return;
     }
-    if (w->type == SCEAT_ID_SKEY) {
-        w->skey.obj = obj;
-        w->skey.func = func;
-        w->skey.flag = b;
-        if (w->prio > 0x12) {
-            w->skey.prio = 0x12;
+    if (w->id == SCEAT_ID_SKEY) {
+        w->skey.pParam = obj;
+        w->skey.pFunc = func;
+        w->skey.kind = b;
+        if (w->task_level > 0x12) {
+            w->skey.task_level = 0x12;
         } else {
-            w->skey.prio = prio;
+            w->skey.task_level = prio;
         }
         return;
     }
     if (a != 0) {
-        if (w->prioBak == 0) {
-            w->prioBak = w->trigger;
+        if (w->trg_type_bak == 0) {
+            w->trg_type_bak = w->trg_type;
         }
-        w->trigger = a;
+        w->trg_type = a;
     }
-    if (w->prio > 0x12) {
-        w->prio = 0x12;
+    if (w->task_level > 0x12) {
+        w->task_level = 0x12;
     } else {
-        w->prio = prio;
+        w->task_level = prio;
     }
-    w->func = func;
-    w->arg = (int) obj;
-    w->execFlag = b;
+    w->pFunc = func;
+    w->pParam = obj;
+    w->kind = b;
 }
 
 // Undoes SceAtDataSet_exec: trigger restored, no function.
 void SceAtDataReset(int at_no)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtDataReset(): AT NOT FOUND");
         return;
     }
-    if (w->prioBak != 0) {
-        w->trigger = w->prioBak;
-        w->prioBak = 0;
+    if (w->trg_type_bak != 0) {
+        w->trg_type = w->trg_type_bak;
+        w->trg_type_bak = 0;
     }
-    w->prio = 0;
-    w->func = 0;
+    w->task_level = 0;
+    w->pFunc = 0;
 }
 
 // Enables / disables area `no` (flag bit0); item areas create / remove their model and effect,
 // collision areas their pieces.
 void SceAtSetEnable(int at_no, int sw)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtSetEnable(): AT NOT FOUND");
         return;
     }
     if (sw == 1) {
-        w->flag |= 1;
+        w->be_flg |= 1;
     } else {
-        w->flag &= ~1;
+        w->be_flg &= ~1;
     }
-    switch (w->type) {
+    switch (w->id) {
     case SCEAT_ID_ITEM:
         if (sw == 1) {
-            sceAtSetItem(w);
+            sceAtSetItem((SCE_AT_ITEM*) w);
         } else {
-            sceAtDeleteItem(w);
+            sceAtDeleteItem((SCE_AT_ITEM*) w);
         }
         break;
     case SCEAT_ID_SCR_AT:
@@ -2381,13 +2379,13 @@ void SceAtSetEnable(int at_no, int sw)
 // Never-called inline the original kept the string of.
 static inline int SceAtCheckEnable(int at_no)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtCheckEnable(): AT NOT FOUND");
         return 0;
     }
-    return w->flag & 1;
+    return w->be_flg & 1;
 }
 
 // 1 when area `no` was hit (someone inside) this frame.
@@ -2404,19 +2402,19 @@ int SceAtHitCheck(u32 at_no)
 // Fires area `no` now (its type handler with no model).
 void SceAtExecute(int at_no)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtExecute(): AT NOT FOUND");
         return;
     }
-    sceAtFunc_tbl[w->type].func(w, 0);
+    sceAtFunc_tbl[w->id].func(w, 0);
 }
 
 // 1 when model `m` is inside normal area `no` this frame (hitModel list).
 int SceAtCheckHitModel(int at_no, cModel* pModel)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
     int i;
 
     if (w == 0) {
@@ -2424,7 +2422,7 @@ int SceAtCheckHitModel(int at_no, cModel* pModel)
         return 0;
     }
     for (i = 0; i < 16; i++) {
-        if (w->hitModel[i] == pModel) {
+        if (w->normal.pModel[i] == pModel) {
             return 1;
         }
     }
@@ -2434,12 +2432,12 @@ int SceAtCheckHitModel(int at_no, cModel* pModel)
 // Action button colour of area `no` (1 = the alternate colour).
 void SceAtSetActColor(int at_no, int col)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtSetActColor(): AT NOT FOUND");
     } else {
-        w->actBtnColor = col;
+        w->act_color = col;
     }
 }
 
@@ -2447,7 +2445,7 @@ void SceAtSetActColor(int at_no, int col)
 void SceAtGetCenterPos(Vec* ret_pos, int at_no)
 {
     AREA_HIT_DATA area;
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtGetCenterPos(): AT NOT FOUND");
@@ -2460,7 +2458,7 @@ void SceAtGetCenterPos(Vec* ret_pos, int at_no)
 // Attaches area `w` to `parent`: the area (and an item's position / offset / model) is converted
 // into the parent's local frame (divided by its scale); flag is or-ed into w->flag (8 = ignore
 // the parent rotation). Returns 1 when attached, 0 when already attached / unsupported shape.
-int SceAtSetParent(SceAtWork* w, cModel* parent, int flag)
+int SceAtSetParent(SCE_AT_DATA* w, cModel* parent, int flag)
 {
     if (parent == 0) {
         pLog->err(0, 0, "sceAtSetParent(): pParent == NULL");
@@ -2479,8 +2477,8 @@ int SceAtSetParent(SceAtWork* w, cModel* parent, int flag)
     if (parent->scale.z != 0.0f) {
         inv.z = 1.0f / parent->scale.z;
     }
-    w->flag |= flag;
-    w->parentParts = -1;
+    w->be_flg |= flag;
+    w->parts_no = -1;
     w->pParent = parent;
     switch (w->area.type) {
     case 1:
@@ -2515,43 +2513,43 @@ int SceAtSetParent(SceAtWork* w, cModel* parent, int flag)
     default:
         return 0;
     }
-    if (w->type == SCEAT_ID_ITEM) {
-        w->item.pos.x -= parent->pos.x;
-        w->item.pos.y -= parent->pos.y;
-        w->item.pos.z -= parent->pos.z;
-        w->item.pos.x *= inv.x;
-        w->item.pos.y *= inv.y;
-        w->item.pos.z *= inv.z;
-        w->item.ofs.x *= inv.x;
-        w->item.ofs.y *= inv.y;
-        w->item.ofs.z *= inv.z;
-        if (w->item.effNo != 0) {
-            sceAtItemEffDelete(&w->item);
-            sceAtItemEffSet(w, 0);
+    if (w->id == SCEAT_ID_ITEM) {
+        ((SCE_AT_ITEM*) w)->item.item_pos.x -= parent->pos.x;
+        ((SCE_AT_ITEM*) w)->item.item_pos.y -= parent->pos.y;
+        ((SCE_AT_ITEM*) w)->item.item_pos.z -= parent->pos.z;
+        ((SCE_AT_ITEM*) w)->item.item_pos.x *= inv.x;
+        ((SCE_AT_ITEM*) w)->item.item_pos.y *= inv.y;
+        ((SCE_AT_ITEM*) w)->item.item_pos.z *= inv.z;
+        ((SCE_AT_ITEM*) w)->item.eff_offset.x *= inv.x;
+        ((SCE_AT_ITEM*) w)->item.eff_offset.y *= inv.y;
+        ((SCE_AT_ITEM*) w)->item.eff_offset.z *= inv.z;
+        if (((SCE_AT_ITEM*) w)->item.eff_setno != 0) {
+            sceAtItemEffDelete(&((SCE_AT_ITEM*) w)->item);
+            sceAtItemEffSet((SCE_AT_ITEM*) w, 0);
         }
-        if (w->item.pModel != 0) {
-            w->item.pModel->pos.x -= w->pParent->pos.x;
-            w->item.pModel->pos.y -= w->pParent->pos.y;
-            w->item.pModel->pos.z -= w->pParent->pos.z;
-            w->item.pModel->pos.x *= inv.x;
-            w->item.pModel->pos.y *= inv.y;
-            w->item.pModel->pos.z *= inv.z;
-            sceAtSetItemModelParent(w);
+        if (((SCE_AT_ITEM*) w)->item.pModel != 0) {
+            ((SCE_AT_ITEM*) w)->item.pModel->pos.x -= w->pParent->pos.x;
+            ((SCE_AT_ITEM*) w)->item.pModel->pos.y -= w->pParent->pos.y;
+            ((SCE_AT_ITEM*) w)->item.pModel->pos.z -= w->pParent->pos.z;
+            ((SCE_AT_ITEM*) w)->item.pModel->pos.x *= inv.x;
+            ((SCE_AT_ITEM*) w)->item.pModel->pos.y *= inv.y;
+            ((SCE_AT_ITEM*) w)->item.pModel->pos.z *= inv.z;
+            sceAtSetItemModelParent((SCE_AT_ITEM*) w);
         }
     }
     return 1;
 }
 
 // SceAtSetParent for area number `no`; 0 when the area does not exist.
-int SceAtSetParent(int no, cObj* obj, int flag)
+int SceAtSetParent(int no, cModel* parent, int flag)
 {
-    SceAtWork* w = SceAtPtr(no);
+    SCE_AT_DATA* w = SceAtPtr(no);
 
     if (w == 0) {
         pLog->err(0, 0, "sceAtSetParent(): AT NOT FOUND");
         return 0;
     }
-    return SceAtSetParent(w, obj, flag);
+    return SceAtSetParent(w, parent, flag);
 }
 
 // Dead-stripped by the original linker (STRIP_UNUSED): only its constant pool (1e10) survives in
@@ -2585,35 +2583,35 @@ int InScreenCheck(Vec* pos)
 // area made up on the spot and fired.
 void SceAtExecRoomJump(u16 room, Vec* pos, Vec* rot, int a)
 {
-    SceAtWork w;
+    SCE_AT_DATA w;
 
     w.country.reset();
-    w.dstStage = room >> 8;
-    w.dstRoom = room;
-    w.dstPos.x = pos->x;
-    w.dstPos.y = pos->y;
-    w.dstPos.z = pos->z;
-    w.dstAngle = rot->y;
-    w.dstPart = a;
-    w.doorFunc = 0;
+    w.door.next_stage_no = room >> 8;
+    w.door.next_room_no = room;
+    w.door.next_pos.x = pos->x;
+    w.door.next_pos.y = pos->y;
+    w.door.next_pos.z = pos->z;
+    w.door.next_ang_y = rot->y;
+    w.door.next_part_no = a;
+    w.door.pExitFunc = 0;
     sceAtFunc_door(&w, 0);
 }
 
 // The field-info payload of the enabled type 0xD area containing `pos`, or 0 (emwindow uses it
 // to decide the lighting of thrown things).
-SceAtField* SceAtCheckFieldInfo(Vec* pos)
+SCE_AT_DATA_FIELD_INFO* SceAtCheckFieldInfo(Vec* pos)
 {
-    SceAtWork* w;
+    SCE_AT_DATA* w;
 
     if (pS == 0) {
         return 0;
     }
     w = sceAtSetOtStart();
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (bitOff(w->flag)) {
+        if (bitOff(w->be_flg)) {
             continue;
         }
-        if (w->type != SCEAT_ID_FIELD_INFO) {
+        if (w->id != SCEAT_ID_FIELD_INFO) {
             continue;
         }
         if (sceAtHitCheck(w, 0, pos, pos) == 1) {
@@ -2627,8 +2625,8 @@ SceAtField* SceAtCheckFieldInfo(Vec* pos)
 // position / facing / level (enemies climbing).
 int SceAtCheckLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height)
 {
-    SceAtWork* w;
-    SceAtLadder* l;
+    SCE_AT_DATA* w;
+    SCE_AT_DATA_LADDER* l;
     Vec* mp;
 
     if (pS == 0) {
@@ -2640,10 +2638,10 @@ int SceAtCheckLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height)
     w = sceAtSetOtStart();
     mp = &pEm->pos;
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (bitOff(w->flag)) {
+        if (bitOff(w->be_flg)) {
             continue;
         }
-        if (w->type != SCEAT_ID_LADDER) {
+        if (w->id != SCEAT_ID_LADDER) {
             continue;
         }
         if (sceAtHitCheck(w, 0, mp, mp) != 1) {
@@ -2652,7 +2650,7 @@ int SceAtCheckLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height)
         l = &w->ladder;
         if (sceAtCheckLadderUp(l, pEm) == 1) {
             sceAtGetLadderPos(l, pos, ladder_ang);
-            *ladder_height = w->ladder.level;
+            *ladder_height = w->ladder.height;
             return 1;
         }
     }
@@ -2662,9 +2660,9 @@ int SceAtCheckLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height)
 // Nearest free ladder within 2000 of `m`; returns 1 with its foot position / facing / level.
 int SceAtSearchLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height)
 {
-    SceAtWork* w;
-    SceAtLadder* l;
-    SceAtLadder* found;
+    SCE_AT_DATA* w;
+    SCE_AT_DATA_LADDER* l;
+    SCE_AT_DATA_LADDER* found;
     f32 best;
     f32 d;
 
@@ -2675,10 +2673,10 @@ int SceAtSearchLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height)
     found = 0;
     w = sceAtSetOtStart();
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (bitOff(w->flag)) {
+        if (bitOff(w->be_flg)) {
             continue;
         }
-        if (!(w->type & 0x10)) {
+        if (!(w->id & 0x10)) {
             continue;
         }
         l = &w->ladder;
@@ -2695,7 +2693,7 @@ int SceAtSearchLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height)
         return 0;
     }
     sceAtGetLadderPos(found, pos, ladder_ang);
-    *ladder_height = found->level;
+    *ladder_height = found->height;
     return 1;
 }
 
@@ -2703,10 +2701,10 @@ int SceAtSearchLadder(cModel* pEm, Vec* pos, f32* ladder_ang, u8* ladder_height)
 // camera. Without one, a corner found by PlCornerCheck makes a temporary area at the player.
 void sceAtCamCtrlCheck()
 {
-    static SceAtCamCtrl auto_work;
-    SceAtCamCtrl* found = 0;
-    SceAtCamCtrl* c;
-    SceAtWork* w;
+    static SCE_AT_DATA_CAM_CTRL auto_work;
+    SCE_AT_DATA_CAM_CTRL* found = 0;
+    SCE_AT_DATA_CAM_CTRL* c;
+    SCE_AT_DATA* w;
     f32 best = 100000000.0f;
     f32 r;
     f32 r2;
@@ -2717,19 +2715,19 @@ void sceAtCamCtrlCheck()
 
     w = sceAtSetOtStart();
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (bitOff(w->flag)) {
+        if (bitOff(w->be_flg)) {
             continue;
         }
-        if (w->type != SCEAT_ID_CAM_CTRL) {
+        if (w->id != SCEAT_ID_CAM_CTRL) {
             continue;
         }
-        c = &w->cam;
+        c = &w->cam_ctrl;
         // `r * r` in both arms: jump2 cross-jumps the shared `fmuls` into the join, ahead of the pPL load.
         if (pS->pCamAt == c) {
-            r = pS->pCamAt->range + pS->pCamAt->range2;
+            r = pS->pCamAt->radius + pS->pCamAt->out_range;
             r2 = r * r;
         } else {
-            r = c->range;
+            r = c->radius;
             r2 = r * r;
         }
         d = PSVECSquareDistance(&pPL->pos, &c->pos);
@@ -2743,9 +2741,9 @@ void sceAtCamCtrlCheck()
         if (dy * dy > 250000.0f) {
             continue;
         }
-        switch (c->mode) {
+        switch (c->type) {
         case 0:
-            a = LIMIT_ANGLE(c->angle - pPL->ang.y);
+            a = LIMIT_ANGLE(c->ang_y - pPL->ang.y);
             if (pS->pCamAt == c) {
                 if (a < -1.3962634f || a > 1.3962634f) {
                     continue;
@@ -2785,7 +2783,7 @@ void sceAtCamCtrlCheck()
         if (ret == 2) {
             RAW_U32(pS, 0x120) = (u32) &auto_work;
             auto_work.pos = pPL->pos;
-            auto_work.angle = pPL->ang.y;
+            auto_work.ang_y = pPL->ang.y;
             CamCtrl.m_QuasiFPS.LRinfo(&auto_work);
         }
     } else {
@@ -2795,7 +2793,7 @@ void sceAtCamCtrlCheck()
             if (lim < PSVECSquareDistance(&pPL->pos, &pS->pCamAt->pos)) {
                 RAW_U32(pS, 0x120) = 0;
             } else {
-                a = LIMIT_ANGLE(pS->pCamAt->angle - pPL->ang.y);
+                a = LIMIT_ANGLE(pS->pCamAt->ang_y - pPL->ang.y);
                 if (a < -1.2217305f || a > 1.2217305f) {
                     RAW_U32(pS, 0x120) = 0;
                 }
@@ -2812,7 +2810,7 @@ void sceAtDebugDisp()
     AREA_HIT_DATA eye;
     Mtx mat;
     Mtx pmat;
-    SceAtWork* w;
+    SCE_AT_DATA* w;
     // COMPILER-DIFF: gcse PRE pseudo numbering. One extra pseudo before the matrix copies: without it the
     // second copy's `s_ + 16` / `d_ + 16` expressions (regs 123/124) hash to buckets 76/0 of the 77-bucket
     // table, so the dst giv is numbered (and allocated, r8) before the src giv; the original has src in r8.
@@ -2823,19 +2821,19 @@ void sceAtDebugDisp()
     }
     w = sceAtSetOtStart();
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (bitOff(w->flag)) {
+        if (bitOff(w->be_flg)) {
             continue;
         }
         eprintf(0xC8, 0x20, 0, 0x11, "[SCENARIO ATARI VIEW]");
         if (w->pParent == 0) {
             AreaDataDisp(&w->area, 0x80808080, 1, 0);
         } else {
-            if (w->parentParts >= 0) {
-                MTX_COPY_LATE_DST(w->pParent->getPartsPtr(w->parentParts)->mat, pmat);
+            if (w->parts_no >= 0) {
+                MTX_COPY_LATE_DST(w->pParent->getPartsPtr(w->parts_no)->mat, pmat);
             } else {
                 MTX_COPY_LATE_DST(w->pParent->mat, pmat);
             }
-            if (w->flag & 8) {
+            if (w->be_flg & 8) {
                 Vec zero = { 0.0f, 0.0f, 0.0f };
                 low_RotMatrix(mat, &zero);
                 mat[0][3] = pmat[0][3];
@@ -2846,7 +2844,7 @@ void sceAtDebugDisp()
             }
             AreaDataDisp(&w->area, 0x80808080, 1, mat);
         }
-        if (w->type == SCEAT_ID_ITEM && (w->item.flag & 1)) {
+        if (w->id == SCEAT_ID_ITEM && (((SCE_AT_ITEM*) w)->item.pos_set & 1)) {
             SceAtDataEyeTriggreCopy(&eye, w);
             AreaDataDisp(&eye, 0x80808080, 1, 0);
         }
@@ -2855,23 +2853,23 @@ void sceAtDebugDisp()
 
 // Builds the eye (view cone) area of an item: 100 radius at the item position, cone from its rot
 // (x / y angles, z = opening).
-void SceAtDataEyeTriggreCopy(AREA_HIT_DATA* area, SceAtWork* w)
+void SceAtDataEyeTriggreCopy(AREA_HIT_DATA* area, SCE_AT_DATA* w)
 {
-    SceAtItem* it;
+    SCE_AT_DATA_ITEM* it;
 
     area->be_flag = 1;
     area->type = 3;
-    if (w->type != SCEAT_ID_ITEM) {
+    if (w->id != SCEAT_ID_ITEM) {
         return;
     }
-    it = &w->item;
-    area->eye_trigger.floor = it->pos.y;
+    it = &((SCE_AT_ITEM*) w)->item;
+    area->eye_trigger.floor = it->item_pos.y;
     area->eye_trigger.radius = 100.0f;
-    area->eye_trigger.xz = w->item.pos.x;
-    area->eye_trigger.z = it->pos.z;
-    area->eye_trigger.ang_x = it->rot.x;
-    area->eye_trigger.ang_y = it->rot.y;
-    area->eye_trigger.open_ang = it->rot.z;
+    area->eye_trigger.xz = ((SCE_AT_ITEM*) w)->item.item_pos.x;
+    area->eye_trigger.z = it->item_pos.z;
+    area->eye_trigger.ang_x = it->ang_x;
+    area->eye_trigger.ang_y = it->ang_y;
+    area->eye_trigger.open_ang = it->open_ang;
 }
 
 // Per frame: for each enabled item area — a shoot-down item (flag2 bit4) that was hit plays its
@@ -2882,42 +2880,42 @@ void sceAtItemFindCheck()
 {
     Vec pos;
     Vec rot;
-    SceAtWork* w = sceAtSetOtStart();
-    SceAtItem* it;
+    SCE_AT_DATA* w = sceAtSetOtStart();
+    SCE_AT_DATA_ITEM* it;
     int off;
     cModel* pm;
 
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        off = !(w->flag & 1);
+        off = !(w->be_flg & 1);
         if (off) {
             continue;
         }
-        if (w->type != SCEAT_ID_ITEM) {
+        if (w->id != SCEAT_ID_ITEM) {
             continue;
         }
-        it = &w->item;
+        it = &((SCE_AT_ITEM*) w)->item;
         sceAtItemFindFlgCk(it);
-        if ((it->flag2 & 0x10) && it->pModel != 0) {
+        if ((it->ctrl_flag & 0x10) && it->pModel != 0) {
             cEmItem* em = (cEmItem*) it->pModel;
 
-            if (em->ckStatus() == 3 && it->seDamage != 0) {
+            if (em->ckStatus() == 3 && it->se_no2 != 0) {
                 pos = it->pModel->pos;
                 pos.y -= 300.0f;
-                SndCall(6, it->seDamage, &pos, 0, 0, 0);
-                it->seDamage = off;
+                SndCall(6, it->se_no2, &pos, 0, 0, 0);
+                it->se_no2 = off;
             }
             if (em->ckStatus() == 1) {
-                it->flag2 &= ~0x10;
-                it->pos = it->pModel->pos;
-                it->pos.y += 100.0f;
+                it->ctrl_flag &= ~0x10;
+                it->item_pos = it->pModel->pos;
+                it->item_pos.y += 100.0f;
                 sceAtItemFindFlgOn(it);
-                if (it->seFind != 0) {
+                if (it->se_no != 0) {
                     pos = it->pModel->pos;
                     pos.y += 300.0f;
-                    SndCall(6, it->seFind, &pos, 0, 0, 0);
+                    SndCall(6, it->se_no, &pos, 0, 0, 0);
                 }
-                if (!(it->flag2 & 2)) {
-                    SceAtItemAutoArea(&w->area, &em->pos, it->size);
+                if (!(it->ctrl_flag & 2)) {
+                    SceAtItemAutoArea(&w->area, &em->pos, it->radius);
                 }
                 pm = it->pModel;
                 if (pm != 0) {
@@ -2929,28 +2927,28 @@ void sceAtItemFindCheck()
                     pm->setAng(rp);
                 }
                 sceAtItemEffDelete(it);
-                it->effType = 2;
-                sceAtItemEffSet(w, it->pModel);
-                sceAtCheckItemModelParent(w);
+                it->eff_type = 2;
+                sceAtItemEffSet((SCE_AT_ITEM*) w, it->pModel);
+                sceAtCheckItemModelParent((SCE_AT_ITEM*) w);
             }
         }
-        if ((it->flag2 & 0x40) && it->pModel != 0) {
-            cEm* m = (cEm*) w->item.pModel;
+        if ((it->ctrl_flag & 0x40) && it->pModel != 0) {
+            cEm* m = (cEm*) ((SCE_AT_ITEM*) w)->item.pModel;
             f32 fl = EatMgr.getFloor(&m->pos, 0, 0.0f, 100000.0f, 0);
 
             m->pos.y -= m->dmg.m_PosFrom.y;
             m->dmg.m_PosFrom.y += 10.0f;
             if (m->pos.y < fl) {
                 m->pos.y = fl;
-                it->flag2 &= ~0x40;
+                it->ctrl_flag &= ~0x40;
                 sceAtItemFindFlgOn(it);
-                if (it->seFind != 0) {
+                if (it->se_no != 0) {
                     pos = it->pModel->pos;
                     pos.y += 300.0f;
-                    SndCall(6, it->seFind, &pos, 0, 0, 0);
+                    SndCall(6, it->se_no, &pos, 0, 0, 0);
                 }
-                if (!(it->flag2 & 2)) {
-                    SceAtItemAutoArea(&w->area, &m->pos, it->size);
+                if (!(it->ctrl_flag & 2)) {
+                    SceAtItemAutoArea(&w->area, &m->pos, it->radius);
                 }
                 if (it->pModel != 0) {
                     it->pModel->ang.x = 0.0f;
@@ -2958,24 +2956,24 @@ void sceAtItemFindCheck()
                     it->pModel->ang.z = 0.0f;
                 }
                 sceAtItemEffDelete(it);
-                it->effType = 2;
-                sceAtItemEffSet(w, it->pModel);
-                sceAtCheckItemModelParent(w);
+                it->eff_type = 2;
+                sceAtItemEffSet((SCE_AT_ITEM*) w, it->pModel);
+                sceAtCheckItemModelParent((SCE_AT_ITEM*) w);
             }
         }
-        if (it->flag2 & 0x20) {
-            if (it->timer != 0) {
+        if (it->ctrl_flag & 0x20) {
+            if (it->disappear_timer != 0) {
                 if (pG->Frame_cnt % 30 == 0) {
-                    it->timer--;
-                    if (it->timer == 6) {
+                    it->disappear_timer--;
+                    if (it->disappear_timer == 6) {
                         sceAtItemEffDelete(it);
-                        sceAtItemDisappearEffSet(w, 0);
+                        sceAtItemDisappearEffSet((SCE_AT_ITEM*) w, 0);
                     }
                 }
             } else {
-                w->item.flag2 &= ~0x20;
+                ((SCE_AT_ITEM*) w)->item.ctrl_flag &= ~0x20;
                 SceAtSetEnable(w->no, 0);
-                if (w->flag & 4) {
+                if (w->be_flg & 4) {
                     Mem_free(w);
                     DelPrim(&pS->ot[15], (u32*) w);
                 }
@@ -3017,10 +3015,10 @@ int SceAtItemFlgCk(u16 item_flg, u16 auto_item_flg)
 // 1 when item area `no` has been taken.
 int SceAtItemFlgCk(int at_no)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
-    if (w != 0 && w->type == SCEAT_ID_ITEM) {
-        return sceAtItemFlgCk(&w->item);
+    if (w != 0 && w->id == SCEAT_ID_ITEM) {
+        return sceAtItemFlgCk(&((SCE_AT_ITEM*) w)->item);
     }
     return 0;
 }
@@ -3028,39 +3026,39 @@ int SceAtItemFlgCk(int at_no)
 // 1 when item area `no` has been found (seen / knocked down).
 int SceAtItemFindFlgCk(int at_no)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
-    if (w != 0 && w->type == SCEAT_ID_ITEM) {
-        return sceAtItemFindFlgCk(&w->item);
+    if (w != 0 && w->id == SCEAT_ID_ITEM) {
+        return sceAtItemFindFlgCk(&((SCE_AT_ITEM*) w)->item);
     }
     return 0;
 }
 
 // Marks the item taken (flagNo, else the room flag findFlagNo).
-void sceAtItemFlgOn(SceAtItem* it)
+void sceAtItemFlgOn(SCE_AT_DATA_ITEM* it)
 {
-    u16 no = it->flagNo;
+    u16 no = it->item_flg;
 
     if (no != 0) {
         FlagOn(itemFlags(), no);
-    } else if (it->findFlagNo != 0) {
+    } else if (it->auto_item_flg != 0) {
         if (RoomData.getRoomSavePtr(pG->room_id) != 0) {
-            FlagOn(roomItemFlags(), it->findFlagNo);
+            FlagOn(roomItemFlags(), it->auto_item_flg);
         }
     }
 }
 
 // 1 when the item has been taken.
-int sceAtItemFlgCk(SceAtItem* it)
+int sceAtItemFlgCk(SCE_AT_DATA_ITEM* it)
 {
     u32 r = 0;
-    u16 no = it->flagNo;
+    u16 no = it->item_flg;
 
     if (no != 0) {
         r = itemFlags()[no >> 5] & (0x80000000 >> (no & 31));
-    } else if (it->findFlagNo != 0) {
+    } else if (it->auto_item_flg != 0) {
         if (RoomData.getRoomSavePtr(pG->room_id) != 0) {
-            r = roomItemFlags()[it->findFlagNo >> 5] & (0x80000000 >> (it->findFlagNo & 31));
+            r = roomItemFlags()[it->auto_item_flg >> 5] & (0x80000000 >> (it->auto_item_flg & 31));
         }
     }
     if (r != 0) {
@@ -3070,30 +3068,30 @@ int sceAtItemFlgCk(SceAtItem* it)
 }
 
 // Marks the item found (Item_flg[4..] by flagNo, else the room record's found flags).
-void sceAtItemFindFlgOn(SceAtItem* it)
+void sceAtItemFindFlgOn(SCE_AT_DATA_ITEM* it)
 {
-    u16 no = it->flagNo;
+    u16 no = it->item_flg;
 
     if (no != 0) {
         FlagOn(itemFindFlags(), no);
-    } else if (it->findFlagNo != 0) {
+    } else if (it->auto_item_flg != 0) {
         if (RoomData.getRoomSavePtr(pG->room_id) != 0) {
-            FlagOn(roomItemFindFlags(), it->findFlagNo);
+            FlagOn(roomItemFindFlags(), it->auto_item_flg);
         }
     }
 }
 
 // 1 when the item has been found.
-int sceAtItemFindFlgCk(SceAtItem* it)
+int sceAtItemFindFlgCk(SCE_AT_DATA_ITEM* it)
 {
     u32 r = 0;
-    u16 no = it->flagNo;
+    u16 no = it->item_flg;
 
     if (no != 0) {
         r = itemFindFlags()[no >> 5] & (0x80000000 >> (no & 31));
-    } else if (it->findFlagNo != 0) {
+    } else if (it->auto_item_flg != 0) {
         if (RoomData.getRoomSavePtr(pG->room_id) != 0) {
-            r = roomItemFindFlags()[it->findFlagNo >> 5] & (0x80000000 >> (it->findFlagNo & 31));
+            r = roomItemFindFlags()[it->auto_item_flg >> 5] & (0x80000000 >> (it->auto_item_flg & 31));
         }
     }
     if (r != 0) {
@@ -3105,7 +3103,7 @@ int sceAtItemFindFlgCk(SceAtItem* it)
 // Removes area `no`: disabled, unlinked from the ordering table, freed if it was created at run time.
 int SceAtDestroy(int at_no)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtDestroy(): AT NOT FOUND");
@@ -3113,7 +3111,7 @@ int SceAtDestroy(int at_no)
     }
     SceAtSetEnable(w->no, 0);
     DelPrim(&pS->ot[15], (u32*) w);
-    if (w->flag & 4) {
+    if (w->be_flg & 4) {
         Mem_free(w);
     }
     return 1;
@@ -3123,34 +3121,34 @@ int SceAtDestroy(int at_no)
 // Creates a type 2 (exec) area at run time on model `m`: quad of the four `pos` corners (floor =
 // their mean y, height h), checkFlag a, trigger b, checkType c, otNo d, facing angle / range (radians),
 // action button kind e, task prio / func / arg / flag. Returns the area number, -1 on failure.
-int SceAtCreateExecAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f32 ang, f32 range, int e, int prio, TaskFunc func, int arg, u8 flag)
+int SceAtCreateExecAt(cModel* m, Vec* pos, f32 h, int a, int b, int c, int d, f32 ang, f32 range, int e, int prio, TaskFunc func, void* arg, u8 flag)
 {
-    SceAtWork* w;
+    SCE_AT_DATA* w;
 
 #line 3859 "D:/Bio4/Prog/sce_at.cpp"
-    w = (SceAtWork*) MEM_CALLOC(sizeof(SceAtWork), 1, 13);
+    w = (SCE_AT_DATA*) MEM_CALLOC(sizeof(SCE_AT_DATA), 1, 13);
     if (w == 0) {
         return -1;
     }
     if (sceAtPullAtNo(&w->no) == 0) {
         return -1;
     }
-    w->checkFlag = a;
-    w->trigger = b;
-    w->checkType = c;
-    w->actBtnKind = e;
-    w->otNo = d;
-    w->prio = prio;
-    w->execFlag = flag;
+    w->hit_type = a;
+    w->trg_type = b;
+    w->target_type = c;
+    w->act_type = e;
+    w->priority = d;
+    w->task_level = prio;
+    w->kind = flag;
     w->pParent = m;
-    w->func = func;
-    w->arg = arg;
-    w->flag = 7;
-    w->type = 2;
-    w->parentParts = -1;
-    w->angle = (s8) (ang * 0.5f * 57.295776f);
-    w->angleRange = (s8) (range * 0.5f * 57.295776f);
-    AreaDataInit(&w->area, &m->pos, 1, 1500.0f, h);
+    w->pFunc = func;
+    w->pParam = arg;
+    w->be_flg = 7;
+    w->id = 2;
+    w->parts_no = -1;
+    w->hit_dir_ang = (s8) (ang * 0.5f * 57.295776f);
+    w->hit_open_ang = (s8) (range * 0.5f * 57.295776f);
+    AreaDataInit(&w->area, &m->pos, 1500.0f, h, 1);
     w->area.xz4.floor = (pos[0].y + pos[1].y + pos[2].y + pos[3].y) * 0.25f;
     w->area.xz4.p[0].x = pos[0].x;
     w->area.xz4.p[0].z = pos[0].z;
@@ -3160,19 +3158,19 @@ int SceAtCreateExecAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f3
     w->area.xz4.p[2].z = pos[2].z;
     w->area.xz4.p[3].x = pos[3].x;
     w->area.xz4.p[3].z = pos[3].z;
-    AddPrim(&pS->ot[w->otNo], (u32*) w);
+    AddPrim(&pS->ot[w->priority], (u32*) w);
     return w->no;
 }
 
 #line 3936 "D:/Bio4/Prog/sce_at.cpp"
 // Creates a type 0xD (field info) area on model `m` (same shape arguments as SceAtCreateExecAt)
 // carrying `val`; *out receives the payload. Returns the area number, -1 on failure.
-int SceAtCreateFieldAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f32 ang, int e, f32 range, int val, SceAtField** out)
+int SceAtCreateFieldAt(cModel* m, Vec* pos, f32 h, int a, int b, int c, int d, f32 ang, f32 range, int e, int val, SCE_AT_DATA_FIELD_INFO** out)
 {
-    SceAtWork* w;
+    SCE_AT_DATA* w;
 
 #line 3946 "D:/Bio4/Prog/sce_at.cpp"
-    w = (SceAtWork*) MEM_CALLOC(sizeof(SceAtWork), 1, 13);
+    w = (SCE_AT_DATA*) MEM_CALLOC(sizeof(SCE_AT_DATA), 1, 13);
     *out = 0;
     if (w == 0) {
         return -1;
@@ -3180,22 +3178,22 @@ int SceAtCreateFieldAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f
     if (sceAtPullAtNo(&w->no) == 0) {
         return -1;
     }
-    w->checkFlag = a;
-    w->trigger = b;
-    w->checkType = c;
-    w->actBtnKind = e;
-    w->otNo = d;
-    w->prio = 0;
-    w->func = 0;
-    w->arg = 0;
-    w->execFlag = 0;
-    w->flag = 7;
-    w->type = 0xD;
-    w->parentParts = -1;
+    w->hit_type = a;
+    w->trg_type = b;
+    w->target_type = c;
+    w->act_type = e;
+    w->priority = d;
+    w->task_level = 0;
+    w->pFunc = 0;
+    w->pParam = 0;
+    w->kind = 0;
+    w->be_flg = 7;
+    w->id = 0xD;
+    w->parts_no = -1;
     w->pParent = m;
-    w->angle = (s8) (ang * 0.5f * 57.295776f);
-    w->angleRange = (s8) (range * 0.5f * 57.295776f);
-    AreaDataInit(&w->area, &m->pos, 1, 1500.0f, h);
+    w->hit_dir_ang = (s8) (ang * 0.5f * 57.295776f);
+    w->hit_open_ang = (s8) (range * 0.5f * 57.295776f);
+    AreaDataInit(&w->area, &m->pos, 1500.0f, h, 1);
     w->area.xz4.floor = (pos[0].y + pos[1].y + pos[2].y + pos[3].y) * 0.25f;
     w->area.xz4.p[0].x = pos[0].x;
     w->area.xz4.p[0].z = pos[0].z;
@@ -3205,9 +3203,9 @@ int SceAtCreateFieldAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f
     w->area.xz4.p[2].z = pos[2].z;
     w->area.xz4.p[3].x = pos[3].x;
     w->area.xz4.p[3].z = pos[3].z;
-    w->field.value = val;
-    w->field.pModel = m;
-    AddPrim(&pS->ot[w->otNo], (u32*) w);
+    w->field.id = val;
+    w->field.pParent = m;
+    AddPrim(&pS->ot[w->priority], (u32*) w);
     *out = &w->field;
     return w->no;
 }
@@ -3218,14 +3216,14 @@ int SceAtCreateFieldAt(cModel* m, Vec* pos, int a, int b, int c, f32 h, int d, f
 // Returns the area number, -1 on failure.
 int SceAtCreateItemAt(Vec* pos, ITEM_ID id, int num, int effType, int saveNo, cModel* parent, int parts)
 {
-    SceAtWork* w;
+    SCE_AT_DATA* w;
     void* bin;
     void* tpl;
     int ok;
     cObj* obj;
 
 #line 4005 "D:/Bio4/Prog/sce_at.cpp"
-    w = (SceAtWork*) MEM_CALLOC(sizeof(SceAtWork), 1, 13);
+    w = (SCE_AT_DATA*) MEM_CALLOC(sizeof(SCE_AT_DATA), 1, 13);
     if (w == 0) {
         return -1;
     }
@@ -3245,63 +3243,63 @@ int SceAtCreateItemAt(Vec* pos, ITEM_ID id, int num, int effType, int saveNo, cM
                 SAVE_ITEM_POS(saveNo, 0) = (s16) (pos->x / 10.0f);
                 SAVE_ITEM_POS(saveNo, 1) = (s16) (pos->y / 10.0f);
                 pG->item_save[saveNo].pos[2] = (s16) (pos->z / 10.0f);
-                w->item.flag2 |= 8;
+                ((SCE_AT_ITEM*) w)->item.ctrl_flag |= 8;
             } else {
                 pLog->err(0, 0, "SceAtCreateItemAt(): lack save work");
             }
         } else if (saveNo == -1) {
-            w->item.timer = 0x3D;
-            w->item.flag2 |= 0x20;
+            ((SCE_AT_ITEM*) w)->item.disappear_timer = 0x3D;
+            ((SCE_AT_ITEM*) w)->item.ctrl_flag |= 0x20;
         }
     } else {
-        w->item.flag2 |= 8;
+        ((SCE_AT_ITEM*) w)->item.ctrl_flag |= 8;
     }
     w->pParent = parent;
-    w->parentParts = parts;
-    w->flag = 7;
-    w->checkFlag |= 1;
-    w->type = 3;
-    w->checkType = 1;
-    w->trigger = 8;
-    w->otNo = 8;
-    w->actBtnKind = 0x28;
+    w->parts_no = parts;
+    w->be_flg = 7;
+    w->hit_type |= 1;
+    w->id = 3;
+    w->target_type = 1;
+    w->trg_type = 8;
+    w->priority = 8;
+    w->act_type = 0x28;
     SceAtItemAutoArea(&w->area, pos, 0.0f);
-    w->item.num = num;
-    w->item.id = id;
-    w->item.flagNo = 0;
-    w->item.findFlagNo = 0;
+    ((SCE_AT_ITEM*) w)->item.item_num = num;
+    ((SCE_AT_ITEM*) w)->item.item_id = id;
+    ((SCE_AT_ITEM*) w)->item.item_flg = 0;
+    ((SCE_AT_ITEM*) w)->item.auto_item_flg = 0;
     switch (effType) {
     case -1:
     case 0:
     case 6:
-        w->item.effType = sceAtCheckItemEffectCol(id);
+        ((SCE_AT_ITEM*) w)->item.eff_type = sceAtCheckItemEffectCol(id);
         break;
     default:
-        w->item.effType = effType;
+        ((SCE_AT_ITEM*) w)->item.eff_type = effType;
         break;
     }
-    w->item.pModel = 0;
-    w->item.saveNo = saveNo;
-    if (w->item.effType == 8) {
-        w->item.pos.x = pos->x;
-        w->item.pos.y = pos->y + 1000.0f;
-        w->item.pos.z = pos->z;
+    ((SCE_AT_ITEM*) w)->item.pModel = 0;
+    ((SCE_AT_ITEM*) w)->item.save_no = saveNo;
+    if (((SCE_AT_ITEM*) w)->item.eff_type == 8) {
+        ((SCE_AT_ITEM*) w)->item.item_pos.x = pos->x;
+        ((SCE_AT_ITEM*) w)->item.item_pos.y = pos->y + 1000.0f;
+        ((SCE_AT_ITEM*) w)->item.item_pos.z = pos->z;
     } else {
-        w->item.pos.x = pos->x;
-        w->item.pos.y = pos->y + 100.0f;
-        w->item.pos.z = pos->z;
+        ((SCE_AT_ITEM*) w)->item.item_pos.x = pos->x;
+        ((SCE_AT_ITEM*) w)->item.item_pos.y = pos->y + 100.0f;
+        ((SCE_AT_ITEM*) w)->item.item_pos.z = pos->z;
     }
     ok = ItemGetBinTplAddr(id, &bin, &tpl) ? 1 : 0;
     if (ok == 1) {
         obj = setItemObj(bin, tpl, (Vec*) &vecZero, (Vec*) &vecZero);
-        SceAtSetItemModel(w, obj);
+        SceAtSetItemModel((SCE_AT_ITEM*) w, obj);
     }
-    if (w->item.effType != 8 && w->item.pModel != 0) {
-        w->item.pModel->be_flag &= ~2;
+    if (((SCE_AT_ITEM*) w)->item.eff_type != 8 && ((SCE_AT_ITEM*) w)->item.pModel != 0) {
+        ((SCE_AT_ITEM*) w)->item.pModel->be_flag &= ~2;
     }
-    sceAtCheckItemModelParent(w);
-    sceAtItemEffSet(w, 0);
-    AddPrim(&pS->ot[w->otNo], (u32*) w);
+    sceAtCheckItemModelParent((SCE_AT_ITEM*) w);
+    sceAtItemEffSet((SCE_AT_ITEM*) w, 0);
+    AddPrim(&pS->ot[w->priority], (u32*) w);
     return w->no;
 }
 
@@ -3421,7 +3419,7 @@ static inline void SceAtLinkEmFlag(int no)
 void SceAtLinkEtcDead(int at_no, int etc_no, int on_off)
 {
     cEm* em;
-    SceAtWork* w;
+    SCE_AT_DATA* w;
 
     if (0) {
         SceAtLinkEmFlag(at_no);
@@ -3435,16 +3433,16 @@ void SceAtLinkEtcDead(int at_no, int etc_no, int on_off)
         return;
     }
     if (bitOff(*GetEtcFlgPtr(etc_no, pG->room_id))) {
-        w->linkNo = etc_no;
-        w->linkType = 2;
+        w->waiting_no = etc_no;
+        w->waiting_type = 2;
         if (on_off == 1) {
             SceAtSetEnable(at_no, 0);
         } else {
             SceAtSetEnable(at_no, 1);
         }
     } else {
-        w->linkType = 0;
-        w->linkNo = 0;
+        w->waiting_type = 0;
+        w->waiting_no = 0;
         if (on_off == 1) {
             SceAtSetEnable(at_no, 1);
         } else {
@@ -3458,24 +3456,24 @@ void SceAtLinkEtcDead(int at_no, int etc_no, int on_off)
 void sceAtLink_check()
 {
     cEm* em;
-    SceAtWork* w = sceAtSetOtStart();
+    SCE_AT_DATA* w = sceAtSetOtStart();
     int flag;
 
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        switch (w->linkType) {
+        switch (w->waiting_type) {
         case 0:
             break;
         case 1:
-            em = GetEmPtrFromList(w->linkNo);
+            em = GetEmPtrFromList(w->waiting_no);
             if (em != 0) {
-                if (w->type == SCEAT_ID_ITEM) {
+                if (w->id == SCEAT_ID_ITEM) {
                     flag = em->checkStatus(EM_STATUS_ITEMSET) == 1;
                 } else {
                     flag = em->checkStatus(EM_STATUS_ACTIVE) == 0;
                 }
             } else {
                 u32 d;
-                int no = w->linkNo;
+                int no = w->waiting_no;
 
                 if (pG->em_list_no >= 0) {
                     d = EM_DEAD_BIT(pG->em_list_no, no >> 5) & (0x80000000 >> (no & 31));
@@ -3488,48 +3486,48 @@ void sceAtLink_check()
                 }
             }
             if (flag == 1) {
-                if (w->flag & 1) {
+                if (w->be_flg & 1) {
                     SceAtSetEnable(w->no, 0);
-                } else if (w->type == SCEAT_ID_ITEM) {
-                    if (w->item.effType == 0 || w->item.effType == 6) {
-                        w->item.effType = sceAtCheckItemEffectCol(w->item.id);
+                } else if (w->id == SCEAT_ID_ITEM) {
+                    if (((SCE_AT_ITEM*) w)->item.eff_type == 0 || ((SCE_AT_ITEM*) w)->item.eff_type == 6) {
+                        ((SCE_AT_ITEM*) w)->item.eff_type = sceAtCheckItemEffectCol(((SCE_AT_ITEM*) w)->item.item_id);
                     }
-                    if (sceAtCheckSaveItem(w->item.id) == 0) {
+                    if (sceAtCheckSaveItem(((SCE_AT_ITEM*) w)->item.item_id) == 0) {
                         SceAtSetEnable(w->no, 1);
-                        sceAtItemFlgOn(&w->item);
-                        w->item.timer = 0x3D;
-                        w->item.flag2 |= 0x20;
+                        sceAtItemFlgOn(&((SCE_AT_ITEM*) w)->item);
+                        ((SCE_AT_ITEM*) w)->item.disappear_timer = 0x3D;
+                        ((SCE_AT_ITEM*) w)->item.ctrl_flag |= 0x20;
                     } else {
                         SceAtSetEnable(w->no, 1);
                     }
                 } else {
                     SceAtSetEnable(w->no, 1);
                 }
-                w->linkType = 0;
-                w->linkNo = 0;
+                w->waiting_type = 0;
+                w->waiting_no = 0;
             }
-            if (w->type == SCEAT_ID_ITEM && bitOff(w->item.flag2)) {
-                em = GetEmPtrFromList(w->linkNo);
-                if (em != 0 && bitOff(w->item.flag2)) {
-                    SceAtSetEmItem(em, w);
+            if (w->id == SCEAT_ID_ITEM && bitOff(((SCE_AT_ITEM*) w)->item.ctrl_flag)) {
+                em = GetEmPtrFromList(w->waiting_no);
+                if (em != 0 && bitOff(((SCE_AT_ITEM*) w)->item.ctrl_flag)) {
+                    SceAtSetEmItem(em, (SCE_AT_ITEM*) w);
                 }
             }
             break;
         case 2: {
             cEm* etc;
 
-            if (getRoomEtcBreak(w->linkNo, &etc, 0) == 1) {
-                if (*GetEtcFlgPtr(w->linkNo, pG->room_id) & 1) {
-                    if (w->flag & 1) {
+            if (getRoomEtcBreak(w->waiting_no, &etc, 0) == 1) {
+                if (*GetEtcFlgPtr(w->waiting_no, pG->room_id) & 1) {
+                    if (w->be_flg & 1) {
                         SceAtSetEnable(w->no, 0);
                     } else {
                         SceAtSetEnable(w->no, 1);
                     }
-                    w->linkType = 0;
-                    w->linkNo = 0;
+                    w->waiting_type = 0;
+                    w->waiting_no = 0;
                 }
             } else {
-                pLog->err(4, 0, "ITEM SET[%d] failed: ETC[%d] not found", w->no - 0x80, w->linkNo);
+                pLog->err(4, 0, "ITEM SET[%d] failed: ETC[%d] not found", w->no - 0x80, w->waiting_no);
             }
             break;
         }
@@ -3540,22 +3538,22 @@ void sceAtLink_check()
 // Hands item area `no` to enemy `em` as its drop; 0 when the area does not exist.
 int SceAtSetEmItem(cEm* em, int no)
 {
-    SceAtWork* w = SceAtPtr(no);
+    SCE_AT_DATA* w = SceAtPtr(no);
 
     if (w == 0) {
         return 0;
     }
-    return SceAtSetEmItem(em, w);
+    return SceAtSetEmItem(em, (SCE_AT_ITEM*) w);
 }
 
 // Hands the item (id, num, flags, glow) to `em` (cEm::setItem) and clears the link. 0 without em.
-int SceAtSetEmItem(cEm* em, SceAtWork* w)
+int SceAtSetEmItem(cEm* em, SCE_AT_ITEM* w)
 {
     if (em == 0) {
         return 0;
     }
-    EM_SET_ITEM(em, w->item.id, w->item.num, w->item.flagNo, w->item.findFlagNo, (s8) w->item.effType);
-    w->linkType = 0;
+    EM_SET_ITEM(em, w->item.item_id, w->item.item_num, w->item.item_flg, w->item.auto_item_flg, (s8) w->item.eff_type);
+    w->waiting_type = 0;
     return 1;
 }
 
@@ -3565,7 +3563,7 @@ void SceAtSetSaveItem()
 {
     Vec pos;
     int i;
-    SceAtWork* w;
+    SCE_AT_DATA* w;
 
     for (i = 0; i <= 0xFF; i++) {
         if (pG->item_save[i].room_no == 0) {
@@ -3583,10 +3581,10 @@ void SceAtSetSaveItem()
             break;
         case 1:
             w = SceAtPtr(SAVE_ITEM_ATNO(i));
-            U16Set(w->item.id, pG->item_save[i].item_id);
-            w->item.num = SAVE_ITEM_NUM(i);
-            w->item.flag2 |= 8;
-            w->item.saveNo = i;
+            U16Set(((SCE_AT_ITEM*) w)->item.item_id, pG->item_save[i].item_id);
+            ((SCE_AT_ITEM*) w)->item.item_num = SAVE_ITEM_NUM(i);
+            ((SCE_AT_ITEM*) w)->item.ctrl_flag |= 8;
+            ((SCE_AT_ITEM*) w)->item.save_no = i;
             break;
         }
     }
@@ -3626,10 +3624,10 @@ int SceAtCheckSaveItemId(int id)
 
 // An unparented item lying inside a type 0x14 (item parent) area is attached to that area's
 // parent model (items on moving platforms).
-void sceAtCheckItemModelParent(SceAtWork* w)
+void sceAtCheckItemModelParent(SCE_AT_ITEM* w)
 {
-    SceAtWork* p;
-    SceAtItem* it;
+    SCE_AT_DATA* p;
+    SCE_AT_DATA_ITEM* it;
 
     if (w->pParent != 0) {
         return;
@@ -3637,24 +3635,24 @@ void sceAtCheckItemModelParent(SceAtWork* w)
     p = sceAtSetOtStart();
     it = &w->item;
     while ((p = sceAtGetOtAddr(p)) != 0) {
-        if (bitOff(p->flag)) {
+        if (bitOff(p->be_flg)) {
             continue;
         }
-        if (p->type != 0x14) {
+        if (p->id != 0x14) {
             continue;
         }
         if (p->pParent == 0) {
             continue;
         }
-        if (sceAtHitCheck(p, 0, &it->pos, &it->pos) != 1) {
+        if (sceAtHitCheck(p, 0, &it->item_pos, &it->item_pos) != 1) {
             continue;
         }
-        SceAtSetParent(w, p->pParent, 0);
+        SceAtSetParent((SCE_AT_DATA*) w, p->pParent, 0);
     }
 }
 
 // Attaches the item's model to the area's parent model (inverse-scaled so it keeps its size).
-void sceAtSetItemModelParent(SceAtWork* w)
+void sceAtSetItemModelParent(SCE_AT_ITEM* w)
 {
     if (w->pParent == 0) {
         return;
@@ -3677,19 +3675,19 @@ void sceAtSetItemModelParent(SceAtWork* w)
 // SceAtSetItemModel for area number `no`.
 int SceAtSetItemModel(int no, cModel* m)
 {
-    SceAtWork* w = SceAtPtr(no);
+    SCE_AT_DATA* w = SceAtPtr(no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtSetItemModel(): AT NOT FOUND");
         return 0;
     }
-    SceAtSetItemModel(w, m);
+    SceAtSetItemModel((SCE_AT_ITEM*) w, m);
     return 1;
 }
 
 // Makes `m` the item area's model: placed at item.pos with the record's rotation (when rot.z > 0),
 // ot_type 1 for item 0xAF, parented like the area.
-int SceAtSetItemModel(SceAtWork* w, cModel* m)
+int SceAtSetItemModel(SCE_AT_ITEM* w, cModel* m)
 {
     if (w == 0) {
         pLog->err(0, 0, "SceAtSetItemModel(): pData == NULL");
@@ -3700,15 +3698,15 @@ int SceAtSetItemModel(SceAtWork* w, cModel* m)
         return 0;
     }
     w->item.pModel = m;
-    if (w->item.id == 0xAF) {
+    if (w->item.item_id == 0xAF) {
         m->ot_type = 1;
     }
-    m->pos.x = w->item.pos.x;
-    m->pos.y = w->item.pos.y;
-    m->pos.z = w->item.pos.z;
-    if (w->item.rot.z > 0.0f) {
-        m->ang.x = w->item.rot.x;
-        m->ang.y = w->item.rot.y;
+    m->pos.x = w->item.item_pos.x;
+    m->pos.y = w->item.item_pos.y;
+    m->pos.z = w->item.item_pos.z;
+    if (w->item.open_ang > 0.0f) {
+        m->ang.x = w->item.ang_x;
+        m->ang.y = w->item.ang_y;
         m->ang.z = 0.0f;
     }
     m->setNoSuspend(0);
@@ -3718,21 +3716,21 @@ int SceAtSetItemModel(SceAtWork* w, cModel* m)
 
 // Creates the cEmItem of a shoot-down item (hanging items the player must shoot) at the item
 // position; the lanterns 0x58 / 0x59 get a box hit volume. Returns 0 when creation fails.
-int SceAtSetShootDownItem(SceAtWork* w, void* bin, void* tpl)
+int SceAtSetShootDownItem(SCE_AT_ITEM* w, void* bin, void* tpl)
 {
     Vec rot = { 0.0f, 0.0f, 0.0f };
     cEmItem* em;
 
-    if (w->item.rot.z > 0.0f) {
-        rot.x = w->item.rot.x;
-        rot.y = w->item.rot.y;
+    if (w->item.open_ang > 0.0f) {
+        rot.x = w->item.ang_x;
+        rot.y = w->item.ang_y;
     }
-    em = SetEmItem(bin, tpl, &w->item.pos, &rot, 0, 0);
+    em = SetEmItem(bin, tpl, &w->item.item_pos, &rot, 0, 0);
     if (em == 0) {
         w->item.pModel = em;
         return 0;
     }
-    switch (w->item.id) {
+    switch (w->item.item_id) {
     case 0x58:
     case 0x59:
         YarareInitCube(em, 0.0f, -85.0f, 0.0f, 85.0f, 170.0f, 300.0f, 0, YAT_FLAG_ON);
@@ -3746,44 +3744,44 @@ int SceAtSetShootDownItem(SceAtWork* w, void* bin, void* tpl)
 // The model of item area `no` (0 when missing or not an item area).
 cModel* SceAtItemModelPtr(int at_no)
 {
-    SceAtWork* w = SceAtPtr(at_no);
+    SCE_AT_DATA* w = SceAtPtr(at_no);
 
     if (w == 0) {
         pLog->err(0, 0, "SceAtItemModelPtr(): AT NOT FOUND");
         return 0;
     }
-    if (w->type != SCEAT_ID_ITEM) {
+    if (w->id != SCEAT_ID_ITEM) {
         pLog->err(0, 0, "SceAtItemModelPtr(): not ID == ITEM");
         return 0;
     }
-    return w->item.pModel;
+    return ((SCE_AT_ITEM*) w)->item.pModel;
 }
 
 // May the item area fire? Not while it still hangs (flag2 bit4); yes while the pick-up zoom shows
 // it (bit2); else the item must be within the eye cone / screen and not hidden by a wall.
-int SceAtItemHitCheck(SceAtWork* w, Vec* pos)
+int SceAtItemHitCheck(SCE_AT_ITEM* w, Vec* pos)
 {
     Vec p;
-    SceAtItem* it = &w->item;
+    SCE_AT_DATA_ITEM* it = &w->item;
 
-    if (it->flag2 & 0x10) {
+    if (it->ctrl_flag & 0x10) {
         return 0;
     }
-    if (it->flag2 & 4) {
+    if (it->ctrl_flag & 4) {
         return 1;
     }
     if (pos == 0) {
-        p = it->pos;
+        p = it->item_pos;
         if (w->pParent != 0) {
             Mtx mat;
             Mtx pmat;
 
-            if (w->parentParts >= 0) {
-                MTX_COPY_LATE_DST(w->pParent->getPartsPtr(w->parentParts)->mat, pmat);
+            if (w->parts_no >= 0) {
+                MTX_COPY_LATE_DST(w->pParent->getPartsPtr(w->parts_no)->mat, pmat);
             } else {
                 MTX_COPY_LATE_DST(w->pParent->mat, pmat);
             }
-            if (w->flag & 8) {
+            if (w->be_flg & 8) {
                 Vec zero = { 0.0f, 0.0f, 0.0f };
                 low_RotMatrix(mat, &zero);
                 mat[0][3] = pmat[0][3];
@@ -3978,7 +3976,7 @@ fail:
 
 // Sets up or refreshes an item area. An item linked to an enemy or etc model waits until it dies or
 // breaks and then appears where it died. Taken items and those excluded by modeMask are skipped.
-void sceAtSetItem(SceAtWork* w)
+void sceAtSetItem(SCE_AT_ITEM* w)
 {
     ITEM_INFO info;
     Vec rot;
@@ -3987,7 +3985,7 @@ void sceAtSetItem(SceAtWork* w)
     int num;
     void* bin;
     void* tpl;
-    SceAtItem* it = &w->item;
+    SCE_AT_DATA_ITEM* it = &w->item;
     int ok = 1;
     int mask = 2;
     int r;
@@ -3997,14 +3995,14 @@ void sceAtSetItem(SceAtWork* w)
     if (pG->pl_type == 0) {
         mask = 1;
     }
-    switch (w->linkType) {
+    switch (w->waiting_type) {
     case 1: {
         u32 d;
         int no;
         cEm* p;
 
-        p = GetEmPtrFromList(w->linkNo);
-        no = w->linkNo;
+        p = GetEmPtrFromList(w->waiting_no);
+        no = w->waiting_no;
         if (pG->em_list_no >= 0) {
             d = EM_DEAD_BIT(pG->em_list_no, no >> 5) & (0x80000000 >> (no & 31));
         } else {
@@ -4012,27 +4010,27 @@ void sceAtSetItem(SceAtWork* w)
         }
         if (d == 0) {
             ok = 0;
-        } else if (bitOff(it->flag2)) {
+        } else if (bitOff(it->ctrl_flag)) {
             if (p == 0) {
                 ok = 0;
             } else {
-                it->pos = p->pos;
+                it->item_pos = p->pos;
             }
         }
         break;
     }
     case 2:
-        if (getRoomEtcBreak(w->linkNo, &em, 1) == 0) {
+        if (getRoomEtcBreak(w->waiting_no, &em, 1) == 0) {
             ok = 0;
-        } else if (bitOff(*GetEtcFlgPtr(w->linkNo, pG->room_id))) {
+        } else if (bitOff(*GetEtcFlgPtr(w->waiting_no, pG->room_id))) {
             ok = 0;
-        } else if (bitOff(it->flag2) && em != 0) {
-            it->pos = em->pos;
-            it->pos.y += 50.0f;
-            if (it->rot.z == 0.0f) {
+        } else if (bitOff(it->ctrl_flag) && em != 0) {
+            it->item_pos = em->pos;
+            it->item_pos.y += 50.0f;
+            if (it->open_ang == 0.0f) {
                 RAW_F32(it, 0x30) = 0.0f;
                 RAW_F32(it, 0x38) = 1.0f;
-                it->rot.y = GetXZAngle(&em->pos, &pPL->pos);
+                it->ang_y = GetXZAngle(&em->pos, &pPL->pos);
             }
         }
         break;
@@ -4040,26 +4038,26 @@ void sceAtSetItem(SceAtWork* w)
     if (sceAtItemFlgCk(it) != 0) {
         goto disable;
     }
-    if ((it->modeMask & mask) == 0 && it->modeMask != 0) {
+    if ((it->player_type & mask) == 0 && it->player_type != 0) {
         goto disable;
     }
     if (ok != 1) {
         goto disable;
     }
-    rot.x = it->rot.x;
-    rot.y = it->rot.y;
-    rot.z = it->rot.z;
-    r = SceAtCheckSystemItemSet(it->id, &id, &num, &it->pos, &rot);
+    rot.x = it->ang_x;
+    rot.y = it->ang_y;
+    rot.z = it->open_ang;
+    r = SceAtCheckSystemItemSet(it->item_id, &id, &num, &it->item_pos, &rot);
     if (r != 1) {
-        w->flag &= ~1;
+        w->be_flg &= ~1;
         sceAtItemFlgOn(it);
         return;
     }
-    if (it->id != id) {
+    if (it->item_id != id) {
         int s;
 
-        it->id = id;
-        it->num = num;
+        it->item_id = id;
+        it->item_num = num;
         s = sceAtPullItemSaveWork();
         if (s >= 0) {
             SAVE_ITEM_ROOM(s) = pG->room_id;
@@ -4070,79 +4068,79 @@ void sceAtSetItem(SceAtWork* w)
             SAVE_ITEM_EFF(s) = -1;
         }
     }
-    w->linkType = 0;
-    w->linkNo = 0;
-    if (!(it->flag2 & 0x80)) {
-        if (!(w->trigger & 8)) {
-            w->trigger = 8;
-            w->actBtnKind = 0x28;
+    w->waiting_type = 0;
+    w->waiting_no = 0;
+    if (!(it->ctrl_flag & 0x80)) {
+        if (!(w->trg_type & 8)) {
+            w->trg_type = 8;
+            w->act_type = 0x28;
         } else {
-            w->trigger &= 0x7F;
+            w->trg_type &= 0x7F;
         }
     } else {
-        w->trigger = 2;
+        w->trg_type = 2;
     }
-    if (bitOff(it->flag2)) {
-        if (it->flag2 & 0x10) {
+    if (bitOff(it->ctrl_flag)) {
+        if (it->ctrl_flag & 0x10) {
             if (it->pModel != 0) {
-                it->pos = it->pModel->pos;
+                it->item_pos = it->pModel->pos;
             }
             if (sceAtItemFindFlgCk(it) == 1) {
-                it->flag2 &= ~0x10;
-                it->pos.y = EatMgr.getFloor(&it->pos, 0, 0.0f, 100000.0f, 0);
-                it->rot.z = 0.0f;
-                it->effType = 2;
+                it->ctrl_flag &= ~0x10;
+                it->item_pos.y = EatMgr.getFloor(&it->item_pos, 0, 0.0f, 100000.0f, 0);
+                it->open_ang = 0.0f;
+                it->eff_type = 2;
             }
         }
-        if (it->flag2 & 0x40) {
+        if (it->ctrl_flag & 0x40) {
             if (sceAtItemFindFlgCk(it) == 1) {
-                it->flag2 &= ~0x40;
-                it->pos.y = EatMgr.getFloor(&it->pos, 0, 0.0f, 100000.0f, 0);
-                it->effType = 2;
+                it->ctrl_flag &= ~0x40;
+                it->item_pos.y = EatMgr.getFloor(&it->item_pos, 0, 0.0f, 100000.0f, 0);
+                it->eff_type = 2;
             }
         }
     }
-    if (!(it->flag2 & 2)) {
-        SceAtItemAutoArea(&w->area, &it->pos, it->size);
+    if (!(it->ctrl_flag & 2)) {
+        SceAtItemAutoArea(&w->area, &it->item_pos, it->radius);
     }
-    if (it->effType == 6) {
-        it->effType = sceAtCheckItemEffectCol(it->id);
+    if (it->eff_type == 6) {
+        it->eff_type = sceAtCheckItemEffectCol(it->item_id);
     }
     if (it->pModel == 0) {
-        ok2 = ItemGetBinTplAddr(it->id, &bin, &tpl) ? 1 : 0;
+        ok2 = ItemGetBinTplAddr(it->item_id, &bin, &tpl) ? 1 : 0;
         if (ok2 == 0) {
             bin = (void*) (pG->pCore->ofs_20 + (u32) pG->pCore);
             tpl = (void*) (pG->pCore->ofs_24 + (u32) pG->pCore);
         }
-        if (it->flag2 & 0x10) {
+        if (it->ctrl_flag & 0x10) {
             SceAtSetShootDownItem(w, bin, tpl);
-            if (it->effNo == 0) {
+            if (it->eff_setno == 0) {
                 sceAtItemEffSet(w, w->item.pModel);
             }
-        } else if (it->flag2 & 0x40) {
+        } else if (it->ctrl_flag & 0x40) {
             obj = setItemObj(bin, tpl, (Vec*) &vecZero, (Vec*) &vecZero);
             SceAtSetItemModel(w, obj);
-            if (ok2 == 0 && it->effType == 0) {
-                it->effType = 1;
+            if (ok2 == 0 && it->eff_type == 0) {
+                it->eff_type = 1;
             }
             ((cEm*) w->item.pModel)->dmg.m_PosFrom.y = 0.0f;
-            if (it->effNo == 0) {
+            if (it->eff_setno == 0) {
                 sceAtItemEffSet(w, w->item.pModel);
             }
         } else {
             if (ok2 == 1) {
                 obj = setItemObj(bin, tpl, (Vec*) &vecZero, (Vec*) &vecZero);
                 SceAtSetItemModel(w, obj);
-            } else if (it->effType == 0) {
-                it->effType = 1;
+            } else if (it->eff_type == 0) {
+                it->eff_type = 1;
             }
-            if (it->effNo == 0) {
+            if (it->eff_setno == 0) {
                 sceAtItemEffSet(w, 0);
             }
         }
     } else {
         it->pModel->be_flag |= 2;
-        if (it->effNo == 0) {
+        if (it->eff_setno == 0) {
             sceAtItemEffSet(w, 0);
         }
     }
@@ -4150,7 +4148,7 @@ void sceAtSetItem(SceAtWork* w)
     return;
 
 disable:
-    w->flag &= ~1;
+    w->be_flg &= ~1;
     if (it->pModel != 0) {
         it->pModel->be_flag &= ~2;
     }
@@ -4169,14 +4167,14 @@ void SceAtItemAutoArea(AREA_HIT_DATA* area, Vec* pos, f32 radius)
         if (radius == 0.0f) {
             radius = 1500.0f;
         }
-        AreaDataInit(area, &p, 2, radius + radius, h);
+        AreaDataInit(area, &p, radius + radius, h, 2);
     }
 }
 
 // Disabling an item area: glow effect gone, model hidden.
-static void sceAtDeleteItem(SceAtWork* w)
+static void sceAtDeleteItem(SCE_AT_ITEM* w)
 {
-    SceAtItem* it = &w->item;
+    SCE_AT_DATA_ITEM* it = &w->item;
 
     sceAtItemEffDelete(it);
     if (it->pModel != 0) {
@@ -4185,13 +4183,13 @@ static void sceAtDeleteItem(SceAtWork* w)
 }
 
 // Removes the item's glow effect (all three effect kinds under effNo).
-void sceAtItemEffDelete(SceAtItem* it)
+void sceAtItemEffDelete(SCE_AT_DATA_ITEM* it)
 {
-    if (it->effType != 0 && it->effNo != 0) {
-        EffectEspDelete(0, it->effNo, 0, 0);
-        EffectEspgenDelete(0, it->effNo, 0);
-        EffectEfmDelete(0, it->effNo, 0);
-        it->effNo = 0;
+    if (it->eff_type != 0 && it->eff_setno != 0) {
+        EffectEspDelete(0, it->eff_setno, 0, 0);
+        EffectEspgenDelete(0, it->eff_setno, 0);
+        EffectEfmDelete(0, it->eff_setno, 0);
+        it->eff_setno = 0;
     }
 }
 
@@ -4199,11 +4197,11 @@ void sceAtItemEffDelete(SceAtItem* it)
 // 0x33 + glow, 3 0x2C, 4 treasure 0x31, 5 ammo 0x2F, 7 0x46, 8 falling 0x33 800 below, 9 0x4D) at
 // item.pos + ofs (or on model `m`); items on a parent get the parts-relative variants (only the
 // parts 2 / 4 / 8 cases of rooms 30F / 21B). Nothing in shooting-range mode.
-void sceAtItemEffSet(SceAtWork* w, cModel* pModel)
+void sceAtItemEffSet(SCE_AT_ITEM* w, cModel* pModel)
 {
     Vec p;
     Vec q;
-    SceAtItem* it = &w->item;
+    SCE_AT_DATA_ITEM* it = &w->item;
     cModel* parent;
     int c;
     int kind;
@@ -4211,92 +4209,92 @@ void sceAtItemEffSet(SceAtWork* w, cModel* pModel)
     if ((s8) pG->shooting_mode != 0) {
         return;
     }
-    it->effNo = 0;
-    if (it->effType == 0) {
+    it->eff_setno = 0;
+    if (it->eff_type == 0) {
         return;
     }
-    it->effNo = EspPullCoreKind();
-    if (it->effNo == 0) {
+    it->eff_setno = EspPullCoreKind();
+    if (it->eff_setno == 0) {
         return;
     }
     parent = w->pParent;
     if (parent == 0) {
         if (pModel == 0) {
-            p.x = w->item.pos.x + it->ofs.x;
-            p.y = it->pos.y + it->ofs.y;
-            p.z = it->pos.z + it->ofs.z;
-            switch (it->effType) {
+            p.x = w->item.item_pos.x + it->eff_offset.x;
+            p.y = it->item_pos.y + it->eff_offset.y;
+            p.z = it->item_pos.z + it->eff_offset.z;
+            switch (it->eff_type) {
             case 1:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->effNo, parent, parent);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->eff_setno, parent, 0);
                 break;
             case 3:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x2C, 0xC00, it->effNo, parent, parent);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x2C, 0xC00, it->eff_setno, parent, 0);
                 break;
             case 5:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x2F, 0xC00, it->effNo, parent, parent);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x2F, 0xC00, it->eff_setno, parent, 0);
                 break;
             case 4:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x31, 0xC00, it->effNo, parent, parent);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x31, 0xC00, it->eff_setno, parent, 0);
                 break;
             case 2:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x33, 0xC00, it->effNo, parent, parent);
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->effNo, parent, parent);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x33, 0xC00, it->eff_setno, parent, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->eff_setno, parent, 0);
                 break;
             case 7:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x46, 0xC00, it->effNo, parent, parent);
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->effNo, parent, parent);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x46, 0xC00, it->eff_setno, parent, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->eff_setno, parent, 0);
                 break;
             case 8:
                 q = p;
                 q.y -= 800.0f;
-                EstSet(0, -1, &q, 0, EFF_CORE, 0x33, 0xC00, it->effNo, parent, parent);
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->effNo, parent, parent);
+                EstSet(0, -1, &q, 0, EFF_CORE, 0x33, 0xC00, it->eff_setno, parent, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->eff_setno, parent, 0);
                 break;
             case 9:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x4D, 0xC00, it->effNo, parent, parent);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x4D, 0xC00, it->eff_setno, parent, 0);
                 break;
             case 6:
                 break;
             }
         } else {
-            if (it->effType == 1) {
-                p.x = it->ofs.x;
-                p.y = it->ofs.y;
-                p.z = it->ofs.z;
+            if (it->eff_type == 1) {
+                p.x = it->eff_offset.x;
+                p.y = it->eff_offset.y;
+                p.z = it->eff_offset.z;
             } else {
-                p.x = pModel->pos.x + it->ofs.x;
-                p.y = pModel->pos.y + it->ofs.y;
-                p.z = pModel->pos.z + it->ofs.z;
+                p.x = pModel->pos.x + it->eff_offset.x;
+                p.y = pModel->pos.y + it->eff_offset.y;
+                p.z = pModel->pos.z + it->eff_offset.z;
             }
-            switch (it->effType) {
+            switch (it->eff_type) {
             case 1:
-                EstSet(pModel, -1, &p, 0, EFF_CORE, 0x2D, 0xC00, it->effNo, 0, 0);
+                EstSet(pModel, -1, &p, 0, EFF_CORE, 0x2D, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 3:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x2C, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x2C, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 5:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x2F, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x2F, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 4:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x31, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x31, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 2:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x33, 0xC00, it->effNo, 0, 0);
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x33, 0xC00, it->eff_setno, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 7:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x46, 0xC00, it->effNo, 0, 0);
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x46, 0xC00, it->eff_setno, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 8:
                 q = p;
                 q.y -= 800.0f;
-                EstSet(0, -1, &q, 0, EFF_CORE, 0x33, 0xC00, it->effNo, 0, 0);
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &q, 0, EFF_CORE, 0x33, 0xC00, it->eff_setno, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x21, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 9:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x4D, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x4D, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 6:
                 break;
@@ -4304,7 +4302,7 @@ void sceAtItemEffSet(SceAtWork* w, cModel* pModel)
         }
         return;
     }
-    switch (w->parentParts) {
+    switch (w->parts_no) {
     case -1:
     case 0:
         break;
@@ -4323,14 +4321,14 @@ void sceAtItemEffSet(SceAtWork* w, cModel* pModel)
         return;
     }
     parent = w->pParent;
-    p.x = it->pos.x + it->ofs.x;
-    p.y = it->pos.y + it->ofs.y;
-    p.z = it->pos.z + it->ofs.z;
+    p.x = it->item_pos.x + it->eff_offset.x;
+    p.y = it->item_pos.y + it->eff_offset.y;
+    p.z = it->item_pos.z + it->eff_offset.z;
     kind = 0;
     c = 0;
-    switch (it->effType) {
+    switch (it->eff_type) {
     case 3:
-        switch (w->parentParts) {
+        switch (w->parts_no) {
         case -1:
         case 0:
             kind = 0x48;
@@ -4348,10 +4346,10 @@ void sceAtItemEffSet(SceAtWork* w, cModel* pModel)
             kind = 0xC;
             break;
         }
-        EstSet(parent, -1, &p, 0, c, kind, 0xC00, it->effNo, 0, 0);
+        EstSet(parent, -1, &p, 0, c, kind, 0xC00, it->eff_setno, 0, 0);
         break;
     case 5:
-        switch (w->parentParts) {
+        switch (w->parts_no) {
         case -1:
         case 0:
             kind = 0x49;
@@ -4369,10 +4367,10 @@ void sceAtItemEffSet(SceAtWork* w, cModel* pModel)
             kind = 0xE;
             break;
         }
-        EstSet(parent, -1, &p, 0, c, kind, 0xC00, it->effNo, 0, 0);
+        EstSet(parent, -1, &p, 0, c, kind, 0xC00, it->eff_setno, 0, 0);
         break;
     case 4:
-        switch (w->parentParts) {
+        switch (w->parts_no) {
         case -1:
         case 0:
             kind = 0x4A;
@@ -4390,10 +4388,10 @@ void sceAtItemEffSet(SceAtWork* w, cModel* pModel)
             kind = 0x10;
             break;
         }
-        EstSet(parent, -1, &p, 0, c, kind, 0xC00, it->effNo, 0, 0);
+        EstSet(parent, -1, &p, 0, c, kind, 0xC00, it->eff_setno, 0, 0);
         break;
     case 2:
-        switch (w->parentParts) {
+        switch (w->parts_no) {
         case -1:
         case 0:
             kind = 0x4B;
@@ -4406,13 +4404,13 @@ void sceAtItemEffSet(SceAtWork* w, cModel* pModel)
         case 8:
             return;
         }
-        EstSet(parent, -1, &p, 0, c, kind, 0xC00, it->effNo, 0, 0);
+        EstSet(parent, -1, &p, 0, c, kind, 0xC00, it->eff_setno, 0, 0);
         // fall through
     case 1:
     case 7:
     case 8:
     case 9:
-        EstSet(parent, -1, &p, 0, EFF_CORE, 0x2D, 0xC00, it->effNo, 0, 0);
+        EstSet(parent, -1, &p, 0, EFF_CORE, 0x2D, 0xC00, it->eff_setno, 0, 0);
         break;
     case 6:
         break;
@@ -4421,48 +4419,48 @@ void sceAtItemEffSet(SceAtWork* w, cModel* pModel)
 
 // Starts the fade-out variant of the glow (0x2E / 0x30 / 0x32 / 0x34 / 0x47 by effType) when a
 // dropped item is about to disappear.
-void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel)
+void sceAtItemDisappearEffSet(SCE_AT_ITEM* w, cModel* pModel)
 {
     Vec p;
-    SceAtItem* it = &w->item;
+    SCE_AT_DATA_ITEM* it = &w->item;
     int c;
     int kind;
 
     if ((s8) pG->shooting_mode != 0) {
         return;
     }
-    it->effNo = 0;
-    if (it->effType == 0) {
+    it->eff_setno = 0;
+    if (it->eff_type == 0) {
         return;
     }
-    it->effNo = EspPullCoreKind();
-    if (it->effNo == 0) {
+    it->eff_setno = EspPullCoreKind();
+    if (it->eff_setno == 0) {
         return;
     }
     if (w->pParent == 0) {
         if (pModel == 0) {
-            p.x = w->item.pos.x + it->ofs.x;
-            p.y = it->pos.y + it->ofs.y;
-            p.z = it->pos.z + it->ofs.z;
-            switch (it->effType) {
+            p.x = w->item.item_pos.x + it->eff_offset.x;
+            p.y = it->item_pos.y + it->eff_offset.y;
+            p.z = it->item_pos.z + it->eff_offset.z;
+            switch (it->eff_type) {
             case 3:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x2E, 0xC00, it->effNo, pModel, pModel);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x2E, 0xC00, it->eff_setno, pModel, 0);
                 break;
             case 5:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x30, 0xC00, it->effNo, pModel, pModel);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x30, 0xC00, it->eff_setno, pModel, 0);
                 break;
             case 4:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x32, 0xC00, it->effNo, pModel, pModel);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x32, 0xC00, it->eff_setno, pModel, 0);
                 break;
             case 2:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x34, 0xC00, it->effNo, pModel, pModel);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x34, 0xC00, it->eff_setno, pModel, 0);
                 break;
             case 7:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x47, 0xC00, it->effNo, pModel, pModel);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x47, 0xC00, it->eff_setno, pModel, 0);
                 break;
             case 8:
                 p.y -= 800.0f;
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x34, 0xC00, it->effNo, pModel, pModel);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x34, 0xC00, it->eff_setno, pModel, 0);
                 break;
             case 1:
             case 6:
@@ -4470,28 +4468,28 @@ void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel)
                 break;
             }
         } else {
-            p.x = pModel->pos.x + it->ofs.x;
-            p.y = pModel->pos.x + it->ofs.y;
-            p.z = pModel->pos.x + it->ofs.z;
-            switch (it->effType) {
+            p.x = pModel->pos.x + it->eff_offset.x;
+            p.y = pModel->pos.x + it->eff_offset.y;
+            p.z = pModel->pos.x + it->eff_offset.z;
+            switch (it->eff_type) {
             case 3:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x2E, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x2E, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 5:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x30, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x30, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 4:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x32, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x32, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 2:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x34, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x34, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 7:
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x47, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x47, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 8:
                 p.y -= 800.0f;
-                EstSet(0, -1, &p, 0, EFF_CORE, 0x34, 0xC00, it->effNo, 0, 0);
+                EstSet(0, -1, &p, 0, EFF_CORE, 0x34, 0xC00, it->eff_setno, 0, 0);
                 break;
             case 1:
             case 6:
@@ -4501,7 +4499,7 @@ void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel)
         }
         return;
     }
-    switch (w->parentParts) {
+    switch (w->parts_no) {
     case -1:
     case 0:
         break;
@@ -4519,15 +4517,15 @@ void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel)
     default:
         return;
     }
-    p.x = it->pos.x + it->ofs.x;
-    p.y = it->pos.y + it->ofs.y;
-    p.z = it->pos.z + it->ofs.z;
+    p.x = it->item_pos.x + it->eff_offset.x;
+    p.y = it->item_pos.y + it->eff_offset.y;
+    p.z = it->item_pos.z + it->eff_offset.z;
     kind = 0;
     c = 0;
     pModel = w->pParent;
-    switch (it->effType) {
+    switch (it->eff_type) {
     case 3:
-        switch (w->parentParts) {
+        switch (w->parts_no) {
         case -1:
         case 0:
             kind = 0x53;
@@ -4545,10 +4543,10 @@ void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel)
             kind = 0xD;
             break;
         }
-        EstSet(pModel, -1, &p, 0, c, kind, 0xC00, it->effNo, 0, 0);
+        EstSet(pModel, -1, &p, 0, c, kind, 0xC00, it->eff_setno, 0, 0);
         break;
     case 5:
-        switch (w->parentParts) {
+        switch (w->parts_no) {
         case -1:
         case 0:
             kind = 0x54;
@@ -4566,10 +4564,10 @@ void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel)
             kind = 0xF;
             break;
         }
-        EstSet(pModel, -1, &p, 0, c, kind, 0xC00, it->effNo, 0, 0);
+        EstSet(pModel, -1, &p, 0, c, kind, 0xC00, it->eff_setno, 0, 0);
         break;
     case 4:
-        switch (w->parentParts) {
+        switch (w->parts_no) {
         case -1:
         case 0:
             kind = 0x55;
@@ -4587,10 +4585,10 @@ void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel)
             kind = 0x11;
             break;
         }
-        EstSet(pModel, -1, &p, 0, c, kind, 0xC00, it->effNo, 0, 0);
+        EstSet(pModel, -1, &p, 0, c, kind, 0xC00, it->eff_setno, 0, 0);
         break;
     case 2:
-        switch (w->parentParts) {
+        switch (w->parts_no) {
         case -1:
         case 0:
             kind = 0x56;
@@ -4602,7 +4600,7 @@ void sceAtItemDisappearEffSet(SceAtWork* w, cModel* pModel)
         default:
             return;
         }
-        EstSet(pModel, -1, &p, 0, c, kind, 0xC00, it->effNo, 0, 0);
+        EstSet(pModel, -1, &p, 0, c, kind, 0xC00, it->eff_setno, 0, 0);
         break;
     case 1:
     case 6:

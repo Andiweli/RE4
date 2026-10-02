@@ -7,8 +7,8 @@
 #include "math_sub.h"
 #include "main_mem.h"
 
-// Face shape motion data built by cPlBody::makeSpaeData (PS2 PL_SHAPE_DATA, 0x58 bytes): a header,
-// two key tables and four keys.
+// Face shape motion data built by cPlBody::makeSpaeData, 0x58 bytes: a header, two key tables and
+// four keys.
 typedef struct tagSHAPE_MOT_HEADER {
     u32 max_frame;  // 0x00  0x101
     u32 tbl_num;    // 0x04  2
@@ -24,7 +24,7 @@ typedef struct tagSHAPE_MOT {
     f32 r_value;    // 0x08
     f32 l_value;    // 0x0C
 } SHAPE_MOT;
-struct SpaeData {
+struct PL_SHAPE_DATA {
     SHAPE_MOT_HEADER head;  // 0x00
     SHAPE_MOT_TBL tbl[2];   // 0x08
     SHAPE_MOT mot[4];       // 0x18
@@ -53,7 +53,7 @@ private:
     cModel* m_pMod;              // 0x38
     f32 m_WaistY;                   // 0x3C  waist twist angle (waistSet)
 public:
-    SpaeData spae[2];            // 0x40
+    PL_SHAPE_DATA pl_shape_data[2];  // 0x40
 
     cPlBody(cModel* model);
     void move();

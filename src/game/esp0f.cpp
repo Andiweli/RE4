@@ -44,7 +44,7 @@ void cEsp0f::move()
 // EspTransTbl[0x0F]: builds the sprite matrix (screen ortho / camera-facing / fully rotated with
 // Tool_flg bit0), copies the frame buffer into a half-size texture, sets up 3 TEV stages (frame
 // copy scaled by Pow, sprite texture as alpha) and draws the quad; then restores the GX state.
-extern "C" void Esp0f_Trans(cEsp0f* esp)
+void Esp0f_Trans(cEsp0f* esp)
 {
     static Mtx Matrix = {
         { 0.001953125f, 0.0f, 0.0f, 0.0f },
@@ -124,10 +124,10 @@ extern "C" void Esp0f_Trans(cEsp0f* esp)
     oy = (f32)anm->Cy;
     z = 1.0f;
     zero = 0.0f;
-    if (ox == zero) {
+    if (ox == 0.0f) {
         ox = -anm->Width * 0.5f;
     }
-    if (oy == zero) {
+    if (oy == 0.0f) {
         oy = anm->Height * 0.5f;
     }
     x0 = ox * sx / anm->Width;
@@ -158,7 +158,7 @@ extern "C" void Esp0f_Trans(cEsp0f* esp)
         Mtx tm;
         Mtx pm;
 
-        C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
+        C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
         PSMTXConcat(pm, esp->m_Mat, tm);
         GXLoadTexMtxImm(tm, 0x1E, 0);
         GXSetTexCoordGen(0, 0, 0, 0x1E);

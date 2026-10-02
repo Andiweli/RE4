@@ -57,7 +57,7 @@ static f32 dai_hi = 5385.0f;
 // COMPILER-DIFF: #8 -- the original's prologue copies `fmr f28,f1; fmr f29,f2` before `mr r29,r5` (mode);
 // ours orders the copies by parameter order, so the definition declares lo/hi before mode (same
 // argument registers) under the original mangled name as a C symbol (the r226 playerPillarDownCk route).
-extern "C" void reva_common_move__FP4cObjiiff(cObj* obj, int axis, f32 lo, f32 hi, int mode);
+void reva_common_move__FP4cObjiiff(cObj* obj, int axis, f32 lo, f32 hi, int mode);
 #define reva_common_move(obj, axis, mode, lo, hi) reva_common_move__FP4cObjiiff(obj, axis, lo, hi, mode)
 static void reva2_use_after_reva3_exit();
 void reva2_use_after_reva3();
@@ -208,7 +208,7 @@ void R223Main()
 // back. mode 1: stop at the end, mode 2: start going back.
 // COMPILER-DIFF: #8 -- the original copies f1/f2 to f28/f29 before `mode` to r29: FP parameters
 // declared before `mode` under the mangled name (see the declaration above).
-extern "C" void reva_common_move__FP4cObjiiff(cObj* obj, int axis, f32 lo, f32 hi, int mode)
+void reva_common_move__FP4cObjiiff(cObj* obj, int axis, f32 lo, f32 hi, int mode)
 {
     f32 spd = 0.0f;
     f32* p;

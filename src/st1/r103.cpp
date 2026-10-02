@@ -28,7 +28,7 @@ struct R103Work {
 };
 
 // Cesspit: object / area numbers
-struct R103Cesspit {
+typedef struct _DATA_WORK {
     u32 cover;      // 0x00  scroll object: the cesspit cover
     u32 lid;        // 0x04  scroll object: the lid
     int itemAt;     // 0x08  item area
@@ -36,21 +36,21 @@ struct R103Cesspit {
     int at10;       // 0x10
     int at14;       // 0x14
     int at18;       // 0x18  cover area (r103_execOpenCover)
-};
+} DATA_WORK;
 
 // Shelf: the two door objects
-struct R103Shelf {
+typedef struct _SHELF_SMD {
     u8 door[2];
-};
+} SHELF_SMD;
 
 static R103Work* r103_work;
 
 // The original's .data is 8-aligned (r105 has the same).
 asm(".section .data; .balign 8");
-R103Cesspit r103_cesspit = {0x52, 0x53, 0x8A, 0x9E, 6, 3, 0xA};
-static R103Shelf r103_shelf0 = {{0x57, 0x58}};
-static R103Shelf r103_shelf1 = {{0x59, 0x5A}};
-static R103Shelf r103_shelf2 = {{0x5B, 0x5C}};
+DATA_WORK r103_cesspit = {0x52, 0x53, 0x8A, 0x9E, 6, 3, 0xA};
+static SHELF_SMD r103_shelf0 = {{0x57, 0x58}};
+static SHELF_SMD r103_shelf1 = {{0x59, 0x5A}};
+static SHELF_SMD r103_shelf2 = {{0x5B, 0x5C}};
 
 // Hit effects of attribute type 4
 static const AtEffInfo r103_eff_info = {
@@ -58,17 +58,17 @@ static const AtEffInfo r103_eff_info = {
 };
 
 static void r103_getFile();
-extern "C" void r103_openShelf_main(R103Shelf* s, int opened);
-extern "C" void r103_openedShelf(R103Shelf* s);
-extern "C" void r103_openShelf(R103Shelf* s);
-extern "C" void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8, void* m9);
-extern "C" void r103_setSubMissionTarget(u32 objNo);
-static void r103_execOpenCover(R103Cesspit* c);
-static void r103_checkCloseCover(R103Cesspit* c);
-extern "C" void r103_checkCesspit0(R103Cesspit* c);
-extern "C" void r103_checkCesspit1(R103Cesspit* c);
-extern "C" void r103_checkCesspit2(R103Cesspit* c);
-extern "C" void r103_initCesspit(R103Cesspit* c);
+void r103_openShelf_main(SHELF_SMD* s, int opened);
+void r103_openedShelf(SHELF_SMD* s);
+void r103_openShelf(SHELF_SMD* s);
+void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8, void* m9);
+void r103_setSubMissionTarget(u32 objNo);
+static void r103_execOpenCover(DATA_WORK* c);
+static void r103_checkCloseCover(DATA_WORK* c);
+void r103_checkCesspit0(DATA_WORK* c);
+void r103_checkCesspit1(DATA_WORK* c);
+void r103_checkCesspit2(DATA_WORK* c);
+void r103_initCesspit(DATA_WORK* c);
 static void r103_BgmStartCheck();
 
 // Room init (in st1_1 and st1_3): the ten corpse models only outside region 0 (Japan hides them and
@@ -93,15 +93,15 @@ void R103Init()
     }
     ScfFlagOn(pG, SCF_R103_ENTER);
     SceExec(0x12, (TaskFunc) r103_BgmStartCheck, 0, 0, SCE_PRIO_DEF_2, 0);
-    SceExec(0x12, (TaskFunc) r103_initCesspit, (int) &r103_cesspit, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r103_initCesspit, &r103_cesspit, 0, SCE_PRIO_DEF_2, 0);
     r103_setSubMissionTarget(8);
     EatMgr.registEffInfo(EAT_ET_ROOM0, (AtEffInfo*) &r103_eff_info);
     if (getRoomEtcRack(6, &rack, 1)) {
         rack->setRange(0.0f, 3000.0f, 0.0f, 3000.0f);
     }
-    SceSetItemEvent(7, 0x92, 0, 0xA, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r103_shelf0, 0);
-    SceSetItemEvent(8, 0x81, 1, 0xB, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r103_shelf1, 0);
-    SceSetItemEvent(9, 0x83, 2, 9, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, (int) &r103_shelf2, 0);
+    SceSetItemEvent(7, 0x92, 0, 0xA, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, &r103_shelf0, 0);
+    SceSetItemEvent(8, 0x81, 1, 0xB, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, &r103_shelf1, 0);
+    SceSetItemEvent(9, 0x83, 2, 9, (void (*)(int)) r103_openShelf, (void (*)(int)) r103_openedShelf, &r103_shelf2, 0);
     if (!ItfFlagChk(pG, ITF_R103_FILE)) {
         r103_work->eff = EspPullCoreKind();
         EstSet(0, -1, 0, 0, EFF_ROOM, 6, 1, (u8) r103_work->eff, 0, 0);
@@ -125,7 +125,7 @@ static void r103_getFile()
 }
 
 // Open shelf `s` (opened != 0: already open): the two doors turn 110 degrees over 30 frames.
-extern "C" void r103_openShelf_main(R103Shelf* s, int opened)
+void r103_openShelf_main(SHELF_SMD* s, int opened)
 {
     cObj* a;
     cObj* b;
@@ -170,19 +170,19 @@ extern "C" void r103_openShelf_main(R103Shelf* s, int opened)
 }
 
 // Item-event "already opened": pose shelf `s` open without the animation.
-extern "C" void r103_openedShelf(R103Shelf* s)
+void r103_openedShelf(SHELF_SMD* s)
 {
     r103_openShelf_main(s, 1);
 }
 
 // Item-event opener: animate shelf `s` open when its item is taken.
-extern "C" void r103_openShelf(R103Shelf* s)
+void r103_openShelf(SHELF_SMD* s)
 {
     r103_openShelf_main(s, 0);
 }
 
 // The ten corpses: scroll objects with the corpse parts models and a motion, darkened by a third.
-extern "C" void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8, void* m9)
+void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7, void* m8, void* m9)
 {
     cEm em;
     // The ctor's `this` pseudo (`addi r3, r1, 8; mr r29, r3`) is what the original addresses subArc
@@ -236,7 +236,7 @@ extern "C" void r103_setCorpse(void* m0, void* m1, void* m2, void* m3, void* m4,
 }
 
 // The sub-mission target (etc item 0x13) hangs on scroll object `objNo` until it is taken.
-extern "C" void r103_setSubMissionTarget(u32 objNo)
+void r103_setSubMissionTarget(u32 objNo)
 {
     cEmItem* item;
     u16* flg;
@@ -256,7 +256,7 @@ extern "C" void r103_setSubMissionTarget(u32 objNo)
 }
 
 // The cesspit cover swings open.
-static void r103_execOpenCover(R103Cesspit* c)
+static void r103_execOpenCover(DATA_WORK* c)
 {
     cObj* lid;
 
@@ -279,7 +279,7 @@ static void r103_execOpenCover(R103Cesspit* c)
 }
 
 // The cover: a hit enemy on the scroll object; once shot it falls, the lid opens and bounces.
-static void r103_checkCloseCover(R103Cesspit* c)
+static void r103_checkCloseCover(DATA_WORK* c)
 {
     cObj* cover;
     cObj* lid;
@@ -340,20 +340,20 @@ static void r103_checkCloseCover(R103Cesspit* c)
 }
 
 // The item model of area `at` moves to area `at2`'s model position and `at2` takes it over.
-static inline void r103_moveItemModel(SceAtWork* at, SceAtWork* at2)
+static inline void r103_moveItemModel(SCE_AT_DATA* at, SCE_AT_DATA* at2)
 {
-    if (at2->item.pModel != 0 && at->item.pModel != 0) {
-        at2->item.pModel->pos = at->item.pModel->pos;
-        at2->item.pModel->ang = at->item.pModel->ang;
-        at->item.pModel->be_flag &= ~2;
-        at->item.pModel = at2->item.pModel;
+    if (((SCE_AT_ITEM*) at2)->item.pModel != 0 && ((SCE_AT_ITEM*) at)->item.pModel != 0) {
+        ((SCE_AT_ITEM*) at2)->item.pModel->pos = ((SCE_AT_ITEM*) at)->item.pModel->pos;
+        ((SCE_AT_ITEM*) at2)->item.pModel->ang = ((SCE_AT_ITEM*) at)->item.pModel->ang;
+        ((SCE_AT_ITEM*) at)->item.pModel->be_flag &= ~2;
+        ((SCE_AT_ITEM*) at)->item.pModel = ((SCE_AT_ITEM*) at2)->item.pModel;
     }
 }
 
 // Cesspit state 0: the cover is still closed; the item found in it moves onto the lid.
-extern "C" void r103_checkCesspit0(R103Cesspit* c)
+void r103_checkCesspit0(DATA_WORK* c)
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     at = SceAtPtr(c->itemAt);
     while (1) {
@@ -361,7 +361,7 @@ extern "C" void r103_checkCesspit0(R103Cesspit* c)
             if (!ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT)) {
                 if (SceAtItemFindFlgCk(c->itemAt) == 1) {
                     ScfFlagOn(pG, SCF_R103_ITEM_IN_CESSPIT);
-                    at->item.id = 0x89;
+                    ((SCE_AT_ITEM*) at)->item.item_id = 0x89;
                     r103_moveItemModel(at, SceAtPtr(c->itemAt2));
                 }
             }
@@ -370,7 +370,7 @@ extern "C" void r103_checkCesspit0(R103Cesspit* c)
             break;
         }
     }
-    at->item.seFind = 5;
+    ((SCE_AT_ITEM*) at)->item.se_no = 5;
     SceAtSetEnable(c->at10, 1);
     if (ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT)) {
         SceAtSetEnable(c->itemAt, 0);
@@ -381,9 +381,9 @@ extern "C" void r103_checkCesspit0(R103Cesspit* c)
 }
 
 // Cesspit state 1: the cover is open; the item area follows the found / taken flags.
-extern "C" void r103_checkCesspit1(R103Cesspit* c)
+void r103_checkCesspit1(DATA_WORK* c)
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     at = SceAtPtr(c->itemAt);
     while (1) {
@@ -406,30 +406,30 @@ extern "C" void r103_checkCesspit1(R103Cesspit* c)
             break;
         }
     }
-    at->item.seFind = 4;
+    ((SCE_AT_ITEM*) at)->item.se_no = 4;
     SceAtSetEnable(c->at10, 0);
     SceAtSetEnable(c->at18, 0);
     if (SceAtItemFlgCk(c->itemAt) == 1) {
         SceExit();
     }
     if (ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT)) {
-        at->item.flag2 |= 0x10;
-        at->item.pModel->pos.y += 10.0f;
+        ((SCE_AT_ITEM*) at)->item.ctrl_flag |= 0x10;
+        ((SCE_AT_ITEM*) at)->item.pModel->pos.y += 10.0f;
         SceAtSetEnable(c->itemAt, 1);
     }
     r103_checkCesspit2(c);
 }
 
 // Cesspit state 2: the lid is open; the item found moves onto the lid.
-extern "C" void r103_checkCesspit2(R103Cesspit* c)
+void r103_checkCesspit2(DATA_WORK* c)
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     at = SceAtPtr(c->itemAt);
     while (1) {
         if (!ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT) && SceAtItemFindFlgCk(c->itemAt) == 1) {
             ScfFlagOn(pG, SCF_R103_ITEM_IN_CESSPIT);
-            at->item.id = 0x89;
+            ((SCE_AT_ITEM*) at)->item.item_id = 0x89;
             r103_moveItemModel(at, SceAtPtr(c->itemAt2));
             break;
         }
@@ -438,16 +438,16 @@ extern "C" void r103_checkCesspit2(R103Cesspit* c)
 }
 
 // Cesspit setup from the saved state.
-extern "C" void r103_initCesspit(R103Cesspit* c)
+void r103_initCesspit(DATA_WORK* c)
 {
-    SceAtWork* at;
+    SCE_AT_DATA* at;
 
     at = SceAtPtr(c->itemAt);
     SceAtSetEnable(c->itemAt2, 1);
     SmdGetObjPtr(c->lid)->be_flag |= 0x20;
     if (!ScfFlagChk(pG, SCF_R103_CLOSE_COVER)) {
-        SceExec(0x12, (TaskFunc) r103_checkCloseCover, (int) c, 0, SCE_PRIO_DEF_2, 0);
-        SceExec(0x12, (TaskFunc) r103_checkCesspit0, (int) c, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r103_checkCloseCover, c, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r103_checkCesspit0, c, 0, SCE_PRIO_DEF_2, 0);
         SceAtSetEnable(c->at10, 0);
         SceAtSetEnable(c->itemAt, 1);
     } else {
@@ -466,18 +466,18 @@ extern "C" void r103_initCesspit(R103Cesspit* c)
             } else {
                 SceAtSetEnable(c->at10, 1);
             }
-            SceExec(0x12, (TaskFunc) r103_checkCesspit1, (int) c, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r103_checkCesspit1, c, 0, SCE_PRIO_DEF_2, 0);
         } else {
             SmdGetObjPtr(c->lid)->pList->ang.x = -1.83f;
             SceAtSetEnable(c->at10, 0);
             if (SceAtItemFlgCk(c->itemAt) == 0) {
-                SceExec(0x12, (TaskFunc) r103_checkCesspit2, (int) c, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) r103_checkCesspit2, c, 0, SCE_PRIO_DEF_2, 0);
             }
         }
     }
     SceSleep(1);
     if (ScfFlagChk(pG, SCF_R103_ITEM_IN_CESSPIT)) {
-        at->item.id = 0x89;
+        ((SCE_AT_ITEM*) at)->item.item_id = 0x89;
         r103_moveItemModel(at, SceAtPtr(c->itemAt2));
     }
 }

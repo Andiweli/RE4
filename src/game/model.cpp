@@ -17,14 +17,12 @@
 
 // Model / parts / model info (cModel, cParts, cModelInfo) and their pools (PartsMgr, ModInfoMgr).
 
-extern "C" {
 void calcModelAddr(cModelData* data);
 void calcModelOffset(cModelData* data);
 void calcTplOffset(TEXPalette* tpl);
-void getBoundingBox(cModelData* data, ModelBound* bound);
-void drawBoundingBox(Mtx m, ModelBound* bound);
+void getBoundingBox(cModelData* data, cBoundingBox* bound);
+void drawBoundingBox(Mtx m, cBoundingBox* bound);
 int GetModelInfoNum(cModelInfo* info);
-}
 cModelInfo* GetModelInfoAddr(cModelInfo* info, int no);
 
 cModInfoMgr* cModel::mm = &ModInfoMgr;
@@ -88,8 +86,8 @@ cModel::cModel()
     Fix_pos.z = 0.0f;
     invisible_factor = 0.0f;
     memclr_asm(&Motion, 0xD0);
-    Motion.blend = 0;
-    Motion.flip = 0;
+    pMotionB = 0;
+    pXFlip = 0;
     inscreen_pos = 0;
     pPath = 0;
     pTexChg = 0;
@@ -787,17 +785,17 @@ void cModelInfo::setBlendType(u8 type)
 void cModelInfo::setSpecular(u8 r, u8 g, u8 b)
 {
     cModelData* d = model_addr;
-    ModelPart* part = d->pParts;
+    cPolyHeader* part = d->pParts;
     u32 n = d->displist_num;
     u32 i;
 
     for (i = 0; i < n; i++) {
-        part->specR = r;
-        part->specG = g;
-        part->specB = b;
+        part->specular_r = r;
+        part->specular_g = g;
+        part->specular_b = b;
         {
             u8* next = (u8*) (part + 1);
-            part = (ModelPart*) (next + part->size);
+            part = (cPolyHeader*) (next + part->buff_size);
         }
     }
 }
@@ -940,7 +938,7 @@ void calcModelAddr(cModelData* d)
     d->pTex = base + (u32) d->pTex;
     d->pHead = (ModelDataHead*) (base + (u32) d->pHead);
     d->pWeight = base + (u32) d->pWeight;
-    d->pParts = (ModelPart*) (base + (u32) d->pParts);
+    d->pParts = (cPolyHeader*) (base + (u32) d->pParts);
     d->vtxOrig = base + (u32) d->vtxOrig;
     d->nrmOrig = base + (u32) d->nrmOrig;
     if (d->version > 0x20030817) {
@@ -969,7 +967,7 @@ void calcModelOffset(cModelData* d)
     d->pTex = (void*) ((u8*) d->pTex - base);
     d->pHead = (ModelDataHead*) ((u8*) d->pHead - base);
     d->pWeight = (void*) ((u8*) d->pWeight - base);
-    d->pParts = (ModelPart*) ((u8*) d->pParts - base);
+    d->pParts = (cPolyHeader*) ((u8*) d->pParts - base);
     d->vtxOrig = (void*) ((u8*) d->vtxOrig - base);
     d->nrmOrig = (void*) ((u8*) d->nrmOrig - base);
     if (d->version > 0x20030817) {
@@ -994,7 +992,7 @@ void slideModelAddr(u32 addr, int ofs)
     d->pTex = (u8*) d->pTex + ofs;
     d->pHead = (ModelDataHead*) ((u8*) d->pHead + ofs);
     d->pWeight = (u8*) d->pWeight + ofs;
-    d->pParts = (ModelPart*) ((u8*) d->pParts + ofs);
+    d->pParts = (cPolyHeader*) ((u8*) d->pParts + ofs);
     d->vtxOrig = (u8*) d->vtxOrig + ofs;
     d->nrmOrig = (u8*) d->nrmOrig + ofs;
     if (d->version > 0x20030817) {
@@ -1112,25 +1110,25 @@ int cModel::makePartsList(int n)
     return 1;
 }
 
-// Binds the motion blend table and flip table of a version 0x20030818 model file to the MotionWork.
+// Binds the motion blend table and flip table of a version 0x20030818 model file to the motion work.
 void cModel::setJointInfo(void* pHead)
 {
     cModelData* d = (cModelData*) pHead;
 
     if (d->version == 0x20030818) {
         if (d->blendTbl != 0) {
-            Motion.blendTbl = (u16*) d->blendTbl;
+            pDblJnt = (u16*) d->blendTbl;
         } else {
-            Motion.blendTbl = 0;
+            pDblJnt = 0;
         }
         if (d->flipTbl != 0) {
-            Motion.flip = (u16*) (d->flipTbl + 4);
+            pXFlip = (u16*) (d->flipTbl + 4);
         } else {
-            Motion.flip = 0;
+            pXFlip = 0;
         }
     } else {
-        Motion.blendTbl = 0;
-        Motion.flip = 0;
+        pDblJnt = 0;
+        pXFlip = 0;
     }
 }
 
@@ -1196,7 +1194,7 @@ cParts::cParts()
 }
 
 // Bounding box of the original vertices (s16 * 2^-shift, 8 bytes each): centre and half size.
-void getBoundingBox(cModelData* d, ModelBound* pBox)
+void getBoundingBox(cModelData* d, cBoundingBox* pBox)
 {
     f32 maxZ = -65536.0f;
     f32 maxY = -65536.0f;
@@ -1240,9 +1238,9 @@ void getBoundingBox(cModelData* d, ModelBound* pBox)
     pBox->size.x = (maxX - minX) * 0.5f;
     pBox->size.y = (maxY - minY) * 0.5f;
     pBox->size.z = (maxZ - minZ) * 0.5f;
-    pBox->center.x = maxX - pBox->size.x;
-    pBox->center.y = maxY - pBox->size.y;
-    pBox->center.z = maxZ - pBox->size.z;
+    pBox->offset.x = maxX - pBox->size.x;
+    pBox->offset.y = maxY - pBox->size.y;
+    pBox->offset.z = maxZ - pBox->size.z;
 }
 
 // Manager of the cParts pool.
@@ -1481,7 +1479,7 @@ void ModelInfoSetTrans(cModel* pMod, int modelInfoNo, int flag)
 }
 
 // Debug: draws a bounding box transformed by m as 12 lines.
-void drawBoundingBox(Mtx m, ModelBound* pBox)
+void drawBoundingBox(Mtx m, cBoundingBox* pBox)
 {
     static u8 ptbl[6][4] = {
         {0, 1, 3, 2}, {4, 5, 7, 6}, {0, 1, 5, 4}, {3, 2, 6, 7}, {1, 3, 7, 5}, {2, 0, 4, 6},
@@ -1516,7 +1514,7 @@ void drawBoundingBox(Mtx m, ModelBound* pBox)
     // compares the stepped pointer against `&v[7]` (`cmplw; ble`), which the do-while form with an
     // explicit end pointer gave as well but with the copy issued before the addis.
     for (j = 0; j < 8; j++) {
-        PSVECAdd(&v[j], &pBox->center, &v[j]);
+        PSVECAdd(&v[j], &pBox->offset, &v[j]);
     }
     PSMTXMultVecArray(m, v, v, 8);
     for (i = 0; i < 6; i++) {

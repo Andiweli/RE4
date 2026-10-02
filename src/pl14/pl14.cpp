@@ -1682,7 +1682,7 @@ int greThrowCheck()
 // something else in front.
 int isTarget(cSubLuis* luis, cEm* em)
 {
-    WepTarget list[2];
+    TARGET_WK list[2];
     Vec hit;
     Vec nrm;
     u32 attr;
@@ -1697,7 +1697,7 @@ int isTarget(cSubLuis* luis, cEm* em)
         return 0;
     }
     if (GetWepTargetList2(&luis->pList->world, &em->pList->world, list, 2, &hit, &nrm, &attr, 2, 0) > 1 &&
-        list[1].em != em) {
+        list[1].pEm != em) {
         return 0;
     }
     return 1;

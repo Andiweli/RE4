@@ -55,7 +55,7 @@ static Vec r403_rot[3] = {{0.0f, 2.345f, 0.0f}, {0.0f, -0.9f, 0.0f}, {0.0f, 1.25
 
 // The room's MercSysInitRoom parameters are 0x6C bytes (the DOL reads the first 0x5C).
 struct R403MercInit {
-    MercInit m;
+    MercSysInitWork m;
     u32 x5C[4];
 };
 
@@ -189,9 +189,9 @@ void R403Init()
         }
         MercSysInitRoom(&init.m);
     }
-    SceSetItemEvent(0x2A, 0x80, 4, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, 0x15, 0);
-    SceSetItemEvent(0x2B, 0x82, 5, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, 0x14, 0);
-    SceSetItemEvent(0x2C, 0x83, 6, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, 0x17, 0);
+    SceSetItemEvent(0x2A, 0x80, 4, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, (void*) 0x15, 0);
+    SceSetItemEvent(0x2B, 0x82, 5, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, (void*) 0x14, 0);
+    SceSetItemEvent(0x2C, 0x83, 6, -1, r403_DuraluminCaseOpen, r403_DuraluminCaseOpened, (void*) 0x17, 0);
 }
 
 // Item-event opener: case `no` (lid up -X) opens.

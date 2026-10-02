@@ -199,7 +199,7 @@ void AreaGetInsidePos(Vec* pos, AREA_HIT_DATA* area)
 
 // Builds a default area of `type` around `pos`: a size x size square, a cylinder of radius
 // size / 2, or an eye trigger with cone length size / 2 and a 60 degree opening.
-void AreaDataInit(AREA_HIT_DATA* area, Vec* pos, u8 type, f32 size, f32 height)
+void AreaDataInit(AREA_HIT_DATA* area, Vec* pos, f32 size, f32 height, u8 type)
 {
     area->be_flag = 1;
     area->pad = 0;
@@ -296,17 +296,17 @@ void AreaDataEdit(AREA_HIT_DATA* area, u32 col, int flg, Mtx pMat, f32 move_scal
         case AREA_TYPE_XZ4:
             area->type = AREA_TYPE_CYLINDER;
             AreaGetCenterPos(&center, area);
-            AreaDataInit(area, &center, area->type, 4000.0f, 4000.0f);
+            AreaDataInit(area, &center, 4000.0f, 4000.0f, area->type);
             break;
         case AREA_TYPE_CYLINDER:
             area->type = AREA_TYPE_EYE;
             AreaGetCenterPos(&center, area);
-            AreaDataInit(area, &center, area->type, 4000.0f, 4000.0f);
+            AreaDataInit(area, &center, 4000.0f, 4000.0f, area->type);
             break;
         case AREA_TYPE_EYE:
             area->type = AREA_TYPE_XZ4;
             AreaGetCenterPos(&center, area);
-            AreaDataInit(area, &center, area->type, 4000.0f, 4000.0f);
+            AreaDataInit(area, &center, 4000.0f, 4000.0f, area->type);
             break;
         default:
             pLog->warn(0, 0, AREA_TYPE_ERR, area->type);
@@ -366,7 +366,7 @@ void AreaDataEdit(AREA_HIT_DATA* area, u32 col, int flg, Mtx pMat, f32 move_scal
         default: {
             pLog->warn(0, 0, AREA_TYPE_ERR, area->type);
             Vec zero = {0.0f, 0.0f, 0.0f};
-            AreaDataInit(area, &zero, AREA_TYPE_XZ4, 2000.0f, 1000.0f);
+            AreaDataInit(area, &zero, 2000.0f, 1000.0f, AREA_TYPE_XZ4);
             break;
         }
         }
@@ -720,7 +720,7 @@ void AreaDataDisp(AREA_HIT_DATA* pAre, u32 col, int flg, Mtx pMat)
     default: {
         pLog->warn(0, 0, AREA_TYPE_ERR, pAre->type);
         Vec zero = {0.0f, 0.0f, 0.0f};
-        AreaDataInit(pAre, &zero, AREA_TYPE_XZ4, 2000.0f, 1000.0f);
+        AreaDataInit(pAre, &zero, 2000.0f, 1000.0f, AREA_TYPE_XZ4);
         break;
     }
     }

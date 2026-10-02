@@ -68,7 +68,7 @@ static const AtEffInfo r101_eff_info = {
 };
 
 static void r101_checkTowerBesieged();
-extern "C" void r101_setFlameBottle(Vec* from, Vec* to);
+void r101_setFlameBottle(Vec* from, Vec* to);
 static void r101_checkEmNum();
 static void r101_Event30_TitleCall();
 static void r101_Event30();
@@ -86,12 +86,12 @@ static void r101_checkDoor102();
 static void r101_DoorDontOpen3();
 static void r101_checkFindPlayer(int mode);
 static void r101_FindPlayer2();
-extern "C" void r101_FindPlayer();
+void r101_FindPlayer();
 static void r101_setChickenFlag();
 static void r101_Event00();
 static void r101_callGanadoVoice();
-extern "C" void Evt_R101S21_Func(Event* e);
-extern "C" void Evt_R101S30_Func(Event* e);
+void Evt_R101S21_Func(Event* e, u32);
+void Evt_R101S30_Func(Event* e, u32);
 
 
 // Clear the death bit of list entry `no` in the loaded enemy list's death words (pG->Em_flg[list]).
@@ -237,7 +237,7 @@ void R101Init()
                 pG->Em_list[0x49].be_flag |= 1;
                 pG->Em_list[0x4A].be_flag |= 1;
             }
-            SceExec(0x12, (TaskFunc) r101_checkFindPlayer, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r101_checkFindPlayer, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         }
     }
     if (!KyfFlagChk(pG, KYF_R105_TO_R101_DOOR)) {
@@ -287,10 +287,9 @@ static void r101_checkTowerBesieged()
 }
 
 // A flame bottle (obj 0x01) thrown from `from` to a random point of area 0x15 around `to`.
-extern "C" void r101_setFlameBottle(Vec* from, Vec* to)
+void r101_setFlameBottle(Vec* from, Vec* to)
 {
     const f32 spd = 20.0f;
-    void* zero = 0;
     Vec dir;
     cObj* obj;
 
@@ -298,8 +297,8 @@ extern "C" void r101_setFlameBottle(Vec* from, Vec* to)
     CalcParabolaVector(&dir, from, to, 2000.0f);
     Vec zeroVec = {0.0f, 0.0f, 0.0f};
     obj = SetObj01(ROOM_ARC_PTR(pG->pRoom, 0x25), ROOM_ARC_PTR(pG->pRoom, 0x26), from, &zeroVec, &dir, spd, 50.0f, 0xD2, 5);
-    Obj01SetEst(obj, 1, 0x12, 2, 1, 0x11, 0, 0x14, (int) zero, (int) zero);
-    EstSet(obj, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, obj, zero);
+    Obj01SetEst(obj, 1, 0x12, 2, 1, 0x11, 0, 0x14, 0, 0);
+    EstSet(obj, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, obj, 0);
 }
 
 // Starts the bell event (s30): the fight is over.
@@ -415,7 +414,7 @@ static void r101_Event30_TitleCall()
     } while (1);
     IdSys.dispSw(IDC_LIFE_METER, 0);
     IdTexDataLoad(tex->getAddr(), TEX_OWNER_ID_EVENT);
-    IdSys.set(id->getAddr(), 0xFF, IDC_EVENT, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) id->getAddr(), 0xFF, IDC_EVENT, 0x13, 6, 0);
     while (1) {
         if (pG->Room_flg[0] & 0x20000000) {
             goto end;
@@ -435,7 +434,7 @@ static void r101_Event30()
 {
     int fail = 0;
     u32 unused[2];   // an 8-byte aggregate slot precedes `win`/`ladder` in the original's frame (0x30)
-    ReadModule* m;
+    MODULE_DAT* m;
     cEmWindow* win;
     cObjLadder* ladder;
 
@@ -466,7 +465,7 @@ static void r101_Event30()
     SceSleep(2);
     m = SearchEmModule(0x15);
     if (fail != 1) {
-        if (r101_work->evt30->getSize() > m->size) {
+        if (r101_work->evt30->getSize() > m->DataSize) {
             // COMPILER-DIFF: frame layout -- codeless use that keeps the 8-byte slot allocated
             // (an unreferenced aggregate gets no slot; the original's use is not in the bytes).
             asm("" : "=m"(unused));
@@ -600,7 +599,7 @@ static void r101_Event20()
     Vec ang;
     int diff;
     int fail = 0;
-    ReadModule* m;
+    MODULE_DAT* m;
     cEmRack* rack;
     cEm* r;
     cEmWindow* win;
@@ -633,11 +632,11 @@ static void r101_Event20()
     SceSleep(2);
     m = SearchEmModule(0x15);
     if (fail != 1) {
-        if (r101_work->evt21->getSize() > m->size) {
+        if (r101_work->evt21->getSize() > m->DataSize) {
             pLog->err(0, 0, "r101_Event20 exec error");
         } else {
-            MemorySwap(m->pArc, (u32) r101_work->evt21->getAddr(), r101_work->evt21->getSize());
-            EvtMgr.SetEvt(m->pArc, 0);
+            MemorySwap(m->pData, r101_work->evt21->getAddr(), r101_work->evt21->getSize());
+            EvtMgr.SetEvt(m->pData, 0);
             SceSleep(3);
             for (;;) {
                 EventMgr* em = &EvtMgr;
@@ -655,7 +654,7 @@ static void r101_Event20()
                 SceSleep(1);
             }
             SysFlagOff(pG, SYS_SCREEN_STOP);
-            MemorySwap(m->pArc, (u32) r101_work->evt21->getAddr(), r101_work->evt21->getSize());
+            MemorySwap(m->pData, r101_work->evt21->getAddr(), r101_work->evt21->getSize());
         }
     }
     r101_work->evt21->setCommand(CMND_DEL_DATA, 0, 0);
@@ -817,7 +816,7 @@ static void r101_checkEmReset()
         r101_work->pEm[9]->setNoSuspend(1);
         CamCtrl.CutCall(4);
     }
-    SceSetEventCancel(1, (TaskFunc) r101_checkEmReset_end, side, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) r101_checkEmReset_end, (void*) side, -1, 1);
     while (CamCtrl.IsMotionEnd() == 0) {
         SceSleep(1);
     }
@@ -898,7 +897,7 @@ static void r101_FindPlayer2()
 }
 
 // The fight starts: the doors lock, the three Ganados of the square, the battle stream.
-extern "C" void r101_FindPlayer()
+void r101_FindPlayer()
 {
     RsfSet(G_ROOM_ID, 6);
     ScfFlagOn(pG, SCF_R101_IMPRISON);
@@ -957,17 +956,17 @@ static void r101_Event00()
         SceEventStart(0);
         r101_setEmSuspend(1);
         if (r101_work->evt00->waitLoadOk() == 1) {
-            ReadModule* m;
+            MODULE_DAT* m;
 
             SysFlagOn(pG, SYS_SCREEN_STOP);
             SceSleep(2);
             m = SearchEmModule(0x26);
-            MemorySwap(m->pArc, (u32) r101_work->evt00->getAddr(), r101_work->evt00->getSize());
-            EvtMgr.SetEvt(m->pArc, 0);
+            MemorySwap(m->pData, r101_work->evt00->getAddr(), r101_work->evt00->getSize());
+            EvtMgr.SetEvt(m->pData, 0);
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
                 SceSleep(1);
             }
-            MemorySwap(m->pArc, (u32) r101_work->evt00->getAddr(), r101_work->evt00->getSize());
+            MemorySwap(m->pData, r101_work->evt00->getAddr(), r101_work->evt00->getSize());
         }
         r101_work->evt00->setCommand(CMND_DEL_DATA, 0, 0);
         r101_setEmSuspend(0);
@@ -1048,7 +1047,7 @@ static void r101_callGanadoVoice()
 }
 
 // Event r101s21 callback: fetch the etc model et0800 on the first frame (registers it with the event).
-extern "C" void Evt_R101S21_Func(Event* e)
+void Evt_R101S21_Func(Event* e, u32)
 {
     void* mod;
 
@@ -1059,12 +1058,12 @@ extern "C" void Evt_R101S21_Func(Event* e)
 
 // Event r101s30 callback (the church bell rings, the Ganados leave): hides the ladders during the event,
 // hands scroll object 0x39 (scr0000) to the event on cut 0 and puts it back at the end.
-extern "C" void Evt_R101S30_Func(Event* e)
+void Evt_R101S30_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -1084,8 +1083,8 @@ extern "C" void Evt_R101S30_Func(Event* e)
     case 2:
         w = SmdGetWorkPtr(0x39);
         if ((obj = SmdGetObjPtr(0x39)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         LadderEventTrans(1);
         break;

@@ -19,7 +19,7 @@ int Snd_se_set_paras(u32 snd_id)
 // Queues the type 4 / cmd 1 (set parameters) request with the control work copied in.
 int se_set_paras_sub(u32 snd_id)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
 
     req = Snd_open_req_work();
     if (req == NULL) {
@@ -36,8 +36,8 @@ int se_set_paras_sub(u32 snd_id)
 // -1 while the SE is still queued, 1 while a voice plays it, 0 when it is gone.
 int Snd_se_end_check(u32 snd_id)
 {
-    SND_REQ_WORK* req;
-    SND_VOICE_WORK* voice;
+    SND_REQ* req;
+    SND_VOICE* voice;
     int old;
 
     old = OSDisableInterrupts();
@@ -70,7 +70,7 @@ int Snd_se_stop_one(u32 snd_id)
 // Queues a type 4 command request (0 stop, 1 set parameters) for a sound id.
 int se_cmd_req_work(u16 cmd, u32 snd_id, u16 para)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
 
     req = Snd_open_req_work();
     if (req == NULL) {
@@ -113,46 +113,46 @@ int Snd_se_fade_out_all2(s16 time)
 // block type, 0x20 volume down to `para`, 0x40 volume back. Refused (1) during a reset.
 int se_ctrl_sub(u16 cmd, s16 para)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
     if (ctrl->reset_flag & 0x10) {
         return 1;
     }
     switch (cmd) {
     case 0x200:
-        ctrl->se_ctrl |= 0x200;
-        ctrl->se_fade_time = para;
+        ctrl->se_ctrl_flag |= 0x200;
+        ctrl->se_fout_time = para;
         break;
     case 0x400:
-        ctrl->se_ctrl |= 0x400;
-        ctrl->se_fade_time = para;
+        ctrl->se_ctrl_flag |= 0x400;
+        ctrl->se_fout_time = para;
         break;
     case 0x1:
-        ctrl->se_ctrl |= 0x1;
-        ctrl->se_state |= 0x1;
+        ctrl->se_ctrl_flag |= 0x1;
+        ctrl->status_flag |= 0x1;
         break;
     case 0x2:
-        ctrl->se_ctrl |= 0x2;
-        ctrl->se_pause_type = para;
+        ctrl->se_ctrl_flag |= 0x2;
+        ctrl->pause_blk = para;
         break;
     case 0x4:
-        ctrl->se_ctrl |= 0x4;
-        ctrl->se_pause_type = para;
+        ctrl->se_ctrl_flag |= 0x4;
+        ctrl->pause_blk = para;
         break;
     case 0x8:
-        ctrl->se_ctrl |= 0x8;
+        ctrl->se_ctrl_flag |= 0x8;
         break;
     case 0x10:
-        ctrl->se_ctrl |= 0x10;
-        ctrl->se_pause_type = para;
+        ctrl->se_ctrl_flag |= 0x10;
+        ctrl->pause_blk = para;
         break;
     case 0x20:
-        ctrl->se_ctrl |= 0x20;
-        ctrl->se_state |= 0x2;
-        ctrl->se_vdown_vol = para;
+        ctrl->se_ctrl_flag |= 0x20;
+        ctrl->status_flag |= 0x2;
+        ctrl->vdown_value = para;
         break;
     case 0x40:
-        ctrl->se_ctrl |= 0x40;
+        ctrl->se_ctrl_flag |= 0x40;
         break;
     }
     return 0;
@@ -161,15 +161,15 @@ int se_ctrl_sub(u16 cmd, s16 para)
 // Non-zero while any SE is queued (0x10) or any AX voice is sounding (1).
 int Snd_se_pronounce_ck_all(void)
 {
-    SND_CTRL_WORK* ctrl;
+    SND_CTRL* ctrl;
     int old;
     int ret;
 
     old = OSDisableInterrupts();
     ctrl = &Snd_ctrl_work;
     ret = 0;
-    ret |= se_pro_ck_req_work(ctrl->req_bank);
-    ret |= se_pro_ck_req_work(ctrl->req_bank_sub);
+    ret |= se_pro_ck_req_work(ctrl->req_push_idx);
+    ret |= se_pro_ck_req_work(ctrl->req_exec_idx);
     OSRestoreInterrupts(old);
     old = OSDisableInterrupts();
     ret |= se_pro_ck_axv_work();
@@ -180,7 +180,7 @@ int Snd_se_pronounce_ck_all(void)
 // 0x10 when the request bank holds a pending SE play (type 2 with a SE SIT).
 int se_pro_ck_req_work(int bank)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
     int i;
 
     for (i = 0; i < SND_REQ_MAX; i++) {
@@ -204,12 +204,12 @@ int se_pro_ck_req_work(int bank)
 // 1 when any AX voice is in use.
 int se_pro_ck_axv_work(void)
 {
-    SND_AXV_WORK* axv;
+    SND_AXV* axv;
     int i;
 
     for (i = 0; i < SND_AXV_MAX; i++) {
         axv = &Snd_axv_work[i];
-        if (axv->status != 0) {
+        if (axv->be_flag != 0) {
             return 1;
         }
     }

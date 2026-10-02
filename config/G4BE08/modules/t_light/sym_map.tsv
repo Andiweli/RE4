@@ -70,7 +70,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00009B34	0x48C	t_light/db_light.cpp	local	edit_ambient__Fv	edit_ambient
 .text	0x00009FC0	0x64	t_light/db_light.cpp	local	edit_fog__Fv	edit_fog
 .text	0x0000A024	0x64	t_light/db_light.cpp	local	edit_mirror_fog__Fv	edit_mirror_fog
-.text	0x0000A088	0x424	t_light/db_light.cpp	global	edit_fog_common__FP8LightFog	edit_fog_common
+.text	0x0000A088	0x424	t_light/db_light.cpp	global	edit_fog_common__FP3FOG	edit_fog_common
 .text	0x0000A4AC	0x2FC	t_light/db_light.cpp	local	edit_focus__Fv	edit_focus
 .text	0x0000A7A8	0x2F8	t_light/db_light.cpp	global	draw_tone_curve__Fv	draw_tone_curve
 .text	0x0000AAA0	0x6C4	t_light/db_light.cpp	local	edit_blur__Fv	edit_blur

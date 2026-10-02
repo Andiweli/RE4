@@ -25,7 +25,6 @@
 #include "rnd.h"
 #include "em_sub.h"
 
-extern "C" {
 
 int actWallCheck(cPlayer* pl);
 int fanceCheck(cPlayer* pl);
@@ -43,7 +42,6 @@ void holdOn();
 int jumpCheck(cPlayer* pl);
 void jumpFallOn();
 u32 upDownCk(cPlayer* pl);
-}
 
 // cPlNeck's checks compile to the folded `addis 0x8000; cmplwi 0x02FFFFFF` range form.
 #define VALID_PTR2(p) ((u32) (p) - 0x80000000 <= 0x02FFFFFF)
@@ -370,7 +368,7 @@ void fanceOn()
 // Action button: go through the window (its event as a scenario task).
 void windowOn(cEmWindow* pEmWindow)
 {
-    SceExec(0x12, (TaskFunc) cEmWindow::ExeWindowEvent, (int) pEmWindow, 2, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) cEmWindow::ExeWindowEvent, pEmWindow, 2, SCE_PRIO_DEF_2, 0);
     PlFanceFlag = 1;
 }
 
@@ -515,9 +513,9 @@ void jumpFallOn()
 void cPlayer::motionSet(void* m0, void* seq0, void* m1, void* seq1, int hokan, int frame)
 {
     if (dmMotCk()) {
-        MotionSetCore(this, MOTION(this), m0, seq0, hokan, 5, frame);
+        MotionSetCore(this, &this->Motion, m0, seq0, hokan, 5, frame);
     } else {
-        MotionSetCore(this, MOTION(this), m1, seq1, hokan, 5, frame);
+        MotionSetCore(this, &this->Motion, m1, seq1, hokan, 5, frame);
     }
 }
 
@@ -563,7 +561,7 @@ int cPlayer::actionSelect()
 
             StaFlagOn(pG, STA_SSCRN_ENABLE);
             if (joyKamae()) {
-                setRno(zero, 6, zero, zero);
+                setRno(0, 6, 0, zero);
                 return 1;
             }
     if (joyLKamae()) {
@@ -661,21 +659,21 @@ void cPlayer::dmgCheck()
     switch (DmgMgr.hitCheck(&getPartsPtr(0)->world, 0)) {
     case DMG_TYPE_GRENADE_BLAST:
     case DMG_TYPE_GRENADE:
-        setDamage(0, 0, 123.0f, 0, 8);
+        setDamage(0, 0, 0, 8, 123.0f);
         break;
     case DMG_TYPE_FIRE:
     case DMG_TYPE_LAMP:
-        setDamage(0, 3, 123.0f, 0, 0x19);
+        setDamage(0, 3, 0, 0x19, 123.0f);
         break;
     case DMG_TYPE_FLAME:
-        setDamage(0, 10, 123.0f, 0, 0x18);
+        setDamage(0, 10, 0, 0x18, 123.0f);
         break;
     }
 }
 
 // Damage entry: life down, and once the accumulated count passes 0xFE a damage routine (0/kind,
 // kind 7-8: routine 1/1, kind 9: routine 1/2) facing `ang` (123.0 = keep the direction).
-void cPlayer::setDamage(u8 kind, int arg, f32 ang, int a, int b)
+void cPlayer::setDamage(u8 kind, int arg, int a, int b, f32 ang)
 {
     beginDamage();
     LifeDownSet2(this, arg, 0, 1);
@@ -807,7 +805,7 @@ void cPlayer::setFootwork()
         hokan = 5;
     }
     motionSet(m_MotTbl[0], m_MotTbl[1], PL_ARC_PTR(pG->pPlayer, 0x32), PL_ARC_PTR(pG->pPlayer, 0x33), hokan, frame);
-    Motion.blend = 0;
+    pMotionB = 0;
 }
 
 // Motion sequence sound (seNo, set by the motion key): foot sounds by parts / kind, sand splash.
@@ -1099,7 +1097,7 @@ void cPlayer::interrupt()
     stat.on(F_SHADOW);
     m_BbtnCnt = 0;
     Neck->m_Mode = 1;
-    MOTION(this)->Seq_speed = 1.0f;
+    this->Motion.Seq_speed = 1.0f;
     stat.off(F_CROUCH);
     ang.y += pList->ang.y;
     pList->ang.y = 0.0f;
@@ -1261,9 +1259,9 @@ void cPlayer::setSlow(f32 speed)
     if (pG->pl_type != 0) {
         return;
     }
-    MOTION(this)->Seq_speed = speed;
+    this->Motion.Seq_speed = speed;
     if (Wep->m_pWep) {
-        MOTION(Wep->m_pWep)->Seq_speed = speed;
+        Wep->m_pWep->Motion.Seq_speed = speed;
     }
 }
 
@@ -1435,7 +1433,7 @@ void cPlayer::shadowCtrl()
 {
     int on;
 
-    if (!(stat.check(F_SHADOW)) || pG->Camera.param.pos.y < pos.y || !pFloor_norm || pFloor_norm->y < 0.8f) {
+    if (!(stat.check(F_SHADOW)) || pG->Camera.param.Campos.y < pos.y || !pFloor_norm || pFloor_norm->y < 0.8f) {
         on = 0;
     } else {
         on = 1;
@@ -1594,12 +1592,12 @@ void cPlNeck::move()
             }
         }
     }
-    if (pPL->Motion.blend) {
+    if (pPL->pMotionB) {
         f32 rate = m_NeckY / 0.7853981852531433f;
         if (!(m_Flag & 1)) {
             rate = -rate;
         }
-        pPL->Motion.blend->Brate = rate;
+        pPL->pMotionB->Brate = rate;
     }
 }
 
@@ -1615,9 +1613,9 @@ void cPlNeck::motSet(void* data, int frame)
     p->m_SubMot.Mot_flag |= 0x10000000;
     MotionSetCore(p, &p->m_SubMot, data, 0, 8, 5, frame);
     p->m_SubMot.Mot_flag &= ~0x10000000;
-    p->Motion.blend = &p->m_SubMot;
-    p->Motion.blend->Brate = 1.0f;
-    p->Motion.blend->Mot_flag |= 0x80000000;
+    p->pMotionB = &p->m_SubMot;
+    p->pMotionB->Brate = 1.0f;
+    p->pMotionB->Mot_flag |= 0x80000000;
 }
 
 // Nearest alive enemy (not in battle) within 5000 of parts 3, seen from there; enemies with status
@@ -1705,9 +1703,9 @@ void cMot3::set(cModel* m, void* m0, void* m1, void* m2, void* seq, u8 b, int c,
     mot1 = m1;
     mot2 = m2;
     m_Mode = c;
-    MotionSetCore(m, MOTION(m), m0, seq, mode, d, e);
+    MotionSetCore(m, &m->Motion, m0, seq, mode, d, e);
     set0(m1, e, mode);
-    ((cEm*) m)->Motion.blend->Brate = 0.0f;
+    ((cEm*) m)->pMotionB->Brate = 0.0f;
 }
 
 // Blend motion `m` (frame a, hokan b) into the model's motion.
@@ -1721,7 +1719,7 @@ void cMot3::set0(void* m, u8 a, int b)
         work.Mot_flag |= 0x80000000;
         break;
     }
-    ((cEm*) m_pEm)->Motion.blend = &work;
+    ((cEm*) m_pEm)->pMotionB = &work;
 }
 
 // Blend rate -1..1: crossing 0 switches the blended motion (mot1 below, mot2 above) at the current
@@ -1731,7 +1729,7 @@ void cMot3::move(f32 r0)
     if (m_pEm == 0) {
         return;
     }
-    if (((cEm*) m_pEm)->Motion.blend == 0) {
+    if (((cEm*) m_pEm)->pMotionB == 0) {
         return;
     }
     if (r0 > 1.0f) {
@@ -1749,7 +1747,7 @@ void cMot3::move(f32 r0)
     if (r0 < 0.0f) {
         r0 = -r0;
     }
-    ((cEm*) m_pEm)->Motion.blend->Brate = r0;
+    ((cEm*) m_pEm)->pMotionB->Brate = r0;
 }
 
 const f32 cPlayer::SPEED_WALK_TURN = 0.0418879f;

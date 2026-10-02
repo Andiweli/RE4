@@ -200,7 +200,7 @@ private:
     void damageCheck();
     // scenario damage area hit (sce_at sceAtFunc_damage)
 public:
-    void setDamage(u8 kind, int arg, f32 power, int a, int b);
+    void setDamage(u8 kind, int arg, int a, int b, f32 power);
     void registPlAction(Vec* pos, f32 y, u8 a);
 private:
     void moveBust();
@@ -223,10 +223,8 @@ public:
 
 u32 SubCharGetStatus();  // game/pl_npc.cpp: routine bits for the camera / scenario (C++ linkage)
 
-extern "C" {
 // game/pl_npc.cpp: partner condition bits for the HUD (cockpit: 1, 2, 8, 0x10, 0x24)
 u32 SubCharGetCondition();
 int SubCharHideCheck();
-}
 
 #endif

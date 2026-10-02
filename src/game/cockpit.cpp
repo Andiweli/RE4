@@ -30,7 +30,7 @@ void Cockpit::roomInit()
     IdSys.roomInit();
     IdTexRoomInit();
     IdTexDataLoad(ARC_PTR(ofs_74), TEX_OWNER_ID_COCKPIT);
-    IdSys.set(ARC_PTR(ofs_88), 0xFF, IDC_CINESCO, 0x13, 0, 0);
+    IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_88), 0xFF, IDC_CINESCO, 0x13, 0, 0);
     IdSys.kill(0xFF, IDC_MSG_WINDOW);
     m_ActBttn.roomInit();
     m_LifeMeter.roomInit();
@@ -61,7 +61,7 @@ void Cockpit::msgWindow(int sw)
     switch (sw) {
     case 1:
         if (!IdSys.setCk(IDC_MSG_WINDOW)) {
-            IdSys.set(ARC_PTR(ofs_94), 0xFF, IDC_MSG_WINDOW, 0x13, 0, 0);
+            IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_94), 0xFF, IDC_MSG_WINDOW, 0x13, 0, 0);
         }
         break;
     case 0:
@@ -110,7 +110,7 @@ void LifeMeter::roomInit()
 {
     ID_UNIT* u;
 
-    IdSys.set(ARC_PTR(ofs_7C), 0xFF, IDC_LIFE_METER, 0x13, 5, 0);
+    IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_7C), 0xFF, IDC_LIFE_METER, 0x13, 5, 0);
     IdSys.unitPtr(0x40, IDC_LIFE_METER)->be_flag &= ~8;
     IdSys.unitPtr(0x41, IDC_LIFE_METER)->be_flag &= ~8;
     IdSys.unitPtr(0x42, IDC_LIFE_METER)->be_flag &= ~8;
@@ -404,8 +404,8 @@ void LifeMeter::fix(int flag)
         u->rev_flag |= 0xF;
         IdSys.setTime(u, 0);
     } else {
-        Hermite1* h = u->curve[0];
-        u8 t = (u8) h->key[h->num - 1].t;
+        HERMITE_1_PTR* h = u->curve[0];
+        u8 t = (u8) h->Point[h->nPoint - 1].T;
 
         u->rev_flag &= ~0xF;
         IdSys.setTime(u, t);
@@ -453,8 +453,8 @@ void LifeMeter::frameIn()
 
 void ActionButton::roomInit()
 {
-    IdSys.set(ARC_PTR(ofs_80), 1, IDC_ACT_BUTTON, 0x13, 5, 0);
-    IdSys.set(ARC_PTR(ofs_80), 0xF0, IDC_ACT_BUTTON, 0x13, 5, 0);
+    IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_80), 1, IDC_ACT_BUTTON, 0x13, 5, 0);
+    IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_80), 0xF0, IDC_ACT_BUTTON, 0x13, 5, 0);
     m_disp_flag_old = 0;
     m_disp_flag = 0;
 }
@@ -514,10 +514,10 @@ void ActionButton::move()
             break;
         }
         IdSys.kill(0xFF, IDC_ACT_BUTTON);
-        IdSys.set(ARC_PTR(ofs_80), 1, IDC_ACT_BUTTON, 0x13, 5, 0);
-        IdSys.set(ARC_PTR(ofs_80), 0xF0, IDC_ACT_BUTTON, 0x13, 5, 0);
+        IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_80), 1, IDC_ACT_BUTTON, 0x13, 5, 0);
+        IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_80), 0xF0, IDC_ACT_BUTTON, 0x13, 5, 0);
         if (m_disp_flag != 0) {
-            IdSys.set(ARC_PTR(ofs_80), id, IDC_ACT_BUTTON, 0x13, 5, 0);
+            IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_80), id, IDC_ACT_BUTTON, 0x13, 5, 0);
         }
     }
     m_disp_flag_old = m_disp_flag;
@@ -582,7 +582,7 @@ void BulletInfo::move()
             IdSys.kill(0xFF, IDC_BLLT_ICON);
         } else {
             IdSys.kill(0xFF, IDC_BLLT_ICON);
-            IdSys.set(ARC_PTR(ofs_98), mark, IDC_BLLT_ICON, 0x13, 5, 0);
+            IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_98), mark, IDC_BLLT_ICON, 0x13, 5, 0);
             ID_UNIT* p = IdSys.unitPtr(mark, IDC_BLLT_ICON);
             IdSys.unitParent(IdSys.unitPtr(0x30, IDC_LIFE_METER), p);
         }
@@ -708,7 +708,7 @@ u8 dispBulletIconMarkNo(u8 weapon_no)
 
 void CountDown::roomInit()
 {
-    IdSys.set(ARC_PTR(ofs_84), 0xFF, IDC_COUNT_DOWN, 0x13, 5, 0);
+    IdSys.set((ID_FILE_HEADER*) ARC_PTR(ofs_84), 0xFF, IDC_COUNT_DOWN, 0x13, 5, 0);
     IdSys.unitPtr(0x10, IDC_COUNT_DOWN)->be_flag &= ~8;
     IdSys.unitPtr(0x10, IDC_COUNT_DOWN)->rev_flag &= ~0xF;
     m_state &= ~TIMER_STA_ALIVE;

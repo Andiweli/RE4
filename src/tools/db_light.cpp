@@ -84,6 +84,9 @@ public:
     int createPath(cLightPathHeader* dst);
 };
 
+// Which light set the tool is editing.
+enum eDataType { DT_WORK, DT_CUT, DT_ROOM, DT_CORE, DT_TOOL };
+
 class cLightTool {
 public:
     u32 Flag;             // 0x00  bit0: object move, bit2: analyze, bit3: cut select follows the camera,
@@ -108,7 +111,7 @@ public:
     u8 EditCutNo;          // 0x15  cut the game camera selects
     u8 CutNum;            // 0x16
     u8 pad_17;
-    int DataType;              // 0x18  0 room local, 1 room server, 2 event, 3 core, 4 tool, 5 item
+    eDataType DataType;        // 0x18
     u8 be_flag;                // 0x1C  move() result: 1 = running, 2 = player mode, 0 = quit
     u8 Mode;              // 0x1D  0 init, 1 camera mode, 2 player mode, 10 mode select
     u8 PageNo;              // 0x1E  debug print page (pG->debug_mode) the eprintf calls draw on (PS2 PageNo; was `color`)
@@ -355,7 +358,7 @@ cLightTool::cLightTool() : modeSel(0, 2, 0)
     pTool = this;
     be_flag = 1;
     table_height = 7;
-    DataType = 1;
+    DataType = DT_CUT;
     rno0 = rno1 = rno2 = rno3 = rno4 = rno5 = rno6 = rno7 = sno0 = sno1 = sno2 = sno3 = pno0 = pno1 = pno2 = pno3 = 0;
     cursor = 0;
     cursorCtr = 0;
@@ -403,17 +406,17 @@ int cLightTool::move()
 
     eprintf(0x18, 0xE, 0, PageNo, "LIGHT TOOL");
     switch (DataType) {
-    case 0:
-    case 1:
+    case DT_WORK:
+    case DT_CUT:
         eprintf(0x1B0, 0xE, 0, PageNo, "CUT%02d/%02d", cutNo, CutNum);
         break;
-    case 4:
+    case DT_TOOL:
         eprintf(0x1B8, 0xE, 0, PageNo, "TOOL %02d", cutNo);
         break;
-    case 2:
+    case DT_ROOM:
         eprintf(0x1A8, 0xE, 0, PageNo, "ROOM%02d/%02d", cutNo, CutNum);
         break;
-    case 3:
+    case DT_CORE:
         eprintf(0x1B8, 0xE, 0, PageNo, "CORE %02d", cutNo);
         break;
     }
@@ -536,13 +539,13 @@ u32 cLightTool::dblCk(u32 bit)
 // (edit any cut), else only while the game camera is in the edited cut.
 int cLightTool::editEnable()
 {
-    if (DataType == 3) {
+    if (DataType == DT_CORE) {
         return 1;
     }
-    if (DataType == 2) {
+    if (DataType == DT_ROOM) {
         return 1;
     }
-    if (DataType == 4) {
+    if (DataType == DT_TOOL) {
         return 1;
     }
     if (dblCk(8)) {
@@ -1159,16 +1162,16 @@ static void edit_light_select_sub()
             case 0:
                 if (pTool->LitTmp.be_flag & 1) {
                     lightInsertWork(pTool->table_y + pTool->cy);
-                    LightMgr.cManager<cLight>::create(pTool->LitTmp.Type, pTool->table_y + pTool->cy);
+                    LightMgr.cManager<cLight>::create(pTool->LitTmp.Id, pTool->table_y + pTool->cy);
                     lightCopyWork(cur, &pTool->LitTmp);
                 }
                 break;
             case 1:
-                cur->Type = pTool->LitTmp.Type;
+                cur->Id = pTool->LitTmp.Id;
                 cur->sub = pTool->LitTmp.sub;
                 break;
             case 2:
-                cur->xF = pTool->LitTmp.xF;
+                cur->EnableMask = pTool->LitTmp.EnableMask;
                 break;
             case 3:
                 cur->ParentType = pTool->LitTmp.ParentType;
@@ -1186,7 +1189,7 @@ static void edit_light_select_sub()
                 cur->Intensity = pTool->LitTmp.Intensity;
                 break;
             case 8:
-                cur->xD = pTool->LitTmp.xD;
+                cur->Type = pTool->LitTmp.Type;
                 cur->spot = pTool->LitTmp.spot;
                 break;
             }
@@ -1224,10 +1227,10 @@ static void edit_light_select_sub()
 void lightCopyWork(cLight* dst, cLight* src)
 {
     dst->be_flag = src->be_flag;
-    dst->xC = src->xC;
-    dst->xD = src->xD;
+    dst->enable = src->enable;
     dst->Type = src->Type;
-    dst->xF = src->xF;
+    dst->Id = src->Id;
+    dst->EnableMask = src->EnableMask;
     dst->Pos = src->Pos;
     dst->Radius = src->Radius;
     dst->Col = src->Col;
@@ -1263,7 +1266,7 @@ void lightCutWork(int no)
         n = LightMgr.at(i + 1);
         if (n && n->isAlive()) {
             cLightMgr* m = &LightMgr;
-            m->cManager<cLight>::create(n->Type, i);
+            m->cManager<cLight>::create(n->Id, i);
             lightCopyWork(p, n);
             LightMgr.destroy(n);
         }
@@ -1284,7 +1287,7 @@ void lightInsertWork(int no)
         n = LightMgr.at(i);
         if (n && n->isAlive()) {
             cLightMgr* m = &LightMgr;
-            m->cManager<cLight>::create(n->Type, i + 1);
+            m->cManager<cLight>::create(n->Id, i + 1);
             lightCopyWork(p, n);
             LightMgr.destroy(n);
         }
@@ -1306,50 +1309,9 @@ static void edit_light_no()
     pTool->rno2 = 0;
 }
 
-// Per-type work areas at cLight+0x78 (light01.cpp .. light08.cpp keep their own copies).
-struct Light01Work {
-    u8 pad_0[4];
-    s8 range;  // 0x04
-};
-struct Light02Work {
-    f32 base;  // 0x00
-    f32 amp;   // 0x04
-    f32 freq;  // 0x08
-};
-struct Light03Work {
-    f32 rot[3];  // 0x00
-};
-struct Light04Work {
-    u16 flags;      // 0x00  bit0: inverse texture, bit1: light position set, bit2: use texture
-    u8 kind;        // 0x02  0 normal, 1..4 cast, 5 foot
-    s8 gndDist;     // 0x03
-    s16 rotX;       // 0x04  (parallel / fix)
-    s16 rotY;       // 0x06
-    u8 texNo;       // 0x08  (fix: range)
-    u8 selfShd;     // 0x09
-    u8 softShd;     // 0x0A
-    u8 multiShd;    // 0x0B
-    Vec lightPos;   // 0x0C  (fit)
-    u8 range;       // 0x18
-};
-struct Light05Work {
-    cLightPathData* pStart;  // 0x00
-    cLightPathData* pCur;    // 0x04
-    u8 flag;                 // 0x08  bit0 loop, bit1 inverse
-    u8 pad_9[3];
-    u8 pathNo;               // 0x0C
-    u8 pathIdx;              // 0x0D
-};
-struct Light06Work {
-    f32 start;  // 0x00
-    f32 speed;  // 0x04
-    f32 rate;   // 0x08
-};
-struct Light07Work {
-    u8 pad_0[8];
-    f32 x8;        // 0x08  (the third editor line writes here: a bug in the original)
-    f32 speed[3];  // 0x0C
-};
+// Per-type work areas at cLight+0x78 (light03.cpp/light07.cpp keep no copy of their own;
+// LIT01/02/04/05/06/08_MOVE_FREE are shared with light01.cpp .. light08.cpp/shadow.cpp/
+// foot_shadow.cpp via light.h).
 
 // Stick step of the numeric editors: A held multiplies it by 10.
 #define STICK_STEP(scale) ((f32) pTool->Pad1.stickX * step / (scale))
@@ -1369,18 +1331,18 @@ static void edit_light_id()
     int first;
 
     if (pTool->rno6 == 0) {
-        pTool->rno7 = cur->Type;
+        pTool->rno7 = cur->Id;
         pTool->rno6 = 1;
         first = 1;
     } else {
         first = 0;
     }
     eprintf(0x40, 0x8C, 4, pTool->PageNo, "LIGHT PROPATY");
-    eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Type, light_id_name[cur->Type]);
-    if (cur->Type != pTool->rno7) {
+    eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Id, light_id_name[cur->Id]);
+    if (cur->Id != pTool->rno7) {
         eprintf(0xC0, 0x9A, 6, pTool->PageNo, "-> %d %s", pTool->rno7, light_id_name[pTool->rno7]);
     }
-    light_id_tbl[cur->Type]();
+    light_id_tbl[cur->Id]();
     if (pTool->Pad1.rep & JOY_B) {
         pTool->rno2 = 0;
         pLog->modeSet(0x18, 0x8C, 0x1E, 10);
@@ -1397,8 +1359,8 @@ static void edit_light_id_normal()
     } else if (pTool->Pad1.rep & JOY_LEFT) {
         pTool->rno7 = (pTool->rno7 + 9) % 10;
     } else if (pTool->Pad1.rep & JOY_A) {
-        if (pTool->rno7 != cur->Type) {
-            cur->Type = pTool->rno7;
+        if (pTool->rno7 != cur->Id) {
+            cur->Id = pTool->rno7;
             clear_move_free();
         }
     }
@@ -1408,7 +1370,7 @@ static void edit_light_id_normal()
 static void edit_light_id_flick()
 {
     cLight* cur = curLight();
-    Light01Work* w = (Light01Work*) cur->work;
+    LIT01_MOVE_FREE* w = (LIT01_MOVE_FREE*) cur->work;
     int n;
     int v;
 
@@ -1419,27 +1381,27 @@ static void edit_light_id_flick()
     case 1:
         DrawTileV(0x60, 0xD2, 0x30, 0x30, cur->Col);
         if (pTool->Pad1.rep & 0x20002) {
-            v = w->range;
+            v = w->ColFlick;
             if (pTool->Pad1.on & JOY_A) {
                 n = v + 10;
             } else {
                 n = v + 1;
             }
-            w->range = n;
+            w->ColFlick = n;
             if (n & 0x80) {
-                w->range = 0;
+                w->ColFlick = 0;
             }
         }
         if (pTool->Pad1.rep & 0x10001) {
-            v = w->range;
+            v = w->ColFlick;
             if (pTool->Pad1.on & JOY_A) {
                 n = v - 10;
             } else {
                 n = v - 1;
             }
-            w->range = n;
+            w->ColFlick = n;
             if (n & 0x80) {
-                w->range = 0x7F;
+                w->ColFlick = 0x7F;
             }
         }
         break;
@@ -1451,10 +1413,10 @@ static void edit_light_id_flick()
         pTool->rno3 = (pTool->rno3 + 3) % 2;
     }
     if (pTool->Pad1.trg & JOY_Y) {
-        w->range = 0;
+        w->ColFlick = 0;
     }
     pTool->printCursor(7, pTool->rno3 + 11);
-    eprintf(0x40, 0xA8, 0, pTool->PageNo, "COLOR FLICK RANGE %d", w->range);
+    eprintf(0x40, 0xA8, 0, pTool->PageNo, "COLOR FLICK RANGE %d", w->ColFlick);
     drawLightInfo(cur, 0xFFFFFFFF);
 }
 
@@ -1462,7 +1424,7 @@ static void edit_light_id_flick()
 static void edit_light_id_wave()
 {
     cLight* cur = curLight();
-    Light02Work* w = (Light02Work*) cur->work;
+    LIT02_MOVE_FREE* w = (LIT02_MOVE_FREE*) cur->work;
 
     switch (pTool->rno3) {
     case 0:
@@ -1471,19 +1433,19 @@ static void edit_light_id_wave()
     case 1:
         {
             STICK_MUL();
-            w->base += STICK_STEP(10000.0f);
+            w->Center += STICK_STEP(10000.0f);
         }
         break;
     case 2:
         {
             STICK_MUL();
-            w->amp += STICK_STEP(10000.0f);
+            w->Range += STICK_STEP(10000.0f);
         }
         break;
     case 3:
         {
             STICK_MUL();
-            w->freq += STICK_STEP(10000.0f);
+            w->Speed += STICK_STEP(10000.0f);
         }
         break;
     }
@@ -1493,9 +1455,9 @@ static void edit_light_id_wave()
     if (pTool->Pad1.rep & JOY_DOWN) {
         pTool->rno3 = (pTool->rno3 + 5) % 4;
     }
-    eprintf(0x40, 0xA8, 0, pTool->PageNo, "CENTER %3.3f", w->base);
-    eprintf(0x40, 0xB6, 0, pTool->PageNo, "RANGE  %3.3f", w->amp);
-    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SPEED   %3.3f", w->freq);
+    eprintf(0x40, 0xA8, 0, pTool->PageNo, "CENTER %3.3f", w->Center);
+    eprintf(0x40, 0xB6, 0, pTool->PageNo, "RANGE  %3.3f", w->Range);
+    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SPEED   %3.3f", w->Speed);
     pTool->printCursor(7, pTool->rno3 + 11);
     drawLightInfo(cur, 0xFFFFFFFF);
 }
@@ -1504,7 +1466,7 @@ static void edit_light_id_wave()
 static void edit_light_id_round()
 {
     cLight* cur = curLight();
-    Light03Work* w = (Light03Work*) cur->work;
+    LIT03_MOVE_FREE* w = (LIT03_MOVE_FREE*) cur->work;
 
     switch (pTool->rno3) {
     case 0:
@@ -1512,44 +1474,44 @@ static void edit_light_id_round()
         break;
     case 1:
         if (pTool->Pad1.trg & JOY_Y) {
-            w->rot[0] = 0.0f;
+            w->Rot.x = 0.0f;
         }
         {
             STICK_MUL();
-            w->rot[0] += STICK_STEP(10000.0f);
+            w->Rot.x += STICK_STEP(10000.0f);
         }
         break;
     case 2:
         if (pTool->Pad1.trg & JOY_Y) {
-            w->rot[1] = 0.0f;
+            w->Rot.y = 0.0f;
         }
         {
             STICK_MUL();
-            w->rot[1] += STICK_STEP(10000.0f);
+            w->Rot.y += STICK_STEP(10000.0f);
         }
         break;
     case 3:
         if (pTool->Pad1.trg & JOY_Y) {
-            w->rot[2] = 0.0f;
+            w->Rot.z = 0.0f;
         }
         {
             STICK_MUL();
-            w->rot[2] += STICK_STEP(10000.0f);
+            w->Rot.z += STICK_STEP(10000.0f);
         }
         break;
     }
-    w->rot[0] = LIMIT_ANGLE(w->rot[0]);
-    w->rot[1] = LIMIT_ANGLE(w->rot[1]);
-    w->rot[2] = LIMIT_ANGLE(w->rot[2]);
+    w->Rot.x = LIMIT_ANGLE(w->Rot.x);
+    w->Rot.y = LIMIT_ANGLE(w->Rot.y);
+    w->Rot.z = LIMIT_ANGLE(w->Rot.z);
     if (pTool->Pad1.rep & JOY_UP) {
         pTool->rno3 = (pTool->rno3 + 3) % 4;
     }
     if (pTool->Pad1.rep & JOY_DOWN) {
         pTool->rno3 = (pTool->rno3 + 5) % 4;
     }
-    eprintf(0x40, 0xA8, 0, pTool->PageNo, "ROT X %3.3f", w->rot[0]);
-    eprintf(0x40, 0xB6, 0, pTool->PageNo, "ROT Y %3.3f", w->rot[1]);
-    eprintf(0x40, 0xC4, 0, pTool->PageNo, "ROT Z %3.3f", w->rot[2]);
+    eprintf(0x40, 0xA8, 0, pTool->PageNo, "ROT X %3.3f", w->Rot.x);
+    eprintf(0x40, 0xB6, 0, pTool->PageNo, "ROT Y %3.3f", w->Rot.y);
+    eprintf(0x40, 0xC4, 0, pTool->PageNo, "ROT Z %3.3f", w->Rot.z);
     eprintf(0x40, 0xEE, 0, pTool->PageNo, "PUSH [Y] TO SET 0.0");
     pTool->printCursor(7, pTool->rno3 + 11);
     drawLightInfo(cur, 0xFFFFFFFF);
@@ -1562,18 +1524,18 @@ static void edit_light_id_shadow()
     static const char* shadow_kind_name[] = {"NORMAL", "CAST", "CAST_ADD", "CAST2", "CAST_ADD2", "FOOT"};
     static const char* shadow_onoff[] = {"OFF", "ON"};
     cLight* cur = curLight();
-    Light04Work* w;
+    LIT04_MOVE_FREE* w;
     int step;
     u8 col;
 
     pLog->modeSet(0xC8, 0x8C, 0x1E, 10);
-    w = (Light04Work*) cur->work;
+    w = (LIT04_MOVE_FREE*) cur->work;
     if ((*(u32*) &cur->Col & 0xFFFFFF00) == 0) {
         cur->Col.r = 0xFF;
-        w->texNo = 0x5A;
+        w->Fovy = 90;
     }
-    if (cur->xD > 2) {
-        cur->xD = 0;
+    if (cur->Type > 2) {
+        cur->Type = 0;
     }
     switch (pTool->rno3) {
     case 0:
@@ -1581,46 +1543,46 @@ static void edit_light_id_shadow()
         break;
     case 1:
         if (pTool->Pad1.rep & JOY_RIGHT) {
-            w->kind++;
+            w->Kind++;
         }
         if (pTool->Pad1.rep & JOY_LEFT) {
-            w->kind--;
+            w->Kind--;
         }
-        if (w->kind & 0x80) {
-            w->kind = 5;
+        if (w->Kind & 0x80) {
+            w->Kind = 5;
         }
-        if (w->kind > 5) {
-            w->kind = 0;
+        if (w->Kind > 5) {
+            w->Kind = 0;
         }
         break;
     case 2:
-        if (w->kind - 1 > 3u) {
+        if (w->Kind - 1 > 3u) {
             if (pTool->Pad1.rep & JOY_RIGHT) {
-                w->flags |= 1;
+                w->Flag |= 1;
             }
             if (pTool->Pad1.rep & JOY_LEFT) {
-                w->flags &= ~1;
+                w->Flag &= ~1;
             }
         }
         break;
     case 3:
         if (pTool->Pad1.rep & JOY_RIGHT) {
-            w->flags |= 4;
+            w->Flag |= 4;
         }
         if (pTool->Pad1.rep & JOY_LEFT) {
-            w->flags &= ~4;
+            w->Flag &= ~4;
         }
         break;
     case 4:
         if (pTool->Pad1.trg & JOY_Y) {
-            w->gndDist = 0;
+            w->Tex_no = 0;
         }
         step = (pTool->Pad1.on & JOY_A) ? 16 : 1;
         if (pTool->Pad1.rep & JOY_RIGHT) {
-            w->gndDist += step;
+            w->Tex_no += step;
         }
         if (pTool->Pad1.rep & JOY_LEFT) {
-            w->gndDist -= step;
+            w->Tex_no -= step;
         }
         break;
     }
@@ -1631,19 +1593,19 @@ static void edit_light_id_shadow()
         pTool->rno3 = (pTool->rno3 + 6) % 5;
     }
     col = 0x14;
-    if (w->flags & 1) {
+    if (w->Flag & 1) {
         col = 0;
     }
-    if (w->kind - 1 <= 3u) {
+    if (w->Kind - 1 <= 3u) {
         col = 0;
     }
-    eprintf(0x40, 0xA8, 0, pTool->PageNo, "KIND   : %s", shadow_kind_name[w->kind]);
-    if (w->kind == 5) {
+    eprintf(0x40, 0xA8, 0, pTool->PageNo, "KIND   : %s", shadow_kind_name[w->Kind]);
+    if (w->Kind == 5) {
         eprintf(0x40, 0xB6, 0x14, pTool->PageNo, "USE_TEX: ");
         eprintf(0x40, 0xC4, 0x14, pTool->PageNo, "INV_TEX:");
-        eprintf(0x40, 0xC4, col, pTool->PageNo, "         %s", shadow_onoff[(w->flags >> 2) & 1]);
+        eprintf(0x40, 0xC4, col, pTool->PageNo, "         %s", shadow_onoff[(w->Flag >> 2) & 1]);
         eprintf(0x40, 0xD2, 0, pTool->PageNo, "GND_DIST:");
-        eprintf(0x40, 0xD2, 0, pTool->PageNo, "          %2d", w->gndDist);
+        eprintf(0x40, 0xD2, 0, pTool->PageNo, "          %2d", (s8) w->Tex_no);
     } else {
         // COMPILER-DIFF: #2 -- the original zero-extends the u8 `col` once before this arm's two
         // uses (`clrlwi r30,r30,24`); ours knows the promoted value fits. The int copy + (u8) casts
@@ -1651,14 +1613,14 @@ static void edit_light_id_shadow()
         int c = col;
         eprintf(0x40, 0xB6, 0, pTool->PageNo, "USE_TEX: ");
         eprintf(0x40, 0xC4, 0, pTool->PageNo, "INV_TEX:");
-        eprintf(0x40, 0xC4, (u8) c, pTool->PageNo, "         %s", shadow_onoff[(w->flags >> 2) & 1]);
+        eprintf(0x40, 0xC4, (u8) c, pTool->PageNo, "         %s", shadow_onoff[(w->Flag >> 2) & 1]);
         eprintf(0x40, 0xD2, 0, pTool->PageNo, "TEX_NO :");
-        eprintf(0x40, 0xD2, (u8) c, pTool->PageNo, "         %2x", (u8) w->gndDist);
+        eprintf(0x40, 0xD2, (u8) c, pTool->PageNo, "         %2x", (u8) w->Tex_no);
     }
-    if (w->kind - 1 <= 3u) {
+    if (w->Kind - 1 <= 3u) {
         eprintf(0x40, 0xB6, 0x17, pTool->PageNo, "         ON");
     } else {
-        eprintf(0x40, 0xB6, 0, pTool->PageNo, "         %s", shadow_onoff[w->flags & 1]);
+        eprintf(0x40, 0xB6, 0, pTool->PageNo, "         %s", shadow_onoff[w->Flag & 1]);
     }
     eprintf(0x40, 0xEE, 0, pTool->PageNo, "PUSH [Y] TO SET 0");
     pTool->printCursor(7, pTool->rno3 + 11);
@@ -1669,7 +1631,7 @@ static void edit_light_id_shadow()
 static void edit_light_id_path()
 {
     cLight* cur = curLight();
-    Light05Work* w = (Light05Work*) cur->work;
+    LIT05_MOVE_FREE* w = (LIT05_MOVE_FREE*) cur->work;
 
     switch (pTool->rno3) {
     case 0:
@@ -1677,15 +1639,15 @@ static void edit_light_id_path()
         break;
     case 1:
         if (pTool->Pad1.rep & 0x20002) {
-            w->pathNo++;
+            w->Id++;
             cur->Rno0 = 0;
         }
         if (pTool->Pad1.rep & 0x10001) {
-            w->pathNo--;
+            w->Id--;
             cur->Rno0 = 0;
         }
         if (pTool->Pad1.rep & JOY_A) {
-            cLightPathData* p = pTool->PathTool.Ofs[w->pathNo];
+            cLightPathData* p = pTool->PathTool.Ofs[w->Id];
             if (VALID_PTR(p)) {
                 memcpy(pTool->PathTool.Work, p, p->getSize());
                 pTool->pno0 = pTool->pno1 = pTool->pno2 = pTool->pno3 = 0;
@@ -1695,12 +1657,12 @@ static void edit_light_id_path()
         break;
     case 2:
         if (pTool->Pad1.rep & (JOY_LEFT | JOY_RIGHT)) {
-            w->flag ^= 1;
+            w->Path.Flag ^= 1;
         }
         break;
     case 3:
         if (pTool->Pad1.rep & (JOY_LEFT | JOY_RIGHT)) {
-            w->flag ^= 2;
+            w->Path.Flag ^= 2;
         }
         break;
     case 100:
@@ -1718,18 +1680,18 @@ static void edit_light_id_path()
             pTool->rno3 = (pTool->rno3 + 5) % 4;
         }
         pTool->printCursor(7, pTool->rno3 + 11);
-        eprintf(0x40, 0xA8, 0, pTool->PageNo, "PATH No:%d", w->pathNo);
-        eprintf(0x40, 0xB6, 0, pTool->PageNo, "LOOP    %s", (w->flag & 1) ? "OFF" : "ON");
-        eprintf(0x40, 0xC4, 0, pTool->PageNo, "INVERSE %s", (w->flag & 2) ? "ON" : "OFF");
+        eprintf(0x40, 0xA8, 0, pTool->PageNo, "PATH No:%d", w->Id);
+        eprintf(0x40, 0xB6, 0, pTool->PageNo, "LOOP    %s", (w->Path.Flag & 1) ? "OFF" : "ON");
+        eprintf(0x40, 0xC4, 0, pTool->PageNo, "INVERSE %s", (w->Path.Flag & 2) ? "ON" : "OFF");
         drawLightInfo(cur, 0xFFFFFFFF);
-        if (VALID_PTR(w->pStart)) {
-            drawPath(0xC8, 0x64, w->pStart, w->flag, 0xFFFFFFFF);
+        if (VALID_PTR(w->Path.pBase)) {
+            drawPath(0xC8, 0x64, (cLightPathData*) w->Path.pBase, w->Path.Flag, 0xFFFFFFFF);
         } else {
             eprintf(0xC8, 0xA8, 0, pTool->PageNo, "NO DATA");
         }
     } else {
-        eprintf(0x40, 0xA8, 0, pTool->PageNo, "EDIT PATH No:%d", w->pathNo);
-        pathEdit(0x20, 0xC4, w->pathNo, w->flag, 0);
+        eprintf(0x40, 0xA8, 0, pTool->PageNo, "EDIT PATH No:%d", w->Id);
+        pathEdit(0x20, 0xC4, w->Id, w->Path.Flag, 0);
     }
 }
 
@@ -1737,7 +1699,7 @@ static void edit_light_id_path()
 static void edit_light_id_fade()
 {
     cLight* cur = curLight();
-    Light06Work* w = (Light06Work*) cur->work;
+    LIT06_MOVE_FREE* w = (LIT06_MOVE_FREE*) cur->work;
 
     switch (pTool->rno3) {
     case 0:
@@ -1745,24 +1707,24 @@ static void edit_light_id_fade()
         break;
     case 1:
         if (pTool->Pad1.rep & JOY_RIGHT) {
-            ((Light06Work*) cur->work)->start += 0.1f;
+            ((LIT06_MOVE_FREE*) cur->work)->m_Start += 0.1f;
         }
         if (pTool->Pad1.rep & JOY_LEFT) {
-            ((Light06Work*) cur->work)->start -= 0.1f;
+            ((LIT06_MOVE_FREE*) cur->work)->m_Start -= 0.1f;
         }
         if (pTool->Pad1.trg & JOY_Y) {
-            ((Light06Work*) cur->work)->start = 0.0f;
+            ((LIT06_MOVE_FREE*) cur->work)->m_Start = 0.0f;
         }
         break;
     case 2:
         if (pTool->Pad1.rep & JOY_RIGHT) {
-            w->speed += 0.01f;
+            w->m_Speed += 0.01f;
         }
         if (pTool->Pad1.rep & JOY_LEFT) {
-            w->speed -= 0.01f;
+            w->m_Speed -= 0.01f;
         }
         if (pTool->Pad1.trg & JOY_Y) {
-            w->speed = 0.0f;
+            w->m_Speed = 0.0f;
         }
         break;
     case 3:
@@ -1778,8 +1740,8 @@ static void edit_light_id_fade()
         pTool->rno3 = (pTool->rno3 + 5) % 4;
     }
     pTool->printCursor(7, pTool->rno3 + 11);
-    eprintf(0x40, 0xA8, 0, pTool->PageNo, "START %f", w->start);
-    eprintf(0x40, 0xB6, 0, pTool->PageNo, "SPEED %f", w->speed);
+    eprintf(0x40, 0xA8, 0, pTool->PageNo, "START %f", w->m_Start);
+    eprintf(0x40, 0xB6, 0, pTool->PageNo, "SPEED %f", w->m_Speed);
     eprintf(0x40, 0xC4, 0, pTool->PageNo, "PLAY");
     drawLightInfo(cur, 0xFFFFFFFF);
 }
@@ -1788,7 +1750,7 @@ static void edit_light_id_fade()
 static void edit_light_id_shine()
 {
     cLight* cur = curLight();
-    Light07Work* w = (Light07Work*) cur->work;
+    LIT07_MOVE_FREE* w = (LIT07_MOVE_FREE*) cur->work;
 
     switch (pTool->rno3) {
     case 0:
@@ -1796,44 +1758,45 @@ static void edit_light_id_shine()
         break;
     case 1:
         if (pTool->Pad1.trg & JOY_Y) {
-            w->speed[0] = 0.0f;
+            w->Speed.x = 0.0f;
         }
         {
             STICK_MUL();
-            w->speed[0] += STICK_STEP(10000.0f);
+            w->Speed.x += STICK_STEP(10000.0f);
         }
         break;
     case 2:
         if (pTool->Pad1.trg & JOY_Y) {
-            w->speed[1] = 0.0f;
+            w->Speed.y = 0.0f;
         }
         {
             STICK_MUL();
-            w->speed[1] += STICK_STEP(10000.0f);
+            w->Speed.y += STICK_STEP(10000.0f);
         }
         break;
     case 3:
         if (pTool->Pad1.trg & JOY_Y) {
-            w->speed[2] = 0.0f;
+            w->Speed.z = 0.0f;
         }
         {
             STICK_MUL();
-            w->x8 += STICK_STEP(10000.0f);
+            // Bug in the original: this should adjust Speed.z but writes Rot.z instead.
+            w->Rot.z += STICK_STEP(10000.0f);
         }
         break;
     }
-    w->speed[0] = LIMIT_ANGLE(w->speed[0]);
-    w->speed[1] = LIMIT_ANGLE(w->speed[1]);
-    w->speed[2] = LIMIT_ANGLE(w->speed[2]);
+    w->Speed.x = LIMIT_ANGLE(w->Speed.x);
+    w->Speed.y = LIMIT_ANGLE(w->Speed.y);
+    w->Speed.z = LIMIT_ANGLE(w->Speed.z);
     if (pTool->Pad1.rep & JOY_UP) {
         pTool->rno3 = (pTool->rno3 + 3) % 4;
     }
     if (pTool->Pad1.rep & JOY_DOWN) {
         pTool->rno3 = (pTool->rno3 + 5) % 4;
     }
-    eprintf(0x40, 0xA8, 0, pTool->PageNo, "SPEED X %3.3f", w->speed[0]);
-    eprintf(0x40, 0xB6, 0, pTool->PageNo, "SPEED Y %3.3f", w->speed[1]);
-    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SPEED Z %3.3f", w->speed[2]);
+    eprintf(0x40, 0xA8, 0, pTool->PageNo, "SPEED X %3.3f", w->Speed.x);
+    eprintf(0x40, 0xB6, 0, pTool->PageNo, "SPEED Y %3.3f", w->Speed.y);
+    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SPEED Z %3.3f", w->Speed.z);
     eprintf(0x40, 0xEE, 0, pTool->PageNo, "PUSH [Y] TO SET 0.0");
     pTool->printCursor(7, pTool->rno3 + 11);
     drawLightInfo(cur, 0xFFFFFFFF);
@@ -1850,14 +1813,14 @@ static void edit_light_eid()
     pTool->printCursor(0x14, pTool->rno3 + 11);
     eprintf(0x40, 0x8C, 4, pTool->PageNo, "LIGHT PROPATY");
     eprintf(0x40, 0x9A, 0, pTool->PageNo, "ENABLE MASK");
-    eprintf(0xA8, 0x9A, !(cur->xF & 1) ? 0x14 : 0, pTool->PageNo, "PLAYER");
-    eprintf(0xA8, 0xA8, (cur->xF & 2) ? 0 : 0x14, pTool->PageNo, "ENEMY");
-    eprintf(0xA8, 0xB6, (cur->xF & 4) ? 0 : 0x14, pTool->PageNo, "OBJ");
-    eprintf(0xA8, 0xC4, (cur->xF & 8) ? 0 : 0x14, pTool->PageNo, "EFFECT");
-    eprintf(0xA8, 0xD2, (cur->xF & 0x10) ? 0 : 0x14, pTool->PageNo, "SCROLL");
-    eprintf(0xA8, 0xE0, (cur->xF & 0x20) ? 0 : 0x14, pTool->PageNo, "ITEM");
-    eprintf(0xA8, 0xEE, (cur->xF & 0x40) ? 0 : 0x14, pTool->PageNo, "SUBCHAR");
-    eprintf(0xA8, 0xFC, (cur->xF & 0x80) ? 0 : 0x14, pTool->PageNo, "THERMO");
+    eprintf(0xA8, 0x9A, !(cur->EnableMask & 1) ? 0x14 : 0, pTool->PageNo, "PLAYER");
+    eprintf(0xA8, 0xA8, (cur->EnableMask & 2) ? 0 : 0x14, pTool->PageNo, "ENEMY");
+    eprintf(0xA8, 0xB6, (cur->EnableMask & 4) ? 0 : 0x14, pTool->PageNo, "OBJ");
+    eprintf(0xA8, 0xC4, (cur->EnableMask & 8) ? 0 : 0x14, pTool->PageNo, "EFFECT");
+    eprintf(0xA8, 0xD2, (cur->EnableMask & 0x10) ? 0 : 0x14, pTool->PageNo, "SCROLL");
+    eprintf(0xA8, 0xE0, (cur->EnableMask & 0x20) ? 0 : 0x14, pTool->PageNo, "ITEM");
+    eprintf(0xA8, 0xEE, (cur->EnableMask & 0x40) ? 0 : 0x14, pTool->PageNo, "SUBCHAR");
+    eprintf(0xA8, 0xFC, (cur->EnableMask & 0x80) ? 0 : 0x14, pTool->PageNo, "THERMO");
     if (pTool->Pad1.rep & JOY_UP) {
         pTool->rno3 = (pTool->rno3 + 7) % 8;
     } else if (pTool->Pad1.rep & JOY_DOWN) {
@@ -1866,37 +1829,37 @@ static void edit_light_eid()
     if (pTool->Pad1.rep & JOY_A) {
         switch (pTool->rno3) {
         case 0:
-            cur->xF ^= 1;
+            cur->EnableMask ^= 1;
             break;
         case 1:
-            cur->xF ^= 2;
+            cur->EnableMask ^= 2;
             break;
         case 2:
-            cur->xF ^= 4;
+            cur->EnableMask ^= 4;
             break;
         case 3:
-            cur->xF ^= 8;
+            cur->EnableMask ^= 8;
             break;
         case 4:
-            cur->xF ^= 0x10;
+            cur->EnableMask ^= 0x10;
             break;
         case 5:
-            cur->xF ^= 0x20;
+            cur->EnableMask ^= 0x20;
             break;
         case 6:
-            cur->xF ^= 0x40;
+            cur->EnableMask ^= 0x40;
             break;
         case 7:
-            cur->xF ^= 0x80;
+            cur->EnableMask ^= 0x80;
             break;
         }
     }
     if (pTool->Pad1.rep & JOY_B) {
         pTool->rno2 = 0;
     }
-    if (cur->xD == 7) {
+    if (cur->Type == 7) {
         eprintf(0xE0, 0xC4, 0x16, pTool->PageNo, "<- NOT SUPPORT");
-        cur->xF &= ~8;
+        cur->EnableMask &= ~8;
     }
 }
 
@@ -2107,7 +2070,7 @@ static void edit_light_pos()
         cur->Pos = vecZero;
     }
     if (pTool->Pad1.trg & JOY_Y) {
-        cur->Pos = pG->Camera.param.at;
+        cur->Pos = pG->Camera.param.Target;
     }
     drawLightInfo(cur, 0x80808080);
     if (pTool->Pad1.rep & JOY_B) {
@@ -2191,7 +2154,7 @@ static void edit_light_intensity()
     f32 step = (Joy[0].on & JOY_A) ? 10.0f : 1.0f;
 
     eprintf(0x40, 0x8C, 4, pTool->PageNo, "LIGHT PROPATY");
-    if (cur->xD == 7) {
+    if (cur->Type == 7) {
         eprintf(0x40, 0x9A, 0, pTool->PageNo, "NOT USED");
         cur->Intensity = 1.0f;
     } else {
@@ -2225,12 +2188,12 @@ static void edit_light_type()
     };
     cLight* cur = curLight();
 
-    if (cur->Type == 4) {
+    if (cur->Id == 4) {
         edit_light_type_shadow();
         return;
     }
     eprintf(0x40, 0x8C, 4, pTool->PageNo, "LIGHT PROPATY");
-    light_type_tbl[cur->xD]();
+    light_type_tbl[cur->Type]();
     if (pTool->Pad1.rep & JOY_B) {
         pTool->rno2 = 0;
     }
@@ -2246,7 +2209,7 @@ void edit_light_type_shadow()
     };
 
     eprintf(0x40, 0x8C, 4, pTool->PageNo, "SHADOW PROPATY");
-    shadow_type_tbl[cur->xD]();
+    shadow_type_tbl[cur->Type]();
     if (pTool->Pad1.rep & JOY_B) {
         pTool->rno2 = 0;
     }
@@ -2260,7 +2223,7 @@ int shadow_select_type()
     int first;
 
     if (pTool->rno4 == 0) {
-        pTool->rno5 = cur->xD;
+        pTool->rno5 = cur->Type;
         pTool->rno4 = 1;
         first = 1;
     } else {
@@ -2273,7 +2236,7 @@ int shadow_select_type()
         pTool->rno5 = (pTool->rno5 + 2) % 3;
     }
     if (pTool->Pad1.rep & JOY_A) {
-        cur->xD = pTool->rno5;
+        cur->Type = pTool->rno5;
     }
     eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", pTool->rno5, shadow_type_name[pTool->rno5]);
     return 1;
@@ -2300,17 +2263,17 @@ int shadow_select_type()
     }
 #define SHADOW_MULTI_EDIT()                                 \
     if (pTool->Pad1.rep & JOY_RIGHT) {                       \
-        w->multiShd = 1;                                    \
+        w->bMultiShadow = 1;                                    \
     }                                                       \
     if (pTool->Pad1.rep & 0x20000) {                         \
-        w->multiShd = 1;                                    \
+        w->bMultiShadow = 1;                                    \
     }                                                       \
-    if (w->multiShd != 0) {                                 \
+    if (w->bMultiShadow != 0) {                                 \
         if (pTool->Pad1.rep & JOY_LEFT) {                    \
-            w->multiShd = 0;                                \
+            w->bMultiShadow = 0;                                \
         }                                                   \
         if (pTool->Pad1.rep & 0x10000) {                     \
-            w->multiShd = 0;                                \
+            w->bMultiShadow = 0;                                \
         }                                                   \
     }
 #define SHADOW_ROT_EDIT(field)                                          \
@@ -2331,7 +2294,7 @@ int shadow_select_type()
 static void edit_light_type_shadow_fit()
 {
     cLight* cur = curLight();
-    Light04Work* w = (Light04Work*) cur->work;
+    LIT04_MOVE_FREE* w = (LIT04_MOVE_FREE*) cur->work;
     f32 step = 5.0f;
     int ret = 1;
     int c;
@@ -2342,50 +2305,50 @@ static void edit_light_type_shadow_fit()
         break;
     case 1:
         if (pTool->Pad1.rep & JOY_A) {
-            if (((Light04Work*) cur->work)->flags & 2) {
-                ((Light04Work*) cur->work)->flags &= ~2;
+            if (((LIT04_MOVE_FREE*) cur->work)->Flag & 2) {
+                ((LIT04_MOVE_FREE*) cur->work)->Flag &= ~2;
             } else {
-                ((Light04Work*) cur->work)->flags |= 2;
+                ((LIT04_MOVE_FREE*) cur->work)->Flag |= 2;
             }
         }
         break;
     case 2:
-        w->lightPos.x += (f32) pTool->Pad1.stickX * step;
-        w->lightPos.z -= (f32) pTool->Pad1.stickY * step;
-        w->lightPos.y += (f32) pTool->Pad1.triggerRight * step * 0.5f;
-        w->lightPos.y -= (f32) pTool->Pad1.triggerLeft * step * 0.5f;
-        Draw_pos(&w->lightPos, 500);
+        w->Lit_pos.x += (f32) pTool->Pad1.stickX * step;
+        w->Lit_pos.z -= (f32) pTool->Pad1.stickY * step;
+        w->Lit_pos.y += (f32) pTool->Pad1.triggerRight * step * 0.5f;
+        w->Lit_pos.y -= (f32) pTool->Pad1.triggerLeft * step * 0.5f;
+        Draw_pos(&w->Lit_pos, 500);
         if (pTool->Pad1.trg & JOY_Y) {
-            w->lightPos = cur->Pos;
+            w->Lit_pos = cur->Pos;
         }
         break;
     case 3:
-        SHADOW_LEVEL_EDIT(selfShd, 4);
+        SHADOW_LEVEL_EDIT(SelfShadowLevel, 4);
         break;
     case 4:
-        SHADOW_LEVEL_EDIT(softShd, 3);
+        SHADOW_LEVEL_EDIT(SoftShadowLevel, 3);
         break;
     case 5:
         SHADOW_MULTI_EDIT();
         break;
     case 6:
-        w->range += (int) ((f32) pTool->Pad1.stickY * step / 100.0f);
-        w->range += (int) ((f32) pTool->Pad1.stickX * step / 100.0f);
+        w->Fovy_sub += (int) ((f32) pTool->Pad1.stickY * step / 100.0f);
+        w->Fovy_sub += (int) ((f32) pTool->Pad1.stickX * step / 100.0f);
         if (Joy[0].on & JOY_LEFT) {
-            if (w->range != 0) {
-                w->range--;
+            if (w->Fovy_sub != 0) {
+                w->Fovy_sub--;
             }
         }
         if (Joy[0].on & JOY_RIGHT) {
-            if (w->range <= 0x59) {
-                w->range++;
+            if (w->Fovy_sub <= 0x59) {
+                w->Fovy_sub++;
             }
         }
-        if (w->range > 0x80) {
-            w->range = 0;
+        if (w->Fovy_sub > 0x80) {
+            w->Fovy_sub = 0;
         }
-        if (w->range > 0x5A) {
-            w->range = 0x5A;
+        if (w->Fovy_sub > 0x5A) {
+            w->Fovy_sub = 0x5A;
         }
         break;
     }
@@ -2399,25 +2362,25 @@ static void edit_light_type_shadow_fit()
         }
     }
     if (pTool->rno3 != 0) {
-        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->xD, shadow_type_name[cur->xD]);
+        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Type, shadow_type_name[cur->Type]);
     }
     eprintf(0x40, 0xA8, 0, pTool->PageNo, "LIT_POS SET ");
-    if (w->flags & 2) {
+    if (w->Flag & 2) {
         eprintf(0x40, 0xA8, 0, pTool->PageNo, "                ON");
         c = 0;
     } else {
         eprintf(0x40, 0xA8, 0, pTool->PageNo, "                OFF");
         c = 0x14;
     }
-    eprintf(0x40, 0xB6, (u8) c, pTool->PageNo, "LIGHT_POS %6f %6f %6f", w->lightPos.x, w->lightPos.y, w->lightPos.z);
-    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SELF_SHD %s", self_shd_name[w->selfShd]);
-    eprintf(0x40, 0xD2, 0, pTool->PageNo, "SOFT_SHD %s", soft_shd_name[w->softShd]);
-    if (w->multiShd == 0) {
+    eprintf(0x40, 0xB6, (u8) c, pTool->PageNo, "LIGHT_POS %6f %6f %6f", w->Lit_pos.x, w->Lit_pos.y, w->Lit_pos.z);
+    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SELF_SHD %s", self_shd_name[w->SelfShadowLevel]);
+    eprintf(0x40, 0xD2, 0, pTool->PageNo, "SOFT_SHD %s", soft_shd_name[w->SoftShadowLevel]);
+    if (w->bMultiShadow == 0) {
         eprintf(0x40, 0xE0, 0, pTool->PageNo, "MULTI_SHD OFF");
     } else {
         eprintf(0x40, 0xE0, 0, pTool->PageNo, "MULTI_SHD ON");
     }
-    eprintf(0x40, 0xEE, 0, pTool->PageNo, "RANGE     %d", w->range);
+    eprintf(0x40, 0xEE, 0, pTool->PageNo, "RANGE     %d", w->Fovy_sub);
     eprintf(0x40, 0xFC, (u8) c, pTool->PageNo, " [Y_BUTTON] Position Reset");
     pTool->printCursor(7, pTool->rno3 + 11);
     drawLightInfo(cur, 0xFFFFFFFF);
@@ -2427,7 +2390,7 @@ static void edit_light_type_shadow_fit()
 static void edit_light_type_shadow_parallel()
 {
     cLight* cur = curLight();
-    Light04Work* w = (Light04Work*) cur->work;
+    LIT04_MOVE_FREE* w = (LIT04_MOVE_FREE*) cur->work;
     f32 step = 5.0f;
     int ret = 1;
 
@@ -2436,38 +2399,38 @@ static void edit_light_type_shadow_parallel()
         ret = shadow_select_type();
         break;
     case 1:
-        SHADOW_ROT_EDIT(rotX);
+        SHADOW_ROT_EDIT(Ang_x);
         break;
     case 2:
-        SHADOW_ROT_EDIT(rotY);
+        SHADOW_ROT_EDIT(Ang_y);
         break;
     case 3:
-        SHADOW_LEVEL_EDIT(selfShd, 4);
+        SHADOW_LEVEL_EDIT(SelfShadowLevel, 4);
         break;
     case 4:
-        SHADOW_LEVEL_EDIT(softShd, 3);
+        SHADOW_LEVEL_EDIT(SoftShadowLevel, 3);
         break;
     case 5:
         SHADOW_MULTI_EDIT();
         break;
     case 6:
-        w->range += (int) ((f32) pTool->Pad1.stickY * step / 100.0f);
-        w->range += (int) ((f32) pTool->Pad1.stickX * step / 100.0f);
+        w->Fovy_sub += (int) ((f32) pTool->Pad1.stickY * step / 100.0f);
+        w->Fovy_sub += (int) ((f32) pTool->Pad1.stickX * step / 100.0f);
         if (Joy[0].on & JOY_LEFT) {
-            if (w->range != 0) {
-                w->range--;
+            if (w->Fovy_sub != 0) {
+                w->Fovy_sub--;
             }
         }
         if (Joy[0].on & JOY_RIGHT) {
-            if (w->range <= 0x59) {
-                w->range++;
+            if (w->Fovy_sub <= 0x59) {
+                w->Fovy_sub++;
             }
         }
-        if (w->range > 0x80) {
-            w->range = 0;
+        if (w->Fovy_sub > 0x80) {
+            w->Fovy_sub = 0;
         }
-        if (w->range > 0x5A) {
-            w->range = 0x5A;
+        if (w->Fovy_sub > 0x5A) {
+            w->Fovy_sub = 0x5A;
         }
         break;
     }
@@ -2481,18 +2444,18 @@ static void edit_light_type_shadow_parallel()
         }
     }
     if (pTool->rno3 != 0) {
-        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->xD, shadow_type_name[cur->xD]);
+        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Type, shadow_type_name[cur->Type]);
     }
-    eprintf(0x40, 0xA8, 0, pTool->PageNo, "ROT_X : %d", w->rotX);
-    eprintf(0x40, 0xB6, 0, pTool->PageNo, "ROT_Y : %d", w->rotY);
-    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SELF_SHD  %s", self_shd_name[w->selfShd]);
-    eprintf(0x40, 0xD2, 0, pTool->PageNo, "SOFT_SHD  %s", soft_shd_name[w->softShd]);
-    if (w->multiShd == 0) {
+    eprintf(0x40, 0xA8, 0, pTool->PageNo, "ROT_X : %d", w->Ang_x);
+    eprintf(0x40, 0xB6, 0, pTool->PageNo, "ROT_Y : %d", w->Ang_y);
+    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SELF_SHD  %s", self_shd_name[w->SelfShadowLevel]);
+    eprintf(0x40, 0xD2, 0, pTool->PageNo, "SOFT_SHD  %s", soft_shd_name[w->SoftShadowLevel]);
+    if (w->bMultiShadow == 0) {
         eprintf(0x40, 0xE0, 0, pTool->PageNo, "MULTI_SHD OFF");
     } else {
         eprintf(0x40, 0xE0, 0, pTool->PageNo, "MULTI_SHD ON");
     }
-    eprintf(0x40, 0xEE, 0, pTool->PageNo, "RANGE     %d", w->range);
+    eprintf(0x40, 0xEE, 0, pTool->PageNo, "RANGE     %d", w->Fovy_sub);
     pTool->printCursor(7, pTool->rno3 + 11);
     drawLightInfo(cur, 0xFFFFFFFF);
 }
@@ -2501,7 +2464,7 @@ static void edit_light_type_shadow_parallel()
 static void edit_light_type_shadow_fix()
 {
     cLight* cur = curLight();
-    Light04Work* w = (Light04Work*) cur->work;
+    LIT04_MOVE_FREE* w = (LIT04_MOVE_FREE*) cur->work;
     f32 step = 5.0f;
     int ret = 1;
 
@@ -2510,19 +2473,19 @@ static void edit_light_type_shadow_fix()
         ret = shadow_select_type();
         break;
     case 1:
-        SHADOW_ROT_EDIT(rotX);
+        SHADOW_ROT_EDIT(Ang_x);
         break;
     case 2:
-        SHADOW_ROT_EDIT(rotY);
+        SHADOW_ROT_EDIT(Ang_y);
         break;
     case 3:
-        w->texNo += (int) ((f32) pTool->Pad1.stickY * step / 100.0f);
-        w->texNo += (int) ((f32) pTool->Pad1.stickX * step / 100.0f);
-        if (w->texNo > 0x80) {
-            w->texNo = 0;
+        w->Fovy += (int) ((f32) pTool->Pad1.stickY * step / 100.0f);
+        w->Fovy += (int) ((f32) pTool->Pad1.stickX * step / 100.0f);
+        if (w->Fovy > 0x80) {
+            w->Fovy = 0;
         }
-        if (w->texNo > 0x5A) {
-            w->texNo = 0x5A;
+        if (w->Fovy > 90) {
+            w->Fovy = 90;
         }
         break;
     }
@@ -2535,11 +2498,11 @@ static void edit_light_type_shadow_fix()
         }
     }
     if (pTool->rno3 != 0) {
-        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->xD, shadow_type_name[cur->xD]);
+        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Type, shadow_type_name[cur->Type]);
     }
-    eprintf(0x40, 0xA8, 0, pTool->PageNo, "ROT_X : %d", w->rotX);
-    eprintf(0x40, 0xB6, 0, pTool->PageNo, "ROT_Y : %d", w->rotY);
-    eprintf(0x40, 0xC4, 0, pTool->PageNo, "RANGE : %d", w->texNo);
+    eprintf(0x40, 0xA8, 0, pTool->PageNo, "ROT_X : %d", w->Ang_x);
+    eprintf(0x40, 0xB6, 0, pTool->PageNo, "ROT_Y : %d", w->Ang_y);
+    eprintf(0x40, 0xC4, 0, pTool->PageNo, "RANGE : %d", w->Fovy);
     pTool->printCursor(7, pTool->rno3 + 11);
     drawLightInfo(cur, 0xFFFFFFFF);
 }
@@ -2633,7 +2596,7 @@ int select_type()
     int first;
 
     if (pTool->rno4 == 0) {
-        pTool->rno5 = cur->xD;
+        pTool->rno5 = cur->Type;
         pTool->rno4 = 1;
         first = 1;
     } else {
@@ -2646,12 +2609,12 @@ int select_type()
         pTool->rno5 = (pTool->rno5 + 7) % 8;
     }
     if (pTool->Pad1.rep & JOY_A) {
-        if (cur->xD != pTool->rno5) {
-            cur->xD = pTool->rno5;
+        if (cur->Type != pTool->rno5) {
+            cur->Type = pTool->rno5;
             clear_type_free();
         }
     }
-    if (cur->xD == pTool->rno5) {
+    if (cur->Type == pTool->rno5) {
         col = 0;
         ret = 1;
     } else {
@@ -2697,7 +2660,7 @@ static void edit_light_type_constant()
         }
     }
     if (pTool->rno3 != 0) {
-        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->xD, light_type_name[cur->xD]);
+        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Type, light_type_name[cur->Type]);
     }
     eprintf(0x40, 0xA8, 0, pTool->PageNo, "INTENSITY %3.3f", cur->Intensity);
     pTool->printCursor(7, pTool->rno3 + 11);
@@ -2732,7 +2695,7 @@ static void edit_light_type_constant()
         }                                                                                       \
     }                                                                                           \
     if (pTool->rno3 != 0) {                                                                     \
-        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->xD, light_type_name[cur->xD]);      \
+        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Type, light_type_name[cur->Type]);      \
     }                                                                                           \
     eprintf(0x40, 0xA8, 0, pTool->PageNo, "SMOOTH EDGE %6f", sp->Normal.x);                      \
     pTool->printCursor(7, pTool->rno3 + 11);                                                    \
@@ -2752,7 +2715,7 @@ static void edit_light_type_spotlight()
     // with one; the .sym's "global" scope at .bss+0 cannot be told from a local S+A field of 0)
     static Vec spotRot;
     cLight* cur = curLight();
-    LIT_TYPE04_FREE* sp = &cur->spot;
+    LIT_TYPE03_FREE* sp = &cur->cone;
     int ret = 1;
     Mtx m;
     Vec pos;
@@ -2786,13 +2749,13 @@ static void edit_light_type_spotlight()
         break;
     case 2: {
         step = (pTool->Pad1.on & JOY_A) ? 3.0f : 1.0f;
-        sp->A0 += (f32) pTool->Pad1.stickY * step / 100.0f;
-        sp->A0 += (f32) pTool->Pad1.stickX * step / 100.0f;
-        if (sp->A0 < 1.0f) {
-            sp->A0 = 1.0f;
+        sp->CutOff += (f32) pTool->Pad1.stickY * step / 100.0f;
+        sp->CutOff += (f32) pTool->Pad1.stickX * step / 100.0f;
+        if (sp->CutOff < 1.0f) {
+            sp->CutOff = 1.0f;
         }
-        if (sp->A0 > 90.0f) {
-            sp->A0 = 90.0f;
+        if (sp->CutOff > 90.0f) {
+            sp->CutOff = 90.0f;
         }
         spotRot.x = 0.0f;
         spotRot.y = 0.0f;
@@ -2802,10 +2765,10 @@ static void edit_light_type_spotlight()
     }
     case 3: {
         step = (pTool->Pad1.on & JOY_A) ? 5.0f : 1.0f;
-        sp->A1 += (f32) pTool->Pad1.stickX * step;
-        sp->A1 += (f32) pTool->Pad1.stickY * step;
+        sp->Edge += (f32) pTool->Pad1.stickX * step;
+        sp->Edge += (f32) pTool->Pad1.stickY * step;
         if (pTool->Pad1.trg & JOY_Y) {
-            sp->A1 = 0.0f;
+            sp->Edge = 0.0f;
         }
         break;
     }
@@ -2828,14 +2791,14 @@ static void edit_light_type_spotlight()
             r = cur->Radius;
         }
         PSVECScale(&dir, &dir, r);
-        Draw_corn3(&pos, &dir, sp->A0, 0xFFFFFFFF);
+        Draw_corn3(&pos, &dir, sp->CutOff, 0xFFFFFFFF);
     }
     if (pTool->rno3 != 0) {
-        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->xD, light_type_name[cur->xD]);
+        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Type, light_type_name[cur->Type]);
     }
     eprintf(0x40, 0xA8, 0, pTool->PageNo, "DIRECTION");
-    eprintf(0x40, 0xB6, 0, pTool->PageNo, "SPOT LIGHT RANGE %3.2f", sp->A0);
-    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SMOOTH EDGE %6f", sp->A1);
+    eprintf(0x40, 0xB6, 0, pTool->PageNo, "SPOT LIGHT RANGE %3.2f", sp->CutOff);
+    eprintf(0x40, 0xC4, 0, pTool->PageNo, "SMOOTH EDGE %6f", sp->Edge);
     pTool->printCursor(7, pTool->rno3 + 11);
     drawLightInfo(cur, 0xFFFFFFFF);
 }
@@ -2927,7 +2890,7 @@ static void edit_light_type_direct()
     }
     pTool->printCursor(7, pTool->rno3 + 11);
     if (pTool->rno3 != 0) {
-        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->xD, light_type_name[cur->xD]);
+        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Type, light_type_name[cur->Type]);
     }
     eprintf(0x40, 0xA8, 0, pTool->PageNo, "A0 %5.4f", sp->A0);
     eprintf(0x40, 0xB6, 0, pTool->PageNo, "A1 %5.4f", sp->A1);
@@ -3056,13 +3019,13 @@ void draw_light_graph(cLight* l)
     }
 }
 // Parallel light: the direction is edited as two angles (static `ang`: x = pitch, y = yaw, z unused),
-// converted back to the unit normal (scaled by 1e6 in the light).
+// converted back to the unit direction (scaled by 1e6 in the light).
 static void edit_light_type_parallel()
 {
     static Vec ang;
     const f32 k = 1000000.0f;  // pool order: 1e6 before the step constants
     cLight* cur = curLight();
-    LIT_TYPE04_FREE* sp = &cur->spot;
+    LIT_TYPE05_FREE* sp = &cur->dir;
     f32 step = (pTool->Pad1.on & JOY_A) ? 10.0f : 1.0f;
     int ret = 1;
 
@@ -3072,10 +3035,10 @@ static void edit_light_type_parallel()
         f32 cx;
         f32 cz;
         pTool->cursor = 0;
-        a->x = asinf(sp->Normal.y / 1000000.0f);
-        cx = sp->Normal.x / 1000000.0f;
+        a->x = asinf(sp->Pos.y / 1000000.0f);
+        cx = sp->Pos.x / 1000000.0f;
         cx = cx / cosf(a->x);
-        cz = sp->Normal.z / 1000000.0f;
+        cz = sp->Pos.z / 1000000.0f;
         cz = cz / cosf(a->x);
         a->y = atan2f(cx, cz);
         a->z = 0.0f;
@@ -3090,12 +3053,12 @@ static void edit_light_type_parallel()
         c = cosf(a->x);
         c *= sinf(a->y);
         c *= k;
-        sp->Normal.x = c;
-        sp->Normal.y = sinf(a->x) * k;
+        sp->Pos.x = c;
+        sp->Pos.y = sinf(a->x) * k;
         d = cosf(a->x);
         d *= cosf(a->y);
         d *= k;
-        sp->Normal.z = d;
+        sp->Pos.z = d;
         break;
     }
     }
@@ -3121,15 +3084,15 @@ static void edit_light_type_parallel()
         break;
     case 3:
         if (pTool->Pad1.rep & JOY_A) {
-            sp->flags ^= 1;
+            sp->Flag ^= 1;
         }
         break;
     case 4:
         step = (pTool->Pad1.on & JOY_A) ? 5.0f : 1.0f;
-        sp->A1 += (f32) pTool->Pad1.stickX * step;
-        sp->A1 += (f32) pTool->Pad1.stickY * step;
+        sp->Edge += (f32) pTool->Pad1.stickX * step;
+        sp->Edge += (f32) pTool->Pad1.stickY * step;
         if (pTool->Pad1.trg & JOY_Y) {
-            sp->A1 = 0.0f;
+            sp->Edge = 0.0f;
         }
         break;
     }
@@ -3143,12 +3106,12 @@ static void edit_light_type_parallel()
     }
     pTool->printCursor(7, pTool->cursor + 11);
     if (pTool->cursor != 0) {
-        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->xD, light_type_name[cur->xD]);
+        eprintf(0x40, 0x9A, 0, pTool->PageNo, "%2d %s", cur->Type, light_type_name[cur->Type]);
     }
     eprintf(0x40, 0xA8, 0, pTool->PageNo, "DIR Y:%3.0f", ang.y * 180.0f / 3.1415927f);
     eprintf(0x40, 0xB6, 0, pTool->PageNo, "DIR X:%3.0f", ang.x * 180.0f / 3.1415927f);
-    eprintf(0x40, 0xC4, (sp->flags & 1) ? 0 : 0x14, pTool->PageNo, "LOCAL DIR");
-    eprintf(0x40, 0xD2, 0, pTool->PageNo, "SMOOTH EDGE %6f", sp->A1);
+    eprintf(0x40, 0xC4, (sp->Flag & 1) ? 0 : 0x14, pTool->PageNo, "LOCAL DIR");
+    eprintf(0x40, 0xD2, 0, pTool->PageNo, "SMOOTH EDGE %6f", sp->Edge);
 }
 // Unused sub menu slot (rno2 21).
 static void edit_light_prop_sub() {}
@@ -3292,10 +3255,10 @@ void edit_fog_common(FOG* fog)
         switch (pTool->cursor) {
         case 0:
             if (pTool->Pad1.rep & JOY_RIGHT) {
-                fog->Type = fogTypeNext(fog->Type);
+                fog->Type = (GXFogType) fogTypeNext(fog->Type);
             }
             if (pTool->Pad1.rep & JOY_LEFT) {
-                fog->Type = fogTypeBack(fog->Type);
+                fog->Type = (GXFogType) fogTypeBack(fog->Type);
             }
             break;
         case 1:
@@ -3923,8 +3886,8 @@ static void edit_wind()
     }
     env->wind.set();
     pPL->moveCloth();
-    a = pG->Camera.param.pos;
-    b = pG->Camera.param.at;
+    a = pG->Camera.param.Campos;
+    b = pG->Camera.param.Target;
     PSVECSubtract(&b, &a, &b);
 #line 4082 "D:/Bio4/Prog/db_light.cpp"
     VECNormalize(&b, &b);
@@ -4093,7 +4056,7 @@ static void load()
         if (pTool->Lit.fileLoad(path)) {
             pTool->cutNo = pTool->EditCutNo;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = (pTool->cursor != 1) ? 1 : 2;
+            pTool->DataType = (pTool->cursor != 1) ? DT_CUT : DT_ROOM;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4124,7 +4087,7 @@ static void load()
             file_lock(path);
             pTool->cutNo = pTool->EditCutNo;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = (pTool->cursor != 1) ? 1 : 2;
+            pTool->DataType = (pTool->cursor != 1) ? DT_CUT : DT_ROOM;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4149,7 +4112,7 @@ static void load()
         if (pTool->Lit.fileLoad(path)) {
             pTool->cutNo = 0;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = 4;
+            pTool->DataType = DT_TOOL;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4175,7 +4138,7 @@ static void load()
             file_lock(path);
             pTool->cutNo = 0;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = 3;
+            pTool->DataType = DT_CORE;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4216,7 +4179,7 @@ static void load()
             file_lock(path);
             pTool->cutNo = pTool->EditCutNo = 0;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = (pTool->cursor != 1) ? 1 : 2;
+            pTool->DataType = (pTool->cursor != 1) ? DT_CUT : DT_ROOM;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4241,7 +4204,7 @@ static void load()
         if (pTool->Lit.fileLoad(path)) {
             pTool->cutNo = 0;
             LitLoadWork(&pTool->Lit, pTool->cutNo);
-            pTool->DataType = 4;
+            pTool->DataType = DT_TOOL;
             pTool->rno0 = 0;
             pTool->rno1 = 0;
             pTool->clearWork();
@@ -4280,10 +4243,10 @@ static void save()
         default:
             pTool->cursor = (DbgFlagChk(pG, DBG_EVENT_TOOL)) ? 2 : 1;
             break;
-        case 4:
+        case DT_TOOL:
             pTool->cursor = 2;
             break;
-        case 3:
+        case DT_CORE:
             pTool->cursor = 3;
             break;
         }
@@ -4306,11 +4269,11 @@ static void save()
             switch (pTool->cursor) {
             case 0:
                 pTool->rno1 = 2;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 1:
                 pTool->rno1 = 4;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 2:
                 pTool->rno1 = 14;
@@ -4330,19 +4293,19 @@ static void save()
                 break;
             case 3:
                 pTool->rno1 = 6;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 4:
                 pTool->rno1 = 8;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 5:
                 pTool->rno1 = 12;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             case 6:
                 pTool->rno1 = 0x10;
-                pTool->cursor = pTool->DataType == 2;
+                pTool->cursor = pTool->DataType == DT_ROOM;
                 break;
             }
         }
@@ -4602,7 +4565,7 @@ static void option()
                     pTool->rno1 = 1;
                 }
             }
-            q = LightMgr.getPathPtr(pTool->rno3);
+            q = (cLightPathData*) LightMgr.getPathPtr(pTool->rno3);
             if (VALID_PTR(q)) {
                 drawPath(0x32, 0xFA, q, 0, 0xFFFFFFFF);
             } else {
@@ -4769,13 +4732,13 @@ static const char* table_head[] = {
     {                                                                                               \
         GXColor col;                                                                                \
                                                                                                     \
-        eprintf(x * 8, (Y), c, pTool->PageNo, "%s", (l->xF & 2) ? "E" : "-");                        \
+        eprintf(x * 8, (Y), c, pTool->PageNo, "%s", (l->EnableMask & 2) ? "E" : "-");                        \
         x++;                                                                                        \
-        eprintf(x * 8, (Y), c, pTool->PageNo, "%s", (l->xF & 4) ? "O" : "-");                        \
+        eprintf(x * 8, (Y), c, pTool->PageNo, "%s", (l->EnableMask & 4) ? "O" : "-");                        \
         x++;                                                                                        \
-        eprintf(x * 8, (Y), c, pTool->PageNo, "%s", (l->xF & 8) ? "E" : "-");                        \
+        eprintf(x * 8, (Y), c, pTool->PageNo, "%s", (l->EnableMask & 8) ? "E" : "-");                        \
         x++;                                                                                        \
-        eprintf(x * 8, (Y), c, pTool->PageNo, "%s", (l->xF & 0x10) ? "S" : "-");                     \
+        eprintf(x * 8, (Y), c, pTool->PageNo, "%s", (l->EnableMask & 0x10) ? "S" : "-");                     \
         x += 2;                                                                                     \
         eprintf(x * 8, (Y), c, pTool->PageNo, "%s", parent_short[l->ParentType]);                    \
         x += 3;                                                                                     \
@@ -4788,7 +4751,7 @@ static const char* table_head[] = {
             eprintf(x * 8, (Y), c, pTool->PageNo, "INF");                                            \
         }                                                                                           \
         x += 4;                                                                                     \
-        if (l->Type == 4) {                                                                         \
+        if (l->Id == 4) {                                                                         \
             /* a four-member chain: `a` gets its own load, the re-evaluated rhs of the innermost   \
                assignment is the one load shared by b, g, r (a three-member chain reloads) */       \
             col.r = col.g = col.b = col.a = l->Col.r;                                             \
@@ -4801,15 +4764,15 @@ static const char* table_head[] = {
         x += 4;                                                                                     \
         eprintf(x * 8, (Y), c, pTool->PageNo, "%1.1f", l->Intensity);                                    \
         x += 4;                                                                                     \
-        if (l->Type != 4) {                                                                         \
-            if (l->xD <= 7) {                                                                       \
-                eprintf(x * 8, (Y), c, pTool->PageNo, "%s", light_type_short[l->xD]);               \
+        if (l->Id != 4) {                                                                         \
+            if (l->Type <= 7) {                                                                       \
+                eprintf(x * 8, (Y), c, pTool->PageNo, "%s", light_type_short[l->Type]);               \
             } else {                                                                                \
                 eprintf(x * 8, (Y), c, pTool->PageNo, "ERR!");                                       \
             }                                                                                       \
         } else {                                                                                    \
-            if (l->xD <= 2) {                                                                       \
-                eprintf(x * 8, (Y), c, pTool->PageNo, "%s", shadow_type_short[l->xD]);              \
+            if (l->Type <= 2) {                                                                       \
+                eprintf(x * 8, (Y), c, pTool->PageNo, "%s", shadow_type_short[l->Type]);              \
             } else {                                                                                \
                 eprintf(x * 8, (Y), c, pTool->PageNo, "ERR!");                                       \
             }                                                                                       \
@@ -4839,7 +4802,7 @@ void printEditTable()
         x = 4;
         if (pTool->editEnable()) {
             if ((l->be_flag & 3) == 3) {
-                c = (l->Type == 4) ? 5 : 0;
+                c = (l->Id == 4) ? 5 : 0;
             } else {
                 c = 0x14;
             }
@@ -4853,7 +4816,7 @@ void printEditTable()
         y = (i + 24) * 14;
         if (l->be_flag & 1) {
             if (page == 0) {
-                eprintf(7 * 8, 0x150 + i * 14, c, pTool->PageNo, "%02d", l->Type);
+                eprintf(7 * 8, 0x150 + i * 14, c, pTool->PageNo, "%02d", l->Id);
                 // COMPILER-DIFF: candidate #12 (gcse cprop): the target keeps `li r30,10` and `li r3,80`
                 // as pseudos of the pre-diamond block (`x + 1` and the "P" call's r3 not folded); ours
                 // const-propagates both into the "P" join block unless the two constants are laundered
@@ -4864,7 +4827,7 @@ void printEditTable()
                     int t80 = x * 8;
                     asm("" : "+r"(t80));
                     asm("" : "+r"(x));
-                    eprintf(t80, 0x150 + i * 14, c, pTool->PageNo, "%s", (l->xF & 1) ? "P" : "-");
+                    eprintf(t80, 0x150 + i * 14, c, pTool->PageNo, "%s", (l->EnableMask & 1) ? "P" : "-");
                 }
                 x++;
                 PRINT_EDIT_TAIL(l, y, c);
@@ -5416,9 +5379,9 @@ int fogTypeBack(int type)
 void initLightWork(cLight* l)
 {
     l->be_flag |= 6;
-    l->Type = 0;
-    l->xD = 2;
-    l->xF |= 0x57;
+    l->Id = 0;
+    l->Type = 2;
+    l->EnableMask |= 0x57;
     l->Col.r = 0x80;
     l->Col.g = 0x80;
     l->Col.b = 0x80;
@@ -5448,7 +5411,7 @@ void clear_move_free()
     cLight* cur = curLight();
 
     memclr_asm(&cur->sub, sizeof(LightSub));
-    if (cur->Type == 1) {
+    if (cur->Id == 1) {
         cur->sub.color = cur->Col;
     }
 }
@@ -5480,7 +5443,7 @@ int getCutNo()
 // Shadow light with a parallel (type 2) direction: draws its position and the shadow cone.
 void drawLightInfo_SpotShadow(cLight* l, u32 color)
 {
-    Light04Work* w = (Light04Work*) l->work;
+    LIT04_MOVE_FREE* w = (LIT04_MOVE_FREE*) l->work;
     Vec dir;
     Vec n;
     Vec rot;
@@ -5496,8 +5459,8 @@ void drawLightInfo_SpotShadow(cLight* l, u32 color)
     dir.y = -1.0f;
     dir.z = 0.0f;
     PSVECNormalize(&dir, &dir);
-    rot.x = (f32) (s16) (u16) w->rotX * 3.1415927f * 2.0f / 360.0f;
-    rot.y = (f32) (s16) (u16) w->rotY * 3.1415927f * 2.0f / 360.0f;
+    rot.x = (f32) (s16) (u16) w->Ang_x * 3.1415927f * 2.0f / 360.0f;
+    rot.y = (f32) (s16) (u16) w->Ang_y * 3.1415927f * 2.0f / 360.0f;
     rot.z = 0.0f;
     PSMTXRotRad(m, 'x', rot.x);
     PSMTXRotAxisRad(m2, &axis, rot.y);
@@ -5514,7 +5477,7 @@ void drawLightInfo_SpotShadow(cLight* l, u32 color)
         if (len == 0.0f) {
             len = 2000.0f;
         }
-        Draw_corn2(pp, pn, len, (f32) w->texNo, 0xFFFFFFFF);
+        Draw_corn2(pp, pn, len, (f32) w->Fovy, 0xFFFFFFFF);
     }
 }
 // Position sphere / hit radius / direction line of a light.
@@ -5524,7 +5487,7 @@ void drawLightInfo(cLight* l, u32 color)
     Vec t;
     Vec n;
 
-    if ((*(u32*) &l->xC & 0x00FFFF00) == 0x00020400) {
+    if ((*(u32*) &l->enable & 0x00FFFF00) == 0x00020400) {
         drawLightInfo_SpotShadow(l, color);
         return;
     }
@@ -5536,7 +5499,7 @@ void drawLightInfo(cLight* l, u32 color)
         Draw_sphere(&pos, (f32) l->HitRadius, 0xFFFF0044, 1, 1);
     }
     Draw_pos(&pos, 300);
-    if (l->xD == 3 || l->xD == 4 || l->xD == 6) {
+    if (l->Type == 3 || l->Type == 4 || l->Type == 6) {
         l->getNormal(&l->normal, &n);
         PSVECScale(&n, &t, 500.0f);
         PSVECAdd(&t, &pos, &t);

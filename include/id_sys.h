@@ -4,6 +4,7 @@
 #include "types.h"
 #include "vec.h"
 #include "hermite.h"
+#include "texture.h"
 
 // Screen id (widget) unit (game/id_sys.cpp), 0x138 bytes.
 struct ID_UNIT {
@@ -55,7 +56,7 @@ struct ID_UNIT {
     f32 v1;          // 0x11C
     void* path0;     // 0x120  FuncPath data
     void* path1;     // 0x124
-    Hermite1* curve[4];  // 0x128
+    HERMITE_1_PTR* curve[4];  // 0x128
 };
 
 // One entry of an id data table (IDSystem::set): ID_DATA_V1 is 0x88 bytes, ID_DATA_V2 0x8C.
@@ -124,12 +125,13 @@ struct ID_DATA_V2 {
     u32 ofs[6];      // 0x74
 };
 
-// Id data table header: version string, entry count, entries from 0x08.
-struct IdDataHeader {
-    char version[5];  // 0x00  "1.00" / "2.00"
-    u8 num;           // 0x05
-    u8 pad_6[2];
-};
+// Id data table header (IDSystem::set's argument), entries from 0x08.
+typedef struct _ID_FILE_HEADER {
+    char Version[4];  // 0x00  "1.00" / "2.00"
+    u8 GroupNo;       // 0x04
+    u8 UnitNum;       // 0x05
+    u8 dummy[2];      // 0x06
+} ID_FILE_HEADER;
 
 // Id class (PS2 ID_CLASS): the `type` / classNo of IDSystem::set/kill/setCk/dispSw/unitPtr and the IdSet*
 // helpers; IDC_NUM_00..IDC_NUM_61 are the 62 digit classes, IDC_ANY matches every class.
@@ -200,25 +202,25 @@ public:
 
     static Mtx m_scrn_mat;
 
-    void gameInit(int n);
+    void gameInit(int maxId);
     void roomInit();
     void free();
-    int setCk(int classNo);
-    void dispSw(int classNo, int sw);
-    void unitPush(ID_UNIT* u);
+    int setCk(ID_CLASS classNo);
+    void dispSw(ID_CLASS classNo, int sw);
+    void unitPush(ID_UNIT* pIdUnit);
     ID_UNIT* unitPull();
     void unitLevel(ID_UNIT* u, u8 level);
-    void unitParent(ID_UNIT* parent, ID_UNIT* child);
-    ID_UNIT* unitPtr(u8 id, int type);
-    void set(void* data, u8 id, int type, u8 ot, u8 prio, u8 mode);
-    void kill(u8 id, int type);
+    void unitParent(ID_UNIT* pParent, ID_UNIT* pChild);
+    ID_UNIT* unitPtr(u8 markNo, ID_CLASS classNo);
+    void set(ID_FILE_HEADER* data, u8 markNo, ID_CLASS classNo, u8 otType, u8 otNo, u32 Attr);
+    void kill(u8 markNo, ID_CLASS classNo);
     void stop();
     void move();
-    void beMove(ID_UNIT* u, int on_off);
-    void setTime(ID_UNIT* u, s16 time);
-    void movePos(ID_UNIT* u);
+    void beMove(ID_UNIT* pParent, int on_off);
+    void setTime(ID_UNIT* pParent, s16 time);
+    void movePos(ID_UNIT* pParent);
     void trans();
-    void unitTrans(ID_UNIT* u);
+    void unitTrans(ID_UNIT* pIdUnit);
 };
 
 extern IDSystem IdSys;
@@ -233,7 +235,6 @@ int IdGetAnmAddr(u8 id, TexAnm** ppAnm);
 void IdChannelSet(ID_UNIT* pIdUnit);
 TEX_WK* IdGetTexWk(u8 id, int bNoDispErrMsg);
 
-extern "C" {
 void idSysMove00(ID_UNIT* u);
 void IdCalcVertex(ID_UNIT* u);
 void idSysMove01(ID_UNIT* u);
@@ -252,24 +253,7 @@ void* IdGetBufferAddr(int type);
 void IdSetBufferType(int type);
 void IdTexGameInit();
 void IdTexRoomInit();
-enum TEX_OWNER {
-    TEX_OWNER_NONE = 0,
-    TEX_OWNER_CORE = 1,
-    TEX_OWNER_ROOM = 2,
-    TEX_OWNER_ID_TOOL = 3,
-    TEX_OWNER_ID_COCKPIT = 4,
-    TEX_OWNER_ID_CINESCO = 5,
-    TEX_OWNER_ID_EVENT = 6,
-    TEX_OWNER_ID_TITLE = 7,
-    TEX_OWNER_ID_SHARE = 8,
-    TEX_OWNER_ID_SSCRN = 9,
-    TEX_OWNER_ID_DEAD = 10,
-    TEX_OWNER_ID_SCOPE = 11,
-    TEX_OWNER_MAX = 12
-};
-
 void IdTexRelease(int owner);
 int IdTexDataLoad(void* data, int id);
-}
 
 #endif

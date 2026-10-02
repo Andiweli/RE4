@@ -202,7 +202,7 @@ void cPl0f::move()
         PSMTXMultVecSR(m, &v, &v);
         SndCall(8, 0x17, &pos, 0xF, 0, 0);
         for (i = 0; i < 2; i++) {
-            w->node[i].spd = v;
+            w->node[i].Spd = v;
         }
     }
 }
@@ -243,11 +243,11 @@ void cPl0f::setPos(Vec* p, f32 ang)
     u32 i;
 
     for (i = 0; i < 2; i++) {
-        Pl0fNode* n = &w->node[i];
+        BOAT_CTRL_WK* n = &w->node[i];
 
-        n->spd.x = 0.0f;
-        n->spd.y = 0.0f;
-        n->spd.z = 0.0f;
+        n->Spd.x = 0.0f;
+        n->Spd.y = 0.0f;
+        n->Spd.z = 0.0f;
     }
     pos = *p;
     pos_old = pos;
@@ -288,27 +288,27 @@ static void pl0f_R0_Init(cPl0f* em)
     em->atari.setPriority(PRI_LV1);
     em->setStatus(EM_STATUS_LOCKOFF);
     EspDataLoad((u32) ARC(PL0F_EFF_004), EFF_PL0F, 0);
-    w->node[0].pos.x = 0.0f;
-    w->node[0].pos.y = 0.0f;
-    w->node[0].pos.z = 2500.0f;
-    w->node[1].pos.x = 0.0f;
-    w->node[1].pos.y = 0.0f;
-    w->node[1].pos.z = -1500.0f;
+    w->node[0].Ofs.x = 0.0f;
+    w->node[0].Ofs.y = 0.0f;
+    w->node[0].Ofs.z = 2500.0f;
+    w->node[1].Ofs.x = 0.0f;
+    w->node[1].Ofs.y = 0.0f;
+    w->node[1].Ofs.z = -1500.0f;
     for (i = 0; i < 2; i++) {
-        Pl0fNode* n = &w->node[i];
+        BOAT_CTRL_WK* n = &w->node[i];
 
-        n->dist[i] = 0.0f;
-        n->maxLen = 25000.0f;
-        n->spd.x = 0.0f;
-        n->spd.y = 0.0f;
-        n->spd.z = 0.0f;
+        n->Len[i] = 0.0f;
+        n->Fix_len = 25000.0f;
+        n->Spd.x = 0.0f;
+        n->Spd.y = 0.0f;
+        n->Spd.z = 0.0f;
         for (j = i + 1; j < 2; j++) {
-            Pl0fNode* m = &w->node[j];
+            BOAT_CTRL_WK* m = &w->node[j];
             f32 len;
 
-            len = VEC_DIST(&n->pos, &m->pos);
-            n->dist[j] = len;
-            m->dist[i] = len;
+            len = VEC_DIST(&n->Ofs, &m->Ofs);
+            n->Len[j] = len;
+            m->Len[i] = len;
         }
     }
     w->Ripple_wait = 0x1D;
@@ -498,12 +498,8 @@ static void pl0f_R1_BossMove(cPl0f* em)
         em->r_no_1 = 1;
         em->r_no_2 = 0;
         em->r_no_3 = 0;
-        {
-            int zero = 0;   // one SImode zero for both stores, separate from the routine's QImode zero
-
-            w->pBoss = (cEm*) zero;
-            w->Boss_chase = zero;
-        }
+        w->pBoss = 0;
+        w->Boss_chase = 0;
         return;
     }
     switch (em->r_no_2) {
@@ -608,7 +604,7 @@ static void pl0f_R1_Drop(cPl0f* em)
             for (i = 0; i < 2; i++) {
                 Vec d;
 
-                d = w->node[i].spd;
+                d = w->node[i].Spd;
                 if (d.x != 0.0f && d.y != 0.0f && d.z != 0.0f) {
                     d.x = 0.0f;
                     d.y = 0.0f;
@@ -618,7 +614,7 @@ static void pl0f_R1_Drop(cPl0f* em)
 #line 806
                 VECNormalize(&d, &d);
                 PSVECScale(&d, &d, spd);
-                w->node[i].spd = d;
+                w->node[i].Spd = d;
             }
         }
         break;
@@ -797,9 +793,9 @@ static void pl0f_R1_R10eOut2(cPl0f* em)
 // `len` rather than an inline, so the `&d` arguments stay one PRE'd pseudo per block while the member
 // reads stay frame-direct, and the squared length goes through `len` (f12).
 #define PL0F_NODE_LIMIT(n, line)                                                                   \
-    PSVECSubtract(&(n)->wpos, &(n)->fixPos, &d);                                                   \
+    PSVECSubtract(&(n)->Pos, &(n)->Fix, &d);                                                   \
     len = d.x * d.x + d.z * d.z;                                                                   \
-    if (len > (n)->maxLen * (n)->maxLen) {                                                         \
+    if (len > (n)->Fix_len * (n)->Fix_len) {                                                         \
         if (0.0f == d.x && 0.0f == d.y && 0.0f == d.z) {                                           \
             pLog->err(0, 0, "VECNormalize:[%s/%d]", "D:/Bio4/Prog/pl0f.cpp", line);              \
             d.x = d.y = d.z = 0.0f;                                                                \
@@ -807,8 +803,8 @@ static void pl0f_R1_R10eOut2(cPl0f* em)
             PSVECNormalize(&d, &d);                                                                \
         }                                                                                          \
         d.y = 0.0f;                                                                                \
-        PSVECScale(&d, &d, (n)->maxLen);                                                           \
-        PSVECAdd(&(n)->fixPos, &d, &(n)->wpos);                                                    \
+        PSVECScale(&d, &d, (n)->Fix_len);                                                           \
+        PSVECAdd(&(n)->Fix, &d, &(n)->Pos);                                                    \
     }
 
 // The hull physics of the frame: the bow and stern nodes move, four relaxation passes restore their
@@ -823,7 +819,7 @@ void pl0fBoatControl(cPl0f* em)
     u32 k;
     u32 pass;
     f32 len;
-    Pl0fNode* n;
+    BOAT_CTRL_WK* n;
 
     // `i` and `n` are the SAME variables in all three node loops. Fresh variables would let gcse and
     // loop.c turn the second loop's index into a `mulli` and its member addresses into stepping
@@ -832,47 +828,47 @@ void pl0fBoatControl(cPl0f* em)
     TransMatrix(m, &em->pos);
     for (i = 0; i < 2; i++) {
         n = &w->node[i];
-        PSMTXMultVec(m, &n->pos, &n->wpos);
-        n->wposOld = n->wpos;
-        PSVECAdd(&n->wpos, &n->spd, &n->wpos);
-        if (n->fixed) {
+        PSMTXMultVec(m, &n->Ofs, &n->Pos);
+        n->Old = n->Pos;
+        PSVECAdd(&n->Pos, &n->Spd, &n->Pos);
+        if (n->Flg) {
             PL0F_NODE_LIMIT(n, 1205);
         }
     }
     for (pass = 0; pass < 4; pass++) {
         for (i = 0; i < 2; i++) {
             n = &w->node[i];
-            if (n->fixed) {
+            if (n->Flg) {
                 PL0F_NODE_LIMIT(n, 1226);
             }
             for (k = 0; k < 2; k++) {
                 if (i != k) {
-                    Pl0fNode* o = &w->node[k];
+                    BOAT_CTRL_WK* o = &w->node[k];
                     f32 rate;
 
-                    PSVECSubtract(&o->wpos, &n->wpos, &d);
+                    PSVECSubtract(&o->Pos, &n->Pos, &d);
                     len = PSVECMag(&d);   // the routine's `len`: f12 (`fmr f12,f1`), not tied to f1
-                    rate = (n->dist[k] - len) * 0.5f;   // 0.5 enters the pool before 1.0
+                    rate = (n->Len[k] - len) * 0.5f;   // 0.5 enters the pool before 1.0
                     PSVECScale(&d, &d, (1.0f / len) * rate);   // 1/len is the left operand of the fmuls
-                    PSVECAdd(&o->wpos, &d, &o->wpos);
-                    PSVECSubtract(&n->wpos, &d, &n->wpos);
+                    PSVECAdd(&o->Pos, &d, &o->Pos);
+                    PSVECSubtract(&n->Pos, &d, &n->Pos);
                 }
             }
         }
     }
     for (i = 0; i < 2; i++) {
         n = &w->node[i];
-        n->fixed = 0;
-        PSVECSubtract(&n->wpos, &n->wposOld, &n->spd);
-        PSVECScale(&n->spd, &n->spd, pl0f_spd_damp);
+        n->Flg = 0;
+        PSVECSubtract(&n->Pos, &n->Old, &n->Spd);
+        PSVECScale(&n->Spd, &n->Spd, pl0f_spd_damp);
     }
     pl0fScrAdjust(em);
-    PSVECSubtract(&w->node[0].wpos, &w->node[1].wpos, &d);
+    PSVECSubtract(&w->node[0].Pos, &w->node[1].Pos, &d);
     em->ang.x = 0.0f;
     em->ang.y = atan2f(d.x, d.z);
     RotMatrix(em->mat, &em->ang);
-    PSVECScale(&w->node[0].pos, &d, -1.0f);
-    TransMatrix(em->mat, &w->node[0].wpos);
+    PSVECScale(&w->node[0].Ofs, &d, -1.0f);
+    TransMatrix(em->mat, &w->node[0].Pos);
     PSMTXMultVec(em->mat, &d, &d);
     TransMatrix(em->mat, &d);
     em->pos = d;
@@ -880,8 +876,8 @@ void pl0fBoatControl(cPl0f* em)
     pl0fWaterEff(em);
     pl0fBoatRoll(em);
     if (w->Boat_spd > 100.0f) {
-        AddWaterPower(w->node[0].wpos, fRand1_1() * 0.3f);
-        AddWaterPower(w->node[1].wpos, fRand1_1() * 0.3f);
+        AddWaterPower(w->node[0].Pos, fRand1_1() * 0.3f);
+        AddWaterPower(w->node[1].Pos, fRand1_1() * 0.3f);
     }
     {
         cPlayer* pl = pPL;
@@ -1032,7 +1028,7 @@ void pl0fBoatAddSpd(cPl0f* em, u32 no, Vec* spd)
     FREE_PL0F* w = PL0F_WK(em);
 
     if (no < 2) {
-        PSVECAdd(&w->node[no].spd, spd, &w->node[no].spd);
+        PSVECAdd(&w->node[no].Spd, spd, &w->node[no].Spd);
     }
 }
 
@@ -1142,7 +1138,7 @@ void pl0fBoatSpdControl(cPl0f* em)
 void pl0fBoatChaseBoss(cPl0f* em)
 {
     cEm* boss = PL0F_WK(em)->pBoss;   // no work pointer: pBoss folds into em+0x3F0
-    Pl0fNode* n;
+    BOAT_CTRL_WK* n;
     Vec v;
     Vec b;
 
@@ -1154,11 +1150,11 @@ void pl0fBoatChaseBoss(cPl0f* em)
     v.y = 0.0f;
     v.z = -2000.0f;
     PSMTXMultVec(boss->mat, &v, &v);
-    v.y = n->wpos.y;
-    n->fixed = 1;
-    n->fixPos = v;
+    v.y = n->Pos.y;
+    n->Flg = 1;
+    n->Fix = v;
     if (boss->flag & 8) {
-        n->maxLen = 500000.0f;
+        n->Fix_len = 500000.0f;
     } else {
         f32 len;
 
@@ -1166,11 +1162,11 @@ void pl0fBoatChaseBoss(cPl0f* em)
         b.y = 0.0f;
         b.z = -2000.0f;
         PSMTXMultVec(boss->mat, &b, &b);
-        len = VEC_DISTXZ(&n->wpos, &b);
-        if (len < n->maxLen && len > 25000.0f) {
-            n->maxLen = len;
+        len = VEC_DISTXZ(&n->Pos, &b);
+        if (len < n->Fix_len && len > 25000.0f) {
+            n->Fix_len = len;
         } else {
-            n->maxLen = n->maxLen * 0.97f + 750.0f;
+            n->Fix_len = n->Fix_len * 0.97f + 750.0f;
         }
     }
 }
@@ -1178,8 +1174,8 @@ void pl0fBoatChaseBoss(cPl0f* em)
 // Camera distance from the position / target pair, then the orientation.
 #define CAM_SET(cam)                                                                                              \
     {                                                                                                             \
-        Vec* cp = &(cam).param.pos;                                                                               \
-        Vec* ca = &(cam).param.at;                                                                                \
+        Vec* cp = &(cam).param.Campos;                                                                            \
+        Vec* ca = &(cam).param.Target;                                                                            \
                                                                                                                   \
         (cam).Distance = VEC_DIST(cp, ca); \
     }                                                                                                             \
@@ -1200,9 +1196,9 @@ void pl0fRideCamMove(cPl0f* em, f32 rate)
     TransMatrix(m, &em->pos);
     PSMTXMultVec(m, &pl0f_ride_cam_ofs, &pos);
     at = pPL->getPartsPtr(0)->world;
-    pl0f_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &at, &pl0f_camera.param.at, rate);
-    PosToPos(&gcam->param.pos, &pos, &pl0f_camera.param.pos, rate);
+    pl0f_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &at, &pl0f_camera.param.Target, rate);
+    PosToPos(&gcam->param.Campos, &pos, &pl0f_camera.param.Campos, rate);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1224,9 +1220,9 @@ void pl0fGetoffCamMove(cPl0f* em)
     TransMatrix(m, &em->pos);
     PSMTXMultVec(m, &pl0f_getoff_cam_ofs, &pos);
     at = pPL->getPartsPtr(0)->world;
-    pl0f_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &at, &pl0f_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &pos, &pl0f_camera.param.pos, 1.0f);
+    pl0f_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &at, &pl0f_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &pos, &pl0f_camera.param.Campos, 1.0f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1322,7 +1318,7 @@ void pl0fBossCamMove(cPl0f* em, int hide)
             d.y = 0.0f;
             d.z = len;
             PSMTXMultVec(m, &d, &cat);
-            pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 3.0f;
+            pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 3.0f;
         } else {
             PSMTXRotRad(m, 'y', em->ang.y);
             TransMatrix(m, &em->pos);
@@ -1341,7 +1337,7 @@ void pl0fBossCamMove(cPl0f* em, int hide)
             PSVECAdd(&em->pos, &bpos, &d);
             PSVECScale(&d, &d, 0.5f);
             cat = d;
-            pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
+            pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
             PSVECSubtract(&cat, &cpos, &d);
             len = SQRTF(d.x * d.x + d.z * d.z);
             ang.x = -atan2f(d.y, len);
@@ -1361,8 +1357,8 @@ void pl0fBossCamMove(cPl0f* em, int hide)
             d.z = len;
             PSMTXMultVec(m, &d, &cat);
         }
-        PosToPos(&gcam->param.at, &cat, &pl0f_camera.param.at, 0.1f);
-        PosToPos(&gcam->param.pos, &cpos, &pl0f_camera.param.pos, 0.5f);
+        PosToPos(&gcam->param.Target, &cat, &pl0f_camera.param.Target, 0.1f);
+        PosToPos(&gcam->param.Campos, &cpos, &pl0f_camera.param.Campos, 0.5f);
     } else {
         PSMTXRotRad(m, 'y', em->ang.y);
         TransMatrix(m, &em->pos);
@@ -1373,15 +1369,15 @@ void pl0fBossCamMove(cPl0f* em, int hide)
             PSMTXMultVec(m, &pl0f_boss_cam_pos0, &cpos);
             PSMTXMultVec(m, &pl0f_boss_cam_at0, &cat);
         }
-        pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
-        PosToPos(&gcam->param.at, &cat, &pl0f_camera.param.at, 0.3f);
-        PosToPos(&gcam->param.pos, &cpos, &pl0f_camera.param.pos, 0.5f);
-        PSVECSubtract(&pl0f_camera.param.at, &pl0f_camera.param.pos, &d2);
+        pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
+        PosToPos(&gcam->param.Target, &cat, &pl0f_camera.param.Target, 0.3f);
+        PosToPos(&gcam->param.Campos, &cpos, &pl0f_camera.param.Campos, 0.5f);
+        PSVECSubtract(&pl0f_camera.param.Target, &pl0f_camera.param.Campos, &d2);
 #line 1929
         VECNormalize(&d2, &d2);
         PSVECScale(&d2, &d2, 1500.0f);
-        PSVECAdd(&pl0f_camera.param.pos, &d2, &d2);
-        EatMgr.adjust(0, &d2, &pl0f_camera.param.pos, 500.0f, 0x2001, 0);
+        PSVECAdd(&pl0f_camera.param.Campos, &d2, &d2);
+        EatMgr.adjust(0, &d2, &pl0f_camera.param.Campos, 500.0f, 0x2001, 0);
     }
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
@@ -1406,9 +1402,9 @@ void pl0fHideModeCamSet(cPlayer* pl)
     TransMatrix(m, &pl->pos);
     PSMTXMultVec(m, &pl0f_hide_cam_at, &at);
     PSMTXMultVec(m, &pl0f_hide_cam_pos, &pos);
-    pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
-    PosToPos(&gcam->param.at, &pos, &pl0f_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl0f_camera.param.pos, 1.0f);
+    pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl0f_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl0f_camera.param.Campos, 1.0f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1427,9 +1423,9 @@ void pl0fHideModeCamMove(cPlayer* pl)
     TransMatrix(m, &pl->pos);
     PSMTXMultVec(m, &pl0f_hide_cam_at, &at);
     PSMTXMultVec(m, &pl0f_hide_cam_pos, &pos);
-    pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
-    PosToPos(&gcam->param.at, &pos, &pl0f_camera.param.at, 0.1f);
-    PosToPos(&gcam->param.pos, &at, &pl0f_camera.param.pos, 0.1f);
+    pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl0f_camera.param.Target, 0.1f);
+    PosToPos(&gcam->param.Campos, &at, &pl0f_camera.param.Campos, 0.1f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1453,9 +1449,9 @@ void pl0fBossDieCamSet(cPlayer* pl)
     TransMatrix(m, &pl->pos);
     PSMTXMultVec(m, &pl0f_die_cam_at, &at);
     PSMTXMultVec(m, &pl0f_die_cam_pos, &pos);
-    pl0f_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &pos, &pl0f_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl0f_camera.param.pos, 1.0f);
+    pl0f_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl0f_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl0f_camera.param.Campos, 1.0f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1474,9 +1470,9 @@ void pl0fBossDieCamMove(cPlayer* pl)
     TransMatrix(m, &pl->pos);
     PSMTXMultVec(m, &pl0f_die_cam_at, &at);
     PSMTXMultVec(m, &pl0f_die_cam_pos, &pos);
-    pl0f_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &pos, &pl0f_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl0f_camera.param.pos, 1.0f);
+    pl0f_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl0f_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl0f_camera.param.Campos, 1.0f);
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -1638,7 +1634,7 @@ int pl0fCrashCk(cPl0f* em)
 
         if (e->isAlive() && e->id == 0x2F && (s16) e->hp > 0) {
             for (i = 0; i < 2; i++) {
-                if (EmYarareContactCk(e, &w->node[i].wpos, 800.0f, &hit)) {
+                if (EmYarareContactCk(e, &w->node[i].Pos, 800.0f, &hit)) {
                     int away = 0;
 
                     if (StaFlagChk(pG, STA_PL_SPEAR_SET)) {
@@ -1660,9 +1656,9 @@ int pl0fCrashCk(cPl0f* em)
             f32 r = o->scale.x * 1800.0f;
 
             for (i = 0; i < 2; i++) {
-                Pl0fNode* nd = &w->node[i];
+                BOAT_CTRL_WK* nd = &w->node[i];
 
-                if ((nd->wpos.x - o->pos.x) * (nd->wpos.x - o->pos.x) + (nd->wpos.z - o->pos.z) * (nd->wpos.z - o->pos.z) < r * r) {
+                if ((nd->Pos.x - o->pos.x) * (nd->Pos.x - o->pos.x) + (nd->Pos.z - o->pos.z) * (nd->Pos.z - o->pos.z) < r * r) {
                     int away;
 
                     ((cObj1c*) o)->setCrash();
@@ -1709,7 +1705,7 @@ void pl0fCrashAdjustSet(cPl0f* em, Vec* p, int away)
         PSVECScale(&d, &d, 300.0f);
     }
     for (i = 0; i < 2; i++) {
-        w->node[i].spd = d;
+        w->node[i].Spd = d;
     }
 }
 
@@ -1742,17 +1738,17 @@ void pl0fScrAdjust(cPl0f* em)
         return;
     }
     for (i = 0; i < 2; i++) {
-        Pl0fNode* n = &w->node[i];
+        BOAT_CTRL_WK* n = &w->node[i];
 
         nrm.x = 0.0f;
         nrm.y = 0.0f;
         nrm.z = 0.0f;
-        p = n->wpos;
-        SatMgr.adjust(&nrm, &n->wposOld, &p, 300.0f, 0x2081, 0);
+        p = n->Pos;
+        SatMgr.adjust(&nrm, &n->Old, &p, 300.0f, 0x2081, 0);
         if (!(nrm.x == 0.0f && nrm.y == 0.0f && nrm.z == 0.0f)) {
             f32 len;
 
-            PSVECSubtract(&p, &n->wpos, &d);
+            PSVECSubtract(&p, &n->Pos, &d);
             d.y = 0.0f;
             if (!(d.x == 0.0f && d.z == 0.0f)) {
                 len = SQRTF(d.x * d.x + d.z * d.z) * 1.2f;
@@ -1760,8 +1756,8 @@ void pl0fScrAdjust(cPl0f* em)
                 VECNormalize(&d, &d);
                 PSVECScale(&d, &d, len);
                 for (j = 0; j < 2; j++) {
-                    Vec* wp = &w->node[j].wpos;
-                    Vec* sp = &w->node[j].spd;
+                    Vec* wp = &w->node[j].Pos;
+                    Vec* sp = &w->node[j].Spd;
 
                     PSVECAdd(wp, &d, wp);
                     *sp = d;
@@ -2511,7 +2507,7 @@ static void plboat_R2_Swim(cPlayer* pl)
         } else {
             pl00SetChaseCam(pl);
             pl->m_Work3 = 90;
-            EstSet(0, -1, 0, 0, 0xF, 0xE, 0, 0x34, pl, (void*) first);
+            EstSet(0, -1, 0, 0, 0xF, 0xE, 0, 0x34, pl, 0);
             StaFlagOn(pG, STA_WATER_CAMERA);
         }
         MotionSetCore(pl, &pl->Motion, EM_ARC(pl, PL0F_MOT_PL_SWIM), EM_ARC(pl, PL0F_SEQ_PL_SWIM_015), 5, 5, 0);
@@ -2957,9 +2953,9 @@ void pl00SetSwimCam(cPlayer* pl)
 
     PSMTXRotRad(m, 'y', pl->m_pBoat->ang.y);
     TransMatrix(m, &pl->m_pBoat->pos);
-    PSMTXMultVec(m, &pl00_swim_cam_pos, &pl0f_camera.param.pos);
-    PSMTXMultVec(m, &pl00_swim_cam_at, &pl0f_camera.param.at);
-    pl0f_camera.param.fovy = 40.0f;
+    PSMTXMultVec(m, &pl00_swim_cam_pos, &pl0f_camera.param.Campos);
+    PSMTXMultVec(m, &pl00_swim_cam_at, &pl0f_camera.param.Target);
+    pl0f_camera.param.Fovy = 40.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -2988,13 +2984,13 @@ void pl00SwimCamMove(cPlayer* pl)
         if (boss) {
             at = boss->getPartsPtr(7)->world;
         } else {
-            at = gcam->param.at;
+            at = gcam->param.Target;
         }
-        pos = gcam->param.pos;
-        PosToPos(&gcam->param.at, &at, &pl0f_camera.param.at, 1.0f);
-        PosToPos(&gcam->param.pos, &pos, &pl0f_camera.param.pos, 1.0f);
+        pos = gcam->param.Campos;
+        PosToPos(&gcam->param.Target, &at, &pl0f_camera.param.Target, 1.0f);
+        PosToPos(&gcam->param.Campos, &pos, &pl0f_camera.param.Campos, 1.0f);
     }
-    pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
+    pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -3008,11 +3004,11 @@ void pl00SetChaseCam(cPlayer* pl)
 {
     Mtx m;
 
-    pl0f_camera.param.at = pl->pos;
+    pl0f_camera.param.Target = pl->pos;
     PSMTXRotRad(m, 'y', pl->ang.y);
     TransMatrix(m, &pl->pos);
-    PSMTXMultVec(m, &pl00_chase_cam_ofs, &pl0f_camera.param.pos);
-    pl0f_camera.param.fovy = 40.0f;
+    PSMTXMultVec(m, &pl00_chase_cam_ofs, &pl0f_camera.param.Campos);
+    pl0f_camera.param.Fovy = 40.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -3026,14 +3022,14 @@ void pl00ChaseCamMove(cPlayer* pl)
     Vec d;
 
     StaFlagOn(pG, STA_PL_SWIM_CAMERA);
-    pl0f_camera.param.at = pl->pos;
-    PSVECSubtract(&pl0f_camera.param.at, &pl0f_camera.param.pos, &d);
+    pl0f_camera.param.Target = pl->pos;
+    PSVECSubtract(&pl0f_camera.param.Target, &pl0f_camera.param.Campos, &d);
     d.y = 0.0f;
 #line 4642
     VECNormalize(&d, &d);
     PSVECScale(&d, &d, 260.0f);
-    PSVECAdd(&pl0f_camera.param.pos, &d, &pl0f_camera.param.pos);
-    pl0f_camera.param.fovy = pl0f_camera.param.fovy * 0.9f + 4.0f;
+    PSVECAdd(&pl0f_camera.param.Campos, &d, &pl0f_camera.param.Campos);
+    pl0f_camera.param.Fovy = pl0f_camera.param.Fovy * 0.9f + 4.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -3048,10 +3044,10 @@ void pl00SetDieCam(cPlayer* pl)
     Mtx m;
     Vec v;
 
-    pl0f_camera.param.pos = pPL->pos;
-    pl0f_camera.param.at = pPL->pos;
-    pl0f_camera.param.pos.y = 23000.0f;
-    pl0f_camera.param.fovy = 40.0f;
+    pl0f_camera.param.Campos = pPL->pos;
+    pl0f_camera.param.Target = pPL->pos;
+    pl0f_camera.param.Campos.y = 23000.0f;
+    pl0f_camera.param.Fovy = 40.0f;
     v.x = 0.0f;
     v.y = 0.0f;
     v.z = 1.0f;
@@ -3069,10 +3065,10 @@ void pl00DieCamMove(cPlayer* pl)
 
     StaFlagOn(pG, STA_PL_SWIM_CAMERA);   // reference store: the pPL load stays below it
     p = pPL->getPartsPtr(0);
-    pl0f_camera.param.pos = p->world;
-    pl0f_camera.param.at = p->world;
-    pl0f_camera.param.pos.y = 14000.0f;
-    pl0f_camera.param.fovy = 40.0f;
+    pl0f_camera.param.Campos = p->world;
+    pl0f_camera.param.Target = p->world;
+    pl0f_camera.param.Campos.y = 14000.0f;
+    pl0f_camera.param.Fovy = 40.0f;
     v.x = 0.0f;
     v.y = 0.0f;
     v.z = 1.0f;
@@ -3100,9 +3096,9 @@ void pl00SetDropCam(cPlayer* pl)
         v.y = 0.0f;
         v.z = -4000.0f;
     }
-    PSMTXMultVec(m, &v, &pl0f_camera.param.pos);
-    pl0f_camera.param.at = pl->pos;
-    pl0f_camera.param.fovy = 40.0f;
+    PSMTXMultVec(m, &v, &pl0f_camera.param.Campos);
+    pl0f_camera.param.Target = pl->pos;
+    pl0f_camera.param.Fovy = 40.0f;
     pl0f_camera.Up.x = 0.0f;
     pl0f_camera.Up.y = 1.0f;
     pl0f_camera.Up.z = 0.0f;
@@ -3120,12 +3116,12 @@ void pl00DropCamMove(cPlayer* pl)
     Vec pos;
     f32 h;
 
-    at = pl0f_camera.param.pos;
+    at = pl0f_camera.param.Campos;
     at.y = pl->pos.y + 1000.0f;
     pos = pl->pos;
-    pl00_drop_camera.param.fovy = 40.0f;
-    PosToPos(&gcam->param.at, &pos, &pl00_drop_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl00_drop_camera.param.pos, 1.0f);
+    pl00_drop_camera.param.Fovy = 40.0f;
+    PosToPos(&gcam->param.Target, &pos, &pl00_drop_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl00_drop_camera.param.Campos, 1.0f);
     pl00_drop_camera.Up.x = 0.0f;
     pl00_drop_camera.Up.y = 1.0f;
     pl00_drop_camera.Up.z = 0.0f;
@@ -3208,7 +3204,7 @@ void plboatBlendMotSet(cPlayer* pl, void* m0, void* m1, void* m2, int a, int b, 
     }
     bm = &pl->m_SubMot;
     MotionSetCore(pl, bm, m, (void*) f, pl->m_Hokan, 4, pl->m_Frame);
-    pl->Motion.blend = bm;
+    pl->pMotionB = bm;
     bm->Brate = rate * (1.0f / 256.0f);
     if (pl->m_Hokan) {
         pl->m_Hokan--;
@@ -3237,7 +3233,7 @@ void subBlendMotSet(cSubChar* sub, void* m0, void* m1, void* m2, int a, int b, i
     }
     bm = &sub->subMot;
     MotionSetCore(sub, bm, m, (void*) f, sub->m_Hokan, 4, sub->m_Frame);
-    sub->Motion.blend = bm;
+    sub->pMotionB = bm;
     bm->Brate = rate * (1.0f / 256.0f);
     if (sub->m_Hokan) {
         sub->m_Hokan--;
@@ -3284,7 +3280,7 @@ int testSearchEm2f(cPl0f* em)
             f32 len;
             int i;
 
-            Pl0fNode* n = &w->node[0];   // node pointer kept callee-saved across the calls; `w` itself dies before them
+            BOAT_CTRL_WK* n = &w->node[0];   // node pointer kept callee-saved across the calls; `w` itself dies before them
 
             w->pBoss = e;
             em->r_no_0 = 1;   // plain byte stores: the 6 stays in the loop, the zero is hoisted (an int inline hoists both)
@@ -3306,11 +3302,11 @@ int testSearchEm2f(cPl0f* em)
             v.y = 0.0f;
             v.z = -2000.0f;
             PSMTXMultVec(w->pBoss->mat, &v, &v);
-            len = VEC_DISTXZ(&n->wpos, &v);
+            len = VEC_DISTXZ(&n->Pos, &v);
             if (len > 25000.0f) {
-                n->maxLen = len;
+                n->Fix_len = len;
             } else {
-                n->maxLen = 25000.0f;
+                n->Fix_len = 25000.0f;
             }
             return 1;
         }
@@ -3356,7 +3352,7 @@ void plboatSpearThrow(cPlayer* pl)
 #line 5166
     VECNormalize(&dir, &dir);
     PSVECScale(&dir, &dir, 25000.0f);
-    PSVECAdd(&gcam->param.pos, &dir, &target);
+    PSVECAdd(&gcam->param.Campos, &dir, &target);
     hand.x = -70.0f;
     hand.y = -30.0f;
     hand.z = -500.0f;

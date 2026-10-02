@@ -11,10 +11,9 @@
 #include "math_sub.h"
 #include "main_mem.h"
 
-extern "C" {
 void LightSetInit();
 void LightSetModel(cModel* m);
-void commonClothLightSet(cLight** list, int n, Vec* pos, f32 size);
+void commonClothLightSet(cLight** list, int n, Vec pos, f32 size);
 void commonWaterLightSet(cLight** list, int n, u32 alpha);
 void commonEspLightSet(cLight** list, int n);
 void lightSetConstant(cLight* l, GXLightObj* obj);
@@ -28,7 +27,6 @@ void lightSetLocalAmb(cLight* l, GXColor* amb);
 void lightSetColor(GXLightObj* obj, cLight* l, cEm* em);
 void lightSetAmbient(GXColor* col0);
 void LightDisable();
-}
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
@@ -92,7 +90,7 @@ void LightSetModel(cModel* pMod)
         if (l == NULL) {
             continue;
         }
-        if (l->xD == 7) {
+        if (l->Type == 7) {
             lightSetLocalAmb(l, &amb);
             continue;
         }
@@ -102,11 +100,11 @@ void LightSetModel(cModel* pMod)
         GXInitLightPos(&lobj[i], p.x, p.y, p.z);
         lightSetColor(&lobj[i], l, (cEm*) pMod);
         GXInitLightDir(&lobj[i], 0.0f, 0.0f, 1.0f);
-        if (l->xD > 7) {
-            pLog->err(0, 0, "LIGHT() INVALIED TYPE %d", l->xD);
+        if (l->Type > 7) {
+            pLog->err(0, 0, "LIGHT() INVALIED TYPE %d", l->Type);
             memclr_asm(l, 0x154);
         }
-        funcLightParam[l->xD](l, &lobj[i]);
+        funcLightParam[l->Type](l, &lobj[i]);
         GXLoadLightObjImm(&lobj[i], 1 << i);
     }
     if (mask == 0) {
@@ -148,7 +146,7 @@ void LightSetModel(cModel* pMod)
 
 // Lighting for a cloth chain at `pos` (no distance fade, obj_flag 0): its lights, the scenery
 // ambient, white material.
-void commonClothLightSet(cLight** list, int n, Vec* pos, f32 size)
+void commonClothLightSet(cLight** list, int n, Vec pos, f32 size)
 {
     LIGHT_FUNC_TABLE;
     GXLightObj lobj[8];
@@ -158,7 +156,7 @@ void commonClothLightSet(cLight** list, int n, Vec* pos, f32 size)
     int i;
 
     obj_flag = 0;
-    obj_pos = *pos;
+    obj_pos = pos;
     obj_size = size;
     mask = 0;
     amb.a = amb.b = amb.g = amb.r = 0;
@@ -168,7 +166,7 @@ void commonClothLightSet(cLight** list, int n, Vec* pos, f32 size)
         if (l == NULL) {
             continue;
         }
-        if (l->xD == 7) {
+        if (l->Type == 7) {
             lightSetLocalAmb(l, &amb);
             continue;
         }
@@ -178,11 +176,11 @@ void commonClothLightSet(cLight** list, int n, Vec* pos, f32 size)
         GXInitLightPos(&lobj[i], p.x, p.y, p.z);
         lightSetColor(&lobj[i], l, NULL);
         GXInitLightDir(&lobj[i], 0.0f, 0.0f, 1.0f);
-        if (l->xD > 7) {
-            pLog->err(0, 0, "LIGHT() INVALIED TYPE %d", l->xD);
+        if (l->Type > 7) {
+            pLog->err(0, 0, "LIGHT() INVALIED TYPE %d", l->Type);
             memclr_asm(l, 0x154);
         }
-        funcLightParam[l->xD](l, &lobj[i]);
+        funcLightParam[l->Type](l, &lobj[i]);
         GXLoadLightObjImm(&lobj[i], 1 << i);
     }
     if (mask == 0) {
@@ -222,7 +220,7 @@ void commonWaterLightSet(cLight** pLightData, int data_num, u32 pow)
         if (l == NULL) {
             continue;
         }
-        if (l->xD == 7) {
+        if (l->Type == 7) {
             lightSetLocalAmb(l, &amb);
             continue;
         }
@@ -235,11 +233,11 @@ void commonWaterLightSet(cLight** pLightData, int data_num, u32 pow)
         lightSetColor(&lobj[i], l, NULL);
         l->DispCol.a = a;
         GXInitLightDir(&lobj[i], 0.0f, 0.0f, 1.0f);
-        if (l->xD > 7) {
-            pLog->err(0, 0, "LIGHT() INVALIED TYPE %d", l->xD);
+        if (l->Type > 7) {
+            pLog->err(0, 0, "LIGHT() INVALIED TYPE %d", l->Type);
             memclr_asm(l, 0x154);
         }
-        funcLightParam[l->xD](l, &lobj[i]);
+        funcLightParam[l->Type](l, &lobj[i]);
         GXLoadLightObjImm(&lobj[i], 1 << i);
     }
     if (mask == 0) {
@@ -280,11 +278,11 @@ void commonEspLightSet(cLight** list, int n)
         GXInitLightPos(&lobj[i], p.x, p.y, p.z);
         lightSetColor(&lobj[i], l, NULL);
         GXInitLightDir(&lobj[i], 0.0f, 0.0f, 1.0f);
-        if (l->xD > 7) {
-            pLog->err(0, 0, "cLight() INVALIED TYPE %d", l->xD);
+        if (l->Type > 7) {
+            pLog->err(0, 0, "cLight() INVALIED TYPE %d", l->Type);
             memclr_asm(l, 0x154);
         }
-        funcLightParam[l->xD](l, &lobj[i]);
+        funcLightParam[l->Type](l, &lobj[i]);
         GXLoadLightObjImm(&lobj[i], 1 << i);
     }
     if (mask == 0) {
@@ -350,22 +348,22 @@ static void lightSetQuadratic(cLight* pLi, GXLightObj* pLo)
     }
     f32 zero = 0.0f;
     f32 one = 1.0f;
-    if (pLi->Radius != zero) {
+    if (pLi->Radius != 0.0f) {
         k2 = (pLi->Intensity - 0.1f) / 0.1f / (pLi->Radius * pLi->Radius);
     } else {
-        k2 = zero;
+        k2 = 0.0f;
     }
     GXInitLightAttn(pLo, br, zero, zero, one, zero, k2);
 }
 
-// Type 3: spot light along the light's normal, cone angle A0, brightness with the radius fade
-// (A1 = fade width), GX distance attenuation over 5000.
+// Type 3: spot light along the light's normal, cone angle CutOff, brightness with the radius fade
+// (Edge = fade width), GX distance attenuation over 5000.
 void lightSetSpotlight(cLight* pLi, GXLightObj* pLo)
 {
     Vec cdir;
     Vec dir;
     Vec p;
-    LIT_TYPE04_FREE* sp = &pLi->spot;
+    LIT_TYPE03_FREE* sp = &pLi->cone;
     f32 refDist = 5000.0f;
     f32 d;
     f32 range;
@@ -377,14 +375,14 @@ void lightSetSpotlight(cLight* pLi, GXLightObj* pLo)
     GXInitLightDir(pLo, cdir.x, cdir.y, cdir.z);
     d = GetDistance3(&obj_pos, &p);
     range = pLi->Radius + obj_size;
-    if (d < range - sp->A1 || !(obj_flag & 1) || pLi->Radius == 0.0f) {
+    if (d < range - sp->Edge || !(obj_flag & 1) || pLi->Radius == 0.0f) {
         br = pLi->Intensity;
     } else if (d < range) {
-        br = pLi->Intensity * (range - d) / sp->A1;
+        br = pLi->Intensity * (range - d) / sp->Edge;
     } else {
         br = 0.001f;
     }
-    GXInitLightSpot(pLo, sp->A0, 2);
+    GXInitLightSpot(pLo, sp->CutOff, 2);
     GXInitLightDistAttn(pLo, 5000.0f, br, 2);
 }
 
@@ -401,23 +399,23 @@ void lightSetCustom(cLight* pLi, GXLightObj* pLo)
     GXInitLightAttn(pLo, sp->A0, sp->A1, sp->A2, sp->K0, sp->K1, sp->K2);
 }
 
-// Type 5: directional light — placed at the object + the normal (in camera space when flags
-// bit0), brightness with the radius fade.
+// Type 5: directional light — placed at the object + the direction (in camera space unless Flag
+// bit0 says it's already local), brightness with the radius fade.
 void lightSetParallel(cLight* pLi, GXLightObj* pLo)
 {
     Vec p;
-    LIT_TYPE04_FREE* sp = &pLi->spot;
+    LIT_TYPE05_FREE* sp = &pLi->dir;
     f32 d;
     f32 range;
     f32 br;
 
-    if (sp->flags & 1) {
+    if (sp->Flag & 1) {
         Mtx inv;
 
         PSMTXInverse(pG->Camera.v_mat, inv);
-        PSMTXMultVecSR(inv, &sp->Normal, &p);
+        PSMTXMultVecSR(inv, &sp->Pos, &p);
     } else {
-        p = sp->Normal;
+        p = sp->Pos;
     }
     PSVECAdd(&obj_pos, &p, &p);
     PSMTXMultVec(pG->Camera.v_mat, &p, &p);
@@ -426,10 +424,10 @@ void lightSetParallel(cLight* pLi, GXLightObj* pLo)
     pLi->getPos(&q);
     d = GetDistance3(&obj_pos, &q);
     range = pLi->Radius + obj_size;
-    if (d < range - sp->A1 || !(obj_flag & 1) || pLi->Radius == 0.0f) {
+    if (d < range - sp->Edge || !(obj_flag & 1) || pLi->Radius == 0.0f) {
         br = pLi->Intensity;
     } else if (d < range) {
-        br = pLi->Intensity * (range - d) / sp->A1;
+        br = pLi->Intensity * (range - d) / sp->Edge;
     } else {
         br = 0.001f;
     }
@@ -442,7 +440,7 @@ void lightSetSpotQuad(cLight* pLi, GXLightObj* pLo)
     Vec cdir;
     Vec dir;
     Vec p;
-    LIT_TYPE04_FREE* sp = &pLi->spot;
+    LIT_TYPE03_FREE* sp = &pLi->cone;
     f32 k2 = 0.1f;
     f32 d;
     f32 range;
@@ -454,14 +452,14 @@ void lightSetSpotQuad(cLight* pLi, GXLightObj* pLo)
     GXInitLightDir(pLo, cdir.x, cdir.y, cdir.z);
     d = GetDistance3(&obj_pos, &p);
     range = pLi->Radius + obj_size;
-    if (d < range - sp->A1 || !(obj_flag & 1) || pLi->Radius == 0.0f) {
+    if (d < range - sp->Edge || !(obj_flag & 1) || pLi->Radius == 0.0f) {
         br = pLi->Intensity;
     } else if (d < range) {
-        br = pLi->Intensity * (range - d) / sp->A1;
+        br = pLi->Intensity * (range - d) / sp->Edge;
     } else {
         br = 0.001f;
     }
-    GXInitLightSpot(pLo, sp->A0, 2);
+    GXInitLightSpot(pLo, sp->CutOff, 2);
     if (pLi->Radius != 0.0f) {
         k2 = (pLi->Intensity - 0.1f) / 0.1f / (pLi->Radius * pLi->Radius) / br;
     } else {

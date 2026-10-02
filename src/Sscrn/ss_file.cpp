@@ -40,7 +40,6 @@ struct SsFileWork {
 
 // The widget classes (SsFileInit / SsFileMain / FileSelect / MessageDisplay) are declared in ss_main.h.
 
-extern "C" {
 int getMsgNum(int no);
 u32 getMsgAttr(u32 type);
 int getTplName(int no, u32 page);
@@ -52,7 +51,6 @@ int fileNo(int cat, int no);
 void sscrn_file_out_init(SUB_SCREEN* wk);
 void dispFileList(SUB_SCREEN* wk, int n);
 // ss_main.cpp
-}
 
 // files per category
 int fileNum[3] = {13, 11, 8};
@@ -271,12 +269,12 @@ void SsFileInit::move(SUB_SCREEN* wk)
             break;
         }
         if (wk->menu_old == 2) {
-            wk->wait_cnt = 1;
+            wk->trans_off = 1;
         }
         IdSubErase();
         IdNumErase();
         IdFreeBuffer();
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
         file_wait[0] = 0;
         state++;
         break;
@@ -305,7 +303,7 @@ void SsFileInit::move(SUB_SCREEN* wk)
         } else {
             sscrnModelClear(wk);
         }
-        wk->wait_cnt = 0;
+        wk->trans_off = 0;
         state++;
     case 3: {
         int stat;
@@ -389,11 +387,11 @@ void SsFileMain::init(SUB_SCREEN* wk)
     fileCameraInit(wk, &pG->Camera);
     IdTexDataLoad(SS_ARC_PTR(wk->pFileDat, 6), TEX_OWNER_ID_SSCRN);
     if (IdSub.setCk(IDC_SSCRN_0) == 0) {
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
     }
-    IdSub.set(SS_ARC_PTR(wk->pFileDat, 7), 0xFF, IDC_SSCRN_FAR_1, 9, 2, 0);
-    IdSub.set(SS_ARC_PTR(wk->pFileDat, 9), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 4, 0);
-    IdSub.set(SS_ARC_PTR(wk->pFileDat, 8), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pFileDat, 7), 0xFF, IDC_SSCRN_FAR_1, 9, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pFileDat, 9), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 4, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pFileDat, 8), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 2, 0);
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_1)->be_flag &= ~8;
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_2)->be_flag &= ~8;
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_2)->rev_flag |= 0xF;
@@ -419,9 +417,9 @@ void SsFileMain::init(SUB_SCREEN* wk)
     if (wk->open_flag == 0x40) {
         int no = fileId2No(wk->get_item_id);
         ItemMgr.get(wk->get_item_id, 0);
-        wk->model_flag = 1;
+        wk->item_get_flag = 1;
         if (pSys->language == 0) {
-            cMes.setupFont(0x1C, 0x1C, (TEXPalette*) SS_ARC_PTR(wk->pFileDat, 4), 3);
+            cMes.setupFont(0x1C, 0x1C, (u8*) SS_ARC_PTR(wk->pFileDat, 4), 3);
         }
         {
             u8* p = fileInfo[no - 1];
@@ -773,7 +771,7 @@ void MessageDisplay::init(SUB_SCREEN* wk)
     x = (int) ((pos->pos0.x + 320.0f) * 0.8f);
     y = (int) ((240.0f - pos->pos0.y) * 0.8f);
     if (pSys->language == 0) {
-        cMes.setupFont(0x1C, 0x1C, (TEXPalette*) SS_ARC_PTR(wk->pFileDat, 4), 3);
+        cMes.setupFont(0x1C, 0x1C, (u8*) SS_ARC_PTR(wk->pFileDat, 4), 3);
     }
     switch (wk->file->layout) {
     case 0:
@@ -976,7 +974,7 @@ void MessageDisplay::quit(SUB_SCREEN* wk)
 {
     cMes.Clear();
     if (pSys->language == 0) {
-        cMes.setupFont(0x1C, 0x1C, (TEXPalette*) SS_ARC_PTR(wk->pCmmn, 4), 3);
+        cMes.setupFont(0x1C, 0x1C, (u8*) SS_ARC_PTR(wk->pCmmn, 4), 3);
     }
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_1)->be_flag &= ~8;
 }

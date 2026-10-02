@@ -37,27 +37,27 @@ struct DvdHeader {
 };
 
 // Read request parameters handed to cDvd::ReadReq by DvdRead/DvdReadN (`DvdReqWork`, 0x6C).
-struct DvdReq {
-    void* dst;       // 0x00
-    u32 aram;        // 0x04  ARAM destination
-    u16 fileNo;      // 0x08  FileTbl index, 0xFFFF = by name
+struct DVD_REQ_WORK {
+    void* mram_addr;       // 0x00
+    u32 aram_addr;        // 0x04  ARAM destination
+    u16 file_no;      // 0x08  FileTbl index, 0xFFFF = by name
     u16 prio;        // 0x0A  (4)
     u16 mode;        // 0x0C  bit0 sync, bit1 debug heap, bit2 main heap, bit3 type 3 header,
                      //       bit5 0x10, bit6 keep, bit8 interrupt task, bit15 headered file
-    u8 pad_E[2];
-    u32 ofs;         // 0x10
-    u32 length;      // 0x14  0 = whole file
-    char name[0x20]; // 0x18
-    char file[0x30]; // 0x38  __FILE__ of the caller
-    int line;        // 0x68
+    u8 dummy[2];
+    u32 offset;         // 0x10
+    u32 size;      // 0x14  0 = whole file
+    char fname[0x20]; // 0x18
+    char reqfile[0x30]; // 0x38  __FILE__ of the caller
+    int reqline;        // 0x68
 };
 
 // Result block filled by cDvd::readCheckMain for a finished request (0x208 bytes).
-struct DvdReadInfo {
-    u32 addr[2][32];  // 0x000  destination of every part, per header level
-    u32 size[2][32];  // 0x100
-    u32 mramSize;     // 0x200
-    u32 aramSize;     // 0x204
+struct DVD_READINFO {
+    u32 start_addr[2][32];  // 0x000  destination of every part, per header level
+    u32 read_size[2][32];   // 0x100
+    u32 mram_readsize;      // 0x200
+    u32 aram_readsize;      // 0x204
 };
 
 // One read queue slot (16 in cDvd, 0x310 bytes each).
@@ -209,10 +209,10 @@ private:
     // the destination address through the non-NULL pointers; < 0 on failure.
 public:
     int ReadCheck(int id, int* mram_size, int* aram_size, void** addr);
-    // Same poll, filling the caller's DvdReadInfo (read.cpp).
-    int ReadCheck(int id, DvdReadInfo* pInfo);
+    // Same poll, filling the caller's DVD_READINFO (read.cpp).
+    int ReadCheck(int id, DVD_READINFO* pInfo);
 private:
-    int readCheckMain(int id, DvdReadInfo* pInfo);
+    int readCheckMain(int id, DVD_READINFO* pInfo);
     cDvdQueue* getQueuePtr(u8 id);
 public:
     int ErrCheck(int disc_new, int proc);
@@ -223,7 +223,7 @@ private:
     void DiscReadInfo();
 };
 
-extern DvdReq DvdReqWork;
+extern DVD_REQ_WORK DvdReqWork;
 extern cDvd Dvd;
 extern cAram Aram;
 
@@ -234,11 +234,10 @@ struct FileTblEntry {
 };
 extern FileTblEntry FileTbl[];
 
-extern "C" {
 int DvdRead(int fileNo, void* dst, u32 aram, u32 ofs, u32 length, int mode, const char* file, int line);
 // Queue a file read; returns the request number. `mode` 3 = allocate the destination.
 int DvdReadN(const char* name, void* dst, int a, int b, int c, int mode, const char* file, int line);
-void MemorySwap(void* mram, u32 aram, u32 size);
+void MemorySwap(void* mram, void* aram, u32 size);
 void DvdReadProc();
 // Disc error message (PS2 DVD_MES_TBL): MesSysMessage / RomFontMessage `msg`, from the DVD state.
 enum DVD_MES_TBL {
@@ -255,6 +254,5 @@ void MesSysMessage(int msg, int disc);
 void RomFontPrint(int x, int y, const char* mes_ptr);
 void RomFontMessage(u32 mes_no, int disc_no);
 void RomFontSetting();
-}
 
 #endif

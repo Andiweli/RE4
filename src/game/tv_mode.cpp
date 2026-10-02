@@ -20,7 +20,7 @@
 
 #line 22 "D:/Bio4/Prog/tv_mode.cpp"
 
-TvModeWork* pTv;
+TV_MODE* pTv;
 u8 tv_mode_cnt;
 
 // Boot: sets the render mode's VI / XFB mode for the console's TV format (progressive when saved
@@ -28,53 +28,53 @@ u8 tv_mode_cnt;
 #line 26
 void SetTvMode(GXRenderModeObj* pRmode)
 {
-    pTv = (TvModeWork*) MEM_CALLOC(sizeof(TvModeWork), 1, 0xD);
-    pTv->rmode = pRmode;
+    pTv = (TV_MODE*) MEM_CALLOC(sizeof(TV_MODE), 1, 0xD);
+    pTv->pRmode = pRmode;
     switch (VIGetTvFormat()) {
     case 0:
     case 2:
         if (pRK->tv_mode == 0) {
-            pRmode->viTVmode = 0;
-            pRmode->xFBmode = 1;
+            pRmode->viTVmode = VI_TVMODE_NTSC_INT;
+            pRmode->xFBmode = VI_XFBMODE_DF;
         } else {
-            pRmode->viTVmode = 2;
-            pRmode->xFBmode = 0;
+            pRmode->viTVmode = VI_TVMODE_NTSC_PROG;
+            pRmode->xFBmode = VI_XFBMODE_SF;
         }
         break;
     case 1:
-        pRmode->viTVmode = 4;
+        pRmode->viTVmode = VI_TVMODE_PAL_INT;
         break;
     case 5:
-        pRmode->viTVmode = 0x14;
+        pRmode->viTVmode = VI_TVMODE_EURGB60_INT;
         break;
     default:
 #line 46
         OSPanic(__FILE__, __LINE__, "invalid TV format\n");
         break;
     }
-    pTv->active = 1;
+    pTv->Status = 1;
     TaskExec(1, tvModeCheckTask, 0);
 }
 
 // Task: black fade, then the state machine (trigger -> progressive menu -> exit).
 void tvModeCheckTask()
 {
-    static void (*tvModeFuncTbl[3])(TvModeWork*) = {tvModeTrigger, tvModeMenu_progressive, tvModeExit};
+    static void (*tvModeFuncTbl[3])(TV_MODE*) = {tvModeTrigger, tvModeMenu_progressive, tvModeExit};
     u32 c0 = 0x00000000;
     u32 c1 = 0x000000FF;
 
     FadeSet(0, (GXColor*) &c0, (GXColor*) &c1, 0, 0, 0);
     tv_mode_cnt = 0;
-    pTv->state = 0;
+    pTv->Rno0 = 0;
     while (1) {
-        tvModeFuncTbl[pTv->state](pTv);
+        tvModeFuncTbl[pTv->Rno0](pTv);
         TaskSleep(1);
     }
 }
 
 // State 0: with a progressive TV and the check not done yet (waits up to 30 frames for the pad),
 // B held or progressive already on opens the menu; else straight to exit. Marks the check done.
-void tvModeTrigger(TvModeWork* pTv)
+void tvModeTrigger(TV_MODE* pTv)
 {
     if (VIGetDTVStatus() != 0 && pRK->tv_mode_select == 0) {
         if (Joy[0].err == -3 || Joy[0].err == -2) {
@@ -85,12 +85,12 @@ void tvModeTrigger(TvModeWork* pTv)
         }
         if (OSGetProgressiveMode() == 1 || (Joy[0].on & JOY_B)) {
             systemVISetBlack(0);
-            pTv->state = 1;
+            pTv->Rno0 = 1;
         } else {
-            pTv->state = 2;
+            pTv->Rno0 = 2;
         }
     } else {
-        pTv->state = 2;
+        pTv->Rno0 = 2;
     }
     pRK->tv_mode_select = 1;
 }
@@ -98,15 +98,15 @@ void tvModeTrigger(TvModeWork* pTv)
 // State 1: the yes / no message (system layout, message 0; the cursor's choice after 300 idle
 // frames), applies the mode (VI reconfigured behind a black screen), then the confirmation
 // message (1 progressive / 2 interlaced) until A.
-void tvModeMenu_progressive(TvModeWork* pTv)
+void tvModeMenu_progressive(TV_MODE* pTv)
 {
     u32 timer;
     s8 sel;
     u8 old;
 
-    switch (pTv->sub) {
+    switch (pTv->Rno1) {
     case 0:
-        MesData.registData(pTv->sub, (u8*) (pG->pCore->ofs_70 + (u32) pG->pCore));
+        MesData.registData(pTv->Rno1, (u8*) (pG->pCore->ofs_70 + (u32) pG->pCore));
         cMes.setLayout(0, LAYOUT_SYSTEM);
         cMes.MesSet(0, 100, 220, 0x1000051, 0, 0, 1);
         timer = 0;
@@ -133,20 +133,20 @@ void tvModeMenu_progressive(TvModeWork* pTv)
         }
         if (pRK->tv_mode != old) {
             if (pRK->tv_mode == 1) {
-                pTv->rmode->viTVmode = 2;
-                pTv->rmode->xFBmode = 0;
+                pTv->pRmode->viTVmode = VI_TVMODE_NTSC_PROG;
+                pTv->pRmode->xFBmode = VI_XFBMODE_SF;
             } else {
-                pTv->rmode->viTVmode = 0;
-                pTv->rmode->xFBmode = 1;
+                pTv->pRmode->viTVmode = VI_TVMODE_NTSC_INT;
+                pTv->pRmode->xFBmode = VI_XFBMODE_DF;
             }
             systemVISetBlack(1);
             VIFlush();
-            VIConfigure(pTv->rmode);
+            VIConfigure(pTv->pRmode);
             VIFlush();
             TaskSleep(100);
             systemVISetBlack(0);
         }
-        pTv->sub++;
+        pTv->Rno1++;
         break;
     case 1:
         if (OSGetProgressiveMode() == 1) {
@@ -156,16 +156,16 @@ void tvModeMenu_progressive(TvModeWork* pTv)
         }
         if (Key.trg & 0x80000000) {
             cMes.Clear();
-            pTv->state = 2;
-            pTv->sub = 0;
+            pTv->Rno0 = 2;
+            pTv->Rno1 = 0;
         }
         break;
     }
 }
 
 // State 2: done — runs the memory card first check and ends the task.
-void tvModeExit(TvModeWork* pTv)
+void tvModeExit(TV_MODE* pTv)
 {
-    pTv->active = 0;
+    pTv->Status = 0;
     CardFirstCheck();
 }

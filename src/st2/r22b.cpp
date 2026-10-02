@@ -17,8 +17,8 @@ struct R22bWork {
 
 static R22bWork* r22b_work;
 
-extern "C" void R22bEventS00();
-extern "C" void Evt_R22bS00_Func(Event* e);
+void R22bEventS00();
+void Evt_R22bS00_Func(Event* e, u32);
 
 
 // Room init: registers the s00 callback and, unless Room_flg bit 0 (seen), pre-loads r22bs00 and starts the event task.
@@ -39,7 +39,7 @@ void R22bMain()
 }
 
 // Once (Room_flg bit 0): System_flg 0x400 (no pause / no room change), play r22bs00, then end chapter 4-1.
-extern "C" void R22bEventS00()
+void R22bEventS00()
 {
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
         RsfSet(G_ROOM_ID, 0);
@@ -51,7 +51,7 @@ extern "C" void R22bEventS00()
 }
 
 // Event r22bs00 callback: fade-outs / fade-ins at fixed frames of cuts 0 and 1 (skipped when the event is skipped).
-extern "C" void Evt_R22bS00_Func(Event* e)
+void Evt_R22bS00_Func(Event* e, u32)
 {
     if (e->GetFuncType() == 1) {
         switch (e->GetNowCut()) {

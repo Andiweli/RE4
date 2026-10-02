@@ -4,13 +4,13 @@
 #include "types.h"
 
 // One vibration request (game/pad.cpp VibSet/VibControl), 0x10 bytes; Joy[0].vib[10].
-struct VibWork {
-    u16 type;   // 0x00  bit 15 = random level; low 4 bits = clear type (VibSetClearType)
-    u16 wait;   // 0x02  frames before it starts
+struct PAD_MOTOR {
+    u16 flag;   // 0x00  bit 15 = random level; low 4 bits = clear type (VibSetClearType)
+    u16 delay;   // 0x02  frames before it starts
     u16 time;   // 0x04  frames left (0 = free)
-    u8 pad_6[2];
+    u8 dummy[2];
     s32 level;  // 0x08  current level (<<7 / <<12 fixed point)
-    s32 add;    // 0x0C  per-frame level step
+    s32 fade;    // 0x0C  per-frame level step
 };
 
 // Controller state (game/main.cpp `Joy[4]`, 0x268 bytes each), filled by pad.cpp PadRead.
@@ -35,7 +35,7 @@ struct JOY {
     s8 rep2_timer[32];  // 0x44
     u8 motor_state;       // 0x64  motor command last sent (Joy[0] only)
     u8 pad_65[3];
-    VibWork vib[10];    // 0x68  (Joy[0] only)
+    PAD_MOTOR vib[10];    // 0x68  (Joy[0] only)
     u8 pad_108[0x268 - 0x108];
 };
 

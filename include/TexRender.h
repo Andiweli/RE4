@@ -58,20 +58,19 @@ struct TexRenderEvt {
 };
 
 // Camera used while rendering to texture: a CameraMotion built in place, plus the saved main camera.
-struct TexRenderCam {
+struct TexRenderEvtCamStruct {
     CameraMotion cam;    // 0x000
     u8 pad_1D4[0x200 - 0x1D4];
-    cCamera* pCam;       // 0x200  &cam
-    CAMERA save;         // 0x204  pG->Camera while the render camera is active
+    cCamera* pProc;       // 0x200  &cam
+    CAMERA CameraBak;         // 0x204  pG->Camera while the render camera is active
     TexRenderEvt* pEvt;  // 0x2FC
-    void* data;          // 0x300  motion data for CameraMotion
+    void* pDat;          // 0x300  motion data for CameraMotion
 };
 
 extern TexRenderMng g_RndMgr[8];
 extern u32 g_RndMgrNum;
 extern int g_TexUse;
 
-extern "C" {
 TexRenderMng* GetTexRenderMgrAddr(int no);
 void TexRenderMgrInit();
 void TexRenderMgrRoomInit();
@@ -84,9 +83,8 @@ void TexRenderModSet(cModel* pMod, int modelInfoNo, u8* pBlendTbl, TexRenderMng*
 void TexRenderModRes(cModel* pMod, u32 modelInfoNo);
 void TexRenderModAddOt(int otType, cModel* pMod);
 void TexRenderModAddOtMirror(int ot, cModel* m);
-void TexRenderCamAddOt(int ot, TexRenderCam* pWk, TexRenderEvt* evt, void* data);
-void CamRenderPrev(TexRenderCam* pWk);
-void CamRenderAfter(TexRenderCam* pWk);
-}
+void TexRenderCamAddOt(int ot, TexRenderEvtCamStruct* pWk, TexRenderEvt* evt, void* data);
+void CamRenderPrev(TexRenderEvtCamStruct* pWk);
+void CamRenderAfter(TexRenderEvtCamStruct* pWk);
 
 #endif

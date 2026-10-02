@@ -247,10 +247,10 @@ void cObjRobo::R0WaitGondola(cObjRobo* pObj)
             pObj->SatMove(pObj, &ft[i], i);
         }
         if (w->pEmHitTbl[HitNoSwitchF] && w->pEmHitTbl[HitNoSwitchF]->ckStatus() == 1 && !RmfFlagChk(pG, RMF_BOBO_SWITCH_EXEC_FRONT)) {
-            SceExec(0x12, (TaskFunc) TaskSwitchFront, (int) pObj, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) TaskSwitchFront, pObj, 0, SCE_PRIO_DEF_2, 0);
         }
         if (w->pEmHitTbl[HitNoSwitchBR] && w->pEmHitTbl[HitNoSwitchBR]->ckStatus() == 1 && !RmfFlagChk(pG, RMF_BOBO_SWITCH_EXEC_BACK)) {
-            SceExec(0x12, (TaskFunc) TaskSwitchBack, (int) pObj, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) TaskSwitchBack, pObj, 0, SCE_PRIO_DEF_2, 0);
         }
         for (i = 0; i < HitNoMax; i++) {
             hit = w->pEmHitTbl[i];

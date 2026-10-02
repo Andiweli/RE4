@@ -153,9 +153,9 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000A914	0x100	st4_0/r405.cpp	global	R405Main__Fv	R405Main
 .text	0x0000AA14	0x1E0	st4_0/r405.cpp	global	setTexRender_AA14	setTexRender
 .text	0x0000ABF4	0x12C	st4_0/r405.cpp	local	R405ExecEventS00__Fv	R405ExecEventS00
-.text	0x0000AD20	0xCC	st4_0/r405.cpp	global	Evt_R405S00_Func	Evt_R405S00_Func
+.text	0x0000AD20	0xCC	st4_0/r405.cpp	global	Evt_R405S00_Func__FP5EventUl	Evt_R405S00_Func
 .text	0x0000ADEC	0x27C	st4_0/r405.cpp	local	em_set	em_set
-.text	0x0000B068	0x4C	st4_0/r405.cpp	global	R405_EmSetEvent	R405_EmSetEvent
+.text	0x0000B068	0x4C	st4_0/r405.cpp	global	R405_EmSetEvent__FP7EM_LIST	R405_EmSetEvent
 .text	0x0000B0B4	0x11C	st4_0/r405.cpp	local	em_set3__Fv	em_set3
 .text	0x0000B1D0	0x64	st4_0/r405.cpp	local	r405_StrCheck__Fv	r405_StrCheck
 .text	0x0000B234	0x3B8	st4_0/r405.cpp	global	fn_st4_0_B234	.
@@ -222,7 +222,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000F730	0xD4	st4_0/r40e.cpp	local	r40e_checkEmDead__Fv	r40e_checkEmDead
 .text	0x0000F804	0x1F0	st4_0/r40e.cpp	local	R40EExecEventS00__Fv	R40EExecEventS00
 .text	0x0000F9F4	0x31C	st4_0/r40e.cpp	local	gameResult__Fv	gameResult
-.text	0x0000FD10	0x348	st4_0/r40e.cpp	global	Evt_R40ES00_Func	Evt_R40ES00_Func
+.text	0x0000FD10	0x348	st4_0/r40e.cpp	global	Evt_R40ES00_Func__FP5EventUl	Evt_R40ES00_Func
 .text	0x00010058	0x134	st4_0/r40e.cpp	global	EvtTexRenderCamTrans__FP5Eventi	EvtTexRenderCamTrans
 .text	0x0001018C	0x3B8	st4_0/r40e.cpp	global	fn_st4_0_1018C	.
 .text	0x00010544	0x190	st4_0/r40f.cpp	global	R40fInit__Fv	R40fInit
@@ -241,7 +241,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x000112F4	0x128	st4_0/r411.cpp	global	R411Init__Fv	R411Init
 .text	0x0001141C	0x4	st4_0/r411.cpp	global	R411Main__Fv	R411Main
 .text	0x00011420	0xE4	st4_0/r411.cpp	local	r411_checkDoorUnlock__Fv	r411_checkDoorUnlock
-.text	0x00011504	0x48	st4_0/r411.cpp	global	r411_lockDoor	r411_lockDoor
+.text	0x00011504	0x48	st4_0/r411.cpp	global	r411_lockDoor__Fv	r411_lockDoor
 .text	0x0001154C	0x13C	st4_0/r411.cpp	local	r411_checkEmSet1_end__Fv	r411_checkEmSet1_end
 .text	0x00011688	0x288	st4_0/r411.cpp	local	r411_checkEmSet1__Fv	r411_checkEmSet1
 .text	0x00011910	0xDC	st4_0/r411.cpp	local	r411_checkEmSet2__Fv	r411_checkEmSet2

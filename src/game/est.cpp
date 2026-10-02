@@ -20,7 +20,7 @@ cEspEventModelList EspEvModList;
 // The common entry: starts est table (owner c, id d) with parts b (-1 = the table's default) on the
 // model a (0 = none), at pos/rot (NULL = the table's own), core flags e, kind f, Core_pEm g and an
 // optional ESPSEQ_CONTROL h.
-void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void* g, void* h)
+void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void* g, ESPSEQ_CONTROL* h)
 {
     cEspSeqHead* head = EspGetEstAddr(c, d, 0);
 
@@ -31,7 +31,7 @@ void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void
 // 0x2000 during a movie / bit 0 in the no-suspend mode from Status_flg[2]), the call number, parts,
 // offset (pos != NULL sets Flg bit 1 = explicit position) and rotation (head->rot is in degrees),
 // and a random seed. Debug_flg[1] 0x01000000 disables all effects.
-void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, void* h)
+void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, ESPSEQ_CONTROL* h)
 {
     cEspgen* w;
     ESPGEN10_WK* p;
@@ -86,9 +86,9 @@ void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e,
     p->Rand_seed = Rnd() | (Rnd() << 8) | (Rnd() << 16);
     if (h != NULL) {
         p->p8 = &p->opt;
-        p->opt = *(ESPSEQ_CONTROL*) h;
+        p->opt = *h;
     } else {
-        p->p8 = (ESPSEQ_CONTROL*) h;
+        p->p8 = h;
     }
 }
 
@@ -375,12 +375,12 @@ void EspSetEatEffect(Vec* pos, Vec* nor, int type, u8 wepNo)
     switch (type) {
     case 0:
         if (EspChkInPuddle(pos, nor) == 1) {
-            EstSet(0, -1, pos, NULL, EFF_CORE, 0x11, 0, ESP_CORE_KIND_NONE, (void*) type, (void*) type);
+            EstSet(0, -1, pos, NULL, EFF_CORE, 0x11, 0, ESP_CORE_KIND_NONE, 0, 0);
             SndCall(2, 0xC, pos, 0, 0, NULL);
         } else {
-            EstSet(0, -1, pos, &rot, EFF_CORE, 0x1F, 0, ESP_CORE_KIND_NONE, (void*) type, (void*) type);
+            EstSet(0, -1, pos, &rot, EFF_CORE, 0x1F, 0, ESP_CORE_KIND_NONE, 0, 0);
             if (DbgFlagChk(pG, DBG_SET_HITMARK_ALL)) {
-                EstSet(0, -1, pos, &rot, EFF_CORE, 0x87, 0, ESP_CORE_KIND_NONE, (void*) type, (void*) type);
+                EstSet(0, -1, pos, &rot, EFF_CORE, 0x87, 0, ESP_CORE_KIND_NONE, 0, 0);
             }
         }
         break;
@@ -461,15 +461,15 @@ int ChkWaterEffectEnable(Vec* pos)
 }
 
 // Ganado falling into water: est 1/0x32 when the room has it, else the generic 0x10/0x8D; the
-// position pointer doubles as the owner key.
-void EstSetEm10WaterFall(Vec* pMod)
+// model pointer doubles as the owner key.
+void EstSetEm10WaterFall(cModel* pMod)
 {
     cEspSeqHead* head = EspGetEstAddr(EFF_ROOM, 0x32, 1);
 
     if (head != NULL) {
-        EstSet((cModel*) pMod, -1, NULL, NULL, EFF_ROOM, 0x32, 0, ESP_CORE_KIND_NONE, pMod, NULL);
+        EstSet(pMod, -1, NULL, NULL, EFF_ROOM, 0x32, 0, ESP_CORE_KIND_NONE, pMod, NULL);
     } else {
-        EstSet((cModel*) pMod, -1, NULL, NULL, EFF_EM10, 0x8D, 0, ESP_CORE_KIND_NONE, pMod, NULL);
+        EstSet(pMod, -1, NULL, NULL, EFF_EM10, 0x8D, 0, ESP_CORE_KIND_NONE, pMod, NULL);
     }
 }
 

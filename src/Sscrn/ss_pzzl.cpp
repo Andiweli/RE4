@@ -91,7 +91,6 @@ struct PzzlCursor {
 // The puzzle screen widgets (include/ss_pzzl.h; SsPzzlMain::init creates them, ss_shop.cpp shares
 // PzzlThinking / PieceSelect / CaseChange).
 
-extern "C" {
 void pzzlClearZ(SUB_SCREEN* wk);
 u32 colorRRGGBBAA(u32 r, u32 g, u32 b, u32 a);
 int back2PieceSelect(SUB_SCREEN* wk);
@@ -121,7 +120,6 @@ void closeMsgWindow(SUB_SCREEN* wk);
 void openMsgWindow(SUB_SCREEN* wk, int no);
 int remarkMsgCombine(int a, int b, int* no);
 int itemCommandType(cItem* item);
-}
 static void setCommandId(u8 type, ID_UNIT** tbl, s8* num, int lang);
 
 static int sscrn_pzzl_out(SUB_SCREEN* wk);
@@ -631,7 +629,7 @@ int puzzlePos2screenPos(Vec* pos, Vec* out)
     if (out->z > -fabsf(ZNEAR)) {
         return 0;
     }
-    ang = pG->Camera.param.fovy * 0.5f * 0.017453292f;
+    ang = pG->Camera.param.Fovy * 0.5f * 0.017453292f;
     az = fabsf(out->z);
     h = az * tanf(ang);
     w = h * 1.3333334f;
@@ -646,8 +644,8 @@ int puzzlePos2screenPos(Vec* pos, Vec* out)
 void screenPos2puzzlePos(Vec* pos, Vec* out)
 {
     CAMERA* cam = &pG->Camera;
-    f32 pz = cam->param.pos.z;
-    f32 h = fabsf((f32) (pz * tan(cam->param.fovy * 0.5f * 3.1415927f / 180.0f)));
+    f32 pz = cam->param.Campos.z;
+    f32 h = fabsf((f32) (pz * tan(cam->param.Fovy * 0.5f * 3.1415927f / 180.0f)));
 
     out->x = pos->x * h / 240.0f;
     out->y = pos->y * h / 240.0f;
@@ -663,15 +661,15 @@ void pieceTblInit(SUB_SCREEN* wk)
     // is the cheaper form, so it is kept as written), gcse's cprop only propagates sets that reach
     // the block entry (`z = 0` is in the same block), and combine folds the single-use `z = 0` into
     // `(mem (reg tbl))` after both cse passes. COMPILER-DIFF: 13.
-    PieceInfo* tbl;
-    PieceInfo* base;
+    ITEM_PIECE_INFO* tbl;
+    ITEM_PIECE_INFO* base;
     void** mp;
     u32 ofs;
 
     tbl = piece_info;
     {
         u32 z = 0;
-        if (((PieceInfo*) (z + (u32) tbl))->id == 0xFFFF) {
+        if (((ITEM_PIECE_INFO*) (z + (u32) tbl))->id == 0xFFFF) {
             return;
         }
     }
@@ -689,7 +687,7 @@ void pieceTblInit(SUB_SCREEN* wk)
         int mdl;
         int tex;
 
-        switch (((PieceInfo*) (ofs + (u32) base))->id) {
+        switch (((ITEM_PIECE_INFO*) (ofs + (u32) base))->id) {
         case 0x40:
             mdl = 0x21;
             break;
@@ -753,7 +751,7 @@ void pieceTblInit(SUB_SCREEN* wk)
         }
         mp += 30;
         ofs += 120;
-    } while (((PieceInfo*) (ofs + (u32) base))->id != 0xFFFF);
+    } while (((ITEM_PIECE_INFO*) (ofs + (u32) base))->id != 0xFFFF);
 }
 
 // Sets the piece model's rotation and cell position from pzlPiece::m_orientation (0..3 quarter
@@ -842,7 +840,7 @@ void pieceFrameDisp(cModel* m, u32 color, int type)
         return;
     }
     {
-        ModelBound* bd = &m->pModelInfo->bound;
+        cBoundingBox* bd = &m->pModelInfo->bound;
 
         size.x = bd->size.x;
         size.y = bd->size.y;
@@ -934,7 +932,7 @@ void pieceFrameDisp(cModel* m, u32 color, int type)
 void getPieceVertex(pzlPiece* p, Vec* out, int corner)
 {
     cModel* m = p->model;
-    ModelBound* bd = &m->pModelInfo->bound;
+    cBoundingBox* bd = &m->pModelInfo->bound;
     Vec c;
 
     out->x = bd->size.x;
@@ -1230,12 +1228,12 @@ void SsPzzlInit::move(SUB_SCREEN* wk)
     case 0:
         if (wk->scrn_out_func(wk) == 1) {
             if (wk->menu_old == 2) {
-                wk->wait_cnt = 1;
+                wk->trans_off = 1;
             }
             IdSubErase();
             IdNumErase();
             IdFreeBuffer();
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
             pzzl_wait[0] = 0;
             state++;
         }
@@ -1265,7 +1263,7 @@ void SsPzzlInit::move(SUB_SCREEN* wk)
         } else {
             sscrnModelClear(wk);
         }
-        wk->wait_cnt = 0;
+        wk->trans_off = 0;
         state++;
     case 3: {
         int result;
@@ -1349,20 +1347,20 @@ void SsPzzlMain::init(SUB_SCREEN* wk)
     puzzleCameraInit(wk, &pG->Camera);
     IdTexDataLoad(SS_ARC_PTR(wk->pPzzlDat, 0x1AA), TEX_OWNER_ID_SSCRN);
     if (!IdSub.setCk(IDC_SSCRN_0)) {
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
     }
-    IdSub.set(SS_ARC_PTR(wk->pPzzlDat, 0x1AB), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 0, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pPzzlDat, 0x1AB), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 0, 0);
     tempSpaceDisp(0);
     idMainMenuFade(wk, 1);
     for (i = 0; i < 0x3E; i++) {
         if (i == 0) {
-            IdNum.set(SS_ARC_PTR(wk->pCmmn, 8), 0xFF, IDC_NUM_00, 0x13, 8, 0);
+            IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, IDC_NUM_00, 0x13, 8, 0);
         } else {
-            IdNum.set(SS_ARC_PTR(wk->pCmmn, 8), 0xFF, 0x40 + i, 0x13, 9, 0);
+            IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, (ID_CLASS) (0x40 + i), 0x13, 9, 0);
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xD), 0xFF, IDC_SSCRN_CKPT_0, 0x13, 2, 0);
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xE), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xD), 0xFF, IDC_SSCRN_CKPT_0, 0x13, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xE), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 2, 0);
     for (lang = 0; lang < 2; lang++) {
         u8 type;
 
@@ -1382,17 +1380,17 @@ void SsPzzlMain::init(SUB_SCREEN* wk)
         // `(u8) k`: with a plain int `0x80 + k` combine narrows the plus under the u8 truncation and
         // emits `addi -128`; the target keeps `addi 4,29,128; clrlwi`.
         for (int k = 0; k < 11; k++) {
-            tbl[k] = IdSub.unitPtr(0x70 + (u8) k, type);
+            tbl[k] = IdSub.unitPtr(0x70 + (u8) k, (ID_CLASS) type);
             tbl[k]->be_flag &= ~8;
             tbl[k]->rev_flag |= 0xF;
         }
         for (int k = 0; k < 11; k++) {
-            tbl[k] = IdSub.unitPtr(0x80 + (u8) k, type);
+            tbl[k] = IdSub.unitPtr(0x80 + (u8) k, (ID_CLASS) type);
             tbl[k]->be_flag &= ~8;
             tbl[k]->rev_flag |= 0xF;
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0x10), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 1, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0x10), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 1, 0);
     sscrnLightCreate(wk, (cLit*) SS_ARC_PTR(wk->pCmmn, 0x12));
     if (wk->menu_old == 2 && wk->open_flag != 4) {
         wk->alpha_flag = 0;
@@ -1448,7 +1446,7 @@ void SsPzzlMain::init(SUB_SCREEN* wk)
         cur = thinking;
         cur->init(wk);
     } else {
-        if ((wk->flags & 4) && wk->puzzlePlayer->spacePtr()->getPieceNum() != 0) {
+        if ((wk->attr_flag & 4) && wk->puzzlePlayer->spacePtr()->getPieceNum() != 0) {
             wk->puzzlePlayer->m_p_active_board = wk->puzzlePlayer->spacePtr();
             thinking->init(wk);
         }
@@ -1643,10 +1641,10 @@ void SsPzzlMain::quit(SUB_SCREEN* wk)
             // x300 first: with x40 first the arm's tail is the else arm's `stw x40` insn, which our
             // jump2 cross-jumps as a single-insn tail (COMPILER-DIFF: 6)
             wk->p_get_item = 0;
-            wk->model_flag = 0;
+            wk->item_get_flag = 0;
         } else {
             wk->puzzlePlayer->save();
-            wk->model_flag = 1;
+            wk->item_get_flag = 1;
         }
     }
     pzzl_dbg.quit(wk);
@@ -1851,7 +1849,7 @@ void openMsgWindow(SUB_SCREEN* wk, int no)
     cMes.Delete(2);
     cMes.setLayout(1, LAYOUT_SUBSCRN);
     cMes.MesSet(no, msg_x, msg_y, 0x11, 1, 0, 3);
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xA), 0xFF, IDC_SSCRN_CONFIRM, 0x13, 0, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xA), 0xFF, IDC_SSCRN_CONFIRM, 0x13, 0, 0);
 }
 
 // Case cursor: A on a piece opens PieceCommand, X picks it up (PzzlThinking) and the d-pad moves
@@ -2464,7 +2462,7 @@ void PieceCommand::move(SUB_SCREEN* wk)
                 if (pG->pl_type == 1) {
                     break;
                 }
-                if (wk->flags & 2) {
+                if (wk->attr_flag & 2) {
                     for (int i = 0; i < num * 2 + 6; i++) {
                         id[i]->rev_flag |= 0xF;
                     }
@@ -2592,7 +2590,7 @@ void PieceCommand::move(SUB_SCREEN* wk)
             break;
         }
         for (int i = 0; i < 11; i++) {
-            sub[i] = IdSub.unitPtr(base + i, type);
+            sub[i] = IdSub.unitPtr(base + i, (ID_CLASS) type);
             sub[i]->be_flag |= 8;
             sub[i]->rev_flag &= 0xF0;
         }
@@ -2794,158 +2792,158 @@ static void setCommandId(u8 type, ID_UNIT** tbl, s8* num, int lang)
     }
     switch (type) {
     case 0:
-        tbl[0] = IdSub.unitPtr(0, t);
-        tbl[1] = IdSub.unitPtr(1, t);
-        tbl[2] = IdSub.unitPtr(2, t);
-        tbl[3] = IdSub.unitPtr(3, t);
-        tbl[4] = IdSub.unitPtr(0xA, t);
-        tbl[5] = IdSub.unitPtr(0xB, t);
+        tbl[0] = IdSub.unitPtr(0, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(1, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(2, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(3, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0xA, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0xB, (ID_CLASS) t);
         *num = 3;
-        tbl[6] = IdSub.unitPtr(4, t);
-        tbl[7] = IdSub.unitPtr(5, t);
-        tbl[8] = IdSub.unitPtr(6, t);
-        tbl[9] = IdSub.unitPtr(7, t);
-        tbl[10] = IdSub.unitPtr(8, t);
-        tbl[11] = IdSub.unitPtr(9, t);
+        tbl[6] = IdSub.unitPtr(4, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(5, (ID_CLASS) t);
+        tbl[8] = IdSub.unitPtr(6, (ID_CLASS) t);
+        tbl[9] = IdSub.unitPtr(7, (ID_CLASS) t);
+        tbl[10] = IdSub.unitPtr(8, (ID_CLASS) t);
+        tbl[11] = IdSub.unitPtr(9, (ID_CLASS) t);
         break;
     case 1:
-        tbl[0] = IdSub.unitPtr(0x10, t);
-        tbl[1] = IdSub.unitPtr(0x11, t);
-        tbl[2] = IdSub.unitPtr(0x12, t);
-        tbl[3] = IdSub.unitPtr(0x13, t);
-        tbl[4] = IdSub.unitPtr(0x1C, t);
-        tbl[5] = IdSub.unitPtr(0x1D, t);
+        tbl[0] = IdSub.unitPtr(0x10, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(0x11, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(0x12, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(0x13, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0x1C, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0x1D, (ID_CLASS) t);
         *num = 4;
-        tbl[6] = IdSub.unitPtr(0x14, t);
-        tbl[7] = IdSub.unitPtr(0x15, t);
-        tbl[8] = IdSub.unitPtr(0x16, t);
-        tbl[9] = IdSub.unitPtr(0x17, t);
-        tbl[10] = IdSub.unitPtr(0x18, t);
-        tbl[11] = IdSub.unitPtr(0x19, t);
-        tbl[12] = IdSub.unitPtr(0x1A, t);
-        tbl[13] = IdSub.unitPtr(0x1B, t);
+        tbl[6] = IdSub.unitPtr(0x14, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(0x15, (ID_CLASS) t);
+        tbl[8] = IdSub.unitPtr(0x16, (ID_CLASS) t);
+        tbl[9] = IdSub.unitPtr(0x17, (ID_CLASS) t);
+        tbl[10] = IdSub.unitPtr(0x18, (ID_CLASS) t);
+        tbl[11] = IdSub.unitPtr(0x19, (ID_CLASS) t);
+        tbl[12] = IdSub.unitPtr(0x1A, (ID_CLASS) t);
+        tbl[13] = IdSub.unitPtr(0x1B, (ID_CLASS) t);
         break;
     case 2:
-        tbl[0] = IdSub.unitPtr(0x20, t);
-        tbl[1] = IdSub.unitPtr(0x21, t);
-        tbl[2] = IdSub.unitPtr(0x22, t);
-        tbl[3] = IdSub.unitPtr(0x23, t);
-        tbl[4] = IdSub.unitPtr(0x2E, t);
-        tbl[5] = IdSub.unitPtr(0x2F, t);
+        tbl[0] = IdSub.unitPtr(0x20, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(0x21, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(0x22, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(0x23, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0x2E, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0x2F, (ID_CLASS) t);
         *num = 5;
-        tbl[6] = IdSub.unitPtr(0x24, t);
-        tbl[7] = IdSub.unitPtr(0x25, t);
-        tbl[8] = IdSub.unitPtr(0x26, t);
-        tbl[9] = IdSub.unitPtr(0x27, t);
-        tbl[10] = IdSub.unitPtr(0x28, t);
-        tbl[11] = IdSub.unitPtr(0x29, t);
-        tbl[12] = IdSub.unitPtr(0x2A, t);
-        tbl[13] = IdSub.unitPtr(0x2B, t);
-        tbl[14] = IdSub.unitPtr(0x2C, t);
-        tbl[15] = IdSub.unitPtr(0x2D, t);
+        tbl[6] = IdSub.unitPtr(0x24, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(0x25, (ID_CLASS) t);
+        tbl[8] = IdSub.unitPtr(0x26, (ID_CLASS) t);
+        tbl[9] = IdSub.unitPtr(0x27, (ID_CLASS) t);
+        tbl[10] = IdSub.unitPtr(0x28, (ID_CLASS) t);
+        tbl[11] = IdSub.unitPtr(0x29, (ID_CLASS) t);
+        tbl[12] = IdSub.unitPtr(0x2A, (ID_CLASS) t);
+        tbl[13] = IdSub.unitPtr(0x2B, (ID_CLASS) t);
+        tbl[14] = IdSub.unitPtr(0x2C, (ID_CLASS) t);
+        tbl[15] = IdSub.unitPtr(0x2D, (ID_CLASS) t);
         break;
     case 3:
-        tbl[0] = IdSub.unitPtr(0x30, t);
-        tbl[1] = IdSub.unitPtr(0x31, t);
-        tbl[2] = IdSub.unitPtr(0x32, t);
-        tbl[3] = IdSub.unitPtr(0x33, t);
-        tbl[4] = IdSub.unitPtr(0x3A, t);
-        tbl[5] = IdSub.unitPtr(0x3B, t);
+        tbl[0] = IdSub.unitPtr(0x30, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(0x31, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(0x32, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(0x33, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0x3A, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0x3B, (ID_CLASS) t);
         *num = type;
-        tbl[6] = IdSub.unitPtr(0x34, t);
-        tbl[7] = IdSub.unitPtr(0x35, t);
-        tbl[8] = IdSub.unitPtr(0x36, t);
-        tbl[9] = IdSub.unitPtr(0x37, t);
-        tbl[10] = IdSub.unitPtr(0x38, t);
-        tbl[11] = IdSub.unitPtr(0x39, t);
+        tbl[6] = IdSub.unitPtr(0x34, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(0x35, (ID_CLASS) t);
+        tbl[8] = IdSub.unitPtr(0x36, (ID_CLASS) t);
+        tbl[9] = IdSub.unitPtr(0x37, (ID_CLASS) t);
+        tbl[10] = IdSub.unitPtr(0x38, (ID_CLASS) t);
+        tbl[11] = IdSub.unitPtr(0x39, (ID_CLASS) t);
         break;
     case 4:
-        tbl[0] = IdSub.unitPtr(0x40, t);
-        tbl[1] = IdSub.unitPtr(0x41, t);
-        tbl[2] = IdSub.unitPtr(0x42, t);
-        tbl[3] = IdSub.unitPtr(0x43, t);
-        tbl[4] = IdSub.unitPtr(0x4A, t);
-        tbl[5] = IdSub.unitPtr(0x4B, t);
+        tbl[0] = IdSub.unitPtr(0x40, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(0x41, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(0x42, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(0x43, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0x4A, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0x4B, (ID_CLASS) t);
         *num = 3;
-        tbl[6] = IdSub.unitPtr(0x44, t);
-        tbl[7] = IdSub.unitPtr(0x45, t);
-        tbl[8] = IdSub.unitPtr(0x46, t);
-        tbl[9] = IdSub.unitPtr(0x47, t);
-        tbl[10] = IdSub.unitPtr(0x48, t);
-        tbl[11] = IdSub.unitPtr(0x49, t);
+        tbl[6] = IdSub.unitPtr(0x44, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(0x45, (ID_CLASS) t);
+        tbl[8] = IdSub.unitPtr(0x46, (ID_CLASS) t);
+        tbl[9] = IdSub.unitPtr(0x47, (ID_CLASS) t);
+        tbl[10] = IdSub.unitPtr(0x48, (ID_CLASS) t);
+        tbl[11] = IdSub.unitPtr(0x49, (ID_CLASS) t);
         break;
     case 5:
-        tbl[0] = IdSub.unitPtr(0x50, t);
-        tbl[1] = IdSub.unitPtr(0x51, t);
-        tbl[2] = IdSub.unitPtr(0x52, t);
-        tbl[3] = IdSub.unitPtr(0x53, t);
-        tbl[4] = IdSub.unitPtr(0x5C, t);
-        tbl[5] = IdSub.unitPtr(0x5D, t);
+        tbl[0] = IdSub.unitPtr(0x50, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(0x51, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(0x52, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(0x53, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0x5C, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0x5D, (ID_CLASS) t);
         *num = 4;
-        tbl[6] = IdSub.unitPtr(0x54, t);
-        tbl[7] = IdSub.unitPtr(0x55, t);
-        tbl[8] = IdSub.unitPtr(0x56, t);
-        tbl[9] = IdSub.unitPtr(0x57, t);
-        tbl[10] = IdSub.unitPtr(0x58, t);
-        tbl[11] = IdSub.unitPtr(0x59, t);
-        tbl[12] = IdSub.unitPtr(0x5A, t);
-        tbl[13] = IdSub.unitPtr(0x5B, t);
+        tbl[6] = IdSub.unitPtr(0x54, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(0x55, (ID_CLASS) t);
+        tbl[8] = IdSub.unitPtr(0x56, (ID_CLASS) t);
+        tbl[9] = IdSub.unitPtr(0x57, (ID_CLASS) t);
+        tbl[10] = IdSub.unitPtr(0x58, (ID_CLASS) t);
+        tbl[11] = IdSub.unitPtr(0x59, (ID_CLASS) t);
+        tbl[12] = IdSub.unitPtr(0x5A, (ID_CLASS) t);
+        tbl[13] = IdSub.unitPtr(0x5B, (ID_CLASS) t);
         break;
     case 6:
-        tbl[0] = IdSub.unitPtr(0x90, t);
-        tbl[1] = IdSub.unitPtr(0x91, t);
-        tbl[2] = IdSub.unitPtr(0x92, t);
-        tbl[3] = IdSub.unitPtr(0x93, t);
-        tbl[4] = IdSub.unitPtr(0x9A, t);
-        tbl[5] = IdSub.unitPtr(0x9B, t);
+        tbl[0] = IdSub.unitPtr(0x90, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(0x91, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(0x92, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(0x93, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0x9A, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0x9B, (ID_CLASS) t);
         *num = 3;
-        tbl[6] = IdSub.unitPtr(0x94, t);
-        tbl[7] = IdSub.unitPtr(0x95, t);
-        tbl[8] = IdSub.unitPtr(0x96, t);
-        tbl[9] = IdSub.unitPtr(0x97, t);
-        tbl[10] = IdSub.unitPtr(0x98, t);
-        tbl[11] = IdSub.unitPtr(0x99, t);
+        tbl[6] = IdSub.unitPtr(0x94, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(0x95, (ID_CLASS) t);
+        tbl[8] = IdSub.unitPtr(0x96, (ID_CLASS) t);
+        tbl[9] = IdSub.unitPtr(0x97, (ID_CLASS) t);
+        tbl[10] = IdSub.unitPtr(0x98, (ID_CLASS) t);
+        tbl[11] = IdSub.unitPtr(0x99, (ID_CLASS) t);
         break;
     case 7:
-        tbl[0] = IdSub.unitPtr(0x60, t);
-        tbl[1] = IdSub.unitPtr(0x61, t);
-        tbl[2] = IdSub.unitPtr(0x62, t);
-        tbl[3] = IdSub.unitPtr(0x63, t);
-        tbl[4] = IdSub.unitPtr(0x68, t);
-        tbl[5] = IdSub.unitPtr(0x69, t);
+        tbl[0] = IdSub.unitPtr(0x60, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(0x61, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(0x62, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(0x63, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0x68, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0x69, (ID_CLASS) t);
         *num = 2;
-        tbl[6] = IdSub.unitPtr(0x64, t);
-        tbl[7] = IdSub.unitPtr(0x65, t);
-        tbl[8] = IdSub.unitPtr(0x66, t);
-        tbl[9] = IdSub.unitPtr(0x67, t);
+        tbl[6] = IdSub.unitPtr(0x64, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(0x65, (ID_CLASS) t);
+        tbl[8] = IdSub.unitPtr(0x66, (ID_CLASS) t);
+        tbl[9] = IdSub.unitPtr(0x67, (ID_CLASS) t);
         break;
     case 8:
-        tbl[0] = IdSub.unitPtr(0xA0, t);
-        tbl[1] = IdSub.unitPtr(0xA1, t);
-        tbl[2] = IdSub.unitPtr(0xA2, t);
-        tbl[3] = IdSub.unitPtr(0xA3, t);
-        tbl[4] = IdSub.unitPtr(0xAC, t);
-        tbl[5] = IdSub.unitPtr(0xAD, t);
+        tbl[0] = IdSub.unitPtr(0xA0, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(0xA1, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(0xA2, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(0xA3, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0xAC, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0xAD, (ID_CLASS) t);
         *num = 4;
-        tbl[6] = IdSub.unitPtr(0xA4, t);
-        tbl[7] = IdSub.unitPtr(0xA5, t);
-        tbl[8] = IdSub.unitPtr(0xA6, t);
-        tbl[9] = IdSub.unitPtr(0xA7, t);
-        tbl[10] = IdSub.unitPtr(0xA8, t);
-        tbl[11] = IdSub.unitPtr(0xA9, t);
-        tbl[12] = IdSub.unitPtr(0xAA, t);
-        tbl[13] = IdSub.unitPtr(0xAB, t);
+        tbl[6] = IdSub.unitPtr(0xA4, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(0xA5, (ID_CLASS) t);
+        tbl[8] = IdSub.unitPtr(0xA6, (ID_CLASS) t);
+        tbl[9] = IdSub.unitPtr(0xA7, (ID_CLASS) t);
+        tbl[10] = IdSub.unitPtr(0xA8, (ID_CLASS) t);
+        tbl[11] = IdSub.unitPtr(0xA9, (ID_CLASS) t);
+        tbl[12] = IdSub.unitPtr(0xAA, (ID_CLASS) t);
+        tbl[13] = IdSub.unitPtr(0xAB, (ID_CLASS) t);
         break;
     case 9:
-        tbl[0] = IdSub.unitPtr(0xB0, t);
-        tbl[1] = IdSub.unitPtr(0xB1, t);
-        tbl[2] = IdSub.unitPtr(0xB2, t);
-        tbl[3] = IdSub.unitPtr(0xB3, t);
-        tbl[4] = IdSub.unitPtr(0xB6, t);
-        tbl[5] = IdSub.unitPtr(0xB7, t);
+        tbl[0] = IdSub.unitPtr(0xB0, (ID_CLASS) t);
+        tbl[1] = IdSub.unitPtr(0xB1, (ID_CLASS) t);
+        tbl[2] = IdSub.unitPtr(0xB2, (ID_CLASS) t);
+        tbl[3] = IdSub.unitPtr(0xB3, (ID_CLASS) t);
+        tbl[4] = IdSub.unitPtr(0xB6, (ID_CLASS) t);
+        tbl[5] = IdSub.unitPtr(0xB7, (ID_CLASS) t);
         *num = 1;
-        tbl[6] = IdSub.unitPtr(0xB4, t);
-        tbl[7] = IdSub.unitPtr(0xB5, t);
+        tbl[6] = IdSub.unitPtr(0xB4, (ID_CLASS) t);
+        tbl[7] = IdSub.unitPtr(0xB5, (ID_CLASS) t);
         break;
     }
 }

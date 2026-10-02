@@ -19,9 +19,7 @@
 #include "est.h"
 #include "em_sub.h"
 
-extern "C" {
 static void emTree_R0_Move(cEmTree* em);
-}
 
 typedef void (*EmTreeFunc)(cEmTree*);
 
@@ -42,7 +40,7 @@ EmTreeFunc EmTree_R1_move_tbl[7] = {
     emTree_R1_Shot,
 };
 
-EmAtkInfo emTreeAtk = { 200.0f, PL_DM_AUTO, 400, 0, 10, 0 };
+ATK_INFO emTreeAtk = { 200.0f, PL_DM_AUTO, 400, 0, 10, 0 };
 
 // Creates a tree enemy (id 0x49, at the back of the pool) from a model / TPL at pos / rot: the
 // trunk El Gigante (r119) tears out and throws. Hit boxes, a solid atari, unlockable, SE / effect
@@ -50,7 +48,7 @@ EmAtkInfo emTreeAtk = { 200.0f, PL_DM_AUTO, 400, 0, 10, 0 };
 cEmTree* SetTree(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cEmTree* em;
-    EmTreeWork* w;
+    FREE_EMTREE* w;
 
     em = (cEmTree*) EmMgr.createBack(0x49);
     if (em == 0) {
@@ -73,7 +71,7 @@ cEmTree* SetTree(void* bin, void* tpl, Vec* pos, Vec* rot)
     f32 zero = 0.0f;
     f32 h = 5000.0f;
     f32 r = 200.0f;
-    em->atari.init(zero, h, zero, r, r, r, h, parts, 2, parts);
+    em->atari.init(0.0f, h, zero, r, r, r, h, parts, 2, parts);
     em->hp_max = em->hp = 1000;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
@@ -90,36 +88,36 @@ cEmTree* SetTree(void* bin, void* tpl, Vec* pos, Vec* rot)
     w->Be_flg = 0;
     em->be_flag &= ~0x10;
     w->Fall_wait = 0;
-    w->pParent = 0;
+    w->pEm_oya = 0;
     w->pEm_old = 0;
     w->pAtk = 0;
-    w->caught = 0;
+    w->Catch_ck = 0;
     w->seFall[0] = 0xFF;
     w->seFall[1] = 0xFF;
     w->seFall[2] = 0;
-    w->landed = 0;
+    w->se_ck_fall = 0;
     w->seHit[0] = 0xFF;
     w->seHit[1] = 0xFF;
     w->seHit[2] = 0;
     w->seWall[0] = 0xFF;
     w->seWall[1] = 0xFF;
     w->seWall[2] = 0;
-    w->se64[0] = 0xFF;
-    w->se64[1] = 0xFF;
-    w->se64[2] = 0;
-    w->seAlways[0] = 0xFF;
-    w->seAlways[1] = 0xFF;
-    w->seAlways[2] = 0;
-    w->seAlwaysWait = 4;
+    w->seDamage[0] = 0xFF;
+    w->seDamage[1] = 0xFF;
+    w->seDamage[2] = 0;
+    w->seThrow[0] = 0xFF;
+    w->seThrow[1] = 0xFF;
+    w->seThrow[2] = 0;
+    w->throw_se_wait = 4;
     w->effFall[0] = 0xFF;
     w->effFall[1] = 0xFF;
-    w->eff72[0] = 0xFF;
-    w->eff72[1] = 0xFF;
+    w->effDamage[0] = 0xFF;
+    w->effDamage[1] = 0xFF;
     w->seid_throw = 0;
     w->effHit[0] = 0xFF;
     w->effHit[1] = 0xFF;
     em->Motion.pMot = 0;
-    w->estNo = 50;
+    w->EffKindId = 50;
     em->r_no_0 = 1;
     em->r_no_1 = 0;
     em->r_no_2 = 0;
@@ -153,7 +151,7 @@ void emTreeDmCk(cEmTree* pEm)
 // parent's visibility / fade while attached; Be_flg bit1 hides the tree.
 void cEmTree::move()
 {
-    EmTreeWork* w = EMTREE_WK(this);
+    FREE_EMTREE* w = EMTREE_WK(this);
 
     Motion.Mot_flag &= ~0x40000000;
     emTreeDmCk(this);
@@ -161,10 +159,10 @@ void cEmTree::move()
     if (isAlive()) {
         EmAtCheck(this);
         atari.move();
-        if (w->pParent) {
-            invisible_factor = w->pParent->invisible_factor;
-            invisible_factor2 = w->pParent->invisible_factor2;
-            if (w->pParent->be_flag & 2) {
+        if (w->pEm_oya) {
+            invisible_factor = w->pEm_oya->invisible_factor;
+            invisible_factor2 = w->pEm_oya->invisible_factor2;
+            if (w->pEm_oya->be_flag & 2) {
                 be_flag |= 2;
             } else {
                 be_flag &= ~2;
@@ -209,7 +207,7 @@ void emTree_R1_Set(cEmTree* pEm)
 // goes to Lost.
 void emTree_R1_LostWait(cEmTree* pEm)
 {
-    EmTreeWork* w = EMTREE_WK(pEm);
+    FREE_EMTREE* w = EMTREE_WK(pEm);
     Vec scr;
     Vec pos;
 
@@ -251,7 +249,7 @@ void emTree_R1_LostWait(cEmTree* pEm)
 // Rno1 == 2: hides the tree, drops its collision and destroys the work 30 frames later.
 void emTree_R1_Lost(cEmTree* pEm)
 {
-    EmTreeWork* w = EMTREE_WK(pEm);
+    FREE_EMTREE* w = EMTREE_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -279,8 +277,8 @@ void emTree_R1_Parent(cEmTree* pEm)
     Vec v0;
     Vec v1;
     Vec v2;
-    EmTreeWork* w = EMTREE_WK(pEm);
-    cModel* parent = w->pParent;
+    FREE_EMTREE* w = EMTREE_WK(pEm);
+    cModel* parent = w->pEm_oya;
 
     RotMatrix(pEm->mat, &pEm->ang);
     TransMatrix(pEm->mat, &pEm->pos);
@@ -345,15 +343,15 @@ void emTree_R1_Parent(cEmTree* pEm)
 // small.
 void emTree_R1_Fall(cEmTree* pEm)
 {
-    EmTreeWork* w = EMTREE_WK(pEm);
+    FREE_EMTREE* w = EMTREE_WK(pEm);
     Vec pt[3] = {
         { 0.0f, 7000.0f, 0.0f },
         { 0.0f, 0.0f, 0.0f },
         { 500.0f, 3500.0f, 0.0f },
     };
-    EmTreeNode node[3];
-    EmTreeNode* n;
-    EmTreeNode* nx;
+    EMTREE_FALLWK node[3];
+    EMTREE_FALLWK* n;
+    EMTREE_FALLWK* nx;
     Vec b;
     Vec a;
     Vec c;
@@ -368,9 +366,9 @@ void emTree_R1_Fall(cEmTree* pEm)
     floor = EatMgr.getFloor(&pEm->pos, 0, 600.0f, 100000.0f, 0) + 300.0f;
     for (i = 0; i < 3; i++) {
         n = &node[i];
-        n->spd.x = w->pt[i].x;
-        n->spd.y = w->pt[i].y;
-        n->spd.z = w->pt[i].z;
+        n->spd.x = w->spd[i].x;
+        n->spd.y = w->spd[i].y;
+        n->spd.z = w->spd[i].z;
     }
     for (i = 0; i < 3; i++) {
         n = &node[i];
@@ -428,8 +426,8 @@ void emTree_R1_Fall(cEmTree* pEm)
             nx = &node[i + 1];
         }
         if (n->reflect) {
-            if (w->landed == 0 && n->spd.y < -50.0f) {
-                w->landed = 1;
+            if (w->se_ck_fall == 0 && n->spd.y < -50.0f) {
+                w->se_ck_fall = 1;
                 if (w->seFall[0] != 0xFF) {
                     SndCall(w->seFall[0], w->seFall[1], &pEm->pos, w->seFall[2], 0, pEm);
                 }
@@ -443,9 +441,9 @@ void emTree_R1_Fall(cEmTree* pEm)
                     return;
                 }
             }
-            EffectEspDelete(0, w->estNo, pEm, 0);
-            EffectEspgenDelete(0, w->estNo, pEm);
-            EffectEfmDelete(0, w->estNo, pEm);
+            EffectEspDelete(0, w->EffKindId, pEm, 0);
+            EffectEspgenDelete(0, w->EffKindId, pEm);
+            EffectEfmDelete(0, w->EffKindId, pEm);
             n->spd.x *= fRand0_1() * 0.2f + 0.5f;
             n->spd.y *= -(fRand0_1() * 0.2f + 0.5f);
             n->spd.z *= fRand0_1() * 0.2f + 0.5f;
@@ -461,9 +459,9 @@ void emTree_R1_Fall(cEmTree* pEm)
     }
     for (i = 0; i < 3; i++) {
         n = &node[i];
-        w->pt[i].x = n->spd.x;
-        w->pt[i].y = n->spd.y;
-        w->pt[i].z = n->spd.z;
+        w->spd[i].x = n->spd.x;
+        w->spd[i].y = n->spd.y;
+        w->spd[i].z = n->spd.z;
     }
     PSVECSubtract(&node[0].pos, &node[1].pos, &a);
     PSVECSubtract(&node[2].pos, &node[1].pos, &b);
@@ -510,7 +508,7 @@ void emTree_R1_Fall(cEmTree* pEm)
 // player (EmAtkHitCk with pAtk: damage, vibration, quake, blood) makes it fall.
 void emTree_R1_Throw(cEmTree* pEm)
 {
-    EmTreeWork* w = EMTREE_WK(pEm);
+    FREE_EMTREE* w = EMTREE_WK(pEm);
     Vec d;
     Mtx m;
     Vec up;
@@ -525,15 +523,15 @@ void emTree_R1_Throw(cEmTree* pEm)
         if (w->Timer) {
             w->Timer--;
         } else {
-            w->Timer = w->seAlwaysWait;
-            if (w->seAlways[0] != 0xFF && w->seAlways[1] != 0xFF) {
-                w->seid_throw = SndCall(w->seAlways[0], w->seAlways[1], &pEm->pos, w->seAlways[2], 0, pEm);
+            w->Timer = w->throw_se_wait;
+            if (w->seThrow[0] != 0xFF && w->seThrow[1] != 0xFF) {
+                w->seid_throw = SndCall(w->seThrow[0], w->seThrow[1], &pEm->pos, w->seThrow[2], 0, pEm);
             }
         }
         break;
     }
-    w->spd.y -= 15.0f;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= 15.0f;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     if (EatMgr.hitCheck(&pEm->pos_old, &pEm->pos, 0, 0, 0, 0)) {
         pEm->setFall();
         if (w->seWall[0] != 0xFF && w->seWall[1] != 0xFF) {
@@ -586,7 +584,7 @@ void emTree_R1_Throw(cEmTree* pEm)
 // to that parts and drops after 30 frames (at once when the player is dead).
 void emTree_R1_Shot(cEmTree* pEm)
 {
-    EmTreeWork* w = EMTREE_WK(pEm);
+    FREE_EMTREE* w = EMTREE_WK(pEm);
     Vec hit;
     Vec hitPos;
     Vec nrm;
@@ -604,9 +602,9 @@ void emTree_R1_Shot(cEmTree* pEm)
         if (w->Timer) {
             w->Timer--;
         } else {
-            w->Timer = w->seAlwaysWait;
-            if (w->seAlways[0] != 0xFF && w->seAlways[1] != 0xFF) {
-                w->seid_throw = SndCall(w->seAlways[0], w->seAlways[1], &pEm->pos, w->seAlways[2], 0, pEm);
+            w->Timer = w->throw_se_wait;
+            if (w->seThrow[0] != 0xFF && w->seThrow[1] != 0xFF) {
+                w->seid_throw = SndCall(w->seThrow[0], w->seThrow[1], &pEm->pos, w->seThrow[2], 0, pEm);
             }
         }
         if (w->Timer2) {
@@ -634,8 +632,8 @@ void emTree_R1_Shot(cEmTree* pEm)
         }
         return;
     }
-    w->spd.y -= 0.0f;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= 0.0f;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     if (EatMgr.hitCheck(&pEm->pos_old, &pEm->pos, &hit, 0, 0, 0)) {
         if (w->seWall[0] != 0xFF && w->seWall[1] != 0xFF) {
             SndCall(w->seWall[0], w->seWall[1], &pEm->pos, w->seWall[2], 0, pEm);
@@ -645,7 +643,7 @@ void emTree_R1_Shot(cEmTree* pEm)
         TransMatrix(pEm->mat, &pEm->pos);
         pEm->partsWorldCalc();
         pEm->r_no_2 = 2;
-    } else if (w->pAtk && (part = (YARARE_INFO*) EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0)) != 0) {
+    } else if (w->pAtk && (part = EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0)) != 0) {
         VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
         if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
             SndCall(w->seHit[0], w->seHit[1], &pEm->pos, w->seHit[2], 0, pEm);
@@ -657,7 +655,7 @@ void emTree_R1_Shot(cEmTree* pEm)
         } else {
             EmPlBloodSet2(pEm, &pEm->pos, 1, 0xFF, 0xFF);
         }
-        EmAtkSetDamagePL((cEm*) part, w->pAtk, &pEm->pos_old, &pEm->pos);
+        EmAtkSetDamagePL(part, w->pAtk, &pEm->pos_old, &pEm->pos);
         if ((part->flag & YAT_FLAG_DMPOS) == 0) {
             pEm->setFall();
         } else {
@@ -685,15 +683,15 @@ void emTree_R1_Shot(cEmTree* pEm)
     }
 }
 
-// Attaches the tree to parts `partsNo` of `parent` (Rno1 3); flag skips the matrix normalisation.
+// Attaches the tree to parts `oya_parts` of `pEm` (Rno1 3); mode skips the matrix normalisation.
 // Clears the parent's atari flag 0x200.
-void cEmTree::setParent(cModel* parent, int partsNo, int flag)
+void cEmTree::setParent(cEm* pEm, u32 oya_parts, u32 mode)
 {
-    EmTreeWork* w = EMTREE_WK(this);
+    FREE_EMTREE* w = EMTREE_WK(this);
 
-    w->pParent = parent;
-    w->oya_parts = partsNo;
-    if (flag) {
+    w->pEm_oya = pEm;
+    w->oya_parts = oya_parts;
+    if (mode) {
         w->Be_flg |= 1;
     } else {
         w->Be_flg &= ~1;
@@ -702,15 +700,15 @@ void cEmTree::setParent(cModel* parent, int partsNo, int flag)
     r_no_1 = 3;
     r_no_2 = 0;
     r_no_3 = 0;
-    ((cEm*) parent)->atari.m_flag &= ~0x200;
+    pEm->atari.m_flag &= ~0x200;
 }
 
 // Detaches the tree and returns it to the Set state.
 void cEmTree::clearParent()
 {
-    EmTreeWork* w = EMTREE_WK(this);
+    FREE_EMTREE* w = EMTREE_WK(this);
 
-    w->pParent = 0;
+    w->pEm_oya = 0;
     r_no_0 = 1;
     r_no_1 = 0;
     r_no_2 = 0;
@@ -721,17 +719,17 @@ void cEmTree::clearParent()
 // current matrix.
 void cEmTree::setFall()
 {
-    EmTreeWork* w = EMTREE_WK(this);
+    FREE_EMTREE* w = EMTREE_WK(this);
     cParts* parts;
     u32 i;
 
     Motion.pMot = 0;
     for (i = 0; i < 3; i++) {
-        w->pt[i].x = fRand1_1() * 10.0f;
-        w->pt[i].y = fRand1_1() * 10.0f + 50.0f;
-        w->pt[i].z = fRand1_1() * 10.0f;
+        w->spd[i].x = fRand1_1() * 10.0f;
+        w->spd[i].y = fRand1_1() * 10.0f + 50.0f;
+        w->spd[i].z = fRand1_1() * 10.0f;
     }
-    w->pParent = 0;
+    w->pEm_oya = 0;
     w->pEm_old = 0;
     hp = 0;
     pos.x = mat[0][3];
@@ -752,9 +750,9 @@ void cEmTree::setFall()
 
 // Never called in the DOL: the linker dropped the bodies and kept the constant pools
 // ({10, 20, 75, 350, 0, PI/2} twice after setFall's), see STRIP_UNUSED.
-void cEmTree::setThrow(Vec* spd, EmAtkInfo* atk)
+void cEmTree::setThrow(Vec* spd, ATK_INFO* atk)
 {
-    EmTreeWork* w = EMTREE_WK(this);
+    FREE_EMTREE* w = EMTREE_WK(this);
     Vec v;
     Mtx m;
 
@@ -764,12 +762,12 @@ void cEmTree::setThrow(Vec* spd, EmAtkInfo* atk)
         v.x = fRand1_1() * 10.0f + 20.0f;
         v.y = fRand1_1() * 10.0f + 75.0f;
         v.z = fRand1_1() * 10.0f + 350.0f;
-        if (w->pParent) {
-            PSMTXMultVecSR(w->pParent->mat, &v, &v);
+        if (w->pEm_oya) {
+            PSMTXMultVecSR(w->pEm_oya->mat, &v, &v);
         }
     }
     PSMTXMultVecSR(mat, &v, &v);
-    w->spd = v;
+    w->throw_v = v;
     ang.x = 0.0f;
     ang.y = atan2f(v.x, v.z);
     ang.z = 0.0f;
@@ -781,7 +779,7 @@ void cEmTree::setThrow(Vec* spd, EmAtkInfo* atk)
     PSMTXConcat(m, mat, mat);
     TransMatrix(mat, &pos);
     pos_old = pos;
-    w->pParent = 0;
+    w->pEm_oya = 0;
     if (atk) {
         w->pAtk = atk;
     } else {
@@ -796,9 +794,9 @@ void cEmTree::setThrow(Vec* spd, EmAtkInfo* atk)
 // Launches the trunk straight at the player (Rno1 6) with speed `spd` (default: forward + a
 // little up in the parent's frame) and attack info `atk` (default emTreeAtk: 200 range, 400
 // damage); the trunk is laid horizontal along its path.
-void cEmTree::setShot(Vec* spd, EmAtkInfo* atk)
+void cEmTree::setShot(Vec* spd, ATK_INFO* atk)
 {
-    EmTreeWork* w = EMTREE_WK(this);
+    FREE_EMTREE* w = EMTREE_WK(this);
     Vec v;
     Mtx m;
 
@@ -808,12 +806,12 @@ void cEmTree::setShot(Vec* spd, EmAtkInfo* atk)
         v.x = fRand1_1() * 10.0f + 20.0f;
         v.y = fRand1_1() * 10.0f + 75.0f;
         v.z = fRand1_1() * 10.0f + 350.0f;
-        if (w->pParent) {
-            PSMTXMultVecSR(w->pParent->mat, &v, &v);
+        if (w->pEm_oya) {
+            PSMTXMultVecSR(w->pEm_oya->mat, &v, &v);
         }
     }
     PSMTXMultVecSR(mat, &v, &v);
-    w->spd = v;
+    w->throw_v = v;
     ang.x = 0.0f;
     ang.y = atan2f(v.x, v.z);
     ang.z = 0.0f;
@@ -825,7 +823,7 @@ void cEmTree::setShot(Vec* spd, EmAtkInfo* atk)
     PSMTXConcat(m, mat, mat);
     TransMatrix(mat, &pos);
     pos_old = pos;
-    w->pParent = 0;
+    w->pEm_oya = 0;
     if (atk) {
         w->pAtk = atk;
     } else {
@@ -840,13 +838,13 @@ void cEmTree::setShot(Vec* spd, EmAtkInfo* atk)
 // 1 while the tree has not been caught yet (setCatch not called).
 int cEmTree::ckCatch()
 {
-    return EMTREE_WK(this)->caught == 0;
+    return EMTREE_WK(this)->Catch_ck == 0;
 }
 
 // Marks the tree as caught (El Gigante grabbed it).
 void cEmTree::setCatch()
 {
-    EMTREE_WK(this)->caught = 1;
+    EMTREE_WK(this)->Catch_ck = 1;
 }
 
 // Script entry: hides the tree and removes it (Rno1 2).

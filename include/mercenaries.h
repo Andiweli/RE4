@@ -7,6 +7,17 @@
 
 class cObj;
 
+// Rank reached in a stage (Mercenaries): N (none) to S.
+enum MercSysRankIdEnum {
+    MercSysRankIdN = 0,
+    MercSysRankIdD = 1,
+    MercSysRankIdC = 2,
+    MercSysRankIdB = 3,
+    MercSysRankIdA = 4,
+    MercSysRankIdS = 5,
+    MercSysRankIdMax = 6
+};
+
 // Result block at the head of the Mercenaries work (MercSysResultInit fills it).
 struct MercResultInfo {
     u32 score;       // 0x00  final score
@@ -52,14 +63,14 @@ struct MercSysWork {
     cObj* smd;       // 0x64  dummy model (SetObjSmd)
     u32 SceAtNo;     // 0x68  (PS2 MercSysData SceAtNo)
     u32 strId;       // 0x6C  SndStrReq handle
-    void* CamNo;     // 0x70  copy of MercInit CamNo (PS2 MercSysData CamNo; always 0 on GC)
+    void* CamNo;     // 0x70  copy of MercSysInitWork CamNo (PS2 MercSysData CamNo; always 0 on GC)
     void* smdMot;    // 0x74  MotionSetCore data of the dummy model
-    u32 ClearScore;  // 0x78  copy of MercInit ClearScore (30000) (PS2 MercSysData ClearScore)
+    u32 ClearScore;  // 0x78  copy of MercSysInitWork ClearScore (30000) (PS2 MercSysData ClearScore)
     int mesStart;    // 0x7C  start message
     int mes[10];     // 0x80  [4]: x4FB8 == 4 message, [5..8]: rank messages, [9]: result end message
     int mesA8;       // 0xA8
     int mesAC;       // 0xAC
-    u32 MesNoStart03; // 0xB0  copy of MercInit MesNoStart03 (PS2 MercSysData MesNoStart03)
+    u32 MesNoStart03; // 0xB0  copy of MercSysInitWork MesNoStart03 (PS2 MercSysData MesNoStart03)
     u8 startSt[5];   // 0xB4  MercSysMoveStart: [0] running, [1] step
     u8 mainSt[5];    // 0xB9  MercSysMoveMain: [0] running
     u8 pad_BE[2];
@@ -67,27 +78,27 @@ struct MercSysWork {
 };
 
 // Room start parameters handed to MercSysInitRoom.
-struct MercInit {
+struct MercSysInitWork {
     Vec pos;         // 0x00  player start position
     Vec rot;         // 0x0C
-    void* CamNo;     // 0x18  camera number, the rooms pass 0 (PS2 MercSysInitWork CamEnum CamNo)
+    void* CamNo;     // 0x18  camera number, the rooms pass 0 (PS2 CamEnum CamNo)
     void* smdMot;    // 0x1C
-    u32 ClearScore;  // 0x20  the rooms pass 30000 (PS2 MercSysInitWork ClearScore)
+    u32 ClearScore;  // 0x20  the rooms pass 30000
     int mesStart;    // 0x24
     int mes[10];     // 0x28
     int mesA8;       // 0x50
     int mesAC;       // 0x54
-    u32 MesNoStart03; // 0x58  (PS2 MercSysInitWork MesNoStart03)
+    u32 MesNoStart03; // 0x58
 };
 
 // Save data view of the Mercenaries records (pSys->x10[] / pSys->x20[] bits), 0x80 bytes.
-struct MercSaveWork {
+struct MercSysSaveWork {
     struct {
         u32 score;   // 0x00
         u32 mode;    // 0x04
         u32 newFlag; // 0x08
     } stage[4];      // 0x00
-    int rank[5][4];  // 0x30  [mode][stage]
+    MercSysRankIdEnum rank[5][4];  // 0x30  [mode][stage]
 };
 
 extern MercSysWork MercSysWk;
@@ -173,16 +184,15 @@ enum MERCE_TYPE {
     MT_ITEM = 9
 };
 
-extern "C" {
 int MercSysInitStage();
-int MercSysInitRoom(MercInit* pMInit);
+int MercSysInitRoom(MercSysInitWork* pMInit);
 int MercSysMoveStart(MercSysWork* wk);
 int MercSysMoveScore(MercSysWork* pWk);
 int MercSysMoveMain(MercSysWork* pWk);
 int MercSysResultInit(MercSysWork* pWk);
 int MercSysResultMove(MercSysWork* pWk);
-void MercSysGetSaveWork(MercSaveWork* pSaveWk);
-void MercSysSetSaveWork(MercSaveWork* pSaveWk);
+void MercSysGetSaveWork(MercSysSaveWork* pSaveWk);
+void MercSysSetSaveWork(MercSysSaveWork* pSaveWk);
 int MercSysSetPoint(int type, int point);   // kind: MERCE_TYPE
 int MercSysSetAddTime(int time);
 int MercSysSetBonusTime(int time);
@@ -194,6 +204,5 @@ void IdSetColStart(IDSystem* pIdSys, int idmNo0, int idmNo1, u8 idcNo);
 void IdSetNum(IDSystem* pIdSys, int idmNo, u8 idcNo, int num, int max, int keta, int mode);
 void IdSetTexNo(IDSystem* pIdSys, int idmNo, u8 idcNo, int texNo);
 int IdIsAnimEnd(IDSystem* pIdSys, int idmNo, u8 idcNo);
-}
 
 #endif

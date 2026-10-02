@@ -5,18 +5,7 @@
 #include "vec.h"
 #include "gx.h"
 
-// Debug primitive drawing environment (game/t_prim.cpp).
-struct TprimRect {
-    f32 x, y, w, h;
-};
-
-struct TprimView {
-    TprimRect rect;
-    f32 nearz;
-    f32 farz;
-};
-
-void TprimInitEnv2D3D(TprimView* view, MtxPtr proj, MtxPtr view_mtx);
+void TprimInitEnv2D3D(f32* view, MtxPtr proj, MtxPtr view_mtx);
 void TprimDraw3D(u32 mode);
 void TprimSetBlend(u32 mode);
 // The tool modules link the full t_prim (tools/t_prim.cpp); the DOL link dead-stripped these.
@@ -31,9 +20,9 @@ struct S16Vec {
     s16 x, y, z;
 };
 
-void TprimInitEnv2D(TprimRect* rect);
+void TprimInitEnv2D(f32* rect);
 void TprimDrawLineFn(Vec* v, GXColor* c, u16 n);
-void TprimDrawTile2D(TprimRect* v, f32 z, GXColor* c);
+void TprimDrawTile2D(f32* v, f32 z, GXColor* c);
 void TprimDrawHtr(Vec* pos, GXColor* col);
 void TprimDrawHtrCone(Vec* pos, GXColor* col);
 void TprimDrawFrameFn_s16(S16Vec* v, GXColor* c, u16 n);

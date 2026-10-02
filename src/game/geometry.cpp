@@ -95,19 +95,19 @@ static inline int collision_point_check(Vec* p)
 }
 
 // 1 when the sphere touches the convex hexahedron given by six outward normals (three through
-// pointA, three through pointB); used for frustum culling.
-int collision_sphere_hexahedron(GeoSphere* pSphere, GeoHexahedron* pHexahedron)
+// vertex 0, three through vertex 6); used for frustum culling.
+int collision_sphere_hexahedron(GEOM_SPHERE* pSphere, GEOM_HEXAHEDRON* pHexahedron)
 {
     int ret = 1;
     u32 i;
     Vec d;
 
-    PSVECSubtract(&pSphere->pos, &pHexahedron->pointA, &d);
+    PSVECSubtract(&pSphere->pos, &pHexahedron->vertex[0], &d);
     for (i = 0; i <= 5; i++) {
         if (i == 3) {
-            PSVECSubtract(&pSphere->pos, &pHexahedron->pointB, &d);
+            PSVECSubtract(&pSphere->pos, &pHexahedron->vertex[6], &d);
         }
-        if (PSVECDotProduct(&d, &pHexahedron->normal[i]) > pSphere->r + 0.01f) {
+        if (PSVECDotProduct(&d, &pHexahedron->normal[i]) > pSphere->radius + 0.01f) {
             ret = 0;
             break;
         }

@@ -58,7 +58,6 @@ void* GetModelInfoAddr(cModelInfo* info, int no);
 
 #define DVD_READ_N(name, dst, a, b, c, mode) DvdReadN(name, dst, a, b, c, mode, __FILE__, __LINE__)
 
-extern "C" {
 u32 MakeCol(f32 r, f32 g, f32 b, f32 a);
 void DbgDrawBoxFill(f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a);
 void partnerDataName(char* name, int no);
@@ -67,7 +66,6 @@ void termMotionSet(void* data, int no);
 void termMotionCancel(void* data, int no);
 void termModelAlloc(SUB_SCREEN* wk);
 void terminalCameraInit(SUB_SCREEN* wk, CAMERA* cam);
-}
 
 // Packs 0..1 float components into an ARGB8 colour word (debug drawing helper).
 u32 MakeCol(f32 r, f32 g, f32 b, f32 a)
@@ -273,26 +271,23 @@ public:
     // Empty: the file-scope instance below gives the unit its (empty) static init/destroy pair.
     cFileList() {}
     ~cFileList() {}
-    void init();
+    int init(const char* d, const char* f);
     char* disp(int x, int y, int rows);
     int update();
-    void dir(char* d, char* f);
+    void dir(const char* d, const char* f);
 };
 
-// Host file list start: default directory (\bio4\data\*.*) and a first read (dir() reads two
-// uninitialised locals here, as the original does).
-void cFileList::init()
+// Host file list start: search pattern d (NULL: \bio4\data\*.*), prefix f stripped from every name;
+// returns the first read's result.
+int cFileList::init(const char* d, const char* f)
 {
-    char* d;
-    char* f;
-
     text = 0;
     list = 0;
     cursor = 0;
     pattern = 0;
     filter = 0;
     dir(d, f);
-    update();
+    return update();
 }
 
 // Scrolling list display at (x, y) with `rows` visible lines: up/down (fast repeat) move the
@@ -386,7 +381,7 @@ int cFileList::update()
 
 // Sets the search pattern `d` and name prefix `f` (copied, backslashes converted); d == 0 gives the
 // defaults \bio4\data\*.* and /bio4/data/.
-void cFileList::dir(char* d, char* f)
+void cFileList::dir(const char* d, const char* f)
 {
     if (pattern) {
         Debug_free(pattern);
@@ -413,7 +408,7 @@ void cFileList::dir(char* d, char* f)
                 *p = '/';
             }
         } else {
-            filter = f;
+            filter = (char*) f;
         }
     }
 }
@@ -427,9 +422,9 @@ TermOpe term_ope_tbl[24] = {
 // The archive inside op/opNN.das starts 0x400 bytes in. Read through an inline (not a macro on the
 // member): the table stores may alias wk->pOpData, so the pointer is reloaded per statement, and
 // `ofs + (u32) arc` is not reassociated with the +0x400.
-static inline SsArc* opArc(SUB_SCREEN* wk)
+static inline u32* opArc(SUB_SCREEN* wk)
 {
-    return (SsArc*) ((u8*) wk->pTermMes + 0x400);
+    return (u32*) ((u8*) wk->pTermMes + 0x400);
 }
 #define OP_ARC_PTR(wk, no) SS_ARC_PTR(opArc(wk), no)
 
@@ -500,18 +495,18 @@ void SsTermMain::OpeMdtSetNo(int no)
     if (no > 0x17) {
         pLog->err(0, 0, "SsTermMain::OpeMdtSetNo [%d]", no);
     } else {
-        OpeMdtSetSub(term_ope_tbl[no].mdtNo, term_ope_tbl[no].seq, term_ope_tbl[no].mes);
+        OpeMdtSetSub(term_ope_tbl[no].mdtNo, (OpeMesSeq*) term_ope_tbl[no].seq, (u8*) term_ope_tbl[no].mes);
     }
 }
 
-// Resets the op player (TermOpeWork) onto a voice stream number, a TermSeq table and a message
+// Resets the op player (TermOpeWork) onto a voice stream number, a OpeMesSeq table and a message
 // block (MesData slot 2): sequence index / counters to 0, stream not started.
-void SsTermMain::OpeMdtSetSub(int mdtNo, void* seq, void* mes)
+void SsTermMain::OpeMdtSetSub(int mdtNo, OpeMesSeq* seq, u8* mes)
 {
     ope.mdtNo = mdtNo;
-    ope.seq = (TermSeq*) seq;
+    ope.seq = seq;
     ope.mes = mes;
-    MesData.registData(2, (u8*) mes);
+    MesData.registData(2, mes);
     ope.seqIdx = 0;
     ope.mesWait = 0;
     ope.flags &= ~0x08000000;
@@ -520,7 +515,7 @@ void SsTermMain::OpeMdtSetSub(int mdtNo, void* seq, void* mes)
 }
 
 // Runs the op one frame: starts the voice stream (SndStrReq mdtNo) and waits for it to be ready,
-// then plays the talking motions and shows the frame units; fires every TermSeq entry whose time
+// then plays the talking motions and shows the frame units; fires every OpeMesSeq entry whose time
 // has come (OpeSeqMove). B (Key bit 18) skips: the stream stops and A/B step the remaining entries
 // by hand. Returns 1 when the sequence ended (arg == -1 entry).
 int SsTermMain::OpeMesMove()
@@ -559,8 +554,8 @@ int SsTermMain::OpeMesMove()
             ope.flags |= 0x10000000;
         }
         for (;;) {
-            TermSeq* s = &ope.seq[ope.seqIdx];
-            if (!(s->time > ope.seqCnt)) {
+            OpeMesSeq* s = &ope.seq[ope.seqIdx];
+            if (!(s->Frame > ope.seqCnt)) {
                 if (OpeSeqMove(s) == 0) {
                     return 1;
                 }
@@ -581,18 +576,18 @@ int SsTermMain::OpeMesMove()
 
 // Executes one sequence entry: arg -1 ends the op (stream stopped, messages deleted; returns 0),
 // otherwise shows message mesNo for `arg` frames and advances seqIdx.
-int SsTermMain::OpeSeqMove(TermSeq* s)
+int SsTermMain::OpeSeqMove(OpeMesSeq* s)
 {
     TermSub* w = &sub;
 
-    w->x14 = s->x2;
-    w->x18 = s->mesNo;
-    if (s->arg == -1) {
+    w->x14 = s->No;
+    w->x18 = s->NoMes;
+    if (s->Timer == -1) {
         OpeSndStrStop();
         cMes.Clear();
         return 0;
     }
-    OpeMesSet(s->mesNo, s->arg);
+    OpeMesSet(s->NoMes, s->Timer);
     ope.seqIdx++;
     return 1;
 }
@@ -661,14 +656,14 @@ int partnerType(int no)
 // cancel motion, 12/13 = the player model's motion / shape data, 14/15 = the partner's.
 void termMotionSet(void* data, int no)
 {
-    SsArc* d = (SsArc*) data;
+    u32* d = (u32*) data;
     cModel* m;
 
     m = MapMgr.getWork(0);
-    MotionSetCore(m, &((cMotModel*) m)->Motion, SS_ARC_PTR(d, 12), 0, (u8) no, 0x8000, 0);
+    MotionSetCore(m, &m->Motion, SS_ARC_PTR(d, 12), 0, (u8) no, 0x8000, 0);
     ShapeSet(GetModelInfoAddr(m->pModelInfo, 3), 0, SS_ARC_PTR(d, 13), 2);
     m = MapMgr.getWork(2);
-    MotionSetCore(m, &((cMotModel*) m)->Motion, SS_ARC_PTR(d, 14), 0, (u8) no, 0x8000, 0);
+    MotionSetCore(m, &m->Motion, SS_ARC_PTR(d, 14), 0, (u8) no, 0x8000, 0);
     ShapeSet(GetModelInfoAddr(m->pModelInfo, 3), 0, SS_ARC_PTR(d, 15), 0xA);
 }
 
@@ -677,13 +672,13 @@ void termMotionSet(void* data, int no)
 void termMotionCancel(void* data, int no)
 {
     SUB_SCREEN* wk = &SubScreenWk;
-    SsArc* d = (SsArc*) data;
+    u32* d = (u32*) data;
     cModel* m;
 
     m = MapMgr.getWork(0);
-    MotionSetCore(m, &((cMotModel*) m)->Motion, SS_ARC_PTR(wk->pTermDat, 14), 0, (u8) no, 0x8004, 0);
+    MotionSetCore(m, &m->Motion, SS_ARC_PTR(wk->pTermDat, 14), 0, (u8) no, 0x8004, 0);
     m = MapMgr.getWork(2);
-    MotionSetCore(m, &((cMotModel*) m)->Motion, SS_ARC_PTR(d, 4), 0, (u8) no, 0x8004, 0);
+    MotionSetCore(m, &m->Motion, SS_ARC_PTR(d, 4), 0, (u8) no, 0x8004, 0);
 }
 
 static cFileList term_file_list;
@@ -715,7 +710,7 @@ void SsTermInit::move(SUB_SCREEN* wk)
         IdSub.dispSw(IDC_SSCRN_PESETA, 0);
         sscrnModelFree(wk);
         sscrnLightClear(wk);
-        wk->pTermDat = (SsArc*) (wk->pSwitchOffs + (u32) wk->pBuf);
+        wk->pTermDat = (u32*) (wk->pSwitchOffs + (u32) wk->pBuf);
         sscrnDataFilename(wk, "ss_term.dat");
 #line 1101 "D:/Bio4/Prog/ss_term.cpp"
         term_read_req = DVD_READ_N(wk->filename, 0, 0, 0, 0, 5);
@@ -725,7 +720,7 @@ void SsTermInit::move(SUB_SCREEN* wk)
         _rno++;
     case 3:
         Dvd.ReadCheck(term_read_req, 0, 0, &term);
-        wk->pTermDat = (SsArc*) term;
+        wk->pTermDat = (u32*) term;
         _rno++;
     case 4: {
         char name[32];
@@ -742,7 +737,7 @@ void SsTermInit::move(SUB_SCREEN* wk)
 #line 1156 "D:/Bio4/Prog/ss_term.cpp"
         term_read_req = DVD_READ_N(name, 0, 0, 0, 0, 5);
         Dvd.ReadCheck(term_read_req, 0, 0, &partner);
-        wk->pTelDat = partner;
+        wk->pTelDat = (u32*) partner;
         _rno++;
     }
     case 6:
@@ -768,7 +763,7 @@ void termModelAlloc(SUB_SCREEN* wk)
 {
     int i;
 
-    wk->attr_flag |= 1;
+    wk->model_flag |= 1;
     ssModInfoMgr.roomInit();
     ssModInfoMgr.arrayAlloc(0x10);
     ssPartsMgr.roomInit();
@@ -787,20 +782,20 @@ void terminalCameraInit(SUB_SCREEN* wk, CAMERA* cam)
 {
     const f32 zero = 0.0f;
 
-    cam->param.pos.z = 2000.0f;
+    cam->param.Campos.z = 2000.0f;
     cam->Up.y = 1.0f;
-    cam->param.at.x = 0.0f;
-    cam->param.at.y = 0.0f;
-    cam->param.at.z = 0.0f;
-    cam->param.pos.x = 0.0f;
-    cam->param.pos.y = 0.0f;
+    cam->param.Target.x = 0.0f;
+    cam->param.Target.y = 0.0f;
+    cam->param.Target.z = 0.0f;
+    cam->param.Campos.x = 0.0f;
+    cam->param.Campos.y = 0.0f;
     cam->Up.x = 0.0f;
     cam->Up.z = 0.0f;
-    cam->param.fovy = 50.0f;
+    cam->param.Fovy = 50.0f;
     CameraSetOrientationUp(cam);
-    C_MTXPerspective(cam->ProjMat, cam->param.fovy, 1.3333334f, ZNEAR, ZFAR);
-    cam->Distance = PSVECDistance(&cam->param.pos, &cam->param.at);
-    C_MTXLookAt(cam->v_mat, &cam->param.pos, &cam->Up, &cam->param.at);
+    C_MTXPerspective(cam->ProjMat, cam->param.Fovy, 1.3333334f, ZNEAR, ZFAR);
+    cam->Distance = PSVECDistance(&cam->param.Campos, &cam->param.Target);
+    C_MTXLookAt(cam->v_mat, &cam->param.Campos, &cam->Up, &cam->param.Target);
 }
 
 
@@ -810,8 +805,8 @@ void terminalCameraInit(SUB_SCREEN* wk, CAMERA* cam)
 static void screenPos2terminalPos(Vec* pos, Vec* out)
 {
     CAMERA* cam = &pG->Camera;
-    f32 pz = cam->param.pos.z;
-    f32 h = fabsf((f32) (pz * tan(cam->param.fovy * 0.5f * 3.1415927f / 180.0f)));
+    f32 pz = cam->param.Campos.z;
+    f32 h = fabsf((f32) (pz * tan(cam->param.Fovy * 0.5f * 3.1415927f / 180.0f)));
 
     out->x = pos->x * h / 240.0f;
     out->y = pos->y * h / 240.0f;
@@ -832,8 +827,8 @@ void SsTermMain::init(SUB_SCREEN* wk)
     cModel* m;
 
     IdTexDataLoad(SS_ARC_PTR(wk->pTermDat, 5), TEX_OWNER_ID_SSCRN);
-    IdSub.set(SS_ARC_PTR(wk->pTermDat, 8), 0xFF, IDC_SSCRN_0, 0xC, 5, 0);
-    IdSub.set(SS_ARC_PTR(wk->pTermDat, 9), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pTermDat, 8), 0xFF, IDC_SSCRN_0, 0xC, 5, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pTermDat, 9), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
     u = IdSub.unitPtr(0x12, IDC_SSCRN_NEAR_0);
     u->be_flag &= ~8;
     u->rev_flag |= 0xF;
@@ -846,7 +841,7 @@ void SsTermMain::init(SUB_SCREEN* wk)
     sscrnMainMenuInit(wk, 0);
     x10 = 0;
     if (pSys->language == 0) {
-        cMes.setupFont(0x1C, 0x1C, (TEXPalette*) SS_ARC_PTR(wk->pTermDat, 4), 3);
+        cMes.setupFont(0x1C, 0x1C, (u8*) SS_ARC_PTR(wk->pTermDat, 4), 3);
     }
     cMes.setLayout(0, LAYOUT_OPERATOR);
     memset(&ope, 0, sizeof(ope));
@@ -877,7 +872,7 @@ void SsTermMain::init(SUB_SCREEN* wk)
             Vec d;
             Vec ang2;
             pos = term_cam_pos;
-            PSVECSubtract(&pG->Camera.param.pos, &pos, &d);
+            PSVECSubtract(&pG->Camera.param.Campos, &pos, &d);
             ang2.x = 0.0f;
             ang2.y = atan2f(d.x, d.z);
             ang2.z = 0.0f;

@@ -75,9 +75,7 @@ extern FLR_AT_SYS* pFlrSys;
 
 FLR_AT_DATA* FlrAtCheck(int id, Vec* pos, int flag);
 
-extern "C" {
 void FlrAtInit();
 int FlrAtSetDefVal(u32 group, u8 foot_se_set, u8 eff_no);
-}
 
 #endif

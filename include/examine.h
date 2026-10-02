@@ -11,14 +11,14 @@
 // Item examine view (game/examine.cpp): shows an item model in front of the item camera.
 
 // Per-item display parameters (exam_info / exam_info_ext, 0x20 bytes).
-struct ExamInfo {
-    u16 id;     // 0x00  item id
+struct ITEM_EXAMINE_INFO {
+    u16 item_id;     // 0x00  item id
     u16 x2;     // 0x02
     Vec rot;    // 0x04  initial rotation (degrees)
     f32 scale;  // 0x10  camera distance divisor
-    s32 light;  // 0x14  light cut selected from pG->pCore (0..4)
-    s32 rot0;   // 0x18  rotation axis for mode 0 (0 world Y, 1 model Y)
-    s32 rot1;   // 0x1C  rotation axis for mode 1
+    s32 light_no;  // 0x14  light cut selected from pG->pCore (0..4)
+    s32 axis_scr;   // 0x18  rotation axis for mode 0 (0 world Y, 1 model Y)
+    s32 axis_id;   // 0x1C  rotation axis for mode 1
 };
 
 class ItemExamine {
@@ -40,7 +40,7 @@ public:
     u16 m_item_id;              // 0x44  item id
     u8 pad_46[2];
     cModel* m_pModel;       // 0x48
-    ExamInfo* m_pInfo;      // 0x4C
+    ITEM_EXAMINE_INFO* m_pInfo;      // 0x4C
     cLight* m_pLight[3];    // 0x50
 
     void setup();
@@ -55,7 +55,7 @@ public:
 
 extern ItemExamine itemExam;
 extern CAMERA itemCamera;
-extern ExamInfo exam_info_ext[2];
+extern ITEM_EXAMINE_INFO exam_info_ext[2];
 extern f32 cap_dist_min;
 extern f32 cap_dist_max;
 extern f32 cap_xrad_max;

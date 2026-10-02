@@ -217,7 +217,7 @@ static void R20fSwitchMain()
         RsfSet(G_ROOM_ID, 1);
         SceAtSetEnable(5, 0);
         SceEventStart(1);
-        SceSetEventCancel(1, (TaskFunc) R20fSwitchEnd, 1, -1, 1);
+        SceSetEventCancel(1, (TaskFunc) R20fSwitchEnd, (void*) 1, -1, 1);
         if (obj1) {
             R20fSwitchMove(obj1, 1);
         }

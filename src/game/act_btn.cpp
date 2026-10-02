@@ -42,7 +42,7 @@ void cActionButton::init()
 void cActionButton::move()
 {
     u32 tag;
-    ActBtnWork* w;
+    ACT_WORK* w;
 
     Cckpt.m_ActBttn.setDispFlag(0);
     setActive(0);
@@ -51,7 +51,7 @@ void cActionButton::move()
         return;
     }
     for (tag = m_ot[15]; tag != 0xFFFFFFFF; tag = w->tag) {
-        w = (ActBtnWork*) (tag | 0x80000000);
+        w = (ACT_WORK*) (tag | 0x80000000);
         if ((s32) tag >= 0) {
             continue;
         }
@@ -76,14 +76,14 @@ void cActionButton::move()
                 ((ActBtnFunc) w->func)(w->arg, w->d);
                 break;
             case ACT_FUNC_SCE:
-                SceExec(0x12, (TaskFunc) w->func, (int) w->arg, flag, w->slot, (void*) w->d);
+                SceExec(0x12, (TaskFunc) w->func, w->arg, flag, w->slot, (void*) w->d);
                 break;
             case ACT_FUNC_SCE_AT: {
-                SceAtWork* at = (SceAtWork*) w->arg;
+                SCE_AT_DATA* at = (SCE_AT_DATA*) w->arg;
 
                 SceAtSetExecFlg(at->no);
                 ((ActBtnFunc) w->func)(w->arg, w->d);
-                if (at->trigger & 0x80) {
+                if (at->trg_type & 0x80) {
                     SceAtSetEnable(at->no, 0);
                 }
                 break;
@@ -97,7 +97,7 @@ void cActionButton::move()
 
 // Shows the prompt: the message (kind + 0x16) at the layout position for the button icon, and
 // tells the cockpit which button icon to draw.
-void cActionButton::disp(ActBtnWork* work)
+void cActionButton::disp(ACT_WORK* work)
 {
     int col = 0;
     u8 kind = work->kind;
@@ -144,7 +144,7 @@ void cActionButton::disp(ActBtnWork* work)
 // 1 when the prompt's button is pressed this frame, honouring the exclusive, no-trigger and "button
 // already consumed" flags. Failing tests `break` to the one shared `return 0` and the case-9 arm ends
 // in a codeless `asm volatile("")`, both so that jump1 / jump2 produce the target's branch layout.
-int cActionButton::checkButton(ActBtnWork* work)
+int cActionButton::checkButton(ACT_WORK* work)
 {
     u32 on = Key.on & 0x00CF0000;
     u32 trg = Key.trg & 0x00CF0000;
@@ -295,7 +295,7 @@ int cActionButton::checkButton(ActBtnWork* work)
 // 1 when the live player may take the action (actCheck, or flags bit1 skips it); some button
 // kinds need the player to be aiming (PlGetStatus 0x10), with flags bit0 marking Status_flg[0]
 // 0x200000.
-int cActionButton::checkPLStatus(ActBtnWork* work)
+int cActionButton::checkPLStatus(ACT_WORK* work)
 {
     if (pPL->hp > 0) {
         if ((work->flags & ACTCTR_ENFORCE_EXEC) || pPL->actCheck() != 0) {
@@ -320,9 +320,9 @@ int cActionButton::checkPLStatus(ActBtnWork* work)
 }
 
 // Next free prompt work of this frame (NULL when the 8 are used).
-ActBtnWork* cActionButton::pullWork()
+cActionButton::ACT_WORK* cActionButton::pullWork()
 {
-    ActBtnWork* w;
+    ACT_WORK* w;
 
     if (m_num > 7) {
         return 0;
@@ -334,9 +334,9 @@ ActBtnWork* cActionButton::pullWork()
 
 // Offers an action for this frame: message kind, priority slot 0..15, callback and its
 // arguments, flags, button kind and call type.
-void cActionButton::set(int kind, int slot, void* func, void* arg, int flags, int btn, int type, int d)
+void cActionButton::set(int kind, int slot, void* func, void* arg, int flags, int btn, int type, void* d)
 {
-    ActBtnWork* w = pullWork();
+    ACT_WORK* w = pullWork();
 
     if (w == 0) {
         return;
@@ -351,7 +351,7 @@ void cActionButton::set(int kind, int slot, void* func, void* arg, int flags, in
     w->flags = flags;
     w->btn = btn;
     w->slot = slot;
-    w->d = d;
+    w->d = (int) d;
     AddPrim(&m_ot[slot], (u32*) w);
     switch (w->btn) {
     case DISP_A_NORMAL:

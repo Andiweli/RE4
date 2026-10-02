@@ -41,7 +41,7 @@ static inline void setVec(Vec* v, f32 x, f32 y, f32 z)
 }
 
 static void R329EventS00();
-extern "C" void Evt_R329S00_Func(Event* e);
+void Evt_R329S00_Func(Event* e, u32);
 
 // Room init: the s00 (and s99) callback. Before the reunion (Room_flg bit 0): r329s00 pre-loaded with
 // the enemy of ESL 0x95, Ashley marked as following, the event task (unless debug trigger 1), the
@@ -89,8 +89,8 @@ static void R329EventS00()
 {
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
         RsfSet(G_ROOM_ID, 0);
-        KyfFlagOff(pG, KYF_ST1_14);
-        KyfFlagOff(pG, KYF_ST1_22);
+        KyfFlagOff(pG, KYF_ST3_13);
+        KyfFlagOff(pG, KYF_ST3_21);
         SceEventStart(0);
         SysFlagOn(pG, SYS_SCREEN_STOP);
         SceSleep(1);
@@ -149,12 +149,12 @@ static void R329EventS00()
 // Event r329s00 callback: Status_flg[1] 0x800 and the pre-event object set at start; per cut the Leon
 // model's flags, the et1200 / et1210 etc models (CMF on) and hand-offs of scroll objects; the end
 // restores the room.
-extern "C" void Evt_R329S00_Func(Event* e)
+void Evt_R329S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -284,23 +284,23 @@ extern "C" void Evt_R329S00_Func(Event* e)
         StaFlagOff(pG, STA_CAMERA_SET_ROOM);
         w = SmdGetWorkPtr(0x29);
         if ((obj = SmdGetObjPtr(0x29)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x2A);
         if ((obj = SmdGetObjPtr(0x2A)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x2B);
         if ((obj = SmdGetObjPtr(0x2B)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x2C);
         if ((obj = SmdGetObjPtr(0x2C)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0x30, 0);
         SmdSetTrans(0x31, 0);

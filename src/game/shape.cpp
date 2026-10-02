@@ -8,14 +8,12 @@
 #include <string.h>
 #include "motion.h"
 
-extern "C" {
 int ShapeMove(cModelInfo* info);
 void SetOriginalShape(cModelInfo* info);
 void ClrShape(cModel* m);
 int SetShape(cModelInfo* info, f32 rate, ShapeData* data);
 void ResetShape(cModelInfo* info, void* dst);
 void CalculateShape_new(cModelInfo* info, f32 rate, ShapeData* data, u8* dst);
-}
 
 void ShapeEnd(void* work);
 
@@ -187,8 +185,8 @@ void CalculateShape_new(cModelInfo* info, f32 rate, ShapeData* data, u8* dst)
 {
     ShapeWork work;
     ShapeWork* w = &work;
-    HermitePrm prm;
-    HermitePrm* pp = &prm;
+    HERMITE_SET prm;
+    HERMITE_SET* pp = &prm;
     f32 result[4];
     s16 tmp[1];
     u8 out[8];
@@ -217,14 +215,14 @@ void CalculateShape_new(cModelInfo* info, f32 rate, ShapeData* data, u8* dst)
     if (dst != NULL) {
         ShapeEntry* tbl = (ShapeEntry*) (info->model_addr->shapeOfs + (u32) info->model_addr + 4);
 
-        pp->frame = rate;
-        pp->maxFrame = w->frame;
-        pp->flags = 2;
+        pp->Frame = rate;
+        pp->Frame_max = w->frame;
+        pp->Attr = 2;
         for (i = 0; i < w->num; i++) {
             if (w->flags[i] & 4) {
                 f32 v;
-                pp->type = w->flags[i] >> 12;
-                pp->key = (u8*) w->table[i];
+                pp->Data_fmt = w->flags[i] >> 12;
+                pp->pData = (u8*) w->table[i];
                 memclr_asm(out, 6);
                 HermiteInterpolation(pp, (Vec*) result, (u16*) out);
                 v = result[1] / 100.0f;

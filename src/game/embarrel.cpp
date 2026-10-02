@@ -64,7 +64,6 @@ cEmBarrel* SetBarrel(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcN
     cEmBarrel* em;
     FREE_EMBARREL* w;
     u16* flg;
-    int zero;
 
     em = (cEmBarrel*) EmMgr.create(0x48);
     if (em == 0) {
@@ -113,12 +112,11 @@ cEmBarrel* SetBarrel(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcN
 
         em->LightInfo.init2(0, 1, barrelLightOfs(), &size, 0x10);
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->setStatus(EM_STATUS_LOCKOFF);
     em->be_flag &= ~0x01000000;
     em->be_flag &= ~0x10;
-    w->Be_flg = zero;
+    w->Be_flg = 0;
     w->Seid = 0;
     w->Bomb_wait = 0;
     w->Etc_no = etcNo;
@@ -149,7 +147,6 @@ cEmBarrel* SetR227Barrel(Vec* pPos, Vec* pAng)
 {
     cEmBarrel* em;
     FREE_EMBARREL* w;
-    int zero;
 
     if (pG->stage_no != 2 || pG->room_no != 0x27) {
         return 0;
@@ -172,7 +169,6 @@ cEmBarrel* SetR227Barrel(Vec* pPos, Vec* pAng)
     em->type = 1;
     w->Eff_id = 0xFF;
     w->EffKindId = EspPullCoreKind();
-    zero = 0;
     {
         cAtariInfo* at = &em->atari;
 
@@ -187,14 +183,14 @@ cEmBarrel* SetR227Barrel(Vec* pPos, Vec* pAng)
 
         em->LightInfo.init2(0, 1, barrelLightOfs(), &size, 0x10);
     }
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->setStatus(EM_STATUS_LOCKOFF);
     em->be_flag &= ~0x01000000;
     em->be_flag &= ~0x10;
     em->r_no_0 = 1;
     em->r_no_1 = 2;
     w->Be_flg = 0;
-    em->r_no_2 = zero;
+    em->r_no_2 = 0;
     em->r_no_3 = 0;
     return em;
 }
@@ -794,9 +790,9 @@ void emBarrelSetBomb(cEmBarrel* pEm)
     w->Bomb_r = 6000.0f;
     cam = &pG->Camera;
     p = pEm->getPartsPtr(1);
-    d2 = (p->world.x - cam->param.pos.x) * (p->world.x - cam->param.pos.x) +
-         (p->world.y - cam->param.pos.y) * (p->world.y - cam->param.pos.y) +
-         (p->world.z - cam->param.pos.z) * (p->world.z - cam->param.pos.z);
+    d2 = (p->world.x - cam->param.Campos.x) * (p->world.x - cam->param.Campos.x) +
+         (p->world.y - cam->param.Campos.y) * (p->world.y - cam->param.Campos.y) +
+         (p->world.z - cam->param.Campos.z) * (p->world.z - cam->param.Campos.z);
     if (d2 < 400000000.0f) {
         power = 10.0f;
         if (d2 > 25000000.0f) {
@@ -844,9 +840,9 @@ void emBarrelSetBomb2(cEmBarrel* pEm)
     w->Bomb_r = 4000.0f;
     cam = &pG->Camera;
     p = pEm->getPartsPtr(1);
-    d2 = (p->world.x - cam->param.pos.x) * (p->world.x - cam->param.pos.x) +
-         (p->world.y - cam->param.pos.y) * (p->world.y - cam->param.pos.y) +
-         (p->world.z - cam->param.pos.z) * (p->world.z - cam->param.pos.z);
+    d2 = (p->world.x - cam->param.Campos.x) * (p->world.x - cam->param.Campos.x) +
+         (p->world.y - cam->param.Campos.y) * (p->world.y - cam->param.Campos.y) +
+         (p->world.z - cam->param.Campos.z) * (p->world.z - cam->param.Campos.z);
     if (d2 < 400000000.0f) {
         power = 10.0f;
         if (d2 > 25000000.0f) {

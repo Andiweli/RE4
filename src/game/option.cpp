@@ -24,7 +24,6 @@
 
 #define KEY_START 0x2000
 
-extern "C" {
 int top_menu(OptionScreen* o);
 void back_to_top_menu(OptionScreen* o);
 int retry_load_menu(OptionScreen* o);
@@ -32,7 +31,6 @@ int controller_menu(OptionScreen* o);
 int brightness_menu(OptionScreen* o);
 int audio_menu(OptionScreen* o);
 void num(int val, int n, int mode, int base, u8 type, int reverse);
-}
 
 OptionScreen OptScrn;
 
@@ -85,7 +83,7 @@ void setLangExt3(char* name)
 // and not while Status_flg[0] 0x400 (menus locked) or 0x40 (event running) are set.
 int OptionOpenCheck()
 {
-    if (SubScreenWk.wait > 0) {
+    if (SubScreenWk.wait_cnt > 0) {
         return 0;
     }
     u32 f = pG->Status_flg[0];
@@ -112,13 +110,13 @@ void OptionScreen::init(int type)
     IdSys.dispSw(IDC_ACT_BUTTON, 0);
     IdSys.dispSw(IDC_COUNT_DOWN, 0);
     IdTexDataLoad(OPT_PTR(0x20), TEX_OWNER_ID_DEAD);
-    IdSys.set(OPT_PTR(0x24), 0xFF, IDC_OPTION_BG, 0x13, 4, 0);
+    IdSys.set((ID_FILE_HEADER*) OPT_PTR(0x24), 0xFF, IDC_OPTION_BG, 0x13, 4, 0);
     if (_type != 0) {
         ID_UNIT* u = IdSys.unitPtr(0, IDC_OPTION_BG);
-        Hermite1* h = u->curve[2];
-        IdSys.setTime(u, (s16) (int) h->key[h->num - 1].t);
+        HERMITE_1_PTR* h = u->curve[2];
+        IdSys.setTime(u, (s16) (int) h->Point[h->nPoint - 1].T);
     }
-    IdSys.set(OPT_PTR(0x28), 0xFF, IDC_OPTION, 0x13, 3, 0);
+    IdSys.set((ID_FILE_HEADER*) OPT_PTR(0x28), 0xFF, IDC_OPTION, 0x13, 3, 0);
     _rno0 = 0;
     _rno1 = 0;
     _rno2 = 0;
@@ -223,7 +221,7 @@ int top_menu(OptionScreen* pOpt)
         }
         if (pOpt->_rno1 != 4) {
             IdSys.kill(0xFF, IDC_OPTION);
-            IdSys.set(data, 0xFF, IDC_OPTION, 0x13, 3, 0);
+            IdSys.set((ID_FILE_HEADER*) data, 0xFF, IDC_OPTION, 0x13, 3, 0);
             SndCall(0, 0x36, 0, 0, 0, 0);
         }
         if (pOpt->_rno1 == 2) {
@@ -310,7 +308,7 @@ int top_menu(OptionScreen* pOpt)
 void back_to_top_menu(OptionScreen* pOpt)
 {
     IdSys.kill(0xFF, IDC_OPTION);
-    IdSys.set(OPT_PTR(0x28), 0xFF, IDC_OPTION, 0x13, 3, 0);
+    IdSys.set((ID_FILE_HEADER*) OPT_PTR(0x28), 0xFF, IDC_OPTION, 0x13, 3, 0);
     pOpt->_rno0 = 0;
     SndCall(0, 0x39, 0, 0, 0, 0);
 }
@@ -467,14 +465,14 @@ int retry_load_menu(OptionScreen* pOpt)
                 ck->lifeMeterDisp(0);
             }
             IdTexDataLoad(OPT_PTR(0x20), TEX_OWNER_ID_DEAD);
-            IdSys.set(OPT_PTR(0x24), 0xFF, IDC_OPTION_BG, 0x13, 4, 0);
+            IdSys.set((ID_FILE_HEADER*) OPT_PTR(0x24), 0xFF, IDC_OPTION_BG, 0x13, 4, 0);
             {
                 ID_UNIT* bg = IdSys.unitPtr(0, IDC_OPTION_BG);
-                Hermite1* h = bg->curve[2];
-                IdSys.setTime(bg, (s16) (int) h->key[h->num - 1].t);
+                HERMITE_1_PTR* h = bg->curve[2];
+                IdSys.setTime(bg, (s16) (int) h->Point[h->nPoint - 1].T);
             }
             IdSys.kill(0xFF, IDC_OPTION);
-            IdSys.set(OPT_PTR(0x2C), 0xFF, IDC_OPTION, 0x13, 3, 0);
+            IdSys.set((ID_FILE_HEADER*) OPT_PTR(0x2C), 0xFF, IDC_OPTION, 0x13, 3, 0);
             pOpt->_rno3 = 0;
         }
         break;
@@ -978,9 +976,9 @@ void num(int no, int digit_num, int flag, int mark_bottom, u8 id_class, int reve
         ID_UNIT* u;
 
         if (reverse == 0) {
-            u = IdSys.unitPtr((u8) (mark_bottom + i), id_class);
+            u = IdSys.unitPtr((u8) (mark_bottom + i), (ID_CLASS) id_class);
         } else {
-            u = IdSys.unitPtr((u8) (mark_bottom - i), id_class);
+            u = IdSys.unitPtr((u8) (mark_bottom - i), (ID_CLASS) id_class);
         }
         if (show == 0 && d[i] == 0 && i != 0) {
             u->be_flag &= ~8;
@@ -1000,7 +998,7 @@ void GameResult::init(void* d)
     IdTexRelease(TEX_OWNER_ID_COCKPIT);
     IdSys.roomInit();
     IdTexDataLoad(DATA_PTR(_addr, 0x10), TEX_OWNER_ID_TITLE);
-    IdSys.set(DATA_PTR(_addr, 0x14), 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) DATA_PTR(_addr, 0x14), 0xFF, IDC_TITLE, 0x13, 6, 0);
     _rno0 = 0;
     _rno1 = 0;
     _rno2 = 0;
@@ -1059,7 +1057,7 @@ void GameResult::omake_init(void* d)
     IdTexRelease(TEX_OWNER_ID_COCKPIT);
     IdSys.roomInit();
     IdTexDataLoad(DATA_PTR(_addr, 0x10), TEX_OWNER_ID_TITLE);
-    IdSys.set(DATA_PTR(_addr, 0x18), 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) DATA_PTR(_addr, 0x18), 0xFF, IDC_TITLE, 0x13, 6, 0);
 }
 
 // Waits for A; returns 1 to leave.
@@ -1078,8 +1076,8 @@ void ChapterEnd::init(void* d, u8 no)
     IdTexRelease(TEX_OWNER_ID_COCKPIT);
     IdSys.roomInit();
     IdTexDataLoad(DATA_PTR(_addr, 0x10), TEX_OWNER_ID_TITLE);
-    IdSys.set(DATA_PTR(_addr, 0x14), 0xFF, IDC_TITLE, 0x13, 6, 0);
-    _chapter = no;
+    IdSys.set((ID_FILE_HEADER*) DATA_PTR(_addr, 0x14), 0xFF, IDC_TITLE, 0x13, 6, 0);
+    _chapter = (CHAPTER_NO) no;
 }
 
 // Fills the chapter result: this chapter / next chapter numbers ("chap-sec"), chapter and total hit

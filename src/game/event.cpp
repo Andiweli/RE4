@@ -74,22 +74,16 @@ static inline int EvtChk(u32 f, u32 mask)
     return (f & mask) ? 1 : 0;
 }
 
-// One Hermite curve of the fog / focus data (64 keys).
-struct EvtCurve {
-    s32 num;
-    HermiteKey key[64];
+struct DatFog {
+    HERMITE_1_FIX ScurveStart;    // 0x000
+    HERMITE_1_FIX ScurveEnd;      // 0x404
 };
 
-struct EvtFogData {
-    EvtCurve start;    // 0x000
-    EvtCurve end;      // 0x404
-};
-
-struct EvtFocusData {
-    EvtCurve near_;    // 0x000
-    EvtCurve far_;     // 0x404
-    f32 nearLevel;     // 0x808
-    f32 farLevel;      // 0x80C
+struct DatFocus {
+    HERMITE_1_FIX ScurveNear;    // 0x000
+    HERMITE_1_FIX ScurveFar;     // 0x404
+    f32 LevelNear;     // 0x808
+    f32 LevelFar;      // 0x80C
 };
 
 // 12-byte model name copied as words (cObj FREE_OBJ18::evName).
@@ -1052,23 +1046,21 @@ int Event::ExePacket_Cam(Event* pEvt)
     void* dat;
     EvtPacket* pac = pEvt->pPacket;
     int frm = 0;
-    void* zero;
 
     if (EvtMgr.GetBin(&dat, pac->mod.name, 0) == 0) {
         pLog->err(0, 0, "Event::ExePacket_Cam : dat failed");
         return 1;
     }
-    zero = 0;
     if (pEvt->FlgCkStatus(EvtStfToolFrontExec)) {
         frm = pEvt->FFNowFrame;
     }
     if (pEvt->FlgCkStatus(EvtStfEvtCancelExe)) {
         frm = pEvt->MaxFrame - 1;
     }
-    CamCtrl.MotionSet(dat, 0, (f32) frm);
+    CamCtrl.MotionSet(dat, (f32) frm, 0);
     pPL->be_flag |= 0x00200000;
-    pEvt->pDatFog = (EvtFogData*) zero;
-    pEvt->pDatFocus = (EvtFocusData*) zero;
+    pEvt->pDatFog = 0;
+    pEvt->pDatFocus = 0;
     pEvt->MotClear();
     if (!pEvt->FlgCkStatus(EvtStfEvtCancelExe)) {
         EventCutEffDelete();
@@ -1660,7 +1652,6 @@ void Event::CalNextPacket()
 void Event::CalNextFrame()
 {
     char buf[0x20];
-    int zero = 0;
 
     if (FlgCkStatus(EvtStfToolExec)) {
         if (NowCut >= MaxCut) {
@@ -1670,14 +1661,14 @@ void Event::CalNextFrame()
     if (GetChangeNowCut() != 0) {
         NowCut = ChangeNowCut - 1;
         NowFrame = MaxFrame;
-        SetChangeNowCut(zero);
+        SetChangeNowCut(0);
     }
     NowFrame++;
     NowTotalFrame++;
     if (NowFrame < MaxFrame) {
         return;
     }
-    NowFrame = zero;
+    NowFrame = 0;
     NowCut++;
     if (CalMaxFrame(&MaxFrame, NowCut) == 0) {
         pLog->err(0, 0, "Event::init : data failed");
@@ -1901,17 +1892,17 @@ void Event::FogMove(Event* pEvt, void* pDatFog)
     f32 start;
     f32 end;
     f32 t;
-    EvtFogData* d = (EvtFogData*) pDatFog;
+    DatFog* d = (DatFog*) pDatFog;
     int frame = pEvt->NowFrame;
 
     if (d == 0) {
         return;
     }
     t = (f32) frame;
-    if (Hermite_1CurveCalc((Hermite1*) &d->start, t, &start)) {
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->ScurveStart, t, &start)) {
         LightMgr.setFogStart(start);
     }
-    if (Hermite_1CurveCalc((Hermite1*) &d->end, t, &end)) {
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->ScurveEnd, t, &end)) {
         LightMgr.setFogEnd(end);
     }
     LightMgr.setFog();
@@ -1923,7 +1914,7 @@ void Event::FocusMove(Event* pEvt, void* pDatFocus)
     f32 near_;
     f32 far_;
     f32 t;
-    EvtFocusData* d = (EvtFocusData*) pDatFocus;
+    DatFocus* d = (DatFocus*) pDatFocus;
     int frame = pEvt->NowFrame;
 
     if (pEvt->FlgCkStatus(EvtStfToolFrontExec)) {
@@ -1933,11 +1924,11 @@ void Event::FocusMove(Event* pEvt, void* pDatFocus)
         return;
     }
     t = (f32) frame;
-    if (Hermite_1CurveCalc((Hermite1*) &d->near_, t, &near_)) {
-        Filter01SetParam_CamZ(0, 1, d->nearLevel, near_);
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->ScurveNear, t, &near_)) {
+        Filter01SetParam_CamZ(0, d->LevelNear, near_, 1);
     }
-    if (Hermite_1CurveCalc((Hermite1*) &d->far_, t, &far_)) {
-        Filter01SetParam_CamZ(1, 1, d->farLevel, far_);
+    if (Hermite_1CurveCalc((HERMITE_1_PTR*) &d->ScurveFar, t, &far_)) {
+        Filter01SetParam_CamZ(1, d->LevelFar, far_, 1);
     }
 }
 
@@ -2295,7 +2286,7 @@ int EventMgr::EvtReadSub(char* pNameEvt, int loadType, int emId, int* pPtr, int 
     u32 size;
     void* r;
     void* addr;
-    ReadModule* mod;
+    MODULE_DAT* mod;
 
     if (pPtr != 0) {
         *pPtr = 0;
@@ -2323,8 +2314,8 @@ int EventMgr::EvtReadSub(char* pNameEvt, int loadType, int emId, int* pPtr, int 
         pLog->err(0, 0, "EventMgr::EvtRead : WkNo failed [%d]", no);
         return 0;
     }
-    ReadWkTbl[no].em = emId;
-    ReadWkTbl[no].swapped = 0;
+    ReadWkTbl[no].EmId = emId;
+    ReadWkTbl[no].SwapFlag = 0;
     if (loadType == 0) {
         if (emId != 0) {
             if (fresh == 1) {
@@ -2352,14 +2343,14 @@ int EventMgr::EvtReadSub(char* pNameEvt, int loadType, int emId, int* pPtr, int 
                 pLog->err(0, 0, "EventMgr::EvtRead : no id SearchEmModule [%x]", emId);
                 return 0;
             }
-            if (unit->getSize() > mod->size) {
+            if (unit->getSize() > mod->DataSize) {
                 DelRead(pNameEvt);
-                pLog->err(0, 0, "EventMgr::EvtRead : event size too large!![%d]>[%d]", unit->getSize(), mod->size);
+                pLog->err(0, 0, "EventMgr::EvtRead : event size too large!![%d]>[%d]", unit->getSize(), mod->DataSize);
                 return 0;
             }
-            MemorySwap(mod->pArc, (u32) unit->getAddr(), unit->getSize());
-            ReadWkTbl[no].swapped = 1;
-            r = mod->pArc;
+            MemorySwap(mod->pData, unit->getAddr(), unit->getSize());
+            ReadWkTbl[no].SwapFlag = 1;
+            r = mod->pData;
             if (pPtr != 0) {
                 *pPtr = (int) r;
             }
@@ -2423,7 +2414,7 @@ int EventMgr::EvtReadExec(char* pNameEvt, int emId, u32 evtReadFlag)
         SceSleep(2);
     }
     if (EvtReadMram(pNameEvt, emId, &addr, 0, 0)) {
-        if (EvtMgr.SetEvt((void*) addr, (u32*) &evt)) {
+        if (EvtMgr.SetEvt((void*) addr, &evt)) {
             if (evtReadFlag & EvtReadFlagDiedemo) {
                 evt->FlgOnStatus(EvtStfEndSleepOrder);
                 evt->FlgOnStatus(EvtStfDiedemo);
@@ -2480,7 +2471,7 @@ int EventMgr::EvtFree(char* pNameEvt)
     cDataUnit* unit = 0;
     u32 no = 0;
     int em;
-    ReadModule* mod;
+    MODULE_DAT* mod;
 
     if (GetRead((void**) &unit, (int*) &no, pNameEvt) == 0) {
         pLog->err(0, 0, "EventMgr::EvtFree : NameEvt failed [%s]", pNameEvt);
@@ -2491,15 +2482,15 @@ int EventMgr::EvtFree(char* pNameEvt)
         pLog->err(0, 0, "EventMgr::EvtFree : WkNo failed [%d]", no);
         return 0;
     }
-    em = ReadWkTbl[no].em;
+    em = ReadWkTbl[no].EmId;
     if (unit != 0) {
         if (unit->waitLoadOk() == 0) {
             pLog->err(0, 0, "EvtFree() : out of memory (0x%x)[%s]", unit->getSize(), pNameEvt);
         }
-        if (em != 0 && ReadWkTbl[no].swapped == 1) {
+        if (em != 0 && ReadWkTbl[no].SwapFlag == 1) {
             mod = SearchEmModule(em);
-            MemorySwap(mod->pArc, (u32) unit->getAddr(), unit->getSize());
-            ReadWkTbl[no].swapped = 0;
+            MemorySwap(mod->pData, unit->getAddr(), unit->getSize());
+            ReadWkTbl[no].SwapFlag = 0;
             EspEmDataSwapPop(em);
         }
         unit->setCommand(CMND_CLEAR_DATA, 0, 0);
@@ -2516,7 +2507,7 @@ void EventMgr::ToolCoreEvdDel()
 
 // Starts an event from a loaded "event" block: validates the tag, registers it (SetEvd) and creates
 // the Event; *key receives it. Refused while Stop_flg 0x400 or Debug_flg[3] 0x80.
-int EventMgr::SetEvt(void* data, u32* key)
+int EventMgr::SetEvt(void* data, Event** ppEvt)
 {
     Event* evt;
     EvtHeader* hdr = (EvtHeader*) data;
@@ -2527,8 +2518,8 @@ int EventMgr::SetEvt(void* data, u32* key)
     if (DbgFlagChk(pG, DBG_NO_EVENT)) {
         return 0;
     }
-    if (key != 0) {
-        *key = 0;
+    if (ppEvt != 0) {
+        *ppEvt = 0;
     }
     if ((int) hdr >= 0) {
         pLog->err(0, 0, "EventMgr::SetEvs : non addr[%x]", hdr);
@@ -2546,8 +2537,8 @@ int EventMgr::SetEvt(void* data, u32* key)
         pLog->err(0, 0, "EventMgr::SetEvt : SetEvt failed[%s]", hdr);
         return 0;
     }
-    if (key != 0) {
-        *key = (u32) evt;
+    if (ppEvt != 0) {
+        *ppEvt = evt;
     }
     return 1;
 }
@@ -3073,7 +3064,7 @@ EventDebug::~EventDebug()
 // Room init: clears the tool's disable bits (FlagEtc).
 int EventDebug::myRoomInit()
 {
-    FlagEtc = 0;
+    FlagEtc[0] = (FlagEtcFlag) 0;
     return 1;
 }
 

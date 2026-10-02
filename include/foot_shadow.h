@@ -20,11 +20,9 @@ struct FootShadowTbl {
     FOOTSHADOW_DATA* dat;
 };
 
-extern "C" {
 // game/foot_shadow.cpp
 void DrawFootShadow(class cModel* pMod);
 void drawShadowParts(GXTexObj* tex, Vec* pos, f32 size, f32 alpha);
-}
 
 // game/foot_shadow_tbl.cpp: the per-character tables the enemy modules point pFsdTbl at.
 extern FootShadowTbl Em10_fs_tbl;   // Ganado (em10..em20, em18, em30, em34 reuse it)

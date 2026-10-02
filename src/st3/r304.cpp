@@ -33,8 +33,8 @@ struct R304Work {
     TexRenderMng* tex2;   // 0x004
     u8 texTbl[0x80];      // 0x008
     u8 texTbl2[0x80];     // 0x088
-    TexRenderCam cam;     // 0x108
-    TexRenderCam cam2;    // 0x40C
+    TexRenderEvtCamStruct cam;     // 0x108
+    TexRenderEvtCamStruct cam2;    // 0x40C
     cEmWrap em;           // 0x710
 };
 
@@ -43,7 +43,7 @@ static R304Work* r304_work;
 
 static void r304_EnemySet();
 void R304EventS00();
-extern "C" void Evt_R304S00_Func(Event* e);
+void Evt_R304S00_Func(Event* e, u32);
 void EvtTexRenderCamTrans(Event* e, int cut);
 static void r304_DuraluminCaseOpen(int no);
 static void r304_DuraluminCaseOpened(int no);
@@ -57,7 +57,6 @@ void R304Init()
 {
     cEmWindow* win;
     int i;
-    void* zero = 0;
 
 #line 55 "D:/Bio4/Prog/r304.cpp"
     r304_work = (R304Work*) MEM_CALLOC(sizeof(R304Work), 1, 0xd);
@@ -65,7 +64,7 @@ void R304Init()
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
         SceAtDataSet_exec(2, 0x12, 0, (TaskFunc) R304EventS00, 0, 1);
         EvtMgr.EvtReadAram("event/evd/r304s00.evd", (u8) GetEmIdFromList(0x28), 0, 0, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, 0, 0);
         for (i = 0x19; i <= 0x1F; i++) {
             if (getRoomEtcWindow(i, &win, 1)) {
                 win->SetEnableDamage(0);
@@ -73,7 +72,7 @@ void R304Init()
         }
     } else {
         SeAtSetOnOff(0, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0, ESP_CORE_KIND_NONE, 0, 0);
     }
     if (RsfCheck(G_ROOM_ID, 1) == 0) {
         SceAtDataSet_exec(3, 0x12, 0, (TaskFunc) r304_EnemySet, 0, 1);
@@ -95,8 +94,8 @@ void R304Init()
             em->setAng(&v);
         }
     }
-    SceSetItemEvent(4, 0x81, 2, 2, r304_DuraluminCaseOpen, r304_DuraluminCaseOpened, 0x17, 0);
-    SceSetItemEvent(5, 0x82, 3, 1, r304_LockerOpen, r304_LockerOpened, 0x20, 0);
+    SceSetItemEvent(4, 0x81, 2, 2, r304_DuraluminCaseOpen, r304_DuraluminCaseOpened, (void*) 0x17, 0);
+    SceSetItemEvent(5, 0x82, 3, 1, r304_LockerOpen, r304_LockerOpened, (void*) 0x20, 0);
     TexRenderInit(&r304_work->tex, 0, 1);
     TexRenderInit(&r304_work->tex2, 0, 1);
 }
@@ -146,12 +145,12 @@ void R304EventS00()
 }
 
 // Event r304s00: the three scroll models join the event, the monitors render the event cameras.
-extern "C" void Evt_R304S00_Func(Event* e)
+void Evt_R304S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec ang = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -216,20 +215,20 @@ extern "C" void Evt_R304S00_Func(Event* e)
         w = SmdGetWorkPtr(0x10);
         obj = SmdGetObjPtr(0x10);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x11);
         obj = SmdGetObjPtr(0x11);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x11);
         obj = SmdGetObjPtr(0x11);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         break;
     }

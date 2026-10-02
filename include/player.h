@@ -61,7 +61,7 @@ public:
 };
 
 // Three-way motion blend (game/pl_class.cpp), 0xE8 bytes; `mot3` in player.cpp: the model's own
-// motion (mot0) blended with mot1 (rate < 0) or mot2 (rate > 0) through MotionWork::blend.
+// motion (mot0) blended with mot1 (rate < 0) or mot2 (rate > 0) through cModel::pMotionB.
 class cMot3 {
 private:
     cModel* m_pEm;       // 0x00
@@ -190,7 +190,7 @@ public:
     YARARE_INFO m_Yarare[10];   // 0x530 .. 0x738  the player's hit boxes (YarareAdd)
     int m_pSatMask;       // 0x738  SatMgr.check flag (player.cpp startUp / move)
     void (*pFuncAux)(class cPlayer*);  // 0x73C  routine 1/0xA (pl_R1_Aux) handler
-    struct PlRoomEff* m_pEffRoom;  // 0x740  room water effect table (pl_sub PlRegistRoomEff/PlWaterProc)
+    struct PlEffRoom* m_pEffRoom;  // 0x740  room water effect table (pl_sub PlRegistRoomEff/PlWaterProc)
     void* m_pBoss;        // 0x744  (pl_sub PlRegistBoss)
     void* m_pBossRmf;     // 0x748
     Vec m_FallVec;        // 0x74C  -wallNrm of the ledge to drop from (pl_class fallCheck)
@@ -298,7 +298,7 @@ public:
     void weaponLoad(int wep_id, int wep_type);  // stores pG 0x4FB0/0x4FB1, then ReadWepData
     void weaponInit();
     // game/pl_class.cpp: scenario damage area hit (sce_at sceAtFunc_damage)
-    void setDamage(u8 kind, int arg, f32 power, int a, int b);
+    void setDamage(u8 kind, int arg, int a, int b, f32 power);
 };
 
 // Leon (game/pl_leon.cpp): the player model set for the main character.
@@ -415,7 +415,7 @@ void knife_r2_fire(cPlayer* pl);
 void knife_r2_down(cPlayer* pl);
 void setWepTrans(cPlayer* pl, int onoff);
 
-// game/player.cpp: one-time init of the player system (game.cpp GameInit). C linkage.
-extern "C" void PlayerInit();
+// game/player.cpp: one-time init of the player system (game.cpp GameInit).
+void PlayerInit();
 
 #endif

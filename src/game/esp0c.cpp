@@ -61,15 +61,15 @@ void cEsp0c::move()
     est.col[3] = m_Col_start_a;
     est.spd = m_Speed;
     if (w->onWater == 1) {
-        EstSet(0, -1, &m_Pos, &m_Ang, w->EstNo_wt, w->estPrm2, info.Core_flg, info.Core_kind, info.Core_pEm, &est);
+        EstSet(0, -1, &m_Pos, &m_Ang, w->EstNo_wt, w->estPrm2, info.Core_flg, info.Core_kind, info.Core_pEm, (ESPSEQ_CONTROL*) &est);
     } else {
-        EstSet(0, -1, &m_Pos, &m_Ang, w->EstNo, w->EstOwner_wt, info.Core_flg, info.Core_kind, info.Core_pEm, &est);
+        EstSet(0, -1, &m_Pos, &m_Ang, w->EstNo, w->EstOwner_wt, info.Core_flg, info.Core_kind, info.Core_pEm, (ESPSEQ_CONTROL*) &est);
     }
     PushEsp(this);
 }
 
 // EspTransTbl[0x0C]: never expected to run (the effect dies in its first move); logs an error.
-extern "C" void Esp0c_Trans(cEsp* esp)
+void Esp0c_Trans(cEsp* esp)
 {
     pLog->err(0, 0, "ESP0C : Invalid Trans.");
 }
@@ -79,7 +79,7 @@ extern "C" void Esp0c_Trans(cEsp* esp)
 int cEsp0c::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
 {
     ESP0C_WK* w = &m_Free;
-    u32 attr;
+    Vec* pNorm;
     f32 h;
 
     w->EstNo = pSeq->Work8[0];
@@ -94,10 +94,10 @@ int cEsp0c::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
     case 0:
         break;
     case 1:
-        m_Pos.y = SatMgr.getFloor(&m_Pos, &attr, 600.0f, 100000.0f, 0) + 65.0f + pSeq->Vec0.y;
+        m_Pos.y = SatMgr.getFloor(&m_Pos, &pNorm, 600.0f, 100000.0f, 0) + 65.0f + pSeq->Vec0.y;
         break;
     case 2:
-        m_Pos.y = SatMgr.getFloor(&m_Pos, &attr, 600.0f, 100000.0f, 0) + 65.0f;
+        m_Pos.y = SatMgr.getFloor(&m_Pos, &pNorm, 600.0f, 100000.0f, 0) + 65.0f;
         if (GetWaterHeight(&m_Pos, &h)) {
             if (m_Pos.y < h + pSeq->Vec0.y) {
                 m_Pos.y = h + pSeq->Vec0.y;

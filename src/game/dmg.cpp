@@ -61,7 +61,7 @@ int cDmgMgr::set(int type, int time, Vec* pPos, f32 radius, f32 height)
     if (p == 0) {
         return 0;
     }
-    p->m_Type = type;
+    p->m_Type = (DMG_TYPE) type;
     p->m_Time = time;
     p->m_Pos = *pPos;
     p->m_Radius = radius;
@@ -77,7 +77,7 @@ int cDmgMgr::set(int type, int time, Vec* pPos4, f32 height)
     if (p == 0) {
         return 0;
     }
-    p->m_Type = type;
+    p->m_Type = (DMG_TYPE) type;
     p->m_Time = time;
     p->m_Pos[0] = pPos4[0];
     p->m_Pos[1] = pPos4[1];

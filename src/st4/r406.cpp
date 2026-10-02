@@ -190,7 +190,7 @@ static void r406_checkRockWall()
                         obj->be_flag &= ~2;
                     }
                     SndCall(6, 2, &obj->pos, 0, 0, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, (void*) zero, 0);
                     SceExit();
                     break;
                 }

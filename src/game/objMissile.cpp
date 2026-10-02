@@ -16,14 +16,12 @@
 #include "pl_wep.h"
 #include "motion.h"
 
-extern "C" {
 void objMissile_R0_Set(cObjMissile* obj);
 void objMissile_R0_Parent(cObjMissile* obj);
 void objMissile_R0_FireWait(cObjMissile* obj);
 void objMissile_R0_Fire(cObjMissile* obj);
 void objMissile_R0_Lost(cObjMissile* obj);
 void objMissileBomb(cObjMissile* obj, Vec* pos);
-}
 
 void (*ObjMissile_R0_move_tbl[5])(cObjMissile*) = {
     objMissile_R0_Set, objMissile_R0_Parent, objMissile_R0_FireWait, objMissile_R0_Fire, objMissile_R0_Lost,

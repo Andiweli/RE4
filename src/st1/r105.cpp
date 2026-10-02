@@ -76,26 +76,26 @@ static void r105_keyItem();
 static void r105_mark();
 static void r105_markInit();
 static void r105_markMain();
-extern "C" int r105_markOpenCk();
+int r105_markOpenCk();
 static void r105_markOpen();
 static void r105_markEnd();
-extern "C" void r105_markDoorOpen();
-extern "C" void r105_markMtxInit();
-extern "C" void r105_markMtxClean(cObj* obj, Mtx m);
-extern "C" void r105_markMtxCopy(Mtx dst, Mtx src);
+void r105_markDoorOpen();
+void r105_markMtxInit();
+void r105_markMtxClean(cObj* obj, Mtx m);
+void r105_markMtxCopy(Mtx dst, Mtx src);
 static void r105_Event();
 static void r105_openTerm();
-extern "C" void r105_EmSet();
+void r105_EmSet();
 static void r105_StreanChk();
 static void r105_bgmCheck();
 static void r105_checkDoor();
-extern "C" void Evt_R105S00_Func(Event* e);
-extern "C" void Evt_R105S10_Func(Event* e);
+void Evt_R105S00_Func(Event* e, u32);
+void Evt_R105S10_Func(Event* e, u32);
 static void r105_execOpenCover();
 static void r105_checkCloseCover();
-extern "C" void r105_checkCesspit0();
-extern "C" void r105_checkCesspit1();
-extern "C" void r105_checkCesspit2();
+void r105_checkCesspit0();
+void r105_checkCesspit1();
+void r105_checkCesspit2();
 static void r105_initCesspit();
 
 // The original's .data is 8-aligned (the table is its only content).
@@ -125,11 +125,11 @@ void R105Init()
     EvtMgr.SetFunc("evt_r105s00_func", (void*) Evt_R105S00_Func);
     EvtMgr.SetFunc("evt_r105s10_func", (void*) Evt_R105S10_Func);
     EvtMgr.SetFunc("evt_r105s99_func", (void*) Evt_R105S10_Func);
-    SceSetItemEvent(0xA, 0x92, 6, 8, r105_moveShelf, r105_movedShelf, 0x92, 0);
-    SceSetItemEvent(0xB, 0x93, 7, 6, r105_moveShelf, r105_movedShelf, 0x93, 0);
-    SceSetItemEvent(0xD, 0x94, 8, 9, r105_moveShelf, r105_movedShelf, 0x94, 0);
-    SceSetItemEvent(0xE, 0x88, 9, 0xB, r105_moveShelf, r105_movedShelf, 0x88, 0);
-    SceSetItemEvent(0xF, 0x8B, 0xA, 0xA, r105_moveShelf, r105_movedShelf, 0x8B, 0);
+    SceSetItemEvent(0xA, 0x92, 6, 8, r105_moveShelf, r105_movedShelf, (void*) 0x92, 0);
+    SceSetItemEvent(0xB, 0x93, 7, 6, r105_moveShelf, r105_movedShelf, (void*) 0x93, 0);
+    SceSetItemEvent(0xD, 0x94, 8, 9, r105_moveShelf, r105_movedShelf, (void*) 0x94, 0);
+    SceSetItemEvent(0xE, 0x88, 9, 0xB, r105_moveShelf, r105_movedShelf, (void*) 0x88, 0);
+    SceSetItemEvent(0xF, 0x8B, 0xA, 0xA, r105_moveShelf, r105_movedShelf, (void*) 0x8B, 0);
     if (RsfCheck(G_ROOM_ID, 12) == 0) {
         SceAtDataSet_exec(0x1A, SCE_LEVEL10, 0, r105_keyItem, 0, 1);
     }
@@ -386,7 +386,7 @@ static void r105_markMain()
 }
 
 // 1 when the dial's rotation matrix is the identity or the half turn about Y.
-extern "C" int r105_markOpenCk()
+int r105_markOpenCk()
 {
     // The work pointer is loaded before the three template copies (its `lwz` is issued between
     // the vz.x and vz.y stores in the original: the RTL order decides the sched1 tie).
@@ -475,7 +475,7 @@ static void r105_markEnd()
 }
 
 // Door already solved: hide the four door parts (smd 0x20/0x21/0x22/0x32) and disable area 7.
-extern "C" void r105_markDoorOpen()
+void r105_markDoorOpen()
 {
     SmdSetTrans(0x20, 0);
     SmdSetTrans(0x21, 0);
@@ -486,7 +486,7 @@ extern "C" void r105_markDoorOpen()
 
 // Puzzle setup: the emblem objects (smd 0x21/0x22) get a rest matrix rotated 90 deg about Y then -90 deg
 // about X, copied into their l_mat / mat.
-extern "C" void r105_markMtxInit()
+void r105_markMtxInit()
 {
     R105Mark* mk = &r105_work->mk;
     Mtx tmp;
@@ -525,7 +525,7 @@ extern "C" void r105_markMtxInit()
     }
 
 // Snap the 3x3 rotation of `m` to exact 0 / +-1 after a 90 degree turn (kills float drift).
-extern "C" void r105_markMtxClean(cObj* obj, Mtx m)
+void r105_markMtxClean(cObj* obj, Mtx m)
 {
     R105_MTX_CLEAN(m[0][0]);
     R105_MTX_CLEAN(m[0][1]);
@@ -539,7 +539,7 @@ extern "C" void r105_markMtxClean(cObj* obj, Mtx m)
 }
 
 // Copies the rotation part only.
-extern "C" void r105_markMtxCopy(Mtx dst, Mtx src)
+void r105_markMtxCopy(Mtx dst, Mtx src)
 {
     dst[0][0] = src[0][0];
     dst[0][1] = src[0][1];
@@ -593,7 +593,7 @@ static void r105_openTerm()
 
 // The Ganado wave after the s00 event: ESL 0x64..0x66, 0x68, 0x69, 0x6B..0x6E, 0x59 into em[], plus the
 // battle-stream task.
-extern "C" void r105_EmSet()
+void r105_EmSet()
 {
     r105_work->em[0].setEm(0x64, -1, 0, 1, 1);
     r105_work->em[1].setEm(0x65, -1, 0, 1, 1);
@@ -668,7 +668,7 @@ static void r105_checkDoor()
 
 // Event r105s00 callback: funcMode 0 shows etc model 1; cuts 0xA..0xC toggle model info 3 (a held item)
 // of the Leon model pl0000 off / on.
-extern "C" void Evt_R105S00_Func(Event* e)
+void Evt_R105S00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -712,7 +712,7 @@ extern "C" void Evt_R105S00_Func(Event* e)
 // Event r105s10 (and s99) callback, Ashley (pl0200): her model info 5 hidden on cut 0 frame 15 and shown
 // from cut 1; cut 0 shows etc model 1 and evm2500; cuts 0x13/0x14 swap Ashley's parts (the alternate
 // costume model pl8200 when game_costume == 1); funcMode 2 (end) restores etc model 1's display.
-extern "C" void Evt_R105S10_Func(Event* e)
+void Evt_R105S10_Func(Event* e, u32)
 {
     void* mod;
     cEmWindow* win;
@@ -897,26 +897,26 @@ static void r105_checkCloseCover()
 }
 
 // Moves the item model of area 0x8D onto area 0x9B's model position and hides it.
-static inline void r105_setItemModel(SceAtWork* at)
+static inline void r105_setItemModel(SCE_AT_DATA* at)
 {
-    SceAtWork* at2;
+    SCE_AT_DATA* at2;
 
-    at->item.id = 0x8A;
+    ((SCE_AT_ITEM*) at)->item.item_id = 0x8A;
     at2 = SceAtPtr(0x9B);
-    if (at2->item.pModel && at->item.pModel) {
-        at2->item.pModel->pos = at->item.pModel->pos;
-        at2->item.pModel->ang = at->item.pModel->ang;
-        at->item.pModel->be_flag &= ~2;
-        at->item.pModel = at2->item.pModel;
+    if (((SCE_AT_ITEM*) at2)->item.pModel && ((SCE_AT_ITEM*) at)->item.pModel) {
+        ((SCE_AT_ITEM*) at2)->item.pModel->pos = ((SCE_AT_ITEM*) at)->item.pModel->pos;
+        ((SCE_AT_ITEM*) at2)->item.pModel->ang = ((SCE_AT_ITEM*) at)->item.pModel->ang;
+        ((SCE_AT_ITEM*) at)->item.pModel->be_flag &= ~2;
+        ((SCE_AT_ITEM*) at)->item.pModel = ((SCE_AT_ITEM*) at2)->item.pModel;
     }
 }
 
 // Cesspit state 0 (cover still on, Room_flg bit 4 clear): once the item is found (bit 5) move its model
 // onto the lid; when the cover comes off, retarget the find SE, enable area 0x11, arm the cover-open
 // prompt on area 0xC and fall through to state 1.
-extern "C" void r105_checkCesspit0()
+void r105_checkCesspit0()
 {
-    SceAtWork* at = SceAtPtr(0x8D);
+    SCE_AT_DATA* at = SceAtPtr(0x8D);
 
     for (;;) {
         if (RsfCheck(G_ROOM_ID, 4) == 0) {
@@ -929,7 +929,7 @@ extern "C" void r105_checkCesspit0()
             break;
         }
     }
-    at->item.seFind = 0x5B;
+    ((SCE_AT_ITEM*) at)->item.se_no = 0x5B;
     SceAtSetEnable(0x11, 1);
     if (RsfCheck(G_ROOM_ID, 5)) {
         SceAtSetEnable(0x8D, 0);
@@ -942,9 +942,9 @@ extern "C" void r105_checkCesspit0()
 // Cesspit state 1 (cover off, lid closed, bit 3 clear): toggles the open prompt (area 0xC) with the item
 // found / taken flags (Room_flg[0] 0x04000000 / 0x02000000); when the lid opens (bit 3) the item sits on
 // the lid; exits if the item is already taken, else state 2.
-extern "C" void r105_checkCesspit1()
+void r105_checkCesspit1()
 {
-    SceAtWork* at = SceAtPtr(0x8D);
+    SCE_AT_DATA* at = SceAtPtr(0x8D);
 
     for (;;) {
         if (RsfCheck(G_ROOM_ID, 3) == 0) {
@@ -966,24 +966,24 @@ extern "C" void r105_checkCesspit1()
             break;
         }
     }
-    at->item.seFind = 0x5A;
+    ((SCE_AT_ITEM*) at)->item.se_no = 0x5A;
     SceAtSetEnable(0x11, 0);
     SceAtSetEnable(0xC, 0);
     if (SceAtItemFlgCk(0x8D) == 1) {
         SceExit();
     }
     if (RsfCheck(G_ROOM_ID, 5)) {
-        at->item.flag2 |= 0x10;
-        at->item.pModel->pos.y += 10.0f;
+        ((SCE_AT_ITEM*) at)->item.ctrl_flag |= 0x10;
+        ((SCE_AT_ITEM*) at)->item.pModel->pos.y += 10.0f;
         SceAtSetEnable(0x8D, 1);
     }
     r105_checkCesspit2();
 }
 
 // Cesspit state 2 (lid open): waits for the item to be found and moves its model onto the lid once (bit 5).
-extern "C" void r105_checkCesspit2()
+void r105_checkCesspit2()
 {
-    SceAtWork* at = SceAtPtr(0x8D);
+    SCE_AT_DATA* at = SceAtPtr(0x8D);
 
     while (1) {
         if (RsfCheck(G_ROOM_ID, 5) == 0 && SceAtItemFindFlgCk(0x8D) == 1) {
@@ -999,7 +999,7 @@ extern "C" void r105_checkCesspit2()
 // clear -> cover off, lid closed (open prompt, state 1); bit 3 set -> lid open (state 2).
 static void r105_initCesspit()
 {
-    SceAtWork* at = SceAtPtr(0x8D);
+    SCE_AT_DATA* at = SceAtPtr(0x8D);
 
     SceAtSetEnable(0x9B, 1);
     SmdGetObjPtr(0x30)->be_flag |= 0x20;

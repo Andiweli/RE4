@@ -6,9 +6,8 @@
 
 class cPlayer;
 
-// game/pl_sub.cpp: player / partner helpers called from the rest of the game (C linkage; the joy*
-// helpers, PlSetCostume and PlChangeData are C++ and declared in player.h).
-extern "C" {
+// game/pl_sub.cpp: player / partner helpers called from the rest of the game (the joy* helpers,
+// PlSetCostume and PlChangeData are declared in player.h).
 void PlSelect(int type);
 void PlGachaInit();
 void PlGachaMove();
@@ -39,13 +38,13 @@ void SubCharCtrl(int mode, int sccf);
 int SubCharCheckCtrl();
 void SubCharCtrlHide(Vec* pos, int type);
 void SubCharMoveTo(f32 x, f32 y, f32 z, f32 ry, int mode);
-void PlSetLadder(Vec* pos, int level, f32 ang);
+void PlSetLadder(Vec* pos, f32 ang, int level);
 void PlSetNeck(int mode);
 void PlEndCamera();
 void PlRegistMotion(void* m0, void* m1, void* m2, void* m3, void* m4, void* m5, void* m6, void* m7,
                     void* m8, void* m9, void* m10, void* m11);
 void SubCharRegistMotion(void* m0, void* m1);
-void PlRegistRoomEff(struct PlRoomEff* er);
+void PlRegistRoomEff(struct PlEffRoom* er);
 void PlReloadBullet();
 void PlWaterProc(cPlayer* pEm);
 void PlMotionReset();
@@ -60,7 +59,6 @@ int PlGetWeaponNo();
 void PlSetFace(int type);
 void SubCharSetFace(int type);
 void PlDataRelease();
-}
 void SetSubDamage(cEm* em, void (*ft)());
 
 int PlSetCostume();

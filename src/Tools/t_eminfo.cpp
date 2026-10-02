@@ -189,7 +189,7 @@ void eminfoInit()
     DbgFlagOn(pG, DBG_TEST_MODE);
     DbgFlagOn(pG, DBG_BACK_CLIP);
     DbgFlagOn(pG, DBG_DBG_CAM);
-    pG->Stop_flg |= 0x800000;
+    SpfFlagOn(pG, SPF_SCE);
     p = (EmInfoTool*) Debug_alloc(sizeof(EmInfoTool), 1);
     W = p;
     memset(p, 0, sizeof(EmInfoTool));
@@ -211,7 +211,7 @@ void eminfoExit()
     DbgFlagOff(pG, DBG_TEST_MODE);
     DbgFlagOff(pG, DBG_BACK_CLIP);
     DbgFlagOff(pG, DBG_DBG_CAM);
-    pG->Stop_flg &= ~0x800000;
+    SpfFlagOff(pG, SPF_SCE);
     TutilQuitDefault();
     TaskSignal(0);
     TaskExit();

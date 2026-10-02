@@ -20,7 +20,6 @@
 #include "merchant.h"
 #include "emitem.h"
 
-extern "C" {
 int checkEmListNo(u16 room);
 const char* getEmListName(u32 no);
 const char* getEmListDbgName(int no);
@@ -32,7 +31,6 @@ void subMissionSt1();
 void subMissionSt2();
 void subMissionSt3();
 void SubMissionCheck();
-}
 
 // Village rooms 200..208: list 2 until the church bell (Scenario_flg[1] 0x40000), then 3.
 static inline int emListVillage(int room)
@@ -253,13 +251,13 @@ void readEmList(int proc)
 }
 
 // Sub-mission 1 (stage 1 blue medallions): room / room / item no per target.
-struct SubMissionTarget {
-    u16 room1;   // 0x00
-    u16 room2;   // 0x02
-    u16 no;      // 0x04
+struct TARGE_TBL {
+    u16 room_no1;   // 0x00
+    u16 room_no2;   // 0x02
+    u16 target_no;      // 0x04
 };
 
-static SubMissionTarget st1_target_tbl[15] = {
+static TARGE_TBL st1_target_tbl[15] = {
     {0x103, 0x113, 0x0F}, {0x103, 0x113, 0x10}, {0x103, 0x113, 0x11}, {0x103, 0x113, 0x12},
     {0x103, 0x113, 0x14}, {0x103, 0x113, 0x13}, {0x103, 0x113, 0x15}, {0x108, 0x118, 0x04},
     {0x108, 0x118, 0x05}, {0x108, 0x118, 0x06}, {0x108, 0x118, 0x07}, {0x108, 0x118, 0x09},
@@ -275,8 +273,8 @@ int checkSubMissionTarget(int stage_no, int target_no)
     if (stage_no != 1) {
         return 0;
     }
-    p1 = GetEtcFlgPtr(st1_target_tbl[target_no].no, st1_target_tbl[target_no].room1);
-    p2 = GetEtcFlgPtr(st1_target_tbl[target_no].no, st1_target_tbl[target_no].room2);
+    p1 = GetEtcFlgPtr(st1_target_tbl[target_no].target_no, st1_target_tbl[target_no].room_no1);
+    p2 = GetEtcFlgPtr(st1_target_tbl[target_no].target_no, st1_target_tbl[target_no].room_no2);
     if ((*p1 & 1) == 0) {
         if ((*p2 & 1) == 0) {
             return 1;
@@ -295,8 +293,8 @@ void subMissionSt1()
 {
     static cEmItem* pCoin = NULL;
     static s16 timer = 0;
-    SubMissionTarget* tbl;
-    SubMissionTarget* t;
+    TARGE_TBL* tbl;
+    TARGE_TBL* t;
     u16* p1;
     u16* p2;
     cEmItem* item;
@@ -316,10 +314,10 @@ void subMissionSt1()
     // base is a register (base-first `lhzx`) that cse2 makes a copy of `t`.
     u32 ofs = 0;
     t = tbl;
-    SubMissionTarget* t0 = t;
+    TARGE_TBL* t0 = t;
     do {
-        p1 = GetEtcFlgPtr(t->no, t->room1);
-        p2 = GetEtcFlgPtr(t->no, t->room2);
+        p1 = GetEtcFlgPtr(t->target_no, t->room_no1);
+        p2 = GetEtcFlgPtr(t->target_no, t->room_no2);
         if ((*p1 & 1) || (*p2 & 1)) {
             *p1 |= 1;
             *p2 |= 1;
@@ -328,21 +326,21 @@ void subMissionSt1()
             count++;
         }
         if (pG->shooting_mode != 0) {
-            if (G_ROOM_ID == ((SubMissionTarget*) ((u32) t0 + ofs))->room1 && !(*p1 & 1)) {
-                if (getRoomEtcItem(t->no, &item, 1)) {
+            if (G_ROOM_ID == ((TARGE_TBL*) ((u32) t0 + ofs))->room_no1 && !(*p1 & 1)) {
+                if (getRoomEtcItem(t->target_no, &item, 1)) {
                     item->be_flag &= ~2;
                     pCoin = item;
                 }
             }
-            if (G_ROOM_ID == t->room2 && !(*p2 & 1)) {
-                if (getRoomEtcItem(t->no, &item, 1)) {
+            if (G_ROOM_ID == t->room_no2 && !(*p2 & 1)) {
+                if (getRoomEtcItem(t->target_no, &item, 1)) {
                     item->be_flag &= ~2;
                     pCoin = item;
                 }
             }
         }
         t++;
-        ofs += sizeof(SubMissionTarget);
+        ofs += sizeof(TARGE_TBL);
     } while (t <= &tbl[14]);
     }
 
@@ -362,7 +360,7 @@ void subMissionSt1()
         int base = 0;
 
         IdSys.kill(0xFF, IDC_SUB_MISSION);
-        IdSys.set((void*) (pG->pCore->ofs_9C + (u32) pG->pCore), 0xFF, IDC_SUB_MISSION, 0x13, 5, 0);
+        IdSys.set((ID_FILE_HEADER*) (pG->pCore->ofs_9C + (u32) pG->pCore), 0xFF, IDC_SUB_MISSION, 0x13, 5, 0);
         u = IdSys.unitPtr(0, IDC_SUB_MISSION);
         if (pCoin != NULL) {
             pos = pCoin->world;

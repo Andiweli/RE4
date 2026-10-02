@@ -29,14 +29,12 @@
 #include <dolphin/os.h>
 #include <dolphin/db.h>
 
-extern "C" {
 // game/exception.cpp
 void ExceptionInit();
 int excepLoadSymbolSub(char* name, OSModuleHeader* module);
 void excepLoadSymbol();
 char* excepGetSymbolName(u32 addr);
 void ErrorHandler(OSError error, OSContext* context, ...);
-}
 
 // Symbol file (Bio4*.sym) header: entries, file names and symbol names by offset.
 struct SymEntry {
@@ -73,12 +71,10 @@ struct MemDump {
     u32 curAddr;  // 0x0C  jump address
 };
 
-extern "C" {
 char* excepGetSymbolNameSub(u32 addr, SYMBOL_INFO* info);
 void excepMemoryDumpMove(MemDump* w, int y);
 void excepMemoryDump(MemDump* w, int y);
 void excepRegConsoleDump(int error, u32 dsisr, u32 dar);
-}
 
 // A store through a scalar reference is not a struct-member MEM: the static `addr` is reloaded
 // after it, as the original does.
@@ -241,7 +237,7 @@ void excepLoadSymbol()
 
     symbol_err = excepLoadSymbolSub("bio4.sym", 0);
     for (i = 0; i < 4; i++) {
-        if (EmReadModule[i].pModule) {
+        if (EmReadModule[i].pDll) {
             switch (EmReadModule[i].id) {
             case 2:
                 sprintf(tmp_str, "Bio4.pl10.sym");
@@ -266,10 +262,10 @@ void excepLoadSymbol()
                 sprintf(tmp_str, "Bio4.em%02x.sym", (u8) EmReadModule[i].id);
                 break;
             }
-            symbol_err = excepLoadSymbolSub(tmp_str, EmReadModule[i].pModule);
+            symbol_err = excepLoadSymbolSub(tmp_str, EmReadModule[i].pDll);
         }
     }
-    if (PlReadModule.pModule) {
+    if (PlReadModule.pDll) {
         switch (PlReadModule.id) {
         default:
         case 0:
@@ -285,11 +281,11 @@ void excepLoadSymbol()
             sprintf(tmp_str, "Bio4.pl0d.sym");
             break;
         }
-        symbol_err = excepLoadSymbolSub(tmp_str, PlReadModule.pModule);
+        symbol_err = excepLoadSymbolSub(tmp_str, PlReadModule.pDll);
     }
-    if (WepReadModule.pModule) {
+    if (WepReadModule.pDll) {
         sprintf(tmp_str, "Bio4.wep%02x.sym", (u8) WepReadModule.id);
-        symbol_err = excepLoadSymbolSub(tmp_str, WepReadModule.pModule);
+        symbol_err = excepLoadSymbolSub(tmp_str, WepReadModule.pDll);
     }
     if (SubScreenWk.p_module) {
         OSModuleHeader* mod = SubScreenWk.p_module;

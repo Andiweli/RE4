@@ -4,14 +4,12 @@
 #include "types.h"
 
 // Light areas (game/light_area.cpp): per-room volumes that recolour the characters inside them. The
-// data header type is the unit's own; callers hand the room file's address over. C linkage.
+// data header type is the unit's own; callers hand the room file's address over.
 
 struct LightAreaHed;
 
-extern "C" {
 void LightAreaInit();
 int LightAreaDataLoad(LightAreaHed* p);
 void LightAreaUpdate();
-}
 
 #endif

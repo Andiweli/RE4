@@ -49,18 +49,11 @@ struct R10fWork {
 
 static R10fWork* r10f_work;
 
-// The gondola sub-motion works: 0xD0 bytes each in the original build (motion.h's MotionWork is
-// the later 0xDC layout).
-struct R10fMotWork {
-    u8 buf[0xD0];
-};
-
-
 static void r10f_GondolaGetOn(int side);
 static void r10f_GondolaGetOff(int side);
 static void r10f_GondolaEmSet(int idx);
-extern "C" cObj* r10f_setFalseEye();
-extern "C" void r10f_DoorOpen();
+cObj* r10f_setFalseEye();
+void r10f_DoorOpen();
 static void r10f_DoorOpenCamera();
 static void r10f_checkFalseEyeUse();
 static void r10f_DoorClose(u32 no);
@@ -91,7 +84,7 @@ void R10fInit()
         SceAtDataSet_exec(3, SCE_LEVEL10, 0, (TaskFunc) r10f_DoorClose, (void*) 0x11E, 1);
     }
     {
-        R10fMotWork* m;
+        MOTION_INFO* m;
         u32 i;
 
         pos.x = 0.0f;
@@ -101,13 +94,13 @@ void R10fInit()
         rot.y = 0.0f;
         rot.z = 0.0f;
 #line 93 "D:/Bio4/Prog/r10f.cpp"
-        m = (R10fMotWork*) MEM_CALLOC(sizeof(R10fMotWork) * 10, 1, 0xd);
+        m = (MOTION_INFO*) MEM_CALLOC(sizeof(MOTION_INFO) * 10, 1, 0xd);
         for (i = 0; i < 10; i++) {
             r10f_work->gondola[i] = (cObjGondola*) SetGondola(ROOM_ARC_PTR(pG->pRoom, 0x23), ROOM_ARC_PTR(pG->pRoom, 0x24), &pos, &rot);
             if (r10f_work->gondola[i] != 0) {
                 r10f_work->gondola[i]->setMoveMotion(ROOM_ARC_PTR(pG->pRoom, 0x26), (u16) (i * 0x1C2));
                 if (m != 0) {
-                    r10f_work->gondola[i]->setSubMotion((MotionWork*) m, ROOM_ARC_PTR(pG->pRoom, 0x30), ROOM_ARC_PTR(pG->pRoom, 0x31));
+                    r10f_work->gondola[i]->setSubMotion(m, ROOM_ARC_PTR(pG->pRoom, 0x30), ROOM_ARC_PTR(pG->pRoom, 0x31));
                     m++;
                 }
             }
@@ -129,10 +122,10 @@ void R10fInit()
     if (getRoomEtcWindow(0xC, &win, 1)) {
         win->SetBreakModel();
     }
-    SceSetItemEvent(0xA, 0x81, 1, 0xD, r10f_LockerOpen, r10f_LockerOpened, 0x35, 0);
-    SceSetItemEvent(0xB, 0x8E, 2, 0xF, r10f_LockerOpen, r10f_LockerOpened, 0x36, 0);
-    SceSetItemEvent(0xC, 0x8D, 3, 0xE, r10f_LockerOpen, r10f_LockerOpened, 0x38, 0);
-    SceSetItemEvent(0xE, 0x87, 4, 0x10, r10f_TreasureBoxOpen, r10f_TreasureBoxOpened, 0x5E, 0);
+    SceSetItemEvent(0xA, 0x81, 1, 0xD, r10f_LockerOpen, r10f_LockerOpened, (void*) 0x35, 0);
+    SceSetItemEvent(0xB, 0x8E, 2, 0xF, r10f_LockerOpen, r10f_LockerOpened, (void*) 0x36, 0);
+    SceSetItemEvent(0xC, 0x8D, 3, 0xE, r10f_LockerOpen, r10f_LockerOpened, (void*) 0x38, 0);
+    SceSetItemEvent(0xE, 0x87, 4, 0x10, r10f_TreasureBoxOpen, r10f_TreasureBoxOpened, (void*) 0x5E, 0);
 }
 
 // Per-frame room main: nothing.
@@ -409,7 +402,7 @@ static void r10f_GondolaEmSet(int idx)
 }
 
 // The false eye in Leon's hand for the door.
-extern "C" cObj* r10f_setFalseEye()
+cObj* r10f_setFalseEye()
 {
     Vec pos = {-139.3f, -43.01f, 32.75f};
     Vec rot = {-0.34927526f, -2.473737f, 1.6477758f};
@@ -422,7 +415,7 @@ extern "C" cObj* r10f_setFalseEye()
 }
 
 // The false eye opens the door: Leon walks up, uses it, the camera cuts follow.
-extern "C" void r10f_DoorOpen()
+void r10f_DoorOpen()
 {
     cObj* eye;
     cPlayer* pl;

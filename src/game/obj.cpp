@@ -46,9 +46,7 @@
 // frame (move / objMove). The per-id classes live in the obj* units; only their constructors are
 // needed here.
 
-extern "C" {
 void objMove(cObj* p);
-}
 
 void (*ObjInitFunc[0x40])(cObj*);
 

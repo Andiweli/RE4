@@ -4,7 +4,7 @@
 #include "types.h"
 #include "vec.h"
 
-// Etc model id (PS2 ETCMODEL_ID): EtcSetData::id, getRoomEtc `id`, the EtcModelSet switch. The GC data
+// Etc model id (PS2 ETCMODEL_ID): ETS_DATA::id, getRoomEtc `id`, the EtcModelSet switch. The GC data
 // goes up to 0x67 (ETC_AUTO_DOOR5); ETC_IRON_DOOR26/27 were added on the PS2.
 enum ETCMODEL_ID {
     ETC_WINDOW00 = 0,
@@ -117,8 +117,9 @@ enum ETCMODEL_ID {
 };
 
 // One room etc model record (0x28 bytes, EtcModelListSet steps through them) handed to the
-// Et*_init functions (EtcModel.cpp, et00.cpp).
-struct EtcSetData {
+// Et*_init functions (EtcModel.cpp, et00.cpp). PS2's ETS_DATA is 0x40 bytes: a leading `scale` Vec this
+// data does not carry, then ang/pos/id/no in that order.
+struct ETS_DATA {
     u16 id;          // 0x00  ETCMODEL_ID (EtcModelSet switch, 0x00..0x67)
     union {
         u16 no;      // 0x02  g_EtcTbl slot (< 0x40)
@@ -134,16 +135,13 @@ struct EtcSetData {
 
 class cEmItem;   // emitem.h
 
-// EtcModel.cpp is C++ but exports its functions with C linkage (unmangled names in the DOL).
 // C++ linkage (sym_map: GetEtcFlgPtr__Fii, getRoomEtcItem__FiPP7cEmItemi)
 u16* GetEtcFlgPtr(u32 etc_no, u16 room_no);   // etc flag word of etc model `no` in `room` (stage << 8 | room), 0 when none
 int getRoomEtcItem(int room, cEmItem** ppEm, int bErrDisp);
 
-extern "C" {
 void* GetEtcAddr(void* arc, const char* name);   // file `name` inside the room etc archive
 // Model a light of parent type 3 (room etc model) hangs on; 1 = found (light.cpp)
 int getRoomEtcOnLight(u32 no, class cModel** ppEm, int bErrDisp);
-}
 
 // Room etc enemies by etc number (the stage rooms delete / hide them); 1 = found.
 class cEm;
@@ -156,7 +154,6 @@ class cEmTorch;    // emtorch.h
 class cEmSwitch;   // emswitch.h
 class cEmBarred;   // emBarred.h
 class cEmBarrel;   // embarrel.h
-extern "C" {
 int getRoomEtcBreak(int no, cEm** ppEm, int bErrDisp);
 int setRoomEtcDisp(int no, int bDisp, int bErrDisp);
 int getRoomEtcWindow(int no, cEmWindow** ppEm, int bErrDisp);
@@ -171,7 +168,6 @@ int getRoomEtcDram(int no, cEmBarrel** ppEm, int bErrDisp);
 int EtcGetDasAddr(int id, void** pRet_addr);   // archive of etc model `id` (r400 setLadderMotion)
 // Generic lookup by etc type (getRoomEtc* call it; r20d counts the torches / lamps with it).
 int getRoomEtc(int no, ETCMODEL_ID id, cEm** pRet, int bDispErr);
-}
 
 // Additive ambient kind of an etc model (PS2 ETC_AMB_KIND): EtcSetAddAmb `kind`, the row of the etc_*_rgb tables.
 enum ETC_AMB_KIND {
@@ -205,7 +201,6 @@ enum ETC_AMB_TYPE {
 
 // Init, room setup, room data load and the debug list (main.cpp / game.cpp / t_sce_item.cpp).
 struct EtcList;
-extern "C" {
 void EtcModelInit();
 void EtcModelRoomInit();
 int EtcModelDataLoad(void* addr);
@@ -214,6 +209,5 @@ int EtcModelGetLastNo();
 void EtcModelDebugDisp();
 // Adds the room etc model's ambient to `m` (the object enemies call it from their model setup).
 void EtcSetAddAmb(class cModel* pMod, int kind);   // no: ETC_AMB_KIND
-}
 
 #endif

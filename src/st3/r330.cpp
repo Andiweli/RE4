@@ -36,8 +36,8 @@ struct R330Work {
     TexRenderMng* tex[2];   // 0x000  render targets of the two screens
     u8 texTbl0[0x80];       // 0x008  blend table of tex[0]
     u8 texTbl1[0x80];       // 0x088  blend table of tex[1]
-    TexRenderCam cam0;      // 0x108  event render camera of tex[0]
-    TexRenderCam cam1;      // 0x40C  event render camera of tex[1]
+    TexRenderEvtCamStruct cam0;      // 0x108  event render camera of tex[0]
+    TexRenderEvtCamStruct cam1;      // 0x40C  event render camera of tex[1]
 };
 
 // Event HUD: a percentage pair (unit ids 1..4 / 5..8 of id table 0x2C) driven by the event mode.
@@ -61,7 +61,7 @@ static s16 r330_scrollTbl[5] = {30, 15, 20, 25, 40};
 
 void R330EventS00Main();
 void R330EventS00End();
-extern "C" void Evt_R330S00_Func(Event* e);
+void Evt_R330S00_Func(Event* e, u32);
 void EvtTexRenderCamTrans(Event* e, int cut);
 
 // Room init: the barred doors 0xA/0xB paired; the s00 callback; until seen (Room_flg bit 0) area 3 =
@@ -211,12 +211,12 @@ void R330EventS00End()
 
 // Event r330s00 callback: the pre-event objects hidden / shown, the two screen render passes fed on
 // their cuts (EvtTexRenderCamTrans), the idR330 HUD driven by the event mode, per-cut model flags.
-extern "C" void Evt_R330S00_Func(Event* e)
+void Evt_R330S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -385,13 +385,13 @@ extern "C" void Evt_R330S00_Func(Event* e)
         EffectEfmDelete(0x2001, ESP_CORE_KIND_ROOM00, 0);
         w = SmdGetWorkPtr(0x28);
         if ((obj = SmdGetObjPtr(0x28)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x29);
         if ((obj = SmdGetObjPtr(0x29)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0x28, 0);
         SmdSetTrans(0x29, 0);
@@ -466,13 +466,13 @@ void idR330::init(u32 no)
     IdTexDataLoad(ROOM_ARC_PTR(pG->pRoom, 0x1F), 7);
     switch (mode) {
     case 0:
-        IdSys.set(ROOM_ARC_PTR(pG->pRoom, 0x22), 0xFF, IDC_EVENT, 0xC, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x22), 0xFF, IDC_EVENT, 0xC, 6, 0);
         break;
     case 1:
-        IdSys.set(ROOM_ARC_PTR(pG->pRoom, 0x20), 0xFF, IDC_EVENT, 0xC, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x20), 0xFF, IDC_EVENT, 0xC, 6, 0);
         break;
     case 2:
-        IdSys.set(ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, IDC_EVENT, 0xC, 6, 0);
+        IdSys.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, IDC_EVENT, 0xC, 6, 0);
         break;
     }
     cnt = 0;

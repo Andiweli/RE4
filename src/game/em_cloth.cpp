@@ -204,7 +204,7 @@ f32 em30ClothMax2[30] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1
 
 // Enemy 34 costume, cloth 1: the 91-node coat / robe chain (bones 29..119, 14 bundles, 16
 // collision sets on the legs), gravity 20, damping 0.7; PenClothSet initialises the pendulums.
-void Em34ClothSet1(cModel* pEm, PlCloth* pCloth)
+void Em34ClothSet1(cModel* pEm, CLOTH_INFO* pCloth)
 {
     {
         // COMPILER-DIFF: 13 (local-alloc qty order): a codeless prio-4 filler issued before the
@@ -220,7 +220,7 @@ void Em34ClothSet1(cModel* pEm, PlCloth* pCloth)
     pCloth->pWindRate = 0;
     pCloth->pGravity = 0;
     pCloth->pRate = 0;
-    pCloth->pModel = pEm;
+    pCloth->pEm_at = pEm;
     pCloth->WindSin = 0.0f;
     pCloth->Move_rate = 0.0f;
     pCloth->Num = 91;
@@ -237,13 +237,13 @@ void Em34ClothSet1(cModel* pEm, PlCloth* pCloth)
     pCloth->Rate = 0.7f;
     pCloth->Bundle_num = 14;
     pCloth->Stretchy = 1.0f;
-    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
+    PenClothSet(pEm, pCloth, 100.0f);
 }
 
 // Per-frame simulation of the enemy 34 coat (the model-driven PenClothMove3 variant).
-void Em34ClothMove1(cModel* pEm, PlCloth* pCloth)
+void Em34ClothMove1(cModel* pEm, CLOTH_INFO* pCloth)
 {
-    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
+    PenClothMove3(pEm, pCloth);
 }
 
 // Clears the model's cloth-state bits (be_flag 0x00E00000) so the chains re-seat next frame.
@@ -254,7 +254,7 @@ void Em34ClothReset(cModel* pEm)
 
 // Enemy 34 costume, cloth 2: the two-node dangling part (bones 124 / 125), 5 collision sets,
 // gravity 15, damping 0.8.
-void Em34ClothSet2(cModel* pEm, PlCloth* pCloth)
+void Em34ClothSet2(cModel* pEm, CLOTH_INFO* pCloth)
 {
     pCloth->Num = 2;
     pCloth->pCloth = em34ClothP;
@@ -274,25 +274,25 @@ void Em34ClothSet2(cModel* pEm, PlCloth* pCloth)
     pCloth->Gravity = 15.0f;
     pCloth->Rate = 0.8f;
     pCloth->Bundle_num = 4;
-    pCloth->pModel = pEm;
+    pCloth->pEm_at = pEm;
     pCloth->WindSin = 0.0f;
     pCloth->Stretchy = 1.0f;
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
+    PenClothSet(pEm, pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 34 cloth 2.
-void Em34ClothMove2(cModel* pEm, PlCloth* pCloth)
+void Em34ClothMove2(cModel* pEm, CLOTH_INFO* pCloth)
 {
-    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
+    PenClothMove3(pEm, pCloth);
 }
 
 // Enemy 18 (robed ganado) costume: the 27-node robe skirt in 4 strands (bones 34..60), 15
 // collision sets, gravity 20, very soft (Rate 0.1, Stretchy 0.05); mode != 0 drops the per-node
 // rate table and makes it stiff (Stretchy 1).
-void Em18ClothSet(cModel* pEm, PlCloth* pCloth, int mode)
+void Em18ClothSet(cModel* pEm, CLOTH_INFO* pCloth, int mode)
 {
     pCloth->Num = 27;
     pCloth->pCloth = em18ClothP;
@@ -310,7 +310,7 @@ void Em18ClothSet(cModel* pEm, PlCloth* pCloth, int mode)
     pCloth->pRate = em18ClothRate;
     pCloth->At_num = 15;
     pCloth->Gravity = 20.0f;
-    pCloth->pModel = pEm;
+    pCloth->pEm_at = pEm;
     pCloth->Rate = 0.1f;
     pCloth->Bundle_num = 4;
     pCloth->WindSin = 0.0f;
@@ -327,18 +327,18 @@ void Em18ClothSet(cModel* pEm, PlCloth* pCloth, int mode)
         pCloth->Bundle_num = 4;
         pCloth->Stretchy = 1.0f;
     }
-    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
+    PenClothSet(pEm, pCloth, 100.0f);
 }
 
 // Per-frame simulation of the enemy 18 robe; clears the cloth-state bits afterwards.
-void Em18ClothMove(cModel* pEm, PlCloth* pCloth)
+void Em18ClothMove(cModel* pEm, CLOTH_INFO* pCloth)
 {
-    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
+    PenClothMove3(pEm, pCloth);
     pEm->be_flag &= ~0x00E00000;
 }
 
 // Enemy 37 costume, hair: an 8-node chain, gravity 10, damping 0.8, Stretchy 0.1.
-void Em37HairSet(cModel* pEm, PlCloth* pCloth)
+void Em37HairSet(cModel* pEm, CLOTH_INFO* pCloth)
 {
     pCloth->Num = 8;
     pCloth->pCloth = em37HairP;
@@ -358,19 +358,19 @@ void Em37HairSet(cModel* pEm, PlCloth* pCloth)
     pCloth->Gravity = 10.0f;
     pCloth->Rate = 0.8f;
     pCloth->Bundle_num = 4;
-    pCloth->pModel = pEm;
+    pCloth->pEm_at = pEm;
     pCloth->WindSin = 0.0f;
     pCloth->Stretchy = 0.1f;
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
+    PenClothSet(pEm, pCloth, 100.0f);
 }
 
 // Per-frame simulation of the enemy 37 hair (plain PenClothMove).
-void Em37HairMove(cModel* pEm, PlCloth* pCloth)
+void Em37HairMove(cModel* pEm, CLOTH_INFO* pCloth)
 {
-    PenClothMove(pEm, (CLOTH_INFO*) pCloth);
+    PenClothMove(pEm, pCloth);
 }
 
 // Clears the model's cloth-state bits.
@@ -380,7 +380,7 @@ void Em37ClothReset(cModel* pEm)
 }
 
 // Enemy 37 costume, coat: a 39-node chain, gravity 15, damping 0.9.
-void Em37CoatSet(cModel* pEm, PlCloth* pCloth)
+void Em37CoatSet(cModel* pEm, CLOTH_INFO* pCloth)
 {
     pCloth->Num = 39;
     pCloth->pCloth = em37CoatP;
@@ -400,24 +400,24 @@ void Em37CoatSet(cModel* pEm, PlCloth* pCloth)
     pCloth->Gravity = 15.0f;
     pCloth->Rate = 0.9f;
     pCloth->Bundle_num = 4;
-    pCloth->pModel = pEm;
+    pCloth->pEm_at = pEm;
     pCloth->WindSin = 0.0f;
     pCloth->Stretchy = 0.1f;
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
+    PenClothSet(pEm, pCloth, 100.0f);
 }
 
 // Per-frame simulation of the enemy 37 coat.
-void Em37CoatMove(cModel* pEm, PlCloth* pCloth)
+void Em37CoatMove(cModel* pEm, CLOTH_INFO* pCloth)
 {
-    PenClothMove(pEm, (CLOTH_INFO*) pCloth);
+    PenClothMove(pEm, pCloth);
 }
 
 // Enemy 33 costume, cloth 1: a 60-node chain, gravity 10, damping 0.8; `small` selects the
 // collision set table of the small variant.
-void Em33ClothSet(cModel* pEm, PlCloth* pCloth, int mode)
+void Em33ClothSet(cModel* pEm, CLOTH_INFO* pCloth, int mode)
 {
     pCloth->Num = 60;
     pCloth->pCloth = em33HairP;
@@ -441,23 +441,23 @@ void Em33ClothSet(cModel* pEm, PlCloth* pCloth, int mode)
     pCloth->Gravity = 10.0f;
     pCloth->Rate = 0.8f;
     pCloth->Bundle_num = 4;
-    pCloth->pModel = pEm;
+    pCloth->pEm_at = pEm;
     pCloth->WindSin = 0.0f;
     pCloth->Stretchy = 0.1f;
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
+    PenClothSet(pEm, pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 33 cloth 1.
-void Em33ClothMove(cModel* pEm, PlCloth* pCloth)
+void Em33ClothMove(cModel* pEm, CLOTH_INFO* pCloth)
 {
-    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
+    PenClothMove3(pEm, pCloth);
 }
 
 // Enemy 33 costume, cloth 2: a 46-node chain with the same parameters; `small` as above.
-void Em33ClothSet2(cModel* pEm, PlCloth* pCloth, int mode)
+void Em33ClothSet2(cModel* pEm, CLOTH_INFO* pCloth, int mode)
 {
     pCloth->Num = 46;
     pCloth->pCloth = em33HairP2;
@@ -481,17 +481,17 @@ void Em33ClothSet2(cModel* pEm, PlCloth* pCloth, int mode)
     pCloth->Gravity = 10.0f;
     pCloth->Rate = 0.8f;
     pCloth->Bundle_num = 4;
-    pCloth->pModel = pEm;
+    pCloth->pEm_at = pEm;
     pCloth->WindSin = 0.0f;
     pCloth->Stretchy = 0.1f;
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
+    PenClothSet(pEm, pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 33 cloth 2.
-void Em33ClothMove2(cModel* pEm, PlCloth* pCloth)
+void Em33ClothMove2(cModel* pEm, CLOTH_INFO* pCloth)
 {
     cParts* p;
 
@@ -513,7 +513,7 @@ void Em33ClothMove2(cModel* pEm, PlCloth* pCloth)
     p->world.x = p->mat[0][3];
     p->world.y = p->mat[1][3];
     p->world.z = p->mat[2][3];
-    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
+    PenClothMove3(pEm, pCloth);
 }
 
 // Clears the model's cloth-state bits.
@@ -525,7 +525,7 @@ void Em33ClothReset(cModel* pEm)
 // El Gigante (em2b) short rope: creates a chain object from the rope model / TPL, gives it a
 // 5-node pendulum chain (gravity 20, damping 0.8) and hangs it between parts 3 and 4 of the
 // enemy with fixed offsets. Returns the chain object, NULL when it could not be created.
-cObjChain* Em2bShortRopeSet(cModel* m, PlCloth* c, void* bin, void* tpl)
+cObjChain* Em2bShortRopeSet(cModel* m, CLOTH_INFO* c, void* bin, void* tpl)
 {
     cObjChain* chain;
     Vec pos;
@@ -560,13 +560,13 @@ cObjChain* Em2bShortRopeSet(cModel* m, PlCloth* c, void* bin, void* tpl)
     c->Gravity = 20.0f;
     c->Rate = 0.8f;
     c->Bundle_num = 100;
-    c->pModel = m;
+    c->pEm_at = m;
     c->WindSin = 0.0f;
     c->Stretchy = 0.1f;
     c->Move_rate = 0.0f;
     c->Flag = 0;
     c->pPtbl = 0;
-    chain->setChain((CLOTH_INFO*) c);
+    chain->setChain(c);
     pos.x = -290.0f;
     pos.y = -162.95f;
     pos.z = 655.0f;
@@ -578,7 +578,7 @@ cObjChain* Em2bShortRopeSet(cModel* m, PlCloth* c, void* bin, void* tpl)
 }
 
 // Enemy 30 costume, cloth 1: the 49-node robe with a wind rate table, gravity 30, damping 0.9.
-void Em30ClothSet1(cModel* pEm, PlCloth* pCloth)
+void Em30ClothSet1(cModel* pEm, CLOTH_INFO* pCloth)
 {
     pCloth->Num = 49;
     pCloth->pCloth = em30ClothP;
@@ -598,23 +598,23 @@ void Em30ClothSet1(cModel* pEm, PlCloth* pCloth)
     pCloth->Gravity = 30.0f;
     pCloth->Rate = 0.9f;
     pCloth->Bundle_num = 20;
-    pCloth->pModel = pEm;
+    pCloth->pEm_at = pEm;
     pCloth->WindSin = 0.0f;
     pCloth->Stretchy = 1.0f;
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0x100;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
+    PenClothSet(pEm, pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 30 cloth 1.
-void Em30ClothMove1(cModel* pEm, PlCloth* pCloth)
+void Em30ClothMove1(cModel* pEm, CLOTH_INFO* pCloth)
 {
-    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
+    PenClothMove3(pEm, pCloth);
 }
 
 // Enemy 30 costume, cloth 2: a 30-node chain, gravity 15, damping 0.5, Stretchy 0.05.
-void Em30ClothSet2(cModel* pEm, PlCloth* pCloth)
+void Em30ClothSet2(cModel* pEm, CLOTH_INFO* pCloth)
 {
     pCloth->Num = 30;
     pCloth->pCloth = em30ClothP2;
@@ -633,20 +633,20 @@ void Em30ClothSet2(cModel* pEm, PlCloth* pCloth)
     pCloth->At_num = 0;
     pCloth->Gravity = 15.0f;
     pCloth->Rate = 0.5f;
-    pCloth->pModel = pEm;
+    pCloth->pEm_at = pEm;
     pCloth->Bundle_num = 0;
     pCloth->WindSin = 0.0f;
     pCloth->Stretchy = 0.05f;
     pCloth->Move_rate = 0.0f;
     pCloth->Flag = 0;
     pCloth->pPtbl = 0;
-    PenClothSet(pEm, (CLOTH_INFO*) pCloth, 100.0f);
+    PenClothSet(pEm, pCloth, 100.0f);
 }
 
 // Per-frame simulation of enemy 30 cloth 2.
-void Em30ClothMove2(cModel* pEm, PlCloth* pCloth)
+void Em30ClothMove2(cModel* pEm, CLOTH_INFO* pCloth)
 {
-    PenClothMove3(pEm, (CLOTH_INFO*) pCloth);
+    PenClothMove3(pEm, pCloth);
 }
 
 // Clears the model's cloth-state bits.
@@ -656,7 +656,7 @@ void Em30ClothReset(cModel* pEm)
 }
 
 // Never called (dead-stripped by the original linker; only its 0.0f pool entry survives).
-static void Em30ClothStop(cModel* m, PlCloth* c)
+static void Em30ClothStop(cModel* m, CLOTH_INFO* c)
 {
     c->WindSin = 0.0f;
 }

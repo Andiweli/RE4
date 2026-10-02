@@ -61,15 +61,15 @@ struct R333Work {
 struct R333IdData {
     u8 pad_0[0x10];
     u32 ofsTex;   // 0x10  IdTexDataLoad(.., 7)
-    u32 ofsId;    // 0x14  IdSys.set(.., 0xFF, IDC_TITLE, ..)
+    u32 ofsId;    // 0x14  IdSys.set((ID_FILE_HEADER*) .., 0xFF, IDC_TITLE, ..)
 };
 
 static R333Work* r333_work;
 
 void R333EventS00();
 void R333EventS10();
-extern "C" void Evt_R333S00_Func(Event* e);
-extern "C" void Evt_R333S10_Func(Event* e);
+void Evt_R333S00_Func(Event* e, u32);
+void Evt_R333S10_Func(Event* e, u32);
 static void setTexRender();
 static void exec_no_ret_exit();
 static void exec_no_ret();
@@ -103,8 +103,6 @@ void st3_endCountDown();
 // the jet ski key, and JumpPoint 2 skips to the escape event. The shake and wind tasks are empty.
 void R333Init()
 {
-    int zero;
-
 #line 103 "D:/Bio4/Prog/r333.cpp"
     r333_work = (R333Work*) MEM_CALLOC(sizeof(R333Work), 1, 0xd);
     read_id_data();
@@ -119,9 +117,8 @@ void R333Init()
     if (pG->JumpPoint == 2) {
         SceExec(0x12, (TaskFunc) R333EventS10, 0, 0, 2, 0);
     }
-    zero = 0;
     SysFlagOff(pG, SYS_SCREEN_STOP);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_ROOM00, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0xB, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     EvtMgr.SetFunc("evt_r333s00_func", (void*) Evt_R333S00_Func);
     EvtMgr.SetFunc("evt_r333s10_func", (void*) Evt_R333S10_Func);
     SceAtDataSet_exec(0xE, 0x12, 0, (TaskFunc) r333_useMes, 0, 1);
@@ -139,9 +136,8 @@ void R333Init()
     if (RsfCheck(G_ROOM_ID, 3) == 0) {
         SceAtDataSet_exec(4, 0x12, 0, (TaskFunc) exec_no_ret, 0, 1);
     } else {
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_ROOM03, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_ROOM03, 0, 0);
     }
-    zero = 0;
     if (RsfCheck(G_ROOM_ID, 2) == 0) {
         SceAtDataSet_exec(0x11, 0x12, 0, (TaskFunc) exec_continue, 0, 1);
     }
@@ -165,7 +161,7 @@ void R333Init()
     }
     ((cPl0e*) r333_work->em.getPtr())->setRail(ROOM_ARC_PTR(pG->pRoom, 0x1F));
     setTexRender();
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 0x801, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 0x801, ESP_CORE_KIND_ROOM01, 0, 0);
     SpfFlagOn(pG, SPF_WATER);
     DpfFlagOn(pG, DPF_WATER);
     SceAtDataSet_exec(0, 0x12, 0, (TaskFunc) fall_eff, 0, 1);
@@ -268,7 +264,7 @@ void R333EventS10()
 // Event r333s00 callback (the ride starts): the jet ski object 3 hidden and the count-down remembered;
 // cuts 0/1 set the event flags and the Leon / Ashley (pl0100) models' parts; the end shows the jet ski
 // and restarts the count-down with the event's length subtracted.
-extern "C" void Evt_R333S00_Func(Event* e)
+void Evt_R333S00_Func(Event* e, u32)
 {
     void* mod;
 
@@ -313,7 +309,7 @@ extern "C" void Evt_R333S00_Func(Event* e)
 // Event r333s10 callback (the escape from the collapsing island): drops the cave effects 0xC..0x2B,
 // hides the jet ski; per cut the wall object 0xCE, the Leon / Ashley / evm8100 models and the screen
 // capture filter (alpha fading from 230 over 50 frames) on cuts 0xD/0xE; the end leads into the result.
-extern "C" void Evt_R333S10_Func(Event* e)
+void Evt_R333S10_Func(Event* e, u32)
 {
     static int alpha = 230;
     static int alphaTime = 50;
@@ -456,11 +452,11 @@ static void exec_no_ret()
 {
     int zero = 0;
 
-    KyfFlagOn(pG, KYF_ST1_26);
+    KyfFlagOn(pG, KYF_ST3_25);
     RsfSet(G_ROOM_ID, 3);
     SceEventStart(1);
     SndStrReq(1, 0x3A, 0x80000003, 0, 0, 0.0f);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_ROOM03, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_ROOM03, (void*) zero, 0);
     CamCtrl.CutCall(0xA);
     SceSetEventCancel(1, (TaskFunc) exec_no_ret_exit, 0, -1, 1);
     while (!CamCtrl.IsMotionEnd()) {
@@ -681,7 +677,7 @@ static void gameResult()
     ExtFlagOn(pSys, EXT_HARD_MODE);
     ExtFlagOn(pSys, EXT_GET_OMAKE_ADA_GAME);
     if (ExtFlagChk(pSys, EXT_GET_OMAKE_ETC_GAME) == 0) {
-        MercSaveWork save;
+        MercSysSaveWork save;
         int i;
 
         ExtFlagOn(pSys, EXT_GET_OMAKE_ETC_GAME);
@@ -726,7 +722,7 @@ static void exec_die()
     SpfFlagOff(pG, SPF_WATER);
     DpfFlagOff(pG, DPF_WATER);
     SmdSetTrans(3, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x14, 1, ESP_CORE_KIND_ROOM02, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x14, 1, ESP_CORE_KIND_ROOM02, (void*) zero, 0);
     CamCtrl.CutCall(0xD);
     while (!CamCtrl.IsMotionEnd()) {
         SceSleep(1);
@@ -778,7 +774,7 @@ void disp_id_data()
     R333IdData* d = (R333IdData*) r333_work->idData;
 
     IdTexDataLoad((void*) (d->ofsTex + (u32) d), 7);
-    IdSys.set((void*) (d->ofsId + (u32) d), 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) (d->ofsId + (u32) d), 0xFF, IDC_TITLE, 0x13, 6, 0);
 }
 
 // Drop the result id table (owner 7 textures, id table 0x28).

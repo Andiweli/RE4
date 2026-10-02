@@ -72,29 +72,41 @@ void Esp4a_Trans();
 void Esp4c_Trans();
 void Esp4d_Trans();
 
-extern "C" {
 cEsp* Esp08_Create();
 cEsp* Esp18_Create();
 cEsp* Esp45_Create();
 cEsp* Esp4e_Create();
-void Esp01_Trans(cEsp* esp);
-void Esp02_Trans(cEsp* esp);
-void Esp03_Trans(cEsp* esp);
-void Esp04_Trans(cEsp* esp);
-void Esp08_Trans(cEsp* esp);
-void Esp09_Trans(cEsp* esp);
-void Esp0a_Trans(cEsp* esp);
-void Esp0b_Trans(cEsp* esp);
+class cEsp01;
+class cEsp02;
+class cEsp03;
+class cEsp04;
+class cEsp08;
+class cEsp09;
+class cEsp0a;
+class cEsp0b;
+class cEsp0e;
+class cEsp0f;
+class cEsp12;
+class cEsp16;
+class cEsp18;
+class cEsp19;
+void Esp01_Trans(cEsp01* esp);
+void Esp02_Trans(cEsp02* esp);
+void Esp03_Trans(cEsp03* esp);
+void Esp04_Trans(cEsp04* esp);
+void Esp08_Trans(cEsp08* esp);
+void Esp09_Trans(cEsp09* esp);
+void Esp0a_Trans(cEsp0a* esp);
+void Esp0b_Trans(cEsp0b* esp);
 void Esp0c_Trans(cEsp* esp);
-void Esp0e_Trans(cEsp* esp);
-void Esp0f_Trans(cEsp* esp);
-void Esp12_Trans(cEsp* esp);
-void Esp16_Trans(cEsp* esp);
-void Esp18_Trans(cEsp* esp);
-void Esp19_Trans(cEsp* esp);
+void Esp0e_Trans(cEsp0e* esp);
+void Esp0f_Trans(cEsp0f* esp);
+void Esp12_Trans(cEsp12* esp);
+void Esp16_Trans(cEsp16* esp);
+void Esp18_Trans(cEsp18* esp);
+void Esp19_Trans(cEsp19* esp);
 void Esp45_Trans(cEsp* esp);
 void Esp4e_Trans();
-}
 
 typedef void (*EffSeFunc)(Vec* pos);
 
@@ -110,31 +122,31 @@ TexRenderMng* g_pMgr;
 void EffSetId()
 {
     EspFuncTblSet(0x00, Esp00_Create, EspCommonTrans);
-    EspFuncTblSet(0x01, Esp01_Create, Esp01_Trans);
-    EspFuncTblSet(0x02, Esp02_Create, Esp02_Trans);
-    EspFuncTblSet(0x03, Esp03_Create, Esp03_Trans);
-    EspFuncTblSet(0x04, Esp04_Create, Esp04_Trans);
+    EspFuncTblSet(0x01, Esp01_Create, (EspTransFunc) Esp01_Trans);
+    EspFuncTblSet(0x02, Esp02_Create, (EspTransFunc) Esp02_Trans);
+    EspFuncTblSet(0x03, Esp03_Create, (EspTransFunc) Esp03_Trans);
+    EspFuncTblSet(0x04, Esp04_Create, (EspTransFunc) Esp04_Trans);
     EspFuncTblSet(0x05, Esp05_Create, EspCommonTrans);
     EspFuncTblSet(0x06, Esp06_Create, EspCommonTrans);
     EspFuncTblSet(0x07, Esp07_Create, EspCommonTrans);
-    EspFuncTblSet(0x08, Esp08_Create, Esp08_Trans);
-    EspFuncTblSet(0x09, Esp09_Create, Esp09_Trans);
-    EspFuncTblSet(0x0a, Esp0a_Create, Esp0a_Trans);
-    EspFuncTblSet(0x0b, Esp0b_Create, Esp0b_Trans);
+    EspFuncTblSet(0x08, Esp08_Create, (EspTransFunc) Esp08_Trans);
+    EspFuncTblSet(0x09, Esp09_Create, (EspTransFunc) Esp09_Trans);
+    EspFuncTblSet(0x0a, Esp0a_Create, (EspTransFunc) Esp0a_Trans);
+    EspFuncTblSet(0x0b, Esp0b_Create, (EspTransFunc) Esp0b_Trans);
     EspFuncTblSet(0x0c, Esp0c_Create, Esp0c_Trans);
     EspFuncTblSet(0x0d, Esp0d_Create, EspCommonTrans);
-    EspFuncTblSet(0x0e, Esp0e_Create, Esp0e_Trans);
-    EspFuncTblSet(0x0f, Esp0f_Create, Esp0f_Trans);
+    EspFuncTblSet(0x0e, Esp0e_Create, (EspTransFunc) Esp0e_Trans);
+    EspFuncTblSet(0x0f, Esp0f_Create, (EspTransFunc) Esp0f_Trans);
     EspFuncTblSet(0x10, Esp10_Create, EspCommonTrans);
     EspFuncTblSet(0x11, Esp11_Create, Esp11_Trans);
-    EspFuncTblSet(0x12, Esp12_Create, Esp12_Trans);
+    EspFuncTblSet(0x12, Esp12_Create, (EspTransFunc) Esp12_Trans);
     EspFuncTblSet(0x13, Esp13_Create, EspCommonTrans);
     EspFuncTblSet(0x14, Esp14_Create, EspCommonTrans);
     EspFuncTblSet(0x15, Esp15_Create, EspCommonTrans);
-    EspFuncTblSet(0x16, Esp16_Create, Esp16_Trans);
+    EspFuncTblSet(0x16, Esp16_Create, (EspTransFunc) Esp16_Trans);
     EspFuncTblSet(0x17, Esp17_Create, EspCommonTrans);
-    EspFuncTblSet(0x18, Esp18_Create, Esp18_Trans);
-    EspFuncTblSet(0x19, Esp19_Create, Esp19_Trans);
+    EspFuncTblSet(0x18, Esp18_Create, (EspTransFunc) Esp18_Trans);
+    EspFuncTblSet(0x19, Esp19_Create, (EspTransFunc) Esp19_Trans);
     EspFuncTblSet(0x1a, Esp1a_Create, EspCommonTrans);
     EspFuncTblSet(0x1b, Esp1b_Create, EspCommonTrans);
     EspFuncTblSet(0x3f, Esp3f_Create, NULL);
@@ -213,7 +225,7 @@ void EspFootCall(int type, int no, Vec* pPos)
             fpos.x = pl->pos.x;
             fpos.y = h;
             fpos.z = pl->pos.z;
-            EstSet(0, -1, &fpos, NULL, pl->m_pEffRoom[4].id, pl->m_pEffRoom[4].type, 0, ESP_CORE_KIND_NONE, 0, NULL);
+            EstSet(0, -1, &fpos, NULL, pl->m_pEffRoom[4].type, pl->m_pEffRoom[4].id, 0, ESP_CORE_KIND_NONE, 0, NULL);
             break;
         default:
             pLog->err(0, 0, "EspFootCall() : FootSeNo[%d] invalid.", no);
@@ -238,7 +250,7 @@ void EspFootCall(int type, int no, Vec* pPos)
             fpos.x = pl->pos.x;
             fpos.y = h;
             fpos.z = pl->pos.z;
-            EstSet(0, -1, &fpos, NULL, pl->m_pEffRoom[5].id, pl->m_pEffRoom[5].type, 0, ESP_CORE_KIND_NONE, 0, NULL);
+            EstSet(0, -1, &fpos, NULL, pl->m_pEffRoom[5].type, pl->m_pEffRoom[5].id, 0, ESP_CORE_KIND_NONE, 0, NULL);
             break;
         default:
             pLog->err(0, 0, "EspFootCall() : FootSeNo[%d] invalid.", no);
@@ -335,7 +347,7 @@ void EffAreaUpdate()
         pos = pPL->pos;
         pos.y += 100.0f;
     } else {
-        pos = pG->Camera.param.pos;
+        pos = pG->Camera.param.Campos;
     }
     flag = 0;
     ent = sys->Area_addr->ent;

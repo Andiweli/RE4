@@ -44,7 +44,7 @@
 // (s03: the first Ganado kills one, s20: the truck runs the car off the bridge, s40: the ravine).
 
 void Obj18CmfOn(cObj* o, u32 n);        // game/obj18.cpp
-extern "C" void EventCarInit(Event* e);  // st1_0/r120.cpp
+void EventCarInit(Event* e);  // st1_0/r120.cpp
 
 
 struct R100Work {
@@ -78,9 +78,9 @@ static const AtEffInfo r100_eff_info5 = {
     2, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0}, {0xD2, 0},
 };
 
-extern "C" int readEvent(int no, int wait, void** out);
-extern "C" void freeEvent(int no, int swap);
-extern "C" void r100_em_set();
+int readEvent(int no, int wait, void** out);
+void freeEvent(int no, int swap);
+void r100_em_set();
 static void r100_GakeEvent(int arg);
 static void r100_StartEvent();
 static void r100_DoorCk();
@@ -90,8 +90,8 @@ static void r100_HouseEvent();
 static void r100_StreanChk();
 static void r100_Sce_look();
 static void r100_Sce_zombi_dead(cEm* em);
-extern "C" void r100_Car_pos_move();
-extern "C" void r100_trap_set();
+void r100_Car_pos_move();
+void r100_trap_set();
 static void r100_MesDoor();
 static void r100_MesTruck();
 static void r100_MesGanado();
@@ -99,10 +99,10 @@ static void r100_MesCar00();
 static void r100_MesCar01();
 static void r100_MesBrige();
 static void r100_EventBrige();
-extern "C" void setTexRender();
-extern "C" void Evt_R100S40_Func(Event* e);
-extern "C" void Evt_R100S20_Func(Event* e);
-extern "C" void Evt_R100S03_Func(Event* e);
+void setTexRender();
+void Evt_R100S40_Func(Event* e, u32);
+void Evt_R100S20_Func(Event* e, u32);
+void Evt_R100S03_Func(Event* e, u32);
 static void r100_mes_gaikotu_bgm();
 static void r100_mes_gaikotu();
 static void r100_mes_gaikotu_bgm_down();
@@ -136,13 +136,13 @@ void R100Init()
     } else {
         Vec pos = {45442.0f, -430.0f, -8800.0f};
         Vec rot = {0.0f, 0.0f, 0.0f};
-        ReadModule* m = SearchEmModule(0x12);
+        MODULE_DAT* m = SearchEmModule(0x12);
 
         if (m) {
             cEm em;
             cEm* pe = &em;
 
-            em.subArc = (PlArc*) m->pArc;
+            em.subArc = (PlArc*) m->pData;
             W->smd = SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x31), ROOM_ARC_PTR(pG->pRoom, 0x32), &pos, &rot, 0x10, 1);
             W->smd->be_flag |= 0x1000;
             SetObjSmd(ROOM_ARC_PTR(pG->pRoom, 0x33), PL_ARC_PTR(pe->subArc, 0x255), &pos, &rot, 0x10, 1)->be_flag |= 0x1000;
@@ -414,7 +414,7 @@ static char* r100_evtName[10] = {
 
 // Loads event `no` (r100_evtName) through a data unit; with `wait` the data is swapped into the
 // Ganado module's block (events 0, 4, 9) or loaded in place, and `out` receives its address.
-extern "C" int readEvent(int no, int wait, void** out)
+int readEvent(int no, int wait, void** out)
 {
     if (out != 0) {
         *out = 0;
@@ -427,12 +427,12 @@ extern "C" int readEvent(int no, int wait, void** out)
     }
     if (wait != 0) {
         if (no == 0 || no == 4 || no == 9) {
-            ReadModule* m;
+            MODULE_DAT* m;
 
             EspEmDataSwapPush(0x12);
             m = SearchEmModule(0x12);
-            if (W->evt[no]->getSize() > m->size) {
-                pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", W->evt[no]->getSize(), m->size);
+            if (W->evt[no]->getSize() > m->DataSize) {
+                pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", W->evt[no]->getSize(), m->DataSize);
                 goto fail;
             }
             if (W->evt[no]->waitLoadOk() == 0) {
@@ -440,9 +440,9 @@ extern "C" int readEvent(int no, int wait, void** out)
                 pLog->err(0, 0, "r100::readEvent() : out of memory");
                 goto fail;
             }
-            MemorySwap(m->pArc, (u32) W->evt[no]->getAddr(), W->evt[no]->getSize());
+            MemorySwap(m->pData, W->evt[no]->getAddr(), W->evt[no]->getSize());
             {
-                void* arc = m->pArc;
+                void* arc = m->pData;
 
                 if (out != 0) {
                     *out = arc;
@@ -478,14 +478,14 @@ fail:
 
 // Release event unit `no`; with `swap` (events 0/4/9 live in the Ganado module's block) swap the
 // module's archive back over it and pop the effect data swap.
-extern "C" void freeEvent(int no, int swap)
+void freeEvent(int no, int swap)
 {
     if (W->evt[no] != 0) {
         if (swap != 0 && (no == 0 || no == 4 || no == 9)) {
-            ReadModule* m;
+            MODULE_DAT* m;
 
             m = SearchEmModule(0x12);
-            MemorySwap(m->pArc, (u32) W->evt[no]->getAddr(), W->evt[no]->getSize());
+            MemorySwap(m->pData, W->evt[no]->getAddr(), W->evt[no]->getSize());
             EspEmDataSwapPop(0x12);
         }
         W->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);
@@ -493,7 +493,7 @@ extern "C" void freeEvent(int no, int swap)
 }
 
 // The ambush after the officer's death.
-extern "C" void r100_em_set()
+void r100_em_set()
 {
     W->ems[0] = (cEmGanado*) EmSetFromList2(3, 1);
     W->ems[1] = (cEmGanado*) EmSetFromList2(4, 1);
@@ -535,7 +535,7 @@ static void r100_GakeEvent(int arg)
         W->car->setNoSuspend(1);
         W->carSub->setNoSuspend(1);
         if (readEvent(4, 1, &evt)) {
-            EvtMgr.SetEvt(evt, (u32*) 0);
+            EvtMgr.SetEvt(evt, 0);
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
                 SceSleep(1);
             }
@@ -565,7 +565,7 @@ static void r100_StartEvent()
     }
     if (!FlagChk((u32) &pG->System_flg, SYS_START_EVT_SKIP) && !ScfFlagChk(pG, SCF_R120_EVENT_CANCEL)) {
         if (readEvent(9, 1, &evt)) {
-            EvtMgr.SetEvt(evt, (u32*) 0);
+            EvtMgr.SetEvt(evt, 0);
             SceSleep(1);
             FadeSetW(0x80000002, 30, 0, 0);
             while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
@@ -852,7 +852,7 @@ static void r100_Sce_look()
     SysFlagOn(pG, SYS_SCREEN_STOP);
     SceSleep(2);
     if (readEvent(0, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) 0);
+        EvtMgr.SetEvt(evt, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
@@ -911,7 +911,7 @@ static void r100_Sce_zombi_dead(cEm* em)
     DC.setAramSort(0);
     r100_em_set();
     if (readEvent(3, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) &ev);
+        EvtMgr.SetEvt(evt, &ev);
         ev->FlgOnStatus(EvtStfPlPosNoSet);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
@@ -926,9 +926,9 @@ static void r100_Sce_zombi_dead(cEm* em)
     W->ems[1]->flag |= 1;
     W->ems[2]->flag |= 1;
     l = &pG->Em_list[4];
-    l->set = zero;
+    l->set = 0;
     l = &pG->Em_list[5];
-    l->set = zero;
+    l->set = 0;
     r100_Car_pos_move();
     SceSleep(1);
     r100_trap_set();
@@ -944,7 +944,7 @@ static void r100_Sce_zombi_dead(cEm* em)
     at[3].x = -750.0f;
     at[3].y = 0.0f;
     at[3].z = -750.0f;
-    if (SceAtCreateExecAt(em, at, 1, 8, 1, 1000.0f, 1, 0.0f, 0.0f, 1, SCE_LEVEL10, (TaskFunc) r100_MesGanado, zero, 2) == -1) {
+    if (SceAtCreateExecAt(em, at, 1000.0f, 1, 8, 1, 1, 0.0f, 0.0f, 1, SCE_LEVEL10, (TaskFunc) r100_MesGanado, (void*) zero, 2) == -1) {
         pLog->err(0, 0, "move : SceAt no create");
     }
     SceAtSetEnable(1, 1);
@@ -966,7 +966,7 @@ static void r100_Sce_zombi_dead(cEm* em)
 }
 
 // The car down in the ravine after the s20 event.
-extern "C" void r100_Car_pos_move()
+void r100_Car_pos_move()
 {
     Vec pos;
     Vec rot;
@@ -1024,7 +1024,7 @@ extern "C" void r100_Car_pos_move()
 }
 
 // The trap Ganados of the after state (the three at the fire get their event motions).
-extern "C" void r100_trap_set()
+void r100_trap_set()
 {
     cEm* em;
 
@@ -1092,7 +1092,7 @@ static void r100_MesCar00()
         SndStop(W->se, 0);
     }
     if (readEvent(5, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) 0);
+        EvtMgr.SetEvt(evt, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
@@ -1121,7 +1121,7 @@ static void r100_MesCar01()
         SndStop(W->se, 0);
     }
     if (readEvent(7, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) 0);
+        EvtMgr.SetEvt(evt, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
@@ -1173,7 +1173,7 @@ static void r100_EventBrige()
     W->cop[1]->setNoSuspend(0);
     StaFlagOn(pG, STA_CAMERA_SET_ROOM);
     if (readEvent(8, 1, &evt)) {
-        EvtMgr.SetEvt(evt, (u32*) 0);
+        EvtMgr.SetEvt(evt, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
@@ -1197,7 +1197,7 @@ static void r100_EventBrige()
     obj->Refract_ratio = v138;
 
 // The pond surface: a render target blended into the water objects.
-extern "C" void setTexRender()
+void setTexRender()
 {
     cObj* obj;
     u8* tbl = r100_texTbl;
@@ -1220,7 +1220,7 @@ extern "C" void setTexRender()
 // Event r100s40 callback (the officers at the ravine / car): Status_flg[1] 0x02000000 during the event,
 // the car event models set up on the first frame (EventCarInit, r120's); funcMode 3 sets Scenario_flg[1]
 // bit 0x10.
-extern "C" void Evt_R100S40_Func(Event* e)
+void Evt_R100S40_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1241,7 +1241,7 @@ extern "C" void Evt_R100S40_Func(Event* e)
 
 // Event r100s20 callback (the truck pushes the car into the ravine): the truck model obm2d00 shown on
 // cut 0; cut 2 keeps ambush Ganados 1/2 updating (unless the debug flag hides them).
-extern "C" void Evt_R100S20_Func(Event* e)
+void Evt_R100S20_Func(Event* e, u32)
 {
     void* mod;
 
@@ -1268,7 +1268,7 @@ extern "C" void Evt_R100S20_Func(Event* e)
 
 // Event r100s03 callback (Leon shoots the first Ganado): the knife model wep0200 is hidden (be_flag 2)
 // on cuts 0..4 and 13..20 and shown on the others.
-extern "C" void Evt_R100S03_Func(Event* e)
+void Evt_R100S03_Func(Event* e, u32)
 {
     void* mod;
 

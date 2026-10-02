@@ -25,10 +25,10 @@ section	offset	size	unit	scope	name	demangled
 .text	0x000017E8	0x2EC	pl0d/wep02.cpp	local	wep02_r2_reload__FP7cPlayer	wep02_r2_reload
 .text	0x00001AD4	0xBC	pl0d/wep02.cpp	global	countActiveWork__t8cManager1Z6cLight	cManager<cLight>::countActiveWork
 .text	0x00001B90	0x158	pl0d/wep02.cpp	global	create__t8cManager1Z6cLighti	cManager<cLight>::create
-.text	0x00001CE8	0x108	pl0d/pl_wesker.cpp	global	testJacketSetWesker__FP6cModelP7PlCloth	testJacketSetWesker
-.text	0x00001DF0	0x20	pl0d/pl_wesker.cpp	global	testJacketMoveWesker__FP6cModelP7PlCloth	testJacketMoveWesker
-.text	0x00001E10	0x20	pl0d/pl_wesker.cpp	global	PlClothSetWesker__FP6cModelP7PlCloth	PlClothSetWesker
-.text	0x00001E30	0x38	pl0d/pl_wesker.cpp	global	PlClothMoveWesker__FP6cModelP7PlCloth	PlClothMoveWesker
+.text	0x00001CE8	0x108	pl0d/pl_wesker.cpp	global	testJacketSetWesker__FP6cModelP10CLOTH_INFO	testJacketSetWesker
+.text	0x00001DF0	0x20	pl0d/pl_wesker.cpp	global	testJacketMoveWesker__FP6cModelP10CLOTH_INFO	testJacketMoveWesker
+.text	0x00001E10	0x20	pl0d/pl_wesker.cpp	global	PlClothSetWesker	PlClothSetWesker
+.text	0x00001E30	0x38	pl0d/pl_wesker.cpp	global	PlClothMoveWesker	PlClothMoveWesker
 .text	0x00001E68	0xB4	pl0d/pl_wesker.cpp	global	__9cPlWesker	cPlWesker::cPlWesker
 .text	0x00001F1C	0x158	pl0d/pl_wesker.cpp	global	setMotion__9cPlWesker	cPlWesker::setMotion
 .text	0x00002074	0x20	pl0d/pl_wesker.cpp	global	move__9cPlWesker	cPlWesker::move

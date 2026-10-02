@@ -49,10 +49,10 @@ public:
     f32 t;         // 0x20  0 lowered .. 1 raised
 
     void move(f32 t);
-    void init(struct R20dFenceData* d);
+    void init(struct FENCE_DATA* d);
 };
 
-struct R20dFenceData {
+struct FENCE_DATA {
     int objNo;     // 0x00
     f32 w;         // 0x04  collision size x
     f32 d;         // 0x08  collision size z
@@ -108,7 +108,7 @@ struct R20dThroughData {
 
 static R20dWork* r20d_work;
 
-static R20dFenceData r20d_fenceData[3] = {
+static FENCE_DATA r20d_fenceData[3] = {
     {0x18, 3000.0f, 300.0f, {0.0f, 2000.0f, 0.0f}},
     {0x29, 300.0f, 3000.0f, {0.0f, 2000.0f, 0.0f}},
     {0x2A, 300.0f, 2100.0f, {0.0f, 0.0f, 2000.0f}},
@@ -167,7 +167,7 @@ void R20dInit()
         if (RsfCheck(G_ROOM_ID, 0) == 0) {
             SceExec(0x12, (TaskFunc) r20d_checkSwitch, 0, 0, SCE_PRIO_DEF_2, 0);
         } else {
-            SceExec(0x12, (TaskFunc) r20d_checkSwitch, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r20d_checkSwitch, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         }
         SceAtDataSet_exec(6, SCE_LEVEL10, 0, (TaskFunc) r20d_execThrough, (void*) 0, 1);
         SceAtDataSet_exec(7, SCE_LEVEL10, 0, (TaskFunc) r20d_execThrough, (void*) 1, 1);
@@ -195,8 +195,8 @@ void R20dInit()
     r20d_initRoundSwitch();
     SceSetItemEvent(0x14, 0x81, 4, 6, r20d_openShelf, r20d_openedShelf, 0, 0);
     SceSetItemEvent(0x15, 0x80, 5, 5, r20d_openDrawer, r20d_openedDrawer, 0, 0);
-    SceSetItemEvent(0x16, 0x83, 6, 7, r20d_openDrawer, r20d_openedDrawer, 1, 0);
-    SceSetItemEvent(0x17, 0x86, 7, 8, r20d_openDrawer, r20d_openedDrawer, 2, 0);
+    SceSetItemEvent(0x16, 0x83, 6, 7, r20d_openDrawer, r20d_openedDrawer, (void*) 1, 0);
+    SceSetItemEvent(0x17, 0x86, 7, 8, r20d_openDrawer, r20d_openedDrawer, (void*) 2, 0);
     SceExec(0x12, (TaskFunc) r20d_checkBgmPlay, 0, 0, SCE_PRIO_DEF_2, 0);
     SceAtSetActColor(0x1B, 1);
 }
@@ -658,7 +658,7 @@ void cFence::move(f32 t)
 
 // Bind fence data: the scroll object (script-moved), lowered position, raise vector, and a 4-corner
 // collision piece (SAT) around it sized from the data's w/d.
-void cFence::init(R20dFenceData* d)
+void cFence::init(FENCE_DATA* d)
 {
     f32 hz;
     f32 hx;
@@ -1017,7 +1017,7 @@ void cLantern::initLantern(void* arc, void* m1, void* m2, void* m3, void* m4, vo
             num++;
         }
     }
-    SceExec(0x12, (TaskFunc) cLantern::checkLantern, (int) this, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) cLantern::checkLantern, this, 0, SCE_PRIO_DEF_2, 0);
 }
 
 // Task over all lantern units: state 0 checks the pickup prompt, 1 is being thrown, 2 destroys the unit.
@@ -1204,7 +1204,6 @@ void cLanternUnit::setThrowLantern(Vec* target)
     void* tpl;
     void* bin;
     cObj* obj;
-    void* zero = NULL;
     const f32 spd0 = 20.0f;   // pool order (20 first) and `lis r25` at the top
 
     from.x = em->pList->mat[0][3];
@@ -1215,6 +1214,6 @@ void cLanternUnit::setThrowLantern(Vec* target)
     EspGetEfmTplAddr(0xF, &tpl);
     CalcParabolaVector(&spd, &from, target, PSVECDistance(&from, target) / 10.0f + 1.0f);
     obj = SetObj01(bin, tpl, &from, &rot, &spd, spd0, 50.0f, 0xD2, 5);
-    Obj01SetEst(obj, 0, 0x10, 3, 1, 1, 0, 0x14, (int) zero, (int) zero);
-    EstSet(obj, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, obj, zero);
+    Obj01SetEst(obj, 0, 0x10, 3, 1, 1, 0, 0x14, 0, 0);
+    EstSet(obj, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, obj, 0);
 }

@@ -15,7 +15,6 @@ u16 esp_num_list[EFF_MAX];
 EspTransFunc EspTransTbl[0xFF];
 EspCreateFunc EspCreateTbl[0xFF];
 
-extern "C" {
 void EspDummyTrans(cEsp* esp);
 void EspFuncTblInit();
 int ESP_IsActive(cEsp* esp);
@@ -28,7 +27,6 @@ int EspArrayAlloc(u32 n);
 int EspArrayFree();
 int EspArrayPush(u32 n);
 int EspArrayPop();
-}
 
 // Default EspTransTbl entry: an effect whose id has no registered trans function is reported and
 // released.
@@ -318,9 +316,9 @@ int EspTrans()
     }
     LightMgr.setEsp(&sys->EspLightEnv, 8);
     cam = &pG->Camera;
-    dir.x = cam->param.at.x - cam->param.pos.x;
-    dir.y = cam->param.at.y - cam->param.pos.y;
-    dir.z = cam->param.at.z - cam->param.pos.z;
+    dir.x = cam->param.Target.x - cam->param.Campos.x;
+    dir.y = cam->param.Target.y - cam->param.Campos.y;
+    dir.z = cam->param.Target.z - cam->param.Campos.z;
     if (dir.x == 0.0f && dir.y == 0.0f && dir.z == 0.0f) {
         dir.y = 1.0f;
     }

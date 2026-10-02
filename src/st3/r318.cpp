@@ -62,23 +62,6 @@ struct R318Work {
     u32 laserSnd;            // 0xF8  laser hum SndCall handle
 };
 
-// sce_com.cpp SceElevatorData
-struct SceElevatorData {
-    s32 dir;
-    u32 objId;
-    Vec pos;
-    Vec plPos;
-    Vec plRot;
-    s32 cut;
-    u16 pad_30;
-    u16 seStart;
-    u16 pad_34;
-    u16 seStop;
-    Vec jumpPos;
-    Vec jumpRot;
-    u16 room;
-};
-
 
 // Effect sequence record tail: the second position at cEsp+0x100 (a laser beam end point).
 struct R318EspView {
@@ -89,8 +72,8 @@ struct R318EspView {
 
 static R318Work* r318_work;
 
-static SceElevatorData r318_elvArrive = {0, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 2, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
-static SceElevatorData r318_elvLeave = {1, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 0, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
+static ElevatorParam r318_elvArrive = {Ele2FArrival, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 2, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
+static ElevatorParam r318_elvLeave = {Ele2FStarting, 3, {0.0f, 0.0f, 0.0f}, {27850.0f, 826.0f, 4380.0f}, {0.0f, -1.48f, 0.0f}, 2, 0, 0, 0, 1, {3085.0f, 0.0f, -100.0f}, {0.0f, 1.35f, 0.0f}, 0x31A};
 
 // cObjScr (game/obj02.cpp) is not in a header: the callback setter of a scripted map object.
 void cObjScrSetCallBack(cObj* o, void (*func)(cObj*)) asm("SetCallBack__7cObjScrPFP4cObj_v");
@@ -126,7 +109,6 @@ static void playerDie(cPlayer* pl);
 // (bit 1); the fifteen laser emitter objects (SetObjSmd with the per-frame callback, hidden).
 void R318Init()
 {
-    void* zero = 0;
     int i;
 
 #line 86 "D:/Bio4/Prog/r318.cpp"
@@ -139,17 +121,17 @@ void R318Init()
         SceAtDataSet_exec(9, 0x12, 0, (TaskFunc) R318ExecSwitchCheck, 0, 1);
     }
     SceExec(0x12, (TaskFunc) R318AutoDoorMgr, 0, 0, 2, 0);
-    SceExec(0x12, (TaskFunc) R318AutoDoorMgr, 1, 0, 2, 0);
-    SceExec(0x12, (TaskFunc) R318AutoDoorMgr, 2, 0, 2, 0);
+    SceExec(0x12, (TaskFunc) R318AutoDoorMgr, (void*) 1, 0, 2, 0);
+    SceExec(0x12, (TaskFunc) R318AutoDoorMgr, (void*) 2, 0, 2, 0);
     SceAtDataSet_exec(1, 0x12, 0, (TaskFunc) SceElevator, &r318_elvLeave, 1);
     SceAtSetActColor(1, 1);
     if (pG->room_id_prev == 0x31A) {
-        SceExec(0x12, (TaskFunc) SceElevator, (int) &r318_elvArrive, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) SceElevator, &r318_elvArrive, 0, 2, 0);
     }
     if (RsfCheck(G_ROOM_ID, 1) == 0) {
         SceAtDataSet_exec(0xE, 0x12, 0, (TaskFunc) R318ExecSitMain, 0, 1);
     }
-    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0x2001, ESP_CORE_KIND_ROOM03, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0x2001, ESP_CORE_KIND_ROOM03, 0, 0);
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     for (i = 0; i < 15; i++) {
@@ -557,7 +539,7 @@ void R318ExecSwitchCheckEnd()
         v.y = -1.5707964f;
         pPL->setAng(&v);
     }
-    SceExec(0x12, (TaskFunc) R318EventLaserMove, 4, 0, 2, 0);
+    SceExec(0x12, (TaskFunc) R318EventLaserMove, (void*) 4, 0, 2, 0);
     SceExit();
 }
 
@@ -640,7 +622,7 @@ static void R226EventLaserStEnd()
         SndCall(6, 3, 0, 0, 0, 0);
     }
     EffectDelete(0x2001, ESP_CORE_KIND_ROOM03);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 9, 0x2001, ESP_CORE_KIND_ROOM03, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 9, 0x2001, ESP_CORE_KIND_ROOM03, zero, 0);
     SceAtSetEnable(0xA, 1);
     SceAtSetEnable(0xB, 1);
     pPL->setNoSuspend(0);
@@ -663,16 +645,16 @@ static void R318EventLaserMgr()
         if ((pG->Room_flg[2] & 0x08000000) && (pG->Room_flg[0] & 0x10000000) == 0) {
             pG->Room_flg[0] |= 0x10000000;
             R318EventLaserEnd(0);
-            SceExec(0x12, (TaskFunc) R318EventLaserMove, 1, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R318EventLaserMove, (void*) 1, 0, 2, 0);
         }
         if ((pG->Room_flg[2] & 0x04000000) && (pG->Room_flg[0] & 0x08000000) == 0) {
             pG->Room_flg[0] |= 0x08000000;
             R318EventLaserEnd(1);
-            SceExec(0x12, (TaskFunc) R318EventLaserMove, 2, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R318EventLaserMove, (void*) 2, 0, 2, 0);
         }
         if ((pG->Room_flg[2] & 0x02000000) && FlagChkSign(pG->Room_flg, 21) && FlagChkSign(pG->Room_flg, 5) == 0) {
             pG->Room_flg[0] |= 0x04000000;
-            SceExec(0x12, (TaskFunc) R318EventLaserMove, 3, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) R318EventLaserMove, (void*) 3, 0, 2, 0);
         }
         SceSleep(1);
     }
@@ -687,16 +669,13 @@ void R318LaserEspInit(int n, int type, int kind)
         cObj* laser = r318_work->laser[i];
 
         if (laser) {
-            void* zero;
-
             if (type == 0) {
                 pG->Room_flg[0] |= 0x00020000;
             }
             if (type == 2) {
                 r318_work->laserSnd = SndCall(6, 0xC, &laser->pos, 0, 0, 0);
             }
-            zero = 0;
-            EstSet(laser, -1, 0, 0, EFF_ROOM, (u8) type, 1, (u8) kind, zero, zero);
+            EstSet(laser, -1, 0, 0, EFF_ROOM, (u8) type, 1, (u8) kind, 0, 0);
         }
     }
 }
@@ -729,7 +708,7 @@ static void R318EventLaserMove(int no)
     // `(clobber (mem:BLK))` of the array (which is what keeps the tbl temporary's dead element-0 store
     // alive in flow's dead-store scan, `stw r14,0x100(r1)`).
     int zero = 0;
-    int preCnt[5] = {zero, 5, zero, zero, zero};
+    int preCnt[5] = {0, 5, 0, 0, zero};
     void* motB[3] = {ROOM_ARC_PTR(pG->pRoom, 0x62), ROOM_ARC_PTR(pG->pRoom, 0x63), ROOM_ARC_PTR(pG->pRoom, 0x64)};
     void* motC[5] = {ROOM_ARC_PTR(pG->pRoom, 0x23), ROOM_ARC_PTR(pG->pRoom, 0x24), ROOM_ARC_PTR(pG->pRoom, 0x25),
                      ROOM_ARC_PTR(pG->pRoom, 0x26), ROOM_ARC_PTR(pG->pRoom, 0x27)};
@@ -864,7 +843,7 @@ static void R318EventLaserMove(int no)
                                 r318_work->dodgeTimer = 60;
                                 pG->Room_flg[0] |= 0x00010000;
                             }
-                            ActBtn.set(ACT_GUARD, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_L_R, ACT_FUNC_SCE, zero);
+                            ActBtn.set(ACT_GUARD, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_L_R, ACT_FUNC_SCE, (void*) zero);
                             if (DodgePressed()) {
                                 pG->Room_flg[0] |= 0x00040000;
                                 SetPlDamage(0, playerEscape03);
@@ -894,7 +873,7 @@ static void R318EventLaserMove(int no)
 
                     if (p2) {
                         if (__builtin_fabsf(p2->world.x - pPL->pos.x) <= dist[no]) {
-                            ActBtn.set(ACT_GUARD, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_L_R, ACT_FUNC_SCE, mode);
+                            ActBtn.set(ACT_GUARD, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_L_R, ACT_FUNC_SCE, (void*) mode);
                             if (DodgePressed()) {
                                 pG->Room_flg[0] |= 0x00040000;
                                 switch (no) {
@@ -948,8 +927,8 @@ void R318EventLaserEnd(int no)
                 Matrix2AxisAngle(t->mat, &rot[0]);
                 Matrix2AxisAngle(p4->mat, &rot[1]);
                 if (p2->world.x != 0.0f) {
-                    EstSet(0, -1, &t->world, &rot[0], EFF_ROOM, 6, 0x801, ESP_CORE_KIND_NONE, zero, zero);
-                    EstSet(0, -1, &p4->world, &rot[1], EFF_ROOM, 7, 0x801, ESP_CORE_KIND_NONE, zero, zero);
+                    EstSet(0, -1, &t->world, &rot[0], EFF_ROOM, 6, 0x801, ESP_CORE_KIND_NONE, 0, 0);
+                    EstSet(0, -1, &p4->world, &rot[1], EFF_ROOM, 7, 0x801, ESP_CORE_KIND_NONE, zero, 0);
                 }
                 asm("" : : "r"(laser), "r"(t), "r"(p4));
             }

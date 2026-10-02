@@ -96,8 +96,8 @@ void R333Main();
 // Store one room's Init/Main pair into the DOL's St3_data_tbl (index = room number & 0xFF).
 void set(int no, void (*init)(), void (*main)())
 {
-    St3_data_tbl[no].init = init;
-    St3_data_tbl[no].main = main;
+    St3_data_tbl[no].pInit = init;
+    St3_data_tbl[no].pMain = main;
 }
 
 // Fill the stage table with every room this module compiles (missing indices are rooms that do not exist).

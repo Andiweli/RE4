@@ -45,7 +45,7 @@ void cAtariInfo::init(f32 ox, f32 oy, f32 oz, f32 rs, f32 ro, f32 ra, f32 h, int
 
 // Changes the size: mode 0 sets radius / radius2 to a / b at once; mode > 0 interpolates toward
 // a / b over `mode` frames; mode < 0 snaps to 100 / 100 first and interpolates over -mode frames.
-void cAtariInfo::set(int mode, f32 a, f32 b)
+void cAtariInfo::set(f32 a, f32 b, int mode)
 {
     if (mode < 0) {
         m_radius_n = a;

@@ -60,22 +60,22 @@ class cModel;
 class cLight;
 
 // One primitive part of a cModelData (dbmodule DrawObjWireframe): 0x20 header, then the GX-style stream.
-struct ModelPart {
+struct cPolyHeader {
     u8 pad_0[0xB];
-    u8 flags;        // 0x0B  material flags (trans shaderSetup): bit0 bump, bit1, bit2 alpha texture, bit4 specular texture in the tpl, bit7 specularSetup2
-    u8 texId;        // 0x0C  texture id (trans materialSetup)
-    u8 bumpTex;      // 0x0D  bump / indirect texture id
-    u8 alphaTex;     // 0x0E  alpha texture id
-    u8 specTex;      // 0x0F  Specular[] index (0xFF = 0)
-    u8 specR;        // 0x10  specular colour
-    u8 specG;        // 0x11
-    u8 specB;        // 0x12
-    u8 specType;     // 0x13  0: konst colour stage, 1: texture alpha
-    u8 alphaRef;     // 0x14  alpha compare reference when the model's x103 is 0xFF
-    u8 specPow;      // 0x15  specular scale (percent)
+    u8 flag;        // 0x0B  material flags (trans shaderSetup): bit0 bump, bit1, bit2 alpha texture, bit4 specular texture in the tpl, bit7 specularSetup2
+    u8 material_tex;        // 0x0C  texture id (trans materialSetup)
+    u8 bump_tex;      // 0x0D  bump / indirect texture id
+    u8 alpha_tex;     // 0x0E  alpha texture id
+    u8 specular_tex;      // 0x0F  Specular[] index (0xFF = 0)
+    u8 specular_r;        // 0x10  specular colour
+    u8 specular_g;        // 0x11
+    u8 specular_b;        // 0x12
+    u8 specular_type;     // 0x13  0: konst colour stage, 1: texture alpha
+    u8 alpha_omit;     // 0x14  alpha compare reference when the model's x103 is 0xFF
+    u8 specular_decay;      // 0x15  specular scale (percent)
     u8 pad_16;
     u8 specTexOrg;   // 0x17  specular texture id when flags bit4 is set
-    u32 size;        // 0x18  byte length of the primitive stream following the header
+    u32 buff_size;        // 0x18  byte length of the primitive stream following the header
     u32 nPoly;       // 0x1C  polygon count (debug statistics)
 };
 
@@ -99,24 +99,24 @@ struct cModelData {
     u8 pad_4[0xC - 0x4];
     void* pClr;      // 0x0C  vertex colour array (GX_VA_CLR0, RGBA8; used when flags bit31 is set)
     void* pTex;      // 0x10  texture coordinate array (GX_VA_TEX0)
-    void* pWeight;   // 0x14  skinning weights (trans MakeWeightPalette: Weight[x18] or WeightExt[x2A])
-    u8 weight_palette_num;  // 0x18  Weight entries of pWeight (trans MakeWeightPalette); <= 1 with nParts == 1: rigid, original arrays
+    void* pWeight;   // 0x14  skinning weights (trans MakeWeightPalette: Weight[x18] or cWeightExt[x2A])
+    u8 weight_palette_num;  // 0x18  cWeight entries of pWeight (trans MakeWeightPalette); <= 1 with nParts == 1: rigid, original arrays
     u8 nParts;       // 0x19  parts count (cModel::setModel copies it into cModel::nParts)
     u16 displist_num;  // 0x1A  primitive (display list) part count (dbmodule DrawObjWireframe)
-    struct ModelPart* pParts;  // 0x1C  first part header (0x20 bytes + primitive stream)
+    struct cPolyHeader* pParts;  // 0x1C  first part header (0x20 bytes + primitive stream)
     u32 flags;       // 0x20  bit31: s16 tex coords (frac 8), bit30 (0x40000000): SmxGetFlag bit1, bit29: s8 normals
     u32 nTex;        // 0x24  texture count (trans: must be <= 0xF7)
     u8 shift;        // 0x28  vertex fixed-point shift (dbmodule: scale = 1 / (1 << shift))
     u8 pad_29;
-    u16 weight_ext_num;  // 0x2A  extended weight entries (> 0xFF: pWeight is a WeightExt table)
+    u16 weight_ext_num;  // 0x2A  extended weight entries (> 0xFF: pWeight is a cWeightExt table)
     u32 shapeOfs;    // 0x2C  offset of the shape (vertex delta) table (shape.cpp)
     void* vtxOrig;   // 0x30  original vertex positions (shape.cpp ResetShape source)
     void* nrmOrig;   // 0x34  original vertex normals
     u16 nVtx;        // 0x38  vertex count (8 bytes each)
     u16 nNrm;        // 0x3A  normal count
     u32 version;     // 0x3C  0x20010801 / 0x20030817 / 0x20030818 (model.cpp: the two tables below exist from 0x20030818)
-    u32 blendTbl;    // 0x40  MotionWork::blendTbl (cModel::setJointInfo); a file offset until calcModelAddr relocates it
-    u32 flipTbl;     // 0x44  MotionWork::flip points 4 bytes into it (setJointInfo)
+    u32 blendTbl;    // 0x40  cModel::pDblJnt (setJointInfo); a file offset until calcModelAddr relocates it
+    u32 flipTbl;     // 0x44  cModel::pXFlip points 4 bytes into it (setJointInfo)
 };
 
 // Shape (morph) animation data referenced by cModelInfo::pShape (game/shape.cpp).
@@ -134,11 +134,15 @@ struct ShapeKey {
     ShapeData* data; // 0x04
 };
 
-// Bounding volume of a model (cModelInfo+0x38).
-struct ModelBound {
-    Vec min;             // 0x00
-    Vec center;          // 0x0C  light info origin (cLightInfo::init2 p0)
-    Vec size;            // 0x18  (cLightInfo::init2 p1, copied field by field to the stack)
+// Bounding volume of a model (cModelInfo+0x38). PS2's cBoundingBox has offset at 0x00 and the
+// half-extents as 3 separate scalars w/h/d, not a Vec; reproducing either change here moves
+// offset/size off the byte positions this compiler needs to keep generating the same code at
+// several call sites (db_port.cpp, ss_pzzl.cpp, t_block.cpp), so the leading 0xC stays unnamed
+// padding instead of becoming a real field.
+struct cBoundingBox {
+    u8 pad_0[0xC];
+    Vec offset;          // 0x0C  light info origin (cLightInfo::init2 p0)
+    Vec size;            // 0x18  half-extents (PS2: w/h/d, copied field by field to the stack)
 };
 
 // Per-model info block (game/model.cpp `cModelInfo`, at cModel+0x15C), a cUnit managed by
@@ -150,7 +154,7 @@ public:
     void* tpl_addr;          // 0x10  texture palette of the model (eff_sys RoomEfmRegist)
     cModelInfo* pList;   // 0x14  next parts info
     u8 pad_18[0x38 - 0x18];
-    ModelBound bound;    // 0x38
+    cBoundingBox bound;  // 0x38
     Mtx mat;             // 0x5C .. 0x8C  (cModelInfo::cModelInfo: identity; cPlBody::setKnife scales the diagonal to 0 / 1)
     union {
         u8 color[4];     // 0x8C  RGBA (word store; 0xFF fill when the RGB part is 0)
@@ -200,7 +204,7 @@ public:
     u8 Flag;         // 0x51  bits 0-1: 2 = follow the model matrix (obj04: updateMatrix each frame); hit check shape (0 cylinder, 1/3 sphere, 2 box)
     s8 PartsNo;      // 0x52  parts index + 1 the light origin follows (getPos), 0 = model
     u8 x53;          // 0x53
-    u32 SelectMask;  // 0x54  bit i: light i never applies (setModel2; scroll: SmxWork.x4)
+    u32 SelectMask;  // 0x54  bit i: light i never applies (setModel2; scroll: cSmxWork.LitSelectMask)
     Vec Offset;         // 0x58  light origin offset in the space of the coord x52 selects (shadow.cpp)
     Vec Size;        // 0x64  hit check size: x radius, y half height (cylinder), xyz box half size
     f32 Radius;      // 0x70  bounding radius from size (init2: cylinder x + y, box length, sphere x)
@@ -213,11 +217,19 @@ public:
     cCoord* getPos(cModel* m, Vec* out);  // light origin of `m` (the parts x52 - 1 selects); returns the coord it belongs to
 };
 
-// One sequence key (MotionData sequence table entry / MotionWork::key*).
-struct MotionSeqKey {
-    u16 frame;  // 0x00  motion frame in 10.6 fixed point
+// One sequence key (MotionData sequence table entry / MOTION_INFO::Seq*).
+struct SEQUENCE_DATA {
+    u16 Frame;  // 0x00  motion frame in 10.6 fixed point
     u8 Se;      // 0x02  sound number + 1 to play at this key, 0 = none (PS2 SEQUENCE_DATA.Se)
     u8 Free;    // 0x03  free bits: player sound kind (low 3 bits) / object event bits (PS2 SEQUENCE_DATA.Free)
+};
+
+// Motion sequence file (.seq): key count, flag byte, then the keys.
+struct SEQUENCE_FILE {
+    u16 Frame_num;       // 0x00  keys in the file
+    u8 Flag;             // 0x02
+    u8 Dummy;            // 0x03
+    SEQUENCE_DATA Data[0];  // 0x04
 };
 
 // Key-frame data header (the `data` given to MotionSetCore). Packed:
@@ -231,11 +243,13 @@ struct MotionData {
 struct ATTACH_CAMERA;   // cam_ctrl.h
 
 // Per-model motion work (game/motion.cpp), 0xD0 bytes: what cModel::cModel clears, what
-// a blend motion (MotionWork::blend, the enemy works' blendMot) is, and the prefix of cModel::Motion.
+// a blend motion (cModel::pMotionB, the enemy works' blendMot) is, and the prefix of cModel::Motion.
+// A cutscene camera's keyframe playback (CameraMotion::m_info, game/cam_motion.cpp) reuses the
+// same struct for its own, simpler set of tracks; see Mot_flag below.
 struct MOTION_INFO {
     MotionData* pMot;     // 0x00  NULL = no motion
     u32* pHermite_data;          // 0x04  per parts key data
-    u16 Key_hist[2][2][3];    // 0x08  root key history [flip][rot/pos][axis]
+    u16 Key_hist[4][3];       // 0x08  key history per motion parts
     f32 Mot_frame_max;         // 0x20
     f32 Mot_frame;            // 0x24
     f32 Mot_frame_sav;        // 0x28
@@ -248,7 +262,9 @@ struct MOTION_INFO {
     u16 Null_rot;       // 0x3E  motion parts index of the root rotation
     u16 Mot_attr;            // 0x40  bit0: move the model by the root speed, bit1: reverse, bit2: loop, bit3: pause, bit6: flip, bit8, bit10: hokan speed blend, bit12: sequence reverse, bit13: blend parts, bit15: frame from seqFrame
     u16 Mot_state;            // 0x42  MotionSequenceCtrl result: 1 looped, 2 looped (reverse), 4 end, 8 end (reverse)
-    u32 Mot_flag;           // 0x44  bit26: cross frame disabled, bit27: flip hist, bit28: no IK, bit29: keep blend, bit30: no matrix, bit31
+    u32 Mot_flag;           // 0x44  bit26: cross frame disabled, bit27: flip hist, bit28: no IK, bit29: keep blend, bit30: no matrix, bit31;
+                            // a camera motion (CameraSequenceCtrl) reuses this word for its own
+                            // small return code instead (1 looped, 4 end), not these bits
     Vec Pos;              // 0x48  root position (current)
     Vec Pos_old;          // 0x54
     Vec Pos_dist;         // 0x60  root position change over the whole motion
@@ -257,10 +273,10 @@ struct MOTION_INFO {
     Vec Ang;              // 0x84  root rotation (current)
     Vec Ang_old;          // 0x90
     Vec Ang_dist;         // 0x9C
-    MotionSeqKey* pSeq_top;    // 0xA8  sequence table (NULL = linear)
-    MotionSeqKey Seq;    // 0xAC  current
-    MotionSeqKey Seq_old;    // 0xB0  previous
-    MotionSeqKey Seq_old2;    // 0xB4  before previous
+    SEQUENCE_DATA* pSeq_top;    // 0xA8  sequence table (NULL = linear)
+    SEQUENCE_DATA Seq;    // 0xAC  current
+    SEQUENCE_DATA Seq_old;    // 0xB0  previous
+    SEQUENCE_DATA Seq_old2;    // 0xB4  before previous
     f32 Seq_frame;         // 0xB8  frame in sequence time
     u16 Seq_frame_num;           // 0xBC  sequence length
     u8 pad_BE[2];
@@ -270,14 +286,6 @@ struct MOTION_INFO {
     u8 pad_C6[2];
     f32 Brate;        // 0xC8  weight of this work when it is another model's blend motion
     ATTACH_CAMERA* pAttachCam;    // 0xCC
-};
-
-// cModel::Motion at cModel+0x1D8, 0xDC bytes: the motion work with the GC's three pointers after it
-// (the PS2 keeps them as cModel members pMotionB / pXFlip / pDblJnt).
-struct MotionWork : public MOTION_INFO {
-    MOTION_INFO* blend;    // 0xD0  second motion blended in by MotionMove (PS2 cModel pMotionB)
-    u16* flip;            // 0xD4  parts index remap for flipped motions
-    u16* blendTbl;        // 0xD8  {count, (dst, a, b, percent)...} quaternion blended parts
 };
 
 // One key history entry (HermiteInterpolation's search start per axis).
@@ -480,10 +488,10 @@ public:
     u8 z_mode;         // 0x12C  (TexRenderModSet sets 2)
     u8 TevScaleGroup;         // 0x12D  (pl_leon setModel sets 1)
     u8 kindid;         // 0x12E  2 = scroll (Smd) object
-    u8 ot_type;         // 0x12F  scroll: SmxWork.type2 (3 by default)
+    u8 ot_type;         // 0x12F  scroll: cSmxWork.OtType (3 by default)
     void* pCldShMd;  // 0x130  child shadow model (db_work prints it as "pCldShMd": GC vendor name; PS2 pChildShadowModel)
     u8 Shd_color;       // 0x134  (db_work "SHD COL")
-    u8 CullMode;         // 0x135  scroll: SmxWork.x3, db_work "CullMode"
+    u8 CullMode;         // 0x135  scroll: cSmxWork.CullMode, db_work "CullMode"
     u8 Shader_type;         // 0x136  TexRender: 2 while rendered to texture, 0 after
     u8 Refract_pow;         // 0x137  TexRender: 0x10
     u8 Refract_ratio;         // 0x138  TexRender: 0x90
@@ -503,7 +511,10 @@ public:
     cModelInfo* pShadowModelInfo; // 0x160  (db_work "pShMdIfo")
     cLightInfo LightInfo;  // 0x164 .. 0x1D8
 
-    MotionWork Motion;     // 0x1D8 .. 0x2B4  motion work (motion.h MOTION(m), cMotBase `m->Motion`; PS2 Motion)
+    MOTION_INFO Motion;    // 0x1D8 .. 0x2A8  motion work (cMotBase `m->Motion`; PS2 Motion)
+    MOTION_INFO* pMotionB; // 0x2A8  second motion blended in by MotionMove
+    u16* pXFlip;           // 0x2AC  parts index remap for flipped motions
+    u16* pDblJnt;          // 0x2B0  {count, (dst, a, b, percent)...} quaternion blended parts
     cAtariInfo atari;          // 0x2B4 .. 0x300  (rect size at 0x2C0/0x2C4)
     Vec* inscreen_pos;                  // 0x300  (cModel::cModel clears it)
     u32 pPath;                  // 0x304  (cModel::cModel clears it)
@@ -596,15 +607,15 @@ static inline void SetAngV(cModel* m, Vec* v) { m->setAng(v); }
 // SetAngY` does the same: game/model, exception, t_bugcheck, r205, db_light, db_mod swap two `lis` of pool
 // labels). The rooms that need it keep a per-file SetAngY (r315, r31c, r321).
 
-// game/model.cpp (C linkage): parts `no` of a parts list (NULL when out of range).
-extern "C" cParts* GetPartsAddr(cParts* pList, u32 idx);
-// game/model.cpp (C linkage): relocate a TPL's file offsets to pointers (trans SpecularInit).
-extern "C" void calcTplAddr(struct TEXPalette* tpl);
-// game/model.cpp (C linkage): the inverse, pointers back to file offsets (mes.cpp releases the font TPL).
-extern "C" void calcTplOffset(struct TEXPalette* tpl);
+// game/model.cpp: parts `no` of a parts list (NULL when out of range).
+cParts* GetPartsAddr(cParts* pList, u32 idx);
+// game/model.cpp: relocate a TPL's file offsets to pointers (trans SpecularInit).
+void calcTplAddr(struct TEXPalette* tpl);
+// game/model.cpp: the inverse, pointers back to file offsets (mes.cpp releases the font TPL).
+void calcTplOffset(struct TEXPalette* tpl);
 
 // game/model.cpp: shows / hides model info `no` of `m` (the rooms hide the player's weapon models).
-extern "C" void ModelInfoSetTrans(cModel* m, int no, int on);
+void ModelInfoSetTrans(cModel* m, int no, int on);
 // game/model.cpp: turns on the reflection flag of model info `no` (r11b: the water render targets).
 void ModelInfoRefrectOn(cModel* pMod, int modelInfoNo);
 

@@ -14,18 +14,12 @@
 #define ID_PATH_MAX 0x40
 #define ID_CURVE_MAX 0x40
 
-// FuncPathData with room for ID_PATH_MAX control points (0x308 bytes).
+// FUNC_PATH_PTR with room for ID_PATH_MAX control points (0x308 bytes).
 struct IdPathData {
     s8 k;              // 0x00
     u8 pad_1[6];
     s8 n;              // 0x07
     Vec pos[ID_PATH_MAX];  // 0x08
-};
-
-// Hermite1 with room for ID_CURVE_MAX keys (0x404 bytes).
-struct IdCurve {
-    s32 num;                    // 0x00
-    HermiteKey key[ID_CURVE_MAX];  // 0x04
 };
 
 // One editable interface element (0x17D0 bytes, 0xC0 of them in idData[]). Derives from cCoord so
@@ -69,10 +63,10 @@ public:
     u8 pad_1A1[7];
     IdPathData path0;    // 0x1A8
     IdPathData path1;    // 0x4B0
-    IdCurve curve0;      // 0x7B8
-    IdCurve curve1;      // 0xBBC
-    IdCurve curve2;      // 0xFC0
-    IdCurve curve3;      // 0x13C4
+    HERMITE_1_FIX curve0;      // 0x7B8
+    HERMITE_1_FIX curve1;      // 0xBBC
+    HERMITE_1_FIX curve2;      // 0xFC0
+    HERMITE_1_FIX curve3;      // 0x13C4
     u8 x17C8[8];         // 0x17C8
 
     virtual ~ID_DATA() {}
@@ -120,8 +114,8 @@ struct IdTool {
     u8 drawSafe;        // 0x5F
     u8 dispTop;         // 0x60  edit list drawn at the top rows
     u8 pad_61[3];
-    DbPathWork* pPath;  // 0x64
-    DbSctrlWork* pSctrl;  // 0x68
+    DB_PATH* pPath;  // 0x64
+    DB_SCTRL* pSctrl;  // 0x68
     IdRandomWork* pRandom;  // 0x6C
     CAMERA camSave;     // 0x70 .. 0x168
     s8 colCur;          // 0x168
@@ -143,7 +137,6 @@ struct IdTool {
     u8 markUse[0x100];  // 0x184
 };
 
-extern "C" {
 void toolIdDrawSafeZone(IdTool* w);
 void toolIdSubMenuPosition(IdTool* w);
 void toolIdDataInit(ID_DATA* d);
@@ -183,7 +176,6 @@ void toolIdFocusReset(IdTool* w, ID_DATA* d);
 void toolIdCalcVertex(ID_DATA* d);
 void toolIdMarkUseReset(IdTool* w);
 int DbRandom(IdRandomWork* w, int x, int y);
-}
 
 void ToolInterfaceDesign();
 

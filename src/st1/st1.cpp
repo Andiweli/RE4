@@ -73,8 +73,8 @@ void R120Main();
 // Store one room's Init/Main pair into the DOL's St1_data_tbl (index = room number & 0xFF).
 void set(int no, void (*init)(), void (*main)())
 {
-    St1_data_tbl[no].init = init;
-    St1_data_tbl[no].main = main;
+    St1_data_tbl[no].pInit = init;
+    St1_data_tbl[no].pMain = main;
 }
 
 // Fill the stage table with every room this module compiles (missing indices are rooms that do not exist).

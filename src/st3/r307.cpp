@@ -157,7 +157,6 @@ void R307Init()
     if (getRoomEtcWindow(0xB, &win, 1)) {
         win->SetEnableFence(0, 0);
     }
-    void* zero = 0;
     if (RsfCheck(G_ROOM_ID, 1) == 0) {
         SceAtDataSet_exec(3, 0x12, 0, (TaskFunc) r307_execEmCut, 0, 1);
     }
@@ -171,7 +170,7 @@ void R307Init()
         if (obj) {
             obj->be_flag &= ~2;
         }
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, 0, 0);
         if (r307_emDead(0x32) == 0) {
             SceExec(0x12, (TaskFunc) r307_checkBgm, 0, 0, 2, 0);
         }
@@ -213,11 +212,10 @@ int r307_checkPiece()
     }
     for (i = 0; i < 9; i++) {
         if (r307_work->done[i] == 1) {
-            void* zero = 0;
             R307_EFF_DELETE(r307_work->eff[i]);
             R307_EFF_DELETE(r307_work->eff2[i]);
-            EstSet(0, -1, &r307_piece[i].pos, 0, EFF_ROOM, r307_effDone[r307_piece[i].no][r307_work->rot.rot[i]], 1, (u8) r307_work->eff[i], zero, zero);
-            EstSet(0, -1, &r307_piece[i].pos, 0, EFF_ROOM, 0x18, 1, (u8) r307_work->eff2[i], zero, zero);
+            EstSet(0, -1, &r307_piece[i].pos, 0, EFF_ROOM, r307_effDone[r307_piece[i].no][r307_work->rot.rot[i]], 1, (u8) r307_work->eff[i], 0, 0);
+            EstSet(0, -1, &r307_piece[i].pos, 0, EFF_ROOM, 0x18, 1, (u8) r307_work->eff2[i], 0, 0);
         }
     }
     if (ok != 1) {
@@ -285,11 +283,10 @@ void r307_initPiece()
     memclr_asm(r307_work->done, 9);
     memclr_asm(r307_work->x85, 9);
     for (k = 0; k < 9; k++) {
-        void* zero = 0;
         int no = r307_piece[k].no;
         u8 eff = r307_effPiece[no][r307_work->rot.rot[k]];
 
-        EstSet(0, -1, &r307_piece[k].pos, 0, EFF_ROOM, eff, 1, (u8) r307_work->eff[k], zero, zero);
+        EstSet(0, -1, &r307_piece[k].pos, 0, EFF_ROOM, eff, 1, (u8) r307_work->eff[k], 0, 0);
     }
     EstSet(0, -1, 0, 0, EFF_ROOM, 0x17, 1, (u8) r307_work->effTerm, 0, 0);
 }
@@ -347,7 +344,7 @@ static void r307_checkPuzzleTerminal()
             void* zero = 0;
 
             RsfSet(G_ROOM_ID, 2);
-            KyfFlagOn(pG, KYF_ST1_06);
+            KyfFlagOn(pG, KYF_ST3_06);
             SceAtSetEnable(5, 0);
             SceAtSetEnable(9, 0);
             SceSleep(10);
@@ -359,7 +356,7 @@ static void r307_checkPuzzleTerminal()
             if (r307_work->barred) {
                 SceSleep(10);
                 R307_EFF_DELETE(r307_work->effBarred);
-                EstSet(r307_work->barred, -1, 0, 0, EFF_ROOM, 2, 1, (u8) r307_work->effBarred, zero, zero);
+                EstSet(r307_work->barred, -1, 0, 0, EFF_ROOM, 2, 1, (u8) r307_work->effBarred, zero, 0);
                 SndCall(6, 7, 0, 0, 0, 0);
                 SceSleep(30);
                 r307_work->barred->setLockMode(0);
@@ -379,7 +376,6 @@ static void r307_checkPuzzleTerminal()
 // (Room_flg bit 2), the per-piece effect kinds pulled; solved -> area 9 off and the open-door effect.
 void r307_initPuzzle()
 {
-    void* zero = 0;
     u32 k;
 
     r307_work->effBarred = EspPullCoreKind();
@@ -388,7 +384,7 @@ void r307_initPuzzle()
         SceAtDataSet_exec(5, 0x12, 0, (TaskFunc) r307_checkPuzzleTerminal, 0, 1);
         if (r307_work->barred) {
             r307_work->barred->setLockMode(1);
-            EstSet(r307_work->barred, -1, 0, 0, EFF_ROOM, 1, 1, (u8) r307_work->effBarred, zero, zero);
+            EstSet(r307_work->barred, -1, 0, 0, EFF_ROOM, 1, 1, (u8) r307_work->effBarred, 0, 0);
         }
         for (k = 0; k < 9; k++) {
             r307_work->eff[k] = EspPullCoreKind();
@@ -398,7 +394,7 @@ void r307_initPuzzle()
     } else {
         SceAtSetEnable(9, 0);
         if (r307_work->barred) {
-            EstSet(r307_work->barred, -1, 0, 0, EFF_ROOM, 3, 1, (u8) r307_work->effBarred, zero, zero);
+            EstSet(r307_work->barred, -1, 0, 0, EFF_ROOM, 3, 1, (u8) r307_work->effBarred, 0, 0);
         }
     }
 }
@@ -484,7 +480,6 @@ void r307_setEmAppear()
 // Area 1: the regenerator comes out of its cell.
 static void r307_appearEm()
 {
-    void* zero = 0;
     cObj* obj;
 
     RsfSet(G_ROOM_ID, 0);
@@ -497,7 +492,7 @@ static void r307_appearEm()
     if (obj) {
         obj->be_flag &= ~2;
     }
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, 0, 0);
     cEmWrap em;
     em.setPtr(0x32, -1, 1);
     em.setNoSuspend(1);

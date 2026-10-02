@@ -31,12 +31,10 @@ Flt03Work flt03;
 
 static const f32 level_tbl3[32] = { 0.008f, 0.008f, 0.008f, 0.008f, 0.008f, 0.016f, 0.008f, 0.016f };
 
-extern "C" {
 void Filter03Render();
 void Filter03GetEFB(int div, int div2);
 void Filter03GXDraw(f32 x, f32 y, f32 z, f32 u, f32 v, u8 r, u8 g, u8 b, u8 a, f32 s, int div, int fmt);
 static void Filter03DrawBuffer();
-}
 
 // Boot: forgets the buffer.
 void Filter03Init()
@@ -214,10 +212,10 @@ static void Filter03DrawBuffer()
     GXSetVtxAttrFmt(0, 13, 1, 4, 0);
     zero = 0.0f;
     GXSetZMode(0, 6, 0);
-    y = zero;
-    x = zero;
-    px = zero;
-    py = zero;
+    y = 0.0f;
+    x = 0.0f;
+    px = 0.0f;
+    py = 0.0f;
     z = 65530.0f;
     Filter03GetEFB(1, 1);
     Filter03GXDraw(px, py, z, 0.0f, 0.0f, 0xFF, 0xFF, 0xFF, 0xFF, 2.0f, 1, 1);

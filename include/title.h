@@ -67,6 +67,6 @@ struct TitleArc {
 };
 #define TITLE_ARC_PTR(arc, no) ((void*) ((arc)->ofs[no] + (u32) (arc)))
 
-extern "C" void Title_task();
+void Title_task();
 
 #endif

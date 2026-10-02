@@ -33,12 +33,10 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 int Esp06GetPathPos(cEsp06* esp);
 void esp06_CommonMove(cEsp06* esp);
 void esp06_Move00(cEsp06* esp);
 void esp06_Move01(cEsp06* esp);
-}
 
 static void (*Esp06MoveTbl[])(cEsp06*) = { esp06_Move00, esp06_Move01 };
 

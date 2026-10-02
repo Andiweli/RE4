@@ -191,7 +191,7 @@ void R207Init()
     r207_work->em[8].em.setEm(0xD9, -1, 0, 1, 1);
     r207_work->em[9].em.setEm(0xDA, -1, 0, 1, 1);
     SceSetItemEvent(3, 0x83, 2, 5, r207_ShelfOpen, r207_ShelfOpened, 0, 0);
-    SceSetItemEvent(4, 0x84, 3, 6, r207_ShelfOpen, r207_ShelfOpened, 1, 0);
+    SceSetItemEvent(4, 0x84, 3, 6, r207_ShelfOpen, r207_ShelfOpened, (void*) 1, 0);
     SceExec(0x12, (TaskFunc) r207_StrCheck, 0, 0, SCE_PRIO_DEF_2, 0);
     if (RsfCheck(G_ROOM_ID, 10) == 0) {
         SceExec(0x12, (TaskFunc) r207_openTerm, 0, 0, SCE_PRIO_DEF_2, 0);
@@ -314,7 +314,7 @@ void r207_EmMoveCk()
     } else {
         return;
     }
-    SceExec(0x12, (TaskFunc) r207_GotoPos, (int) e, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r207_GotoPos, e, 0, SCE_PRIO_DEF_2, 0);
     r207_work->timer = 150;
 }
 
@@ -733,7 +733,6 @@ void r207_SetSword(int which, int mode)
 // Both swords swapped: the wall slides open.
 static void r207_WallMove()
 {
-    void* zero = 0;
     cObj* obj;
     void* bin;
     void* tpl;
@@ -744,14 +743,14 @@ static void r207_WallMove()
     SceAtSetEnable(0x87, 0);
     SceAtSetEnable(0xD, 0);
     SceAtSetEnable(0xE, 0);
-    r207_work->item1 = (cObj*) zero;
+    r207_work->item1 = 0;
     if (ItemGetBinTplAddr(0xC4, &bin, &tpl) == 1) {
         r207_work->item1 = SetObj00(bin, tpl, &r207_work->wallOfs, &r207_wallRot);
         OyaSetObj00(r207_work->item1, obj, 0);
         r207_work->item1->setNoSuspend(1);
         SceSleep(1);
     }
-    r207_work->item0 = (cObj*) zero;
+    r207_work->item0 = 0;
     if (ItemGetBinTplAddr(0x80, &bin, &tpl) == 1) {
         r207_work->item0 = SetObj00(bin, tpl, &r207_swordPos, &r207_swordRot);
         SceSleep(1);
@@ -760,7 +759,7 @@ static void r207_WallMove()
     CamCtrl.CutCall(3);
     SceSetEventCancel(1, (TaskFunc) r207_WallMoveEndProc, 0, -1, 1);
     RoomSeCall(0, &obj->pos, 0, 0, obj);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, 0, 0);
     while (obj->pos.z < -9500.0f) {
         obj->pos.z += 30.0f;
         obj->matUpdate();

@@ -19,23 +19,23 @@ public:
     int GetXmlStart(char** pOut, const char* pIn, const char* pName);
     int GetXmlNext(char** pOut, const char* pIn, const char* pName);
     int GetXmlElem(char* pOut, const char* pIn, const char* pName);
-    int SetXmlStart(int* pOut, char* pIn);
-    int SetXmlEnd(int* pOut, char* pIn);
-    int SetXmlElemStart(int* size, char* buf);
-    int SetXmlElemEnd(int* size, char* buf);
-    int SetXmlElem(int* pOut, char* pIn, const char* pName, const char* pText);
+    int SetXmlStart(char** pOut, char* pIn);
+    int SetXmlEnd(char** pOut, char* pIn);
+    int SetXmlElemStart(char** pOut, char* pIn, char* pName);
+    int SetXmlElemEnd(char** pOut, char* pIn, char* pName);
+    int SetXmlElem(char** pOut, char* pIn, const char* pName, const char* pText);
 
     // Element with an integer value (printed decimal).
-    int SetXmlElem(int* size, char* buf, const char* name, long value)
+    int SetXmlElem(char** pOut, char* pIn, const char* name, long value)
     {
         char tmp[32];
         sprintf(tmp, "%ld", value);
-        return SetXmlElem(size, buf, name, tmp);
+        return SetXmlElem(pOut, pIn, name, tmp);
     }
     // Element with a boolean value ("true" / "false").
-    int SetXmlElem(int* size, char* buf, const char* name, bool value)
+    int SetXmlElem(char** pOut, char* pIn, const char* name, bool value)
     {
-        return SetXmlElem(size, buf, name, value ? "true" : "false");
+        return SetXmlElem(pOut, pIn, name, value ? "true" : "false");
     }
     // Reads a boolean element ("true" in any case); 0 when the element is missing.
     int GetXmlElem(bool* out, const char* src, const char* tag)
@@ -65,28 +65,28 @@ inline int ReadXml(const char* name, char* buf, int max, int size)
 }
 
 // Writes the twelve fields of a tool "Node" record, all with the same `value` (a template).
-inline void WriteNode(XmlSimple* xml, int* size, char* buf, const char* value)
+inline void WriteNode(XmlSimple* xml, char** pOut, char* pIn, const char* value)
 {
-    xml->SetXmlElem(size, buf, "Node", value);
-    xml->SetXmlElem(size, buf, "SetFlg", value);
-    xml->SetXmlElem(size, buf, "SetOwner", value);
-    xml->SetXmlElem(size, buf, "SetEdit", value);
-    xml->SetXmlElem(size, buf, "NamePac", value);
-    xml->SetXmlElem(size, buf, "CutNo", value);
-    xml->SetXmlElem(size, buf, "Frame", value);
-    xml->SetXmlElem(size, buf, "ComFlag", value);
-    xml->SetXmlElem(size, buf, "SetBin", value);
-    xml->SetXmlElem(size, buf, "SetTpl", value);
-    xml->SetXmlElem(size, buf, "Dat0", value);
-    xml->SetXmlElem(size, buf, "Dat1", value);
+    xml->SetXmlElem(pOut, pIn, "Node", value);
+    xml->SetXmlElem(pOut, pIn, "SetFlg", value);
+    xml->SetXmlElem(pOut, pIn, "SetOwner", value);
+    xml->SetXmlElem(pOut, pIn, "SetEdit", value);
+    xml->SetXmlElem(pOut, pIn, "NamePac", value);
+    xml->SetXmlElem(pOut, pIn, "CutNo", value);
+    xml->SetXmlElem(pOut, pIn, "Frame", value);
+    xml->SetXmlElem(pOut, pIn, "ComFlag", value);
+    xml->SetXmlElem(pOut, pIn, "SetBin", value);
+    xml->SetXmlElem(pOut, pIn, "SetTpl", value);
+    xml->SetXmlElem(pOut, pIn, "Dat0", value);
+    xml->SetXmlElem(pOut, pIn, "Dat1", value);
 }
 
 // Writes the default cut / name / frame fields of a node.
-inline void WriteDefaultNode(XmlSimple* xml, int* size, char* buf)
+inline void WriteDefaultNode(XmlSimple* xml, char** pOut, char* pIn)
 {
-    xml->SetXmlElem(size, buf, "CutNo", "3");
-    xml->SetXmlElem(size, buf, "NamePac", "\203\201\203b\203Z\201[\203W");  // "message" (SJIS)
-    xml->SetXmlElem(size, buf, "Frame", "0");
+    xml->SetXmlElem(pOut, pIn, "CutNo", "3");
+    xml->SetXmlElem(pOut, pIn, "NamePac", "\203\201\203b\203Z\201[\203W");  // "message" (SJIS)
+    xml->SetXmlElem(pOut, pIn, "Frame", "0");
 }
 
 // Checks a loaded data file was found (error logged); 1 when usable.

@@ -194,7 +194,7 @@ void damageBlow(cPlayer* pEm)
         if (n) {
             EstSet(pEm, -1, 0, 0, EFF_PL00, ChkWaterEffectEnable(&pEm->pos) ? 0xE : 0xD, 0, ESP_CORE_KIND_NONE, pEm, 0);
         } else {
-            EstSet(pEm, -1, 0, 0, EFF_PL00, ChkWaterEffectEnable(&pEm->pos) ? 6 : 5, 0, ESP_CORE_KIND_NONE, pEm, (void*) n);
+            EstSet(pEm, -1, 0, 0, EFF_PL00, ChkWaterEffectEnable(&pEm->pos) ? 6 : 5, 0, ESP_CORE_KIND_NONE, pEm, 0);
         }
         if (pEm->m_Fwork0 != 123.0f) {
             ang = Muku2(pEm->ang.y, pEm->m_Fwork0, PI);
@@ -225,7 +225,7 @@ void damageBlow(cPlayer* pEm)
             splash = pEm->m_Work2;
             if (splash == 0 && GetWaterHeight(&pEm->pList->world, &wh) && pEm->pList->world.y < wh + 400.0f) {
                 pEm->m_Work2 = 1;
-                EstSet(pEm, -1, 0, 0, EFF_ROOM, 0x24, 0, ESP_CORE_KIND_NONE, pEm, (void*) splash);
+                EstSet(pEm, -1, 0, 0, EFF_ROOM, 0x24, 0, ESP_CORE_KIND_NONE, pEm, 0);
             }
         }
         if (pEm->motionMove()) {
@@ -323,7 +323,7 @@ void Pl_R0_Die(cPlayer* pEm)
     case 0:
         pEm->beginDamage();
         MotionSetCore(pEm, &pEm->Motion, PL_ARC_PTR(pG->pPlayer, 0x4C), (void*) (pG->pPlayer->ofs[0x4D] + (u32) pG->pPlayer), 5, 1, 0);
-        EstSet(pEm, -1, 0, 0, EFF_PL00, ChkWaterEffectEnable(&pEm->pos) ? 4 : 3, 0, ESP_CORE_KIND_NONE, pEm, (void*) no);
+        EstSet(pEm, -1, 0, 0, EFF_PL00, ChkWaterEffectEnable(&pEm->pos) ? 4 : 3, 0, ESP_CORE_KIND_NONE, pEm, 0);
         pEm->dmg.m_Timer |= 0x80;
         if (pEm->Body->m_pHead) {
             SndCall(1, 0xD, &pEm->getPartsPtr(4)->world, 0, 0, 0);

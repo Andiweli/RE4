@@ -107,8 +107,8 @@ public:
     void getParam(f32* zoom_ratio, f32* x_radian);
     void getTrajectory(Vec* p_pos0, Vec* p_pos1)
     {
-        *p_pos0 = param.pos;
-        *p_pos1 = param.at;
+        *p_pos0 = param.Campos;
+        *p_pos1 = param.Target;
     }
 };
 

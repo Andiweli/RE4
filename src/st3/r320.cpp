@@ -152,17 +152,17 @@ static inline void r320_heriSet()
     }
 }
 
-extern "C" void emset(int idx, int no);
-extern "C" void setMisileUseNum(int num);
-extern "C" int getMisileUseNum();
-extern "C" void addMisileUseNum();
+void emset(int idx, int no);
+void setMisileUseNum(int num);
+int getMisileUseNum();
+void addMisileUseNum();
 static void em_all_destroy_task();
 static void r320_heri_event();
-extern "C" void scr_delete();
-extern "C" void scr_set();
-extern "C" u32 getHeriTimeWait(int no);
-extern "C" void SetHeriTargetEm();
-extern "C" int setChange(int idx, int no, int idx2, int no2);
+void scr_delete();
+void scr_set();
+u32 getHeriTimeWait(int no);
+void SetHeriTargetEm();
+int setChange(int idx, int no, int idx2, int no2);
 static void appear_a();
 static void appear_b_exit();
 static void appear_b();
@@ -173,17 +173,17 @@ static void appear_e();
 static void appear_f_exit();
 static void appear_f();
 static void appear_g();
-extern "C" void reva_common_move(cObj* obj, f32 from, f32 to);
+void reva_common_move(cObj* obj, f32 from, f32 to);
 static void reva_b_down();
 static void reva_c_down();
-extern "C" void Gatling2_set();
+void Gatling2_set();
 static void switch1_move();
 static void switch2_move();
 static void switch3_move();
 static void slide_move();
-extern "C" void gate1_open(int no);
-extern "C" void gate1_close();
-extern "C" void gate2_open();
+void gate1_open(int no);
+void gate1_close();
+void gate2_open();
 static void gate2_close();
 static void attack_heri0();
 static void attack_heri1();
@@ -199,7 +199,7 @@ static void destroy_5();
 static void destroy_6();
 static void Evt_R320S00_Func(Event* e);
 static void Evt_R320S01_Func(Event* e);
-extern "C" void deleteFarEm(int dist);
+void deleteFarEm(int dist);
 static void em_lastset();
 static void door_open();
 static void door_opened();
@@ -534,21 +534,21 @@ void R320Init()
     SmdGetObjPtr(0x30)->be_flag |= 0x20;
     if ((R320_SAVE_FLAGS & 0x00010000) == 0) {
         SceAtDataSet_exec(0x1B, 0x12, 0, (TaskFunc) switch1_move, 0, 1);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_ROOM01, 0, 0);
     } else {
         SmdGetObjPtr(0x2E)->pList->ang.z = -1.24f;
-        EstSet(0, -1, 0, 0, EFF_ROOM, 8, 1, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 8, 1, ESP_CORE_KIND_ROOM01, (void*) zero, 0);
         gate1_open(1);
     }
     int zero2 = 0;
     if ((R320_SAVE_FLAGS & 0x8000) == 0) {
         SceAtDataSet_exec(0x1C, 0x12, 0, (TaskFunc) switch2_move, 0, 1);
     }
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_ROOM02, (void*) zero2, (void*) zero2);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_ROOM02, 0, 0);
     if ((R320_SAVE_FLAGS & 0x4000) == 0) {
         SceAtDataSet_exec(0x1D, 0x12, 0, (TaskFunc) switch3_move, 0, 1);
     }
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0xC, 1, ESP_CORE_KIND_ROOM03, (void*) zero2, (void*) zero2);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0xC, 1, ESP_CORE_KIND_ROOM03, (void*) zero2, 0);
     {
         cObj* o = SmdGetObjPtr(0x2B);
 
@@ -1315,7 +1315,7 @@ static void appear_f_exit()
 static void appear_f()
 {
     cEm3d* heri;
-    SceAtWork* at;
+    SCE_AT_DATA* at;
     u32 i;
 
     R320_SAVE_FLAGS |= 0x00040000;
@@ -1582,7 +1582,7 @@ static void switch1_move()
     EffectEspDelete(1, ESP_CORE_KIND_ROOM01, 0, 0);
     EffectEspgenDelete(1, ESP_CORE_KIND_ROOM01, 0);
     EffectEfmDelete(1, ESP_CORE_KIND_ROOM01, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 1, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 1, ESP_CORE_KIND_ROOM01, (void*) zero, 0);
     SndCall(6, 0x14, 0, 0, 0, 0);
     SceSleep(0xF);
     gate1_open(0);
@@ -1605,7 +1605,7 @@ static void switch2_move()
     EffectEspDelete(1, ESP_CORE_KIND_ROOM02, 0, 0);
     EffectEspgenDelete(1, ESP_CORE_KIND_ROOM02, 0);
     EffectEfmDelete(1, ESP_CORE_KIND_ROOM02, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_ROOM02, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_ROOM02, (void*) zero, 0);
     SndCall(6, 0x14, 0, 0, 0, 0);
     SceSleep(0xF);
     if (R320_SAVE_FLAGS & 0x4000) {
@@ -1628,7 +1628,7 @@ static void switch3_move()
     EffectEspDelete(1, ESP_CORE_KIND_ROOM03, 0, 0);
     EffectEspgenDelete(1, ESP_CORE_KIND_ROOM03, 0);
     EffectEfmDelete(1, ESP_CORE_KIND_ROOM03, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0xC, 1, ESP_CORE_KIND_ROOM03, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0xC, 1, ESP_CORE_KIND_ROOM03, (void*) zero, 0);
     SndCall(6, 0x14, 0, 0, 0, 0);
     SceSleep(0xF);
     if (R320_SAVE_FLAGS & 0x8000) {
@@ -1691,7 +1691,7 @@ void gate1_open(int no)
 {
     cObj* o;
 
-    KyfFlagOn(pG, KYF_ST1_20);
+    KyfFlagOn(pG, KYF_ST3_19);
     scr_set();
     o = SmdGetObjPtr(0x2A);
     o->be_flag |= 0x20;
@@ -1742,7 +1742,7 @@ void gate2_open()
 {
     cObj* o;
 
-    KyfFlagOn(pG, KYF_ST1_19);
+    KyfFlagOn(pG, KYF_ST3_18);
     RmfFlagOn(pG, RMF_GATE2_OPEN);
     SceEventStart(1);
     CamCtrl.CutCall(0x16);
@@ -1925,7 +1925,7 @@ static void destroy_0()
         PlWepHitCheck2(0, &r320_posA[0], &r320_posA[0], 0x12, 3, 7000.0f);
         Vec pos = {59934.0f, 11941.0f, 27319.0f};
         Vec rot = {0.0f, -0.4537856f, 0.0f};
-        EstSet(0, -1, &pos, &rot, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+        EstSet(0, -1, &pos, &rot, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, (void*) zero, 0);
         SmdSetTrans(0x1F, 0);
         SceSleep(0x1E);
         while (CamCtrl.IsMotionEnd() == 0) {
@@ -1980,8 +1980,8 @@ static void destroy_1()
 // Gun tower 2 destroyed (as destroy_1).
 static void destroy_2()
 {
-    SceAtWork* at;
-    SceAtWork* w;
+    SCE_AT_DATA* at;
+    SCE_AT_DATA* w;
 
     while (!RmfFlagChk(pG, RMF_TARGET_DESTROY)) {
         SceSleep(1);
@@ -1999,7 +1999,7 @@ static void destroy_2()
     CamCtrl.CutCall(9);
     Vec pos = {59514.0f, 11200.0f, 16319.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
-    EstSet(0, -1, &pos, &rot, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, &pos, &rot, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, (void*) zero, 0);
     SmdSetTrans(0x21, 0);
     SceSleep(0x1E);
     while (CamCtrl.IsMotionEnd() == 0) {
@@ -2017,8 +2017,8 @@ static void destroy_2()
     }
     w = sceAtSetOtStart();
     while ((w = sceAtGetOtAddr(w)) != 0) {
-        if (w->type == 3) {
-            if (AreaHitCheck(&at->area, &w->dstPos)) {
+        if (w->id == 3) {
+            if (AreaHitCheck(&at->area, &w->door.next_pos)) {
                 SceAtSetEnable(w->no, 0);
             }
         }
@@ -2056,7 +2056,7 @@ static void destroy_3()
     CamCtrl.CutCall(0xB);
     Vec pos = {79324.0f, 15600.0f, 4458.0f};
     Vec rot = {0.0f, 0.34906584f, 0.0f};
-    EstSet(0, -1, &pos, &rot, EFF_ROOM, 5, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, &pos, &rot, EFF_ROOM, 5, 1, ESP_CORE_KIND_NONE, (void*) zero, 0);
     SmdSetTrans(9, 0);
     SmdSetTrans(0x10, 0);
     SceSleep(0x1E);
@@ -2088,7 +2088,7 @@ static void destroy_4()
     CamCtrl.CutCall(0x1A);
     Vec pos = {42666.0f, 9445.0f, -14165.0f};
     Vec rot = {0.0f, -0.41887903f, 0.0f};
-    EstSet(0, -1, &pos, &rot, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, &pos, &rot, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, (void*) zero, 0);
     PlWepHitCheck2(0, &pos, &pos, 0x12, 3, 7000.0f);
     SmdSetTrans(0x16, 0);
     SceSleep(0x1E);
@@ -2127,7 +2127,7 @@ static void destroy_5()
     CamCtrl.CutCall(0x18);
     Vec pos = {31723.0f, 10563.0f, 2719.0f};
     Vec rot = {0.0f, -4.2184606f, 0.0f};
-    EstSet(0, -1, &pos, &rot, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, &pos, &rot, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, (void*) zero, 0);
     PlWepHitCheck2(0, &pos, &pos, 0x12, 3, 7000.0f);
     SmdSetTrans(0x17, 0);
     SceSleep(0x1E);
@@ -2161,7 +2161,7 @@ static void destroy_6()
     CamCtrl.CutCall(0x19);
     Vec pos = {25412.0f, 13235.0f, -14502.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
-    EstSet(0, -1, &pos, &rot, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, &pos, &rot, EFF_ROOM, 0, 1, ESP_CORE_KIND_NONE, (void*) zero, 0);
     PlWepHitCheck2(0, &pos, &pos, 0x12, 3, 7000.0f);
     SmdSetTrans(0x18, 0);
     SceSleep(0x1E);
@@ -2241,12 +2241,12 @@ static void Evt_R320S00_Func(Event* e)
         break;
     }
     case 2: {
-        SmdWork* w = SmdGetWorkPtr(0x22);
+        cSmdWork* w = SmdGetWorkPtr(0x22);
 
         obj = SmdGetObjPtr(0x22);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0x22, 0);
         SmdSetTrans(0x28, 1);
@@ -2410,12 +2410,12 @@ static void Evt_R320S01_Func(Event* e)
         break;
     }
     case 2: {
-        SmdWork* w = SmdGetWorkPtr(0x22);
+        cSmdWork* w = SmdGetWorkPtr(0x22);
 
         obj = SmdGetObjPtr(0x22);
         if (obj && w) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0x22, 0);
         SmdSetTrans(0x28, 1);
@@ -2485,12 +2485,12 @@ static void door_open()
     int zero = 0;
     u32 i;
 
-    KyfFlagOn(pG, KYF_ST1_21);
+    KyfFlagOn(pG, KYF_ST3_20);
     R320_SAVE_FLAGS |= 0x200;
     EffectEspDelete(1, ESP_CORE_KIND_ROOM04, 0, 0);
     EffectEspgenDelete(1, ESP_CORE_KIND_ROOM04, 0);
     EffectEfmDelete(1, ESP_CORE_KIND_ROOM04, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x14, 1, ESP_CORE_KIND_ROOM04, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x14, 1, ESP_CORE_KIND_ROOM04, (void*) zero, 0);
     SndCall(6, 0x14, 0, 0, 0, 0);
     SceAtSetEnable(0x2C, 0);
     SceEventStart(1);

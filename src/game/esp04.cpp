@@ -26,10 +26,8 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 void move00(cEsp04* esp);
 void move10(cEsp04* esp);
-}
 
 static void (*func_tbl[])(cEsp04*) = { move00, move10 };
 
@@ -159,7 +157,7 @@ void move10(cEsp04* esp)
 
 // EspTransTbl[0x04]: ortho projection, then draws the quad grid (542 / sx + 2 columns and / or
 // 448 / sy + 2 rows when repeating, starting one tile off screen) with the whole texture per tile.
-extern "C" void Esp04_Trans(cEsp04* esp)
+void Esp04_Trans(cEsp04* esp)
 {
     ESP04_WK* w = &esp->m_Free;
     cAnm* anm;

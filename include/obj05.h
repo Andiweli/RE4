@@ -4,12 +4,13 @@
 #include "types.h"
 #include "vec.h"
 #include "obj.h"
+#include "esp.h"
 
 // Effect model with loose parts (game/obj05.cpp `Efm05`): the obj04 scale / colour fade with the
 // parts burst parameters; each parts keeps its own state in cParts (Kaboom_flg / Kaboom_spd /
 // Kaboom_ang_spd).
 struct OBJ05_FREE {
-    EfmCore Eff_core;       // 0x00
+    cEffectCore Eff_core;   // 0x00
     Vec Ang_plus;           // 0x0C  added to rot every frame
     f32 Size_base_x;        // 0x18
     f32 Size_base_y;        // 0x1C

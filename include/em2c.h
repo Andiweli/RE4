@@ -46,7 +46,7 @@ struct Em2cWork {
     Vec startPos;         // 0x38C (0x76C)  pos at init
     Vec startRot;         // 0x398 (0x778)  rot at init
     u8 pad_3A4[8];
-    PlCloth cloth;        // 0x3AC (0x78C)  tail cloth chain (em2cClothSet)
+    CLOTH_INFO cloth;        // 0x3AC (0x78C)  tail cloth chain (em2cClothSet)
     f32 plDir;            // 0x40C (0x7EC)  em2cGetPlDir towards the player's head
     f32 plDirAbs;         // 0x410 (0x7F0)
     CAMERA cam;           // 0x414 (0x7F4)  escape camera (em2cEscapeCamMove)
@@ -79,7 +79,7 @@ struct Em2cWork {
     f32 blendVal;         // 0x5B8 (0x998)  signed blend weight of the two-motion blend (em2cBlendMotSet: sign picks the motion)
     int blendCnt;         // 0x5BC (0x99C)  counts down; its low byte is the MotionSetCore frame argument
     int blendSeq;         // 0x5C0 (0x9A0)  wraps at Motion.Seq_frame_num; its low half is the MotionSetCore last argument
-    MOTION_INFO blendMot;  // 0x5C4 (0x9A4)  second motion work (cModel::Motion.blend)
+    MOTION_INFO blendMot;  // 0x5C4 (0x9A4)  second motion work (cModel::pMotionB)
     void* blendM0;        // 0x694 (0xA74)  walk blend motions (em2c_R1_Walk / Dash: em2cBlendMotSet arguments)
     void* blendM1;        // 0x698 (0xA78)
     void* blendM2;        // 0x69C (0xA7C)
@@ -99,7 +99,6 @@ struct Em2cWork {
 };
 
 #define EM2C_WK(em) ((Em2cWork*) (((cEm2c*) (em))->free))
-#define EM2C_BLEND_MOT(w) ((MotionWork*) &(w)->blendMot)
 
 class cEm2c : public cEm {
 public:

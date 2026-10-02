@@ -276,7 +276,6 @@ void cEm2f::move()
 static void em2f_R0_Init(cEm2f* em)
 {
     Em2fWork* w = EM2F_WK(em);
-    int zero;
     u32 i;
 
     switch (em->type) {
@@ -305,7 +304,6 @@ static void em2f_R0_Init(cEm2f* em)
     AtariInit(&em->atari, 0.0f, 0.0f, 0.0f, 700.0f, 3500.0f, 3500.0f, 2000.0f, 1, 2, 0);   // COMPILER-DIFF: #1
     YarareInit(em, 0.0f, -200.0f, 0.0f, 1200.0f, 1000.0f, 9, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[0], 0.0f, -200.0f, 0.0f, 1200.0f, 1400.0f, 2, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
-    zero = 0;
     YarareAdd(em, &w->hit[1], 0.0f, -100.0f, 0.0f, 1400.0f, 1400.0f, 4, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[2], 0.0f, -200.0f, 0.0f, 1200.0f, 700.0f, 6, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[3], 0.0f, 0.0f, 0.0f, 700.0f, 1400.0f, 0x19, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
@@ -313,25 +311,25 @@ static void em2f_R0_Init(cEm2f* em)
     YarareAdd(em, &w->hit[5], 0.0f, 0.0f, 0.0f, 700.0f, 600.0f, 0x1C, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     YarareAdd(em, &w->hit[6], 0.0f, 0.0f, -600.0f, 500.0f, 600.0f, 0x1D, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     em->hp = 1000;
-    em->Motion.flip = em2f_flip_tbl;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->pXFlip = em2f_flip_tbl;
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     EspDataLoad((u32) ARC(EM2F_EFF_008), EFF_EM2F, 0);
-    w->flags = zero;
+    w->flags = 0;
     w->x580 = em->pos.y;
     w->x584 = 0.0f;
-    w->x5C9 = zero;
-    w->x5CB = zero;
+    w->x5C9 = 0;
+    w->x5CB = 0;
     w->effTimer1 = 30;
     w->effTimer2 = 3;
     w->effTimer3 = 3;
     w->atkCnt = Rnd() % 3 + 1;
     // the zero's dying store (pBoat, written last) is issued first, the rest in source order
-    w->seTimer1 = zero;
-    w->seTimer2 = zero;
-    w->seTimer3 = zero;
-    w->sndId1 = zero;
-    w->sndId2 = zero;
-    w->pBoat = (cEm*) zero;
+    w->seTimer1 = 0;
+    w->seTimer2 = 0;
+    w->seTimer3 = 0;
+    w->sndId1 = 0;
+    w->sndId2 = 0;
+    w->pBoat = 0;
     w->rndFlag = Rnd() & 1;
     for (i = 0; i < 6; i++) {
         w->pTentacle[i] = 0;
@@ -352,7 +350,7 @@ static void em2f_R0_Init(cEm2f* em)
         em->r_no_1 = 0;
         em->r_no_2 = 0;
         em->r_no_3 = 0;
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), 0, 0, 0x401, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), 0, 0, 0x401, 0);
         MotionMove(em, 0);
         break;
     case 1:
@@ -362,7 +360,7 @@ static void em2f_R0_Init(cEm2f* em)
         em->scale.y = 2.0f;
         em->scale.z = 2.0f;
         em->setRno(1, 2, 0, 0);
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), 0, 0, 0x401, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), 0, 0, 0x401, 0);
         MotionMove(em, 0);
         break;
     case 2:
@@ -374,7 +372,7 @@ static void em2f_R0_Init(cEm2f* em)
         em->atari.m_flag &= ~0x300;
         em->atari.m_flag |= 8;
         em->setRno(1, 0xA, 0, 0);
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), 0, 0, 0x401, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), 0, 0, 0x401, 0);
         MotionMove(em, 0);
         break;
     }
@@ -403,7 +401,7 @@ static void em2f_R1_Wait(cEm2f* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), 0, 10, 0x405, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), 0, 10, 0x405, 0);
         em->r_no_2++;
     case 1:
         MotionMove(em, 0);
@@ -418,7 +416,7 @@ static void em2f_R1_Walk(cEm2f* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_009), 0, 10, 0x405, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_009), 0, 10, 0x405, 0);
         em->r_no_2++;
     case 1:
         em->ang.y += Muku(&em->pos, &w->targetPos, em->ang.y, PI / 32.0f);
@@ -440,7 +438,7 @@ static void em2f_R1_SwimWait(cEm2f* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), 0, 0, 1, 0);
         MotionMove(em, 0);
         em->be_flag &= ~2;
         em->r_no_2++;
@@ -470,7 +468,7 @@ static void em2f_R1_Swim(cEm2f* em)
     switch (em->r_no_2) {
     case 0:
         em->atari.m_flag &= ~0x100;
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 30, flip, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 30, flip, 0);
         w->waitTimer = Rnd() % 90 + 90;
         w->x424 = 0;
         w->x420 = 10;
@@ -498,13 +496,13 @@ static void em2f_R1_Swim(cEm2f* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00E), ARC(EM2F_SEQ_01F), 30, flip, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00E), ARC(EM2F_SEQ_01F), 30, flip, 0);
         EstSet(em, -1, 0, 0, EFF_EM2F, 0xC, 0, w->espKind, em, 0);
         w->timer = 80;
         em->r_no_2++;
         goto swim;  // the target's case 2 runs the swim step too (tails cross-jumped into case 4's)
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM), ARC(EM2F_SEQ_SWIM), 30, flip, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM), ARC(EM2F_SEQ_SWIM), 30, flip, 0);
         EstSet(em, -1, 0, 0, EFF_EM2F, 4, 0, w->espKind, em, 0);
         w->timer = 80;
         em->r_no_2++;
@@ -593,18 +591,18 @@ static void em2f_R1_SwimTurn90(cEm2f* em)
     case 0:
         if (Muku(&em->pos, &w->nextPos, em->ang.y, PI) < 0.0f) {
             if (w->flags & 0x20) {
-                MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN90_010), ARC(EM2F_SEQ_SWIM_TURN90_021), 30, flip, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN90_010), ARC(EM2F_SEQ_SWIM_TURN90_021), 30, flip, 0);
             } else {
-                MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN90_00F), ARC(EM2F_SEQ_SWIM_TURN90_020), 30, flip, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN90_00F), ARC(EM2F_SEQ_SWIM_TURN90_020), 30, flip, 0);
             }
             if (!(w->flags & 0x10)) {
                 EstSet(em, -1, 0, 0, EFF_EM2F, 1, 0, w->espKind, em, 0);
             }
         } else {
             if (w->flags & 0x20) {
-                MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN90_00F), ARC(EM2F_SEQ_SWIM_TURN90_020), 30, flip, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN90_00F), ARC(EM2F_SEQ_SWIM_TURN90_020), 30, flip, 0);
             } else {
-                MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN90_010), ARC(EM2F_SEQ_SWIM_TURN90_021), 30, flip, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN90_010), ARC(EM2F_SEQ_SWIM_TURN90_021), 30, flip, 0);
             }
             if (!(w->flags & 0x10)) {
                 EstSet(em, -1, 0, 0, EFF_EM2F, 0xD, 0, w->espKind, em, 0);
@@ -638,11 +636,11 @@ static void em2f_R1_SwimTurn180(cEm2f* em)
     switch (em->r_no_2) {
     case 0:
         if (w->flags & 0x10) {
-            MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN180_01A), ARC(EM2F_SEQ_SWIM_TURN180_02B), 30, flip, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN180_01A), ARC(EM2F_SEQ_SWIM_TURN180_02B), 30, flip, 0);
             w->flags &= ~0x10;
             EstSet(em, -1, 0, 0, EFF_EM2F, 0x12, 0, w->espKind, em, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN180_019), ARC(EM2F_SEQ_SWIM_TURN180_02A), 30, flip, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN180_019), ARC(EM2F_SEQ_SWIM_TURN180_02A), 30, flip, 0);
             w->flags |= 0x10;
             EstSet(em, -1, 0, 0, EFF_EM2F, 0x11, 0, w->espKind, em, 0);
         }
@@ -674,16 +672,16 @@ static void em2f_R1_SwimTurn180Atk(cEm2f* em)
             w->atkCnt--;
         }
         if (w->flags & 0x10) {
-            MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN180_ATK_018), ARC(EM2F_SEQ_SWIM_TURN180_ATK_029), 30, flip, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN180_ATK_018), ARC(EM2F_SEQ_SWIM_TURN180_ATK_029), 30, flip, 0);
             EstSet(em, -1, 0, 0, EFF_EM2F, 0x10, 0, w->espKind, em, 0);
         } else if (Rnd() & 3) {
-            MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN180_ATK_016), ARC(EM2F_SEQ_SWIM_TURN180_ATK_027), 30, flip, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN180_ATK_016), ARC(EM2F_SEQ_SWIM_TURN180_ATK_027), 30, flip, 0);
             EstSet(em, -1, 0, 0, EFF_EM2F, 0xE, 0, w->espKind, em, 0);
         } else if (Rnd() & 1) {
-            MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN180_ATK_013), ARC(EM2F_SEQ_SWIM_TURN180_ATK_024), 30, flip, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN180_ATK_013), ARC(EM2F_SEQ_SWIM_TURN180_ATK_024), 30, flip, 0);
             EstSet(em, -1, 0, 0, EFF_EM2F, 9, 0, w->espKind, em, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_SWIM_TURN180_ATK_014), ARC(EM2F_SEQ_SWIM_TURN180_ATK_025), 30, flip, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_SWIM_TURN180_ATK_014), ARC(EM2F_SEQ_SWIM_TURN180_ATK_025), 30, flip, 0);
             EstSet(em, -1, 0, 0, EFF_EM2F, 8, 0, w->espKind, em, 0);
         }
         w->flags &= ~0x10;
@@ -718,7 +716,7 @@ static void em2f_R1_RisingDragon(cEm2f* em)
     case 0:
         em2fSetPosBetweenBoat(em);
         w->flags &= ~0x20;
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 0);
         w->timer = 149;
         w->timer2 = 15;
         w->risingOk = 0;
@@ -750,7 +748,7 @@ static void em2f_R1_RisingDragon(cEm2f* em)
             SndRoomStrStart(1, 3, 1);
             w->flags &= ~0x200;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 75);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 75);
         w->flags |= 0x10;
         w->timer = 170;
         em->r_no_2++;
@@ -764,7 +762,7 @@ static void em2f_R1_RisingDragon(cEm2f* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_RISING_DRAGON), ARC(EM2F_SEQ_RISING_DRAGON), 10, 0x401, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_RISING_DRAGON), ARC(EM2F_SEQ_RISING_DRAGON), 10, 0x401, 0);
         w->flags &= ~0x10;
         EstSet(em, -1, 0, 0, EFF_EM2F, 7, 0, w->espKind, em, 0);
         w->timer = 0;
@@ -823,7 +821,7 @@ static void em2f_R1_Packman(cEm2f* em)
     case 0:
         em2fSetPosBetweenBoat(em);
         w->flags &= ~0x20;
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 0);
         w->timer = 149;
         w->risingOk = 0;
         w->timer2 = 15;
@@ -855,7 +853,7 @@ static void em2f_R1_Packman(cEm2f* em)
             SndRoomStrStart(1, 3, 1);
             w->flags &= ~0x200;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 0);
         w->flags |= 0x10;
         w->timer = 180;
         em->r_no_2++;
@@ -869,7 +867,7 @@ static void em2f_R1_Packman(cEm2f* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_017), ARC(EM2F_SEQ_028), 10, 0x401, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_017), ARC(EM2F_SEQ_028), 10, 0x401, 0);
         w->flags &= ~0x10;
         EstSet(em, -1, 0, 0, EFF_EM2F, 0xF, 0, w->espKind, em, 0);
         w->timer = 0;
@@ -910,7 +908,7 @@ static void em2f_R1_Packman(cEm2f* em)
         }
         break;
     case 6:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00E), ARC(EM2F_SEQ_01F), 30, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00E), ARC(EM2F_SEQ_01F), 30, 1, 0);
         EstSet(em, -1, 0, 0, EFF_EM2F, 0xC, 0, w->espKind, em, 0);
         em->r_no_2++;
     case 7:
@@ -948,7 +946,7 @@ static void em2f_R1_HideMode(cEm2f* em)
     }
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_HIDE_MODE_01C), ARC(EM2F_SEQ_HIDE_MODE_02D), 30, flip, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_HIDE_MODE_01C), ARC(EM2F_SEQ_HIDE_MODE_02D), 30, flip, 0);
         w->flags &= ~0x20;
         w->atkCnt = Rnd() % 3 + 1;
         w->timer = 120;
@@ -968,7 +966,7 @@ static void em2f_R1_HideMode(cEm2f* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), ARC(EM2F_SEQ_01D), 0, 5, 0);
         w->flags |= 0x10;
         w->timer = Rnd() % 90 + 90;
         em->r_no_2++;
@@ -984,7 +982,7 @@ static void em2f_R1_HideMode(cEm2f* em)
     case 4:
         em2fSetPosHideMode(em);
         w->hideRush = 0;
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_HIDE_MODE_032), ARC(EM2F_SEQ_HIDE_MODE_034), 30, flip, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_HIDE_MODE_032), ARC(EM2F_SEQ_HIDE_MODE_034), 30, flip, 0);
         em->be_flag |= 2;
         SndRoomStrStart(1, 3, 1);
         w->flags &= ~0x200;
@@ -998,7 +996,7 @@ static void em2f_R1_HideMode(cEm2f* em)
         }
         break;
     case 6:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_009), ARC(EM2F_SEQ_HIDE_MODE_033), 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_009), ARC(EM2F_SEQ_HIDE_MODE_033), 30, 5, 0);
         SndCall(8, 0x1A, &em->pos, em->id, 0, em);
         SndCall(8, 0x1C, &em->pos, em->id, 0, em);
         w->flags &= ~0x10;
@@ -1016,7 +1014,7 @@ static void em2f_R1_HideMode(cEm2f* em)
         }
         break;
     case 8:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_017), ARC(EM2F_SEQ_028), 10, 0x401, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_017), ARC(EM2F_SEQ_028), 10, 0x401, 0);
         w->flags &= ~0x10;
         EstSet(em, -1, 0, 0, EFF_EM2F, 0xF, 0, w->espKind, em, 0);
         w->timer2 = 90;
@@ -1037,7 +1035,7 @@ static void em2f_R1_HideMode(cEm2f* em)
         }
         break;
     case 0xA:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00E), ARC(EM2F_SEQ_01F), 30, flip, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00E), ARC(EM2F_SEQ_01F), 30, flip, 0);
         EstSet(em, -1, 0, 0, EFF_EM2F, 0x16, 0, w->espKind, em, 0);
         w->timer2 = 90;
         em->r_no_2++;
@@ -1077,7 +1075,7 @@ static void em2f_R1_Critical(cEm2f* em)
         v.z = -35742.0f;
         PSMTXMultVecSR(m, &v, &v);
         PSVECAdd(&em2f_die_pos, &v, &em->pos);
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_00A), 0, 0, 0x405, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_00A), 0, 0, 0x405, 0);
         MotionMove(em, 0);
         em->be_flag &= ~2;
         w->timer = 5;
@@ -1118,7 +1116,7 @@ static void em2f_R1_Critical(cEm2f* em)
         w->camAt.z = 22609.0f;
         w->timer = 3;
         w->timer2 = 15;
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_CRITICAL), ARC(EM2F_SEQ_CRITICAL), 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_CRITICAL), ARC(EM2F_SEQ_CRITICAL), 0, 1, 0);
         EstSet(em, -1, 0, 0, EFF_EM2F, 0x13, 0, w->espKind, em, 0);
         em->r_no_2++;
     case 3:
@@ -1162,13 +1160,13 @@ void em2fCriCamMove(cEm2f* em)
     CAMERA* cam;
     Vec v;
 
-    PosToPos(&c->param.pos, &w->camPos, &em2f_cri_cam.param.pos, 0.1f);
-    PosToPos(&c->param.at, &w->camAt, &em2f_cri_cam.param.at, 0.1f);
+    PosToPos(&c->param.Campos, &w->camPos, &em2f_cri_cam.param.Campos, 0.1f);
+    PosToPos(&c->param.Target, &w->camAt, &em2f_cri_cam.param.Target, 0.1f);
     v.x = fRand1_1() * 50.0f;
     v.y = fRand1_1() * 50.0f;
     v.z = fRand1_1() * 50.0f;
-    PSVECAdd(&em2f_cri_cam.param.pos, &v, &em2f_cri_cam.param.pos);
-    PSVECAdd(&em2f_cri_cam.param.at, &v, &em2f_cri_cam.param.at);
+    PSVECAdd(&em2f_cri_cam.param.Campos, &v, &em2f_cri_cam.param.Campos);
+    PSVECAdd(&em2f_cri_cam.param.Target, &v, &em2f_cri_cam.param.Target);
     {
         // cam BEFORE the pos/at pointers: its lo_sum finds no register for em2f_cri_cam+N (the call
         // arguments were hard regs) and stays a fresh lis/addi; the pointers then reuse the call
@@ -1177,12 +1175,12 @@ void em2fCriCamMove(cEm2f* em)
         Vec* at;
         f32 dx, dy, dz;
         cam = &em2f_cri_cam;
-        pos = &em2f_cri_cam.param.pos;
-        at = &em2f_cri_cam.param.at;
+        pos = &em2f_cri_cam.param.Campos;
+        at = &em2f_cri_cam.param.Target;
         dx = pos->x - at->x;
         dy = pos->y - at->y;
         dz = pos->z - at->z;
-        cam->param.fovy = c->param.fovy;
+        cam->param.Fovy = c->param.Fovy;
         cam->Up.x = 0.0f;
         cam->Up.y = 1.0f;
         cam->Up.z = 0.0f;
@@ -1206,7 +1204,7 @@ static void em2f_R1_Dm_Normal(cEm2f* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_009), 0, 3, 0x401, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_009), 0, 3, 0x401, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -1236,7 +1234,7 @@ static void em2f_R1_Die_Normal(cEm2f* em)
     switch (em->r_no_2) {
     case 0:
         em2fSetPosDie(em);
-        MotionSetCore(em, MOTION(em), ARC(EM2F_MOT_DIE_NORMAL), 0, 0, 0x401, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM2F_MOT_DIE_NORMAL), 0, 0, 0x401, 0);
         pl = pPL;
         pl->r_no_1 = 0xF;
         pl->r_no_2 = 0xC;

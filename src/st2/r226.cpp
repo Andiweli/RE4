@@ -65,29 +65,12 @@ struct R226Work {
 };
 
 
-// sce_com.cpp SceElevatorData
-struct SceElevatorData {
-    s32 dir;
-    u32 objId;
-    Vec pos;
-    Vec plPos;
-    Vec plRot;
-    s32 cut;
-    u16 pad_30;
-    u16 seStart;
-    u16 pad_34;
-    u16 seStop;
-    Vec jumpPos;
-    Vec jumpRot;
-    u16 room;
-};
-
 
 static R226Work* r226_work;
 static CAMERA r226_cam;
 
-static SceElevatorData r226_elvArrive = {0, 0, {0.0f, 0.0f, 0.0f}, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, -1, 0, 0xE, 0, 0xF, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 0x225};
-static SceElevatorData r226_elvLeave = {1, 0, {0.0f, 0.0f, 0.0f}, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0xE, 0, 0xD, 0, 0xF, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 0x225};
+static ElevatorParam r226_elvArrive = {Ele2FArrival, 0, {0.0f, 0.0f, 0.0f}, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, -1, 0, 0xE, 0, 0xF, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 0x225};
+static ElevatorParam r226_elvLeave = {Ele2FStarting, 0, {0.0f, 0.0f, 0.0f}, {-3300.0f, 5000.0f, 22200.0f}, {0.0f, 3.14f, 0.0f}, 0xE, 0, 0xD, 0, 0xF, {80130.0f, 1500.0f, -22530.0f}, {0.0f, -1.6f, 0.0f}, 0x225};
 
 int R226EmNo[13] = {0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBF, 0xC0};
 int R226EmIdx[14] = {3, 4, 5, 6, 7, 8, 9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 0x3C};
@@ -142,7 +125,7 @@ void playerRunCamDiePassage(cPlayer* pl);
 // COMPILER-DIFF: 1 -- the original's prologue copies `fmr f31,f1` before `mr r28,r6` (FP parameter copy
 // before the trailing int one); ours orders the copies by parameter order, so the definition declares
 // `dist` before `idx` (same argument registers) under the original mangled name as a C symbol.
-extern "C" void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, u32 flagNo, f32 dist, int idx);
+void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, u32 flagNo, f32 dist, int idx);
 #define playerPillarDownCk(robo, smdNo, flagNo, idx, dist) playerPillarDownCk__FP8cObjRoboiUlif(robo, smdNo, flagNo, dist, idx)
 static void playerPillarDownTask(int smdNo);
 
@@ -192,7 +175,7 @@ void R226Init()
     if (!(SysFlagChk(pG, SYS_CONTINUE) && RsfCheck(G_ROOM_ID, 17))) {
         if (!SysFlagChk(pG, SYS_LOAD_GAME)) {
             if (pG->room_id_prev == 0x225) {
-                SceExec(0x12, (TaskFunc) SceElevator, (int) &r226_elvArrive, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) SceElevator, &r226_elvArrive, 0, SCE_PRIO_DEF_2, 0);
             }
         }
     }
@@ -359,7 +342,7 @@ void R226Main()
         RsfClear(G_ROOM_ID, 7);
     }
     if (Joy[2].trg & 0x200) {
-        SceExec(0x12, (TaskFunc) R226EventPassageSwitchMain, 1, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) R226EventPassageSwitchMain, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         RsfClear(G_ROOM_ID, 8);
     }
     if (Joy[2].trg & 0x800) {
@@ -485,9 +468,9 @@ static void R226EventRoboStartMain()
     CamCtrl.CutCall(8);
     EstSet(0, -1, 0, 0, EFF_ROOM, 0x1F, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     r226_work->str = SndStrPlayBlock(1, 0x2B, 0.0f);
-    SceExec(0x12, (TaskFunc) R226EventRoboStartMainSub, 0x3D, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) R226EventRoboStartMainSub, (void*) 0x3D, 0, SCE_PRIO_DEF_2, 0);
     SceSleep(30);
-    SceExec(0x12, (TaskFunc) R226EventRoboStartMainSub, 0x3E, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) R226EventRoboStartMainSub, (void*) 0x3E, 0, SCE_PRIO_DEF_2, 0);
     SceSleep(60);
     SceSleep(10);
     while (CamCtrl.IsMotionEnd() == 0) {
@@ -609,7 +592,7 @@ static void R226EventPassageSwitchMain(int side)
     }
     SceAtSetEnable(atNo, 0);
     SceEventStart(1);
-    SceSetEventCancel(1, (TaskFunc) R226EventPassageSwitchEnd, side, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) R226EventPassageSwitchEnd, (void*) side, -1, 1);
     CamCtrl.CutCall(cut);
     o = SmdGetObjPtr(objAng);
     if (o) {
@@ -1154,7 +1137,7 @@ static void playerRunMovePassage(cPlayer* pl)
             RmfFlagOff(pG, RMF_PILLAR_ESCAPE_ING);
             if (RmfFlagChk(pG, RMF_PILLAR_ESCAPE_LAST)) {
                 pl->r_no_2 = 5;
-                SceExec(0x12, (TaskFunc) R226EventRoboWalkPassageGoal, (int) robo, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) R226EventRoboWalkPassageGoal, robo, 0, SCE_PRIO_DEF_2, 0);
                 EndPlDamage();
             } else {
                 pl->r_no_2 = 1;
@@ -1346,7 +1329,7 @@ static void playerRunDieBridge(cPlayer* pl)
     switch (pl->r_no_2) {
     case 0:
         MotionSetCore(pl, &pl->Motion, ROOM_ARC_PTR(pG->pRoom, 0x36), 0, 3, 1, 0);
-        CamCtrl.MotionSet(ROOM_ARC_PTR(pG->pRoom, 0x60), 0, 0.0f);
+        CamCtrl.MotionSet(ROOM_ARC_PTR(pG->pRoom, 0x60), 0.0f, 0);
         pG->pl_life = 0;
         pl->atari.off();
         PlSetDamageSe(0xA);
@@ -1378,15 +1361,15 @@ void playerRunCamMovePassage(cPlayer* pl, f32 t)
     Vec pos;
     Vec at;
 
-    cam->param.fovy = r226_fovyPassage;
+    cam->param.Fovy = r226_fovyPassage;
     PSMTXMultVec(pl->mat, &r226_camOfsPos, &pos);
     PSMTXMultVec(pl->mat, &r226_camOfsAt, &at);
-    PosToPos(&g->Camera.param.at, &at, &r226_cam.param.at, t);
-    PosToPos(&g->Camera.param.pos, &pos, &r226_cam.param.pos, t);
+    PosToPos(&g->Camera.param.Target, &at, &r226_cam.param.Target, t);
+    PosToPos(&g->Camera.param.Campos, &pos, &r226_cam.param.Campos, t);
     cam->Up.x = 0.0f;
     cam->Up.y = 1.0f;
     cam->Up.z = 0.0f;
-    cam->Distance = VEC_DIST(&r226_cam.param.pos, &r226_cam.param.at);
+    cam->Distance = VEC_DIST(&r226_cam.param.Campos, &r226_cam.param.Target);
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }
@@ -1399,7 +1382,7 @@ void playerRunCamMoveBridge(cPlayer* pl, f32 t)
     Vec pos;
     Vec at;
 
-    cam->param.fovy = r226_fovyBridge;
+    cam->param.Fovy = r226_fovyBridge;
     if (RmfFlagChk(g, RMF_BRIDGE_ST_00)) {
         r226_work->camPos.x += r226_camSpdPos.x;
         r226_work->camPos.y += r226_camSpdPos.y;
@@ -1410,12 +1393,12 @@ void playerRunCamMoveBridge(cPlayer* pl, f32 t)
     }
     PSMTXMultVec(pl->mat, &r226_work->camPos, &pos);
     PSMTXMultVec(pl->mat, &r226_work->camAt, &at);
-    PosToPos(&g->Camera.param.at, &at, &r226_cam.param.at, t);
-    PosToPos(&g->Camera.param.pos, &pos, &r226_cam.param.pos, t);
+    PosToPos(&g->Camera.param.Target, &at, &r226_cam.param.Target, t);
+    PosToPos(&g->Camera.param.Campos, &pos, &r226_cam.param.Campos, t);
     cam->Up.x = 0.0f;
     cam->Up.y = 1.0f;
     cam->Up.z = 0.0f;
-    cam->Distance = VEC_DIST(&r226_cam.param.pos, &r226_cam.param.at);
+    cam->Distance = VEC_DIST(&r226_cam.param.Campos, &r226_cam.param.Target);
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }
@@ -1427,20 +1410,20 @@ void playerRunCamDiePassage(cPlayer* pl)
     GLOBAL_WK* g = pG;
     cParts* parts;
 
-    cam->param.fovy = r226_fovyDie;
+    cam->param.Fovy = r226_fovyDie;
     parts = pl->getPartsPtr(0);
-    PosToPos(&g->Camera.param.at, &parts->world, &r226_cam.param.at, 1.0f);
-    cam->param.pos = g->Camera.param.pos;
+    PosToPos(&g->Camera.param.Target, &parts->world, &r226_cam.param.Target, 1.0f);
+    cam->param.Campos = g->Camera.param.Campos;
     cam->Up.x = 0.0f;
     cam->Up.y = 1.0f;
     cam->Up.z = 0.0f;
-    cam->Distance = VEC_DIST(&r226_cam.param.pos, &r226_cam.param.at);
+    cam->Distance = VEC_DIST(&r226_cam.param.Campos, &r226_cam.param.Target);
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }
 
 // Starts the pillar `smdNo` falling once the player passed it by `dist`.
-extern "C" void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, u32 flagNo, f32 dist, int idx)
+void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, u32 flagNo, f32 dist, int idx)
 {
     FREE_ROBO* rw = ROBO_WK(robo);
 
@@ -1450,7 +1433,7 @@ extern "C" void playerPillarDownCk__FP8cObjRoboiUlif(cObjRobo* robo, int smdNo, 
         if (o) {
             if (pPL->pos.x < o->pos.x + dist) {
                 rw->ActBtnType = idx;
-                SceExec(0x12, (TaskFunc) playerPillarDownTask, smdNo, 6, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) playerPillarDownTask, (void*) smdNo, 6, SCE_PRIO_DEF_2, 0);
                 FlagOnVar(&pG->Room_flg, (u32) flagNo);
             }
         }

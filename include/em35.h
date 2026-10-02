@@ -51,8 +51,8 @@ struct Em35Work {
     cEm* pTarget;         // 0x67C (0xA5C)  pPL
     CAMERA cam;           // 0x680 (0xA60)  event camera (em35EscapeCamMove / em35StampCamMove)
     f32 neckAng;          // 0x778 (0xB58)  smoothed neck yaw (em35NeckMove)
-    PlCloth cloth1;       // 0x77C (0xB5C)  em35ClothSet / em35ClothMove (type 1 tail)
-    PlCloth cloth2;       // 0x7DC (0xBBC)  em35ClothSet2 / ClothSet3 (the hanging skin)
+    CLOTH_INFO cloth1;       // 0x77C (0xB5C)  em35ClothSet / em35ClothMove (type 1 tail)
+    CLOTH_INFO cloth2;       // 0x7DC (0xBBC)  em35ClothSet2 / ClothSet3 (the hanging skin)
     f32 scaleAng;         // 0x83C (0xC1C)  em35ScaleMove phase
     cModelInfo* pInfo;    // 0x840 (0xC20)  extra model (type 0)
     cObj* pWeak[4];       // 0x844 (0xC24)  weak point objects (em35WeakInit, obj00)
@@ -65,7 +65,7 @@ struct Em35Work {
     f32 blendRate;        // 0x86C (0xC4C)  em35BlendMotSet weight (-255..255)
     int blendA;           // 0x870 (0xC50)  interpolation frames left
     u32 blendB;           // 0x874 (0xC54)  frame counter of the blended motion
-    MOTION_INFO blendMot;  // 0x878 (0xC58)  the blend motion work (cModel::Motion.blend)
+    MOTION_INFO blendMot;  // 0x878 (0xC58)  the blend motion work (cModel::pMotionB)
     s16 effTimer;         // 0x948 (0xD28)  frames until the next upper body effect
     u16 seTimer;          // 0x94A (0xD2A)  frames until the next voice
     u8 atkHit;            // 0x94C (0xD2C)  the attack hit the player

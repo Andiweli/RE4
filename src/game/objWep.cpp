@@ -20,11 +20,9 @@
 // Player weapon object: the model the player holds, its mode dispatch (stay / ready / fire /
 // down / reload / drop), the laser sight and the debug collision display.
 
-extern "C" {
 void Draw_line3d_local_222(Vec* p0, Vec* p1, Mtx mtx, u32 color, int blend);
 void Draw_line3d_222(Vec* p0, Vec* p1, u32 color, int blend);
 void drawPoint(Vec& lpos, Vec& lcross);
-}
 
 // Common weapon object setup: no collision, a 500-unit light, no motions yet, all three display
 // types shown.
@@ -308,7 +306,7 @@ void drawPoint(Vec& lpos, Vec& lcross)
     if (EspEstSetSelect(EFF_CORE, 0x50, 0, &esp, 1) != 1) {
         return;
     }
-    PSVECSubtract(&pG->Camera.param.pos, &lcross, &d);
+    PSVECSubtract(&pG->Camera.param.Campos, &lcross, &d);
     dist = PSVECMag(&d);
     if (StaFlagChk(pG, STA_BIG_MARKER) || pG->stage_no == 2 && pG->room_no == 0x2C ||
         pG->stage_no == 2 && pG->room_no == 0x28) {

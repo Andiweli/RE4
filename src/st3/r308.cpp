@@ -65,23 +65,22 @@ static void SceBgmCheck();
 // watcher; the card key door (area 4 + key watcher) and the barred door per flags; the battle stream.
 void R308Init()
 {
-    void* zero = 0;
     cEmBarred* barred;
 
 #line 54 "D:/Bio4/Prog/r308.cpp"
     r308_work = (R308Work*) MEM_CALLOC(sizeof(R308Work), 1, 0xd);
-    SceSetItemEvent(3, 0x80, 1, 3, OpenBoxTreasure, OpenedBoxTreasure, 0x80, 1);
+    SceSetItemEvent(3, 0x80, 1, 3, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x80, 1);
     r308_work->se = -1;
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
         SceAtDataSet_exec(1, 0x12, 0, (TaskFunc) R308SwitchMain, 0, 1);
         SceAtSetEnable(3, 0);
         SceAtSetEnable(2, 1);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM00, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM00, 0, 0);
         r308_work->se = SndCall(6, 2, 0, 0, 0, 0);
     } else {
         SceAtSetEnable(3, 1);
         SceAtSetEnable(2, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x2001, ESP_CORE_KIND_ROOM01, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
     }
     EmReadSearch((u8) GetEmIdFromList(0x58), 0, 0);
     if (RsfCheck(G_ROOM_ID, 2) == 0) {
@@ -356,20 +355,18 @@ void R308EnemyDieEnd()
 // Area 1: the switch on the container.
 static void R308SwitchMain()
 {
-    void* zero = 0;
-
     SceEventStart(1);
     R308_EFF_DELETE(2);
     R308_EFF_DELETE(3);
     R308_EFF_DELETE(5);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0x2001, ESP_CORE_KIND_ROOM02, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0x2001, ESP_CORE_KIND_ROOM02, 0, 0);
     CamCtrl.CutCall(2);
     SceMesSet(0, 0x20, 1, 0x64, 0x150 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
     if (SceMesGetSelection() != 1) {
         R308_EFF_DELETE(3);
         R308_EFF_DELETE(4);
         R308_EFF_DELETE(5);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM00, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM00, 0, 0);
         CamCtrl.Comeback(0);
         SceEventEnd(0);
         SceExit();

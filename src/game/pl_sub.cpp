@@ -310,7 +310,7 @@ void EndPlDamage()
     pl->subArc = pl->subArc2;
     at->on();
     at->setPriority(0);
-    at->set(10, 400.0f, 200.0f);
+    at->set(400.0f, 200.0f, 10);
     pl->endDamage();
 }
 
@@ -400,7 +400,7 @@ void EndSubDamage()
     at = &sub->atari;
     at->on();
     at->setPriority(0);
-    at->set(10, 400.0f, 200.0f);
+    at->set(400.0f, 200.0f, 10);
 }
 
 // Creates the partner enemy if none exists: type 0 = Luis (em 2), 1 = Ashley (em 3, or 5 in the
@@ -614,7 +614,7 @@ void SubCharMoveTo(f32 x, f32 y, f32 z, f32 ry, int mode)
 
 // Scenario: puts the player on a ladder at pos / ang: level > 1 climbs up (m_Work0 = level - 2
 // rungs), level < -1 climbs down (r_no_2 0xA); routine 0/0x10.
-void PlSetLadder(Vec* pos, int level, f32 ang)
+void PlSetLadder(Vec* pos, f32 ang, int level)
 {
     cPlayer* pl;
 
@@ -734,7 +734,7 @@ void SubCharRegistMotion(void* m0, void* m1)
 }
 
 // Room water effect table for the player (ripple, walk splash, run splash).
-void PlRegistRoomEff(PlRoomEff* er)
+void PlRegistRoomEff(PlEffRoom* er)
 {
     pPL->m_pEffRoom = er;
 }
@@ -897,17 +897,17 @@ void PlWaterProc(cPlayer* pEm)
         u8 t = hamonTimer % 13;
 
         if (t == 0) {
-            EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[0].id, pEm->m_pEffRoom[0].type, 0, ESP_CORE_KIND_NONE, pEm, (void*) t);
+            EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[0].type, pEm->m_pEffRoom[0].id, 0, ESP_CORE_KIND_NONE, pEm, 0);
         }
     }
     dist = GetDistance(&m_PosOldWater, &pEm->pos);
     if (sibukiTimer) {
         sibukiTimer--;
     } else if (dist > spd1) {
-        EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[2].id, pEm->m_pEffRoom[2].type, 0, ESP_CORE_KIND_NONE, pEm, (void*) sibukiTimer);
+        EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[2].type, pEm->m_pEffRoom[2].id, 0, ESP_CORE_KIND_NONE, pEm, 0);
         sibukiTimer = 10;
     } else if (dist > spd0) {
-        EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[1].id, pEm->m_pEffRoom[1].type, 0, ESP_CORE_KIND_NONE, pEm, (void*) sibukiTimer);
+        EstSet(pEm, -1, 0, 0, pEm->m_pEffRoom[1].type, pEm->m_pEffRoom[1].id, 0, ESP_CORE_KIND_NONE, pEm, 0);
         sibukiTimer = 0x10;
     }
     if (dist > spd0) {

@@ -29,10 +29,8 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 cEsp* Esp18_Create();
 void Esp18_Trans(cEsp18* esp);
-}
 int GetDrawTmpBufType();       // game/TmpBuf.cpp (C++ linkage)
 
 // EspCreateTbl[0x18] factory.
@@ -163,7 +161,7 @@ void Esp18_Trans(cEsp18* esp)
     oy = (f32) anm->Cy;
     z = 1.0f;
     zero = 0.0f;
-    if (ox == zero) {
+    if (ox == 0.0f) {
         ox = -anm->Width * 0.5f;
     }
     // `i` declared here (pseudo 237, not 116): gcse numbers its PRE pseudos in hash-bucket order
@@ -171,7 +169,7 @@ void Esp18_Trans(cEsp18* esp)
     // 563-bucket table (regno 223..252), so the by-value fog copy's address gets spill slot
     // 0x234 and `i + 1` gets 0x238.
     u32 i;
-    if (oy == zero) {
+    if (oy == 0.0f) {
         oy = anm->Height * 0.5f;
     }
     x0 = ox * sx / anm->Width;
@@ -299,7 +297,7 @@ void Esp18_Trans(cEsp18* esp)
             GXSetTexCoordGen(texGens, 1, 0, 0x1E);
             texGens++;
         } else {
-            C_MTXLightPerspective(pm, pG->Camera.param.fovy, 1.3333334f, 0.5f, -0.6666667f, rx * (1.0f / 512.0f) * e18mx + 0.5f,
+            C_MTXLightPerspective(pm, pG->Camera.param.Fovy, 1.3333334f, 0.5f, -0.6666667f, rx * (1.0f / 512.0f) * e18mx + 0.5f,
                                   ry / 392.0f * e18my + 0.5f);
             PSMTXConcat(pm, esp->m_Mat, tm);
             GXLoadTexMtxImm(tm, 0x1E, 0);

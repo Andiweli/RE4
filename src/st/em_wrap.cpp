@@ -36,9 +36,9 @@ int cEmControl::SetControl(int no, Vec* tbl, int n, int errOn)
 }
 
 #ifdef EM_WRAP_ROUTE
-// Same as the Vec* overload but the route entries carry their own goto mode (EmControlPoint::mode),
+// Same as the Vec* overload but the route entries carry their own goto mode (TarWork::mode),
 // used by cEmRouteExec.
-int cEmControl::SetControl(int no, EmControlPoint* tbl, int n, int errOn)
+int cEmControl::SetControl(int no, TarWork* tbl, int n, int errOn)
 {
     if (em.setPtr(no, -1, errOn) == 0) {
         if (errOn == 1) {
@@ -59,7 +59,7 @@ void cEmControl::SetTargetPos(Vec* tbl, int n)
 
     prev = 0;
     cur = 0;
-    memset(&point[0], 0, sizeof(EmControlPoint));
+    memset(&point[0], 0, sizeof(TarWork));
     nPoint = n;
     if (n > 15) {
         nPoint = 15;
@@ -70,14 +70,14 @@ void cEmControl::SetTargetPos(Vec* tbl, int n)
 }
 
 #ifdef EM_WRAP_ROUTE
-// Load the route table from full EmControlPoint entries (position + goto mode); clamps to 15 points.
-void cEmControl::SetTargetTbl(EmControlPoint* tbl, int n)
+// Load the route table from full TarWork entries (position + goto mode); clamps to 15 points.
+void cEmControl::SetTargetTbl(TarWork* tbl, int n)
 {
     int i;
 
     prev = 0;
     cur = 0;
-    memset(&point[0], 0, sizeof(EmControlPoint));
+    memset(&point[0], 0, sizeof(TarWork));
     nPoint = n;
     if (n > 15) {
         nPoint = 15;
@@ -114,7 +114,7 @@ int cEmPatrol::SetPatrol(s16 no, Vec* tbl, int n, u8 prio, int errOn)
     if (SetControl(no, tbl, n, errOn) == 0) {
         return 0;
     }
-    SceExec(0x12, (TaskFunc) TaskMove, (int) this, prio, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) TaskMove, this, prio, SCE_PRIO_DEF_2, 0);
     return 1;
 }
 
@@ -153,7 +153,7 @@ int cEmRouteRun::SetRouteRun(s16 no, Vec* tbl, int n, u8 prio, int errOn)
     if (SetControl(no, tbl, n, errOn) == 0) {
         return 0;
     }
-    SceExec(0x12, (TaskFunc) TaskMove, (int) this, prio, 2, 0);
+    SceExec(0x12, (TaskFunc) TaskMove, this, prio, 2, 0);
     return 1;
 }
 
@@ -183,13 +183,13 @@ void cEmRouteRun::TaskMove(cEmRouteRun* p)
     }
 }
 
-// Route exec: like SetRouteRun but each EmControlPoint carries its own goto mode; starts TaskMove.
-int cEmRouteExec::SetRouteExec(s16 no, EmControlPoint* tbl, int n, u8 prio, int errOn)
+// Route exec: like SetRouteRun but each TarWork carries its own goto mode; starts TaskMove.
+int cEmRouteExec::SetRouteExec(s16 no, TarWork* tbl, int n, u8 prio, int errOn)
 {
     if (SetControl(no, tbl, n, errOn) == 0) {
         return 0;
     }
-    SceExec(0x12, (TaskFunc) TaskMove, (int) this, prio, 2, 0);
+    SceExec(0x12, (TaskFunc) TaskMove, this, prio, 2, 0);
     return 1;
 }
 
@@ -225,7 +225,7 @@ int cEmGuard::SetGuard(s16 no, Vec* tbl, int n, int (*check)(cEmWrap*), f32 ang,
     if (SetControl(no, tbl, n, errOn) == 0) {
         return 0;
     }
-    SceExec(0x12, (TaskFunc) TaskMove, (int) this, prio, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) TaskMove, this, prio, SCE_PRIO_DEF_2, 0);
     this->ang = ang;
     guard_r = em.getGuard_r();
     this->check = check;

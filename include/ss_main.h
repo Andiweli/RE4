@@ -314,19 +314,10 @@ public:
     virtual void move(SUB_SCREEN* pWk);
 };
 
-// One entry of the op message sequence table (0x10 bytes).
-struct TermSeq {
-    u16 x0;
-    s16 x2;    // 0x02  copied to SsTermMain::TermSub::x14
-    int time;  // 0x04  frame the entry fires at
-    int mesNo; // 0x08  message number (-1: wait for the message end)
-    int arg;   // 0x0C  message clear time; -1 ends the sequence
-};
-
 // One op number of ss_term's op table (SsTermMain::OpeMesTblInit, 0x14 bytes, 24 entries in .data).
 struct TermOpe {
     int mdtNo;  // 0x00  0x8C ..
-    void* seq;  // 0x04  TermSeq table
+    void* seq;  // 0x04  OpeMesSeq table
     void* mes;  // 0x08  message data (MesData type 2)
     void* xC;
     void* x10;
@@ -334,6 +325,15 @@ struct TermOpe {
 
 class SsTermMain : public Widget<SUB_SCREEN> {
 public:
+    // One entry of the op message sequence table (0x10 bytes).
+    struct OpeMesSeq {
+        u16 be_flag;
+        s16 No;    // 0x02  copied to SsTermMain::TermSub::x14
+        int Frame;  // 0x04  frame the entry fires at
+        int NoMes; // 0x08  message number (-1: wait for the message end)
+        int Timer;   // 0x0C  message clear time; -1 ends the sequence
+    };
+
     // The op message player (memset at init).
     struct TermOpeWork {
         u32 flags;    // 0x1C  0x08000000 voice stream started, 0x10000000 sequence ended / skipped
@@ -344,15 +344,15 @@ public:
         int seqCnt;   // 0x30  frame counter
         int wait;     // 0x34  frames before the op starts (0x1E)
         int mdtNo;    // 0x38
-        TermSeq* seq; // 0x3C
+        OpeMesSeq* seq; // 0x3C
         void* mes;    // 0x40
         int x44;
         int _rno;
     };
     struct TermSub {
         u8 pad_0[0x14];
-        int x14;      // 0x60  TermSeq::x2 of the last entry
-        int x18;      // 0x64  TermSeq::mesNo of the last entry
+        int x14;      // 0x60  OpeMesSeq::x2 of the last entry
+        int x18;      // 0x64  OpeMesSeq::mesNo of the last entry
         int count;    // 0x68  messages set / cleared
         u8 pad_20[0x40 - 0x20];  // sizeof == 0x40 (SsTermMain is 0x8C: SubScreenTask's `li r3, 0x8c`)
     };
@@ -370,9 +370,9 @@ public:
     void OpeMesTblInit(SUB_SCREEN* wk);
     void OpeMdtSet();
     void OpeMdtSetNo(int no);
-    void OpeMdtSetSub(int mdtNo, void* seq, void* mes);
+    void OpeMdtSetSub(int mdtNo, OpeMesSeq* seq, u8* mes);
     int OpeMesMove();
-    int OpeSeqMove(TermSeq* s);
+    int OpeSeqMove(OpeMesSeq* s);
     void OpeMesSet(int no, int wait);
     void OpeMesClear();
     void OpeSndStrStop();
@@ -391,7 +391,6 @@ extern cModel* ssWepModel;
 extern cModel* ssPlMotion;
 extern cModel* ssWepModel2;
 
-extern "C" {
 // ss_main.cpp
 void IdSubErase();
 void IdNumErase();
@@ -425,13 +424,12 @@ void adaModelInit(u16 no, u16 type);
 void klauserModelInit(u16 no, u16 type);
 void hunkModelInit(u16 no, u16 type);
 void weskerModelInit(u16 no, u16 type);
-void tel00ModelInit(cModel* m, SsArc* arc);
-void hunniganModelInit(cModel* m, void* data, u32 type);
+void tel00ModelInit(cModel* m, u32* arc);
+void hunniganModelInit(cModel* m, u32* data, u32 type);
 // ss_main.cpp helpers the screens share
-void clearZbuffer();
+void clearZbuffer(int*);
 void dispScrollBar(u32 top, u32 n, u32 num, ID_UNIT* bar, ID_UNIT* up, ID_UNIT* down);
 void idMainMenuFade(SUB_SCREEN* wk, int sw);
 void weaponChangeRequest(u16 no, u16 type);
-}
 
 #endif

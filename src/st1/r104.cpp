@@ -100,24 +100,24 @@ void EvtFlgOnStatus(Event* e, u32 no) asm("FlgOnStatus__5EventUl");
 
 static void r104_checkBgmPlay();
 static void r104_execEmDash();
-extern "C" void r104_openBox_main(int no, int opened);
+void r104_openBox_main(int no, int opened);
 static void r104_openedBox();
 static void r104_openBox(int no);
-extern "C" void r104_openShelf_main(int no, int opened);
+void r104_openShelf_main(int no, int opened);
 static void r104_openedShelf();
 static void r104_openShelf(int no);
-extern "C" void cPatrol104_getNextTarget(cPatrol104* p, Vec* out);
-extern "C" void cPatrol104_init(cPatrol104* p, R104PatrolData* d);
-extern "C" void cPatrol104_move(cPatrol104* p);
+void cPatrol104_getNextTarget(cPatrol104* p, Vec* out);
+void cPatrol104_init(cPatrol104* p, R104PatrolData* d);
+void cPatrol104_move(cPatrol104* p);
 static void r104_initEmPatrol();
 static void r104_execShowView_end();
 static void r104_execShowView();
 static void r104_checkDoor107KeyUse();
 static void r104_checkDoor107();
-extern "C" void EmReset_init(EmReset* r, R104ResetData* d);
-extern "C" int EmReset_set(EmReset* r);
-extern "C" int r104_checkNowArea();
-extern "C" void r104_execEmReset(int area);
+void EmReset_init(EmReset* r, R104ResetData* d);
+int EmReset_set(EmReset* r);
+int r104_checkNowArea();
+void r104_execEmReset(int area);
 static void r104_checkEmReset();
 static void r104_execEvent20();
 static void r104_execEvent10();
@@ -190,10 +190,10 @@ void R104Init()
         SceAtDataSet_exec(0xE, SCE_LEVEL10, 0, (TaskFunc) r104_execEmDash, 0, 1);
     }
     SceSetItemEvent(0xB, 0x84, 0x10, 7, r104_openShelf, (void (*)(int)) r104_openedShelf, 0, 0);
-    SceSetItemEvent(0xC, 0x8E, 0x11, 8, r104_openShelf, (void (*)(int)) r104_openedShelf, 1, 0);
-    SceSetItemEvent(0xD, 0x89, 0x12, 9, r104_openShelf, (void (*)(int)) r104_openedShelf, 2, 0);
+    SceSetItemEvent(0xC, 0x8E, 0x11, 8, r104_openShelf, (void (*)(int)) r104_openedShelf, (void*) 1, 0);
+    SceSetItemEvent(0xD, 0x89, 0x12, 9, r104_openShelf, (void (*)(int)) r104_openedShelf, (void*) 2, 0);
     SceSetItemEvent(0xF, 0x8F, 0x13, 0xA, r104_openBox, (void (*)(int)) r104_openedBox, 0, 0);
-    SceSetItemEvent(0x10, 0x90, 0x14, 0xB, r104_openBox, (void (*)(int)) r104_openedBox, 1, 0);
+    SceSetItemEvent(0x10, 0x90, 0x14, 0xB, r104_openBox, (void (*)(int)) r104_openedBox, (void*) 1, 0);
     SceExec(0x12, (TaskFunc) r104_checkBgmPlay, 0, 0, SCE_PRIO_DEF_2, 0);
 }
 
@@ -232,7 +232,7 @@ static void r104_execEmDash()
 }
 
 // Box `no` opens (opened: already open, snap the lid).
-extern "C" void r104_openBox_main(int no, int opened)
+void r104_openBox_main(int no, int opened)
 {
     f32 ang = 0.0f;
     cObj* obj = 0;
@@ -284,7 +284,7 @@ static void r104_openBox(int no)
 }
 
 // Shelf `no` opens.
-extern "C" void r104_openShelf_main(int no, int opened)
+void r104_openShelf_main(int no, int opened)
 {
     f32 ang = 0.0f;
     cObj* obj = 0;
@@ -339,7 +339,7 @@ static void r104_openShelf(int no)
 }
 
 // Advance the two-point patrol to its next way point (wraps) and return that position.
-extern "C" void cPatrol104_getNextTarget(cPatrol104* p, Vec* out)
+void cPatrol104_getNextTarget(cPatrol104* p, Vec* out)
 {
     p->cur++;
     if (p->cur >= p->nPoint) {
@@ -350,7 +350,7 @@ extern "C" void cPatrol104_getNextTarget(cPatrol104* p, Vec* out)
 
 // Bind a patrol to the Ganado of table entry d: way points = its spawn position and d->pos; starts it
 // walking (goto mode 6) toward the table point. Inactive if the enemy is not alive.
-extern "C" void cPatrol104_init(cPatrol104* p, R104PatrolData* d)
+void cPatrol104_init(cPatrol104* p, R104PatrolData* d)
 {
     p->em.setPtr(d->no, -1, 0);
     if (p->em.isAlive() == 1) {
@@ -367,7 +367,7 @@ extern "C" void cPatrol104_init(cPatrol104* p, R104PatrolData* d)
 
 // Per-frame patrol step: stops (active = 0) when the enemy dies or spots the player; otherwise, each time
 // the goto finished, walks to the other way point.
-extern "C" void cPatrol104_move(cPatrol104* p)
+void cPatrol104_move(cPatrol104* p)
 {
     Vec t;
 
@@ -467,7 +467,7 @@ static void r104_checkDoor107()
 }
 
 // A reset wave from its table entry: the wave flags of an interrupted run are cleared.
-extern "C" void EmReset_init(EmReset* r, R104ResetData* d)
+void EmReset_init(EmReset* r, R104ResetData* d)
 {
     r->R104ResetData::em[0] = d->em[0];
     r->R104ResetData::em[1] = d->em[1];
@@ -486,7 +486,7 @@ extern "C" void EmReset_init(EmReset* r, R104ResetData* d)
 }
 
 // Sets the wave (first time) or resets its three enemies; 1 when it ran.
-extern "C" int EmReset_set(EmReset* r)
+int EmReset_set(EmReset* r)
 {
     if (RsfCheck(G_ROOM_ID, r->flagC)) {
         return 0;
@@ -517,7 +517,7 @@ extern "C" int EmReset_set(EmReset* r)
 }
 
 // The area the player stands in (0..3), -1 elsewhere.
-extern "C" int r104_checkNowArea()
+int r104_checkNowArea()
 {
     if (SceAtHitCheck(4) == 1) {
         return 0;
@@ -535,7 +535,7 @@ extern "C" int r104_checkNowArea()
 }
 
 // The next wave for the player's area, by the wave flags.
-extern "C" void r104_execEmReset(int area)
+void r104_execEmReset(int area)
 {
     switch (area) {
     case 0:

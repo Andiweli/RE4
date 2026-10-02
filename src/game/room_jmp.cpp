@@ -14,25 +14,27 @@
 #include "room_jmp.h"
 #include "ref_access.h"
 
-// Room jump tool work (0x38 bytes)
-struct test {
-    s8 state;      // 0x00  tbl index
-    s8 mode;       // 0x01  cursor line: 0 stage, 1 room, 2 point
+// Room jump tool work (0x38 bytes). PS2 names this task's work struct `tagTEST`/`TEST`, like the
+// debug-menu and flag-editor tool tasks; the three are unrelated, PS2 just reuses the name. PS2's
+// is 0x58 bytes: a GXTexObj at 0x18 this build's work area does not reserve.
+typedef struct tagTEST {
+    s8 r_no_0;     // 0x00  tbl index
+    s8 r_no_1;     // 0x01  cursor line: 0 stage, 1 room, 2 point
     s8 stage;      // 0x02
-    s8 room[12];   // 0x03  selected room index per stage
+    s8 room[10];   // 0x03  selected room index per stage
+    u8 stage_max;  // 0x0D
+    u8 flag;       // 0x0E
     s8 point;      // 0x0F
-    u8 flag;       // 0x10  1 = a jump was executed
+    u8 door_exec;  // 0x10  1 = a jump was executed
     u8 pad_11[3];
-    u32 stop_bak;  // 0x14  pG->flags_170
+    u32 stopFlag;  // 0x14  pG->flags_170
     u8 pad_18[0x38 - 0x18];
-};
+} TEST;
 
-extern "C" {
-void roomJumpInit(test* w);
-void roomJumpMove(test* w);
-void roomJumpExec(test* w);
-void roomJumpExit(test* w);
-}
+void roomJumpInit(TEST* w);
+void roomJumpMove(TEST* w);
+void roomJumpExec(TEST* w);
+void roomJumpExit(TEST* w);
 
 // The original stores GLOBAL_WK fields through references: GCC then reloads pG after every store.
 
@@ -247,34 +249,34 @@ s8 cRoomJmp::checkRoomNo(s8 stage, s8 room)
 // Debug room-jump menu task (bugcheck controller): init -> move (menu) -> exec / exit.
 void RoomJump()
 {
-    static test test;
-    static void (*tbl[])(struct test*) = {roomJumpInit, roomJumpMove, roomJumpExec, roomJumpExit};
-    struct test* w = &test;
+    static TEST test;
+    static void (*tbl[])(TEST*) = {roomJumpInit, roomJumpMove, roomJumpExec, roomJumpExit};
+    TEST* w = &test;
 
-    memclr_asm(w, sizeof(test));
+    memclr_asm(w, sizeof(TEST));
     for (;;) {
-        tbl[w->state](w);
+        tbl[w->r_no_0](w);
         TaskSleep(1);
     }
 }
 
 // Freezes the game (Stop_flg), builds the cRoomJmp on the room info table and starts the cursor at
 // the current stage / room / jump point.
-void roomJumpInit(test* pTest)
+void roomJumpInit(TEST* pTest)
 {
-    pTest->state++;
-    pTest->stop_bak = pG->Stop_flg;
+    pTest->r_no_0++;
+    pTest->stopFlag = pG->Stop_flg;
     BitOn(pG->Stop_flg, 0xFFFFBFFF);
     pRj = new cRoomJmp(roomInfoAddr);
     pTest->stage = pG->stage_no;
     pTest->room[pTest->stage] = pRj->getRoomIdx(pG->stage_no, pG->room_no);
     pTest->point = pG->JumpPoint;
-    pTest->flag = 0;
+    pTest->door_exec = 0;
 }
 
 // Menu frame: up/down pick the line (stage / room / point), left/right change it (repeat keys);
 // prints the room name, screen and programmer; button 0x100 jumps, 0x200 cancels.
-void roomJumpMove(test* w)
+void roomJumpMove(TEST* w)
 {
     JOY* joy = GetBugCheckController();
     CRoomInfo* info;
@@ -283,12 +285,12 @@ void roomJumpMove(test* w)
     int pt;
 
     if (joy->rep & 0x40004) {
-        w->mode++;
+        w->r_no_1++;
     }
     if (joy->rep & 0x80008) {
-        w->mode--;
+        w->r_no_1--;
     }
-    w->mode = (w->mode < 0) ? 2 : ((w->mode > 2) ? 0 : w->mode);
+    w->r_no_1 = (w->r_no_1 < 0) ? 2 : ((w->r_no_1 > 2) ? 0 : w->r_no_1);
     info = pRj->getRoomInfo(w->stage, w->room[w->stage] + w->point);
     eprintf(0xD8, 0x38, 0, 0, "STAGE = %d", w->stage);
     eprintf(0xD8, 0x46, 0, 0, "ROOM  = %02x", info->room);
@@ -300,14 +302,14 @@ void roomJumpMove(test* w)
     if (info->person[0] != 0) {
         eprintf(0xD8, 0xE, 0, 0, "     SCR(%s)", info->person);
     }
-    eprintf(0xD0, (w->mode + 4) * 0xE, 0, 0, ">");
+    eprintf(0xD0, (w->r_no_1 + 4) * 0xE, 0, 0, ">");
     if (joy->trg & 0x100) {
-        w->state = 2;
+        w->r_no_0 = 2;
     }
     if (joy->trg & 0x200) {
-        w->state = 3;
+        w->r_no_0 = 3;
     }
-    no = w->mode;
+    no = w->r_no_1;
     switch (no) {
     case 0:
         if (joy->rep2 & 0x20002) {
@@ -353,9 +355,9 @@ void roomJumpMove(test* w)
 
 // Performs the jump: everything stopped, Debug_flg[2] bit31 (debug jump), the chosen point becomes
 // the next room entry, messages cleared, life refilled.
-void roomJumpExec(test* pTest)
+void roomJumpExec(TEST* pTest)
 {
-    pTest->state++;
+    pTest->r_no_0++;
     pG->Stop_flg = 0xFFFFFFFF;
     DbgFlagOn(pG, DBG_ROOMJMP);
     pRj->getRoomInfo(pTest->stage, pTest->room[pTest->stage] + pTest->point)->setNextPos();
@@ -364,22 +366,22 @@ void roomJumpExec(test* pTest)
     cMes.Clear();
     pG->pl_life = pG->pl_life_max;
     pG->r_continue_cnt = 0;
-    pTest->flag = 1;
+    pTest->door_exec = 1;
 }
 
 // Leaves the menu: restores Stop_flg; after a jump sets the game routine to 4 (room change) and
 // clears System_flg 0x40.
-void roomJumpExit(test* pTest)
+void roomJumpExit(TEST* pTest)
 {
     delete pRj;
-    if (pTest->flag == 1) {
+    if (pTest->door_exec == 1) {
         pG->Rno0 = 4;
         pG->Rno1 = 0;
         pG->Rno2 = 0;
         pG->Rno3 = 0;
         SysFlagOff(pG, SYS_START_EVT_SKIP);
     }
-    pG->Stop_flg = pTest->stop_bak;
+    pG->Stop_flg = pTest->stopFlag;
     DbgFlagOff(pG, DBG_TEST_MODE);
     TaskExit();
 }

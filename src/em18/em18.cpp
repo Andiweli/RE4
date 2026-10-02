@@ -250,7 +250,7 @@ static void em18_R0_Init(cEm18* em)
     em18ClothPartsSet(em, 0);
     em18GoodsPartsSet(em, 0);
     em->pFsdTbl = &Em10_fs_tbl;
-    em->Motion.flip = em18_flip_tbl;
+    em->pXFlip = em18_flip_tbl;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
         static const Vec size = { 10000.0f, 10000.0f, 10000.0f };
@@ -279,7 +279,7 @@ static void em18_R0_Init(cEm18* em)
     w->Be_flg = 0;
     w->Neck_dir_y = 0.0f;
     em->setRno(one, 0, 0, 0);
-    MotionSetCore(em, MOTION(em), ARC(EM18_MOT_014), 0, 0, 1, 0);
+    MotionSetCore(em, &em->Motion, ARC(EM18_MOT_014), 0, 0, 1, 0);
     MotionMove(em, 0);
     em->clearStatus(EM_STATUS_ACTIVE);
     em18_R0_Move(em);
@@ -300,7 +300,7 @@ static void em18_R1_Wait(cEm18* em)
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_014), 0, 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM18_MOT_014), 0, 30, 5, 0);
         em->r_no_2++;
     case 1:
         MotionMove(em, 0);
@@ -318,7 +318,7 @@ static void em18_R1_Trade(cEm18* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_TRADE_015), 0, 10, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM18_MOT_TRADE_015), 0, 10, 1, 0);
         w->Seid_voice = SndCall(8, 9, &em->pos, em->id, 0, 0);
         KeyStop(0xEFCF0000);
         em->r_no_2++;
@@ -343,10 +343,10 @@ static void em18_R1_Trade(cEm18* em)
         }
         break;
     case 3:
-        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_TRADE_017), 0, 10, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM18_MOT_TRADE_017), 0, 10, 1, 0);
         SndCall(8, 0xA, &em->pos, em->id, 0, 0);
         w->Seid_voice = SndCall(8, 7, &em->pos, em->id, 0, 0);
-        pG->Stop_flg &= 0x7FFFFFFF;
+        SpfFlagOff(pG, SPF_KEY);
         em->r_no_2++;
     case 4:
         if (em->Motion.Seq_frame > 33.7f && em->Motion.Seq_frame < 34.3f) {
@@ -447,7 +447,7 @@ static void em18_R1_Dm_Normal(cEm18* em)
     w->Be_flg |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_014), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM18_MOT_014), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -477,7 +477,7 @@ static void em18_R1_Die_Normal(cEm18* em)
     default:
         break;
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM18_MOT_DIE_NORMAL), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM18_MOT_DIE_NORMAL), 0, 3, 1, 0);
         SndStop(w->Seid_voice, 0);
         SndCall(8, 8, &em->pos, em->id, 0, 0);
         em->r_no_2++;

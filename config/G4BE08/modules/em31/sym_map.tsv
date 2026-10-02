@@ -61,10 +61,10 @@ section	offset	size	unit	scope	name	demangled
 .text	0x00008388	0x48	em31/em31.cpp	local	em31_R0_Die__FP5cEm31	em31_R0_Die
 .text	0x000083D0	0x5E8	em31/em31.cpp	local	em31_R1_Die_Normal__FP5cEm31	em31_R1_Die_Normal
 .text	0x000089B8	0x114	em31/em31.cpp	global	em31RouteCk__FP5cEm31	em31RouteCk
-.text	0x00008ACC	0xE4	em31/em31.cpp	global	Em31ClothSet2__FP5cEm31P7PlCloth	Em31ClothSet2
-.text	0x00008BB0	0x84	em31/em31.cpp	global	Em31ClothMove2__FP5cEm31P7PlCloth	Em31ClothMove2
-.text	0x00008C34	0xE4	em31/em31.cpp	global	Em31ClothSet3__FP5cEm31P7PlCloth	Em31ClothSet3
-.text	0x00008D18	0x2C	em31/em31.cpp	global	Em31ClothMove3__FP5cEm31P7PlCloth	Em31ClothMove3
+.text	0x00008ACC	0xE4	em31/em31.cpp	global	Em31ClothSet2__FP5cEm31P10CLOTH_INFO	Em31ClothSet2
+.text	0x00008BB0	0x84	em31/em31.cpp	global	Em31ClothMove2__FP5cEm31P10CLOTH_INFO	Em31ClothMove2
+.text	0x00008C34	0xE4	em31/em31.cpp	global	Em31ClothSet3__FP5cEm31P10CLOTH_INFO	Em31ClothSet3
+.text	0x00008D18	0x2C	em31/em31.cpp	global	Em31ClothMove3__FP5cEm31P10CLOTH_INFO	Em31ClothMove3
 .text	0x00008D44	0x4C4	em31/em31.cpp	global	em31AtkCk__FP5cEm31P3VecT1i	em31AtkCk
 .text	0x00009208	0x1C8	em31/em31.cpp	local	plem31_dm_Stamp__FP7cPlayer	plem31_dm_Stamp
 .text	0x000093D0	0x11C	em31/em31.cpp	global	em31StampCamMove__FP5cEm31	em31StampCamMove

@@ -176,13 +176,13 @@ void R327Init()
     } else {
         EstSet(0, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_NONE, 0, 0);
     }
-    SceSetItemEvent(0x10, 0x83, 3, 0x15, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, 0x68, 0);
-    SceSetItemEvent(0x11, 0x82, 4, 0x18, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, 0x4A, 0);
-    SceSetItemEvent(0x13, -1, 6, 0x17, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, 0x48, 0);
-    SceSetItemEvent(0x12, -1, 5, 0x13, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, 0x4C, 0);
-    SceSetItemEvent(0x14, -1, 7, 0x12, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, 0x4E, 0);
-    SceSetItemEvent(0x16, 0x87, 9, 0x14, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, 0x79, 0);
-    SceSetItemEvent(0x1A, 0x89, 0xE, 0x16, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, 0x6A, 0);
+    SceSetItemEvent(0x10, 0x83, 3, 0x15, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, (void*) 0x68, 0);
+    SceSetItemEvent(0x11, 0x82, 4, 0x18, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, (void*) 0x4A, 0);
+    SceSetItemEvent(0x13, -1, 6, 0x17, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, (void*) 0x48, 0);
+    SceSetItemEvent(0x12, -1, 5, 0x13, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, (void*) 0x4C, 0);
+    SceSetItemEvent(0x14, -1, 7, 0x12, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, (void*) 0x4E, 0);
+    SceSetItemEvent(0x16, 0x87, 9, 0x14, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, (void*) 0x79, 0);
+    SceSetItemEvent(0x1A, 0x89, 0xE, 0x16, (void (*)(int)) r327_BoxOpen, (void (*)(int)) r327_BoxOpened, (void*) 0x6A, 0);
     SceAtDataSet_exec(0x1B, 0x12, 0, (TaskFunc) r327_ContinuePointSet, 0, 1);
     SceExec(0x12, (TaskFunc) r327_StrCheck, 0, 0, 2, 0);
     SceExec(0x12, (TaskFunc) r327_EnemySet2nd, 0, 0, 2, 0);
@@ -370,7 +370,7 @@ static void r327_GatlingGanadoSet()
     r327_work->em[idx].em.setNoSuspend(1);
     r327_work->em[idx].em.setFindPL();
     pG->Room_flg[0] &= ~0x80000000;
-    SceSetEventCancel(1, (TaskFunc) r327_GatlingGanadoSetEndProc, idx, 0, 1);
+    SceSetEventCancel(1, (TaskFunc) r327_GatlingGanadoSetEndProc, (void*) idx, 0, 1);
     while (!CamCtrl.IsMotionEnd()) {
         SceSleep(1);
     }
@@ -399,7 +399,7 @@ static void r327_SwitchOperate(int no)
         if (SceMesGetSelection() == 1) {
             RoomSeCall(0, 0, 0, 0, 0);
             SceSleep(5);
-            SceExec(0x12, (TaskFunc) r327_LampSet, no, 0, 2, 0);
+            SceExec(0x12, (TaskFunc) r327_LampSet, (void*) no, 0, 2, 0);
         }
         SceEventEnd(0);
     }
@@ -425,7 +425,7 @@ static void r327_LampSet(int no)
     pG->Room_flg[0] &= ~0x80000000;
     SceSleep(10);
     RoomSeCall(0x1F, 0, 0, 0, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, lamp, 1, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, lamp, 1, ESP_CORE_KIND_NONE, (void*) zero, 0);
     while (!CamCtrl.IsMotionEnd()) {
         SceSleep(1);
     }
@@ -470,7 +470,7 @@ static void r327_GanadoAppearCut()
     }
     CamCtrl.CutCall(side == 0 ? 0x10 : 8);
     pG->Room_flg[0] &= ~0x80000000;
-    SceSetEventCancel(1, (TaskFunc) r327_GanadoAppearCutEndProc, side, 0, 1);
+    SceSetEventCancel(1, (TaskFunc) r327_GanadoAppearCutEndProc, (void*) side, 0, 1);
     while (!CamCtrl.IsMotionEnd()) {
         SceSleep(1);
     }
@@ -553,7 +553,7 @@ static void r327_DoorOpen()
     CamCtrl.CutCall(3);
     se = RoomSeCall(1, &obj->pos, 0, 0, 0);
     pG->Room_flg[0] &= ~0x80000000;
-    SceSetEventCancel(1, (TaskFunc) r327_DoorOpenEndProc, se, 0, 1);
+    SceSetEventCancel(1, (TaskFunc) r327_DoorOpenEndProc, (void*) se, 0, 1);
     obj->be_flag |= 0x20;
     while (obj->pos.y < 9400.0f) {
         obj->pos.y += 40.0f;
@@ -578,7 +578,7 @@ static void r327_DoorOpenEndProc(int se)
     CamCtrl.Comeback(0);
     SceAtSetEnable(5, 0);
     SceAtSetEnable(6, 0);
-    KyfFlagOn(pG, KYF_ST1_18);
+    KyfFlagOn(pG, KYF_ST3_17);
     SceEventEnd(0);
 }
 
@@ -651,7 +651,7 @@ static void r327_CheckUseCardKey()
     EffectEspDelete(1, ESP_CORE_KIND_ROOM02, 0, 0);
     EffectEspgenDelete(1, ESP_CORE_KIND_ROOM02, 0);
     EffectEfmDelete(1, ESP_CORE_KIND_ROOM02, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_ROOM02, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 7, 1, ESP_CORE_KIND_ROOM02, (void*) zero, 0);
     SceUpCut(3, 9, 0x1D, 0);
     SceAtSetEnable(0x18, 0);
     SceExec(0x12, (TaskFunc) r327_SetSwitchEnable, 0, 0, 2, 0);
@@ -672,7 +672,7 @@ static void r327_SetSwitchEnable()
     EffectEspDelete(1, ESP_CORE_KIND_ROOM01, 0, 0);
     EffectEspgenDelete(1, ESP_CORE_KIND_ROOM01, 0);
     EffectEfmDelete(1, ESP_CORE_KIND_ROOM01, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_ROOM01, (void*) zero, 0);
     while (!CamCtrl.IsMotionEnd()) {
         SceSleep(1);
     }
@@ -702,8 +702,8 @@ static void r327_SetSwitchEnableEndProc()
         EffectEspDelete(1, ESP_CORE_KIND_ROOM01, 0, 0);
         EffectEspgenDelete(1, ESP_CORE_KIND_ROOM01, 0);
         EffectEfmDelete(1, ESP_CORE_KIND_ROOM01, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_ROOM00, (void*) zero, (void*) zero);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_ROOM00, 0, 0);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_ROOM01, (void*) zero, 0);
     }
     CamCtrl.Comeback(0);
     SceEventEnd(0);
@@ -799,12 +799,12 @@ static void r327_SetSwitchDisableEndProc()
         EffectEspDelete(1, ESP_CORE_KIND_ROOM01, 0, 0);
         EffectEspgenDelete(1, ESP_CORE_KIND_ROOM01, 0);
         EffectEfmDelete(1, ESP_CORE_KIND_ROOM01, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_ROOM00, (void*) zero, (void*) zero);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_ROOM00, 0, 0);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_ROOM01, 0, 0);
         EffectEspDelete(1, ESP_CORE_KIND_ROOM02, 0, 0);
         EffectEspgenDelete(1, ESP_CORE_KIND_ROOM02, 0);
         EffectEfmDelete(1, ESP_CORE_KIND_ROOM02, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 6, 1, ESP_CORE_KIND_ROOM02, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 6, 1, ESP_CORE_KIND_ROOM02, 0, 0);
     }
     r327_work->em2.destroy();
     CamCtrl.Comeback(0);

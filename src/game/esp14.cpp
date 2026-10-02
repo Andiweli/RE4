@@ -49,8 +49,8 @@ void cEsp14::move()
     if (!AnmMove()) {
         PushEsp(this);
     } else {
-        PSVECSubtract(&pG->Camera.param.at, &pG->Camera.param.pos, &camDir);
-        PSVECSubtract(&m_Pos, &pG->Camera.param.pos, &d);
+        PSVECSubtract(&pG->Camera.param.Target, &pG->Camera.param.Campos, &camDir);
+        PSVECSubtract(&m_Pos, &pG->Camera.param.Campos, &d);
         PSVECCrossProduct(&d, &pG->Camera.Up, &cross);
         m_Ang.x = PI / 2.0f;
         m_Ang.y = atan2f(cross.z, -cross.x);

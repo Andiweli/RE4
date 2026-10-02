@@ -59,13 +59,12 @@ struct GEOM_CONE_REV;
 
 BOOL AreaHitCheck(AREA_HIT_DATA* pAre, Vec* pPos);
 
-extern "C" {
 BOOL areaHitCheck_xz4(AREA_XZ4* pXz4, Vec* pPos);
 BOOL areaHitCheck_Cylinder(AREA_CYLINDER* pCld, Vec* pPos);
 BOOL AreaViewCheck(AREA_HIT_DATA* pAre, GEOM_CONE_REV* pCrev);
 void AreaGetCenterPos(Vec* pos, AREA_HIT_DATA* area);
 void AreaGetInsidePos(Vec* pos, AREA_HIT_DATA* area);
-void AreaDataInit(AREA_HIT_DATA* area, Vec* pos, u8 type, f32 size, f32 height);
+void AreaDataInit(AREA_HIT_DATA* area, Vec* pos, f32 size, f32 height, u8 type);
 void area_Draw_sphere(Vec pos, f32 r, u32 rgb, Mtx pMat);
 void area_Draw_line(Vec pos1, Vec pos2, u32 rgb, Mtx pMat);
 void AreaDataEdit(AREA_HIT_DATA* area, u32 col, int flg, Mtx pMat, f32 move_scale);
@@ -78,6 +77,5 @@ void area_cylinder_Disp(AREA_CYLINDER* pCld, u32 color, int flag, Mtx mtx);
 void area_eye_trigger_Disp(AREA_EYE_TRIGGER* pEtg, u32 col, int flg, Mtx pMat);
 void AreaDataInfoDisp(AREA_HIT_DATA* pArea, int x, s16 y);
 void AreaDataHelpDisp(AREA_HIT_DATA* pArea, int x, s16 y);
-}
 
 #endif

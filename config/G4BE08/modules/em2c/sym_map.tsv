@@ -58,7 +58,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000B05C	0x1C8	em2c/em2c.cpp	local	em2c_R1_Dm_Freeze__FP5cEm2c	em2c_R1_Dm_Freeze
 .text	0x0000B224	0x3AC	em2c/em2c.cpp	local	em2c_R1_Dm_C_Freeze__FP5cEm2c	em2c_R1_Dm_C_Freeze
 .text	0x0000B5D0	0x98	em2c/em2c.cpp	local	em2cKickAction__FP5cEm2c	em2cKickAction
-.text	0x0000B668	0x2F0	em2c/em2c.cpp	local	plemKick	plemKick
+.text	0x0000B668	0x2F0	em2c/em2c.cpp	local	plemKick__FP7cPlayer	plemKick
 .text	0x0000B958	0x288	em2c/em2c.cpp	local	em2c_R1_Dm_F_Normal__FP5cEm2c	em2c_R1_Dm_F_Normal
 .text	0x0000BBE0	0x230	em2c/em2c.cpp	local	em2c_R1_Dm_F_Blow__FP5cEm2c	em2c_R1_Dm_F_Blow
 .text	0x0000BE10	0x48	em2c/em2c.cpp	local	em2c_R0_Die__FP5cEm2c	em2c_R0_Die
@@ -99,7 +99,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x0000EB58	0x57C	em2c/em2c.cpp	local	plem2cEscape__FP7cPlayer	plem2cEscape
 .text	0x0000F0D4	0x264	em2c/em2c.cpp	global	em2cEscapeCamMove__FP5cEm2c	em2cEscapeCamMove
 .text	0x0000F338	0x48	em2c/em2c.cpp	local	em2cBackjumpAction__FP5cEm2c	em2cBackjumpAction
-.text	0x0000F380	0x204	em2c/em2c.cpp	local	plemBackjump	plemBackjump
+.text	0x0000F380	0x204	em2c/em2c.cpp	local	plemBackjump__FP7cPlayer	plemBackjump
 .text	0x0000F584	0x48	em2c/em2c.cpp	local	em2cBackjumpAction2__FP5cEm2c	em2cBackjumpAction2
 .text	0x0000F5CC	0x204	em2c/em2c.cpp	local	plemBackjump2__FP7cPlayer	plemBackjump2
 .text	0x0000F7D0	0x100	em2c/em2c.cpp	global	em2cBlendMotSet__FP5cEm2cPvN21iiii	em2cBlendMotSet

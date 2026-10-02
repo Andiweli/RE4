@@ -33,18 +33,16 @@
 #include "em10.h"
 #include "em_sub.h"
 
-extern "C" {
 static void emWep_R1_Parent(cEmWep* em);
 // The original is a `static plemEscape` (emBar.cpp has a global one); the name carries the split's
 // address suffix in sym_map.
 #define plemEscape plemEscape_80017688
 static void plemEscape(cPlayer* pl);
-}
 
 
 // One rope node of the falling weapon (emWep_R1_Fall): three point masses joined by distance
 // constraints; the model matrix is rebuilt from them every frame.
-struct EmWepNode {
+struct EMWEP_FALLWK {
     Vec pos;      // 0x00
     Vec old;      // 0x0C
     Vec spd;      // 0x18
@@ -78,7 +76,7 @@ EmWepFunc EmWep_R1_move_tbl[13] = {
     emWep_R1_GrenadeThrow,
 };
 
-EmAtkInfo emWepAtk = { 200.0f, PL_DM_AUTO, 400, 0, 10, 0 };
+ATK_INFO emWepAtk = { 200.0f, PL_DM_AUTO, 400, 0, 10, 0 };
 
 // Cloth chain of the whip-like weapons (setCloth): parts per link and the neighbour tables.
 u8 emWepClothP[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -98,7 +96,7 @@ CLOTH_AT_SET emWepAt[3] = {
 cEmWep* SetWeapon(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
 {
     cEmWep* em;
-    EmWepWork* w;
+    FREE_EMWEP* w;
 
     em = (cEmWep*) EmMgr.createBack(0x42);
     if (em == 0) {
@@ -150,7 +148,7 @@ cEmWep* SetWeapon(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
     w->seThrow[0] = 0xFF;
     w->seThrow[1] = 0xFF;
     w->Be_flg = 0;
-    w->timer4 = 0;
+    w->Fall_wait = 0;
     w->Water_ck = 0;
     w->pEm_oya = 0;
     w->pEm_old = 0;
@@ -162,7 +160,7 @@ cEmWep* SetWeapon(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
     w->seHitWall[2] = 0;
     w->seDamage[2] = 0;
     w->seThrow[2] = 0;
-    w->alwaysTimer = 0;
+    w->se_wait = 0;
     w->seid_throw = 0;
     w->effFall[0] = 0xFF;
     w->EffKindId = 50;
@@ -171,8 +169,8 @@ cEmWep* SetWeapon(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
     w->effDamage[1] = 0xFF;
     w->effHit[0] = 0xFF;
     w->effHit[1] = 0xFF;
-    w->eff_id_always2[0] = 0xFF;
-    w->eff_id_always2[1] = 0xFF;
+    w->effWater[0] = 0xFF;
+    w->effWater[1] = 0xFF;
     w->effAlways[0] = 0xFF;
     w->effAlways[1] = 0xFF;
     w->always2_parts = 0xFF;
@@ -211,7 +209,7 @@ void cEmWep::beginEvent(u32 flag)
 // tied to the weapon (At_no) is destroyed.
 void emWepDmCk(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     u8 wep;
     u8 stat;
     int one;
@@ -276,7 +274,7 @@ void emWepDmCk(cEmWep* pEm)
         StaFlagOn(pG, STA_CRITICAL);
         GameAddPoint(9);
         r.x = 0.0f;
-        r.y = GetXZAngle(&pEm->pos, &pG->Camera.param.pos);
+        r.y = GetXZAngle(&pEm->pos, &pG->Camera.param.Campos);
         r.z = 0.0f;
         EstSet(0, -1, &pEm->pos, &r, EFF_EM10, 0x42, 0, ESP_CORE_KIND_NONE, 0, 0);
         if (w->pEm_old) {
@@ -332,7 +330,7 @@ void emWepDmCk(cEmWep* pEm)
 // destruction when the holder's work vanished.
 void cEmWep::move()
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
 
     emWepDmCk(this);
@@ -362,12 +360,12 @@ void cEmWep::move()
                 w->always2_timer = w->always2_wait;
             }
         }
-        if (w->alwaysTimer) {
-            w->alwaysTimer--;
-            if (w->alwaysTimer == 0) {
+        if (w->se_wait) {
+            w->se_wait--;
+            if (w->se_wait == 0) {
                 cParts* p = getPartsPtr(0);
 
-                w->alwaysTimer = w->alwaysWait;
+                w->se_wait = w->se_wait2;
                 SndCall(w->seAlways[0], w->seAlways[1], &p->world, w->seAlways[2], 0, this);
             }
         }
@@ -397,7 +395,7 @@ void emWep_R0_Move(cEmWep* pEm)
 // freezes its matrix after 3 frames and is lost as soon as it is hidden).
 void emWep_R1_Set(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -433,7 +431,7 @@ void emWep_R1_Set(cEmWep* pEm)
 // fades out and goes to Lost.
 void emWep_R1_LostWait(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec scr;
     Vec pos;
 
@@ -480,7 +478,7 @@ void emWep_R1_LostWait(cEmWep* pEm)
 // Rno1 == 2: removes the weapon: hidden, its effects (Core_kind espKind) deleted, work destroyed.
 void emWep_R1_Lost(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -497,16 +495,16 @@ void emWep_R1_Lost(cEmWep* pEm)
     }
 }
 
-// Rno1 == 3: held by pEm_oya: follows its parts (setParentMatCalc) and drops after timer4 frames
+// Rno1 == 3: held by pEm_oya: follows its parts (setParentMatCalc) and drops after Fall_wait frames
 // (setWaitDrop).
 static void emWep_R1_Parent(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
 
     pEm->setParentMatCalc(0);
-    if (w->timer4) {
-        w->timer4--;
-        if (w->timer4 == 0) {
+    if (w->Fall_wait) {
+        w->Fall_wait--;
+        if (w->Fall_wait == 0) {
             pEm->setFall(0, 0, 20.0f);
         }
     }
@@ -518,19 +516,19 @@ static void emWep_R1_Parent(cEmWep* pEm)
 // speeds are small; a water entry plays the splash est / SE once.
 void emWep_R1_Fall(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec ofs[4][3] = {
         { { 0.0f, 0.0f, 600.0f }, { 0.0f, 0.0f, -600.0f }, { 300.0f, 0.0f, 0.0f } },
         { { 0.0f, 0.0f, 1500.0f }, { 0.0f, 0.0f, 0.0f }, { 300.0f, 0.0f, 1300.0f } },
         { { -140.0f, 60.0f, 140.0f }, { -140.0f, 60.0f, -140.0f }, { 200.0f, 60.0f, 0.0f } },
         { { -140.0f, 30.0f, 140.0f }, { -140.0f, 30.0f, -140.0f }, { 200.0f, 30.0f, 0.0f } },
     };
-    EmWepNode node[3];
+    EMWEP_FALLWK node[3];
     // one pointer shared by every node loop (emtree emTree_R1_Fall): the later mentions keep the
     // k-body loop's giv from being marked replaceable, loop.c emits its final value `&node[2]`
     // after that loop and cse2 makes the last loop's bound a copy of it (`mr r25, r0`)
-    EmWepNode* n;
-    EmWepNode* nx;
+    EMWEP_FALLWK* n;
+    EMWEP_FALLWK* nx;
     Vec b;
     Vec c;
     Vec a;
@@ -546,9 +544,9 @@ void emWep_R1_Fall(cEmWep* pEm)
     floor = EatMgr.getFloor(&pEm->pos, 0, 600.0f, 100000.0f, 0) + 50.0f;
     for (i = 0; i < 3; i++) {
         n = &node[i];
-        n->spd.x = w->pt[i].x;
-        n->spd.y = w->pt[i].y;
-        n->spd.z = w->pt[i].z;
+        n->spd.x = w->spd[i].x;
+        n->spd.y = w->spd[i].y;
+        n->spd.z = w->spd[i].z;
     }
     for (i = 0; i < 3; i++) {
         n = &node[i];
@@ -641,9 +639,9 @@ void emWep_R1_Fall(cEmWep* pEm)
     }
     for (i = 0; i < 3; i++) {
         n = &node[i];
-        w->pt[i].x = n->spd.x;
-        w->pt[i].y = n->spd.y;
-        w->pt[i].z = n->spd.z;
+        w->spd[i].x = n->spd.x;
+        w->spd[i].y = n->spd.y;
+        w->spd[i].z = n->spd.z;
     }
     PSVECSubtract(&node[0].pos, &node[1].pos, &a);
     PSVECSubtract(&node[2].pos, &node[1].pos, &b);
@@ -684,8 +682,8 @@ void emWep_R1_Fall(cEmWep* pEm)
     }
     pEm->partsWorldCalc();
     if (w->Water_ck == 0 && CheckInWater(pEm, 0)) {
-        if (w->eff_id_always2[0] != 0xFF && w->eff_id_always2[1] != 0xFF) {
-            EstSet(0, -1, &pEm->pos, 0, w->eff_id_always2[0], w->eff_id_always2[1], 0, ESP_CORE_KIND_NONE, 0, 0);
+        if (w->effWater[0] != 0xFF && w->effWater[1] != 0xFF) {
+            EstSet(0, -1, &pEm->pos, 0, w->effWater[0], w->effWater[1], 0, ESP_CORE_KIND_NONE, 0, 0);
         }
         SndCall(6, 0x17, &pEm->pos, 0, 0, pEm);
         w->Water_ck = 1;
@@ -697,7 +695,7 @@ void emWep_R1_Fall(cEmWep* pEm)
 // deals damage with blood, SE, quake and drops it; water entry splashes.
 void emWep_R1_Throw(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec d;
     Mtx m;
     Vec up;
@@ -720,8 +718,8 @@ void emWep_R1_Throw(cEmWep* pEm)
         }
         break;
     }
-    w->spd.y -= w->Gravity;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= w->Gravity;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     if (EatMgr.hitCheck(&pEm->pos_old, &pEm->pos, 0, 0, 0, 0)) {
         pEm->setFall(0, 0, 20.0f);
         if (w->seHitWall[0] != 0xFF && w->seHitWall[1] != 0xFF && w->Water_ck == 0) {
@@ -770,8 +768,8 @@ void emWep_R1_Throw(cEmWep* pEm)
     TransMatrix(pEm->mat, &pEm->pos);
     pEm->partsWorldCalc();
     if (w->Water_ck == 0 && CheckInWater(pEm, 0)) {
-        if (w->eff_id_always2[0] != 0xFF && w->eff_id_always2[1] != 0xFF) {
-            EstSet(0, -1, &pEm->pos, 0, w->eff_id_always2[0], w->eff_id_always2[1], 0, ESP_CORE_KIND_NONE, 0, 0);
+        if (w->effWater[0] != 0xFF && w->effWater[1] != 0xFF) {
+            EstSet(0, -1, &pEm->pos, 0, w->effWater[0], w->effWater[1], 0, ESP_CORE_KIND_NONE, 0, 0);
         }
         SndCall(6, 0x17, &pEm->pos, 0, 0, pEm);
         w->Water_ck = 1;
@@ -782,7 +780,7 @@ void emWep_R1_Throw(cEmWep* pEm)
 // vertical axis; a head hit decapitates the player (emWepPlHeadLost).
 void emWep_R1_ThrowScythe(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec d;
     Mtx m;
     cCtrl* c;
@@ -802,7 +800,7 @@ void emWep_R1_ThrowScythe(cEmWep* pEm)
         }
         break;
     }
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     if (EatMgr.hitCheck(&pEm->pos_old, &pEm->pos, 0, 0, 0, 0)) {
         pEm->setFall(0, 0, 20.0f);
         if (w->seHitWall[0] != 0xFF && w->seHitWall[1] != 0xFF && w->Water_ck == 0) {
@@ -833,8 +831,8 @@ void emWep_R1_ThrowScythe(cEmWep* pEm)
     TransMatrix(pEm->mat, &pEm->pos);
     pEm->partsWorldCalc();
     if (w->Water_ck == 0 && CheckInWater(pEm, 0)) {
-        if (w->eff_id_always2[0] != 0xFF && w->eff_id_always2[1] != 0xFF) {
-            EstSet(0, -1, &pEm->pos, 0, w->eff_id_always2[0], w->eff_id_always2[1], 0, ESP_CORE_KIND_NONE, 0, 0);
+        if (w->effWater[0] != 0xFF && w->effWater[1] != 0xFF) {
+            EstSet(0, -1, &pEm->pos, 0, w->effWater[0], w->effWater[1], 0, ESP_CORE_KIND_NONE, 0, 0);
         }
         SndCall(6, 0x17, &pEm->pos, 0, 0, pEm);
         w->Water_ck = 1;
@@ -844,10 +842,10 @@ void emWep_R1_ThrowScythe(cEmWep* pEm)
 // Rno1 == 6: a straight projectile (thrown knife / bolt) for at most 90 frames: a scenery hit
 // (attribute 0x404000) stops it in place (rests, then drops), a player or partner hit
 // (EmAtkLineHitCk / Sub) deals the pAtk damage; when the hit part is flagged 0x4000 the weapon
-// stays stuck in that parts for timer4 frames (setParent) before dropping.
+// stays stuck in that parts for Fall_wait frames (setParent) before dropping.
 void emWep_R1_Shot(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec hit;
     Vec hitPos;
     Vec nrm;
@@ -859,7 +857,7 @@ void emWep_R1_Shot(cEmWep* pEm)
 
     switch (pEm->r_no_2) {
     case 0:
-        PSVECSubtract(&pEm->pos, &w->spd, &pEm->pos_old);
+        PSVECSubtract(&pEm->pos, &w->throw_v, &pEm->pos_old);
         w->Timer = 0;
         w->Timer2 = 90;
         pEm->r_no_2++;
@@ -884,22 +882,22 @@ void emWep_R1_Shot(cEmWep* pEm)
         break;
     case 2:
         w->pEm_old = 0;
-        w->timer4 = 60;
+        w->Fall_wait = 60;
         pEm->hp = 0;
         pEm->setStatus(EM_STATUS_LOCKOFF);
         pEm->r_no_2++;
     case 3:
         pEm->partsWorldCalc();
-        if (w->timer4) {
-            w->timer4--;
+        if (w->Fall_wait) {
+            w->Fall_wait--;
         } else {
             pEm->setFall(0, 0, 20.0f);
             SndStop(w->seid_throw, 0);
         }
         return;
     }
-    w->spd.y -= 0.0f;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= 0.0f;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     if (emWepShotHitVaseCk(&pEm->pos_old, &pEm->pos) || emWepShotHitWindowCk(&pEm->pos_old, &pEm->pos)) {
         pEm->setFall(0, 0, 20.0f);
         return;
@@ -920,7 +918,7 @@ void emWep_R1_Shot(cEmWep* pEm)
         return;
     }
     if (w->pAtk) {
-        part = (YARARE_INFO*) EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0);
+        part = EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hitPos, &nrm, 0);
         if (part) {
             VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
@@ -933,7 +931,7 @@ void emWep_R1_Shot(cEmWep* pEm)
             } else {
                 EmPlBloodSet2(pEm, &pEm->pos, 1, 0xFF, 0xFF);
             }
-            EmAtkSetDamagePL((cEm*) part, w->pAtk, &pEm->pos_old, &pEm->pos);
+            EmAtkSetDamagePL(part, w->pAtk, &pEm->pos_old, &pEm->pos);
             if ((part->flag & YAT_FLAG_DMPOS) == 0) {
                 pEm->setFall(0, 0, 20.0f);
                 return;
@@ -949,9 +947,9 @@ void emWep_R1_Shot(cEmWep* pEm)
             pEm->ang.y = atan2f(-pEm->pos.x, -pEm->pos.z);
             pEm->ang.z = 0.0f;
             if ((s16) pG->pl_life <= 0) {
-                w->timer4 = 0;
+                w->Fall_wait = 0;
             } else {
-                w->timer4 = 30;
+                w->Fall_wait = 30;
             }
             pEm->setParent(pPL, no, 0);
             pEm->hp = 0;
@@ -993,9 +991,9 @@ void emWep_R1_Shot(cEmWep* pEm)
             pEm->ang.y = atan2f(-pEm->pos.x, -pEm->pos.z);
             pEm->ang.z = 0.0f;
             if ((s16) pG->ashley_life <= 0) {
-                w->timer4 = 0;
+                w->Fall_wait = 0;
             } else {
-                w->timer4 = 30;
+                w->Fall_wait = 30;
             }
             pEm->setParent(pSUB, no, 0);
             pEm->hp = 0;
@@ -1009,8 +1007,8 @@ void emWep_R1_Shot(cEmWep* pEm)
     TransMatrix(pEm->mat, &pEm->pos);
     pEm->partsWorldCalc();
     if (w->Water_ck == 0 && CheckInWater(pEm, 0)) {
-        if (w->eff_id_always2[0] != 0xFF && w->eff_id_always2[1] != 0xFF) {
-            EstSet(0, -1, &pEm->pos, 0, w->eff_id_always2[0], w->eff_id_always2[1], 0, ESP_CORE_KIND_NONE, 0, 0);
+        if (w->effWater[0] != 0xFF && w->effWater[1] != 0xFF) {
+            EstSet(0, -1, &pEm->pos, 0, w->effWater[0], w->effWater[1], 0, ESP_CORE_KIND_NONE, 0, 0);
         }
         SndCall(6, 0x17, &pEm->pos, 0, 0, pEm);
         w->Water_ck = 1;
@@ -1022,7 +1020,7 @@ void emWep_R1_Shot(cEmWep* pEm)
 // emWepArrowBomb; a body hit sticks and explodes the same way.
 void emWep_R1_ShotArrow(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec hit;
     Vec nrm;
     YARARE_INFO* part;
@@ -1079,8 +1077,8 @@ void emWep_R1_ShotArrow(cEmWep* pEm)
         }
         return;
     }
-    w->spd.y -= 0.0f;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= 0.0f;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     if (w->Timer3) {
         w->Timer3--;
     } else if (EatMgr.hitCheck(&pEm->pos_old, &pEm->pos, &hit, 0, 0, 0x404000)) {
@@ -1098,7 +1096,7 @@ void emWep_R1_ShotArrow(cEmWep* pEm)
         return;
     }
     if (w->pAtk) {
-        part = (YARARE_INFO*) EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hit, &nrm, 0);
+        part = EmAtkLineHitCk(&pEm->pos_old, &pEm->pos, &hit, &nrm, 0);
         if (part) {
             VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
             if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
@@ -1111,7 +1109,7 @@ void emWep_R1_ShotArrow(cEmWep* pEm)
             } else {
                 EmPlBloodSet2(pEm, &pEm->pos, 1, 0xFF, 0xFF);
             }
-            EmAtkSetDamagePL((cEm*) part, w->pAtk, &pEm->pos_old, &pEm->pos);
+            EmAtkSetDamagePL(part, w->pAtk, &pEm->pos_old, &pEm->pos);
             // `mr r3,part` is the LAST argument move in the original (part does not die there).
             asm("" : "=m"(hit) : "r"(part));  // COMPILER-DIFF: #13 (keep-alive)
         } else {
@@ -1143,8 +1141,8 @@ fly:
     TransMatrix(pEm->mat, &pEm->pos);
     pEm->partsWorldCalc();
     if (w->Water_ck == 0 && CheckInWater(pEm, 0)) {
-        if (w->eff_id_always2[0] != 0xFF && w->eff_id_always2[1] != 0xFF) {
-            EstSet(0, -1, &pEm->pos, 0, w->eff_id_always2[0], w->eff_id_always2[1], 0, ESP_CORE_KIND_NONE, 0, 0);
+        if (w->effWater[0] != 0xFF && w->effWater[1] != 0xFF) {
+            EstSet(0, -1, &pEm->pos, 0, w->effWater[0], w->effWater[1], 0, ESP_CORE_KIND_NONE, 0, 0);
         }
         SndCall(6, 0x17, &pEm->pos, 0, 0, pEm);
         w->Water_ck = 1;
@@ -1156,7 +1154,7 @@ fly:
 // partner's chest, or after 500 frames.
 void emWep_R1_Rocket(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec d;
     Mtx m;
     Vec hit;
@@ -1194,8 +1192,8 @@ void emWep_R1_Rocket(cEmWep* pEm)
         }
         break;
     }
-    w->spd.y -= 0.0f;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= 0.0f;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     if (w->Timer3 == 0) {
         if (EatMgr.hitCheck(&pEm->pos_old, &pEm->pos, &hit, 0, 0, 0x4000)) {
             emWepRocketBobm(pEm);
@@ -1226,7 +1224,7 @@ void emWep_R1_Rocket(cEmWep* pEm)
 // thrower's explosion SE, 5000 radius damage (PlWepHitCheck2 type 0x13), then Lost.
 void emWepRocketBobm(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     CAMERA* cam = &pG->Camera;
     cParts* p;
     Vec r;
@@ -1238,11 +1236,11 @@ void emWepRocketBobm(cEmWep* pEm)
     EffectEspgenDelete(0, w->EffKindId, pEm);
     EffectEfmDelete(0, w->EffKindId, pEm);
     p = pEm->getPartsPtr(0);
-    len = (cam->param.pos.x - p->world.x) * (cam->param.pos.x - p->world.x)
-        + (cam->param.pos.y - p->world.y) * (cam->param.pos.y - p->world.y)
-        + (cam->param.pos.z - p->world.z) * (cam->param.pos.z - p->world.z);
+    len = (cam->param.Campos.x - p->world.x) * (cam->param.Campos.x - p->world.x)
+        + (cam->param.Campos.y - p->world.y) * (cam->param.Campos.y - p->world.y)
+        + (cam->param.Campos.z - p->world.z) * (cam->param.Campos.z - p->world.z);
     r.x = 0.0f;
-    r.y = GetXZAngle(&p->world, &cam->param.pos);
+    r.y = GetXZAngle(&p->world, &cam->param.Campos);
     r.z = 0.0f;
     if (len < 16000000.0f) {
         EstSet(0, -1, &pEm->pos, &r, EFF_EM10, 0x48, 0, ESP_CORE_KIND_NONE, 0, 0);
@@ -1266,7 +1264,7 @@ void emWepRocketBobm(cEmWep* pEm)
 // Explosive arrow detonation: blast ests 0/0xD + 0/0x1A, SE, 5000 radius damage, then Lost.
 void emWepArrowBomb(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec pos;
 
     SndStop(w->seid_throw, 0);
@@ -1292,7 +1290,7 @@ void emWepArrowBomb(cEmWep* pEm)
 // est, SE, 5000 radius damage, Lost); landing in water drowns it (splash, Fall).
 void emWep_R1_BombThrow(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec d;
     Vec nrm;
     f32 spd;
@@ -1302,7 +1300,7 @@ void emWep_R1_BombThrow(cEmWep* pEm)
 
     switch (pEm->r_no_2) {
     case 0:
-        w->bounce = 1;
+        w->TmpU32 = 1;
         w->Timer = 0;
         w->Timer2 = 0;
         pEm->r_no_2++;
@@ -1325,11 +1323,11 @@ void emWep_R1_BombThrow(cEmWep* pEm)
         f32 dist;
 
         p = pEm->getPartsPtr(0);
-        dist = (cam->param.pos.x - p->world.x) * (cam->param.pos.x - p->world.x)
-            + (cam->param.pos.y - p->world.y) * (cam->param.pos.y - p->world.y)
-            + (cam->param.pos.z - p->world.z) * (cam->param.pos.z - p->world.z);
+        dist = (cam->param.Campos.x - p->world.x) * (cam->param.Campos.x - p->world.x)
+            + (cam->param.Campos.y - p->world.y) * (cam->param.Campos.y - p->world.y)
+            + (cam->param.Campos.z - p->world.z) * (cam->param.Campos.z - p->world.z);
         r.x = 0.0f;
-        r.y = GetXZAngle(&p->world, &cam->param.pos);
+        r.y = GetXZAngle(&p->world, &cam->param.Campos);
         r.z = 0.0f;
         if (dist < 16000000.0f) {
             EstSet(0, -1, &pEm->pos, &r, EFF_EM10, 0x48, 0, ESP_CORE_KIND_NONE, 0, 0);
@@ -1350,18 +1348,18 @@ void emWep_R1_BombThrow(cEmWep* pEm)
         pEm->setLost();
         return;
     }
-    w->spd.y -= 15.0f;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= 15.0f;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     nrm.x = 0.0f;
     nrm.y = 0.0f;
     nrm.z = 0.0f;
     EatMgr.adjust(&nrm, &pEm->pos_old, &pEm->pos, 100.0f, 0x2001, 0x4000);
     if (nrm.x != 0.0f || nrm.y != 0.0f || nrm.z != 0.0f) {
-        spd = RootSumSquare3(&w->spd);
-        C_VECReflect(&w->spd, &nrm, &d);
-        PSVECScale(&d, &w->spd, spd * 0.5f);
-        if (w->bounce) {
-            w->bounce = 0;
+        spd = RootSumSquare3(&w->throw_v);
+        C_VECReflect(&w->throw_v, &nrm, &d);
+        PSVECScale(&d, &w->throw_v, spd * 0.5f);
+        if (w->TmpU32) {
+            w->TmpU32 = 0;
             SndCall(5, 6, &pEm->pos, 0, 0, pEm);
         }
         if (w->seHitWall[0] != 0xFF && w->seHitWall[1] != 0xFF && w->Water_ck == 0) {
@@ -1390,7 +1388,7 @@ void emWep_R1_BombThrow(cEmWep* pEm)
         VECNormalize(&fwd, &fwd);
         ang = acosf(PSVECDotProduct(&up, &fwd));
         if (ang > 0.01f && ang < 3.1315927f) {
-            len = SQRTF(w->spd.x * w->spd.x + w->spd.y * w->spd.y + w->spd.z * w->spd.z);
+            len = SQRTF(w->throw_v.x * w->throw_v.x + w->throw_v.y * w->throw_v.y + w->throw_v.z * w->throw_v.z);
             if (len > 200.0f) {
                 len = 200.0f;
             }
@@ -1403,8 +1401,8 @@ void emWep_R1_BombThrow(cEmWep* pEm)
     TransMatrix(pEm->mat, &pEm->pos);
     pEm->partsWorldCalc();
     if (w->Water_ck == 0 && CheckInWater(pEm, 0)) {
-        if (w->eff_id_always2[0] != 0xFF && w->eff_id_always2[1] != 0xFF) {
-            EstSet(0, -1, &pEm->pos, 0, w->eff_id_always2[0], w->eff_id_always2[1], 0, ESP_CORE_KIND_NONE, 0, 0);
+        if (w->effWater[0] != 0xFF && w->effWater[1] != 0xFF) {
+            EstSet(0, -1, &pEm->pos, 0, w->effWater[0], w->effWater[1], 0, ESP_CORE_KIND_NONE, 0, 0);
         }
         SndCall(6, 0x17, &pEm->pos, 0, 0, pEm);
         w->Water_ck = 1;
@@ -1417,7 +1415,7 @@ void emWep_R1_BombThrow(cEmWep* pEm)
 // alive, then Lost.
 void emWep_R1_FlashThrow(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec d;
     Vec nrm;
     Mtx m;
@@ -1434,7 +1432,7 @@ void emWep_R1_FlashThrow(cEmWep* pEm)
         pEm->hp = 0;
         w->Timer = 0;
         w->Timer2 = 0;
-        w->bounce = 1;
+        w->TmpU32 = 1;
         pEm->r_no_2++;
     case 1:
         w->Timer2++;
@@ -1459,18 +1457,18 @@ void emWep_R1_FlashThrow(cEmWep* pEm)
         pEm->setLost();
         return;
     }
-    w->spd.y -= 15.0f;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= 15.0f;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     nrm.x = 0.0f;
     nrm.y = 0.0f;
     nrm.z = 0.0f;
     EatMgr.adjust(&nrm, &pEm->pos_old, &pEm->pos, 100.0f, 0x2001, 0x4000);
     if (nrm.x != 0.0f || nrm.y != 0.0f || nrm.z != 0.0f) {
-        spd = RootSumSquare3(&w->spd);
-        C_VECReflect(&w->spd, &nrm, &d);
-        PSVECScale(&d, &w->spd, spd * 0.5f);
-        if (w->bounce) {
-            w->bounce = 0;
+        spd = RootSumSquare3(&w->throw_v);
+        C_VECReflect(&w->throw_v, &nrm, &d);
+        PSVECScale(&d, &w->throw_v, spd * 0.5f);
+        if (w->TmpU32) {
+            w->TmpU32 = 0;
             SndCall(5, 6, &pEm->pos, 0, 0, pEm);
         }
         if (w->seHitWall[0] != 0xFF && w->seHitWall[1] != 0xFF && w->Water_ck == 0) {
@@ -1494,7 +1492,7 @@ void emWep_R1_FlashThrow(cEmWep* pEm)
     VECNormalize(&fwd, &fwd);
     ang = acosf(PSVECDotProduct(&up, &fwd));
     if (ang > 0.01f && ang < 3.1315927f) {
-        len = SQRTF(w->spd.x * w->spd.x + w->spd.y * w->spd.y + w->spd.z * w->spd.z);
+        len = SQRTF(w->throw_v.x * w->throw_v.x + w->throw_v.y * w->throw_v.y + w->throw_v.z * w->throw_v.z);
         if (len > 200.0f) {
             len = 200.0f;
         }
@@ -1512,7 +1510,7 @@ void emWep_R1_FlashThrow(cEmWep* pEm)
 // the escape action button 0x25 (emWepEscapeAction) once.
 void emWep_R1_GrenadeThrow(cEmWep* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec d;
     Vec nrm;
     f32 spd;
@@ -1522,7 +1520,7 @@ void emWep_R1_GrenadeThrow(cEmWep* pEm)
 
     switch (pEm->r_no_2) {
     case 0:
-        w->bounce = 1;
+        w->TmpU32 = 1;
         w->Timer = 0;
         w->Timer2 = 0;
         w->Act_ck = 0;
@@ -1554,18 +1552,18 @@ void emWep_R1_GrenadeThrow(cEmWep* pEm)
     if (w->Bomb_wait <= 0x18 && pEm->l_pl < 36000000.0f && w->Act_ck == 0) {
         ActBtn.set(ACT_GUARD, 0xB, (void*) emWepEscapeAction, pEm, ACTCTR_WEP_SET_IGNORE, DISP_L_R, ACT_FUNC_NORMAL, 0);
     }
-    w->spd.y -= 15.0f;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= 15.0f;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     nrm.x = 0.0f;
     nrm.y = 0.0f;
     nrm.z = 0.0f;
     EatMgr.adjust(&nrm, &pEm->pos_old, &pEm->pos, 100.0f, 0x2001, 0x4000);
     if (nrm.x != 0.0f || nrm.y != 0.0f || nrm.z != 0.0f) {
-        spd = RootSumSquare3(&w->spd);
-        C_VECReflect(&w->spd, &nrm, &d);
-        PSVECScale(&d, &w->spd, spd * 0.5f);
-        if (w->bounce) {
-            w->bounce = 0;
+        spd = RootSumSquare3(&w->throw_v);
+        C_VECReflect(&w->throw_v, &nrm, &d);
+        PSVECScale(&d, &w->throw_v, spd * 0.5f);
+        if (w->TmpU32) {
+            w->TmpU32 = 0;
             SndCall(5, 6, &pEm->pos, 0, 0, pEm);
         }
         if (w->seHitWall[0] != 0xFF && w->seHitWall[1] != 0xFF && w->Water_ck == 0) {
@@ -1594,7 +1592,7 @@ void emWep_R1_GrenadeThrow(cEmWep* pEm)
         VECNormalize(&fwd, &fwd);
         ang = acosf(PSVECDotProduct(&up, &fwd));
         if (ang > 0.01f && ang < 3.1315927f) {
-            len = SQRTF(w->spd.x * w->spd.x + w->spd.y * w->spd.y + w->spd.z * w->spd.z);
+            len = SQRTF(w->throw_v.x * w->throw_v.x + w->throw_v.y * w->throw_v.y + w->throw_v.z * w->throw_v.z);
             if (len > 200.0f) {
                 len = 200.0f;
             }
@@ -1633,7 +1631,7 @@ void emWepEscapeAction(cEmWep* ptr)
 // Player damage routine: runs away from the grenade.
 static void plemEscape(cPlayer* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm->pEmCatch);
+    FREE_EMWEP* w = EMWEP_WK(pEm->pEmCatch);
 
     pEm->subArc = pEm->pEmCatch->subArc;
     pEm->dmg.m_Timer = 2;
@@ -1673,7 +1671,7 @@ static void plemEscape(cPlayer* pEm)
 // Player damage routine: back jump away from the grenade.
 void plemBackjump(cPlayer* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm->pEmCatch);
+    FREE_EMWEP* w = EMWEP_WK(pEm->pEmCatch);
 
     pEm->subArc = pEm->pEmCatch->subArc;
     pEm->dmg.m_Timer = 0x1E;
@@ -1716,7 +1714,7 @@ void plemBackjump(cPlayer* pEm)
 // Player damage routine: dive forward over the grenade.
 void plemFrontEscape(cPlayer* pEm)
 {
-    EmWepWork* w = EMWEP_WK(pEm->pEmCatch);
+    FREE_EMWEP* w = EMWEP_WK(pEm->pEmCatch);
 
     pEm->subArc = pEm->pEmCatch->subArc;
     pEm->dmg.m_Timer = 0x1E;
@@ -1754,7 +1752,7 @@ void plemFrontEscape(cPlayer* pEm)
 void emWepEscapeCamMove(cEmWep* pEm)
 {
     GLOBAL_WK* g = pG;
-    EmWepWork* w = EMWEP_WK(pEm);
+    FREE_EMWEP* w = EMWEP_WK(pEm);
     Vec p0;
     Vec p1;
     Vec hit;
@@ -1763,7 +1761,7 @@ void emWepEscapeCamMove(cEmWep* pEm)
 
     // Store through a cast pointer (no MEM_IN_STRUCT_P): the store may alias the `pPL` load below,
     // which keeps `lwz pPL` after it and ranks the `w` chain above the constant-pool `lis`es.
-    *(f32*) (u8*) &w->Cam.param.fovy = g->Camera.param.fovy;
+    *(f32*) (u8*) &w->Cam.param.Fovy = g->Camera.param.Fovy;
     p0.x = -376.0f;
     p0.y = 575.0f;
     p0.z = -1831.0f;
@@ -1772,19 +1770,19 @@ void emWepEscapeCamMove(cEmWep* pEm)
     p1.z = 52.6f;
     PSMTXMultVec(pPL->mat, &p0, &p0);
     PSMTXMultVec(pPL->mat, &p1, &p1);
-    PosToPos(&g->Camera.param.at, &p1, &w->Cam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &p0, &w->Cam.param.pos, 1.0f);
-    if (EatMgr.hitCheck(&w->Cam.param.at, &w->Cam.param.pos, &hit, 0, 0x8000, 0)) {
-        PSVECSubtract(&hit, &w->Cam.param.at, &d);
+    PosToPos(&g->Camera.param.Target, &p1, &w->Cam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &p0, &w->Cam.param.Campos, 1.0f);
+    if (EatMgr.hitCheck(&w->Cam.param.Target, &w->Cam.param.Campos, &hit, 0, 0x8000, 0)) {
+        PSVECSubtract(&hit, &w->Cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 2682 "D:/Bio4/Prog/emwep.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&w->Cam.param.at, &d, &w->Cam.param.pos);
+        PSVECAdd(&w->Cam.param.Target, &d, &w->Cam.param.Campos);
     }
-    len = (w->Cam.param.pos.x - w->Cam.param.at.x) * (w->Cam.param.pos.x - w->Cam.param.at.x)
-        + (w->Cam.param.pos.y - w->Cam.param.at.y) * (w->Cam.param.pos.y - w->Cam.param.at.y)
-        + (w->Cam.param.pos.z - w->Cam.param.at.z) * (w->Cam.param.pos.z - w->Cam.param.at.z);
+    len = (w->Cam.param.Campos.x - w->Cam.param.Target.x) * (w->Cam.param.Campos.x - w->Cam.param.Target.x)
+        + (w->Cam.param.Campos.y - w->Cam.param.Target.y) * (w->Cam.param.Campos.y - w->Cam.param.Target.y)
+        + (w->Cam.param.Campos.z - w->Cam.param.Target.z) * (w->Cam.param.Campos.z - w->Cam.param.Target.z);
     w->Cam.Up.x = 0.0f;
     w->Cam.Up.y = 1.0f;
     w->Cam.Up.z = 0.0f;
@@ -1793,14 +1791,14 @@ void emWepEscapeCamMove(cEmWep* pEm)
     CamCtrl.SetExtraCamera(&w->Cam);
 }
 
-// Puts the weapon in `parent`'s parts `partsNo_` (Rno1 3); flag skips the matrix normalisation.
-void cEmWep::setParent(cEm* parent, int partsNo_, int flag)
+// Puts the weapon in `pEm`'s parts `oya_parts` (Rno1 3); mode skips the matrix normalisation.
+void cEmWep::setParent(cEm* pEm, u32 oya_parts, u32 mode)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
-    w->pEm_oya = parent;
-    w->oya_parts = partsNo_;
-    if (flag) {
+    w->pEm_oya = pEm;
+    w->oya_parts = oya_parts;
+    if (mode) {
         w->Be_flg |= 1;
     } else {
         w->Be_flg &= ~1;
@@ -1815,7 +1813,7 @@ void cEmWep::setParent(cEm* parent, int partsNo_, int flag)
 // speed of the nodes (random when NULL).
 void cEmWep::setFall(int type, Vec* pSpd, f32 gravity)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Mtx m;
     Vec v;
     f32 ang;
@@ -1827,9 +1825,9 @@ void cEmWep::setFall(int type, Vec* pSpd, f32 gravity)
             switch (i) {
             case 0:
             default:
-                w->pt[i].x = pSpd->x;
-                w->pt[i].y = pSpd->y;
-                w->pt[i].z = pSpd->z;
+                w->spd[i].x = pSpd->x;
+                w->spd[i].y = pSpd->y;
+                w->spd[i].z = pSpd->z;
                 break;
             case 1:
                 if (pSpd->x == 0.0f && pSpd->z == 0.0f) {
@@ -1839,9 +1837,9 @@ void cEmWep::setFall(int type, Vec* pSpd, f32 gravity)
                 }
                 PSMTXRotRad(m, 'y', ang + 1.5707964f);
                 PSMTXMultVec(m, pSpd, &v);
-                w->pt[i].x = v.x;
-                w->pt[i].y = v.y;
-                w->pt[i].z = v.z;
+                w->spd[i].x = v.x;
+                w->spd[i].y = v.y;
+                w->spd[i].z = v.z;
                 break;
             case 2:
                 if (pSpd->x == 0.0f && pSpd->z == 0.0f) {
@@ -1851,15 +1849,15 @@ void cEmWep::setFall(int type, Vec* pSpd, f32 gravity)
                 }
                 PSMTXRotRad(m, 'y', ang - 1.5707964f);
                 PSMTXMultVec(m, pSpd, &v);
-                w->pt[i].x = v.x;
-                w->pt[i].y = v.y;
-                w->pt[i].z = v.z;
+                w->spd[i].x = v.x;
+                w->spd[i].y = v.y;
+                w->spd[i].z = v.z;
                 break;
             }
         } else {
-            w->pt[i].x = fRand1_1() * 10.0f;
-            w->pt[i].y = fRand1_1() * 10.0f + 50.0f;
-            w->pt[i].z = fRand1_1() * 10.0f;
+            w->spd[i].x = fRand1_1() * 10.0f;
+            w->spd[i].y = fRand1_1() * 10.0f + 50.0f;
+            w->spd[i].z = fRand1_1() * 10.0f;
         }
     }
     w->fall_type = type;
@@ -1878,9 +1876,9 @@ void cEmWep::setFall(int type, Vec* pSpd, f32 gravity)
 }
 
 // Throws the weapon with speed `spd` (a random forward throw in the parent's frame when NULL).
-void cEmWep::setThrow(Vec* spd, EmAtkInfo* atk, f32 grav)
+void cEmWep::setThrow(Vec* spd, ATK_INFO* atk, f32 grav)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
     Mtx m;
 
@@ -1896,9 +1894,9 @@ void cEmWep::setThrow(Vec* spd, EmAtkInfo* atk, f32 grav)
             PSMTXMultVecSR(mat, &v, &v);
         }
     }
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     w->Gravity = grav;
     ang.x = 0.0f;
     ang.y = atan2f(v.x, v.z);
@@ -1929,9 +1927,9 @@ void cEmWep::setThrow(Vec* spd, EmAtkInfo* atk, f32 grav)
 }
 
 // Scythe throw: flies straight (no gravity) spinning about its axis (emWep_R1_ThrowScythe).
-void cEmWep::setThrowScythe(Vec* spd, EmAtkInfo* atk)
+void cEmWep::setThrowScythe(Vec* spd, ATK_INFO* atk)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
 
     if (spd) {
@@ -1946,9 +1944,9 @@ void cEmWep::setThrowScythe(Vec* spd, EmAtkInfo* atk)
             PSMTXMultVecSR(mat, &v, &v);
         }
     }
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     w->Gravity = 15.0f;
     ang.x = 0.0f;
     ang.y = atan2f(v.x, v.z);
@@ -1975,9 +1973,9 @@ void cEmWep::setThrowScythe(Vec* spd, EmAtkInfo* atk)
 }
 
 // Shoots the weapon along `spd` (emWep_R1_Shot): it sticks into the player on a hit.
-void cEmWep::setShot(Vec* spd, EmAtkInfo* atk)
+void cEmWep::setShot(Vec* spd, ATK_INFO* atk)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
     Mtx m;
     f32 len;
@@ -1994,9 +1992,9 @@ void cEmWep::setShot(Vec* spd, EmAtkInfo* atk)
             PSMTXMultVecSR(mat, &v, &v);
         }
     }
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     len = SQRTF(v.x * v.x + v.z * v.z);
     ang.x = -atan2f(v.y, len);
     ang.y = atan2f(v.x, v.z);
@@ -2027,9 +2025,9 @@ void cEmWep::setShot(Vec* spd, EmAtkInfo* atk)
 }
 
 // Shoots an (explosive) arrow (emWep_R1_ShotArrow).
-void cEmWep::setShotArrow(Vec* spd, EmAtkInfo* atk)
+void cEmWep::setShotArrow(Vec* spd, ATK_INFO* atk)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
     Mtx m;
     f32 len;
@@ -2046,9 +2044,9 @@ void cEmWep::setShotArrow(Vec* spd, EmAtkInfo* atk)
             PSMTXMultVecSR(mat, &v, &v);
         }
     }
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     len = SQRTF(v.x * v.x + v.z * v.z);
     ang.x = -atan2f(v.y, len);
     ang.y = atan2f(v.x, v.z);
@@ -2078,9 +2076,9 @@ void cEmWep::setShotArrow(Vec* spd, EmAtkInfo* atk)
 }
 
 // Fires the weapon as a rocket (emWep_R1_Rocket) for `owner`.
-void cEmWep::setRocket(cEm* owner, Vec* spd, EmAtkInfo* atk)
+void cEmWep::setRocket(cEm* owner, Vec* spd, ATK_INFO* atk)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
     Mtx m;
     f32 len;
@@ -2097,9 +2095,9 @@ void cEmWep::setRocket(cEm* owner, Vec* spd, EmAtkInfo* atk)
             PSMTXMultVecSR(mat, &v, &v);
         }
     }
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     len = SQRTF(v.x * v.x + v.z * v.z);
     ang.x = -atan2f(v.y, len);
     ang.y = atan2f(v.x, v.z);
@@ -2130,7 +2128,7 @@ void cEmWep::setRocket(cEm* owner, Vec* spd, EmAtkInfo* atk)
 // Throws the weapon as dynamite with a `fuse` frame fuse (emWep_R1_BombThrow).
 void cEmWep::setBombThrow(Vec* pSpd, int bomb_wait)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
     Mtx m;
 
@@ -2147,9 +2145,9 @@ void cEmWep::setBombThrow(Vec* pSpd, int bomb_wait)
         }
     }
     w->Gravity = 15.0f;
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     ang.x = 0.0f;
     ang.y = atan2f(v.x, v.z);
     ang.z = 0.0f;
@@ -2178,7 +2176,7 @@ void cEmWep::setBombThrow(Vec* pSpd, int bomb_wait)
 // Throws the weapon as a flash grenade (emWep_R1_FlashThrow).
 void cEmWep::setFlashThrow(Vec* pSpd, int bomb_wait)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
     Mtx m;
 
@@ -2195,9 +2193,9 @@ void cEmWep::setFlashThrow(Vec* pSpd, int bomb_wait)
         }
     }
     w->Gravity = 15.0f;
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     ang.x = 0.0f;
     ang.y = atan2f(v.x, v.z);
     ang.z = 0.0f;
@@ -2225,7 +2223,7 @@ void cEmWep::setFlashThrow(Vec* pSpd, int bomb_wait)
 // Throws the weapon as a hand grenade (emWep_R1_GrenadeThrow) with the player's escape motions.
 void cEmWep::setGrenadeThrow(Vec* spd, int fuse, void* motEscape, void* motEscape2, void* motBackjump, void* motFront)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     Vec v;
     Mtx m;
 
@@ -2242,9 +2240,9 @@ void cEmWep::setGrenadeThrow(Vec* spd, int fuse, void* motEscape, void* motEscap
         }
     }
     w->Gravity = 15.0f;
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     ang.x = 0.0f;
     ang.y = atan2f(v.x, v.z);
     ang.z = 0.0f;
@@ -2277,7 +2275,7 @@ void cEmWep::setGrenadeThrow(Vec* spd, int fuse, void* motEscape, void* motEscap
 // SE played when the falling weapon lands (0xFF = none).
 void cEmWep::setSeFall(u8 se_id, u8 se_no, u8 em_id)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->seFall[0] = se_id;
     w->seFall[1] = se_no;
@@ -2288,7 +2286,7 @@ void cEmWep::setSeFall(u8 se_id, u8 se_no, u8 em_id)
 // SE played when the weapon is shot out of the hand.
 void cEmWep::setSeDamage(u8 se_id, u8 se_no, u8 em_id)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->seDamage[0] = se_id;
     w->seDamage[1] = se_no;
@@ -2298,7 +2296,7 @@ void cEmWep::setSeDamage(u8 se_id, u8 se_no, u8 em_id)
 // SE played when the thrown weapon hits the player.
 void cEmWep::setSeHit(u8 se_id, u8 se_no, u8 em_id)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->seHit[0] = se_id;
     w->seHit[1] = se_no;
@@ -2308,7 +2306,7 @@ void cEmWep::setSeHit(u8 se_id, u8 se_no, u8 em_id)
 // SE played when the thrown weapon hits the scenery.
 void cEmWep::setSeHitWall(u8 se_id, u8 se_no, u8 em_id)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->seHitWall[0] = se_id;
     w->seHitWall[1] = se_no;
@@ -2318,7 +2316,7 @@ void cEmWep::setSeHitWall(u8 se_id, u8 se_no, u8 em_id)
 // Flying SE restarted every `wait` frames while thrown / shot.
 void cEmWep::setSeThrow(u8 se_id, u8 se_no, u8 em_id, u8 wait)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->seThrow[0] = se_id;
     w->seThrow[1] = se_no;
@@ -2329,19 +2327,19 @@ void cEmWep::setSeThrow(u8 se_id, u8 se_no, u8 em_id, u8 wait)
 // SE played every `wait` frames at parts 0 while the weapon is visible (chainsaw idle).
 void cEmWep::setSeAlways(u8 se_id, u8 se_no, u8 em_id, u8 wait)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
-    w->alwaysTimer = wait;
+    w->se_wait = wait;
     w->seAlways[0] = se_id;
     w->seAlways[1] = se_no;
     w->seAlways[2] = em_id;
-    w->alwaysWait = wait;
+    w->se_wait2 = wait;
 }
 
 // Est spawned when the fall ends.
 void cEmWep::setEffFall(u8 eff_id, u8 est_id)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->effFall[0] = eff_id;
     w->effFall[1] = est_id;
@@ -2350,7 +2348,7 @@ void cEmWep::setEffFall(u8 eff_id, u8 est_id)
 // Est spawned when the weapon is shot out of the hand.
 void cEmWep::setEffDamage(u8 eff_id, u8 est_id)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->effDamage[0] = eff_id;
     w->effDamage[1] = est_id;
@@ -2359,7 +2357,7 @@ void cEmWep::setEffDamage(u8 eff_id, u8 est_id)
 // Blood est arguments when the thrown weapon hits the player.
 void cEmWep::setEffHit(u8 eff_id, u8 est_id)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->effHit[0] = eff_id;
     w->effHit[1] = est_id;
@@ -2368,10 +2366,10 @@ void cEmWep::setEffHit(u8 eff_id, u8 est_id)
 // Est spawned when the weapon enters water.
 void cEmWep::setEffWater(u8 eff_id, u8 est_id)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
-    w->eff_id_always2[0] = eff_id;
-    w->eff_id_always2[1] = est_id;
+    w->effWater[0] = eff_id;
+    w->effWater[1] = est_id;
 }
 
 // Attaches a continuous est (torch flame, chainsaw smoke) to the weapon under its Core_kind.
@@ -2383,7 +2381,7 @@ void cEmWep::setEffAlways(u8 eff_id, u8 est_id)
 // A repeating est spawned every `wait` frames at `ofs` in parts `parts` while visible.
 void cEmWep::setEffAlways2(u8 eff_id, u8 est_id, u8 parts_no, Vec* pOffset, u16 wait)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->effAlways[0] = eff_id;
     w->effAlways[1] = est_id;
@@ -2419,7 +2417,7 @@ void cEmWep::setYarareCube(f32 w, f32 h, f32 d, Vec* pOfs)
 // on == 0 keeps the weapon hidden (Be_flg bit1), on != 0 shows it.
 void cEmWep::setTransMode(int mode)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     if (mode) {
         w->Be_flg &= ~2;
@@ -2449,7 +2447,7 @@ void cEmWep::setLost()
 // Drops a held weapon that has a pending drop timer (doors opening, holder staggered).
 void cEmWep::setWaitDrop()
 {
-    if (EMWEP_WK(this)->timer4) {
+    if (EMWEP_WK(this)->Fall_wait) {
         setFall(0, 0, 20.0f);
     }
 }
@@ -2634,7 +2632,7 @@ int emWepShotHitWindowCk(Vec* pPos, Vec* pPos2)
 // Chain weapons (whips): the parts hang as a pendulum cloth from `owner`'s collision volumes.
 void cEmWep::setCloth(cModel* pEm)
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
 
     w->Cloth.Num = 10;
     w->Cloth.pLeft = 0;
@@ -2669,7 +2667,7 @@ void cEmWep::setCloth(cModel* pEm)
 // vanished collision target is forgotten.
 void cEmWep::moveCloth()
 {
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     cParts* p;
     Mtx inv;
 
@@ -2687,13 +2685,13 @@ void cEmWep::moveCloth()
 
 // Matrix of a weapon hanging on its parent's parts (emWep_R1_Parent; objTrolley calls it with
 // noMotion = 1 to skip the motion update).
-void cEmWep::setParentMatCalc(int mode)
+void cEmWep::setParentMatCalc(u32 mode)
 {
     Mtx m;
     Vec v0;
     Vec v1;
     Vec v2;
-    EmWepWork* w = EMWEP_WK(this);
+    FREE_EMWEP* w = EMWEP_WK(this);
     cEm* parent = w->pEm_oya;
 
     if (parent == 0) {

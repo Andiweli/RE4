@@ -62,7 +62,7 @@ void cPlBody::waistMove()
 // 256 frames, used for the blink / mouth morphs.
 void cPlBody::makeSpaeData()
 {
-    SpaeData* d = spae;
+    PL_SHAPE_DATA* d = pl_shape_data;
     u32 i;
 
     for (i = 0; i < 2; i++) {

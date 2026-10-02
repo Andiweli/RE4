@@ -13,11 +13,9 @@
 #include "trans_ot.h"
 #include <dolphin/os.h>
 
-extern "C" {
 // game/trans_lit.cpp defines it with Vec* pos; this unit was built with the by-value prototype (three words
 // in r5..r7), so trans_lit.h is not included.
 void commonClothLightSet(cLight** list, int n, Vec pos, f32 radius);
-}
 
 Cloth ClothWk[8];
 
@@ -61,7 +59,7 @@ static Vec* clothAllocNormal(Vec* dir)
 // apart horizontally and h vertically hanging from the top row at pos_ / ang, binds the texture
 // (and TLUT) and the owner pointer p_; be_flag 0x31 = live, drawn. The top row (or the top four
 // rows in the alternate pin mode) stays fixed.
-void Cloth::Set(Vec ang, Vec pos_, u8 nx_, u8 ny_, f32 w, GXTexObj* tex_, f32 h, void* p_, f32 d, GXTlutObj* tlut_,
+void Cloth::Set(Vec ang, Vec pos_, u8 nx_, u8 ny_, f32 w, f32 h, f32 d, GXTexObj* tex_, GXTexObj* p_, GXTlutObj* tlut_,
                 int flag_)
 {
     Vec zero = {0.0f, 0.0f, 0.0f};
@@ -170,8 +168,8 @@ void ClothCalcTplAddr(void* tpl)
     }
 }
 
-// Initialises a GXTexObj (and TLUT for CI formats) from texture `no` of the TPL; 1 on success.
-int ClothTexSetUp(void* tpl, GXTexObj* tex, int no, GXTlutObj* tlut)
+// Initialises a GXTexObj (and TLUT for CI formats); 1 on success.
+int ClothTexSetUp(void* tpl, GXTexObj* tex, GXTexObj* unusedTex, GXTlutObj* tlut)
 {
     TEXDescriptor* d;
     TEXHeader* t;
@@ -349,7 +347,7 @@ void clothTrans(Cloth* pCL)
 {
     Mtx texMtx;
     GXTexObj* tex = pCL->tex;
-    void* tex2 = pCL->pTobjA;
+    GXTexObj* tex2 = pCL->pTobjA;
     GXTlutObj* tlut = pCL->pTlobjC;
     int nStages;
     int i;
@@ -404,7 +402,7 @@ void clothTrans(Cloth* pCL)
         nStages = 2;
         GXSetZCompLoc(0);
         GXSetBlendMode(1, 4, 5, 0);
-        GXLoadTexObj((GXTexObj*) tex2, 1);
+        GXLoadTexObj(tex2, 1);
         GXSetTevOrder(1, 0, 1, 4);
         GXSetTevOp(1, 0);
     }

@@ -236,7 +236,6 @@ static void em23_R0_Init(cEm23* em)
 {
     Em23Work* w = EM23_WK(em);
     f32 scale;
-    int zero;
 
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
@@ -244,13 +243,12 @@ static void em23_R0_Init(cEm23* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->atari.init(0.0f, -100.0f, 0.0f, 350.0f, 150.0f, 150.0f, 200.0f, 1, 0x2000, 10);
     em->setStatus(EM_STATUS_LOCKOFF);
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     EspDataLoad((u32) ARC(EM23_EFF_004), EFF_EM23, 0);
-    em->Motion.flip = em23_flip_tbl;
+    em->pXFlip = em23_flip_tbl;
     YarareInit(em, 0.0f, -100.0f, 0.0f, 250.0f, 200.0f, 1, YAT_FLAG_ON);
     if (em->modelInit(ARC(EM23_BIN_005), ARC(EM23_TPL_008)) == 0) {
         pLog->err(0, 0, "em23() ModelInit failed.");
@@ -265,11 +263,11 @@ static void em23_R0_Init(cEm23* em)
     w->pWingInfo = 0;
     w->wing = 0xFF;
     em23SetWing(em, 1);
-    w->flags = zero;
+    w->flags = 0;
     w->spd.x = 0.0f;
     w->spd.y = 0.0f;
     w->spd.z = 0.0f;
-    w->moveTimer = zero;
+    w->moveTimer = 0;
     w->x20 = 0.0f;
     w->pCorpse = 0;
     w->x3C = 100000000.0f;
@@ -290,7 +288,7 @@ static void em23_R0_Init(cEm23* em)
         em->setRno(1, 0, 0, 0);
         break;
     }
-    MotionSetCore(em, MOTION(em), ARC(EM23_MOT_009), 0, 0, 5, 0);
+    MotionSetCore(em, &em->Motion, ARC(EM23_MOT_009), 0, 0, 5, 0);
     MotionMove(em, 0);
     em23_R0_Move(em);
 }
@@ -326,7 +324,7 @@ static inline void em23WaitMotion(cEm23* em)
         m1 = ARC(EM23_SEQ_01D);
         break;
     }
-    MotionSetCore(em, MOTION(em), m0, m1, 5, 5, 0);
+    MotionSetCore(em, &em->Motion, m0, m1, 5, 5, 0);
 }
 
 // Takeoff motion: the blend motion depends on the enemy list slot.
@@ -352,7 +350,7 @@ static inline void em23TakeoffMotion(cEm23* em)
         m1 = ARC(EM23_SEQ_028);
         break;
     }
-    MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00E), m1, 5, 1, 0);
+    MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00E), m1, 5, 1, 0);
 }
 
 // The player is close enough to react to (farther with the noise flag set).
@@ -424,7 +422,7 @@ static void em23_R1_R20ALanding(cEm23* em)
             m1 = ARC(EM23_SEQ_01D);
             break;
         }
-        MotionSetCore(em, MOTION(em), m0, m1, 5, 5, 0);
+        MotionSetCore(em, &em->Motion, m0, m1, 5, 5, 0);
         em->hp = 1;
         em23SetWing(em, 1);
         em->r_no_2++;
@@ -456,7 +454,7 @@ static void em23_R1_R20ALanding(cEm23* em)
             m1 = ARC(EM23_SEQ_028);
             break;
         }
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00E), m1, 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00E), m1, 5, 1, 0);
         w->spd.x = 0.0f;
         w->spd.y = 0.0f;
         w->spd.z = 0.0f;
@@ -478,7 +476,7 @@ static void em23_R1_R20ALanding(cEm23* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00D), ARC(EM23_SEQ_023), 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00D), ARC(EM23_SEQ_023), 5, 5, 0);
         em->atari.off();
         w->timer = 20;
         em->r_no_2++;
@@ -560,7 +558,7 @@ static void em23_R1_TakeoffDash(cEm23* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_TAKEOFF_DASH), 0, 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_TAKEOFF_DASH), 0, 5, 1, 0);
         w->spd.x = 0.0f;
         w->spd.y = 0.0f;
         w->spd.z = 0.0f;
@@ -598,28 +596,28 @@ static void em23_R1_Turn(cEm23* em)
         switch (em->r_no_3) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00D), ARC(EM23_SEQ_023), 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00D), ARC(EM23_SEQ_023), 5, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_022), 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_022), 5, 5, 0);
             break;
         case 2:
-            MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_021), 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_021), 5, 5, 0);
             break;
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_020), 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_020), 5, 5, 0);
             break;
         case 4:
-            MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_01F), 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_01F), 5, 5, 0);
             break;
         case 5:
-            MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_01E), 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_01E), 5, 5, 0);
             break;
         case 6:
             if (Rnd() & 1) {
-                MotionSetCore(em, MOTION(em), ARC(EM23_MOT_TURN), 0, 5, 5, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM23_MOT_TURN), 0, 5, 5, 0);
             } else {
-                MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_01E), 5, 5, 0);
+                MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00D), ARC(EM23_SEQ_TURN_01E), 5, 5, 0);
             }
             break;
         }
@@ -683,7 +681,7 @@ static void em23_R1_Landing(cEm23* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_00D), ARC(EM23_SEQ_023), 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_00D), ARC(EM23_SEQ_023), 5, 5, 0);
         em->r_no_2++;
     case 1:
         if (w->pCorpse) {
@@ -740,7 +738,7 @@ static void em23_R1_Landing(cEm23* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_LANDING), ARC(EM23_SEQ_LANDING), 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_LANDING), ARC(EM23_SEQ_LANDING), 5, 5, 0);
         w->spd.x = 0.0f;
         w->spd.y = 0.0f;
         w->spd.z = 0.0f;
@@ -807,9 +805,9 @@ static void em23_R1_ToCorpse(cEm23* em)
     switch (em->r_no_2) {
     case 0:
         if (Rnd() & 1) {
-            MotionSetCore(em, MOTION(em), ARC(EM23_MOT_TO_CORPSE_01A), ARC(EM23_SEQ_TO_CORPSE_02B), 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM23_MOT_TO_CORPSE_01A), ARC(EM23_SEQ_TO_CORPSE_02B), 5, 5, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM23_MOT_TO_CORPSE_01B), ARC(EM23_SEQ_TO_CORPSE_02C), 5, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM23_MOT_TO_CORPSE_01B), ARC(EM23_SEQ_TO_CORPSE_02C), 5, 5, 0);
         }
         em->r_no_2++;
     case 1:
@@ -834,7 +832,7 @@ static void em23_R1_ToCorpse(cEm23* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_TO_CORPSE_013), 0, 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_TO_CORPSE_013), 0, 5, 1, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {
@@ -842,7 +840,7 @@ static void em23_R1_ToCorpse(cEm23* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_TO_CORPSE_012), 0, 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_TO_CORPSE_012), 0, 5, 1, 0);
         em->r_no_2++;
     case 5:
         if (MotionMove(em, 0)) {
@@ -850,7 +848,7 @@ static void em23_R1_ToCorpse(cEm23* em)
         }
         break;
     case 6:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_TO_CORPSE_012), 0, 5, 0x41, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_TO_CORPSE_012), 0, 5, 0x41, 0);
         em->r_no_2++;
     case 7:
         if (MotionMove(em, 0)) {
@@ -867,7 +865,7 @@ static void em23_R1_Eat(cEm23* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_EAT), 0, 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_EAT), 0, 5, 5, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0) && (Rnd() & 1)) {
@@ -875,7 +873,7 @@ static void em23_R1_Eat(cEm23* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_EAT), 0, 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_EAT), 0, 5, 5, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {
@@ -918,7 +916,7 @@ static void em23_R1_Dm_Air(cEm23* em)
     switch (em->r_no_2) {
     case 0:
         em->dmg.m_Timer = 0x80;
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_DM_AIR_016), ARC(EM23_SEQ_DM_AIR), 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_DM_AIR_016), ARC(EM23_SEQ_DM_AIR), 5, 5, 0);
         if (Rnd() & 1) {
             w->dmRotSpd = PI / 20.0f;
         } else {
@@ -945,7 +943,7 @@ static void em23_R1_Dm_Air(cEm23* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_DM_AIR_015), 0, 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_DM_AIR_015), 0, 5, 5, 0);
         w->spd.y = 0.0f;
         em->dmg.m_Timer = 0;
         em->r_no_2++;
@@ -977,7 +975,7 @@ static void em23_R1_Die_Normal(cEm23* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM23_MOT_DIE_NORMAL), 0, 5, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM23_MOT_DIE_NORMAL), 0, 5, 1, 0);
         em->atari.off();
         SndCall(8, 8, &em->pos, em->id, 0, em);
         em->setStatus(EM_STATUS_ITEMSET);

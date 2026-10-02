@@ -113,9 +113,9 @@ int AddOtWorldPos(void* data, void (*func)(void*), Vec* pos, u16 kind, f32 zlimi
         z = 0.0f;
     } else {
         CameraGetLookVecInverse(cam, &look);
-        d.x = pos->x - cam->param.pos.x;
-        d.y = pos->y - cam->param.pos.y;
-        d.z = pos->z - cam->param.pos.z;
+        d.x = pos->x - cam->param.Campos.x;
+        d.y = pos->y - cam->param.Campos.y;
+        d.z = pos->z - cam->param.Campos.z;
         z = PSVECDotProduct(&look, &d);
     }
     if (z >= zlimit) {
@@ -144,8 +144,8 @@ int AddOtWorldPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
     OtData* q;
     Vec look;
     Vec d;
-    GeoSphere sph;
-    GeoHexahedron* h;
+    GEOM_SPHERE sph;
+    GEOM_HEXAHEDRON* h;
     u32 no;
     f32 z;
 
@@ -155,16 +155,16 @@ int AddOtWorldPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
         return 0xFFFF;
     }
     cam = &pG->Camera;
-    h = (GeoHexahedron*) CameraViewFrustumPtr(cam);
+    h = CameraViewFrustumPtr(cam);
     sph.pos = *pos;
-    sph.r = radius;
+    sph.radius = radius;
     if (!collision_sphere_hexahedron(&sph, h)) {
         return 0xFFFF;
     }
     CameraGetLookVecInverse(cam, &look);
-    d.x = pos->x - cam->param.pos.x;
-    d.y = pos->y - cam->param.pos.y;
-    d.z = pos->z - cam->param.pos.z;
+    d.x = pos->x - cam->param.Campos.x;
+    d.y = pos->y - cam->param.Campos.y;
+    d.z = pos->z - cam->param.Campos.z;
     z = PSVECDotProduct(&look, &d);
     if (z + radius < zlimit) {
         if (zlimit != 0.0f) {
@@ -194,8 +194,8 @@ int AddOtModelPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
     OtData* q;
     Vec look;
     Vec d;
-    GeoSphere sph;
-    GeoHexahedron* h;
+    GEOM_SPHERE sph;
+    GEOM_HEXAHEDRON* h;
     u32 no;
     f32 z;
 
@@ -205,16 +205,16 @@ int AddOtModelPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
         return 0xFFFF;
     }
     cam = &pG->Camera;
-    h = (GeoHexahedron*) CameraViewFrustumPtr(cam);
+    h = CameraViewFrustumPtr(cam);
     sph.pos = *pos;
-    sph.r = radius;
+    sph.radius = radius;
     if (!collision_sphere_hexahedron(&sph, h)) {
         return 0xFFFF;
     }
     CameraGetLookVecInverse(cam, &look);
-    d.x = pos->x - cam->param.pos.x;
-    d.y = pos->y - cam->param.pos.y;
-    d.z = pos->z - cam->param.pos.z;
+    d.x = pos->x - cam->param.Campos.x;
+    d.y = pos->y - cam->param.Campos.y;
+    d.z = pos->z - cam->param.Campos.z;
     z = PSVECDotProduct(&look, &d);
     if (z + radius < zlimit) {
         if (zlimit != 0.0f) {
@@ -237,18 +237,18 @@ int AddOtModelPosRadius(void* data, void (*func)(void*), Vec* pos, f32 radius, u
 
 // Adds a callback into table `ot` at bucket `no` (clamped), optionally frustum-culled by
 // (pos, radius). Returns the bucket, 0xFFFF when culled or out of buffer.
-extern "C" int AddOtDirect(int ot, void* data, void (*func)(), u32 no, u16 flag, Vec* pos, f32 radius)
+int AddOtDirect(int ot, void* data, void (*func)(), u32 no, u16 flag, Vec* pos, f32 radius)
 {
     OtWork* w;
     OtData* p;
     OtData* q;
-    GeoSphere sph;
-    GeoHexahedron* h;
+    GEOM_SPHERE sph;
+    GEOM_HEXAHEDRON* h;
 
     if (radius != 0.0f && pos != 0) {
-        h = (GeoHexahedron*) CameraViewFrustumPtr(&pG->Camera);
+        h = CameraViewFrustumPtr(&pG->Camera);
         sph.pos = *pos;
-        sph.r = radius;
+        sph.radius = radius;
         if (!collision_sphere_hexahedron(&sph, h)) {
             return 0xFFFF;
         }

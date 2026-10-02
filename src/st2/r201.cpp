@@ -224,12 +224,12 @@ void R201Init()
     }
     SceExec(0x12, (TaskFunc) r201_checkBellBreak, 0, 0, SCE_PRIO_DEF_2, 0);
     SceSetItemEvent(0x26, 0x8F, 0xC, 0x10, r201_openShelf, r201_openedShelf, 0, 0);
-    SceSetItemEvent(0x27, 0x90, 0xD, 0x11, r201_openShelf, r201_openedShelf, 1, 0);
+    SceSetItemEvent(0x27, 0x90, 0xD, 0x11, r201_openShelf, r201_openedShelf, (void*) 1, 0);
     {
         u8 kind = 1;
 
-        SceAtPtr(0x26)->actBtnKind = kind;
-        SceAtPtr(0x27)->actBtnKind = kind;
+        SceAtPtr(0x26)->act_type = kind;
+        SceAtPtr(0x27)->act_type = kind;
     }
 }
 
@@ -785,7 +785,7 @@ void r201_setBattleArea(int open, int init)
         } else {
             SndCall(6, 0x26, 0, 0, 0, 0);
         }
-        SceExec(0x12, (TaskFunc) r201_setBattleArea_sub, open, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r201_setBattleArea_sub, (void*) open, 0, SCE_PRIO_DEF_2, 0);
         if (open == 1) {
             EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 1, ESP_CORE_KIND_NONE, 0, 0);
         } else {
@@ -1033,7 +1033,7 @@ void r201_setSwitchEnv(int on)
         RsfSet(G_ROOM_ID, 5);
         r201_work->barred->setOpen(0);
         EffectEspgenDelete(0, r201_work->effKind, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, 0, 0);
         SceAtSetEnable(0, 0);
         SceAtSetEnable(1, 0);
         SceAtSetEnable(3, 0);
@@ -1043,18 +1043,18 @@ void r201_setSwitchEnv(int on)
         zero = 0;
         RsfClear(G_ROOM_ID, 5);
         r201_work->barred->setClose(0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, r201_work->effKind, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 1, r201_work->effKind, 0, 0);
         SceAtSetEnable(3, 1);
         SceAtSetEnable(0x28, 1);
         SceAtSetEnable(5, 1);
         if (SceAtHitCheck(2) == 0) {
             SceAtSetEnable(0, 1);
-            SceAtPtr(3)->dstAngle = 0.0f;
-            SceAtPtr(0x28)->dstAngle = 0.0f;
+            SceAtPtr(3)->door.next_ang_y = 0.0f;
+            SceAtPtr(0x28)->door.next_ang_y = 0.0f;
         } else {
             SceAtSetEnable(1, 1);
-            SceAtPtr(3)->dstAngle = 3.1415927f;
-            SceAtPtr(0x28)->dstAngle = 3.1415927f;
+            SceAtPtr(3)->door.next_ang_y = 3.1415927f;
+            SceAtPtr(0x28)->door.next_ang_y = 3.1415927f;
         }
     }
 }
@@ -1083,8 +1083,8 @@ static void r201_checkSwitch(int on)
 // The entrance event: plays the evd once its data is loaded.
 static void r201_execEvent00()
 {
-    ReadModule* m;
-    u32 key;
+    MODULE_DAT* m;
+    Event* evt;
 
     ScfFlagOn(pG, SCF_R201_EVENT00);
     SceEventStart(0);
@@ -1092,13 +1092,13 @@ static void r201_execEvent00()
         SysFlagOn(pG, SYS_SCREEN_STOP);
         SceSleep(2);
         m = SearchEmModule(0x1B);
-        MemorySwap(m->pArc, (u32) r201_work->evd->getAddr(), r201_work->evd->getSize());
-        EvtMgr.SetEvt(m->pArc, &key);
-        ((Event*) key)->FlgOnStatus(EvtStfPlPosNoSet);
+        MemorySwap(m->pData, r201_work->evd->getAddr(), r201_work->evd->getSize());
+        EvtMgr.SetEvt(m->pData, &evt);
+        evt->FlgOnStatus(EvtStfPlPosNoSet);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r201_work->evd->getAddr(), r201_work->evd->getSize());
+        MemorySwap(m->pData, r201_work->evd->getAddr(), r201_work->evd->getSize());
     }
     r201_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     SceEventEnd(0);

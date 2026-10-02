@@ -382,7 +382,7 @@ static void tDrArea_Create()
     DrArea* a = &DR->area[DR->areaNo];
 
     if (!(a->flag & 2)) {
-        AreaDataInit(&a->data, &pPL->pos, 1, 5000.0f, 2000.0f);
+        AreaDataInit(&a->data, &pPL->pos, 5000.0f, 2000.0f, 1);
     }
     a->type = 0;
     a->flag |= 3;

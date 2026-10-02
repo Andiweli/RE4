@@ -187,9 +187,9 @@ void R30dInit()
             }
         }
     }
-    SceSetItemEvent(4, 0x80, 0, 3, OpenBoxTreasure, OpenedBoxTreasure, 0x80, 0);
-    SceSetItemEvent(5, 0x81, 1, 4, OpenBoxTreasure, OpenedBoxTreasure, 0x81, 0);
-    SceSetItemEvent(0x1B, 0x87, 5, 9, OpenBoxTreasure, OpenedBoxTreasure, 0x87, 0);
+    SceSetItemEvent(4, 0x80, 0, 3, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x80, 0);
+    SceSetItemEvent(5, 0x81, 1, 4, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x81, 0);
+    SceSetItemEvent(0x1B, 0x87, 5, 9, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x87, 0);
     if (pG->room_id_prev == 0x30F) {
         r30d_work->em[0].setEm(0x5E, -1, 0, 1, 1);
         v.y = r30d_work->em[0].getAngY() + PI;
@@ -361,13 +361,13 @@ static void R30dShutterFrontEvent()
         return;
     }
     if (!(pG->Room_flg[0] & 0x20000000)) {
-        SceAtWork* at;
+        SCE_AT_DATA* at;
 
         SceUpCut(0xA, -1, -1, 0);
         pG->Room_flg[0] |= 0x20000000;
         at = SceAtPtr(0x18);
         if (at) {
-            at->actBtnKind = 0x33;
+            at->act_type = 0x33;
         }
         return;
     }
@@ -377,7 +377,7 @@ static void R30dShutterFrontEvent()
     }
     SceAtSetEnable(0x18, 0);
     R30D_SAVE_FLAGS |= 0x08000000;
-    KyfFlagOn(pG, KYF_ST1_09);
+    KyfFlagOn(pG, KYF_ST3_09);
     pSUB->dmg.m_Timer = 0x80;
     SubCharMoveTo(2670.0f, 0.0f, 15200.0f, 0.0f, 0);
     while ((SubCharGetStatus() & 0x00800000) == 0) {
@@ -626,7 +626,7 @@ static void R30dCoopSwitch()
                             SndCall(6, 9, 0, 0, 0, 0);
                         }
                         KyfFlagOn(pG, KYF_R30D_TO_R30F_DOOR);
-                        KyfFlagOn(pG, KYF_ST1_10);
+                        KyfFlagOn(pG, KYF_ST3_10);
                         SceUpCut(3, 6, 4, 0);
                         COOP_ACTIVE(c) = zero;
                         break;

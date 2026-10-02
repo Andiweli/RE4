@@ -165,7 +165,7 @@ API void mot_model_destroy(HostModel* h)
 // (NULL to clear). MotionMove applies it after the IK.
 API void mot_model_blend_table(HostModel* h, u16* tbl)
 {
-    h->model.Motion.blendTbl = tbl;
+    h->model.pDblJnt = tbl;
 }
 
 // MotionSetCore(m, &m->Motion, image, seq 0, hokan 0, flags, frame 0). ik 0: Mot_flag 0x10000000

@@ -16,13 +16,7 @@
 #include "obj18.h"
 #include "scroll.h"
 #include "db_work.h"
-
-// game/dbmodule.cpp. dbmodule.h is not included: this unit was built with a by-value Vec prototype for
-// Draw_sphere (the definition takes Vec*), and the header's conflicts with it.
-extern "C" {
-void Draw_pos(Vec* pos, int size);
-void Draw_sphere(Vec pos, f32 r, int color, int zcmp, int zupd);
-}
+#include "dbmodule.h"
 
 // obj18 work (cObj::work) as far as the viewer reads it
 struct DbObj18Work {
@@ -240,6 +234,7 @@ void cDbWork::dispLit()
         eprintf(32, 280, 0, 0, "BE FLAG  %08X", l->be_flag);
         eprintf(32, 294, 0, 0, "POSITION %7.0f %7.0f %7.0f", l->Pos.x, l->Pos.y, l->Pos.z);
         eprintf(32, 308, 0, 0, "ATTR     %02x", l->Attribute);
-        Draw_sphere(l->World, l->Radius, -1, 1, 1);
+        Vec pos = l->World;
+        Draw_sphere(&pos, l->Radius, -1, 1, 1);
     }
 }

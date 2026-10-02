@@ -33,7 +33,7 @@ void R40cInit()
 {
 #line 53 "D:/Bio4/Prog/r40c.cpp"
     r40c_work = (R40cWork*) MEM_CALLOC(sizeof(R40cWork), 1, 0xd);
-    SceSetItemEvent(1, 0x80, 1, 3, OpenBoxTreasure, OpenedBoxTreasure, 0x80, 1);
+    SceSetItemEvent(1, 0x80, 1, 3, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x80, 1);
 }
 
 // Per-frame room main: nothing.

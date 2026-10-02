@@ -35,11 +35,9 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 cEsp* Esp08_Create();
 void Esp08_Trans(cEsp08* esp);
 void Esp08_TransShimmer(cEsp08* esp, int type);
-}
 
 
 #define ESP_PARTS_SCREEN(esp) ((s8) (esp)->m_Parts_no >= -8 && (s8) (esp)->m_Parts_no <= -3)
@@ -513,10 +511,10 @@ void Esp08_Trans(cEsp08* esp)
     oy = (f32) anm->Cy;
     z = 1.0f;
     zero = 0.0f;
-    if (ox == zero) {
+    if (ox == 0.0f) {
         ox = -anm->Width * 0.5f;
     }
-    if (oy == zero) {
+    if (oy == 0.0f) {
         oy = anm->Height * 0.5f;
     }
     x0 = ox * sx / anm->Width;
@@ -638,10 +636,10 @@ void Esp08_TransShimmer(cEsp08* esp, int u_pow)
     oy = (f32) anm->Cy;
     z = 1.0f;
     zero = 0.0f;
-    if (ox == zero) {
+    if (ox == 0.0f) {
         ox = -anm->Width * 0.5f;
     }
-    if (oy == zero) {
+    if (oy == 0.0f) {
         oy = anm->Height * 0.5f;
     }
     x0 = ox * sx / anm->Width;
@@ -684,7 +682,7 @@ void Esp08_TransShimmer(cEsp08* esp, int u_pow)
         GXLoadTexMtxImm(tm, 0x1E, 1);
         GXSetTexCoordGen(0, 1, 0, 0x1E);
     } else {
-        f32 fovy = pG->Camera.param.fovy;
+        f32 fovy = pG->Camera.param.Fovy;
         if (SysFlagChk(pG, SYS_SCISSOR_ON)) {
             C_MTXLightPerspective(pm, fovy, 1.3333334f, 0.5f, -0.6666667f, 0.5f, 0.5f);
         } else {

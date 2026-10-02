@@ -35,12 +35,6 @@
 
 void DbMenuSetExecTool(const char* name);
 
-// cFileList::init really takes the list buffer and the host directory (the symbol keeps the
-// parameterless name); XmlSimple::SetXmlElemStart/End take the element name as well.
-int FileListInit(cFileList* l, char* buf, const char* dir) __asm__("init__9cFileList");
-int XmlElemStart(XmlSimple* x, char** cur, char* buf, const char* name) __asm__("SetXmlElemStart__9XmlSimplePiPc");
-int XmlElemEnd(XmlSimple* x, char** cur, char* buf, const char* name) __asm__("SetXmlElemEnd__9XmlSimplePiPc");
-
 // EvtDebug's leading fields: the event name and the header copy the tool fills at load
 struct EvtDebugView {
     char name[0x20];   // 0x00
@@ -353,13 +347,13 @@ ToolEvt::ToolEvt()
     }
     EvtMgr.ToolCoreEvdDel();
     sprintf(path, "%sr%x%02xs??.evd", "x:\\soft\\room\\event\\evd\\", pG->stage_no, pG->room_no);
-    if (FileListInit(&DbgFileList, path, "x:\\soft\\room\\event\\evd\\") == 0) {
+    if (DbgFileList.init(path, "x:\\soft\\room\\event\\evd\\") == 0) {
         EtcFlag |= TefBit(TefExit);
     }
     DbgFlagOn(pG, DBG_EVENT_TOOL);
     PFil = Debug_alloc(8000000, 1);
     memclr_asm(PFil, 4);
-    PDatDbSctrl = (DbSctrlWork*) Debug_alloc(1000000, 1);
+    PDatDbSctrl = (DB_SCTRL*) Debug_alloc(1000000, 1);
     memclr_asm(PDatDbSctrl, 1000000);
     PMesDat = (EventMessageData*) Debug_alloc(1000000, 1);
     memclr_asm(PMesDat, 1000000);
@@ -461,8 +455,8 @@ void ToolEvt::MainMenu(ToolEvt* t)
     sel = ToolMenuDisp_cur(0x40, 0x40, 1, &t->CursolMain, mainMenu, sizeof(mainMenu), t->pJoy1);
     if (sel != -1) {
         t->r_no_0 = sel + 1;
-        t->r_no_1 = zero;
-        t->r_no_2 = zero;
+        t->r_no_1 = 0;
+        t->r_no_2 = 0;
         t->r_no_3 = zero;
     }
 }
@@ -534,7 +528,7 @@ void ToolEvt::MainPreview(ToolEvt* t)
         EvtDebugView* d = EVTDBG;
 
         d->hdr = *h;
-        if (EvtMgr.SetEvt(t->PFil, (u32*) &ev) == 0) {
+        if (EvtMgr.SetEvt(t->PFil, &ev) == 0) {
             pLog->err(0, 0, "ToolEvt_Main_Preview : failed");
             t->r_no_0 = 1;
             t->r_no_1 = 4;
@@ -849,7 +843,7 @@ void ToolEvt::SubMenuFog(ToolEvt* t, Event* ev)
         break;
     case 2:
         if (t->SubMenuSelectYesNo(t, "INIT", "")) {
-            memset(&t->DatFogWk, 0, sizeof(EvtFogData));
+            memset(&t->DatFogWk, 0, sizeof(DatFog));
         }
         t->SubToolFogWkInit(t, ev);
         break;
@@ -860,7 +854,7 @@ void ToolEvt::SubMenuFog(ToolEvt* t, Event* ev)
         break;
     case 4:
         if (t->SubMenuSelectYesNo(t, "SAVE", name)) {
-            HDWrite(path, &t->DatFogWk, sizeof(EvtFogData));
+            HDWrite(path, &t->DatFogWk, sizeof(DatFog));
         }
         break;
     case 5:
@@ -911,14 +905,14 @@ void ToolEvt::SubMenuFocus(ToolEvt* t, Event* ev)
         }
         break;
     case 2:
-        t->SubMenuEditFocusLevel(t, ev, "NEAR", &t->DatFocusWk.nearLevel);
+        t->SubMenuEditFocusLevel(t, ev, "NEAR", &t->DatFocusWk.LevelNear);
         break;
     case 3:
-        t->SubMenuEditFocusLevel(t, ev, "FAR ", &t->DatFocusWk.farLevel);
+        t->SubMenuEditFocusLevel(t, ev, "FAR ", &t->DatFocusWk.LevelFar);
         break;
     case 4:
         if (t->SubMenuSelectYesNo(t, "INIT", "")) {
-            memset(&t->DatFocusWk, 0, sizeof(EvtFocusData));
+            memset(&t->DatFocusWk, 0, sizeof(DatFocus));
         }
         t->SubToolFocusWkInit(t, ev);
         break;
@@ -929,7 +923,7 @@ void ToolEvt::SubMenuFocus(ToolEvt* t, Event* ev)
         break;
     case 6:
         if (t->SubMenuSelectYesNo(t, "SAVE", name)) {
-            HDWrite(path, &t->DatFocusWk, sizeof(EvtFocusData));
+            HDWrite(path, &t->DatFocusWk, sizeof(DatFocus));
         }
         break;
     case 7:
@@ -1061,24 +1055,24 @@ void ToolEvt::SubToolLightMove(ToolEvt* /*t*/)
 // Default fog curves: start / end constant at the current LightMgr fog over the event length.
 int ToolEvt::SubToolFogWkInit(ToolEvt* t, Event* ev)
 {
-    t->DatFogWk.start.num = 2;
-    t->DatFogWk.start.key[0].t = 0.0f;
-    t->DatFogWk.start.key[0].v = LightMgr.getFogStart();
-    t->DatFogWk.start.key[0].out = 0.0f;
-    t->DatFogWk.start.key[0].in = 0.0f;
-    t->DatFogWk.start.key[1].t = (f32) ev->GetMaxFrame();
-    t->DatFogWk.start.key[1].v = LightMgr.getFogStart();
-    t->DatFogWk.start.key[1].out = 0.0f;
-    t->DatFogWk.start.key[1].in = 0.0f;
-    t->DatFogWk.end.num = 2;
-    t->DatFogWk.end.key[0].t = 0.0f;
-    t->DatFogWk.end.key[0].v = LightMgr.getFogEnd();
-    t->DatFogWk.end.key[0].out = 0.0f;
-    t->DatFogWk.end.key[0].in = 0.0f;
-    t->DatFogWk.end.key[1].t = (f32) ev->GetMaxFrame();
-    t->DatFogWk.end.key[1].v = LightMgr.getFogEnd();
-    t->DatFogWk.end.key[1].out = 0.0f;
-    t->DatFogWk.end.key[1].in = 0.0f;
+    t->DatFogWk.ScurveStart.nPoint = 2;
+    t->DatFogWk.ScurveStart.Point[0].T = 0.0f;
+    t->DatFogWk.ScurveStart.Point[0].Q = LightMgr.getFogStart();
+    t->DatFogWk.ScurveStart.Point[0].dQ[0] = 0.0f;
+    t->DatFogWk.ScurveStart.Point[0].dQ[1] = 0.0f;
+    t->DatFogWk.ScurveStart.Point[1].T = (f32) ev->GetMaxFrame();
+    t->DatFogWk.ScurveStart.Point[1].Q = LightMgr.getFogStart();
+    t->DatFogWk.ScurveStart.Point[1].dQ[0] = 0.0f;
+    t->DatFogWk.ScurveStart.Point[1].dQ[1] = 0.0f;
+    t->DatFogWk.ScurveEnd.nPoint = 2;
+    t->DatFogWk.ScurveEnd.Point[0].T = 0.0f;
+    t->DatFogWk.ScurveEnd.Point[0].Q = LightMgr.getFogEnd();
+    t->DatFogWk.ScurveEnd.Point[0].dQ[0] = 0.0f;
+    t->DatFogWk.ScurveEnd.Point[0].dQ[1] = 0.0f;
+    t->DatFogWk.ScurveEnd.Point[1].T = (f32) ev->GetMaxFrame();
+    t->DatFogWk.ScurveEnd.Point[1].Q = LightMgr.getFogEnd();
+    t->DatFogWk.ScurveEnd.Point[1].dQ[0] = 0.0f;
+    t->DatFogWk.ScurveEnd.Point[1].dQ[1] = 0.0f;
     return 1;
 }
 
@@ -1092,9 +1086,9 @@ void ToolEvt::SubToolFogInit(ToolEvt* t, int sw, Event* ev, int which)
             return;
         }
         if (which == 0) {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFogWk.start, (f32) ev->GetMaxFrame(), 100000.0f);
+            t->SctrlToolInit(t, (HERMITE_1_PTR*) &t->DatFogWk.ScurveStart, (f32) ev->GetMaxFrame(), 100000.0f);
         } else {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFogWk.end, (f32) ev->GetMaxFrame(), 100000.0f);
+            t->SctrlToolInit(t, (HERMITE_1_PTR*) &t->DatFogWk.ScurveEnd, (f32) ev->GetMaxFrame(), 100000.0f);
         }
         t->CurveNo = which;
     } else {
@@ -1121,26 +1115,26 @@ void ToolEvt::SubToolFogMove(ToolEvt* t, Event* ev)
 // Default focus curves: near 0 / far 10000 constant over the event length.
 void ToolEvt::SubToolFocusWkInit(ToolEvt* t, Event* ev)
 {
-    t->DatFocusWk.near_.num = 2;
-    t->DatFocusWk.near_.key[0].t = 0.0f;
-    t->DatFocusWk.near_.key[0].v = 0.0f;
-    t->DatFocusWk.near_.key[0].out = 0.0f;
-    t->DatFocusWk.near_.key[0].in = 0.0f;
-    t->DatFocusWk.near_.key[1].t = (f32) ev->GetMaxFrame();
-    t->DatFocusWk.near_.key[1].v = 0.0f;
-    t->DatFocusWk.near_.key[1].out = 0.0f;
-    t->DatFocusWk.near_.key[1].in = 0.0f;
-    t->DatFocusWk.far_.num = 2;
-    t->DatFocusWk.far_.key[0].t = 0.0f;
-    t->DatFocusWk.far_.key[0].v = 10000.0f;
-    t->DatFocusWk.far_.key[0].out = 0.0f;
-    t->DatFocusWk.far_.key[0].in = 0.0f;
-    t->DatFocusWk.far_.key[1].t = (f32) ev->GetMaxFrame();
-    t->DatFocusWk.far_.key[1].v = 10000.0f;
-    t->DatFocusWk.far_.key[1].out = 0.0f;
-    t->DatFocusWk.far_.key[1].in = 0.0f;
-    t->DatFocusWk.nearLevel = 5.0f;
-    t->DatFocusWk.farLevel = 5.0f;
+    t->DatFocusWk.ScurveNear.nPoint = 2;
+    t->DatFocusWk.ScurveNear.Point[0].T = 0.0f;
+    t->DatFocusWk.ScurveNear.Point[0].Q = 0.0f;
+    t->DatFocusWk.ScurveNear.Point[0].dQ[0] = 0.0f;
+    t->DatFocusWk.ScurveNear.Point[0].dQ[1] = 0.0f;
+    t->DatFocusWk.ScurveNear.Point[1].T = (f32) ev->GetMaxFrame();
+    t->DatFocusWk.ScurveNear.Point[1].Q = 0.0f;
+    t->DatFocusWk.ScurveNear.Point[1].dQ[0] = 0.0f;
+    t->DatFocusWk.ScurveNear.Point[1].dQ[1] = 0.0f;
+    t->DatFocusWk.ScurveFar.nPoint = 2;
+    t->DatFocusWk.ScurveFar.Point[0].T = 0.0f;
+    t->DatFocusWk.ScurveFar.Point[0].Q = 10000.0f;
+    t->DatFocusWk.ScurveFar.Point[0].dQ[0] = 0.0f;
+    t->DatFocusWk.ScurveFar.Point[0].dQ[1] = 0.0f;
+    t->DatFocusWk.ScurveFar.Point[1].T = (f32) ev->GetMaxFrame();
+    t->DatFocusWk.ScurveFar.Point[1].Q = 10000.0f;
+    t->DatFocusWk.ScurveFar.Point[1].dQ[0] = 0.0f;
+    t->DatFocusWk.ScurveFar.Point[1].dQ[1] = 0.0f;
+    t->DatFocusWk.LevelNear = 5.0f;
+    t->DatFocusWk.LevelFar = 5.0f;
 }
 
 // Opens the S-curve editor on the focus near (which 0) / far (1) curve, or closes it.
@@ -1152,9 +1146,9 @@ void ToolEvt::SubToolFocusInit(ToolEvt* t, int sw, Event* ev, int which)
             return;
         }
         if (which == 0) {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFocusWk.near_, (f32) ev->GetMaxFrame(), 10000.0f);
+            t->SctrlToolInit(t, (HERMITE_1_PTR*) &t->DatFocusWk.ScurveNear, (f32) ev->GetMaxFrame(), 10000.0f);
         } else {
-            t->SctrlToolInit(t, (Hermite1*) &t->DatFocusWk.far_, (f32) ev->GetMaxFrame(), 10000.0f);
+            t->SctrlToolInit(t, (HERMITE_1_PTR*) &t->DatFocusWk.ScurveFar, (f32) ev->GetMaxFrame(), 10000.0f);
         }
         t->CurveNo = which;
     } else {
@@ -1341,21 +1335,21 @@ void ToolEvt::SubToolIn(ToolEvt* t, int sw, int bit)
 
 // Sets up the S-curve editor on `curve` ("Frame" / "Param" axes, range -0.2..1.2 of xMax / yMax,
 // grid lock 1), cursor on the first key.
-void ToolEvt::SctrlToolInit(ToolEvt* t, Hermite1* curve, f32 xMax, f32 yMax)
+void ToolEvt::SctrlToolInit(ToolEvt* t, HERMITE_1_PTR* curve, f32 xMax, f32 yMax)
 {
-    memset(t->PDatDbSctrl, 0, sizeof(DbSctrlWork));
-    t->PDatDbSctrl->curve = curve;
+    memset(t->PDatDbSctrl, 0, sizeof(DB_SCTRL));
+    t->PDatDbSctrl->pScurve = curve;
     SctrlSetAxisLabel(t->PDatDbSctrl, "Frame", "Param");
-    t->PDatDbSctrl->gridX = xMax;
-    t->PDatDbSctrl->gridY = yMax;
-    t->PDatDbSctrl->grid.x = 1.0f;
-    t->PDatDbSctrl->grid.y = 1.0f;
-    t->PDatDbSctrl->flags = 1;
+    t->PDatDbSctrl->grid_disp_X = xMax;
+    t->PDatDbSctrl->grid_disp_Y = yMax;
+    t->PDatDbSctrl->Grid.x = 1.0f;
+    t->PDatDbSctrl->Grid.y = 1.0f;
+    t->PDatDbSctrl->Graph_flag = 1;
     SctrlInitAxisRange(t->PDatDbSctrl, xMax * 1.2f, xMax * -0.2f, yMax * 1.2f, yMax * -0.2f);
-    if (t->PDatDbSctrl->curve->num <= 1) {
+    if (t->PDatDbSctrl->pScurve->nPoint <= 1) {
         SctrlInitCursor(t->PDatDbSctrl, 0.0f, 0.0f);
     } else {
-        SctrlInitCursor(t->PDatDbSctrl, t->PDatDbSctrl->curve->key[0].t, t->PDatDbSctrl->curve->key[0].v);
+        SctrlInitCursor(t->PDatDbSctrl, t->PDatDbSctrl->pScurve->Point[0].T, t->PDatDbSctrl->pScurve->Point[0].Q);
     }
 }
 
@@ -1507,36 +1501,36 @@ static inline char* EvtWriteXml(XmlNodeData* d, char* tmp, char* buf)
     int i;
 
     cur = buf;
-    xml.SetXmlStart((int*) &cur, buf);
+    xml.SetXmlStart(&cur, buf);
     for (i = 0; i < d->num; i++) {
         XmlNode* n = &d->node[i];
 
-        XmlElemStart(&xml, &cur, cur, "Node");
+        xml.SetXmlElemStart(&cur, cur, "Node");
         strcpy(tmp, n->s[XN_SETFLG]);
-        xml.SetXmlElem((int*) &cur, cur, "SetFlg", tmp);
+        xml.SetXmlElem(&cur, cur, "SetFlg", tmp);
         strcpy(tmp, n->s[XN_SETOWNER]);
-        xml.SetXmlElem((int*) &cur, cur, "SetOwner", "3");
+        xml.SetXmlElem(&cur, cur, "SetOwner", "3");
         strcpy(tmp, n->s[XN_SETEDIT]);
-        xml.SetXmlElem((int*) &cur, cur, "SetEdit", "true");
+        xml.SetXmlElem(&cur, cur, "SetEdit", "true");
         strcpy(tmp, n->s[XN_NAMEPAC]);
-        xml.SetXmlElem((int*) &cur, cur, "NamePac", "\203\201\203b\203Z\201[\203W");
+        xml.SetXmlElem(&cur, cur, "NamePac", "\203\201\203b\203Z\201[\203W");
         strcpy(tmp, n->s[XN_CUTNO]);
-        xml.SetXmlElem((int*) &cur, cur, "CutNo", tmp);
+        xml.SetXmlElem(&cur, cur, "CutNo", tmp);
         strcpy(tmp, n->s[XN_FRAME]);
-        xml.SetXmlElem((int*) &cur, cur, "Frame", tmp);
+        xml.SetXmlElem(&cur, cur, "Frame", tmp);
         strcpy(tmp, n->s[XN_COMFLAG]);
-        xml.SetXmlElem((int*) &cur, cur, "ComFlag", "0");
+        xml.SetXmlElem(&cur, cur, "ComFlag", "0");
         strcpy(tmp, n->s[XN_SETBIN]);
-        xml.SetXmlElem((int*) &cur, cur, "SetBin", "false");
+        xml.SetXmlElem(&cur, cur, "SetBin", "false");
         strcpy(tmp, n->s[XN_SETTPL]);
-        xml.SetXmlElem((int*) &cur, cur, "SetTpl", "false");
+        xml.SetXmlElem(&cur, cur, "SetTpl", "false");
         strcpy(tmp, n->s[XN_DAT0]);
-        xml.SetXmlElem((int*) &cur, cur, "Dat0", tmp);
+        xml.SetXmlElem(&cur, cur, "Dat0", tmp);
         strcpy(tmp, n->s[XN_DAT1]);
-        xml.SetXmlElem((int*) &cur, cur, "Dat1", tmp);
-        XmlElemEnd(&xml, &cur, cur, "Node");
+        xml.SetXmlElem(&cur, cur, "Dat1", tmp);
+        xml.SetXmlElemEnd(&cur, cur, "Node");
     }
-    xml.SetXmlEnd((int*) &cur, cur);
+    xml.SetXmlEnd(&cur, cur);
     return cur;
 }
 

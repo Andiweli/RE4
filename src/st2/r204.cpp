@@ -85,7 +85,7 @@ static void r204_EventChandelier1();
 static void r204_EventChandelier2();
 static void r204_EventExec();
 static void r204_openTerm();
-void Evt_R204S00_Func(Event* e);
+void Evt_R204S00_Func(Event* e, u32);
 static void r204_checkEmDead();
 static void door_move();
 
@@ -100,7 +100,6 @@ static const Vec r204_chandOfs = {0.0f, 5826.0f, 5610.0f};
 void R204Init()
 {
     R204Work** wp;
-    void* zero;
     u32 i;
     u32 no;
 
@@ -192,7 +191,6 @@ void R204Init()
             }
         }
         SmdSetTrans(0x14, 1);
-        zero = NULL;
         SmdSetTrans(0x17, 1);
         SmdSetTrans(0x18, 1);
         SceAtSetEnable(7, 1);
@@ -208,10 +206,10 @@ void R204Init()
         SmdGetObjPtr(0x1C)->be_flag |= 0x20;
         SmdGetObjPtr(0x1C)->ang.y = -2.72f;
         SceAtSetEnable(0xD, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 1, ESP_CORE_KIND_NONE, 0, 0);
         SmdSetTrans(0x3C, 0);
         SmdSetTrans(0x3D, 1);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, 0, 0);
     } else {
         SmdSetTrans(0x14, 0);
         SmdSetTrans(0x17, 0);
@@ -225,12 +223,11 @@ void R204Init()
         SmdSetTrans(0x3B, 1);
         SceAtSetEnable(0x12, 1);
         SceAtSetEnable(0x13, 1);
-        zero = NULL;
-        EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_NONE, 0, 0);
         SceAtSetEnable(0xD, 1);
         SmdSetTrans(0x3C, 1);
         SmdSetTrans(0x3D, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 3, 1, ESP_CORE_KIND_NONE, 0, 0);
     }
     if (pG->em_list_no == 3) {
         cEm* em0;
@@ -295,7 +292,7 @@ static void setTexRender()
     SceAtLinkEtcDead(8, 0x2B, 1);
     SceAtLinkEtcDead(0x16, 2, 1);
     SceSetItemEvent(8, 0x88, 3, 5, r204_openBox, r204_openedBox, 0, 0);
-    SceSetItemEvent(0x16, 0x81, 4, 6, r204_openBox, r204_openedBox, 1, 0);
+    SceSetItemEvent(0x16, 0x81, 4, 6, r204_openBox, r204_openedBox, (void*) 1, 0);
     SceSetItemEvent(0x17, 0x87, 5, 7, (void (*)(int)) r204_openTana, (void (*)(int)) r204_openedTana, 0, 0);
 }
 
@@ -717,7 +714,7 @@ static void door5_close()
     cnt = 0;
     while (SmdGetObjPtr(0x39)->pos.y > 0.0f) {
         if (cnt == 0x1E || cnt == 0x3C || cnt == 0x4B) {
-            SceAtWork* at = SceAtPtr(0x19);
+            SCE_AT_DATA* at = SceAtPtr(0x19);
             u32 j;
 
             for (j = 0; j <= 10; j++) {
@@ -846,7 +843,7 @@ static void door5_close()
                 RoomSeCall(0x13, &pPL->pos, 0, 0, 0);                                                              \
             }                                                                                                      \
             ActBtn.set(ACT_JUMP_MOVE, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, 0);                                                                 \
-            mf = (u32) MotionGetCurrentFrame(MOTION(pPL));                                                         \
+            mf = (u32) MotionGetCurrentFrame(&pPL->Motion);                                                         \
             eprintf(0x140, 0x15E, 0, 0, "%d", mf);                                                                 \
             if (mf - 5 > 0x41) {                                                                                   \
                 eprintf(0x20, 0x15E, 0, 0, "OK");                                                                  \
@@ -979,7 +976,7 @@ static void r204_openTerm()
 
 // Event r204s00 callback: cut 0 hides scroll object 0xC and sets the pl0100 / evm6500 / evm0200 models'
 // light mask / draw flags; later cuts hand objects to the event and swap models; the end restores them.
-void Evt_R204S00_Func(Event* e)
+void Evt_R204S00_Func(Event* e, u32)
 {
     void* mod;
     void* mod2;

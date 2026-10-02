@@ -32,7 +32,6 @@ extern void* pCurrent_buff;
 
 // game/main_sub.cpp
 int Render_checkBlurPermission();
-extern "C" {
 void Render_init();
 void Render_before();
 void Render_done();
@@ -62,7 +61,6 @@ void DrawTpl(struct TEXPalette* tpl, int x, int y, int w, int h);
 void DrawTexture(GXTexObj* texobj, s16 x, s16 y, s16 z, s16 w, s16 h);
 void DLL_Unlink(OSModuleHeader* pModule);
 void DLL_Link(OSModuleHeader* pModule, void* pBss);
-}
 // main_sub.cpp also owns flag_render_after, AutoScreenShotExec, ScreenShotExec,
 // ScreenShotTriggerType, ScreenShotFilename[11]; declare them extern locally where needed
 // (a header extern would change main_sub's .sbss order).

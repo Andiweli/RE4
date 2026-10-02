@@ -147,7 +147,6 @@ u32 g_at_cyc[20];
 u32 g_at2_cnt[20];
 u32 g_at2_cyc[20];
 
-extern "C" {
 void DoorFlagInit();
 void gameInit();
 void gameStageInit();
@@ -161,7 +160,6 @@ void gameRoomMemInit();
 void gameStopMove();
 void gameDebugDisp();
 void gameDebug();
-}
 
 SAVE_DATA_HEAD* pSaveData;
 cGameSave GameSave;
@@ -186,9 +184,9 @@ static const AtEffInfo effInfoNormal = {
     0, {0xD2, 0}, {0, 0xD}, {0, 0xB}, {0, 0xC}, {0, 0x1F}, {0, 0x1F}, {0, 0x36}, {0, 0xD},
 };
 // Room water effect table of the player (PlRegistRoomEff).
-static const PlRoomEff effRoom[6] = {
-    {1, {0, 0, 0}, 0x21}, {1, {0, 0, 0}, 0x22}, {1, {0, 0, 0}, 0x23},
-    {1, {0, 0, 0}, 0x21}, {1, {0, 0, 0}, 0x22}, {1, {0, 0, 0}, 0x23},
+static const PlEffRoom effRoom[6] = {
+    {1, 0x21}, {1, 0x22}, {1, 0x23},
+    {1, 0x21}, {1, 0x22}, {1, 0x23},
 };
 
 // New game: presets the door state flags (Scenario_flg[3]/51CC/51D0) of the doors that start
@@ -378,7 +376,7 @@ void gameRoomInit()
     ConsInitRoom((ConsRoom*) GetDataExt(pG->pRoom, "CNS", 0));
     {
         cSmd* smd = (cSmd*) GetDataExt(pG->pRoom, "SMD", 0);
-        cSmx* smx = (cSmx*) GetDataExt(pG->pRoom, "SMX", 0);
+        cSmxData* smx = (cSmxData*) GetDataExt(pG->pRoom, "SMX", 0);
         SmdInit(smd, smx, (cSmd*) GetDataExt(pG->pRoom, "SMD", 1));
     }
     ModInfoMgr.roomInit();
@@ -465,7 +463,7 @@ void gameRoomInit()
     EvtDebug.myRoomInit();
     if (!SysFlagChk(pG, SYS_DOORDEMO)) {
         EmMgr.create(0, 0);
-        PlRegistRoomEff((PlRoomEff*) effRoom);
+        PlRegistRoomEff((PlEffRoom*) effRoom);
     }
     SmdSetup(-1);
     ShdInit((ShdHeader*) GetDataExt(pG->pRoom, "SHD", 0));
@@ -497,11 +495,11 @@ void gameRoomInit()
     CameraRoomInit();
     p = GetDataExt(pG->pRoom, "CAM", 0);
     if (p != 0) {
-        CamCtrl.RoomDataRead((CameraDataHeader*) p);
+        CamCtrl.RoomDataRead((u8*) p);
     } else {
         pG->pCamRoom = p;
     }
-    CamCtrl.CoreDataRead((CameraDataHeader*) (pG->pCore->ofs_30 + (u32) pG->pCore));
+    CamCtrl.CoreDataRead((u8*) (pG->pCore->ofs_30 + (u32) pG->pCore));
     CamCtrl.roomInit();
     View.roomInit();
     p = GetDataExt(pG->pRoom, "BLK", 0);
@@ -847,7 +845,7 @@ bool cGameSave::load(SAVE_DATA_HEAD* head)
         pG->room_id = 0x120;
     } else {
         RoomData.load(head->pRm);
-        SscrnDataLoad(head->pSscrn);
+        SscrnDataLoad(head->pSs);
         MerchantDataLoad(head->pMr);
         ItemMgr.load(head->pItm);
         PlSetCostume();
@@ -870,7 +868,7 @@ bool cGameSave::save(SAVE_DATA_HEAD* data, int mode)
     pG->SaveKind = mode;
     *data->pGlobal = *(GameSaveBlock*) pG->save_data_start_addr;
     RoomData.save(data->pRm);
-    SscrnDataSave(data->pSscrn);
+    SscrnDataSave(data->pSs);
     MerchantDataSave(data->pMr);
     ItemMgr.save(data->pItm);
     return 1;
@@ -904,8 +902,8 @@ void cGameSave::calcOffset(SAVE_DATA_HEAD* head, u32 headaddr)
     head->pGlobal = (GameSaveBlock*) (p - headaddr);
     p = (u32) head->pRm;
     head->pRm = (void*) (p - headaddr);
-    p = (u32) head->pSscrn;
-    head->pSscrn = (u32*) (p - headaddr);
+    p = (u32) head->pSs;
+    head->pSs = (SSCRN_SAVE_DATA*) (p - headaddr);
     p = (u32) head->pMr;
     head->pMr = (void*) (p - headaddr);
     p = (u32) head->pItm;
@@ -925,8 +923,8 @@ void cGameSave::calcAddr(SAVE_DATA_HEAD* head)
     head->pGlobal = (GameSaveBlock*) ((u32) head + p);
     p = (u32) head->pRm;
     head->pRm = (void*) ((u32) head + p);
-    p = (u32) head->pSscrn;
-    head->pSscrn = (u32*) ((u32) head + p);
+    p = (u32) head->pSs;
+    head->pSs = (SSCRN_SAVE_DATA*) ((u32) head + p);
     p = (u32) head->pMr;
     head->pMr = (void*) ((u32) head + p);
     p = (u32) head->pItm;
@@ -961,7 +959,7 @@ SAVE_DATA_HEAD* cGameSave::alloc()
     d = (SAVE_DATA_HEAD*) MEM_CALLOC(size, 1, 13);
     d->pGlobal = (GameSaveBlock*) globalOfs;
     d->pRm = (void*) roomOfs;
-    d->pSscrn = (u32*) sscrnOfs;
+    d->pSs = (SSCRN_SAVE_DATA*) sscrnOfs;
     d->pMr = (void*) merchantOfs;
     d->pItm = (void*) itemOfs;
     d->size = size;
@@ -1049,7 +1047,7 @@ void DiedemoExec(int time, int type)
     IdSys.kill(0xFF, IDC_ACT_BUTTON);
     Cckpt.endCountDownTimer();
     PlEndCamera();
-    TaskExec(1, (TaskFunc) gameDiedemo, (int) &diedemo_work);
+    TaskExec(1, (TaskFunc) gameDiedemo, &diedemo_work);
 }
 
 // Per-frame: starts the death demo when the partner's life (ashley_life) or the player's life
@@ -1105,10 +1103,10 @@ void gameDiedemo(DIEDEMO_WORK* pDw)
             }
             switch (kind) {
             case 1:
-                IdSys.set((void*) (((OptionArc*) pG->pOption)->ofs_14 + (u32) pG->pOption), 0xFF, IDC_DEAD, 0x13, 6, 0);
+                IdSys.set((ID_FILE_HEADER*) (((OptionArc*) pG->pOption)->ofs_14 + (u32) pG->pOption), 0xFF, IDC_DEAD, 0x13, 6, 0);
                 break;
             case 2:
-                IdSys.set((void*) (((OptionArc*) pG->pOption)->ofs_1C + (u32) pG->pOption), 0xFF, IDC_DEAD, 0x13, 6, 0);
+                IdSys.set((ID_FILE_HEADER*) (((OptionArc*) pG->pOption)->ofs_1C + (u32) pG->pOption), 0xFF, IDC_DEAD, 0x13, 6, 0);
                 break;
             }
             if (StaFlagChk(pG, STA_EVENT_CANCEL)) {
@@ -1123,7 +1121,7 @@ void gameDiedemo(DIEDEMO_WORK* pDw)
             /* fallthrough */
         case 2:
             if (cnt >= pDw->exec_frame + 0x10E || (Key.trg & 0x80000000)) {
-                IdSys.set((void*) (((OptionArc*) pG->pOption)->ofs_18 + (u32) pG->pOption), 0xFF, IDC_CONTINUE, 0x13, 5, 0);
+                IdSys.set((ID_FILE_HEADER*) (((OptionArc*) pG->pOption)->ofs_18 + (u32) pG->pOption), 0xFF, IDC_CONTINUE, 0x13, 5, 0);
                 cnt2 = 0;
                 step++;
                 IdSys.beMove(IdSys.unitPtr(0x30, IDC_CONTINUE), 0);
@@ -1291,14 +1289,14 @@ void gameRoomMemInit()
 {
     if (SysFlagChk(pG, SYS_DOORDEMO)) {
         MemReplaceHeap(3, 4);
-        MemorySwap((void*) 0x807EC000, ARAM_FREE_BASE, 0x188000);
+        MemorySwap((void*) 0x807EC000, (void*) ARAM_FREE_BASE, 0x188000);
         memclr_asm((void*) 0x807EC000, 0x188000);
-        MemCreateHeap(10, 0x807EC000, 0x80974000);
+        MemCreateHeap(10, (void*) 0x807EC000, (void*) 0x80974000);
         MemSetCurrentHeap(10);
     } else {
         if (SysFlagChk(pG, SYS_DOOR_AFTER)) {
             MemDestroyHeap(10);
-            MemorySwap((void*) 0x807EC000, ARAM_FREE_BASE, 0x188000);
+            MemorySwap((void*) 0x807EC000, (void*) ARAM_FREE_BASE, 0x188000);
         } else {
             MemReplaceHeap(3, 4);
         }

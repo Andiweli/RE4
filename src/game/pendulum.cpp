@@ -10,10 +10,7 @@
 #include "rnd.h"
 #include "dbmodule.h"
 
-extern "C" {
-// static but declared with C linkage: Bio4.sym names it unmangled
 static void PenClothReset(cModel* m, CLOTH_INFO* c);
-}
 
 Vec GlobalWind = {0.0f, 0.0f, 20.0f};
 f32 GlobalWindAdd = 1.0471976f;
@@ -1154,7 +1151,7 @@ PenAtWork* penClothAtMake(cModel* m, CLOTH_AT_SET* at, int n)
     Vec d;
     Vec up;
     Vec zero;
-    PenAt* a;
+    CLOTH_AT_DATA* a;
     u32 i;
 
     if (at == 0 || n == 0 || m == 0) {
@@ -1178,10 +1175,10 @@ PenAtWork* penClothAtMake(cModel* m, CLOTH_AT_SET* at, int n)
         switch (at->Type) {
         case 0:
         default:
-            a->type = 0;
+            a->Type = 0;
             PosToPos(pv1, &v0, &c, rate);
-            a->p0 = c;
-            a->r = at->R;
+            a->Pos = c;
+            a->R = at->R;
             // struct view of pG: the fixed-scalar load would otherwise be hoisted between the
             // copy's word stores (and the copy issued 4, 0, 8 through the extra r9 anti-dependence).
             if (DbgFlagChk(pG, DBG_CLOTH_AT_DISP)) {
@@ -1189,11 +1186,11 @@ PenAtWork* penClothAtMake(cModel* m, CLOTH_AT_SET* at, int n)
             }
             break;
         case 1:
-            a->type = 1;
-            a->r = at->R;
-            a->p0 = v0;
-            a->p1 = *pv1;
-            a->len = GetDistance3(&v0, pv1);
+            a->Type = 1;
+            a->R = at->R;
+            a->Pos = v0;
+            a->Pos2 = *pv1;
+            a->Len = GetDistance3(&v0, pv1);
             PSVECSubtract(pv1, &v0, &d);
             ax.x = fabsf(d.x);
             ax.z = fabsf(d.z);
@@ -1212,22 +1209,22 @@ PenAtWork* penClothAtMake(cModel* m, CLOTH_AT_SET* at, int n)
             VECNormalize(&ax, &ax);
             VECNormalize(&d, &d);
             VECNormalize(&up, &up);
-            a->mat[0][0] = ax.x;
-            a->mat[1][0] = ax.y;
-            a->mat[2][0] = ax.z;
-            a->mat[0][1] = d.x;
-            a->mat[1][1] = d.y;
-            a->mat[2][1] = d.z;
-            a->mat[0][2] = up.x;
-            a->mat[1][2] = up.y;
-            a->mat[2][2] = up.z;
-            TransMatrix(a->mat, &v0);
-            PSMTXInverse(a->mat, a->inv);
+            a->m[0][0] = ax.x;
+            a->m[1][0] = ax.y;
+            a->m[2][0] = ax.z;
+            a->m[0][1] = d.x;
+            a->m[1][1] = d.y;
+            a->m[2][1] = d.z;
+            a->m[0][2] = up.x;
+            a->m[1][2] = up.y;
+            a->m[2][2] = up.z;
+            TransMatrix(a->m, &v0);
+            PSMTXInverse(a->m, a->im);
             if (DbgFlagChk(pG, DBG_CLOTH_AT_DISP)) {
                 zero.x = 0.0f;
                 zero.y = 0.0f;
                 zero.z = 0.0f;
-                Draw_cylinderMtx(a->mat, &zero, a->r, a->len, 0x80808080);
+                Draw_cylinderMtx(a->m, &zero, a->R, a->Len, 0x80808080);
             }
             break;
         }
@@ -1249,7 +1246,7 @@ int penClothAtCk(Vec* pos, Vec* up, PenAtWork* wk)
     f32 ang;
     int hit;
     u32 i;
-    PenAt* a;
+    CLOTH_AT_DATA* a;
 
     if (wk == 0) {
         return 0;
@@ -1258,11 +1255,11 @@ int penClothAtCk(Vec* pos, Vec* up, PenAtWork* wk)
     hit = 0;
     a = wk->pAt;
     for (i = 0; i < wk->num; i++, a++) {
-        PSVECSubtract(pos, &a->p0, &v);
+        PSVECSubtract(pos, &a->Pos, &v);
         dd = v.x * v.x + v.y * v.y + v.z * v.z;
-        rr = a->r * a->r;
+        rr = a->R * a->R;
         if (dd < rr) {
-            PSVECSubtract(&a->p0, up, &v);
+            PSVECSubtract(&a->Pos, up, &v);
             d = SQRTF(v.x * v.x + v.y * v.y + v.z * v.z);
             ang = acosf((rr - len * len - d * d) / (len * -2.0f * d));
             if (ang > 0.01f && ang < PI - 0.01f) {
@@ -1277,8 +1274,8 @@ int penClothAtCk(Vec* pos, Vec* up, PenAtWork* wk)
             } else {
 #line 2899 "D:/Bio4/Prog/pendulum.cpp"
                 VECNormalize(&v, &v);
-                PSVECScale(&v, &v, a->r + 1.0f);
-                PSVECAdd(&a->p0, &v, pos);
+                PSVECScale(&v, &v, a->R + 1.0f);
+                PSVECAdd(&a->Pos, &v, pos);
             }
             hit = 1;
         }
@@ -1308,7 +1305,7 @@ int penClothAtCkBorder(Vec* pos, Vec* up, PenAtWork* wk)
     f32 rr;
     int n;
     int ret;
-    PenAt* a;
+    CLOTH_AT_DATA* a;
 
     if (wk == 0) {
         return 0;
@@ -1325,34 +1322,34 @@ int penClothAtCkBorder(Vec* pos, Vec* up, PenAtWork* wk)
     a = wk->pAt - 1;
     while (n--) {
         a++;
-        if (a->type != 0) {
+        if (a->Type != 0) {
             continue;
         }
-        w.x = pos->x - a->p0.x;
-        w.y = pos->y - a->p0.y;
-        w.z = pos->z - a->p0.z;
+        w.x = pos->x - a->Pos.x;
+        w.y = pos->y - a->Pos.y;
+        w.z = pos->z - a->Pos.z;
         d.x = pos->x - up->x;
         d.y = pos->y - up->y;
         d.z = pos->z - up->z;
         wSq = w.x * w.x + w.y * w.y + w.z * w.z;
-        pu.x = a->p0.x - up->x;
-        pu.y = a->p0.y - up->y;
-        pu.z = a->p0.z - up->z;
+        pu.x = a->Pos.x - up->x;
+        pu.y = a->Pos.y - up->y;
+        pu.z = a->Pos.z - up->z;
         if (pu.x == 0.0f && pu.y == 0.0f && pu.z == 0.0f) {
             pu.y = 1.0f;
         }
         puSq = pu.x * pu.x + pu.y * pu.y + pu.z * pu.z;
-        rr = a->r * a->r;
+        rr = a->R * a->R;
         if (puSq < rr) {
             continue;
         }
         if (wSq > rr) {
-            if (puSq > (len + a->r) * (len + a->r)) {
+            if (puSq > (len + a->R) * (len + a->R)) {
                 continue;
             }
-            w.x = a->p0.x - up->x;
-            w.y = a->p0.y - up->y;
-            w.z = a->p0.z - up->z;
+            w.x = a->Pos.x - up->x;
+            w.y = a->Pos.y - up->y;
+            w.z = a->Pos.z - up->z;
             t = w.x * d.x + w.y * d.y + w.z * d.z;
             t *= invLenSq;
             if (t < 0.0f) {
@@ -1361,18 +1358,18 @@ int penClothAtCkBorder(Vec* pos, Vec* up, PenAtWork* wk)
             if (t > 1.0f) {
                 continue;
             }
-            w.x = d.x * t + up->x - a->p0.x;
-            w.y = d.y * t + up->y - a->p0.y;
-            w.z = d.z * t + up->z - a->p0.z;
-            if (w.x * w.x + w.y * w.y + w.z * w.z > a->r * a->r) {
+            w.x = d.x * t + up->x - a->Pos.x;
+            w.y = d.y * t + up->y - a->Pos.y;
+            w.z = d.z * t + up->z - a->Pos.z;
+            if (w.x * w.x + w.y * w.y + w.z * w.z > a->R * a->R) {
                 continue;
             }
         }
-        if (puSq - a->r * a->r > lenSq) {
-            w.x = a->p0.x - up->x;
-            w.y = a->p0.y - up->y;
-            w.z = a->p0.z - up->z;
-            rad = a->r + 0.0001f;
+        if (puSq - a->R * a->R > lenSq) {
+            w.x = a->Pos.x - up->x;
+            w.y = a->Pos.y - up->y;
+            w.z = a->Pos.z - up->z;
+            rad = a->R + 0.0001f;
             dd = SQRTF(w.x * w.x + w.y * w.y + w.z * w.z);
             ang = acosf((rad * rad - len * len - dd * dd) / (len * -2.0f * dd));
             if (ang > 0.01f && ang < PI - 0.01f) {
@@ -1396,13 +1393,13 @@ int penClothAtCkBorder(Vec* pos, Vec* up, PenAtWork* wk)
                 w.x *= rad;
                 w.y *= rad;
                 w.z *= rad;
-                pos->x = a->p0.x + w.x;
-                pos->y = a->p0.y + w.y;
-                pos->z = a->p0.z + w.z;
+                pos->x = a->Pos.x + w.x;
+                pos->y = a->Pos.y + w.y;
+                pos->z = a->Pos.z + w.z;
             }
         } else {
             dd = SQRTF(puSq);
-            ang = asinf(a->r / dd) + 0.0001f;
+            ang = asinf(a->R / dd) + 0.0001f;
             PSVECCrossProduct(&pu, &d, &ax);
             PSMTXRotAxisRad(mtx, &ax, ang);
 #line 3133 "D:/Bio4/Prog/pendulum.cpp"
@@ -1435,7 +1432,7 @@ void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
     f32 invLenSq;
     f32 push;
     int n;
-    PenAt* a;
+    CLOTH_AT_DATA* a;
 
     if (wk == 0) {
         return;
@@ -1460,7 +1457,7 @@ void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
     a = wk->pAt - 1;
     while (n--) {
         a++;
-        if (a->type == 0) {
+        if (a->Type == 0) {
             Vec v;
             f32 dot;
             f32 t;
@@ -1468,21 +1465,21 @@ void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
             f32 d1;
             f32 d0;
 
-            rr = a->r * a->r;
-            dot = (a->p0.x - p1.x) * d.x + (a->p0.y - p1.y) * d.y;
-            dot += (a->p0.z - p1.z) * d.z;
+            rr = a->R * a->R;
+            dot = (a->Pos.x - p1.x) * d.x + (a->Pos.y - p1.y) * d.y;
+            dot += (a->Pos.z - p1.z) * d.z;
             t = dot * invLenSq;
-            v.x = nd.x * t + p1.x - a->p0.x;
-            v.y = nd.y * t + p1.y - a->p0.y;
-            v.z = nd.z * t + p1.z - a->p0.z;
+            v.x = nd.x * t + p1.x - a->Pos.x;
+            v.y = nd.y * t + p1.y - a->Pos.y;
+            v.z = nd.z * t + p1.z - a->Pos.z;
             push = v.x * v.x + v.y * v.y + v.z * v.z;
             if (push >= rr) {
                 continue;
             }
-            d1 = (a->p0.x - p1.x) * (a->p0.x - p1.x) + (a->p0.y - p1.y) * (a->p0.y - p1.y);
-            d1 += (a->p0.z - p1.z) * (a->p0.z - p1.z);
-            d0 = (a->p0.x - p0.x) * (a->p0.x - p0.x) + (a->p0.y - p0.y) * (a->p0.y - p0.y);
-            d0 += (a->p0.z - p0.z) * (a->p0.z - p0.z);
+            d1 = (a->Pos.x - p1.x) * (a->Pos.x - p1.x) + (a->Pos.y - p1.y) * (a->Pos.y - p1.y);
+            d1 += (a->Pos.z - p1.z) * (a->Pos.z - p1.z);
+            d0 = (a->Pos.x - p0.x) * (a->Pos.x - p0.x) + (a->Pos.y - p0.y) * (a->Pos.y - p0.y);
+            d0 += (a->Pos.z - p0.z) * (a->Pos.z - p0.z);
             if (d1 > rr && d0 > rr) {
                 if (dot < 0.0f) {
                     continue;
@@ -1491,7 +1488,7 @@ void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
                     continue;
                 }
             }
-            push = a->r - SQRTF(push);
+            push = a->R - SQRTF(push);
             if (v.x == 0.0f && v.y == 0.0f && v.z == 0.0f) {
                 v.y = 1.0f;
             }
@@ -1518,8 +1515,8 @@ void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
             f32 l1;
             f32 l0;
 
-            PSMTXMultVec(a->inv, &p1, &lp1);
-            PSMTXMultVec(a->inv, &p0, &lp0);
+            PSMTXMultVec(a->im, &p1, &lp1);
+            PSMTXMultVec(a->im, &p0, &lp0);
             l1 = lp1.x * lp1.x + lp1.z * lp1.z;
             l0 = lp0.x * lp0.x + lp0.z * lp0.z;
             ld.x = lp0.x - lp1.x;
@@ -1529,7 +1526,7 @@ void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
             ld.y = 0.0f;
             dot = (-lp1.x) * ld.x + (-lp1.z) * ld.z;
             ldSq = ld.x * ld.x + ld.z * ld.z;
-            rr = a->r * a->r;
+            rr = a->R * a->R;
             if (l1 > rr && l0 > rr) {
                 if (dot < 0.0f) {
                     continue;
@@ -1549,15 +1546,15 @@ void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
             if (q.y < 0.0f) {
                 continue;
             }
-            if (q.y > a->len) {
+            if (q.y > a->Len) {
                 continue;
             }
             q.y = 0.0f;
             push = q.x * q.x + q.z * q.z;
-            if (push >= a->r * a->r) {
+            if (push >= a->R * a->R) {
                 continue;
             }
-            push = a->r - SQRTF(push);
+            push = a->R - SQRTF(push);
             if (q.x == 0.0f && q.y == 0.0f && q.z == 0.0f) {
                 continue;
             }
@@ -1571,8 +1568,8 @@ void penClothAtCkParallel(Vec* pos, Vec* up, PenAtWork* wk)
             lp0.x += q.x;
             lp0.y += q.y;
             lp0.z += q.z;
-            PSMTXMultVec(a->mat, &lp1, &p1);
-            PSMTXMultVec(a->mat, &lp0, &p0);
+            PSMTXMultVec(a->m, &lp1, &p1);
+            PSMTXMultVec(a->m, &lp0, &p0);
         }
     }
     *up = p1;

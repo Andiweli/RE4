@@ -27,7 +27,6 @@
 #include "game.h"
 #include "em_sub.h"
 
-extern "C" {
 void objPillar_R0_Set(cObjPillar* obj);
 void objPillar_R0_Break(cObjPillar* obj);
 void objPillar_R0_Throw(cObjPillar* obj);
@@ -39,20 +38,17 @@ void EscapeCamMove();
 void EscapeAction2(cObjPillar* obj);
 void plemEscape2(cPlayer* pl);
 void objPillarEatSet(cObjPillar* obj);
-}
 // The original is a `static plemEscape` (emBar.cpp has a global one); the name carries the split's
 // address suffix so the report can pair it with the local symbol.
 #define plemEscape plemEscape_8003C33C
-extern "C" {
 static void plemEscape(cPlayer* pl);
 
-}
 
 void (*ObjPillar_R0_move_tbl[5])(cObjPillar*) = {
     objPillar_R0_Set, objPillar_R0_Break, objPillar_R0_Throw, objPillar_R0_Escape, objPillar_R0_Fall,
 };
 
-EmAtkInfo ObjPillar_atk_info = { 1000.0f, PL_DM_AUTO, 1000, 0, 10, 0 };
+ATK_INFO ObjPillar_atk_info = { 1000.0f, PL_DM_AUTO, 1000, 0, 10, 0 };
 
 CAMERA Cam;   // escape sequence camera
 
@@ -211,7 +207,7 @@ void objPillar_R0_Throw(cObjPillar* pObj)
         MotionSetCore(pObj, &pObj->Motion, w->Mot_catch, 0, 0, 0x8001, 0x1F);
         w->TmpU32 = Rnd() & 1;
         w->Act_ck = 1;
-        EstSet(pObj, -1, 0, 0, EFF_EM31, 0x22, 0, ESP_CORE_KIND_NONE, pObj, (void*) step);
+        EstSet(pObj, -1, 0, 0, EFF_EM31, 0x22, 0, ESP_CORE_KIND_NONE, pObj, 0);
         w->Seid = step;
         pObj->r_no_2++;
     case 1:
@@ -491,7 +487,7 @@ void cObjPillar::setFall(void* mot0, void* mot1)
 void objPillarAtkCk(cObjPillar* pObj, Vec* pPos)
 {
     FREE_PILLAR* w = PILLAR_WK(pObj);
-    EmAtkInfo* atk = &ObjPillar_atk_info;
+    ATK_INFO* atk = &ObjPillar_atk_info;
     int hit;
 
     if ((s16) pG->pl_life > 500) {
@@ -593,7 +589,7 @@ void EscapeCamMove()
     f32 len;
     GLOBAL_WK* g = pG;
 
-    Cam.param.fovy = g->Camera.param.fovy;
+    Cam.param.Fovy = g->Camera.param.Fovy;
     p0.x = -376.0f;
     p0.y = 575.0f;
     p0.z = -1831.0f;
@@ -602,20 +598,20 @@ void EscapeCamMove()
     p1.z = 52.6f;
     PSMTXMultVec(pPL->mat, &p0, &p0);
     PSMTXMultVec(pPL->mat, &p1, &p1);
-    PosToPos(&g->Camera.param.at, &p1, &Cam.param.at, 1.0f);
-    PosToPos(&g->Camera.param.pos, &p0, &Cam.param.pos, 1.0f);
-    if (EatMgr.hitCheck(&Cam.param.at, &Cam.param.pos, &hit, 0, 0x8000, 0)) {
-        PSVECSubtract(&hit, &Cam.param.at, &d);
+    PosToPos(&g->Camera.param.Target, &p1, &Cam.param.Target, 1.0f);
+    PosToPos(&g->Camera.param.Campos, &p0, &Cam.param.Campos, 1.0f);
+    if (EatMgr.hitCheck(&Cam.param.Target, &Cam.param.Campos, &hit, 0, 0x8000, 0)) {
+        PSVECSubtract(&hit, &Cam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 875 "D:/Bio4/Prog/objPillar.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&Cam.param.at, &d, &Cam.param.pos);
+        PSVECAdd(&Cam.param.Target, &d, &Cam.param.Campos);
     }
     {
         CAMERA* cam = &Cam;
-        Vec* cp = &cam->param.pos;
-        Vec* ca = &cam->param.at;
+        Vec* cp = &cam->param.Campos;
+        Vec* ca = &cam->param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -657,7 +653,7 @@ void plemEscape2(cPlayer* pEm)
     case 0:
         em->ang.y = GetXZAngle(&em->pos, &w->St_pos);
         MotionSetCore(em, &em->Motion, w->Mot_pl_escape, w->Seq_pl_escape, 0, 1, 0);
-        EstSet(em, -1, 0, 0, EFF_EM31, 0x39, 0, ESP_CORE_KIND_NONE, em, (void*) step);
+        EstSet(em, -1, 0, 0, EFF_EM31, 0x39, 0, ESP_CORE_KIND_NONE, em, 0);
         SndCall(1, 0x48, &em->pos, 0, 0, em);
         SndCall(1, 0x11, &em->getPartsPtr(4)->world, 0, 0, em);
         em->r_no_2++;

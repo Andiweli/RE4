@@ -22,9 +22,7 @@
 class cPlayer;
 
 
-extern "C" {
 void plemEscape(cPlayer* pl);
-}
 
 typedef void (*EmBarFunc)(cEmBar*);
 
@@ -66,7 +64,6 @@ cEmBar* SetBar(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo)
         return 0;
     }
     EtcSetAddAmb(em, ETC_AMB_BAR);
-    u32 zero = 0;
     w->size.x = 3500.0f;
     w->size.y = 400.0f;
     w->size.z = 10.0f;
@@ -87,7 +84,7 @@ cEmBar* SetBar(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo)
     em->hp = 1000;
     em->be_flag &= ~0x01000000;
     em->be_flag &= ~0x10;
-    w->Be_flg = zero;
+    w->Be_flg = 0;
     w->Etc_no = flagNo;
     flg = GetEtcFlgPtr(flagNo, pG->room_id);
     if (flg && (*flg & 1)) {
@@ -287,7 +284,7 @@ void emBar_R1_Set(cEmBar* pEm)
 
         if (esc == 0) {
             if (fabsf(Muku(&pEm->pos, &pPL->pos, pEm->ang.y, 3.1415927f)) < 1.5707964f) {
-                ActBtn.set(ACT_GUARD, 5, (void*) emBarActEscape, pEm, ACTCTR_WEP_SET_IGNORE, DISP_L_R, ACT_FUNC_NORMAL, esc);
+                ActBtn.set(ACT_GUARD, 5, (void*) emBarActEscape, pEm, ACTCTR_WEP_SET_IGNORE, DISP_L_R, ACT_FUNC_NORMAL, (void*) esc);
             }
         }
     }

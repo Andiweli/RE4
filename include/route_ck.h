@@ -16,22 +16,24 @@ struct RTP_POINT {
 };
 
 // Link table entry (4 bytes).
-struct RtpLink {
-    s16 point;     // 0x00  way point index
-    u16 x2;        // 0x02
+struct RTP_LINE {
+    s16 connect;  // 0x00  way point index, -1 = none
+    u16 dist;     // 0x02  distance / 10
 };
 
-// RTP file header; the tables are at byte offsets from the header.
-struct RtpData {
-    u8 pad_0[6];
-    u16 nPoint;    // 0x06
-    u8 pad_8[4];
-    u32 pointOfs;  // 0x0C  RTP_POINT[nPoint]
-    u32 linkOfs;   // 0x10  RtpLink[]
-    u32 nextOfs;   // 0x14  s8 next[nPoint][nPoint]: next hop from row to column, -1 = unreachable
+// RTP file header; the tables are at byte offsets from the header (the file's own offsets, where
+// PS2 holds them relocated to pointers).
+struct RTP {
+    u32 ID;              // 0x00  "2RTP" (0x32525450)
+    u16 mapped;          // 0x04
+    u16 nPoint;          // 0x06
+    u16 nLine;           // 0x08
+    u16 nNext;      // 0x0A  nPoint * nPoint (next table size)
+    u32 pPoint;     // 0x0C  RTP_POINT[nPoint]
+    u32 pLine;      // 0x10  RTP_LINE[nLine]
+    u32 pNext;      // 0x14  s8 next[nPoint][nPoint]: next hop from row to column, -1 = unreachable
 };
 
-extern "C" {
 void RouteCk();
 // Next position for `em` on its way to `target`; returns 1 when the target itself is reachable.
 int RouteCkToEm(cEm* pMy, cEm* pTo, Vec* pDest, int mode);
@@ -51,6 +53,5 @@ int getNearInfo(cEm* pEm, int mode, int flag);
 s8 getNearPoint(Vec* pPos, int mode, int flag);
 void Draw_rtp();
 void Draw_eminfo();
-}
 
 #endif

@@ -261,7 +261,6 @@ static void em3d_R0_Init(cEm3d* em)
     FREE_EM3D* w = EM3D_WK(em);
     cAtariInfo* at;
     u32 i;
-    int zero;
 
     if (em->modelInit(ARC(EM3D_BIN_005), ARC(EM3D_TPL_006)) == 0) {
         pLog->err(0, 0, "em3d() ModelInit failed.");
@@ -276,7 +275,6 @@ static void em3d_R0_Init(cEm3d* em)
     }
     at = &em->atari;
     at->init(0.0f, 0.0f, 0.0f, 800.0f, 700.0f, 700.0f, 3000.0f, 1, 0x2000, 10);
-    zero = 0;
     at->off();
     em->setStatus(EM_STATUS_LOCKOFF);
     em->be_flag &= ~0x01000000;
@@ -285,8 +283,8 @@ static void em3d_R0_Init(cEm3d* em)
     YarareInit(em, 0.0f, 750.0f, -3000.0f, 1500.0f, 6000.0f, 1, YAT_FLAG_ON | YAT_FLAG_Z_AXIS | YAT_FLAG_NO_MARK);
     em->cEm::setTarget(2, 0.0f, 0.0f, 0.0f);
     EspDataLoad((u32) ARC(EM3D_EFF_004), EFF_EM3D, 0);
-    w->Be_flg = zero;
-    w->Fire_wait = zero;
+    w->Be_flg = 0;
+    w->Fire_wait = 0;
     w->vibAng.x = fRand1_1() * PI;
     w->vibAng.y = fRand1_1() * PI;
     w->vibAng.z = fRand1_1() * PI;
@@ -659,7 +657,7 @@ void em3dRoterMove(cEm3d* em)
             rot.z = 0.0f;                                                               \
             PSVECScale(&nrm, &s, 30.0f);                                                \
             PSVECAdd(&hit, &s, &hit);                                                   \
-            EstSet(0, -1, &hit, &rot, EFF_EM3D, 6, 0, ESP_CORE_KIND_NONE, (void*) (zero), (void*) (zero));             \
+            EstSet(0, -1, &hit, &rot, EFF_EM3D, 6, 0, ESP_CORE_KIND_NONE, (void*) (zero), 0);             \
             if (se) {                                                                   \
                 SndCall(6, 0xA, &hit, 0, 0, em);                                        \
             }                                                                           \
@@ -721,8 +719,8 @@ void em3dChainGunMove(cEm3d* em)
         return;
     }
     w->Fire_wait = 2;
-    EstSet(em, -1, 0, 0, EFF_EM3D, 1, 1, ESP_CORE_KIND_NONE, em, (void*) t);
-    EstSet(em, -1, 0, 0, EFF_EM3D, 2, 1, ESP_CORE_KIND_NONE, em, (void*) t);
+    EstSet(em, -1, 0, 0, EFF_EM3D, 1, 1, ESP_CORE_KIND_NONE, em, 0);
+    EstSet(em, -1, 0, 0, EFF_EM3D, 2, 1, ESP_CORE_KIND_NONE, em, 0);
     SndCall(6, 1, &em->pos, 0, 0, em);
     EM3D_GUN_SHOT(em, 4, 5000.0f, 100000.0f, 1, t);
     EM3D_GUN_SHOT(em, 7, 2000.0f, 300000.0f, 0, t);

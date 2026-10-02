@@ -58,7 +58,6 @@ public:
     virtual void setTrolleyLost();
 };
 
-extern "C" {
 void objTrolley_R0_Set(cObjTrolley* obj);
 void objTrolley_R0_Move(cObjTrolley* obj);
 void objTrolley_R0_Break(cObjTrolley* obj);
@@ -76,7 +75,6 @@ void objTrolleyMoveAdjustEM(cObjTrolley* obj);
 void objTrolleyHitCk(cObjTrolley* obj);
 void objTrolleyFallEM(cObjTrolley* obj);
 void objTrolleyLostEM(cObjTrolley* obj);
-}
 static void objTrolleySatClear(cObjTrolley* obj);
 
 void (*ObjTrolley_R0_move_tbl[3])(cObjTrolley*) = {
@@ -629,8 +627,8 @@ void objTrolleySetAdjust(cObjTrolley* pObj, cEm* em)
     em->setPos(&v);
     if (em->id == 0) {
         if (CamCtrl.m_pExtraCamera) {
-            PSVECAdd(&CamCtrl.m_pExtraCamera->param.at, &d, &CamCtrl.m_pExtraCamera->param.at);
-            PSVECAdd(&CamCtrl.m_pExtraCamera->param.pos, &d, &CamCtrl.m_pExtraCamera->param.pos);
+            PSVECAdd(&CamCtrl.m_pExtraCamera->param.Target, &d, &CamCtrl.m_pExtraCamera->param.Target);
+            PSVECAdd(&CamCtrl.m_pExtraCamera->param.Campos, &d, &CamCtrl.m_pExtraCamera->param.Campos);
         }
         pG->quake_ofs = d;
     }

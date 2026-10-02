@@ -23,7 +23,7 @@
 int SetToolLight(int no);  // db_light_tools.cpp
 
 // Tool-side view of the FLR_AT_DATA record (flr_at.h), 0x84 bytes.
-struct TFlrAt {
+struct FLR_AT_DATA_101 {
     u8 be_flg;        // 0x00  bit 0 enabled, bit 1 created
     u8 id;         // 0x01  0 foot SE, 1 SE volume, 2 BGM volume, 3 thunder volume
     u8 no;           // 0x02  record index (set on save)
@@ -78,10 +78,10 @@ struct FlrAtWork {
     u8 defCartridge;  // 0x7D  FLR_AT_HEADER cartridge_type
     u8 pad_7E[2];
     FLR_AT_HEADER head;   // 0x80
-    TFlrAt area[256]; // 0x90
+    FLR_AT_DATA_101 area[256]; // 0x90
     FLR_AT_HEADER fileHead;  // 0x8490
-    TFlrAt file[256];    // 0x84A0
-    TFlrAt copyBuf;      // 0x108A0
+    FLR_AT_DATA_101 file[256];    // 0x84A0
+    FLR_AT_DATA_101 copyBuf;      // 0x108A0
     FLR_AT_SYS flrSys;       // 0x10924
     FLR_AT_SYS* saveFlrSys;  // 0x109B0
 };
@@ -89,7 +89,7 @@ struct FlrAtWork {
 static int flrAtSaveNum;
 static FlrAtWork* flrAtWk;
 #define pW (flrAtWk)
-static TFlrAt* flrAtCur;
+static FLR_AT_DATA_101* flrAtCur;
 #define pCur (flrAtCur)
 
 static const char* flrAtTypeName[4] = {"FOOT SE", "SE VOL CTRL", "BGM VOL CTRL", "THUNDER VOL"};
@@ -133,17 +133,17 @@ void flrAtInit()
 
     TutilInitDefault();
     pW->saveStop = pG->Stop_flg;
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
     pW->saveDisp = pG->Disp_flg;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
-    pG->Disp_flg |= 0x2000000;
-    pG->Disp_flg |= 0x100000;
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
+    DpfFlagOn(pG, DPF_SHADOW);
+    DpfFlagOn(pG, DPF_FILTER);
     DbgFlagOn(pG, DBG_DBG_CAM);
     SetToolLight(1);
     pW->x0 = 0x2D;
@@ -151,11 +151,11 @@ void flrAtInit()
     pW->head.magic[0] = 'F';
     pW->head.magic[1] = 'S';
     pW->head.magic[2] = 'E';
-    pW->head.magic[3] = zero;
+    pW->head.magic[3] = 0;
     pW->head.version = 0x103;
     pW->head.num = 256;
-    pW->head.cartridge_type = zero;
-    pW->copySrc = zero;
+    pW->head.cartridge_type = 0;
+    pW->copySrc = 0;
     pW->copyValid = zero;
     pW->saveFlrSys = pFlrSys;
     pW->dispGroup = -1;
@@ -359,10 +359,10 @@ static void flrAtAreaEdit_AreaCreate()
     if (sel < 0) return;
     switch (sel) {
     case 0:
-        AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_XZ4, 1000.0f, 1000.0f);
+        AreaDataInit(&pCur->area, &pPL->pos, 1000.0f, 1000.0f, AREA_TYPE_XZ4);
         break;
     case 1:
-        AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_CYLINDER, 1000.0f, 1000.0f);
+        AreaDataInit(&pCur->area, &pPL->pos, 1000.0f, 1000.0f, AREA_TYPE_CYLINDER);
         break;
     }
     pCur->priority = 8;
@@ -396,7 +396,7 @@ static void flrAtAreaEdit_AreaPaste()
 // Empties the copy buffer.
 static void flrAtAreaEdit_CopyBuffClear()
 {
-    memclr_asm(&pW->copyBuf, sizeof(TFlrAt));
+    memclr_asm(&pW->copyBuf, sizeof(FLR_AT_DATA_101));
     pW->copySrc = 0;
     pW->copyValid = 0;
 }
@@ -1077,7 +1077,7 @@ static void flrAtDataLoad()
                         if (pW->area[j].be_flg == 0) {
                             pW->area[j] = pW->area[i];
                             pW->area[j].no = j;
-                            memclr_asm(&pW->area[i], sizeof(TFlrAt));
+                            memclr_asm(&pW->area[i], sizeof(FLR_AT_DATA_101));
                             break;
                         }
                     }
@@ -1191,7 +1191,7 @@ static void flrAtDataSave()
             switch (sel) {
             case 0:
             case 1:
-                ret = HDWrite_only(pathX + sel * 0x40, &pW->fileHead, flrAtSaveNum * sizeof(TFlrAt) + 0x10);
+                ret = HDWrite_only(pathX + sel * 0x40, &pW->fileHead, flrAtSaveNum * sizeof(FLR_AT_DATA_101) + 0x10);
                 break;
             case 2:
                 pW->mode = 0;
@@ -1262,9 +1262,9 @@ static void flrAtPreview()
 static void preview_init()
 {
     pW->dispType = -1;
-    pG->Stop_flg &= ~0x10000000;
-    pG->Disp_flg &= ~0x40000000;
-    pG->Disp_flg &= ~0x80000000;
+    SpfFlagOff(pG, SPF_PL);
+    DpfFlagOff(pG, DPF_PL);
+    DpfFlagOff(pG, DPF_EM);
     DbgFlagOff(pG, DBG_DBG_CAM);
     pFlrSys = &pW->flrSys;
     pFlrSys->pHead = &pW->head;
@@ -1293,14 +1293,14 @@ static void preview_main()
 // Restores the tool flags, back to the sub menu.
 static void preview_exit()
 {
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
     DbgFlagOn(pG, DBG_DBG_CAM);
     pW->dispGroup = -1;
     pW->mode = 5;

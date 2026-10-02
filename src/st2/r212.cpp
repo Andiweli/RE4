@@ -114,7 +114,7 @@ void r212_SetSwitchInfo();
 static void r212_Puzzle();
 static void r212_PuzzleEndProc();
 static void r212_EventTrap();
-void Evt_R212S00_Func(Event* e);
+void Evt_R212S00_Func(Event* e, u32);
 static void r212_RoofMove();
 static void r212_RoofTrapWatcher();
 static void r212_MesRoofDoor();
@@ -144,8 +144,8 @@ void R212Init()
     r212_work->door[2].setOpened();
     r212_TrapInit();
     SceExec(0x12, (TaskFunc) r212_DoorLock, 0, 0, SCE_PRIO_DEF_2, 0);
-    SceSetItemEvent(0xB, 0x81, 3, 0xA, r212_TreasureBoxOpen, r212_TreasureBoxOpened, 6, 0);
-    SceSetItemEvent(0xC, 0x80, 4, 0xB, r212_TreasureBoxOpen, r212_TreasureBoxOpened, 0x3E, 0);
+    SceSetItemEvent(0xB, 0x81, 3, 0xA, r212_TreasureBoxOpen, r212_TreasureBoxOpened, (void*) 6, 0);
+    SceSetItemEvent(0xC, 0x80, 4, 0xB, r212_TreasureBoxOpen, r212_TreasureBoxOpened, (void*) 0x3E, 0);
 }
 
 // The trap room: its attribute piece; until the trap ran (Room_flg bit 0) area 1 = the roof trap event
@@ -347,17 +347,17 @@ static void r212_EventTrap()
 {
     Vec pos = {-508.0f, 0.0f, -2166.0f};
     Vec ang;
-    ReadModule* m = SearchEmModule(0x11);
+    MODULE_DAT* m = SearchEmModule(0x11);
 
     RsfSet(G_ROOM_ID, 0);
     SceEventStart(0);
     if (r212_work->evd->waitLoadOk() == 1 && m != 0) {
-        MemorySwap(m->pArc, (u32) r212_work->evd->getAddr(), r212_work->evd->getSize());
-        EvtMgr.SetEvt(m->pArc, 0);
+        MemorySwap(m->pData, r212_work->evd->getAddr(), r212_work->evd->getSize());
+        EvtMgr.SetEvt(m->pData, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0)) {
             SceSleep(1);
         }
-        MemorySwap(m->pArc, (u32) r212_work->evd->getAddr(), r212_work->evd->getSize());
+        MemorySwap(m->pData, r212_work->evd->getAddr(), r212_work->evd->getSize());
         r212_work->evd->setCommand(CMND_DEL_DATA, 0, 0);
     }
     Vec* pa = &ang;
@@ -393,7 +393,7 @@ static void r212_EventTrap()
 
 // Event r212s00 callback (the roof trap closes in): objects 0x1B/0xC shown for the event, light mask
 // 0x40 on pl0100, then hidden again.
-void Evt_R212S00_Func(Event* e)
+void Evt_R212S00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -635,14 +635,14 @@ static void r212_DrillAppearCheck()
     CamCtrl.CutCall(9);
     pG->Room_flg[0] &= ~0x40000000;
     SceSetEventCancel(1, (TaskFunc) r212_DrillAppearCheckEndProc, 0, 1, 1);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0xD, 0, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0xD, 0, ESP_CORE_KIND_NONE, (void*) zero, 0);
     r212_work->door[2].setClose();
     while ((st = r212_work->door[2].getStatus()) != 0) {
         SceSleep(1);
     }
     SceSleep(30);
     r212_work->se = RoomSeCall(0, &SmdGetObjPtr(0x2C)->pos, 0, 0x80000000, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 9, 1, ESP_CORE_KIND_ROOM00, (void*) st, (void*) st);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 9, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     SmdGetObjPtr(0x32)->be_flag &= ~2;
     CamCtrl.CutCall(4);
     SceSleep(10);

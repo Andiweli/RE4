@@ -41,7 +41,6 @@ public:
     void setBreakModel(void* bin, void* tpl);
 };
 
-extern "C" {
 cEmBox* SetBox(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type, int etcNo);
 void emBoxDmCk(cEmBox* em);
 void emBoxSetBreak(cEmBox* em, u32 kind);
@@ -55,6 +54,5 @@ void emBoxActEvtCk(cEmBox* em);
 int checkNearOtherBarrel(cEmBox* em);
 void emBoxAction(cEmBox* em);
 void emBoxSetItem(cEmBox* em);
-}
 
 #endif

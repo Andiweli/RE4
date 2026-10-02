@@ -82,19 +82,19 @@ static inline void r10b_waitEvt()
 // The rooms call Event::FlgOnStatus out of line (event.h has it in-class).
 void EvtFlgOnStatus(Event* e, u32 no) asm("FlgOnStatus__5EventUl");
 
-extern "C" int readEvent(int no, int wait, void** out);
-extern "C" void freeEvent(int no);
+int readEvent(int no, int wait, void** out);
+void freeEvent(int no);
 static void R10b_chkEmDie();
 static void R10b_chkWater();
 static void r10b_GakeEvent();
-extern "C" void Evt_R10BS00_Func(Event* e);
-extern "C" void em2fTentacleMove(cEm* em, Event* e, int mode);
-extern "C" void Evt_R10BS10_Func(Event* e);
-extern "C" void Evt_R10BS20_Func(Event* e);
-extern "C" void Evt_R10BS21_Func(Event* e);
-extern "C" void Evt_R10BS22_Func(Event* e);
-extern "C" void Evt_R10BSXX_Func_Pl0f(Event* e);
-extern "C" void Evt_R10BSXX_Func_Em2f(Event* e);
+void Evt_R10BS00_Func(Event* e, u32);
+void em2fTentacleMove(cEm* em, Event* e, int mode);
+void Evt_R10BS10_Func(Event* e, u32);
+void Evt_R10BS20_Func(Event* e, u32);
+void Evt_R10BS21_Func(Event* e, u32);
+void Evt_R10BS22_Func(Event* e, u32);
+void Evt_R10BSXX_Func_Pl0f(Event* e);
+void Evt_R10BSXX_Func_Em2f(Event* e);
 static void r10b_setEm();
 
 // Room init (the lake, Del Lago): System_flg 0x800, the water-follow task, water hit effects; area 4 =
@@ -103,7 +103,6 @@ static void r10b_setEm();
 // created at fixed positions; the boat enemy (ESL 0xA2), the boss module and the death watcher.
 void R10bInit()
 {
-    void* zero = 0;
     Vec pos;
     Vec rot;
     cObj* obj;
@@ -186,8 +185,8 @@ void R10bInit()
         ((cObj1c*) obj)->setMotion(ROOM_ARC_PTR(pG->pRoom, 0x20), ROOM_ARC_PTR(pG->pRoom, 0x21),
                                    ROOM_ARC_PTR(pG->pRoom, 0x22), ROOM_ARC_PTR(pG->pRoom, 0x23));
     }
-    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_ROOM00, zero, zero);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_ROOM01, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_ROOM00, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_ROOM01, 0, 0);
     r10b_work->boat = EmSetFromList2(0xA2, 1);
     RoomEfmRegist(SmdGetGroupObjPtr(0x58), 0x60);
     SetSstAddAreaFlag(0x800);
@@ -206,7 +205,7 @@ static char* r10b_evtName[6] = {
 
 // Loads event `no` (r10b_evtName) through a data unit; with `wait` the data is swapped into the
 // boss module's block and `out` receives its address.
-extern "C" int readEvent(int no, int wait, void** out)
+int readEvent(int no, int wait, void** out)
 {
     if (out != 0) {
         *out = 0;
@@ -218,7 +217,7 @@ extern "C" int readEvent(int no, int wait, void** out)
         }
     }
     if (wait != 0) {
-        ReadModule* m;
+        MODULE_DAT* m;
         u32 max;
 
         if (r10b_work->evt[no]->waitLoadOk() == 0) {
@@ -228,7 +227,7 @@ extern "C" int readEvent(int no, int wait, void** out)
         }
         EspEmDataSwapPush(0x2F);
         m = SearchEmModule(0x2F);
-        max = m->size;
+        max = m->DataSize;
         if (r10b_work->evt[no]->getSize() > max) {
             // `return 0` (not `goto fail`): at sched2 the block continues past the err call with
             // `li r3,0`, whose output dependence on the pLog load and the block-end jump rank the
@@ -236,8 +235,8 @@ extern "C" int readEvent(int no, int wait, void** out)
             pLog->err(0, 0, "readEvent() : event size too large!![%d]>[%d]", r10b_work->evt[no]->getSize(), max);
             return 0;
         }
-        MemorySwap(m->pArc, (u32) r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
-        *out = m->pArc;
+        MemorySwap(m->pData, r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
+        *out = m->pData;
     } else {
         r10b_work->evt[no]->setCommand(CMND_ARAM_LOAD, 0, 0);
     }
@@ -248,13 +247,13 @@ fail:
 
 // Release event unit `no`: swap the boss (0x2F) module's archive back over the event data it had been
 // loaded into, pop the effect data swap, and clear the unit.
-extern "C" void freeEvent(int no)
+void freeEvent(int no)
 {
     if (r10b_work->evt[no] != 0) {
-        ReadModule* m;
+        MODULE_DAT* m;
 
         m = SearchEmModule(0x2F);
-        MemorySwap(m->pArc, (u32) r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
+        MemorySwap(m->pData, r10b_work->evt[no]->getAddr(), r10b_work->evt[no]->getSize());
         EspEmDataSwapPop(0x2F);
         r10b_work->evt[no]->setCommand(CMND_CLEAR_DATA, 0, 0);
     }
@@ -264,8 +263,8 @@ extern "C" void freeEvent(int no)
 static void R10b_chkEmDie()
 {
     void* evt;
-    u32 key;
-    u32 key2;
+    Event* pEvt;
+    Event* pEvt2;
     cEm* boss;
 
     SceSleep(1);
@@ -295,17 +294,17 @@ static void R10b_chkEmDie()
             }
             if (r10b_work->count > 14) {
                 if (readEvent(2, 1, &evt)) {
-                    if (EvtMgr.SetEvt(evt, &key) != 0) {
-                        ((Event*) key)->FlgOnStatus(EvtStfFadeOut);
+                    if (EvtMgr.SetEvt(evt, &pEvt) != 0) {
+                        pEvt->FlgOnStatus(EvtStfFadeOut);
                     }
                     r10b_waitEvt();
                     freeEvent(2);
                 }
             } else {
                 if (readEvent(1, 1, &evt)) {
-                    if (EvtMgr.SetEvt(evt, &key2) != 0) {
-                        ((Event*) key2)->FlgOnStatus(EvtStfEndSleepOrder);
-                        ((Event*) key2)->FlgOnStatus(EvtStfDiedemo);
+                    if (EvtMgr.SetEvt(evt, &pEvt2) != 0) {
+                        pEvt2->FlgOnStatus(EvtStfEndSleepOrder);
+                        pEvt2->FlgOnStatus(EvtStfDiedemo);
                     }
                     r10b_waitEvt();
                     return;
@@ -369,8 +368,8 @@ static void R10b_chkWater()
                 r10b_effDelete(2);
                 r10b_effDelete(3);
                 SceSleep(1);
-                EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_ROOM01, zero, zero);
-                EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_ROOM00, zero, zero);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 5, 1, ESP_CORE_KIND_ROOM01, 0, 0);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 2, 1, ESP_CORE_KIND_ROOM00, zero, 0);
             }
         } else if (pG->Room_flg[2] & 0x80000000) {
             pG->Room_flg[0] |= 0x80000000;
@@ -442,7 +441,7 @@ static void r10b_GakeEvent()
 // updating; cut 0 sets up the boat player and boss stand-ins; cuts 1/3/7 create the binocular view
 // (IdBinocular + FocusAnimation) once per Status_flg[0] 0x400 and point it at the cut's target; the
 // end releases them.
-extern "C" void Evt_R10BS00_Func(Event* e)
+void Evt_R10BS00_Func(Event* e, u32)
 {
     void* mod;
 
@@ -506,7 +505,7 @@ extern "C" void Evt_R10BS00_Func(Event* e)
 
 // The boss's tentacle heads (obj 0x16) on its parts 0x1D..0x22, each with its motion started at a
 // different frame; mode 1 releases them.
-extern "C" void em2fTentacleMove(cEm* em, Event* e, int mode)
+void em2fTentacleMove(cEm* em, Event* e, int mode)
 {
     u32 i;
 
@@ -582,7 +581,7 @@ extern "C" void em2fTentacleMove(cEm* em, Event* e, int mode)
 // Event r10bs10 callback (the boss death / harpoon finish): funcMode 0 optionally clears the boat
 // effects (debug flag); cut 3 parents the kind-1 light to Leon; the tentacle heads are animated by
 // em2fTentacleMove per cut; the end restores the room state.
-extern "C" void Evt_R10BS10_Func(Event* e)
+void Evt_R10BS10_Func(Event* e, u32)
 {
     void* mod;
 
@@ -673,7 +672,7 @@ extern "C" void Evt_R10BS10_Func(Event* e)
 // Event r10bs20 callback (the boss drags the boat: the rope QTE): status 3, cancel cut 9; cut 0 sets the
 // stand-ins and hides Leon's parts 2/6; cut 9 frame 100 starts the action-button prompt 0x29 that the
 // count in W->count scores; the outcome selects s21 (escaped) or s22 (pulled under).
-extern "C" void Evt_R10BS20_Func(Event* e)
+void Evt_R10BS20_Func(Event* e, u32)
 {
     void* mod;
 
@@ -724,7 +723,7 @@ extern "C" void Evt_R10BS20_Func(Event* e)
 
 // Event r10bs21 callback (QTE passed: Leon cuts the rope): boat stand-in setup on cut 0, sea area flag
 // 0x800 restored at the end.
-extern "C" void Evt_R10BS21_Func(Event* e)
+void Evt_R10BS21_Func(Event* e, u32)
 {
     void* mod;
 
@@ -758,7 +757,7 @@ extern "C" void Evt_R10BS21_Func(Event* e)
 
 // Event r10bs22 callback (QTE failed: Leon is pulled into the lake, game over): hides object 0x59, the
 // boat stand-in on cut 0, Leon's parts per cut.
-extern "C" void Evt_R10BS22_Func(Event* e)
+void Evt_R10BS22_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -809,7 +808,7 @@ extern "C" void Evt_R10BS22_Func(Event* e)
 }
 
 // The player model of the boat events: no shadow, the parts 3 (the harpoon) hidden.
-extern "C" void Evt_R10BSXX_Func_Pl0f(Event* e)
+void Evt_R10BSXX_Func_Pl0f(Event* e)
 {
     void* mod;
 
@@ -826,7 +825,7 @@ extern "C" void Evt_R10BSXX_Func_Pl0f(Event* e)
 }
 
 // Fetch the boss event model em2f00 (the lookup registers it with the event; the pointer is unused).
-extern "C" void Evt_R10BSXX_Func_Em2f(Event* e)
+void Evt_R10BSXX_Func_Em2f(Event* e)
 {
     void* mod;
 

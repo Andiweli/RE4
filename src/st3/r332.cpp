@@ -54,23 +54,6 @@
 cObj* SetPillar(void* bin, void* tpl, Vec* pos, Vec* rot);
 void Obj18CmfOn(cObj* o, u32 n);   // game/obj18.cpp
 
-// sce_com.cpp SceElevatorData
-struct SceElevatorData {
-    s32 dir;
-    u32 objId;
-    Vec pos;
-    Vec plPos;
-    Vec plRot;
-    s32 cut;
-    u16 pad_30;
-    u16 seStart;
-    u16 pad_34;
-    u16 seStop;
-    Vec jumpPos;
-    Vec jumpRot;
-    u16 room;
-};
-
 
 struct R332Bridge {
     int open;   // 0x0  1 while the bridge is open
@@ -102,7 +85,7 @@ struct R332Work {
 
 // The original object's .data is 8-aligned (0x260 in the REL after r330's 12-byte table).
 asm(".section .data; .balign 8");
-static SceElevatorData r332_elv = {1, 0x24, {-45093.0f, 15811.0f, 47400.0f}, {-45120.0f, 15800.0f, 47200.0f}, {0.0f, 1.54f, 0.0f}, 7, 0, 5, 0, 7, {-44950.0f, 1745.0f, 47280.0f}, {0.0f, 1.49f, 0.0f}, 0x331};
+static ElevatorParam r332_elv = {Ele2FStarting, 0x24, {-45093.0f, 15811.0f, 47400.0f}, {-45120.0f, 15800.0f, 47200.0f}, {0.0f, 1.54f, 0.0f}, 7, 0, 5, 0, 7, {-44950.0f, 1745.0f, 47280.0f}, {0.0f, 1.49f, 0.0f}, 0x331};
 static f32 r332_craneUpY[2] = {21180.0f, 19670.0f};
 static f32 r332_craneDownY[2] = {20910.0f, 19400.0f};
 Vec r332_satPos[4] = {{-49272.0f, 17311.0f, 59394.0f}, {-38880.0f, 15811.0f, 59394.0f}, {-49272.0f, 17311.0f, 83192.0f}, {-38880.0f, 15811.0f, 83192.0f}};
@@ -125,10 +108,10 @@ void st3_checkCountDown();
 static void R332EmSetMain();
 static void playerDieBridge(cPlayer* pl);
 static void playerBridge(cPlayer* pl);
-extern "C" int R332ChkNearBridge();
-extern "C" void R332BridgeInit(int no, int open);
-extern "C" void R332BridgeOpened(int no, int open);
-extern "C" void R332BridgeOpen(int no, int open);
+int R332ChkNearBridge();
+void R332BridgeInit(int no, int open);
+void R332BridgeOpened(int no, int open);
+void R332BridgeOpen(int no, int open);
 static void R332BridgeTask(int no);
 static void R332BossDown();
 static void R332BossDownEnd();
@@ -136,19 +119,19 @@ static void R332RocketShootMain(int type);
 static void R332RocketShootEnd(int type);
 static void R332RevaCommonMoveDw(int no);
 static void R332RevaCommonMoveUp(int no);
-extern "C" void R332RevaCommonMove(int no, int up);
+void R332RevaCommonMove(int no, int up);
 static void R332ExecCrane(int no);
-extern "C" void R332ExecCraneEnd(int no, int atNo);
+void R332ExecCraneEnd(int no, int atNo);
 static void R332EventS00();
 static void R332EventS00Cancel();
-extern "C" void R332EventS00End();
+void R332EventS00End();
 static void R332EventS10();
 static void R332EventS20();
-extern "C" void R332Em32RocketDie(cObj* obj);
-extern "C" void R332ScrTrans(int on);
-extern "C" void Evt_R332S00_Func(Event* e);
-extern "C" void Evt_R332S10_Func(Event* e);
-extern "C" void Evt_R332S20_Func(Event* e);
+void R332Em32RocketDie(cObj* obj);
+void R332ScrTrans(int on);
+void Evt_R332S00_Func(Event* e, u32);
+void Evt_R332S10_Func(Event* e, u32);
+void Evt_R332S20_Func(Event* e, u32);
 static void setTexRender();
 
 // The room's flag words from pG->flags_174 on, one bit per number (0x40/0x41 are the bits of 0x17C).
@@ -242,14 +225,14 @@ void R332Init()
         EvtMgr.EvtReadAram("event/evd/r332s00.evd", (u8) GetEmIdFromList(0xA9), 0, 0, size);
         SceAtSetEnable(0, 0);
         SceAtSetEnable(9, 1);
-        KyfFlagOff(pG, KYF_ST1_24);
+        KyfFlagOff(pG, KYF_ST3_23);
         SmdSetTrans(7, 0);
     } else {
         SceExec(0x12, (TaskFunc) R332EmSetMain, 0, 0, 2, 0);
         st3_startCountDown();
         SceAtSetEnable(0, 1);
         SceAtSetEnable(9, 0);
-        KyfFlagOn(pG, KYF_ST1_24);
+        KyfFlagOn(pG, KYF_ST3_23);
         SmdSetTrans(0xA, 1);
         SndBgmTblSet(0x332, 1);
         SndRoomStrStart(1, 0, 1);
@@ -361,7 +344,7 @@ void R332Main()
             }
             if (RsfCheck(G_ROOM_ID, 4) == 0 && em->hp <= 0) {
                 RsfSet(G_ROOM_ID, 4);
-                SceExec(0x12, (TaskFunc) R332RocketShootMain, 1, 0, 2, 0);
+                SceExec(0x12, (TaskFunc) R332RocketShootMain, (void*) 1, 0, 2, 0);
                 return;
             }
             if (RsfCheck(G_ROOM_ID, 2) == 0 && (em->ckRocketEnable() || DebugTrg(1))) {
@@ -873,7 +856,7 @@ static void R332BridgeTask(int no)
         R332BridgeInit(no, 0);
     }
     if (DbgFlagChk(pG, DBG_EVENT_TOOL) == 0) {
-        R332_TASK_SET(no, SceExec(0x12, (TaskFunc) R332BridgeTask, no, 0, 2, 0));
+        R332_TASK_SET(no, SceExec(0x12, (TaskFunc) R332BridgeTask, (void*) no, 0, 2, 0));
     }
 }
 
@@ -989,7 +972,7 @@ static void R332RocketShootMain(int type)
         r332_work->strBlk = SndStrPlayBlock(1, 0xED, 0.0f);
     }
     SysFlagOff(pG, SYS_SCREEN_STOP);
-    SceSetEventCancel(1, (TaskFunc) R332RocketShootEnd, type, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) R332RocketShootEnd, (void*) type, -1, 1);
     pG->Room_flg[0] |= 0x02000000;
     if (type == 0) {
         cObjLauncher* lau;
@@ -1306,9 +1289,9 @@ static void R332ExecCrane(int no)
             ActBtn.set(ACT_OPERATION, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, 0);
             CAMERA* cam = &r332_work->cam;
             f32 roll = 0.0f;
-            dir.x = cam->param.at.x - cam->param.pos.x;
-            dir.y = cam->param.at.y - cam->param.pos.y;
-            dir.z = cam->param.at.z - cam->param.pos.z;
+            dir.x = cam->param.Target.x - cam->param.Campos.x;
+            dir.y = cam->param.Target.y - cam->param.Campos.y;
+            dir.z = cam->param.Target.z - cam->param.Campos.z;
             ang = atan2f(dir.x, dir.z) * (180.0f / 3.14159265f);
             eprintf(0x14C, 0xC8, 0, 0, "%f", ang);
             if (no == 0) {
@@ -1328,8 +1311,8 @@ static void R332ExecCrane(int no)
             }
             PSMTXRotRad(m, 'y', roll * (3.14159265f / 180.0f));
             PSMTXMultVecSR(m, &dir, &dir);
-            PSVECAdd(&dir, &cam->param.pos, &cam->param.at);
-            cam->param.roll = 0.0f;
+            PSVECAdd(&dir, &cam->param.Campos, &cam->param.Target);
+            cam->param.Roll = 0.0f;
             CameraSetOrientationRoll(cam);
             CamCtrlSetCam(&CamCtrl, cam);
             if (Key.trg & 0x00080000) {
@@ -1337,7 +1320,7 @@ static void R332ExecCrane(int no)
                 loopOn = 0;
                 step++;
                 pPL->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x36), 5, 0, 0x200, 0);
-                SceExec(0x12, (TaskFunc) R332RevaCommonMoveDw, no, 0, 2, 0);
+                SceExec(0x12, (TaskFunc) R332RevaCommonMoveDw, (void*) no, 0, 2, 0);
             }
             break;
         }
@@ -1401,7 +1384,7 @@ static void R332ExecCrane(int no)
         R332ExecCraneEnd(no, atNo);
     }
     if (RsfCheck(G_ROOM_ID, rsfNo) == 0) {
-        SceExec(0x12, (TaskFunc) R332RevaCommonMoveUp, no, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) R332RevaCommonMoveUp, (void*) no, 0, 2, 0);
     }
     FlagOffVar(R332_FLAGS, (u32) flgNo);
 }
@@ -1485,7 +1468,7 @@ void R332EventS00End()
     R332BridgeInit(0, 0);
     R332BridgeInit(1, 0);
     r332_work->task[0] = SceExec(0x12, (TaskFunc) R332BridgeTask, 0, 0, 2, 0);
-    r332_work->task[1] = SceExec(0x12, (TaskFunc) R332BridgeTask, 1, 0, 2, 0);
+    r332_work->task[1] = SceExec(0x12, (TaskFunc) R332BridgeTask, (void*) 1, 0, 2, 0);
     pPL->setNoSuspend(0);
     pPL->setPos(-32900.0f, 15811.0f, 47140.0f);
     pPL->setAng(0.0f, 0.766f, 0.0f);
@@ -1533,7 +1516,7 @@ static void R332EventS10()
     ScfFlagOn(pG, SCF_R332_BOSS_DIE);
     SceAtSetEnable(0, 1);
     SceAtSetEnable(9, 0);
-    KyfFlagOn(pG, KYF_ST1_24);
+    KyfFlagOn(pG, KYF_ST3_23);
     SceAtSetEnable(1, 0);
     SceAtSetEnable(2, 0);
     SceSleep(1);
@@ -1648,7 +1631,7 @@ void R332ScrTrans(int on)
 
 // Event r332s00 callback (Saddler appears): scroll object 0xA hidden; fades and the evmc200 / pl8200 /
 // evmd100 / Ashley (pl0200) models' flags per cut; the end shows 0xA again.
-void Evt_R332S00_Func(Event* e)
+void Evt_R332S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
@@ -1729,11 +1712,11 @@ void Evt_R332S00_Func(Event* e)
         break;
     }
     case 2: {
-        SmdWork* w = SmdGetWorkPtr(0x24);
+        cSmdWork* w = SmdGetWorkPtr(0x24);
 
         if ((obj = SmdGetObjPtr(0x24)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SmdSetTrans(0xA, 1);
         break;
@@ -1749,7 +1732,7 @@ void Evt_R332S00_Func(Event* e)
 // Event r332s10 callback (after the kill): the pillar state, the obm3d00 / evma500 / evmb500 / evm9500
 // models per cut, the dead boss models darkened (R332Em32RocketDie), the arena scroll objects swapped;
 // cut 0xD starts the escape count-down (0x1518 frames); the end sets it to 0x127D and restarts it.
-void Evt_R332S10_Func(Event* e)
+void Evt_R332S10_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1877,7 +1860,7 @@ void Evt_R332S10_Func(Event* e)
 }
 
 // Event r332s20 callback (the special rocket is thrown down): per-cut model flags for the rocket case.
-void Evt_R332S20_Func(Event* e)
+void Evt_R332S20_Func(Event* e, u32)
 {
     void* mod;
 

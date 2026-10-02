@@ -620,7 +620,7 @@ void emlist_EmDir_disp();
 int emlist_catch_em();
 // The original prototype has no parameter but the body reads the entry pointer from r3 (the
 // caller leaves it there); the definition takes it explicitly under the original's mangled name.
-extern "C" void emlist_em_move_to_cursor__Fv(EmListEnt* p);
+void emlist_em_move_to_cursor__Fv(EmListEnt* p);
 int emlist_get_numof_str(const char** tbl);
 void emlistCameraMove();
 void emlistCamToPoin();
@@ -657,12 +657,12 @@ void emlist_init()
     TaskSuspend(0);
     TaskSleep(1);
     TutilInitDefault();
-    pG->Stop_flg |= 0x200000;
-    pG->Disp_flg |= 0x1000000;
-    pG->Disp_flg |= 0x800000;
+    SpfFlagOn(pG, SPF_CCHG);
+    DpfFlagOn(pG, DPF_WATER);
+    DpfFlagOn(pG, DPF_MIRROR);
     DbgFlagOn(pG, DBG_TEST_MODE);
     DbgFlagOn(pG, DBG_BACK_CLIP);
-    pG->Stop_flg |= 0x800000;
+    SpfFlagOn(pG, SPF_SCE);
     DbgFlagOn(pG, DBG_DBG_CAM);
     EmListCtrl* ctl = &EmList;
 
@@ -710,11 +710,11 @@ void emlist_init()
 // Restores the flags, frees the work and ends the task.
 void emlist_exit()
 {
-    pG->Stop_flg &= ~0x200000;
-    pG->Disp_flg &= ~0x1000000;
-    pG->Disp_flg &= ~0x800000;
+    SpfFlagOff(pG, SPF_CCHG);
+    DpfFlagOff(pG, DPF_WATER);
+    DpfFlagOff(pG, DPF_MIRROR);
     DbgFlagOff(pG, DBG_TEST_MODE);
-    pG->Stop_flg &= ~0x800000;
+    SpfFlagOff(pG, SPF_SCE);
     DbgFlagOff(pG, DBG_DBG_CAM);
     TutilQuitDefault();
     TaskSignal(0);
@@ -1062,13 +1062,13 @@ static void emlist_r0_target()
                 p->flags |= 1;
                 *(u16*) ((u8*) p + 0x18) = (pG->stage_no << 8) | pG->room_no;
                 p->emset_no = 0;
-                PSVECSubtract(&pG->Camera.param.at, &pG->Camera.param.pos, &v);
+                PSVECSubtract(&pG->Camera.param.Target, &pG->Camera.param.Campos, &v);
                 {
                     f32 vy = v.y;
                     v.y = 0.0f;
-                    PSVECScale(&v, &v, (pPLem->pos.y - pG->Camera.param.pos.y) / vy);
+                    PSVECScale(&v, &v, (pPLem->pos.y - pG->Camera.param.Campos.y) / vy);
                 }
-                PSVECAdd(&pG->Camera.param.pos, &v, &v);
+                PSVECAdd(&pG->Camera.param.Campos, &v, &v);
                 ((s16*) p->pos)[0] = (s16) (v.x * 0.1f);
                 ((s16*) p->pos)[1] = (s16) (pPLem->pos.y * 0.1f);
                 ((s16*) p->pos)[2] = (s16) (v.z * 0.1f);
@@ -2695,7 +2695,7 @@ int emlist_catch_em()
 }
 
 // Moves the entry to the cursor's ground position, clamped to the 16-bit cm range.
-extern "C" void emlist_em_move_to_cursor__Fv(EmListEnt* p)
+void emlist_em_move_to_cursor__Fv(EmListEnt* p)
 {
     Vec pos;
     Vec cur;
@@ -2780,19 +2780,19 @@ void emlistCamToPoin()
         if (GetScreenPos(&tmp, &scr) != 0 && scr.x > 50.0f && scr.x < 462.0f && scr.y > 100.0f && scr.y < 348.0f) {
             return;
         }
-        PSVECSubtract(&cam->param.pos, &cam->param.at, &d);
-        EmList.wk->cam.param.at = pos;
-        PSVECAdd(&EmList.wk->cam.param.at, &d, &EmList.wk->cam.param.pos);
+        PSVECSubtract(&cam->param.Campos, &cam->param.Target, &d);
+        EmList.wk->cam.param.Target = pos;
+        PSVECAdd(&EmList.wk->cam.param.Target, &d, &EmList.wk->cam.param.Campos);
         EmList.wk->cam.Up.x = 0.0f;
         EmList.wk->cam.Up.y = 1.0f;
         EmList.wk->cam.Up.z = 0.0f;
         EmList.wk->cam.Distance =
-            VEC_DIST(&EmList.wk->cam.param.pos, &EmList.wk->cam.param.at);
-        EmList.wk->cam.param.fovy = cam->param.fovy;
+            VEC_DIST(&EmList.wk->cam.param.Campos, &EmList.wk->cam.param.Target);
+        EmList.wk->cam.param.Fovy = cam->param.Fovy;
         CameraSetOrientationUp(&EmList.wk->cam);
         CamCtrl.SetExtraCamera(&EmList.wk->cam);
-        cam->param.at = EmList.wk->cam.param.at;
-        cam->param.pos = EmList.wk->cam.param.pos;
+        cam->param.Target = EmList.wk->cam.param.Target;
+        cam->param.Campos = EmList.wk->cam.param.Campos;
         EmList.wk->cursorX = (Screen.x + Screen.width) * 0.5f;
         EmList.wk->cursorY = (Screen.y + Screen.height) * 0.5f;
     }

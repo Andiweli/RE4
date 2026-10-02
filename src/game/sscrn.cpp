@@ -57,15 +57,15 @@ int SscrnDataSize()
 }
 
 // Writes the sub screen's save word.
-void SscrnDataSave(u32* dst)
+void SscrnDataSave(SSCRN_SAVE_DATA* dst)
 {
-    *dst = SubScreenWk.save;
+    dst->save = SubScreenWk.save;
 }
 
 // Reads the sub screen's save word.
-void SscrnDataLoad(u32* pData)
+void SscrnDataLoad(SSCRN_SAVE_DATA* pData)
 {
-    SubScreenWk.save = *pData;
+    SubScreenWk.save = pData->save;
 }
 
 // Game start: loads the sub screen REL ("rel/Sscrn.rel"), the common data ("SS/<lang>/ss_cmmn.dat")
@@ -162,10 +162,10 @@ void SubScreenRoomInit()
 {
     SubScreenWork* wk = &SubScreenWk;
 
-    wk->open_flag = 0;
-    wk->flags = 0;
+    wk->open_flag = SS_OPEN_NULL;
+    wk->attr_flag = SS_ATTR_NULL;
     wk->close_flag = 0;
-    wk->wait = 0;
+    wk->wait_cnt = 0;
     if (ItemMgr.search(0x7C)) {
         wk->board_size = 0;
     }
@@ -192,7 +192,7 @@ void SubScreenRoomInit()
 // Blocks the sub screen from opening for `frames` frames (events, item pick-ups).
 void SubScreenWait(int frame)
 {
-    SubScreenWk.wait = frame;
+    SubScreenWk.wait_cnt = frame;
 }
 
 // Per frame (game loop): when the player (and Ashley) live, the screen is armed and the player
@@ -213,11 +213,11 @@ void SubScreenCall()
         return;
     }
     if (pPL->subScrCheck() == 1) {
-        wk->wait--;
-        if (wk->wait > 0) {
+        wk->wait_cnt--;
+        if (wk->wait_cnt > 0) {
             return;
         }
-        wk->wait = 0;
+        wk->wait_cnt = 0;
         if (Key.trg & 0x100000) {
             SubScreenOpen(SS_OPEN_NORMAL, 0);
         } else if (Key.trg & 0x200000) {
@@ -276,15 +276,15 @@ int SubScreenOpen(int type, int flags)
         return 0;
     }
     StaFlagOn(pG, STA_SSCRN_REQUEST);
-    wk->open_flag = type;
-    wk->flags = flags;
+    wk->open_flag = (SS_OPEN_FLAG) type;
+    wk->attr_flag = (SS_ATTR_FLAG) flags;
     wk->close_flag = 0;
-    wk->model_flag = 0;
+    wk->item_get_flag = 0;
     if (flags & 1) {
         SceEventStart(0);
     } else {
         if (StaFlagChk(pG, STA_PL_BOAT)) {
-            wk->flags = flags | 2;
+            wk->attr_flag = (SS_ATTR_FLAG) (flags | 2);
         }
         wk->stop_bak = pG->Stop_flg;
         pG->Stop_flg = 0xFFFFFFFF;
@@ -299,13 +299,13 @@ void SubScreenMiss()
 {
     SubScreenWork* wk = &SubScreenWk;
 
-    if (wk->flags & 1) {
+    if (wk->attr_flag & 1) {
         SceEventEnd(0);
     } else {
         pG->Stop_flg = wk->stop_bak;
     }
-    wk->flags = 0;
-    wk->open_flag = 0;
+    wk->attr_flag = SS_ATTR_NULL;
+    wk->open_flag = SS_OPEN_NULL;
     StaFlagOff(pG, STA_SSCRN_REQUEST);
 }
 
@@ -431,7 +431,7 @@ void SubScreenExec()
             RoomData.stopRelData();
             wk->pBuf = pG->pStFnt;
             DC.setDataCtrl(0);
-            MemorySwap(wk->pBuf, SS_ARAM, SS_ARAM_SIZE);
+            MemorySwap(wk->pBuf, (void*) SS_ARAM, SS_ARAM_SIZE);
             MemSuspendHeap(4);
             if (wk->open_flag & 0x10) {
                 wk->pHeapOffs = wk->pFreeOffs + 0x50000;
@@ -441,22 +441,22 @@ void SubScreenExec()
                 wk->pHeapOffs = wk->pSwitchOffs + 0xE4000;
             }
             if (wk->open_flag & 0x30) {
-                MemCreateHeap(12, (u32) wk->pBuf + wk->pHeapOffs, (u32) wk->pBuf + SS_ARAM_SIZE);
+                MemCreateHeap(12, (void*) ((u32) wk->pBuf + wk->pHeapOffs), (void*) ((u32) wk->pBuf + SS_ARAM_SIZE));
             } else {
-                MemCreateHeap(12, (u32) wk->pBuf + wk->pHeapOffs, (u32) wk->pBuf + 0x2E5E00);
+                MemCreateHeap(12, (void*) ((u32) wk->pBuf + wk->pHeapOffs), (void*) ((u32) wk->pBuf + 0x2E5E00));
             }
             MemSetCurrentHeap(12);
             if (wk->relAddr >= 0) {
                 wk->relAddr = wk->pPreplfOffs + (u32) wk->pBuf;
-                wk->pCmmn = (SsArc*) (wk->pCommonOffs + (u32) wk->pBuf);
-                wk->pSwitchDat = (SsArc*) (wk->pSwitchOffs + (u32) wk->pBuf);
+                wk->pCmmn = (u32*) (wk->pCommonOffs + (u32) wk->pBuf);
+                wk->pSwitchDat = (u32*) (wk->pSwitchOffs + (u32) wk->pBuf);
             }
             wk->p_module = (OSModuleHeader*) wk->relAddr;
             {
                 cMes.Clear();
             }
             if (pSys->language == 0) {
-                cMes.setupFont(28, 28, (TEXPalette*) SS_ARC_PTR(wk->pCmmn, 4), 3);
+                cMes.setupFont(28, 28, (u8*) SS_ARC_PTR(wk->pCmmn, 4), 3);
             }
             cMes.setLayout(1, LAYOUT_SUBSCRN);
             cMes.setLayout(7, LAYOUT_SUBSCRN);
@@ -471,12 +471,12 @@ void SubScreenExec()
             } else {
                 IdNum.gameInit(0x1B2);
             }
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 7), 0xFF, IDC_SSCRN_PESETA, 0x13, 7, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 7), 0xFF, IDC_SSCRN_PESETA, 0x13, 7, 0);
             if (!(wk->open_flag & 0x10)) {
-                IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xB), 0xFF, IDC_SSCRN_MAIN_MENU, 0xF, 0, 0);
+                IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xB), 0xFF, IDC_SSCRN_MAIN_MENU, 0xF, 0, 0);
             }
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 0x11), 0xFF, IDC_SSCRN_ETC, 0x13, 9, 0);
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 9), 0xFF, IDC_SSCRN_BACK_GROUND, 9, 3, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0x11), 0xFF, IDC_SSCRN_ETC, 0x13, 9, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 9), 0xFF, IDC_SSCRN_BACK_GROUND, 9, 3, 0);
             switch (wk->open_flag) {
             case 2:
                 IdSys.dispSw(IDC_LIFE_METER, 0);
@@ -511,7 +511,7 @@ void SubScreenExec()
                 wk->menu_no = 1;
             }
             wk->Loop = 1;
-            wk->wait_cnt = 0;
+            wk->trans_off = 0;
             LightMgr.inSscrn();
             LightMgr.create(0, 9, -2, 0);
             {
@@ -560,7 +560,7 @@ void SubScreenExitCore(SubScreenWork* pSscrn)
         MemDestroyHeap(12);
         MemSignalHeap(4);
         MemSetCurrentHeap(4);
-        MemorySwap(pSscrn->pBuf, SS_ARAM, SS_ARAM_SIZE);
+        MemorySwap(pSscrn->pBuf, (void*) SS_ARAM, SS_ARAM_SIZE);
         DC.setDataCtrl(1);
         RoomData.restartRelData();
         cModel::mm = &ModInfoMgr;
@@ -633,7 +633,7 @@ void SubScreenExit()
         case 4:
             if (pG->pl_type != 1 && (pG->weapon_no != wepNo || pG->weapon_type != wepType || pG->bullet_type != wepLv)) {
                 cPlayer* pl;
-                if (wk->flags & 2) {
+                if (wk->attr_flag & 2) {
                     ItemMgr.arm(0);
                     wepLv = 0;
                     wepNo = WeaponId2WeaponNo(ItemMgr.weaponId());
@@ -722,13 +722,13 @@ void SubScreenExit()
                 }
                 LightMgr.outSscrn(mode);
             }
-            if (wk->flags & 1) {
+            if (wk->attr_flag & 1) {
                 SceEventEnd(0);
             } else {
                 pG->Stop_flg = wk->stop_bak;
             }
-            wk->open_flag = 0;
-            wk->flags = 0;
+            wk->open_flag = SS_OPEN_NULL;
+            wk->attr_flag = SS_ATTR_NULL;
             pG->debug_mode = wk->debugMode;
             if (wk->debug_flg_bak) {
                 DbgFlagOn(pG, DBG_PROC_BAR);

@@ -59,7 +59,6 @@ public:
     virtual void move(SUB_SCREEN* wk);
 };
 
-extern "C" {
 void itemNameDisp(SUB_SCREEN* wk);
 void itemCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 void sscrn_item_out_init(SUB_SCREEN* wk);
@@ -76,7 +75,6 @@ void setCommandId(u8 mode, ID_UNIT** tbl, s8* num);
 void itemMakeInit(SUB_SCREEN* wk);
 void itemMakeMove(SUB_SCREEN* wk);
 void itemMakeDisp(SUB_SCREEN* wk, int x, int y);
-}
 
 static int sscrn_item_out(SUB_SCREEN* wk);
 
@@ -98,7 +96,7 @@ s8 item_total;
 cItem* item_sel;
 int item_frame_on;
 void* item_path0[2];
-Hermite1* item_curve[2];
+HERMITE_1_PTR* item_curve[2];
 void* item_path1[2];
 Vec item_scr[2];
 Vec item_pos[2];
@@ -163,12 +161,12 @@ void SsItemInit::move(SUB_SCREEN* wk)
             break;
         }
         if (wk->menu_old == 2) {
-            wk->wait_cnt = 1;
+            wk->trans_off = 1;
         }
         IdSubErase();
         IdNumErase();
         IdFreeBuffer();
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 2, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 2, 0);
         item_wait[0] = st;
         // `state++` written out here too (jump2 cross-jumps it into case 1's tail): at allocation
         // time this block has two pseudos, so the `lis item_wait@ha` gets r11.
@@ -203,7 +201,7 @@ void SsItemInit::move(SUB_SCREEN* wk)
         } else {
             sscrnModelClear(wk);
         }
-        wk->wait_cnt = 0;
+        wk->trans_off = 0;
         state++;
     case 3: {
         int stat;
@@ -244,23 +242,23 @@ void SsItemMain::init(SUB_SCREEN* wk)
     itemCameraInit(wk, &pG->Camera);
     IdTexDataLoad(SS_ARC_PTR(wk->pItemDat, 5), TEX_OWNER_ID_SSCRN);
     if (IdSub.setCk(IDC_SSCRN_0) == 0) {
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 2, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_0, 0xC, 2, 0);
     }
-    IdNum.set(SS_ARC_PTR(wk->pItemDat, 7), 0xFF, IDC_SSCRN_1, 0xC, 6, 0);
+    IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pItemDat, 7), 0xFF, IDC_SSCRN_1, 0xC, 6, 0);
     for (int i = 0; i < 32; i++) {
         int no = i + 0x40;
-        IdNum.set(SS_ARC_PTR(wk->pCmmn, 8), 0xFF, no, 0xC, 5, 0);
+        IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 8), 0xFF, (ID_CLASS) no, 0xC, 5, 0);
         numDisp(no, 0, 0, 0);
     }
     for (int k = 0; k < 2; k++) {
         int type = k * 8 + 0x40;
         for (int n = -3; n <= 4; n++) {
             ID_UNIT* parent = IdNum.unitPtr(frameMarkNo(n, k) - 0x30, IDC_SSCRN_1);
-            IdNum.unitParent(parent, IdNum.unitPtr(0, type));
+            IdNum.unitParent(parent, IdNum.unitPtr(0, (ID_CLASS) type));
             type++;
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pItemDat, 6), 0xFF, IDC_SSCRN_2, 0xC, 4, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pItemDat, 6), 0xFF, IDC_SSCRN_2, 0xC, 4, 0);
     for (int i = 0; i < 2; i++) {
         ID_UNIT* tbl[16];
         s8 num;
@@ -270,7 +268,7 @@ void SsItemMain::init(SUB_SCREEN* wk)
             tbl[j]->rev_flag |= 0xF;
         }
     }
-    IdSub.set(SS_ARC_PTR(wk->pCmmn, 0x10), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 1, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0x10), 0xFF, IDC_SSCRN_CKPT_2, 0x13, 1, 0);
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_2)->be_flag &= ~8;
     IdSub.unitPtr(0x60, IDC_SSCRN_2)->rev_flag |= 0xF;
     IdSub.unitPtr(0x61, IDC_SSCRN_2)->be_flag &= ~8;

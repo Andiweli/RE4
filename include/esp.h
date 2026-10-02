@@ -69,7 +69,7 @@ struct cEspSeqTbl {
     u16 Life_max;      // 0xB8 (esp_efm: life) (PS2 Life_max)
     u16 Life_time;     // 0xBA (esp_efm: start frame) (PS2 Life_time)
     u8 Ptn_no;         // 0xBC (esp_sub: start animation pattern) (PS2 Ptn_no)
-    u8 Anm_rate;       // 0xBD (esp_sub: animation speed - 0x20) (PS2 sint8 Anm_rate)
+    s8 Anm_rate;       // 0xBD (esp_sub: animation speed - 0x20) (PS2 sint8 Anm_rate)
     u16 Anm_cnt;       // 0xBE (esp_sub: animation counter) (PS2 Anm_cnt)
     u8 Release_time;   // 0xC0 (esp_efm: parent release frame) (PS2 Release_time)
     u8 Groupe_no;      // 0xC1 (PS2 Groupe_no)
@@ -596,7 +596,6 @@ Vec* Esp3f_GetVecPtr(cEsp3f* pEsp, u32 idx);
 typedef cEsp* (*EspCreateFunc)();
 typedef void (*EspTransFunc)(cEsp*);
 void PushEsp(cEsp* pEsp);
-extern "C" {
 void EspFuncTblSet(int id, EspCreateFunc create, EspTransFunc trans);
 int PullEsp(cEsp** ppEsp, int id);
 cEsp* EspGetDmyPtr();
@@ -640,33 +639,30 @@ f32 PathGetLength(void* pPdat);
 int PathGetPos(void* pPdat, f32 dist, u16* pPntNo, Vec* pPos);  // f32 second: callee copies f1 right after r3
 int PathGetPosEm(void* pPdat, cModel* pMod, f32 dist, u16* pPntNo, Vec* pPos);
 int EspGetTplAddr(int no, void** pTpl_addr);
+struct ESPSEQ_CONTROL;
 // game/est.cpp. void: no caller reads r3 after the call, and with an `int` result the call's
 // set of r3 changes the haifa depend counts, moving `li r3,0` to the end of the arg setup
 // (obj01/obj10 move00, obj10AddSpeed).
-void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void* g, void* h);
-}
+void EstSet(cModel* a, int b, Vec* pos, Vec* rot, int c, u8 d, u16 e, u8 f, void* g, ESPSEQ_CONTROL* h);
 // game/est.cpp: the C++ overload the plain EstSet forwards to, with the est data block resolved.
-void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, void* h);
+void EstSet(cModel* model, int no, Vec* pos, Vec* rot, cEspSeqHead* head, u16 e, u8 f, void* g, u32 owner, ESPSEQ_CONTROL* h);
 // game/eff_sys.cpp
 int EspGenGetMoveLoop();
 extern cCoord* pEffParentWorld;
 extern char* owner_name_tbl[0xD1];   // effect owner names 0..0xD0 (debug display; eff_sys.cpp)
 // game/esp_app.cpp
-extern "C" void EspCallSeType(int type, Vec* pos);
+void EspCallSeType(int type, Vec* pos);
 void EffCallRoomSeFunc(int no, Vec* pPos);
 int EffAreaCheckNo(Vec* pos, u8 areaNo);
 void EspFootCall(int type, int no, Vec* pPos);
 int EspPlWaterCall(int type, Vec* pPos);
 // game/Espgen42.cpp
 int GetWaterHeight(Vec* pos, f32* Ret);
-extern "C" void AddWaterPower(Vec& pos, f32 power);
-extern "C" {
+void AddWaterPower(Vec& pos, f32 power);
 void EspWaterInit();
 void Espgen42SetNoWater(int flg);
 int GetWaterCrossPos(Vec* pos, Vec* dir, Vec* Ret);
-}
 // game/Espgen43.cpp
-extern "C" {
 int GetSandHeight(Vec* pos, f32* Ret);
 void AddSandPower(Vec& pos, f32 power);
 // game/eff_sys.cpp
@@ -691,7 +687,6 @@ void EffSetToolStateCallBack(int no, void (*on)(), void (*off)());
 void EffCallToolStateCallBack();
 // Loads the effect data at `addr` under `owner` (the rooms load their EFF sub-files)
 int EspDataLoad(u32 eff_addr, u32 owner, int MultipleOK);
-}
 // game/eff_sys.cpp (C++ linkage): the TPL of effect model `id`; 0 when not registered
 int EspGetEfmTplAddr(int id, void** ppTpl);
 // game/eff_sys.cpp: quad display list shared by the sprite effects (esp_sub)
@@ -740,15 +735,14 @@ void EspEmDataSwapPop(int em_id);
 void RoomEfmRegist(cModel* pMod, u8 no);
 // Same for a model / texture palette pair that is not a scroll model yet (raw addresses).
 void RoomEfmRegist(void* model, void* tpl, u8 id);
-// game/eff_sys.cpp: releases the effect data of owner `id` (C linkage).
-extern "C" int EspDataRelease(u32 owner, int flag, int warn);
+// game/eff_sys.cpp: releases the effect data of owner `id`.
+int EspDataRelease(u32 owner, int flag, int warn);
 // Debug tools (tools.cpp ToolArrayPush/ToolWorkPop): swap the esp work pool for a Debug_alloc'd one of
 // `num` works and back; 1 when done, 0 when a pool is already pushed / none is.
-extern "C" int EspArrayPush(u32 num);
-extern "C" int EspArrayPop();
+int EspArrayPush(u32 num);
+int EspArrayPop();
 
-// game/esp.cpp: the effect pool's frame update / draw / allocation and its debug view (C linkage).
-extern "C" {
+// game/esp.cpp: the effect pool's frame update / draw / allocation and its debug view.
 void EspFuncTblInit();
 int EspMove();
 int EspTrans();
@@ -757,7 +751,6 @@ int EspDispInfo();
 // Camera pan angles the billboard effects face (esp_sub.cpp, esp08.cpp).
 f32 EspGetCameraPan();
 f32 EspGetCameraPan2();
-}
 extern u32 tubo_amb;   // ambient colour the breakable pots add (embox.cpp)
 
 #endif

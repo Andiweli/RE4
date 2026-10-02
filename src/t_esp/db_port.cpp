@@ -126,29 +126,25 @@ static s16 db_texH = 0x40;
 static char db_emName[0xC];
 static cLightTool* db_pLightTool;
 
-extern "C" int DB_isGetComeEventTool();
-extern "C" void LoadModEff();
-extern "C" void LightToolStart();
-extern "C" void LightToolEnd();
-extern "C" void DB_WorkPush(int flags, int emArray);
-extern "C" void DB_WorkPop(int flags, int emArray);
-extern "C" void SeqSet(cEspSeqHead* head, int mode);
-extern "C" void DbModCarSet(cModel* m);
-extern "C" int LoadModelInit();
-extern "C" u32 MakeCol(f32 r, f32 g, f32 b, f32 a);
-extern "C" int Sp_char_ck(int c);
-extern "C" void font_draw(u8* c, f32 r, f32 g, f32 b, f32 a, s16 y, s16 x, s16 z, s16 w, s16 h);
-extern "C" void EprintfDrawing(char* s, f32 x, f32 y, f32 r, f32 g, f32 b, f32 a);
-extern "C" void DB_VecNullPartsPos(cEspSeqHead* head, Vec* in, Vec* out, Mtx* m);
-extern "C" void DB_VecMulEmPartsMat(u32 parts, Vec* in, Vec* out, Mtx* m, cEspSeqTbl* gen);
-extern "C" void DB_GetCursorPos(cEspSeqHead* head, cEspSeqTbl* gen, int flag, Vec* out, Mtx* m);
-extern "C" void DB_DrawCross3D(Vec* pos, Mtx* m, f32 size);
-extern "C" void drawTexture2(GXTexObj* obj, s16 x, s16 y, s16 z, s16 w, s16 h);
-extern "C" int comment_check(char** pp);
-extern "C" char* space_skip(char* p);
-extern "C" int num_get(char** pp);
-extern "C" int symbol_check(char** pp, const char* sym);
-extern "C" void sp_PosRand_trans_1a(cEspSeqHead* head, cEspSeqTbl* gen);
+int DB_isGetComeEventTool();
+void LoadModEff();
+void LightToolStart();
+void LightToolEnd();
+void DB_WorkPush(int flags, int emArray);
+void DB_WorkPop(int flags, int emArray);
+void SeqSet(cEspSeqHead* head, int mode);
+void DbModCarSet(cModel* m);
+int LoadModelInit();
+u32 MakeCol(f32 r, f32 g, f32 b, f32 a);
+int Sp_char_ck(int c);
+void font_draw(u8* c, f32 r, f32 g, f32 b, f32 a, s16 y, s16 x, s16 z, s16 w, s16 h);
+void EprintfDrawing(char* s, f32 x, f32 y, f32 r, f32 g, f32 b, f32 a);
+void DB_VecNullPartsPos(cEspSeqHead* head, Vec* in, Vec* out, Mtx* m);
+void DB_VecMulEmPartsMat(u32 parts, Vec* in, Vec* out, Mtx* m, cEspSeqTbl* gen);
+void DB_GetCursorPos(cEspSeqHead* head, cEspSeqTbl* gen, int flag, Vec* out, Mtx* m);
+void DB_DrawCross3D(Vec* pos, Mtx* m, f32 size);
+void drawTexture2(GXTexObj* obj, s16 x, s16 y, s16 z, s16 w, s16 h);
+void sp_PosRand_trans_1a(cEspSeqHead* head, cEspSeqTbl* gen);
 // COMPILER-DIFF: #1 (the original moves the cModel* argument before the f32 one: `mr r4; fmr f1`)
 
 // the room id read through the struct view of pG (global.h pG) right after the "x:/soft/room/" template copy: the
@@ -158,7 +154,7 @@ extern "C" void sp_PosRand_trans_1a(cEspSeqHead* head, cEspSeqTbl* gen);
 
 // The model an effect generator hangs on: the db_mod slot of its Parent_no, else the viewer's
 // model 0.
-extern "C" cModel* GetActiveModel(cEspSeqTbl* gen)
+cModel* GetActiveModel(cEspSeqTbl* gen)
 {
     cModel* m;
 
@@ -173,7 +169,7 @@ extern "C" cModel* GetActiveModel(cEspSeqTbl* gen)
 }
 
 // 0..1 float components -> ARGB8 word.
-extern "C" u32 MakeCol(f32 r, f32 g, f32 b, f32 a)
+u32 MakeCol(f32 r, f32 g, f32 b, f32 a)
 {
     u32 col = 0;
 
@@ -259,7 +255,7 @@ void DB_DrawString(f32 x, f32 y, const char* s, f32 r, f32 g, f32 b, f32 a)
 
 // Fills the window system's keyboard from pad 1: d-pad / A / B / X / Y / L / R / Z / START on
 // flags, the stick as floats and direction flags, then DB_KEYBORD::Update for triggers / repeats.
-extern "C" void DB_GetKeybordData(DB_KEYBORD* k)
+void DB_GetKeybordData(DB_KEYBORD* k)
 {
     u8 unused[8];
     JOY* joy;
@@ -314,12 +310,12 @@ extern "C" void DB_GetKeybordData(DB_KEYBORD* k)
 }
 
 // No mouse on the GameCube: nothing.
-extern "C" void DB_GetMouseData()
+void DB_GetMouseData(DB_MOUSE*)
 {
 }
 
 // 1 for the characters the tool font has no glyph for (skipped by EprintfDrawing).
-extern "C" int Sp_char_ck(int c)
+int Sp_char_ck(int c)
 {
     switch (c) {
     case 1:
@@ -335,7 +331,7 @@ extern "C" int Sp_char_ck(int c)
 }
 
 // Draws one character of the eprintf font texture at (x, y) in a float colour.
-extern "C" void font_draw(u8* c, f32 r, f32 g, f32 b, f32 a, s16 y, s16 x, s16 z, s16 w, s16 h)
+void font_draw(u8* c, f32 r, f32 g, f32 b, f32 a, s16 y, s16 x, s16 z, s16 w, s16 h)
 {
     int code = *c;
     int idx;
@@ -372,7 +368,7 @@ extern "C" void font_draw(u8* c, f32 r, f32 g, f32 b, f32 a, s16 y, s16 x, s16 z
 }
 
 // Draws a string with font_draw, 8 pixels per character.
-extern "C" void EprintfDrawing(char* s, f32 x, f32 y, f32 r, f32 g, f32 b, f32 a)
+void EprintfDrawing(char* s, f32 x, f32 y, f32 r, f32 g, f32 b, f32 a)
 {
     f32 cr = r * 0.7f;
     f32 cg = g * 0.7f;
@@ -405,7 +401,7 @@ extern "C" void EprintfDrawing(char* s, f32 x, f32 y, f32 r, f32 g, f32 b, f32 a
 
 // Starts the edited effect sequence on the viewer model (EstSet with owner 0xCF): mode 0 plain,
 // mode n the flag 8 << (n - 1) (loop / once variants of the tool's PLAY buttons).
-extern "C" void SeqSet(cEspSeqHead* head, int mode)
+void SeqSet(cEspSeqHead* head, int mode)
 {
     cModel* m;
     u16 f;
@@ -428,22 +424,22 @@ extern "C" void SeqSet(cEspSeqHead* head, int mode)
 }
 
 // Loads the event's camera data for the event-tool preview (EvtDebug camName).
-extern "C" void DB_EventCamLoad()
+void DB_EventCamLoad(u8, u8)
 {
 }
 
 // Switches to the event camera (the tool's Debug_flg[0] bit 28 cleared).
-extern "C" void DB_EventCamStart()
+void DB_EventCamStart()
 {
     if (db_camMotion) {
         DbgFlagOff(pG, DBG_DBG_CAM);
-        CamCtrl.MotionSet(db_camMotion, 0, 0.0f);
+        CamCtrl.MotionSet(db_camMotion, 0.0f, 0);
         CameraMove();
     }
 }
 
 // Switches to room camera cut `cut` (CamCtrl) for the preview.
-extern "C" void DB_RoomCamStart(int cut)
+void DB_RoomCamStart(int cut)
 {
     db_camCut = cut;
     DbgFlagOff(pG, DBG_DBG_CAM);
@@ -454,7 +450,7 @@ extern "C" void DB_RoomCamStart(int cut)
 }
 
 // Starts the db_mod viewer (dbModelInit); 1.
-extern "C" int LoadModelInit()
+int LoadModelInit()
 {
     dbModelInit();
     dbModSetViewFlag(4);
@@ -464,7 +460,7 @@ extern "C" int LoadModelInit()
 
 // After a model set loaded into slot 0: derives the enemy name (emNN / obm2 special cases) and
 // reads its x:/soft/room/esp/<name>.eff effect data so the editor can pick from it.
-extern "C" void LoadModEff()
+void LoadModEff()
 {
     char path[0x100];
     char name[5];
@@ -490,12 +486,11 @@ extern "C" void LoadModEff()
     if (s[0] == db_emName[0] && s[1] == db_emName[1] && s[2] == db_emName[2] && s[3] == db_emName[3]) {
         return;
     }
-    u8 zero = 0;
     name[0] = s[0];
     name[1] = s[1];
     name[2] = s[2];
     name[3] = s[3];
-    name[4] = zero;
+    name[4] = 0;
     if (db_emName[0] != 0) {
         EspDataRelease(db_effOwner, 1, 1);
     }
@@ -503,7 +498,7 @@ extern "C" void LoadModEff()
     db_emName[1] = s[1];
     db_emName[2] = s[2];
     db_emName[3] = s[3];
-    db_emName[4] = zero;
+    db_emName[4] = 0;
     if (strcmp(name, "em11") == 0 || strcmp(name, "em12") == 0 || strcmp(name, "em13") == 0 ||
         strcmp(name, "em14") == 0 || strcmp(name, "em15") == 0 || strcmp(name, "em16") == 0 ||
         strcmp(name, "em17") == 0 || strcmp(name, "obm2") == 0) {
@@ -521,7 +516,7 @@ extern "C" void LoadModEff()
 
 // Runs the db_mod menu (dbModel) for the model selection; when it leaves (2) loads the model's
 // effects (LoadModEff). Returns the menu's result.
-extern "C" int LoadModel()
+int LoadModel()
 {
     int ret = 1;
 
@@ -537,7 +532,7 @@ extern "C" int LoadModel()
 }
 
 // 1 when a viewer model is alive (slot 0 or the event models).
-extern "C" int DB_IsEmLoad()
+int DB_IsEmLoad()
 {
     cModel* m = dbModGetEmPtr(db_modelNo);
 
@@ -548,14 +543,14 @@ extern "C" int DB_IsEmLoad()
 }
 
 // 1 while the room's manager arrays are parked (DB_WorkPush).
-extern "C" int DB_IsWorkPush()
+int DB_IsWorkPush()
 {
     return db_workPushed;
 }
 
 // Parks the room's manager arrays (ToolArrayPush with `flags`, plus 10 enemy works when emArray)
 // and turns off the room display / camera target for the tool's own scene.
-extern "C" void DB_WorkPush(int flags, int emArray)
+void DB_WorkPush(int flags, int emArray)
 {
     if (db_workPushed && emArray == db_emArray) {
         return;
@@ -575,7 +570,7 @@ extern "C" void DB_WorkPush(int flags, int emArray)
 }
 
 // Restores the room's arrays and display (inverse of DB_WorkPush).
-extern "C" void DB_WorkPop(int flags, int emArray)
+void DB_WorkPop(int flags, int emArray)
 {
     if (db_workPushed == 0 && emArray == db_emArray) {
         return;
@@ -605,7 +600,7 @@ static inline void carPartsClear(cModel* m, int no)
 }
 
 // Sets up a car model for the viewer: be_flag 0x10 / 0x2000000 and parts 0x12..0x17 hidden.
-extern "C" void DbModCarSet(cModel* m)
+void DbModCarSet(cModel* m)
 {
     m->ot_type = 4;
     m->be_flag |= 0x10;
@@ -871,7 +866,7 @@ void EspToolInit(bool& out, u8& stage, u8& cut)
                 Vec center;
                 cModel* p;
                 cModelInfo* info;
-                ModelBound* b;
+                cBoundingBox* b;
                 u8 lit;
 
                 em->setNoSuspend(1);
@@ -890,7 +885,7 @@ void EspToolInit(bool& out, u8& stage, u8& cut)
                 size.x = b->size.x;
                 size.y = b->size.y;
                 size.z = b->size.z;
-                PSVECSubtract(&b->center, &em->pList->pos, &center);
+                PSVECSubtract(&b->offset, &em->pList->pos, &center);
                 em->LightInfo.init2(2, 1, &center, &size, lit);
             }
             EvtDebug.GetNameMot(i, name);
@@ -1037,7 +1032,7 @@ void EspToolInit(bool& out, u8& stage, u8& cut)
 
 // Tool exit hook when leaving to the game: stops the viewer and restores the arrays; with `on`
 // re-plays the edited sequence on the game model.
-extern "C" void EspToolExitEstSet(cEspSeqHead* head, int on, int mode)
+void EspToolExitEstSet(cEspSeqHead* head, int on, int mode)
 {
     pLog->modeSet(0xA0, 0x17A, 0x5A, 5);
     DB_WorkPush(3, 1);
@@ -1052,7 +1047,7 @@ extern "C" void EspToolExitEstSet(cEspSeqHead* head, int on, int mode)
 
 // Effect tool end: clears the tool flags, frees the .eff buffers; when entered from the event tool
 // hands back to it (DbMenuSetExecTool "EVENT TOOL").
-extern "C" void EspToolExit()
+void EspToolExit(cEspSeqHead*)
 {
     // through a volatile pointer: the store keeps `&CamDbg` in a register (`stb 0xf(rX)`, t_lightarea idiom)
     volatile debugCamera* dbg = &CamDbg;
@@ -1090,7 +1085,7 @@ extern "C" void EspToolExit()
 }
 
 // 1 when the tool was started from the event tool.
-extern "C" int DB_isGetComeEventTool()
+int DB_isGetComeEventTool()
 {
     if (EvtDebug.FlagCkEtc(FlagEsp2Event)) {
         return 1;
@@ -1099,7 +1094,7 @@ extern "C" int DB_isGetComeEventTool()
 }
 
 // Screen clear colour of the tool scene.
-extern "C" void DB_SetBgColor(u8 r, u8 g, u8 b, u8 a)
+void DB_SetBgColor(u8 r, u8 g, u8 b, u8 a)
 {
     GXColor col;
 
@@ -1111,7 +1106,7 @@ extern "C" void DB_SetBgColor(u8 r, u8 g, u8 b, u8 a)
 }
 
 // Ground grid on / off (Debug_flg bit).
-extern "C" void DB_DrawGrid(int on)
+void DB_DrawGrid(int on)
 {
     if (on) {
         DbgFlagOn(pG, DBG_GROUND_DISP);
@@ -1121,7 +1116,7 @@ extern "C" void DB_DrawGrid(int on)
 }
 
 // Draws the current viewer model's skeleton this frame when `on`.
-extern "C" void DB_DrawMod_sk(int on)
+void DB_DrawMod_sk(int on)
 {
     if (on) {
         cModel* m = dbModGetEmPtr(db_modelNo);
@@ -1132,26 +1127,26 @@ extern "C" void DB_DrawMod_sk(int on)
 }
 
 // Remembers the fog switch for the tool scene.
-extern "C" void DB_SetFog(int on)
+void DB_SetFog(int on)
 {
     db_fog = on;
 }
 
 // Remembers the cinemascope switch.
-extern "C" void DB_SetCinesco(int on)
+void DB_SetCinesco(int on)
 {
     db_cinesco = on;
 }
 
 // Remembers the motion camera switch.
-extern "C" void DB_SetMotionCam(int on)
+void DB_SetMotionCam(int on)
 {
     db_motionCam = on;
 }
 
 // Per frame: animates the viewer models, serves the tool's motion request (restart the motion,
 // camera, the face fcv), and applies the selected texture render manager's blend table.
-extern "C" void EspToolUpdate(DbToolWk* wk, int texNo)
+void EspToolUpdate(DB_KEYBORD* k, u8 texNo)
 {
     SpfFlagOn(pG, SPF_PL);
     if (db_emArray == 0) {
@@ -1180,7 +1175,7 @@ extern "C" void EspToolUpdate(DbToolWk* wk, int texNo)
             DbgFlagOn(pG, DBG_DBG_CAM);
         }
     }
-    if (wk->motionReq) {
+    if (((DbToolWk*) k)->motionReq) {
         if (G_ROOM_ID == 0x228 && db_camCut == 0xA) {
             db_motNo = 0x46;
         } else if (G_ROOM_ID == 0x228 && db_camCut == 0xB) {
@@ -1208,7 +1203,7 @@ extern "C" void EspToolUpdate(DbToolWk* wk, int texNo)
 }
 
 // Screen cross-hair at `pos`.
-extern "C" void DB_DrawCursor2D(Vec* pos)
+void DB_DrawCursor2D(Vec* pos)
 {
     Vec p0;
     Vec p1;
@@ -1227,7 +1222,7 @@ extern "C" void DB_DrawCursor2D(Vec* pos)
 
 // World position / matrix of a generator's origin: the parent parts (Parts_no; 0xFE = the null
 // parts position, 0xFF or flag = world) applied to gen->Pos.
-extern "C" void DB_GetCursorPos(cEspSeqHead* head, cEspSeqTbl* gen, int flag, Vec* out, Mtx* m)
+void DB_GetCursorPos(cEspSeqHead* head, cEspSeqTbl* gen, int flag, Vec* out, Mtx* m)
 {
     int parts = gen->Parts_no;
 
@@ -1245,7 +1240,7 @@ extern "C" void DB_GetCursorPos(cEspSeqHead* head, cEspSeqTbl* gen, int flag, Ve
 }
 
 // Draws the 3D cross at a generator's origin.
-extern "C" void DB_DrawCursor3D(cEspSeqHead* head, cEspSeqTbl* gen, int flag, f32 size)
+void DB_DrawCursor3D(cEspSeqHead* head, cEspSeqTbl* gen, int flag, f32 size)
 {
     Vec pos;
     Mtx m;
@@ -1255,7 +1250,7 @@ extern "C" void DB_DrawCursor3D(cEspSeqHead* head, cEspSeqTbl* gen, int flag, f3
 }
 
 // Three axis lines of length `size` at `pos` oriented by `m`.
-extern "C" void DB_DrawCross3D(Vec* pos, Mtx* m, f32 size)
+void DB_DrawCross3D(Vec* pos, Mtx* m, f32 size)
 {
     Vec p0;
     Vec p1;
@@ -1312,7 +1307,7 @@ static void DB_VecClear(Vec* v)
 
 // Transforms `in` by the sequence's null parts (head->parts) of the active model (0xFE = the
 // model itself); logs an error for a bad parts number.
-extern "C" void DB_VecNullPartsPos(cEspSeqHead* head, Vec* in, Vec* out, Mtx* m)
+void DB_VecNullPartsPos(cEspSeqHead* head, Vec* in, Vec* out, Mtx* m)
 {
     cModel* em = dbModGetEmPtr(db_modelNo);
     Vec zero;
@@ -1370,7 +1365,7 @@ extern "C" void DB_VecNullPartsPos(cEspSeqHead* head, Vec* in, Vec* out, Mtx* m)
 
 // Transforms `in` by parts `parts` of the generator's parent (a db_mod slot, or a scroll object
 // for Parent_no > 0); no-op for a dead model or bad parts.
-extern "C" void DB_VecMulEmPartsMat(u32 parts, Vec* in, Vec* out, Mtx* m, cEspSeqTbl* gen)
+void DB_VecMulEmPartsMat(u32 parts, Vec* in, Vec* out, Mtx* m, cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     Vec v;
@@ -1424,7 +1419,7 @@ none:
 }
 
 // Writes `size` bytes to the host file (HDWrite).
-extern "C" void SaveData(const char* path, void* buf, int size)
+void SaveData(const char* path, void* buf, int size)
 {
     int ret = HDWrite(path, buf, size);
 
@@ -1438,7 +1433,7 @@ extern "C" void SaveData(const char* path, void* buf, int size)
 }
 
 // Reads a host file into `buf`; the byte count (0 when missing).
-extern "C" int LoadData(const char* path, void* buf)
+int LoadData(const char* path, void* buf)
 {
     int ret = HDRead(path, buf);
 
@@ -1456,7 +1451,7 @@ extern "C" int LoadData(const char* path, void* buf)
 int SetToolLight(int no);
 
 // Opens the embedded db_light editor (tool light on).
-extern "C" void LightToolStart()
+void LightToolStart()
 {
     db_pLightTool = new cLightTool();
     SetToolLight(-1);
@@ -1464,13 +1459,13 @@ extern "C" void LightToolStart()
 }
 
 // Runs the embedded light editor one frame.
-extern "C" void LightToolExec()
+void LightToolExec()
 {
     db_pLightTool->move();
 }
 
 // Closes the embedded light editor.
-extern "C" void LightToolEnd()
+void LightToolEnd()
 {
     if (db_pLightTool) {
         delete db_pLightTool;
@@ -1478,39 +1473,39 @@ extern "C" void LightToolEnd()
 }
 
 // Runs the debug camera on pad 1 (CamDbg).
-extern "C" void EspToolCameraMode()
+void EspToolCameraMode()
 {
     CamDbg.move(&pG->Camera, &Joy[0], 1);
     eprintf(0xD0, 0x10, 0, 0, "CAMERA MODE");
 }
 
 // pG->stage_no.
-extern "C" u8 DB_GetStageNo()
+u8 DB_GetStageNo()
 {
     return pG->stage_no;
 }
 
 // pG->room_no.
-extern "C" u8 DB_GetRoomNo()
+u8 DB_GetRoomNo()
 {
     return pG->room_no;
 }
 
 // World point `dist` units in front of the camera (new generator default position).
-extern "C" void DB_GetCamFrontPos(f32 dist, f32* x, f32* y, f32* z)
+void DB_GetCamFrontPos(f32 dist, f32* x, f32* y, f32* z)
 {
     Vec dir;
     Vec pos;
     CAMERA* cam = &pG->Camera;
 
-    dir.x = cam->param.at.x - cam->param.pos.x;
-    dir.y = cam->param.at.y - cam->param.pos.y;
-    dir.z = cam->param.at.z - cam->param.pos.z;
+    dir.x = cam->param.Target.x - cam->param.Campos.x;
+    dir.y = cam->param.Target.y - cam->param.Campos.y;
+    dir.z = cam->param.Target.z - cam->param.Campos.z;
 #line 2047 "D:/Bio4/Prog/db_port.cpp"
     VECNormalize(&dir, &dir);
-    pos.x = cam->param.pos.x;
-    pos.y = cam->param.pos.y;
-    pos.z = cam->param.pos.z;
+    pos.x = cam->param.Campos.x;
+    pos.y = cam->param.Campos.y;
+    pos.z = cam->param.Campos.z;
     PSVECScale(&dir, &dir, dist);
     PSVECAdd(&dir, &pos, &pos);
     *x = pos.x;
@@ -1519,13 +1514,13 @@ extern "C" void DB_GetCamFrontPos(f32 dist, f32* x, f32* y, f32* z)
 }
 
 // TaskSleep(n).
-extern "C" void DB_Sleep(int n)
+void DB_Sleep(int n)
 {
     TaskSleep(n);
 }
 
 // Debug draw of a ctrl01 generator: its origin (parent parts applied) and direction vector.
-extern "C" void sp_ctrl01_trans(cEspSeqTbl* gen)
+void sp_ctrl01_trans(cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     Mtx ry;
@@ -1599,7 +1594,7 @@ extern "C" void sp_ctrl01_trans(cEspSeqTbl* gen)
 }
 
 // Debug draw of a generator's emission sphere (radius Vec0.z).
-extern "C" void sp_sphere(cEspSeqHead* head, cEspSeqTbl* gen)
+void sp_sphere(cEspSeqHead* head, cEspSeqTbl* gen)
 {
     Vec pos;
     Mtx m;
@@ -1609,7 +1604,7 @@ extern "C" void sp_sphere(cEspSeqHead* head, cEspSeqTbl* gen)
 }
 
 // Debug draw of a generator's emission box (Vec0 half sizes) in green.
-extern "C" void sp_3dgrid_trans(cEspSeqHead* head, cEspSeqTbl* gen)
+void sp_3dgrid_trans(cEspSeqHead* head, cEspSeqTbl* gen)
 {
     Mtx m;
     Mtx rm;
@@ -1671,7 +1666,7 @@ extern "C" void sp_3dgrid_trans(cEspSeqHead* head, cEspSeqTbl* gen)
 
 // Debug draw of an esp06 path effect: the path sampled along its length (on the parent model when
 // it has one).
-extern "C" void sp_path_trans(cEspSeqHead* head, cEspSeqTbl* gen)
+void sp_path_trans(cEspSeqHead* head, cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     cEsp* esp;
@@ -1723,7 +1718,7 @@ extern "C" void sp_path_trans(cEspSeqHead* head, cEspSeqTbl* gen)
 }
 
 // Debug draw of an Espgen02 path generator: the path with the generator's rotation / scale.
-extern "C" void sp_path_trans2(cEspSeqHead* head, cEspSeqTbl* gen)
+void sp_path_trans2(cEspSeqHead* head, cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     Vec pos;
@@ -1789,7 +1784,7 @@ extern "C" void sp_path_trans2(cEspSeqHead* head, cEspSeqTbl* gen)
 }
 
 // Debug draw of a generator's extension limit rectangle (Vec0 x/z).
-extern "C" void sp_nobigenkai_trans(cEspSeqHead* head, cEspSeqTbl* gen)
+void sp_nobigenkai_trans(cEspSeqHead* head, cEspSeqTbl* gen)
 {
     Vec c;
     Vec v0;
@@ -1820,7 +1815,7 @@ extern "C" void sp_nobigenkai_trans(cEspSeqHead* head, cEspSeqTbl* gen)
 }
 
 // Debug draw of a position-random generator bound to a parts: a sphere at the parts.
-extern "C" void sp_PosRand_trans_1a(cEspSeqHead* head, cEspSeqTbl* gen)
+void sp_PosRand_trans_1a(cEspSeqHead* head, cEspSeqTbl* gen)
 {
     cModel* em = GetActiveModel(gen);
     cParts* p0;
@@ -1860,7 +1855,7 @@ extern "C" void sp_PosRand_trans_1a(cEspSeqHead* head, cEspSeqTbl* gen)
 }
 
 // Debug draw of a position-random generator's box (yellow) in the parent's frame.
-extern "C" void sp_PosRand_trans(cEspSeqHead* head, cEspSeqTbl* gen)
+void sp_PosRand_trans(cEspSeqHead* head, cEspSeqTbl* gen)
 {
     f32 rx = gen->R_pos.x;
     f32 ry = gen->R_pos.y;
@@ -1924,7 +1919,7 @@ extern "C" void sp_PosRand_trans(cEspSeqHead* head, cEspSeqTbl* gen)
 }
 
 // the definition takes `int` (t_esp.cpp declares it `u8`): the entry `clrlwi r28,r3,24` is the (u8) cast
-extern "C" void sp_tex_trans(int no)
+void sp_tex_trans(int no)
 {
     void* tpl;
     u32 owner;
@@ -2004,13 +1999,13 @@ extern "C" void sp_tex_trans(int no)
 }
 
 // Deletes every running effect.
-extern "C" void DB_EffDelete()
+void DB_EffDelete()
 {
     EffectDeleteAll();
 }
 
 // Frame counter display: frames since the last X press, and the current event cut / frame.
-extern "C" void DB_DispProc()
+void DB_DispProc()
 {
     static int start;
     int d;
@@ -2032,7 +2027,7 @@ extern "C" void DB_DispProc()
 }
 
 // Config parser: skips a [[ ]], /* */ or // comment at *pp; 0 when one was skipped, -1 otherwise.
-extern "C" int comment_check(char** pp)
+int comment_check(char** pp)
 {
     char* p = *pp;
 
@@ -2061,7 +2056,7 @@ extern "C" int comment_check(char** pp)
 }
 
 // Config parser: skips blanks / tabs / newlines.
-extern "C" char* space_skip(char* p)
+char* space_skip(char* p)
 {
     do {
         while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r') {
@@ -2072,7 +2067,7 @@ extern "C" char* space_skip(char* p)
 }
 
 // Config parser: reads a decimal or 0x hex number at *pp.
-extern "C" int num_get(char** pp)
+int num_get(char** pp)
 {
     *pp = space_skip(*pp);
     if (strncmp(*pp, "0x", 2) == 0) {
@@ -2088,7 +2083,7 @@ extern "C" int num_get(char** pp)
 // Reads a model set config (.cfg) from the host: MODEL_NAME / MOTION_NO / TRANS / LOOP / FLIP /
 // POS_* / ANG_* / PAR_* entries per model, then loads every model set into the viewer slots with
 // its motion flags, position and parent link. 0 when the file is missing.
-extern "C" int DB_ConfigLoad(const char* file)
+int DB_ConfigLoad(const char* file)
 {
     DbConfigModel tbl[10];
     DbConfigModel* cur = tbl;
@@ -2195,7 +2190,7 @@ extern "C" int DB_ConfigLoad(const char* file)
 }
 
 // Config parser: 1 and advance when `sym` is at *pp.
-extern "C" int symbol_check(char** pp, const char* sym)
+int symbol_check(char** pp, const char* sym)
 {
     int len = strlen(sym);
 
@@ -2212,13 +2207,13 @@ extern "C" int symbol_check(char** pp, const char* sym)
 }
 
 // Plays core effect `id` at the origin (EstSet without an owner).
-extern "C" void CoreEstSet(u8 id)
+void CoreEstSet(u8 id)
 {
     EstSet(0, -1, 0, 0, EFF_CORE, id, 1, ESP_CORE_KIND_NONE, 0, 0);
 }
 
 // Blits a texture object to the screen (the texture preview window).
-extern "C" void drawTexture2(GXTexObj* obj, s16 x, s16 y, s16 z, s16 w, s16 h)
+void drawTexture2(GXTexObj* obj, s16 x, s16 y, s16 z, s16 w, s16 h)
 {
     GXColor col;
 

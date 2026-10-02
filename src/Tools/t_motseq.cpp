@@ -19,22 +19,20 @@
 #include <string.h>
 #include <dolphin/os.h>
 #include "tools.h"
+#include "eprintf.h"
 
-// Motion sequence editor (Tools/t_motseq.cpp): edits the key sequence (u16 count + MotionSeqKey[])
+// Motion sequence editor (Tools/t_motseq.cpp): edits the key sequence (u16 count + SEQUENCE_DATA[])
 // of the motion shown in db_mod's slot 0 and saves it as a .seq file.
 
-extern "C" void EprintfSetCurrentNo(int no);   // game/eprintf.cpp defines `int EprintfSetCurrentNo()`: this unit was built with the vendor's one-argument prototype, so it is not in eprintf.h
 int SetToolLight(int no);      // db_light_tools.cpp
 
 #define MSQ_KEY_MAX 1024
 
 
-// The sequence being edited: the file image (count + keys) followed by the editor state.
+// The sequence being edited: the .seq file image (SEQUENCE_FILE plus room for the keys) followed by the editor state.
 struct MsqSeq {
-    u16 num;                        // 0x0000  keys in use
-    u8 reverse;                     // 0x0002  1: the sequence runs backwards (msqMakeSequence start > end)
-    u8 pad_3;
-    MotionSeqKey key[MSQ_KEY_MAX];  // 0x0004  frame (10.6), se + 1, flag bits
+    SEQUENCE_FILE file;             // 0x0000  Frame_num: keys in use; Flag: 1 = the sequence runs backwards (msqMakeSequence start > end)
+    SEQUENCE_DATA dataBuf[MSQ_KEY_MAX];  // 0x0004  storage behind file.Data: frame (10.6), se + 1, flag bits
     u8 pad_1004[0x1090 - 0x1004];
     u32 x1090;                      // 0x1090
     u32 x1094;                      // 0x1094
@@ -47,7 +45,7 @@ struct MsqSeq {
     u8 copyFlagDisp[8];             // 0x10AC  flag bits of the copy buffer (display)
     u8 speed;                       // 0x10B4  0: off, 1: on, 2: on + position reset
     u8 pad_10B5[3];
-    MotionSeqKey copy;              // 0x10B8  copy buffer
+    SEQUENCE_DATA copy;              // 0x10B8  copy buffer
     u32 viewFlag;                   // 0x10BC  MotionSetCore flags (low half -> dbModSlot[0].seqFlag)
 };
 
@@ -161,7 +159,7 @@ void msqToolInit()
     int i;
     MsqWork* w;
     CAMERA* cam;
-    TprimRect rect;
+    f32 rect[4];
     MsqWork*& wp = msqWork;
     f32 zero;
 
@@ -174,10 +172,10 @@ void msqToolInit()
     EprintfSetCurrentNo(0);
     StaFlagOn(pG, STA_BG_OFF);
     DbgFlagOn(pG, DBG_DBG_CAM);
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x00800000;
-    pG->Disp_flg |= 0x02000000;
-    pG->Disp_flg |= 0x00800000;
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_SCE);
+    DpfFlagOn(pG, DPF_SHADOW);
+    DpfFlagOn(pG, DPF_MIRROR);
     memclr_asm(MSQ, sizeof(MsqWork));
     for (i = 0; i < 1; i++) {
         MSQ->seq[i].x1090 = 0;
@@ -202,22 +200,22 @@ void msqToolInit()
     ToolArrayPush(0);
     zero = 0.0f;
     cam = &pG->Camera;
-    cam->param.at.y = 1000.0f;
-    cam->param.at.x = zero;
-    cam->param.at.z = zero;
-    cam->param.pos.x = zero;
-    cam->param.pos.y = 1000.0f;
-    cam->param.pos.z = 3000.0f;
-    cam->param.roll = zero;
+    cam->param.Target.y = 1000.0f;
+    cam->param.Target.x = 0.0f;
+    cam->param.Target.z = 0.0f;
+    cam->param.Campos.x = 0.0f;
+    cam->param.Campos.y = 1000.0f;
+    cam->param.Campos.z = 3000.0f;
+    cam->param.Roll = 0.0f;
     CameraSetOrientationRoll(cam);
-    rect.x = 0.0f;
-    rect.y = 0.0f;
-    rect.w = 512.0f;
-    rect.h = 448.0f;
-    TprimInitEnv2D(&rect);
+    rect[0] = 0.0f;
+    rect[1] = 0.0f;
+    rect[2] = 512.0f;
+    rect[3] = 448.0f;
+    TprimInitEnv2D(rect);
     SetToolLight(2);
     dbModelInit();
-    pG->Stop_flg |= 0x40000000;
+    SpfFlagOn(pG, SPF_CAMERA);
     msqSetMode(0);
 }
 
@@ -307,7 +305,7 @@ static void msq_R0_SeqLoad()
     } else if (MSQ->joy.trg & 0x100) {
         if (msqLoadFile()) {
             w->seq[0].loaded = 1;
-            dbModMotionSetSeq(0, w, w->seq[0].viewFlag, 0);
+            dbModMotionSetSeq(0, &w->seq[0].file, w->seq[0].viewFlag, 0);
             msqFrameSizeCk();
             msqSetMode(3);
         } else {
@@ -428,9 +426,9 @@ static void msq_R0_SeqResize()
     cModel* m = dbModSlot[0].pModel;
     int max;
     int i;
-    MotionSeqKey* k;
+    SEQUENCE_DATA* k;
 
-    if (w->seq[0].reverse & 1) {
+    if (w->seq[0].file.Flag & 1) {
         msqSetMode(3);
         return;
     }
@@ -440,69 +438,69 @@ static void msq_R0_SeqResize()
     // read is the u16 field (gcse PRE gives the reload after each store), the decrement sits at the
     // end of the preheader and of the loop body (jump2 cross-jumps the two `sth`), the exits are
     // gotos so stmt.c does not rotate the loop, and `k` is recomputed from `i` (loop.c giv copy).
-    i = w->seq[0].num - 1;
+    i = w->seq[0].file.Frame_num - 1;
     if (i >= 0) {
-        k = &w->seq[0].key[i];
-        if (k->frame > max) {
-            w->seq[0].num--;
+        k = &w->seq[0].file.Data[i];
+        if (k->Frame > max) {
+            w->seq[0].file.Frame_num--;
             for (;;) {
                 i--;
                 if (i < 0) {
                     goto done;
                 }
-                k = &w->seq[0].key[i];
-                if (k->frame <= max) {
+                k = &w->seq[0].file.Data[i];
+                if (k->Frame <= max) {
                     goto done;
                 }
-                w->seq[0].num--;
+                w->seq[0].file.Frame_num--;
             }
         }
     }
 done:
-    if (w->seq[0].num == 0) {
-        k = &w->seq[0].key[0];
-        k->frame = 0;
-        w->seq[0].num = 1;
+    if (w->seq[0].file.Frame_num == 0) {
+        k = &w->seq[0].file.Data[0];
+        k->Frame = 0;
+        w->seq[0].file.Frame_num = 1;
         k->Free = 0;
         k->Se = 0;
-        dbModMotionSetSeq(0, w, w->seq[0].viewFlag, 0);
+        dbModMotionSetSeq(0, &w->seq[0].file, w->seq[0].viewFlag, 0);
         msqSetMode(3);
         return;
     }
-    if (w->seq[0].num > 1) {
-        int step = w->seq[0].key[1].frame - w->seq[0].key[0].frame;
+    if (w->seq[0].file.Frame_num > 1) {
+        int step = w->seq[0].file.Data[1].Frame - w->seq[0].file.Data[0].Frame;
         int f;
 
-        k = &w->seq[0].key[w->seq[0].num - 1];
-        f = k->frame;
+        k = &w->seq[0].file.Data[w->seq[0].file.Frame_num - 1];
+        f = k->Frame;
         if (step > 0) {
             f += step;
             // Goto loop (no loop notes): the shared zero of the two byte stores then has 3 refs
             // and is allocated after `max` (r5 / r6).
-            if (f <= max && w->seq[0].num - 1 <= 0x3FF) {
+            if (f <= max && w->seq[0].file.Frame_num - 1 <= 0x3FF) {
                 u8 z = 0;
 
             again2:
-                w->seq[0].num++;
-                k = &w->seq[0].key[w->seq[0].num - 1];
-                k->frame = f;
+                w->seq[0].file.Frame_num++;
+                k = &w->seq[0].file.Data[w->seq[0].file.Frame_num - 1];
+                k->Frame = f;
                 k->Free = z;
                 k->Se = z;
                 f += step;
-                if (f <= max && w->seq[0].num - 1 <= 0x3FF) {
+                if (f <= max && w->seq[0].file.Frame_num - 1 <= 0x3FF) {
                     goto again2;
                 }
             }
         }
     }
-    dbModMotionSetSeq(0, w, w->seq[0].viewFlag, 0);
+    dbModMotionSetSeq(0, &w->seq[0].file, w->seq[0].viewFlag, 0);
     msqSetMode(3);
 }
 
 // Plays the SE of key `no` of the shown model (bank by seMode) and clears the model's own SE keys.
 static inline void msqPlaySe(MsqWork* w, cModel* m)
 {
-    u8 se = w->seq[0].key[(u32) m->Motion.Seq_frame].Se;
+    u8 se = w->seq[0].file.Data[(u32) m->Motion.Seq_frame].Se;
 
     if (se != 0) {
         switch (MSQ->seMode) {
@@ -605,17 +603,17 @@ static void msq_R0_Sequence()
         u32 on = MSQ->joy.on;
 
         if ((on & 0x60) == 0x60) {
-            w->seq[0].copy = w->seq[0].key[cur2];
-            w->seq[0].key[cur2].Se = 0;
-            w->seq[0].key[cur2].Free = 0;
+            w->seq[0].copy = w->seq[0].file.Data[cur2];
+            w->seq[0].file.Data[cur2].Se = 0;
+            w->seq[0].file.Data[cur2].Free = 0;
             w->seq[0].changed = 1;
         } else {
             if (on & 0x20) {
-                w->seq[0].copy = w->seq[0].key[cur2];
+                w->seq[0].copy = w->seq[0].file.Data[cur2];
             }
             if (MSQ->joy.on & 0x40) {
-                w->seq[0].key[cur2].Se = w->seq[0].copy.Se;
-                w->seq[0].key[cur2].Free = w->seq[0].copy.Free;
+                w->seq[0].file.Data[cur2].Se = w->seq[0].copy.Se;
+                w->seq[0].file.Data[cur2].Free = w->seq[0].copy.Free;
                 w->seq[0].changed = 1;
             }
         }
@@ -625,28 +623,28 @@ static void msq_R0_Sequence()
 
         switch (w->seq[0].cursor) {
         case 1:
-            w->seq[0].key[cur2].Free |= 0x01;
+            w->seq[0].file.Data[cur2].Free |= 0x01;
             break;
         case 2:
-            w->seq[0].key[cur2].Free |= 0x02;
+            w->seq[0].file.Data[cur2].Free |= 0x02;
             break;
         case 3:
-            w->seq[0].key[cur2].Free |= 0x04;
+            w->seq[0].file.Data[cur2].Free |= 0x04;
             break;
         case 4:
-            w->seq[0].key[cur2].Free |= 0x08;
+            w->seq[0].file.Data[cur2].Free |= 0x08;
             break;
         case 5:
-            w->seq[0].key[cur2].Free |= 0x10;
+            w->seq[0].file.Data[cur2].Free |= 0x10;
             break;
         case 6:
-            w->seq[0].key[cur2].Free |= 0x20;
+            w->seq[0].file.Data[cur2].Free |= 0x20;
             break;
         case 7:
-            w->seq[0].key[cur2].Free |= 0x40;
+            w->seq[0].file.Data[cur2].Free |= 0x40;
             break;
         case 8:
-            w->seq[0].key[cur2].Free |= 0x80;
+            w->seq[0].file.Data[cur2].Free |= 0x80;
             break;
         case 9:
             if (MSQ->joy.rep & 2) {
@@ -657,9 +655,9 @@ static void msq_R0_Sequence()
                 } else {
                     step = 1;
                 }
-                int c = (u8) w->seq[0].key[cur2].Se;  // narrow `+` via an int local: `add step, c`
+                int c = (u8) w->seq[0].file.Data[cur2].Se;  // narrow `+` via an int local: `add step, c`
 
-                w->seq[0].key[cur2].Se = step + c;
+                w->seq[0].file.Data[cur2].Se = step + c;
             }
             break;
         case 0:
@@ -675,28 +673,28 @@ static void msq_R0_Sequence()
 
         switch (w->seq[0].cursor) {
         case 1:
-            w->seq[0].key[cur2].Free &= ~0x01;
+            w->seq[0].file.Data[cur2].Free &= ~0x01;
             break;
         case 2:
-            w->seq[0].key[cur2].Free &= ~0x02;
+            w->seq[0].file.Data[cur2].Free &= ~0x02;
             break;
         case 3:
-            w->seq[0].key[cur2].Free &= ~0x04;
+            w->seq[0].file.Data[cur2].Free &= ~0x04;
             break;
         case 4:
-            w->seq[0].key[cur2].Free &= ~0x08;
+            w->seq[0].file.Data[cur2].Free &= ~0x08;
             break;
         case 5:
-            w->seq[0].key[cur2].Free &= ~0x10;
+            w->seq[0].file.Data[cur2].Free &= ~0x10;
             break;
         case 6:
-            w->seq[0].key[cur2].Free &= ~0x20;
+            w->seq[0].file.Data[cur2].Free &= ~0x20;
             break;
         case 7:
-            w->seq[0].key[cur2].Free &= ~0x40;
+            w->seq[0].file.Data[cur2].Free &= ~0x40;
             break;
         case 8:
-            w->seq[0].key[cur2].Free &= ~0x80;
+            w->seq[0].file.Data[cur2].Free &= ~0x80;
             break;
         case 9:
             if (MSQ->joy.rep & 1) {
@@ -707,7 +705,7 @@ static void msq_R0_Sequence()
                 } else {
                     step = 1;
                 }
-                w->seq[0].key[cur2].Se -= step;
+                w->seq[0].file.Data[cur2].Se -= step;
             }
             break;
         case 0:
@@ -721,18 +719,18 @@ static void msq_R0_Sequence()
     {
         u8 cf = w->seq[0].copy.Free;
 
-        w->seq[0].flagDisp[0] = w->seq[0].key[cur2].Free & 0x01;
-        w->seq[0].flagDisp[1] = w->seq[0].key[cur2].Free & 0x02;
-        w->seq[0].flagDisp[2] = w->seq[0].key[cur2].Free & 0x04;
+        w->seq[0].flagDisp[0] = w->seq[0].file.Data[cur2].Free & 0x01;
+        w->seq[0].flagDisp[1] = w->seq[0].file.Data[cur2].Free & 0x02;
+        w->seq[0].flagDisp[2] = w->seq[0].file.Data[cur2].Free & 0x04;
         // COMPILER-DIFF: #13 (free sched slot filler): the original's sched1 has one insn between
         // `stb flagDisp[2]` and `lbz flagDisp[3]`'s load, so the two chains share r0 instead of
         // alternating r0/r9 (local-alloc's birth-2/death+1 conflict). Codeless, no bytes.
         asm("" : "=m"(w->seq[0].flagDisp[2]) : "m"(w->seq[0].flagDisp[2]));
-        w->seq[0].flagDisp[3] = w->seq[0].key[cur2].Free & 0x08;
-        w->seq[0].flagDisp[4] = w->seq[0].key[cur2].Free & 0x10;
-        w->seq[0].flagDisp[5] = w->seq[0].key[cur2].Free & 0x20;
-        w->seq[0].flagDisp[6] = w->seq[0].key[cur2].Free & 0x40;
-        w->seq[0].flagDisp[7] = w->seq[0].key[cur2].Free & 0x80;
+        w->seq[0].flagDisp[3] = w->seq[0].file.Data[cur2].Free & 0x08;
+        w->seq[0].flagDisp[4] = w->seq[0].file.Data[cur2].Free & 0x10;
+        w->seq[0].flagDisp[5] = w->seq[0].file.Data[cur2].Free & 0x20;
+        w->seq[0].flagDisp[6] = w->seq[0].file.Data[cur2].Free & 0x40;
+        w->seq[0].flagDisp[7] = w->seq[0].file.Data[cur2].Free & 0x80;
         w->seq[0].copyFlagDisp[0] = cf & 0x01;
         w->seq[0].copyFlagDisp[1] = cf & 0x02;
         w->seq[0].copyFlagDisp[2] = cf & 0x04;
@@ -879,16 +877,16 @@ static void msq_R0_QuitCk()
 static void msq_R0_Quit()
 {
     dbModelQuit();
-    pG->Stop_flg &= ~0x40000000;
+    SpfFlagOff(pG, SPF_CAMERA);
     DbgFlagOff(pG, DBG_TEST_MODE);
     ToolWorkPop(0);
     bio4_GXSetCopyClear(g_sysBgColor, 0xFFFFFF);
     DbgFlagOff(pG, DBG_DBG_CAM);
     StaFlagOff(pG, STA_BG_OFF);
-    pG->Stop_flg &= ~0x10000000;
-    pG->Stop_flg &= ~0x00800000;
-    pG->Disp_flg &= ~0x00800000;
-    pG->Disp_flg &= ~0x02000000;
+    SpfFlagOff(pG, SPF_PL);
+    SpfFlagOff(pG, SPF_SCE);
+    DpfFlagOff(pG, DPF_MIRROR);
+    DpfFlagOff(pG, DPF_SHADOW);
     TutilQuitDefault();
     TaskExit();
 }
@@ -897,13 +895,13 @@ static void msq_R0_Quit()
 void msqMakeSequence(int start, int end, int add)
 {
     MsqWork* w = MSQ;
-    MotionSeqKey* k = w->seq[0].key;
+    SEQUENCE_DATA* k = w->seq[0].file.Data;
     u32 n = 1;
     int f = start;
     int i;
 
     for (i = 0; i < MSQ_KEY_MAX; i++) {
-        k->frame = f;
+        k->Frame = f;
         k->Se = 0;
         k->Free = 0;
         if (start <= end) {
@@ -922,12 +920,12 @@ void msqMakeSequence(int start, int end, int add)
     if (n > 999) {
         n = 999;
     }
-    w->seq[0].num = n;
-    w->seq[0].reverse = 0;
+    w->seq[0].file.Frame_num = n;
+    w->seq[0].file.Flag = 0;
     if (start > end) {
-        w->seq[0].reverse = 1;
+        w->seq[0].file.Flag = 1;
     }
-    dbModMotionSetSeq(0, w, w->seq[0].viewFlag, 0);
+    dbModMotionSetSeq(0, &w->seq[0].file, w->seq[0].viewFlag, 0);
 }
 
 // Removes key `no`.
@@ -936,21 +934,21 @@ void msqSeqDelete(u32 no)
     MsqWork* w = MSQ;
     u32 i;
 
-    if (w->seq[0].num > 1) {
-        MotionSeqKey* d;
-        MotionSeqKey* s;
+    if (w->seq[0].file.Frame_num > 1) {
+        SEQUENCE_DATA* d;
+        SEQUENCE_DATA* s;
 
-        w->seq[0].num--;
-        d = &w->seq[0].key[no];
-        s = &w->seq[0].key[no + 1];
+        w->seq[0].file.Frame_num--;
+        d = &w->seq[0].file.Data[no];
+        s = &w->seq[0].file.Data[no + 1];
         for (i = no; i < MSQ_KEY_MAX - 1; i++) {
             *d++ = *s++;
         }
         *s = *d;
-        if (no >= w->seq[0].num) {
-            no = w->seq[0].num - 1;
+        if (no >= w->seq[0].file.Frame_num) {
+            no = w->seq[0].file.Frame_num - 1;
         }
-        dbModMotionSetSeq(0, w, w->seq[0].viewFlag, no);
+        dbModMotionSetSeq(0, &w->seq[0].file, w->seq[0].viewFlag, no);
         w->seq[0].changed = 1;
     }
 }
@@ -959,13 +957,13 @@ void msqSeqDelete(u32 no)
 void msqSeqAdd(u32 no)
 {
     MsqWork* w = MSQ;
-    MotionSeqKey prev;
-    MotionSeqKey tmp;
+    SEQUENCE_DATA prev;
+    SEQUENCE_DATA tmp;
     u32 i;
 
-    if (w->seq[0].num < 999) {
-        MotionSeqKey* p = &w->seq[0].key[no];
-        w->seq[0].num++;
+    if (w->seq[0].file.Frame_num < 999) {
+        SEQUENCE_DATA* p = &w->seq[0].file.Data[no];
+        w->seq[0].file.Frame_num++;
         prev = *p;
         for (i = no; i < MSQ_KEY_MAX; i++) {
             tmp = *p;
@@ -973,7 +971,7 @@ void msqSeqAdd(u32 no)
             prev = tmp;
             p++;
         }
-        dbModMotionSetSeq(0, w, w->seq[0].viewFlag, no);
+        dbModMotionSetSeq(0, &w->seq[0].file, w->seq[0].viewFlag, no);
         w->seq[0].changed = 1;
     }
 }
@@ -982,22 +980,22 @@ void msqSeqAdd(u32 no)
 void msqSeqFrameAdd(int no, u32 step, int sub)
 {
     MsqWork* w = MSQ;
-    MotionSeqKey* k = &w->seq[0].key[no];
+    SEQUENCE_DATA* k = &w->seq[0].file.Data[no];
     cModel* m = dbModSlot[0].pModel;
 
     if (sub) {
-        if (k->frame > step) {
-            k->frame -= step;
+        if (k->Frame > step) {
+            k->Frame -= step;
         } else {
-            k->frame = 0;
+            k->Frame = 0;
         }
     } else {
         u32 max;
 
-        k->frame += step;
+        k->Frame += step;
         max = (u32) m->Motion.Mot_frame_max << 6;
-        if (k->frame > max) {
-            k->frame = max;
+        if (k->Frame > max) {
+            k->Frame = max;
         }
     }
 }
@@ -1009,13 +1007,13 @@ void msqDisp()
 {
     MsqWork* w = MSQ;
     cModel* m = dbModSlot[0].pModel;
-    TprimRect rc;
+    f32 rc[4];
     GXColor col;
     int i;
     int c;
     int r;
     char* p;
-    MotionSeqKey* k;
+    SEQUENCE_DATA* k;
     s16 cur;
     s16 y0;
     int cx;  // text column; set to 3 and 48 (two sets: gcse cprop leaves `cx * 8` unfolded after the loops)
@@ -1117,9 +1115,9 @@ void msqDisp()
         cx = 3;
 
         eprintf(24, 196, 0, MSQ->col, "--SEQUENCE INFO--");
-        k = &w->seq[0].key[cur];
+        k = &w->seq[0].file.Data[cur];
         eprintf(cx * 8, 210, 0, MSQ->col, "Frame:%4.2f [%03d]",
-                (f32) (k->frame >> 6) + (f32) (k->frame & 0x3F) / 64.0f, cur);
+                (f32) (k->Frame >> 6) + (f32) (k->Frame & 0x3F) / 64.0f, cur);
         eprintf(cx * 8, 224, 0, MSQ->col, "Free :0x%02x", k->Free);
         j = 0;
         for (i = 0; i < 8; i++) {
@@ -1177,28 +1175,28 @@ void msqDisp()
 
         TprimDraw2D(0);
         tx = 248.0f;
-        rc.x = tx;
-        rc.y = 362.0f;
-        rc.w = 17.0f;
-        rc.h = 73.0f;
-        TprimDrawTile2D(&rc, 0.0f, &c1);
+        rc[0] = tx;
+        rc[1] = 362.0f;
+        rc[2] = 17.0f;
+        rc[3] = 73.0f;
+        TprimDrawTile2D(rc, 0.0f, &c1);
         if (w->seq[0].cursor != 0) {
-            rc.x = tx;
-            rc.y = (f32) (w->seq[0].cursor * 5 + 362);
-            rc.w = 17.0f;
+            rc[0] = tx;
+            rc[1] = (f32) (w->seq[0].cursor * 5 + 362);
+            rc[2] = 17.0f;
             if (w->seq[0].cursor == 9) {
-                rc.h = 28.0f;
+                rc[3] = 28.0f;
             } else {
-                rc.h = 8.0f;
+                rc[3] = 8.0f;
             }
             col.r = 0x20;
             col.g = 0x20;
             col.b = 0x80;
             col.a = 0x40;
-            TprimDrawTile2D(&rc, 0.0f, &col);
+            TprimDrawTile2D(rc, 0.0f, &col);
         }
         x = 40.0f;
-        rc.w = 13.0f;
+        rc[2] = 13.0f;
         y0 = (s16) m->Motion.Seq_frame - 14;
         f32 rowStep = 5.0f;  // a variable set before the loop: its load precedes every loop.c hoist (369.0 after it)
         const f32 rowH = 4.0f;
@@ -1209,13 +1207,13 @@ void msqDisp()
             u8 bit = 1;
             f32 rowY = 369.0f;
 
-            rc.x = x;
-            rc.h = rowH;
-            rc.y = rowY;
+            rc[0] = x;
+            rc[3] = rowH;
+            rc[1] = rowY;
             for (r = 0; r < 8; r++) {
                 if (y0 < 0 || y0 >= m->Motion.Seq_frame_num) {
                     col = c3;
-                } else if (w->seq[0].key[y0].Free & bit) {
+                } else if (w->seq[0].file.Data[y0].Free & bit) {
                     col.r = 0x20;
                     col.g = 0x80;
                     col.b = 0x20;
@@ -1223,14 +1221,14 @@ void msqDisp()
                 } else {
                     col = c2;
                 }
-                TprimDrawTile2D(&rc, 0.0f, &col);
+                TprimDrawTile2D(rc, 0.0f, &col);
                 bit <<= 1;
-                rc.y += rowStep;
+                rc[1] += rowStep;
             }
-            rc.h = seH;
+            rc[3] = seH;
             if (y0 < 0 || y0 >= m->Motion.Seq_frame_num) {
                 col = c3;
-            } else if (w->seq[0].key[y0].Se != 0) {
+            } else if (w->seq[0].file.Data[y0].Se != 0) {
                 col.r = 0x80;
                 col.g = 0x20;
                 col.b = 0x20;
@@ -1238,9 +1236,9 @@ void msqDisp()
             } else {
                 col = c2;
             }
-            TprimDrawTile2D(&rc, 0.0f, &col);
+            TprimDrawTile2D(rc, 0.0f, &col);
             y0++;
-            rc.y += colStep;
+            rc[1] += colStep;
             x += xStep;
         }
     }
@@ -1255,7 +1253,7 @@ int msqLoadFile()
 // Writes the count + keys to the .seq file.
 int msqSaveFile()
 {
-    return HDWrite(MSQ->fileName, MSQ, MSQ->seq[0].num * 4 + 4);
+    return HDWrite(MSQ->fileName, MSQ, MSQ->seq[0].file.Frame_num * 4 + 4);
 }
 
 // START toggles camera mode: the debug camera takes pad 1 and the tool's pad copy is cleared.
@@ -1301,21 +1299,21 @@ void msqFrameSizeCk()
     int i;
     int max;
 
-    if (w->seq[0].reverse & 1) {
+    if (w->seq[0].file.Flag & 1) {
         msqSetMode(3);
         return;
     }
     max = (int) m->Motion.Mot_frame_max;
     max <<= 6;
     i = 0;
-    if (i < w->seq[0].num) {
+    if (i < w->seq[0].file.Frame_num) {
         do {
-            if (w->seq[0].key[i].frame > max) {
+            if (w->seq[0].file.Data[i].Frame > max) {
                 MSQ->errTimer = 150;
                 MSQ->errType = 1;
                 break;
             }
             i++;
-        } while (i < w->seq[0].num);
+        } while (i < w->seq[0].file.Frame_num);
     }
 }

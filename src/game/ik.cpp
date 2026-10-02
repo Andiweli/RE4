@@ -9,10 +9,8 @@
 #include "math_sub.h"
 #include "db_log.h"
 
-extern "C" {
 void ikCalc(cParts* root, cParts* joint, cParts* eff);
 static void heel2toe(Mtx m, cParts* p, Vec* pos);
-}
 
 #define IK_FLAGS(p) ((p)->motParts.flags)
 #define BIND_X(p) (p->lt_inv_mat[0][3])
@@ -302,7 +300,7 @@ static void heel2toe(Mtx m, cParts* p, Vec* pos)
 void InverseKinematics(cModel* pEm, int arm_flag)
 {
     cEm* em = (cEm*) pEm;
-    MOTION_INFO* blend = MOTION(pEm)->blend;
+    MOTION_INFO* blend = pEm->pMotionB;
     Mtx inv;
     Vec target;
     Vec a;

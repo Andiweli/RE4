@@ -23,7 +23,7 @@
 #include "em_sub.h"
 
 // Rope node of the falling arrow (emMine_R1_Fall).
-struct MineNode {
+struct EMMINE_FALLWK {
     Vec pos;          // 0x00
     Vec old;       // 0x0C
     Vec spd;          // 0x18
@@ -962,13 +962,13 @@ void emMine_R1_Fall(cEmMine* pEm)
 {
     FREE_EMMINE* w = EMMINE_WK(pEm);
     Vec ofs[4] = { { 0.0f, 0.0f, 600.0f }, { 0.0f, 0.0f, -600.0f }, { 300.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
-    MineNode node[3];
+    EMMINE_FALLWK node[3];
     Vec e1;
     Vec nrm;
     Vec e0;
     Vec d;
-    MineNode* n;
-    MineNode* nn;
+    EMMINE_FALLWK* n;
+    EMMINE_FALLWK* nn;
     f32 floor;
     u32 i;
     u32 k;
@@ -1225,7 +1225,7 @@ int emMineHitCk(cEmMine* pEm)
     Vec dir;
     Vec a;
     Vec b;
-    WepTarget list;
+    TARGET_WK list;
     u32 attr;
     cEm* hitEm;
     YARARE_INFO* part;
@@ -1238,8 +1238,8 @@ int emMineHitCk(cEmMine* pEm)
         type = 0x1C;
     }
     if (GetWepTargetList2(&pEm->pos_old, &pEm->pos, &list, 1, &hit, &nrm, &attr, type, 0) != 0) {
-        hitEm = list.em;
-        part = list.part;
+        hitEm = list.pEm;
+        part = list.pAt;
         hitEm->dmg.set(0, 2, type, &pEm->pos_old, part->len, part);
         if (part->flag & YAT_FLAG_DMPOS) {
             partsNo = 0;

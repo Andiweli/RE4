@@ -26,24 +26,25 @@ typedef struct tagMENU {
     int id;            // 0x0C  DebugMenuSelected
 } MENU;
 
-// Debug menu task work (0x34 bytes)
-struct test {
-    u8 x0;             // 0x00
-    u8 x1;             // 0x01
-    u8 x2;             // 0x02
-    u8 x3;             // 0x03
-    s8 cursor;         // 0x04
-    u8 pad_5;
-    u8 flag;           // 0x06  1 = we set system flag 0x20000
-    u8 exec_tool;      // 0x07  1 = start the tool named in `name`
-    u8 stop_saved;     // 0x08  1 = stop flags in `stop_bak` must be restored
+// Debug menu task work (0x34 bytes). PS2 names this task's work struct `tagTEST`/`TEST`, like the
+// room-jump and flag-editor tool tasks; the three are unrelated, PS2 just reuses the name.
+typedef struct tagTEST {
+    u8 rno0;           // 0x00
+    u8 rno1;           // 0x01
+    u8 rno2;           // 0x02
+    u8 rno3;           // 0x03
+    s8 sel;            // 0x04
+    s8 old_page;       // 0x05
+    u8 sn_pc_read;     // 0x06  1 = we set system flag 0x20000
+    u8 exec_flag;      // 0x07  1 = start the tool named in `exec_tool`
+    u8 restore_flag;   // 0x08  1 = stop flags in `stop_flag` must be restored
     u8 pad_9;
-    s16 exit_wait;     // 0x0A  frames after the menu exits before it can reopen
+    s16 die_timer;     // 0x0A  frames after the menu exits before it can reopen
     s16 x;             // 0x0C
     s16 y;             // 0x0E
-    u32 stop_bak;      // 0x10  pG->flags_170
-    char name[0x20];   // 0x14
-};
+    u32 stop_flag;     // 0x10  pG->flags_170
+    char exec_tool[0x20]; // 0x14
+} TEST;
 
 void FlagEdit();
 void ToolDebugPage();
@@ -91,15 +92,15 @@ MENU menu[MENU_NUM] = {
     {"EXIT", NULL, NULL, 3},
 };
 
-test test;
+TEST test;
 int DebugMenuSelected;
 void DbmenuModuleInit();
 static OSModuleHeader* pModule;
 void* pModule_bss;
 
-void init(struct test* t);
-static void exit(struct test* t);
-void move(struct test* t);
+static void init(TEST* t);
+static void exit(TEST* t);
+static void move(TEST* t);
 
 // Menu index of the tool called `name`; -1 when unknown.
 int dbMenuGetMenuNo(const char* menu_name)
@@ -117,7 +118,7 @@ int dbMenuGetMenuNo(const char* menu_name)
 // The menu task: init, then move() every frame.
 void MenuTask()
 {
-    struct test* t = &test;
+    TEST* t = &test;
     init(t);
     TaskSleep(1);
     while (1) {
@@ -130,18 +131,18 @@ void MenuTask()
 // switches debug_mode to the menu page and starts MenuTask.
 void DbMenuExec()
 {
-    struct test* t = &test;
+    TEST* t = &test;
     DbgFlagOn(pG, DBG_TEST_MODE);
-    t->stop_bak = pG->Stop_flg;
+    t->stop_flag = pG->Stop_flg;
     BitOn(pG->Stop_flg, ~0x4000);
     pG->debug_disp = pG->debug_mode;
     pG->debug_mode = 1;
     if (SysFlagChk(pG, SYS_SN_PC_READ_TOOL)) {
         if (!SysFlagChk(pG, SYS_SN_PC_READ)) {
             SysFlagOn(pG, SYS_SN_PC_READ);
-            t->flag = 1;
+            t->sn_pc_read = 1;
         } else {
-            t->flag = 0;
+            t->sn_pc_read = 0;
         }
     }
     SetDebugAlloc();
@@ -153,13 +154,13 @@ void DbMenuExec()
 // the menu to run it.
 void DbMenuExitAfterCheck()
 {
-    struct test* t = &test;
+    TEST* t = &test;
     if (!DbgFlagChk(pG, DBG_TEST_MODE_CK)) {
         if (DbgFlagChk(pG, DBG_TEST_MODE)) {
             DbgFlagOn(pG, DBG_TEST_MODE_CK);
         }
-        if (t->exit_wait > 0) {
-            t->exit_wait--;
+        if (t->die_timer > 0) {
+            t->die_timer--;
         }
         return;
     }
@@ -170,14 +171,14 @@ void DbMenuExitAfterCheck()
         pG->debug_mode = pG->debug_disp;
         pG->debug_disp = -1;
     }
-    if (SysFlagChk(pG, SYS_SN_PC_READ_TOOL) && t->flag == 1) {
+    if (SysFlagChk(pG, SYS_SN_PC_READ_TOOL) && t->sn_pc_read == 1) {
         SysFlagOff(pG, SYS_SN_PC_READ);
     }
     DbmenuModuleInit();
     ResetDebugAlloc();
-    t->exit_wait = 30;
+    t->die_timer = 30;
     DbgFlagOff(pG, DBG_TEST_MODE_CK);
-    if (t->exec_tool == 1) {
+    if (t->exec_flag == 1) {
         DbMenuExec();
     }
 }
@@ -185,15 +186,15 @@ void DbMenuExitAfterCheck()
 // Queues tool `name` to be started by the next menu open (other debug code jumps into a tool).
 void DbMenuSetExecTool(const char* name)
 {
-    struct test* t = &test;
-    strcpy(t->name, name);
-    t->exec_tool = 1;
+    TEST* t = &test;
+    strcpy(t->exec_tool, name);
+    t->exec_flag = 1;
 }
 
 // 1 while the menu or a tool is active.
 int DbMenuActiveCheck()
 {
-    if (test.exit_wait > 0) {
+    if (test.die_timer > 0) {
         return 1;
     }
     return 0;
@@ -202,50 +203,50 @@ int DbMenuActiveCheck()
 // Restores the Stop_flg saved when the menu opened (the tool runs the game underneath).
 void DbMenuRestoreStopFlag()
 {
-    struct test* t = &test;
-    if (t->stop_saved == 1) {
-        pG->Stop_flg = t->stop_bak;
+    TEST* t = &test;
+    if (t->restore_flag == 1) {
+        pG->Stop_flg = t->stop_flag;
         SpfFlagOff(pG, SPF_KEY);
-        t->stop_saved = 0;
+        t->restore_flag = 0;
     }
 }
 
 // Room start: forgets a queued tool.
 void DbMenuRoomInit()
 {
-    test.exit_wait = 0;
-    test.exec_tool = 0;
+    test.die_timer = 0;
+    test.exec_flag = 0;
 }
 
 // Menu setup: cursor / position, and a queued tool selects itself.
-void init(struct test* t)
+static void init(TEST* t)
 {
     int no;
     FadeKill(0);
     FadeKill(FADE_NO_SCENARIO);
     t->x = 176;
     t->y = 30;
-    t->x3 = 0;
-    t->x2 = 0;
-    t->x1 = 0;
-    t->x0 = 0;
-    t->cursor = 0;
-    t->stop_saved = 0;
+    t->rno3 = 0;
+    t->rno2 = 0;
+    t->rno1 = 0;
+    t->rno0 = 0;
+    t->sel = 0;
+    t->restore_flag = 0;
     DebugMenuSelected = -1;
-    if (t->exec_tool == 1) {
-        no = dbMenuGetMenuNo(t->name);
+    if (t->exec_flag == 1) {
+        no = dbMenuGetMenuNo(t->exec_tool);
         if (no >= 0) {
-            t->cursor = no;
+            t->sel = no;
         } else {
-            t->exec_tool = 0;
+            t->exec_flag = 0;
         }
     }
 }
 
 // Closes the menu: Stop_flg restored, menu flag cleared, task ends.
-static void exit(struct test* t)
+static void exit(TEST* t)
 {
-    pG->Stop_flg = t->stop_bak;
+    pG->Stop_flg = t->stop_flag;
     DbgFlagOff(pG, DBG_TEST_MODE);
     TaskExit();
 }
@@ -253,7 +254,7 @@ static void exit(struct test* t)
 // Menu per frame: draws the tool list with the cursor, C-stick / D-pad moves it, B closes, A (or
 // a queued tool) starts the tool: a REL tool is read from "tools/<name>" into the debug heap,
 // linked and its prolog run; a built-in tool is chained as the task.
-void move(struct test* t)
+static void move(TEST* t)
 {
     JOY* joy;
     int i;
@@ -271,50 +272,50 @@ void move(struct test* t)
         color = ((i / 2) & 1) ? 0x18 : 0;
         eprintf(t->x + ((i & 1) * 20 - 4) * 8, t->y + (i / 2 + 2) * 15, color, 0, "%s", menu[i].name);
     }
-    eprintf(t->x + ((t->cursor & 1) * 20 - 5) * 8, t->y + (t->cursor / 2 + 2) * 15, 0, 0, ">");
+    eprintf(t->x + ((t->sel & 1) * 20 - 5) * 8, t->y + (t->sel / 2 + 2) * 15, 0, 0, ">");
     if (joy->rep & 0x80008) {
-        t->cursor -= 2;
-        if (t->cursor < 0) {
+        t->sel -= 2;
+        if (t->sel < 0) {
             // COMPILER-DIFF: candidate (jump2-only deleted arm). The target keeps a dead
-            // `andi. r11,r9,1` (cursor & 1 on the register) whose jump was deleted in jump2, then
-            // re-reads cursor for the value-form test `xori; andi.; beq; li r0,1; cmpwi; li 32; bne;
-            // li 33` = `(!(cursor & 1) && !(n & 1)) ? n - 2 : n - 1` (n the local: cprop folds the
+            // `andi. r11,r9,1` (sel & 1 on the register) whose jump was deleted in jump2, then
+            // re-reads sel for the value-form test `xori; andi.; beq; li r0,1; cmpwi; li 32; bne;
+            // li 33` = `(!(sel & 1) && !(n & 1)) ? n - 2 : n - 1` (n the local: cprop folds the
             // second operand to `li 1`, combine leaves the compare). The parity test's arm must hold
             // an insn flow2 keeps and jump2 removes: two identical codeless "=m" asms in both arms
             // are cross-jumped, the condjump becomes a jump-to-next and only the compare survives;
             // their memory output also keeps cse from folding the re-read (fresh `lbz`). Both asms must
             // sit on ONE source line: ASM_OPERANDS carries the line number and rtx_equal_p compares it.
-            if (t->cursor & 1) { asm("" : "=m"(t->cursor)); } else { asm("" : "=m"(t->cursor)); }
-            t->cursor = (!(t->cursor & 1) && !(n & 1)) ? n - 2 : n - 1;
+            if (t->sel & 1) { asm("" : "=m"(t->sel)); } else { asm("" : "=m"(t->sel)); }
+            t->sel = (!(t->sel & 1) && !(n & 1)) ? n - 2 : n - 1;
         }
     }
     if (joy->rep & 0x40004) {
-        t->cursor += 2;
-        if (t->cursor >= n) {
-            t->cursor = t->cursor & 1;
+        t->sel += 2;
+        if (t->sel >= n) {
+            t->sel = t->sel & 1;
         }
     }
     if (joy->rep & 0x30003) {
-        t->cursor ^= 1;
-        if (t->cursor >= n) {
-            t->cursor ^= 1;
+        t->sel ^= 1;
+        if (t->sel >= n) {
+            t->sel ^= 1;
         }
     }
     if (joy->trg & 0x1200) {
         exit(t);
     }
-    if ((joy->trg & 0x100) || t->exec_tool == 1) {
-        t->stop_saved = 1;
-        t->exec_tool = 0;
+    if ((joy->trg & 0x100) || t->exec_flag == 1) {
+        t->restore_flag = 1;
+        t->exec_flag = 0;
         SpfFlagOff(pG, SPF_KEY);
-        if (menu[t->cursor].func == NULL && menu[t->cursor].rel_name == NULL) {
+        if (menu[t->sel].func == NULL && menu[t->sel].rel_name == NULL) {
             exit(t);
         }
-        DebugMenuSelected = menu[t->cursor].id;
-        if (menu[t->cursor].rel_name != NULL) {
+        DebugMenuSelected = menu[t->sel].id;
+        if (menu[t->sel].rel_name != NULL) {
             char buf[32] = "rel/";
             int req;
-            strcat(buf, menu[t->cursor].rel_name);
+            strcat(buf, menu[t->sel].rel_name);
 #line 397 "D:/Bio4/Prog/db_menu.cpp"
             req = DvdReadN(buf, NULL, 0, 0, 0, 3, __FILE__, __LINE__);
             if (Dvd.ReadCheck(req, NULL, NULL, (void**) &pModule) >= 0) {
@@ -326,11 +327,11 @@ void move(struct test* t)
                 DLL_Link(pModule, pModule_bss);
                 TaskChain(DLL_PROLOG(pModule), 0);
             } else {
-                pLog->err(0, 0, "%s FILE NOT FOUND", menu[t->cursor].rel_name);
+                pLog->err(0, 0, "%s FILE NOT FOUND", menu[t->sel].rel_name);
                 exit(t);
             }
         } else {
-            TaskChain(menu[t->cursor].func, 0);
+            TaskChain(menu[t->sel].func, 0);
         }
     }
 }

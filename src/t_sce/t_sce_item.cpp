@@ -42,11 +42,11 @@ struct TSceItemFileHead {
 
 struct TSceItemFile {
     TSceItemFileHead head;   // 0x00
-    SceAtWork work[128];     // 0x10
+    SCE_AT_ITEM work[128];     // 0x10
 };
 
 struct SceAtWorkTbl {
-    SceAtWork a[128];
+    SCE_AT_ITEM a[128];
 };
 
 // game/sce_at.cpp's SceAtSysWork (static there; the REL imports it by name).
@@ -92,10 +92,10 @@ struct TSceItemWork {
     char xmlPath[0x40]; // 0xCC  x:\ xml export path
     AREA_HIT_DATA editArea;  // 0x10C  scratch area of the eye trigger editor
     TSceItemFileHead head;   // 0x13C
-    SceAtWork area[128];     // 0x14C
+    SCE_AT_ITEM area[128];     // 0x14C
     TSceItemFile file;       // 0x4F4C  load / save image
-    SceAtWork areaLoad[128]; // 0x9D5C  the table as loaded / saved
-    SceAtWork copyBuf;       // 0xEB5C
+    SCE_AT_ITEM areaLoad[128]; // 0x9D5C  the table as loaded / saved
+    SCE_AT_ITEM copyBuf;       // 0xEB5C
     u32 flgAuto[4];          // 0xEBF8  ITEM_SET flags handed out automatically
     char idName[512][64];    // 0xEC08  ITEM_ID_ names
     char idName2[512][64];   // 0x16C08  ITEM_ID_ names from ITEM_ID_SYSTEM_TOP on
@@ -109,12 +109,11 @@ static char* xmlP;
 static TSceItemWork* sceItemWk;
 #define pW (sceItemWk)
 struct SceAtWorkPtr {
-    SceAtWork* p;
+    SCE_AT_ITEM* p;
 };
-static SceAtWork* sceItemCur;
+static SCE_AT_ITEM* sceItemCur;
 #define pCur (sceItemCur)
 
-extern "C" {
 void tSceItemInit_base();
 void tSceItemInit();
 static void set_filename();  // duplicated in t_block / t_sce_at: static here (they own the module names)
@@ -129,7 +128,7 @@ static void tSceItemAreaEdit_AreaCopy();
 static void tSceItemAreaEdit_AreaPaste();
 static void tSceItemAreaEdit_CopyBuffClear();
 static void tSceItemAreaEdit_AreaDelete();
-static void angle_arrow_disp(SceAtWork* a);
+static void angle_arrow_disp(SCE_AT_UNIT* a);
 void tSceItemAreaEdit_disp();
 static void tSceItemAreaEdit_AreaMove();
 static void tSceItemAreaEdit_DataInput();
@@ -156,7 +155,6 @@ void tSceItemPreview_pl_pos();
 static void tSceItemPreview_exit();
 void loadItemIdName(const char* path, char* names, char* names2);
 char* getItemIdStr(u32 id);
-}
 
 #define AREA_NUM 128
 
@@ -192,10 +190,10 @@ char* getItemIdStr(u32 id);
     pW->step2 = 0;
 
 // link types 1 (enemy) and 2 (etc model) place the item on another model
-#define LINKED(a) ((a)->linkType == 1 || (a)->linkType == 2)
+#define LINKED(a) ((a)->waiting_type == 1 || (a)->waiting_type == 2)
 
 
-// ITEM SET TOOL entry (debug menu 34): edits the room's ITA item placement records (SceAtWork with
+// ITEM SET TOOL entry (debug menu 34): edits the room's ITA item placement records (SCE_AT_DATA with
 // the item payload). Loops: sub stick moves the panel, START toggles the debug camera, Z the tool
 // light, then routine[mode] (main menu, area edit, preview, load, save, exit).
 void ToolSceItem()
@@ -248,18 +246,18 @@ void tSceItemInit_base()
 {
     pG->debug_mode = 0x11;
     DbgFlagOn(pG, DBG_BACK_CLIP);
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x8000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
-    pG->Disp_flg |= 0x20000000;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x4000000;
-    pG->Disp_flg |= 0x2000000;
-    pG->Disp_flg |= 0x100000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_ESP);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
+    DpfFlagOn(pG, DPF_SUBCHAR);
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_ESP);
+    DpfFlagOn(pG, DPF_SHADOW);
+    DpfFlagOn(pG, DPF_FILTER);
     DbgFlagOn(pG, DBG_DBG_CAM);
     pW->light = 1;
     SetToolLight(1);
@@ -288,7 +286,7 @@ void tSceItemInit()
     set_filename();
     file_lock(pW->pathX);
     if (SceAtSys.pItemData != NULL) {
-        memcpy(&pW->file, SceAtSys.pItemData, SceAtSys.pItemData->head.num * sizeof(SceAtWork) + sizeof(TSceItemFileHead));
+        memcpy(&pW->file, SceAtSys.pItemData, SceAtSys.pItemData->head.num * sizeof(SCE_AT_ITEM) + sizeof(TSceItemFileHead));
         tSceItemLoadDataCopy();
     }
     sprintf(buf, "d:\\bio4/prog/item_id.h");
@@ -415,8 +413,8 @@ static void tSceItemAreaEdit()
     }
     pCur = &pW->area[pW->areaNo];
     eprintf(pW->x, pW->y, 4, 0, "ITEM_SET[ %d ]", pW->areaNo);
-    if (pCur->flag & 1) {
-        id = pCur->item.id;
+    if (pCur->be_flg & 1) {
+        id = pCur->item.item_id;
         eprintf(pW->x + 0x80, pW->y, 6, 0, "ID:%02X %s", id, getItemIdStr(id));
     } else {
         eprintf(pW->x + 0x80, pW->y, 2, 0, "no data:");
@@ -462,18 +460,18 @@ static void tSceItemAreaEdit_ListDisp()
 // one line of the item set list: number, and id + name when the record is live
 void dispItemSetList1(s16 x, s16 y, int no)
 {
-    SceAtWork* a = &pW->area[no];
+    SCE_AT_ITEM* a = &pW->area[no];
     int col;
     int col2; // a second variable: one `col` set in four places is global and loses r29 to `a`
     u16 id;
 
-    if (a->flag & 1) {
+    if (a->be_flg & 1) {
         col = 0;
         if (no == pW->areaNo) col = 6;
         eprintf(x, y, col, 0, "[%02d]", no);
         col2 = 0;
         if (no == pW->areaNo) col2 = 6;
-        id = a->item.id;
+        id = a->item.item_id;
         eprintf(x, y, (u8) col2, 0, "      %02x %s", id, getItemIdStr(id));
     } else {
         eprintf(x, y, 7, 0, "[%02d]", no);
@@ -504,7 +502,7 @@ static void tSceItemAreaEdit_EditMenu()
 
     tSceItemCreateMenu[1].Be_flg = tSceItemCreateMenu[2].Be_flg = tSceItemEditMenu[3].Be_flg =
         tSceItemEditMenu[4].Be_flg = valid;
-    if (pCur->flag & 1) {
+    if (pCur->be_flg & 1) {
         sel = ToolMenuDisp_cur(pW->x, pW->y, 0, &pW->editCursor, tSceItemEditMenu, sizeof(tSceItemEditMenu), &Joy[0]);
         switch (sel) {
         case 0:
@@ -547,32 +545,32 @@ static void tSceItemAreaEdit_AreaCreate()
 
     switch (pW->step) {
     case 0:
-        if (pCur->flag) pW->editCursor = pCur->area.type - 1;
+        if (pCur->be_flg) pW->editCursor = pCur->area.type - 1;
         pW->step++;
     case 1:
         sel = ToolMenuDisp_cur(pW->x, pW->y, 0, &pW->editCursor, tSceItemShapeMenu, sizeof(tSceItemShapeMenu), &Joy[0]);
         if (sel >= 0) {
-            if ((pW->editCursor != pCur->area.type - 1 && pCur->flag) || pCur->flag == 0) {
+            if ((pW->editCursor != pCur->area.type - 1 && pCur->be_flg) || pCur->be_flg == 0) {
                 switch (sel) {
                 case 0:
-                    AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_XZ4, 1500.0f, 1000.0f);
+                    AreaDataInit(&pCur->area, &pPL->pos, 1500.0f, 1000.0f, AREA_TYPE_XZ4);
                     break;
                 case 1:
-                    AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_CYLINDER, 1000.0f, 1000.0f);
+                    AreaDataInit(&pCur->area, &pPL->pos, 1000.0f, 1000.0f, AREA_TYPE_CYLINDER);
                     break;
                 case 2:
-                    AreaDataInit(&pCur->area, &pPL->pos, AREA_TYPE_EYE, 200.0f, 1000.0f);
+                    AreaDataInit(&pCur->area, &pPL->pos, 200.0f, 1000.0f, AREA_TYPE_EYE);
                     break;
                 }
             }
-            pCur->type = 3;
-            pCur->flag |= 3;
-            pCur->trigger = 2;
-            pCur->checkType = 1;
-            pCur->checkFlag |= 1;
-            pCur->angle = 0;
-            pCur->angleRange = 0x2D;
-            pCur->otNo = 8;
+            pCur->id = 3;
+            pCur->be_flg |= 3;
+            pCur->trg_type = 2;
+            pCur->target_type = 1;
+            pCur->hit_type |= 1;
+            pCur->hit_dir_ang = 0;
+            pCur->hit_open_ang = 0x2D;
+            pCur->priority = 8;
             pW->editCursor = 0;
             pW->sub = 1;
             pW->step = 0;
@@ -604,7 +602,7 @@ static void tSceItemAreaEdit_AreaPaste()
 // Empties the copy buffer.
 static void tSceItemAreaEdit_CopyBuffClear()
 {
-    memclr_asm(&pW->copyBuf, sizeof(SceAtWork));
+    memclr_asm(&pW->copyBuf, sizeof(SCE_AT_ITEM));
     pW->copySrc = 0;
     pW->copyValid = 0;
 }
@@ -612,13 +610,13 @@ static void tSceItemAreaEdit_CopyBuffClear()
 // Clears the record.
 static void tSceItemAreaEdit_AreaDelete()
 {
-    pCur->flag &= ~1;
+    pCur->be_flg &= ~1;
     pW->editCursor = 0;
 }
 
 // the hit-angle arrow of an area: centre, direction and the +-range fan (the older RotMatrix build
 // of t_sce_at's angle_arrow_disp)
-static void angle_arrow_disp(SceAtWork* a)
+static void angle_arrow_disp(SCE_AT_UNIT* a)
 {
     Vec center;
     Vec p;
@@ -630,7 +628,7 @@ static void angle_arrow_disp(SceAtWork* a)
 
     AreaGetCenterPos(&center, &a->area);
     center.y += 100.0f;
-    rot.y = (f32) (a->angle * 2) * DEG2RAD;
+    rot.y = (f32) (a->hit_dir_ang * 2) * DEG2RAD;
     PSMTXIdentity(m);
     RotMatrix(m, &rot);
     TransMatrix(m, &center);
@@ -639,10 +637,10 @@ static void angle_arrow_disp(SceAtWork* a)
     Draw_sphere(&center, 80.0f, 0x808040FF, 0, 0);
     Draw_sphere(&p, 80.0f, 0xFFFFA0FF, 0, 0);
     Draw_line3d(&center, &p, 0xFEFFFFA0, 0);
-    sweep = (f32) ((a->angle + a->angleRange) * 2) * DEG2RAD - (f32) ((a->angle - a->angleRange) * 2) * DEG2RAD;
+    sweep = (f32) ((a->hit_dir_ang + a->hit_open_ang) * 2) * DEG2RAD - (f32) ((a->hit_dir_ang - a->hit_open_ang) * 2) * DEG2RAD;
     for (i = 0; i <= 10; i++) {
         if (i == 5) continue;
-        rot.y = (f32) ((a->angle - a->angleRange) * 2) * DEG2RAD + sweep * (f32) i / 10.0f;
+        rot.y = (f32) ((a->hit_dir_ang - a->hit_open_ang) * 2) * DEG2RAD + sweep * (f32) i / 10.0f;
         rot.y = LIMIT_ANGLE(rot.y);
         PSMTXIdentity(m);
         RotMatrix(m, &rot);
@@ -669,7 +667,7 @@ void tSceItemAreaEdit_disp()
     u32 col;
 
     for (i = 0; i < AREA_NUM; i++) {
-        if ((pW->area[i].flag & 1) == 0) continue;
+        if ((pW->area[i].be_flg & 1) == 0) continue;
         if (pW->areaNo == i) {
             colA = 0xA0FF8080;
             colB = 0x90300080;
@@ -680,48 +678,48 @@ void tSceItemAreaEdit_disp()
         col = colB;
         if (SceAtItemHitCheck(&pW->area[i], NULL) == 1) col = colA;
         obj = NULL;
-        if (pW->area[i].linkType == 2 && !(pW->area[i].item.flag2 & 1)) {
-            if (getRoomEtcBreak(pW->area[i].linkNo, &obj, 0) == 1) {
+        if (pW->area[i].waiting_type == 2 && !(pW->area[i].item.ctrl_flag & 1)) {
+            if (getRoomEtcBreak(pW->area[i].waiting_no, &obj, 0) == 1) {
                 col = colB;
                 if (SceAtItemHitCheck(&pW->area[i], &obj->pos) == 1) col = colA;
                 Draw_sphere(&obj->pos, 100.0f, col, 0, 0);
             }
-        } else if (pW->area[i].item.flag & 1) {
+        } else if (pW->area[i].item.pos_set & 1) {
             Vec pos;
-            SceAtDataEyeTriggreCopy(&ad, &pW->area[i]);
+            SceAtDataEyeTriggreCopy(&ad, (SCE_AT_DATA*) &pW->area[i]);
             AreaDataDisp(&ad, col, 1, NULL);
-            pos.x = pW->area[i].item.pos.x;
-            pos.y = pW->area[i].item.pos.y;
-            pos.z = pW->area[i].item.pos.z;
+            pos.x = pW->area[i].item.item_pos.x;
+            pos.y = pW->area[i].item.item_pos.y;
+            pos.z = pW->area[i].item.item_pos.z;
             Vec rot = {0.0f, 0.0f, 0.0f};
             Vec p;
             Vec ofs = {0.0f, 0.0f, 0.0f};
             Mtx m;
-            ofs.x = pW->area[i].item.ofs.x;
-            ofs.y = pW->area[i].item.ofs.y;
-            ofs.z = pW->area[i].item.ofs.z;
+            ofs.x = pW->area[i].item.eff_offset.x;
+            ofs.y = pW->area[i].item.eff_offset.y;
+            ofs.z = pW->area[i].item.eff_offset.z;
             p = ofs;
-            if (pW->area[i].item.rot.z > 0.0f) {
-                rot.x = pW->area[i].item.rot.x;
-                rot.y = pW->area[i].item.rot.y;
+            if (pW->area[i].item.open_ang > 0.0f) {
+                rot.x = pW->area[i].item.ang_x;
+                rot.y = pW->area[i].item.ang_y;
             }
             low_RotMatrix(m, &rot);
             TransMatrix(m, &pos);
             PSMTXMultVec(m, &p, &pos);
             Draw_sphere(&pos, 50.0f, 0xFFFF00FF, 1, 1);
         }
-        if (pW->area[i].item.flag2 & 2) {
+        if (pW->area[i].item.ctrl_flag & 2) {
             AreaDataDisp(&pW->area[i].area, colA, 1, NULL);
-            if (pW->area[i].checkFlag & 2) angle_arrow_disp(&pW->area[i]);
+            if (pW->area[i].hit_type & 2) angle_arrow_disp(&pW->area[i]);
         } else {
             if (obj != NULL) {
-                SceAtItemAutoArea(&ad, &obj->pos, pW->area[i].item.size);
+                SceAtItemAutoArea(&ad, &obj->pos, pW->area[i].item.radius);
                 AreaDataDisp(&ad, colA, 1, NULL);
             } else if (!LINKED(&pW->area[i])) {
-                SceAtItemAutoArea(&ad, &pW->area[i].item.pos, pW->area[i].item.size);
+                SceAtItemAutoArea(&ad, &pW->area[i].item.item_pos, pW->area[i].item.radius);
                 AreaDataDisp(&ad, colA, 1, NULL);
             }
-            if (pW->area[i].checkFlag & 2) {
+            if (pW->area[i].hit_type & 2) {
                 save = pW->area[i].area;
                 pW->area[i].area = ad;
                 angle_arrow_disp(&pW->area[i]);
@@ -740,7 +738,7 @@ void tSceItemAreaEdit_disp()
 // AREA MOVE: the shared AreaDataEdit editor on the record's area; B back.
 static void tSceItemAreaEdit_AreaMove()
 {
-    if (pCur->flag & 1) {
+    if (pCur->be_flg & 1) {
         AreaDataEdit(&pCur->area, 0xA0FF8080, 0, NULL, 0.75f);
         AreaDataInfoDisp(&pCur->area, pW->x, pW->y);
         AreaDataHelpDisp(&pCur->area, (s16) (pW->x + 0xE0), (s16) (pW->y - 0x20));
@@ -755,7 +753,7 @@ static void tSceItemAreaEdit_AreaMove()
 // DATA INPUT: the item payload editor (tSceItemDataInput_item); B back.
 static void tSceItemAreaEdit_DataInput()
 {
-    if (pCur->flag & 1) {
+    if (pCur->be_flg & 1) {
         tSceItemDataInput_item();
     }
     if (Joy[0].trg & JOY_B) {
@@ -786,7 +784,7 @@ void tSceItemDataInput_basic_menu(int sel, TOOL_MENU* menu)
     int m;
     u8 on;
 
-    on = pCur->checkFlag & 2;
+    on = pCur->hit_type & 2;
     if (on) on = 1;
     menu[1].Be_flg = on;
     menu[2].Be_flg = on;
@@ -797,60 +795,60 @@ void tSceItemDataInput_basic_menu(int sel, TOOL_MENU* menu)
     y = pW->y;
     switch (sel) {
     case 0:
-        n = PC(c0)->checkFlag;
+        n = PC(c0)->hit_type;
         if (Joy[0].rep & REP_RIGHT) n--;
         if (Joy[0].rep & REP_LEFT) n++;
         m = WRAP(n, 3);
-        pCur->checkFlag = m;
+        pCur->hit_type = m;
         break;
     case 1: {
-        SceAtWork* a = PC(c1);
-        if (a->checkFlag & 2) {
-            n = a->angle;
+        SCE_AT_ITEM* a = PC(c1);
+        if (a->hit_type & 2) {
+            n = a->hit_dir_ang;
             if (Joy[0].rep & 0x20000) n += 0x2D;
             if (Joy[0].rep & 0x10000) n -= 0x2D;
             if (Joy[0].rep & JOY_RIGHT) n += 5;
             if (Joy[0].rep & JOY_LEFT) n -= 5;
             if (n > 0x59) n -= 0xB4;
             if (n < -0x5A) n += 0xB4;
-            a->angle = n;
+            a->hit_dir_ang = n;
         }
         break;
     }
     case 2:
-        if (PC(c2)->checkFlag & 2) {
-            n = PC(c2)->angleRange;
+        if (PC(c2)->hit_type & 2) {
+            n = PC(c2)->hit_open_ang;
             if (Joy[0].rep & REP_RIGHT) n += 5;
             if (Joy[0].rep & REP_LEFT) n -= 5;
             CLAMP_SET(n, m, 0x5A);
-            pCur->angleRange = m;
+            pCur->hit_open_ang = m;
         }
         break;
     case 3:
-        n = PC(c3)->otNo;
+        n = PC(c3)->priority;
         STEP(rep, n);
         CLAMP_SET(n, m, 0xF);
-        pCur->otNo = m;
+        pCur->priority = m;
         break;
     default:
         eprintf(x + 0x40, y, 5, 0, "(push Y:data init.)");
-        if (Joy[0].trg & JOY_Y) memclr_asm(pCur->data, sizeof(pCur->data));
+        if (Joy[0].trg & JOY_Y) memclr_asm(&pCur->item, sizeof(pCur->item));
         break;
     }
-    eprintf(x, y, 0, 0, "%s", tSceItemHitTypeName[pCur->checkFlag]);
+    eprintf(x, y, 0, 0, "%s", tSceItemHitTypeName[pCur->hit_type]);
     y += 0x10;
-    if (pCur->checkFlag & 2) {
-        eprintf(x, y, 0, 0, "%d", pCur->angle * 2);
+    if (pCur->hit_type & 2) {
+        eprintf(x, y, 0, 0, "%d", pCur->hit_dir_ang * 2);
         y += 0x10;
-        eprintf(x, y, 0, 0, "%d", pCur->angleRange * 2);
+        eprintf(x, y, 0, 0, "%d", pCur->hit_open_ang * 2);
         y += 0x10;
     } else {
         y += 0x20;
     }
-    if (pCur->otNo == 8) {
+    if (pCur->priority == 8) {
         eprintf(x, y, 0, 0, "default");
     } else {
-        eprintf(x, y, 0, 0, "%d", pCur->otNo);
+        eprintf(x, y, 0, 0, "%d", pCur->priority);
     }
     eprintf(x, y, 6, 0, "        [0:low - 15:high]");
     y += 0x10;
@@ -914,7 +912,7 @@ static void tSceItemDataInput_item_main()
         tSceItemMenu[8].Be_flg = 0;
         tSceItemMenu[9].Be_flg = 0;
     }
-    if (LINKED(pCur) && !(pCur->item.flag2 & 1)) {
+    if (LINKED(pCur) && !(pCur->item.ctrl_flag & 1)) {
         tSceItemMenu[10].Be_flg = 0;
     } else {
         tSceItemMenu[10].Be_flg = 1;
@@ -924,7 +922,7 @@ static void tSceItemDataInput_item_main()
     switch (pW->inputCursor) {
     case 4: {
         int m;
-        n = pCur->item.id;
+        n = pCur->item.item_id;
         if (Joy[0].rep2 & REP_RIGHT) {
             if (n == 0xFE) {
                 n = 0x1000;
@@ -944,127 +942,127 @@ static void tSceItemDataInput_item_main()
             }
         }
         m = WRAP(n, 0x1005);
-        pCur->item.id = m;
+        pCur->item.item_id = m;
         break;
     }
     case 5: {
         int m;
-        n = pCur->item.flagNo;
+        n = pCur->item.item_flg;
         STEP(rep2, n);
         m = WRAP(n, 0xFF);
-        pCur->item.flagNo = m;
+        pCur->item.item_flg = m;
         break;
     }
     case 6: {
         int m;
-        n = pCur->item.num;
+        n = pCur->item.item_num;
         if (Joy[0].rep2 & JOY_RIGHT) n++;
         if (Joy[0].rep2 & JOY_LEFT) n--;
         if (Joy[0].rep2 & 0x20000) n += 100;
         if (Joy[0].rep2 & 0x10000) n -= 100;
         m = WRAP(n, 60000);
-        pCur->item.num = m;
+        pCur->item.item_num = m;
         break;
     }
     case 7: {
         int m;
-        n = pCur->linkType;
+        n = pCur->waiting_type;
         STEP(rep2, n);
         CLAMP_SET(n, m, 2);
-        pCur->linkType = m;
+        pCur->waiting_type = m;
         break;
     }
     case 8:
-        if (pCur->linkType == 1) {
+        if (pCur->waiting_type == 1) {
             int m;
-            n = pCur->linkNo;
+            n = pCur->waiting_no;
             STEP(rep2, n);
             m = WRAP(n, 0xFF);
-            pCur->linkNo = m;
+            pCur->waiting_no = m;
         }
-        if (pCur->linkType == 2) {
-            n = pCur->linkNo;
+        if (pCur->waiting_type == 2) {
+            n = pCur->waiting_no;
             STEP(rep2, n);
             if (n < 0) {
                 k = EtcModelGetLastNo();
             } else {
                 k = n > EtcModelGetLastNo() ? 0 : n;
             }
-            pCur->linkNo = k;
+            pCur->waiting_no = k;
         }
         break;
     case 9:
         if (LINKED(pCur)) {
-            if (Joy[0].rep2 & (REP_RIGHT | REP_LEFT)) pCur->item.flag2 ^= 1;
+            if (Joy[0].rep2 & (REP_RIGHT | REP_LEFT)) pCur->item.ctrl_flag ^= 1;
         }
         break;
     case 0xA:
         if (LINKED(pCur)) {
-            if (!(pCur->item.flag2 & 1)) break;
+            if (!(pCur->item.ctrl_flag & 1)) break;
         }
         if (Joy[0].trg & JOY_A) pW->step = 1;
         break;
     case 0xB:
-        if (Joy[0].rep2 & (REP_RIGHT | REP_LEFT)) pCur->item.flag2 ^= 2;
+        if (Joy[0].rep2 & (REP_RIGHT | REP_LEFT)) pCur->item.ctrl_flag ^= 2;
         break;
     case 0xC:
-        if (Joy[0].rep2 & (REP_RIGHT | REP_LEFT)) pCur->item.flag2 ^= 4;
+        if (Joy[0].rep2 & (REP_RIGHT | REP_LEFT)) pCur->item.ctrl_flag ^= 4;
         break;
     case 0xD: {
         int m;
-        n = pCur->item.effType;
+        n = pCur->item.eff_type;
         STEP(rep, n);
         CLAMP_SET(n, m, 9);
-        pCur->item.effType = m;
+        pCur->item.eff_type = m;
         break;
     }
     case 0xE:
         if (Joy[0].trg & JOY_A) pW->step = 2;
         break;
     case 0xF:
-        if (Joy[0].rep & REP_RIGHT) pCur->item.size += 100.0f;
-        if (Joy[0].rep & REP_LEFT) pCur->item.size -= 100.0f;
-        if (pCur->item.size < 0.0f) pCur->item.size = 0.0f;
+        if (Joy[0].rep & REP_RIGHT) pCur->item.radius += 100.0f;
+        if (Joy[0].rep & REP_LEFT) pCur->item.radius -= 100.0f;
+        if (pCur->item.radius < 0.0f) pCur->item.radius = 0.0f;
         break;
     case 0x10: {
-        u8 f = pCur->item.flag2;
+        u8 f = pCur->item.ctrl_flag;
         if (f & 0x10) {
             if (Joy[0].rep2 & REP_RIGHT) {
-                pCur->item.flag2 = f & ~0x10;
-                pCur->item.flag2 |= 0x40;
+                pCur->item.ctrl_flag = f & ~0x10;
+                pCur->item.ctrl_flag |= 0x40;
             }
             if (Joy[0].rep2 & REP_LEFT) {
-                pCur->item.flag2 &= ~0x10;
+                pCur->item.ctrl_flag &= ~0x10;
             }
         } else if (f & 0x40) {
             if (Joy[0].rep2 & REP_LEFT) {
-                pCur->item.flag2 = f & ~0x40;
-                pCur->item.flag2 |= 0x10;
+                pCur->item.ctrl_flag = f & ~0x40;
+                pCur->item.ctrl_flag |= 0x10;
             }
         } else {
-            if (Joy[0].rep2 & REP_RIGHT) pCur->item.flag2 = f | 0x10;
+            if (Joy[0].rep2 & REP_RIGHT) pCur->item.ctrl_flag = f | 0x10;
         }
         break;
     }
     case 0x11: {
         int m;
-        n = pCur->item.seFind;
+        n = pCur->item.se_no;
         STEP(rep2, n);
         CLAMP_SET(n, m, 0xFF);
-        pCur->item.seFind = m;
+        pCur->item.se_no = m;
         break;
     }
     case 0x12: {
         int m;
-        n = pCur->item.seDamage;
+        n = pCur->item.se_no2;
         STEP(rep2, n);
         CLAMP_SET(n, m, 0xFF);
-        pCur->item.seDamage = m;
+        pCur->item.se_no2 = m;
         break;
     }
     case 0x13:
-        if (Joy[0].rep2 & REP_RIGHT) pCur->item.flag2 |= 0x80;
-        if (Joy[0].rep2 & REP_LEFT) pCur->item.flag2 &= 0x7F;
+        if (Joy[0].rep2 & REP_RIGHT) pCur->item.ctrl_flag |= 0x80;
+        if (Joy[0].rep2 & REP_LEFT) pCur->item.ctrl_flag &= 0x7F;
         break;
     case 0x14: {
         int m;
@@ -1075,51 +1073,51 @@ static void tSceItemDataInput_item_main()
         break;
     }
     }
-    tSceItem_PointDisp(pCur->item.pos.x, pCur->item.pos.y, pCur->item.pos.z);
-    id = pCur->item.id;
+    tSceItem_PointDisp(pCur->item.item_pos.x, pCur->item.item_pos.y, pCur->item.item_pos.z);
+    id = pCur->item.item_id;
     x = pW->x + 0x80;
     y = pW->y;
     eprintf(x, y, 0, 0, "%02X %s", id, getItemIdStr(id));
     y += 0x10;
-    if (pCur->item.flagNo == 0) {
+    if (pCur->item.item_flg == 0) {
         eprintf(x, y, 0, 0, "auto");
     } else {
-        eprintf(x, y, 0, 0, "%02X", pCur->item.flagNo);
+        eprintf(x, y, 0, 0, "%02X", pCur->item.item_flg);
     }
     y += 0x10;
-    if (pCur->item.num == 0) {
+    if (pCur->item.item_num == 0) {
         eprintf(x, y, 0, 0, "default");
     } else {
-        eprintf(x, y, 0, 0, "%d", pCur->item.num);
+        eprintf(x, y, 0, 0, "%d", pCur->item.item_num);
     }
     y += 0x10;
-    eprintf(x, y, 0, 0, "%s", NAME(tSceItemWaitTypeName, pCur->linkType, 3));
+    eprintf(x, y, 0, 0, "%s", NAME(tSceItemWaitTypeName, pCur->waiting_type, 3));
     y += 0x10;
-    if (LINKED(pCur)) eprintf(x, y, 0, 0, "%d", pCur->linkNo);
+    if (LINKED(pCur)) eprintf(x, y, 0, 0, "%d", pCur->waiting_no);
     y += 0x10;
-    if (LINKED(pCur)) eprintf(x, y, 0, 0, "%s", (pCur->item.flag2 & 1) ? "OFF" : "ON");
+    if (LINKED(pCur)) eprintf(x, y, 0, 0, "%s", (pCur->item.ctrl_flag & 1) ? "OFF" : "ON");
     y += 0x20;
-    eprintf(x, y, 0, 0, "%s", (pCur->item.flag2 & 2) ? "OFF" : "ON");
+    eprintf(x, y, 0, 0, "%s", (pCur->item.ctrl_flag & 2) ? "OFF" : "ON");
     y += 0x10;
-    eprintf(x, y, 0, 0, "%s", (pCur->item.flag2 & 4) ? "OFF" : "ON");
+    eprintf(x, y, 0, 0, "%s", (pCur->item.ctrl_flag & 4) ? "OFF" : "ON");
     y += 0x10;
-    eprintf(x, y, 0, 0, "%s", NAME(tSceItemEffTypeName, pCur->item.effType, 9));
+    eprintf(x, y, 0, 0, "%s", NAME(tSceItemEffTypeName, pCur->item.eff_type, 9));
     y += 0x20;
-    eprintf(x, y, 0, 0, "%f", pCur->item.size);
+    eprintf(x, y, 0, 0, "%f", pCur->item.radius);
     y += 0x10;
-    if (pCur->item.flag2 & 0x10) {
+    if (pCur->item.ctrl_flag & 0x10) {
         eprintf(x, y, 0, 0, "SHOT & FALL");
-    } else if (pCur->item.flag2 & 0x40) {
+    } else if (pCur->item.ctrl_flag & 0x40) {
         eprintf(x, y, 0, 0, "FALL");
     } else {
         eprintf(x, y, 0, 0, "FIX");
     }
     y += 0x10;
-    eprintf(x, y, 0, 0, "%d", pCur->item.seFind);
+    eprintf(x, y, 0, 0, "%d", pCur->item.se_no);
     y += 0x10;
-    eprintf(x, y, 0, 0, "%d", pCur->item.seDamage);
+    eprintf(x, y, 0, 0, "%d", pCur->item.se_no2);
     y += 0x10;
-    eprintf(x, y, 0, 0, "%s", (pCur->item.flag2 & 0x80) ? "ON" : "OFF");
+    eprintf(x, y, 0, 0, "%s", (pCur->item.ctrl_flag & 0x80) ? "ON" : "OFF");
     y += 0x10;
     {
         // defined here: its strings follow the ones above in .rodata
@@ -1133,17 +1131,17 @@ static void tSceItemDataInput_item_main()
 // POSITION_SET: the item position / rotation edited as an eye trigger area
 static void tSceItemDataInput_item_ETedit()
 {
-    SceAtItem* it = &pCur->item;
+    SCE_AT_DATA_ITEM* it = &pCur->item;
     Vec c;
 
     switch (pW->step2) {
     case 0:
-        if (!(it->flag & 1)) {
+        if (!(it->pos_set & 1)) {
             AreaGetCenterPos(&c, &pCur->area);
-            AreaDataInit(&pW->editArea, &c, AREA_TYPE_EYE, 200.0f, 1000.0f);
-            it->flag |= 1;
+            AreaDataInit(&pW->editArea, &c, 200.0f, 1000.0f, AREA_TYPE_EYE);
+            it->pos_set |= 1;
         } else {
-            SceAtDataEyeTriggreCopy(&pW->editArea, pCur);
+            SceAtDataEyeTriggreCopy(&pW->editArea, (SCE_AT_DATA*) pCur);
         }
         pW->step2++;
     case 1:
@@ -1155,16 +1153,16 @@ static void tSceItemDataInput_item_ETedit()
         }
         AreaDataInfoDisp(&pW->editArea, pW->x, pW->y);
         AreaDataHelpDisp(&pW->editArea, (s16) (pW->x + 0xE0), (s16) (pW->y - 0x20));
-        it->pos.x = pW->editArea.eye_trigger.xz;
-        it->pos.y = pW->editArea.eye_trigger.floor;
-        it->pos.z = pW->editArea.eye_trigger.z;
-        it->rot.z = pW->editArea.eye_trigger.open_ang;
-        it->rot.x = pW->editArea.eye_trigger.ang_x;
-        it->rot.y = pW->editArea.eye_trigger.ang_y;
+        it->item_pos.x = pW->editArea.eye_trigger.xz;
+        it->item_pos.y = pW->editArea.eye_trigger.floor;
+        it->item_pos.z = pW->editArea.eye_trigger.z;
+        it->open_ang = pW->editArea.eye_trigger.open_ang;
+        it->ang_x = pW->editArea.eye_trigger.ang_x;
+        it->ang_y = pW->editArea.eye_trigger.ang_y;
         if (!((u32) it->pModel < 0x80000000 || (u32) it->pModel > 0x82FFFFFF)) {
-            if (it->rot.z > 0.0f) {
-                it->pModel->ang.x = it->rot.x;
-                it->pModel->ang.y = it->rot.y;
+            if (it->open_ang > 0.0f) {
+                it->pModel->ang.x = it->ang_x;
+                it->pModel->ang.y = it->ang_y;
             }
         }
         if (Joy[0].trg & JOY_B) {
@@ -1196,16 +1194,16 @@ static void tSceItemDataInput_item_EffPosSet()
         ToolMenuDisp_cur(pW->x, pW->y, 0, &pW->exitCursor, tSceItemEffOfsMenu, sizeof(tSceItemEffOfsMenu), &Joy[0]);
         switch (pW->exitCursor) {
         case 0:
-            if (Joy[0].rep & REP_RIGHT) pCur->item.ofs.x += 50.0f;
-            if (Joy[0].rep & REP_LEFT) pCur->item.ofs.x -= 50.0f;
+            if (Joy[0].rep & REP_RIGHT) pCur->item.eff_offset.x += 50.0f;
+            if (Joy[0].rep & REP_LEFT) pCur->item.eff_offset.x -= 50.0f;
             break;
         case 1:
-            if (Joy[0].rep & REP_RIGHT) pCur->item.ofs.y += 50.0f;
-            if (Joy[0].rep & REP_LEFT) pCur->item.ofs.y -= 50.0f;
+            if (Joy[0].rep & REP_RIGHT) pCur->item.eff_offset.y += 50.0f;
+            if (Joy[0].rep & REP_LEFT) pCur->item.eff_offset.y -= 50.0f;
             break;
         case 2:
-            if (Joy[0].rep & REP_RIGHT) pCur->item.ofs.z += 50.0f;
-            if (Joy[0].rep & REP_LEFT) pCur->item.ofs.z -= 50.0f;
+            if (Joy[0].rep & REP_RIGHT) pCur->item.eff_offset.z += 50.0f;
+            if (Joy[0].rep & REP_LEFT) pCur->item.eff_offset.z -= 50.0f;
             break;
         }
         if (Joy[0].trg & JOY_B) {
@@ -1215,11 +1213,11 @@ static void tSceItemDataInput_item_EffPosSet()
         }
         x = pW->x + 0xA0;
         y = pW->y;
-        eprintf(x, y, 0, 0, "%f", pCur->item.ofs.x);
+        eprintf(x, y, 0, 0, "%f", pCur->item.eff_offset.x);
         y += 0x10;
-        eprintf(x, y, 0, 0, "%f", pCur->item.ofs.y);
+        eprintf(x, y, 0, 0, "%f", pCur->item.eff_offset.y);
         y += 0x10;
-        eprintf(x, y, 0, 0, "%f", pCur->item.ofs.z);
+        eprintf(x, y, 0, 0, "%f", pCur->item.eff_offset.z);
         y += 0x10;
         pW->y = y;
         break;
@@ -1399,7 +1397,7 @@ static void tSceItemDataSave()
     case 2:
         tSceItemSetItemFlgAutoDataCreate();
         tSceItemSaveDataCreate();
-        size = pW->saveNum * sizeof(SceAtWork) + sizeof(TSceItemFileHead);
+        size = pW->saveNum * sizeof(SCE_AT_ITEM) + sizeof(TSceItemFileHead);
         switch (pW->saveSel) {
         case 0:
             ret = HDWrite(pW->pathX, &pW->file, size);
@@ -1480,12 +1478,12 @@ void tSceSaveXml()
     xmlP += sprintf(xmlP, "<format attrib=\"format_file=Aev_fmt.xml\">\n");
     xmlP += sprintf(xmlP, "</format>\n\n");
     for (i = 0; i < AREA_NUM; i++) {
-        if ((pW->area[i].flag & 1) == 0) continue;
+        if ((pW->area[i].be_flg & 1) == 0) continue;
         xmlP += sprintf(xmlP, "%s<data>\n", xmlTab);
         xmlTab[xmlDepth++] = '\t';
         xmlTab[xmlDepth] = 0;
         xmlP += sprintf(xmlP, "%s<id>ITEM</id>\n", xmlTab);
-        d = pW->area[i].data;
+        d = (u8*) &pW->area[i].item;
         xmlP += sprintf(xmlP, "%s<item_id>%02x</item_id>\n", xmlTab, *(u16*) (d + 0x1C));
         xmlP += sprintf(xmlP, "%s<item_flg>%02x</item_flg>\n", xmlTab, *(u16*) (d + 0x1E));
         xmlP += sprintf(xmlP, "%s<item_num>%02x</item_num>\n", xmlTab, *(u16*) (d + 0x20));
@@ -1508,14 +1506,14 @@ void tSceItemSaveDataCreate()
 
     pW->saveNum = 0;
     for (i = 0; i < AREA_NUM; i++) {
-        if (pW->area[i].flag & 1) {
+        if (pW->area[i].be_flg & 1) {
             pW->area[i].no = i;
-            pW->area[i].func = NULL;
-            pW->area[i].arg = 0;
-            pW->area[i].prioBak = 0;
+            pW->area[i].pFunc = NULL;
+            pW->area[i].pParam = 0;
+            pW->area[i].trg_type_bak = 0;
             pW->area[i].pParent = NULL;
             pW->area[i].item.pModel = NULL;
-            pW->area[i].item.effNo = 0;
+            pW->area[i].item.eff_setno = 0;
             pW->file.work[pW->saveNum] = pW->area[i];
             pW->saveNum++;
         }
@@ -1560,22 +1558,22 @@ int tSceItemSetItemFlgAuto_ck(u32 no)
 void tSceItemSetItemFlgAutoDataCreate()
 {
     u32 i;
-    SceAtWork* tbl = pW->area;
-    SceAtItem* it;
+    SCE_AT_ITEM* tbl = pW->area;
+    SCE_AT_DATA_ITEM* it;
 
     memclr_asm(pW->flgAuto, sizeof(pW->flgAuto));
     for (i = 0; i < AREA_NUM; i++) {
         it = &tbl[i].item;
-        if ((tbl[i].flag & 1) == 0) continue;
-        if (tbl[i].type != 3) continue;
-        if (it->flagNo == 0) {
-            if (tSceItemSetItemFlgAuto_ck(it->findFlagNo)) {
-                it->findFlagNo = tSceItemSetItemFlgAuto_on();
+        if ((tbl[i].be_flg & 1) == 0) continue;
+        if (tbl[i].id != 3) continue;
+        if (it->item_flg == 0) {
+            if (tSceItemSetItemFlgAuto_ck(it->auto_item_flg)) {
+                it->auto_item_flg = tSceItemSetItemFlgAuto_on();
             } else {
-                FlagOnVar(pW->flgAuto, it->findFlagNo);
+                FlagOnVar(pW->flgAuto, it->auto_item_flg);
             }
         } else {
-            it->findFlagNo = 0;
+            it->auto_item_flg = 0;
         }
     }
 }
@@ -1601,9 +1599,9 @@ static void tSceItemPreview()
 // Un-pauses the player / HUD for the preview.
 static void tSceItemPreview_init()
 {
-    pG->Stop_flg &= ~0x10000000;
-    pG->Disp_flg &= ~0x40000000;
-    pG->Disp_flg &= ~0x80000000;
+    SpfFlagOff(pG, SPF_PL);
+    DpfFlagOff(pG, DPF_PL);
+    DpfFlagOff(pG, DPF_EM);
     DbgFlagOff(pG, DBG_DBG_CAM);
     pW->sub = 1;
     pW->step = 0;
@@ -1645,7 +1643,7 @@ void tSceItemPreview_pl_pos()
     hit = 0;
     hitFront = 0;
     for (i = 0; i < pW->head.num; i++) {
-        if (pW->area[i].flag & 1) {
+        if (pW->area[i].be_flg & 1) {
             if (AreaHitCheck(&pW->area[i].area, &pos) == 1) hit = 1;
             if (AreaHitCheck(&pW->area[i].area, &front) == 1) hitFront = 1;
         }
@@ -1669,15 +1667,15 @@ void tSceItemPreview_pl_pos()
 // Restores the tool flags, back to the main menu.
 static void tSceItemPreview_exit()
 {
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x8000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_ESP);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
     DbgFlagOn(pG, DBG_DBG_CAM);
     MODE_RESET();
 }

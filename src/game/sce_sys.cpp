@@ -138,19 +138,19 @@ void ScenarioMove()
 }
 
 // Iteration start over the scenario tasks (ordering table head).
-u32* scenarioSetOtStart()
+SCE_TASK* scenarioSetOtStart()
 {
-    return &SceSys.SceTaskOt[15];
+    return (SCE_TASK*) &SceSys.SceTaskOt[15];
 }
 
 // Next SCE_TASK in the task ordering table after `p`; 0 at the end.
-u32* scenarioGetOtAddr(u32* pSceOt)
+SCE_TASK* scenarioGetOtAddr(SCE_TASK* pSceOt)
 {
-    u32 v;
+    u32 tag;
 
-    while ((v = *pSceOt) != 0xFFFFFFFF) {
-        pSceOt = (u32*) (v | 0x80000000);
-        if ((s32) v < 0) {
+    while ((tag = pSceOt->tag) != 0xFFFFFFFF) {
+        pSceOt = (SCE_TASK*) (tag | 0x80000000);
+        if ((s32) tag < 0) {
             return pSceOt;
         }
     }
@@ -160,9 +160,9 @@ u32* scenarioGetOtAddr(u32* pSceOt)
 // Unlinks the SCE_TASK of task `t` from the ordering table (and drops its event-cancel role).
 void SceTaskDelete(TASK* t)
 {
-    SCE_TASK* p = (SCE_TASK*) scenarioSetOtStart();
+    SCE_TASK* p = scenarioSetOtStart();
 
-    while ((p = (SCE_TASK*) scenarioGetOtAddr((u32*) p)) != 0) {
+    while ((p = scenarioGetOtAddr(p)) != 0) {
         if (p->getTaskPtr() == t) {
             DelPrim(&SceSys.SceTaskOt[15], (u32*) p);
             if (p->cancel_flag == 1) {
@@ -199,8 +199,8 @@ void cSceSys::scheduler()
             prim[i].exec_flag = 1;
         }
     }
-    p = (SCE_TASK*) scenarioSetOtStart();
-    while ((p = (SCE_TASK*) scenarioGetOtAddr((u32*) p)) != 0) {
+    p = scenarioSetOtStart();
+    while ((p = scenarioGetOtAddr(p)) != 0) {
         if (SpfFlagChk(pG, SPF_SCE)) {
             break;
         }
@@ -237,7 +237,7 @@ void cSceSys::scheduler()
             p->exec_flag = 0;
             setDrawDone(0);
         }
-        p = (SCE_TASK*) scenarioSetOtStart();
+        p = scenarioSetOtStart();
     }
     pParentThread = parent;
     pCTask = ctask;
@@ -247,7 +247,7 @@ void cSceSys::scheduler()
 // > 17 = the highest free slot. Linked into ordering slot otPrio (SCE_PRIO_*), OS priority 0xE,
 // `model` as the task's model; `flag` (0 = inherit the caller's event kind). Warns when fewer
 // than 3 slots remain. Returns the SCE_TASK, 0 when none is free.
-SCE_TASK* SceExec(int prio, TaskFunc func, int arg, u8 flag, int otPrio, void* model)
+SCE_TASK* SceExec(int prio, TaskFunc func, void* arg, u8 flag, int otPrio, void* model)
 {
     TASK* t;
     SCE_TASK* p;
@@ -257,7 +257,7 @@ SCE_TASK* SceExec(int prio, TaskFunc func, int arg, u8 flag, int otPrio, void* m
 
     if (prio == 0) {
         SetTaskModelPtr(model, 0);
-        ((void (*)(int)) func)(arg);
+        ((void (*)(int)) func)((int) arg);
         return 0;
     }
     if ((u32) prio > 17) {
@@ -281,7 +281,7 @@ SCE_TASK* SceExec(int prio, TaskFunc func, int arg, u8 flag, int otPrio, void* m
         pLog->err(0, 0, "SCE_TASK DON'T EXEC");
         return 0;
     }
-    t = TaskExec(prio, func, arg);
+    t = TaskExec(prio, func, (void*) arg);
     if (t == 0) {
         return 0;
     }
@@ -353,9 +353,9 @@ void SceKill(TASK* t)
 // Kills every scenario task running `func`.
 void SceKill(void (*func)(int))
 {
-    SCE_TASK* p = (SCE_TASK*) scenarioSetOtStart();
+    SCE_TASK* p = scenarioSetOtStart();
 
-    while ((p = (SCE_TASK*) scenarioGetOtAddr((u32*) p)) != 0) {
+    while ((p = scenarioGetOtAddr(p)) != 0) {
         if (p->getTaskPtr()->pFunc == func) {
             SceKill(p->getTaskPtr());
         }
@@ -389,16 +389,16 @@ void SceExecInitCondition()
 // Is the condition met? type 0 enemy list entry dead (Em_flg bit), 1 camera area == param, 2
 // enemy `param` dead and in its die routine, 3 callback returns 1, 4 etc model `param` broken, 5
 // item area `param` taken.
-int SceExecCheckCondition_sub(SceCond* pP)
+int SceExecCheckCondition_sub(SCE_EXEC_PRIM* pP)
 {
     cEm* em;
     u32* row;
     u32 no;
     u32 bit;
 
-    switch (pP->type) {
+    switch (pP->cond) {
     case 0:
-        no = (u32) pP->param;
+        no = (u32) pP->value;
         if (pG->em_list_no >= 0) {
             // Row address as integer arithmetic (index first, the list offset added last), like sce_at.
             bit = *(u32*) (((no >> 5) << 2) + emDeadRow(pG->em_list_no)) & (0x80000000 >> (no & 31));
@@ -410,29 +410,29 @@ int SceExecCheckCondition_sub(SceCond* pP)
         }
         break;
     case 1:
-        if (CamCtrl.CurrentAreaNo() == (int) pP->param) {
+        if (CamCtrl.CurrentAreaNo() == (int) pP->value) {
             return 1;
         }
         break;
     case 2:
-        em = (cEm*) pP->param;
+        em = (cEm*) pP->value;
         // Raw (non-struct) read: keeps the load behind the store of `em` to its stack slot.
         if (*(s16*) ((u32) em + 0x320) <= 0 && em->r_no_0 == 3) {
             return 1;
         }
         break;
     case 3:
-        if (((int (*)()) pP->param)() == 1) {
+        if (((int (*)()) pP->value)() == 1) {
             return 1;
         }
         break;
     case 4:
-        if (getRoomEtcBreak((int) pP->param, &em, 1) == 1 && em->hp <= 0) {
+        if (getRoomEtcBreak((int) pP->value, &em, 1) == 1 && em->hp <= 0) {
             return 1;
         }
         break;
     case 5:
-        if (SceAtPtr((int) pP->param) != 0 && SceAtItemFlgCk((int) pP->param) == 1) {
+        if (SceAtPtr((int) pP->value) != 0 && SceAtItemFlgCk((int) pP->value) == 1) {
             return 1;
         }
         break;
@@ -444,23 +444,23 @@ int SceExecCheckCondition_sub(SceCond* pP)
 void SceExecCheckCondition()
 {
     u32 v = SceExecOt;
-    SceCond* c;
+    SCE_EXEC_PRIM* c;
 
     if (v == 0xFFFFFFFF) {
         return;
     }
     do {
-        c = (SceCond*) (v | 0x80000000);
+        c = (SCE_EXEC_PRIM*) (v | 0x80000000);
         if ((s32) v < 0) {
             if (SceExecCheckCondition_sub(c) == 1) {
                 if (c->func != 0) {
-                    SceExec(c->prio, c->func, (int) c->arg, c->flag, SCE_PRIO_DEF_2, 0);
+                    SceExec(c->level, c->func, c->param, c->kind, SCE_PRIO_DEF_2, 0);
                 }
                 DelPrim(&SceExecOt, (u32*) c);
                 Mem_free(c);
             }
         }
-        v = c->next;
+        v = c->tag;
     } while (v != 0xFFFFFFFF);
 }
 
@@ -468,14 +468,14 @@ void SceExecCheckCondition()
 void SceExecLinkCondition(int type, void* param, u8 prio, TaskFunc func, void* arg, u8 flag)
 {
 #line 608
-    SceCond* c = (SceCond*) MEM_ALLOC(sizeof(SceCond), 1, 13);
+    SCE_EXEC_PRIM* c = (SCE_EXEC_PRIM*) MEM_ALLOC(sizeof(SCE_EXEC_PRIM), 1, 13);
 
-    c->type = type;
-    c->param = param;
-    c->prio = prio;
+    c->cond = type;
+    c->value = param;
+    c->level = prio;
     c->func = func;
-    c->arg = arg;
-    c->flag = flag;
+    c->param = arg;
+    c->kind = flag;
     AddPrim(&SceExecOt, (u32*) c);
 }
 
@@ -540,7 +540,7 @@ void SceExecEventCancel()
 
 // Event script: makes the calling task skippable (`on`): `func(arg)` runs after a skip, event flag
 // `flagNo` (cleared now) is set by the skip, sndFlag = stop the event stream too.
-void SceSetEventCancel(int on, TaskFunc func, int arg, int flagNo, int sndFlag)
+void SceSetEventCancel(int on, TaskFunc func, void* arg, int flagNo, int sndFlag)
 {
     u32 no;
     cSceSys* s;

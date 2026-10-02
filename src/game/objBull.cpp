@@ -22,7 +22,6 @@
 #include "motion.h"
 #include "em_sub.h"
 
-extern "C" {
 void objBull_R0_Set(cObjBull* obj);
 void objBull_R0_Break1st(cObjBull* obj);
 void objBull_R0_To2nd(cObjBull* obj);
@@ -51,7 +50,6 @@ void Sub_bull_lookback(cEm* em);
 void Sub_bull_look(cEm* em);
 void Sub_dm_bull(cEm* em);
 int SubCkNearEm();
-}
 
 void (*ObjBull_R0_move_tbl[12])(cObjBull*) = {
     objBull_R0_Set,      objBull_R0_Break1st, objBull_R0_To2nd, objBull_R0_Break2nd,
@@ -345,8 +343,8 @@ void objBull_R0_LiftWait(cObjBull* pObj)
         zero = 0;
         if (pG->Room_flg[0] & 0x08000000) {  // RMF_LIFT_START (r30f)
             pObj->r_no_0 = 6;
-            pObj->r_no_1 = zero;
-            pObj->r_no_2 = zero;
+            pObj->r_no_1 = 0;
+            pObj->r_no_2 = 0;
             pObj->r_no_3 = zero;
         }
         break;
@@ -391,8 +389,8 @@ void objBull_R0_Lift(cObjBull* pObj)
         zero = 0;
         if (pG->Room_flg[0] & 0x00400000) {  // RMF_LIFT_END (r30f)
             pObj->r_no_0 = 7;
-            pObj->r_no_1 = zero;
-            pObj->r_no_2 = zero;
+            pObj->r_no_1 = 0;
+            pObj->r_no_2 = 0;
             pObj->r_no_3 = zero;
         }
         break;
@@ -812,8 +810,8 @@ void objBullSetAdjust(cObjBull* pObj, cEm* pEm)
     pEm->setPos(&v);
     if (pEm->id == 0) {
         if (CamCtrl.m_pExtraCamera) {
-            PSVECAdd(&CamCtrl.m_pExtraCamera->param.at, &d, &CamCtrl.m_pExtraCamera->param.at);
-            PSVECAdd(&CamCtrl.m_pExtraCamera->param.pos, &d, &CamCtrl.m_pExtraCamera->param.pos);
+            PSVECAdd(&CamCtrl.m_pExtraCamera->param.Target, &d, &CamCtrl.m_pExtraCamera->param.Target);
+            PSVECAdd(&CamCtrl.m_pExtraCamera->param.Campos, &d, &CamCtrl.m_pExtraCamera->param.Campos);
         }
         pG->quake_ofs = d;
     }

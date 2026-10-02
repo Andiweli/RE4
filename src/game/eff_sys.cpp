@@ -37,22 +37,21 @@ struct EffEfmEnt {
     u32 ofsMot;        // 0x0C 0 = none
     u32 ofsX;          // 0x10 0 = none
 };
-struct EffData {
-    u32 version;       // 0x00 == 0xB
-    u32 ofsTexId;      // 0x04 EffIdTbl of texture ids
-    u32 ofsEstList;    // 0x08
-    u32 ofsSstList;    // 0x0C
-    u32 ofsPathList;   // 0x10
-    u32 ofsEfmId;      // 0x14 EffIdTbl of effect model ids
-    u32 ofsTpl;        // 0x18 EffOfsTbl of TPLs
-    u32 ofsAnm;        // 0x1C EffOfsTbl of texture animations
-    u32 ofsEstData;    // 0x20
-    u32 ofsSstData;    // 0x24
-    u32 ofsPathData;   // 0x28
-    u32 ofsEfm;        // 0x2C EffOfsTbl of EffEfmEnt
+struct ESP_EFF_HEADER {
+    u32 Num;       // 0x00 == 0xB
+    u32 Tpl_id_tbl_offset;      // 0x04 EffIdTbl of texture ids
+    u32 Est_id_tbl_offset;    // 0x08
+    u32 Sst_id_tbl_offset;    // 0x0C
+    u32 Path_id_tbl_offset;   // 0x10
+    u32 Obj_id_tbl_offset;      // 0x14 EffIdTbl of effect model ids
+    u32 Tpl_offset;        // 0x18 EffOfsTbl of TPLs
+    u32 Anm_offset;        // 0x1C EffOfsTbl of texture animations
+    u32 Est_offset;    // 0x20
+    u32 Sst_offset;    // 0x24
+    u32 Path_offset;   // 0x28
+    u32 Obj_offset;        // 0x2C EffOfsTbl of EffEfmEnt
 };
 
-extern "C" {
 
 void EspInit();
 void EspRoomInit();
@@ -86,7 +85,6 @@ u8 EffGetToolState();
 void EffClearToolState();
 void EffSetToolStateCallBack(int no, void (*on)(), void (*off)());
 void EffCallToolStateCallBack();
-}
 void RoomEfmRegist(cModel* m, u8 id);
 void RoomEfmRegist(void* model, void* tpl, u8 id);
 
@@ -331,7 +329,7 @@ done:
 // 0 on a NULL / wrong-version file.
 int EspDataLoad(u32 eff_addr, u32 owner, int MultipleOK)
 {
-    EffData* data = (EffData*) eff_addr;
+    ESP_EFF_HEADER* data = (ESP_EFF_HEADER*) eff_addr;
     cEspSystem* sys = g_pEspSys;
     EffIdTbl* ids;
     EffOfsTbl* tpls;
@@ -355,28 +353,28 @@ int EspDataLoad(u32 eff_addr, u32 owner, int MultipleOK)
         OWNER_ERR2(owner, "EspDataLoad():[%s] data already regist.", "EspDataLoad():[%x] data already regist.", data);
         return 0;
     }
-    if (data->version != 0xB) {
+    if (data->Num != 0xB) {
         OWNER_ERR2(owner, "EspDataLoad():EffData [%s:0x%x] Invalid.", "EspDataLoad():EffData [%x:0x%x] Invalid.",
                    data);
         return 0;
     }
-    ids = (EffIdTbl*) ((u8*) data + data->ofsTexId);
-    tpls = (EffOfsTbl*) ((u8*) data + data->ofsTpl);
-    anms = (EffOfsTbl*) ((u8*) data + data->ofsAnm);
+    ids = (EffIdTbl*) ((u8*) data + data->Tpl_id_tbl_offset);
+    tpls = (EffOfsTbl*) ((u8*) data + data->Tpl_offset);
+    anms = (EffOfsTbl*) ((u8*) data + data->Anm_offset);
     for (i = 0; i < ids->num; i++) {
         TEXPalette* tpl = (TEXPalette*) ((u8*) tpls + tpls->ofs[i]);
         cAnm* anm = (cAnm*) ((u8*) anms + anms->ofs[i]);
         u16 id = ids->ent[i].id;
         espTexRegist(tpl, anm, id, owner);
     }
-    list = (u8*) data + data->ofsEstList;
-    estRegist((u8*) data + data->ofsEstData, list, owner);
-    list = (u8*) data + data->ofsSstList;
-    sstRegist((u8*) data + data->ofsSstData, list, owner);
-    list = (u8*) data + data->ofsPathList;
-    pathRegist((u8*) data + data->ofsPathData, list, owner);
-    efmIds = (EffIdTbl*) ((u8*) data + data->ofsEfmId);
-    efms = (EffOfsTbl*) ((u8*) data + data->ofsEfm);
+    list = (u8*) data + data->Est_id_tbl_offset;
+    estRegist((u8*) data + data->Est_offset, list, owner);
+    list = (u8*) data + data->Sst_id_tbl_offset;
+    sstRegist((u8*) data + data->Sst_offset, list, owner);
+    list = (u8*) data + data->Path_id_tbl_offset;
+    pathRegist((u8*) data + data->Path_offset, list, owner);
+    efmIds = (EffIdTbl*) ((u8*) data + data->Obj_id_tbl_offset);
+    efms = (EffOfsTbl*) ((u8*) data + data->Obj_offset);
     for (i = 0; i < efmIds->num; i++) {
         EffEfmEnt* e = (EffEfmEnt*) ((u8*) efms + efms->ofs[i]);
         void* model = (u8*) e + e->ofsModel;
@@ -1098,7 +1096,7 @@ void EffClearToolState()
     g_pEspSys->ToolState = 0;
 }
 
-extern "C" void EffSetToolStateCallBack(int no, void (*on)(), void (*off)())
+void EffSetToolStateCallBack(int no, void (*on)(), void (*off)())
 {
     cEspSystem* sys = g_pEspSys;
 

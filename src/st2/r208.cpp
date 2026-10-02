@@ -92,7 +92,6 @@ static const AtEffInfo r208_eff_info5 = {
     1, {1, 0x12}, {1, 0x15}, {1, 0x14}, {1, 0x13}, {1, 0x10}, {1, 0x10}, {1, 0x11}, {1, 0x15},
 };
 
-extern "C" {
 // Also defined in r222.cpp (same module): static so the two objects do not clash in the -r link.
 static void setResetNum(int n);
 static u32 getResetNum();
@@ -111,7 +110,6 @@ void addUnderEmCnt();
 void r208_CarryOnShoulder();
 void r208_StrCheck();
 void r208_continue();
-}
 static void em_all_destroy_task();
 static void funcAshley(cEm* p);
 static void funcAshley2(cEm* p);
@@ -556,13 +554,13 @@ void R208Main()
         Vec pos;
         cSat* sat;
 
-        sat = SceAtPtr(0x1B)->scr.pSat;
+        sat = SceAtPtr(0x1B)->scr_at.pSat;
         pos.x = -5700.79f;
         pos.y = 124.796f;
         pos.z = -67214.7f;
         pos.y -= W->doorB;
         sat->setCoord(&pos, (Vec*) &vecZero);
-        sat = SceAtPtr(0x1C)->scr.pSat;
+        sat = SceAtPtr(0x1C)->scr_at.pSat;
         pos.x = 3425.79f;
         pos.y = 124.796f;
         pos.z = -67283.7f;
@@ -580,7 +578,7 @@ void R208Main()
 }
 
 // The alive Ganado farthest from the player within `range` (NULL when there are less than two).
-extern "C" cEm* getMostFarEm(f32 range)
+cEm* getMostFarEm(f32 range)
 {
     f32 best = 0.0f;
     cEm* far = NULL;
@@ -839,7 +837,7 @@ static void asl_yubisasi()
 }
 
 // The water surface: a render target blended into the water object.
-extern "C" void setTexRender()
+void setTexRender()
 {
     cObj* obj;
     u8* tbl = r208_texTbl;
@@ -957,7 +955,7 @@ static void atari_exec_D()
 }
 
 // Group A: the two list events and up to five more Ganado depending on how many are alive.
-extern "C" void emGroupeA_reset()
+void emGroupeA_reset()
 {
     u32 alive;
 
@@ -986,7 +984,7 @@ extern "C" void emGroupeA_reset()
 }
 
 // Group B1: only marks Room_flg bit 2 (its spawns were removed from this build).
-extern "C" void emGroupeB1_reset()
+void emGroupeB1_reset()
 {
     if (RsfCheck(G_ROOM_ID, 2)) {
         return;
@@ -995,7 +993,7 @@ extern "C" void emGroupeB1_reset()
 }
 
 // Group B2: only marks Room_flg bit 2 (same as B1).
-extern "C" void emGroupeB2_reset()
+void emGroupeB2_reset()
 {
     if (RsfCheck(G_ROOM_ID, 2)) {
         return;
@@ -1004,7 +1002,7 @@ extern "C" void emGroupeB2_reset()
 }
 
 // Group C once (Room_flg bit 3): five Ganados 0xAA..0xAE (list 2).
-extern "C" void emGroupeC_reset()
+void emGroupeC_reset()
 {
     if (RsfCheck(G_ROOM_ID, 3)) {
         return;
@@ -1018,7 +1016,7 @@ extern "C" void emGroupeC_reset()
 }
 
 // Group D: the four Ganado behind the gates, with the camera cut on the gates opening.
-extern "C" void emGroupeD_reset()
+void emGroupeD_reset()
 {
     cEmBarred* b0;
     cEmBarred* b1;
@@ -1333,7 +1331,7 @@ static void r208_operateCrank()
 }
 
 // Sets the handle's list entry when less than twelve enemies are alive.
-extern "C" cEm* R208_setEm(s16 no)
+cEm* R208_setEm(s16 no)
 {
     u32 alive = SceCountEmAlive(0x10, 0x20);
 
@@ -1345,7 +1343,7 @@ extern "C" cEm* R208_setEm(s16 no)
 }
 
 // EmSetEvent only while enemy list 2 (the courtyard list) is the loaded one.
-extern "C" cEm* R208_EmSetEvent(EM_LIST* d)
+cEm* R208_EmSetEvent(EM_LIST* d)
 {
     if (pG->em_list_no == 2) {
         return EmSetEvent(d);
@@ -1354,7 +1352,7 @@ extern "C" cEm* R208_EmSetEvent(EM_LIST* d)
 }
 
 // Number of the enemies below the footings still active.
-extern "C" u32 getUnderEmNum()
+u32 getUnderEmNum()
 {
     u32 n = 0;
     u32 i;
@@ -1368,7 +1366,7 @@ extern "C" u32 getUnderEmNum()
 }
 
 // One more under[] slot in use.
-extern "C" void addUnderEmCnt()
+void addUnderEmCnt()
 {
     W->underCnt++;
 }
@@ -1543,7 +1541,7 @@ static void r208_snipe()
 }
 
 // The player lifts Ashley onto the wall (camera event, side by the player's x).
-extern "C" void r208_CarryOnShoulder()
+void r208_CarryOnShoulder()
 {
     Vec a;
     Vec b;
@@ -1616,7 +1614,7 @@ extern "C" void r208_CarryOnShoulder()
 }
 
 // Battle stream on while a Ganado has found the player or the bridge is down.
-extern "C" void r208_StrCheck()
+void r208_StrCheck()
 {
     if (SceCkFindPL(0) == 1 || (pG->Room_flg[0] & 0x10000000)) {
         if (RsfCheck(G_ROOM_ID, 13)) {
@@ -1776,7 +1774,7 @@ static void SubUnderCrankExec()
 }
 
 // Continue point (Room_flg bit 12): autosave.
-extern "C" void r208_continue()
+void r208_continue()
 {
     RsfSet(G_ROOM_ID, 12);
     GameSave.save(pSaveData, -1);

@@ -50,9 +50,9 @@ inline void cDataUnit::setName(char* s)
 // Queues a command (1 load to MRAM, 2 load to ARAM, 3 clear, 4 delete) with the destination
 // address `arg` (0 = allocate) and the synchronous flag `wait`; executed at once unless the
 // controller holds commands back (m_nblock_read_stop).
-void cDataUnit::setCommand(int cmd, u32 arg, u8 wait)
+void cDataUnit::setCommand(int cmd, void* arg, u8 wait)
 {
-    m_command = cmd;
+    m_command = (DATA_COMMAND) cmd;
     this->m_arg_addr = arg;
     this->m_mode = wait;
     if (wait != 0 || DC.checkNBlkStop() != 1) {
@@ -69,7 +69,7 @@ int cDataUnit::getCommand()
 // Sets the unit state (see the condition codes in datactrl.h).
 void cDataUnit::setCondition(int c)
 {
-    m_condition = c;
+    m_condition = (DATA_CONDITION) c;
 }
 
 // The unit state: 0 none, 1 / 2 MRAM loading / ok, 3 / 4 ARAM loading / ok, 5..8 transfers.
@@ -111,7 +111,7 @@ void cDataUnit::setMallocInfo(int set, void* malloc_addr)
 }
 
 // Pins the MRAM destination: loads go to `a` instead of allocating.
-void cDataUnit::fixMramAddr(u32 a)
+void cDataUnit::fixMramAddr(void* a)
 {
     m_fix_addr = a;
 }
@@ -119,7 +119,7 @@ void cDataUnit::fixMramAddr(u32 a)
 // 1 when the data is in MRAM and usable (condition 2); 0 while idle or elsewhere.
 int cDataUnit::isUseOk()
 {
-    if (m_condition == COND_NO_DATA && m_command == 0) {
+    if (m_condition == COND_NO_DATA && m_command == CMND_NONE) {
         setErr(5);
         return 0;
     }
@@ -129,7 +129,7 @@ int cDataUnit::isUseOk()
 // Blocks (TaskSleep) until the data is in MRAM; 0 when the unit is idle or the wait failed.
 int cDataUnit::waitUseOk()
 {
-    if (m_condition == COND_NO_DATA && m_command == 0) {
+    if (m_condition == COND_NO_DATA && m_command == CMND_NONE) {
         setErr(5);
         return 0;
     }
@@ -149,7 +149,7 @@ int cDataUnit::waitUseOk()
 // 1 when the data is resident in MRAM or ARAM (condition 2 or 4).
 int cDataUnit::isLoadOk()
 {
-    if (m_condition == COND_NO_DATA && m_command == 0) {
+    if (m_condition == COND_NO_DATA && m_command == CMND_NONE) {
         setErr(5);
         return 0;
     }
@@ -162,7 +162,7 @@ int cDataUnit::isLoadOk()
 // Blocks until the data is resident somewhere.
 int cDataUnit::waitLoadOk()
 {
-    if (m_condition == COND_NO_DATA && m_command == 0) {
+    if (m_condition == COND_NO_DATA && m_command == CMND_NONE) {
         setErr(5);
         return 0;
     }
@@ -196,16 +196,16 @@ void cDataUnit::setLoadToMram()
         if (m_fix_addr == 0) {
             if (m_arg_addr == 0) {
                 if (DC.checkUseDebugMemFlag() == 1) {
-                    m_dest_addr = (u32) Debug_alloc(m_size, 1);
+                    m_dest_addr = Debug_alloc(m_size, 1);
                 } else {
 #line 200 "D:/Bio4/Prog/datactrl.cpp"
-                    m_dest_addr = (u32) MEM_ALLOC(m_size, 1, 0xD);
+                    m_dest_addr = MEM_ALLOC(m_size, 1, 0xD);
                 }
                 if (m_dest_addr == 0) {
                     setErr(1);
                     return;
                 }
-                setMallocInfo(1, (void*) m_dest_addr);
+                setMallocInfo(1, m_dest_addr);
             } else {
                 m_dest_addr = m_arg_addr;
                 setMallocInfo(0, NULL);
@@ -215,14 +215,14 @@ void cDataUnit::setLoadToMram()
             setMallocInfo(0, NULL);
         }
 #line 222 "D:/Bio4/Prog/datactrl.cpp"
-        no = DvdReadN(m_name, (void*) m_dest_addr, 0, 0, 0, m_mode | 0x10, __FILE__, __LINE__);
+        no = DvdReadN(m_name, m_dest_addr, 0, 0, 0, m_mode | 0x10, __FILE__, __LINE__);
         if (pG->IsDevConsole == 1) {
 #line 226 "D:/Bio4/Prog/datactrl.cpp"
             DC.setDummyId(DvdReadN("dummy.dat", DC.m_DummyDataMem, 0, 0, 0, m_mode | 0x10, __FILE__, __LINE__));
         }
         m_id = no;
         if (no >= 0) {
-            m_command = 0;
+            m_command = CMND_NONE;
             m_condition = COND_MRAM_LOAD;
             if (m_mode == 1) {
                 checkLoadToMram();
@@ -236,35 +236,35 @@ void cDataUnit::setLoadToMram()
         break;
     case COND_MRAM_OK:
         if (m_fix_addr == 0) {
-            if (m_arg_addr != 0 && m_arg_addr != (u32) m_addr) {
+            if (m_arg_addr != 0 && m_arg_addr != m_addr) {
                 checkMallocRelease();
-                memcpy((void*) m_arg_addr, m_addr, m_size);
-                m_addr = (void*) m_arg_addr;
-                DCFlushRange((void*) m_arg_addr, m_size);
+                memcpy(m_arg_addr, m_addr, m_size);
+                m_addr = m_arg_addr;
+                DCFlushRange(m_arg_addr, m_size);
             }
-        } else if (m_fix_addr != (u32) m_addr) {
+        } else if (m_fix_addr != m_addr) {
             checkMallocRelease();
-            memcpy((void*) m_fix_addr, m_addr, m_size);
-            m_addr = (void*) m_fix_addr;
-            DCFlushRange((void*) m_arg_addr, m_size);
+            memcpy(m_fix_addr, m_addr, m_size);
+            m_addr = m_fix_addr;
+            DCFlushRange(m_arg_addr, m_size);
         }
-        m_command = 0;
+        m_command = CMND_NONE;
         OSReport("DC:%s set MRAM_TO_MRAM\n", m_name);
         break;
     case COND_ARAM_OK:
         if (m_fix_addr == 0) {
             if (m_arg_addr == 0) {
                 if (DC.checkUseDebugMemFlag() == 1) {
-                    m_dest_addr = (u32) Debug_alloc(m_size, 1);
+                    m_dest_addr = Debug_alloc(m_size, 1);
                 } else {
 #line 290 "D:/Bio4/Prog/datactrl.cpp"
-                    m_dest_addr = (u32) MEM_ALLOC(m_size, 1, 0xD);
+                    m_dest_addr = MEM_ALLOC(m_size, 1, 0xD);
                 }
                 if (m_dest_addr == 0) {
                     setErr(1);
                     return;
                 }
-                setMallocInfo(1, (void*) m_dest_addr);
+                setMallocInfo(1, m_dest_addr);
             } else {
                 m_dest_addr = m_arg_addr;
                 setMallocInfo(0, NULL);
@@ -273,10 +273,10 @@ void cDataUnit::setLoadToMram()
             m_dest_addr = m_fix_addr;
             setMallocInfo(0, NULL);
         }
-        no = Aram.DmaTransReq(1, (u32) m_addr, m_dest_addr, m_size, m_mode);
+        no = Aram.DmaTransReq(1, (u32) m_addr, (u32) m_dest_addr, m_size, m_mode);
         m_id = no;
         if (no >= 0) {
-            m_command = 0;
+            m_command = CMND_NONE;
             m_condition = COND_ARAM_TO_MRAM;
             if (m_mode == 1) {
                 checkAramToMram();
@@ -308,7 +308,7 @@ void cDataUnit::setLoadToAram()
         break;
     case COND_NO_DATA:
         if (m_arg_addr == 0) {
-            m_dest_addr = DC.getAramFree(m_size);
+            m_dest_addr = (void*) DC.getAramFree(m_size);
             if (m_dest_addr == 0) {
                 setErr(4);
                 pLog->err(0, 0, "ARAM over: %s", m_name);
@@ -318,14 +318,14 @@ void cDataUnit::setLoadToAram()
             m_dest_addr = m_arg_addr;
         }
 #line 366 "D:/Bio4/Prog/datactrl.cpp"
-        no = DvdReadN(m_name, NULL, m_dest_addr, 0, 0, m_mode | 0x8, __FILE__, __LINE__);
+        no = DvdReadN(m_name, NULL, (int) m_dest_addr, 0, 0, m_mode | 0x8, __FILE__, __LINE__);
         if (pG->IsDevConsole == 1) {
 #line 370 "D:/Bio4/Prog/datactrl.cpp"
             DC.setDummyId(DvdReadN("dummy.dat", DC.m_DummyDataMem, 0, 0, 0, m_mode | 0x10, __FILE__, __LINE__));
         }
         m_id = no;
         if (no >= 0) {
-            m_command = 0;
+            m_command = CMND_NONE;
             m_condition = COND_ARAM_LOAD;
             if (m_mode == 1) {
                 checkLoadToAram();
@@ -339,7 +339,7 @@ void cDataUnit::setLoadToAram()
         break;
     case COND_MRAM_OK:
         if (m_arg_addr == 0) {
-            m_dest_addr = DC.getAramFree(m_size);
+            m_dest_addr = (void*) DC.getAramFree(m_size);
             if (m_dest_addr == 0) {
                 setErr(4);
                 pLog->err(0, 0, "ARAM over: %s", m_name);
@@ -348,10 +348,10 @@ void cDataUnit::setLoadToAram()
         } else {
             m_dest_addr = m_arg_addr;
         }
-        no = Aram.DmaTransReq(0, (u32) m_addr, m_dest_addr, m_size, m_mode);
+        no = Aram.DmaTransReq(0, (u32) m_addr, (u32) m_dest_addr, m_size, m_mode);
         m_id = no;
         if (no >= 0) {
-            m_command = 0;
+            m_command = CMND_NONE;
             m_condition = COND_MRAM_TO_ARAM;
             if (m_mode == 1) {
                 checkMramToAram();
@@ -364,19 +364,19 @@ void cDataUnit::setLoadToAram()
         }
         break;
     case COND_ARAM_OK:
-        if (m_arg_addr != 0 && m_arg_addr != (u32) m_addr) {
+        if (m_arg_addr != 0 && m_arg_addr != m_addr) {
             if (DC.checkUseDebugMemFlag() == 1) {
-                m_dest_addr = (u32) Debug_alloc(m_size, 1);
+                m_dest_addr = Debug_alloc(m_size, 1);
             } else {
 #line 452 "D:/Bio4/Prog/datactrl.cpp"
-                m_dest_addr = (u32) MEM_ALLOC(m_size, 0, 0xD);
+                m_dest_addr = MEM_ALLOC(m_size, 0, 0xD);
             }
             if (m_dest_addr != 0) {
-                setMallocInfo(1, (void*) m_dest_addr);
-                no = Aram.DmaTransReq(1, (u32) m_addr, m_dest_addr, m_size, m_mode);
+                setMallocInfo(1, m_dest_addr);
+                no = Aram.DmaTransReq(1, (u32) m_addr, (u32) m_dest_addr, m_size, m_mode);
                 m_id = no;
                 if (no >= 0) {
-                    m_command = 0;
+                    m_command = CMND_NONE;
                     m_condition = COND_ARAM_TO_ARAM;
                     OSReport("DC:%s set ARAM_TO_ARAM\n", m_name);
                 } else {
@@ -397,7 +397,7 @@ void cDataUnit::setLoadToAram()
 // to condition 0 (the ARAM space is reclaimed by the sort).
 int cDataUnit::setClear()
 {
-    m_command = 0;
+    m_command = CMND_NONE;
     switch (m_condition) {
     case COND_ARAM_TO_MRAM:
     case COND_MRAM_TO_ARAM:
@@ -450,7 +450,7 @@ void cDataUnit::checkLoadToMram()
     ret = Dvd.ReadCheck(m_id, NULL, NULL, NULL);
     if (ret > 0) {
         m_condition = COND_MRAM_OK;
-        m_addr = (void*) m_dest_addr;
+        m_addr = m_dest_addr;
         OSReport("DC:%s check MRAM_OK\n", m_name);
     } else if (ret < 0) {
         setErr(2);
@@ -471,7 +471,7 @@ void cDataUnit::checkLoadToAram()
     ret = Dvd.ReadCheck(m_id, NULL, NULL, NULL);
     if (ret > 0) {
         m_condition = COND_ARAM_OK;
-        m_addr = (void*) m_dest_addr;
+        m_addr = m_dest_addr;
         OSReport("DC:%s check ARAM_OK\n", m_name);
     } else if (ret < 0) {
         setErr(2);
@@ -493,7 +493,7 @@ void cDataUnit::checkAramToMram()
     }
     if (Aram.TransCheck(m_id) == 1 || done == 1) {
         m_condition = COND_MRAM_OK;
-        m_addr = (void*) m_dest_addr;
+        m_addr = m_dest_addr;
         OSReport("DC:%s check MRAM_OK\n", m_name);
     }
 }
@@ -513,7 +513,7 @@ void cDataUnit::checkMramToAram()
     if (Aram.TransCheck(m_id) == 1 || done == 1) {
         checkMallocRelease();
         m_condition = COND_ARAM_OK;
-        m_addr = (void*) m_dest_addr;
+        m_addr = m_dest_addr;
         OSReport("DC:%s check ARAM_OK\n", m_name);
     }
 }
@@ -531,8 +531,8 @@ void cDataUnit::checkAramToAram()
         done = 1;
     }
     if (Aram.TransCheck(m_id) == 1 || done == 1) {
-        m_addr = (void*) m_dest_addr;
-        m_id = Aram.DmaTransReq(0, m_dest_addr, m_arg_addr, m_size, m_mode);
+        m_addr = m_dest_addr;
+        m_id = Aram.DmaTransReq(0, (u32) m_dest_addr, (u32) m_arg_addr, m_size, m_mode);
         m_dest_addr = m_arg_addr;
         if (m_id >= 0) {
             m_condition = COND_MRAM_TO_ARAM;
@@ -626,7 +626,7 @@ u32 cDataCtrl::getAramFree(u32 size)
         if (u->isBeAlive()) {
             switch (u->getCondition()) {
             case COND_ARAM_TO_ARAM:
-                tbl[n].addr = u->getArgAddr();
+                tbl[n].addr = (u32) u->getArgAddr();
                 tbl[n].size = u->getSize();
                 n++;
                 // fallthrough
@@ -638,7 +638,7 @@ u32 cDataCtrl::getAramFree(u32 size)
                 break;
             case COND_ARAM_LOAD:
             case COND_MRAM_TO_ARAM:
-                tbl[n].addr = u->getDestAddr();
+                tbl[n].addr = (u32) u->getDestAddr();
                 tbl[n].size = u->getSize();
                 n++;
                 break;
@@ -665,7 +665,7 @@ u32 cDataCtrl::getAramFree(u32 size)
             if ((int) (tbl[i].addr - base) >= (int) size) {
                 for (k = 0; k < 32; k++) {
                     u = &m_DataUnit[k];
-                    if (u->isBeAlive() && base == u->getDestAddr()) {
+                    if (u->isBeAlive() && base == (u32) u->getDestAddr()) {
 #line 852 "D:/Bio4/Prog/datactrl.cpp"
                         HALT();
                     }
@@ -828,7 +828,7 @@ int cDataCtrl::checkAramSort()
         base = ARAM_FREE_BASE;
         for (i = 0; i < n; i++) {
             if (base < (u32) tbl[i]->getAddr()) {
-                tbl[i]->setCommand(CMND_ARAM_LOAD, base, 0);
+                tbl[i]->setCommand(CMND_ARAM_LOAD, (void*) base, 0);
                 tbl[i]->setLoadToAram();
                 return 1;
             }

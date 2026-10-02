@@ -26,34 +26,32 @@ struct RckEmiData {
 };
 
 // The room's route point data.
-static inline RtpData* rtpData()
+static inline RTP* rtpData()
 {
-    return (RtpData*)pG->Rtp;
+    return (RTP*)pG->Rtp;
 }
 
 // The point array of the RTP data.
-static inline RTP_POINT* rtpPoint(RtpData* r)
+static inline RTP_POINT* rtpPoint(RTP* r)
 {
-    return (RTP_POINT*)(r->pointOfs + (u32)r);
+    return (RTP_POINT*)(r->pPoint + (u32)r);
 }
 
 // The link array (each point's links start at its offLine).
-static inline RtpLink* rtpLink(RtpData* r)
+static inline RTP_LINE* rtpLink(RTP* r)
 {
-    return (RtpLink*)(r->linkOfs + (u32)r);
+    return (RTP_LINE*)(r->pLine + (u32)r);
 }
 
 // Next-hop table: row = current point, column = destination (read through the Global instance).
 static inline s8* rtpNextTbl()
 {
-    RtpData* r = (RtpData*)Global.Rtp;
-    return (s8*)(r->nextOfs + (u32)r);
+    RTP* r = (RTP*)Global.Rtp;
+    return (s8*)(r->pNext + (u32)r);
 }
 
 
-extern "C" {
 static int rckLineHitCheck(Vec* from, Vec* to, int attr, int flag);
-}
 
 // Once per frame before the enemies move: clears every live enemy's and the player's RckStat so
 // the near point is looked up again.
@@ -121,8 +119,8 @@ int RouteCkToEm(cEm* pMy, cEm* pTo, Vec* pDest, int mode)
         return 1;
     }
     {
-        RtpData* r = (RtpData*) Global.Rtp;
-        tbl = (s8*) (r->nextOfs + (u32) r);
+        RTP* r = (RTP*) Global.Rtp;
+        tbl = (s8*) (r->pNext + (u32) r);
     }
     next = tbl[rtpData()->nPoint * p + t];
     if (next == -1) {
@@ -152,7 +150,7 @@ int RouteCkToEm(cEm* pMy, cEm* pTo, Vec* pDest, int mode)
 // most directly away from `from` (within 1000 in height); the mirrored position when no RTP.
 void RouteCkEscEm(cEm* pMy, cEm* pTo, Vec* pDest)
 {
-    RtpData* rtp;
+    RTP* rtp;
     RTP_POINT* pt;
     RTP_POINT* np;
     int mask;
@@ -180,9 +178,9 @@ void RouteCkEscEm(cEm* pMy, cEm* pTo, Vec* pDest)
         // Block-local rtp copy (a second `rtp =` would make the entry block's rtp a global
         // pseudo) and the link entry through a pointer local (a deref'd `tbl[n]` puts the
         // index first in the lhax address; `&tbl[n]` keeps the table first).
-        RtpData* r = rtpData();
-        RtpLink* lk = &rtpLink(r)[pt->offLine + i];
-        np = &rtpPoint(r)[lk->point];
+        RTP* r = rtpData();
+        RTP_LINE* lk = &rtpLink(r)[pt->offLine + i];
+        np = &rtpPoint(r)[lk->connect];
         m = fabsf(Muku(&pMy->pos, &np->pos, ang, PI));
         if (m < best) {
             continue;
@@ -262,8 +260,8 @@ int RouteCkToPos(cEm* pMy, Vec* pPos, Vec* pDest, int mode, f32* pMax)
         return 1;
     }
     {
-        RtpData* r = (RtpData*) Global.Rtp;
-        tbl = (s8*) (r->nextOfs + (u32) r);
+        RTP* r = (RTP*) Global.Rtp;
+        tbl = (s8*) (r->pNext + (u32) r);
     }
     next = tbl[rtpData()->nPoint * p + t];
     if (next == -1) {
@@ -295,7 +293,7 @@ int RouteCkToPos(cEm* pMy, Vec* pPos, Vec* pDest, int mode, f32* pMax)
     }
     *pDest = rtpPoint(rtpData())[pMy->RckMy].pos;
     if (pMax != NULL) {
-        RtpData* r;
+        RTP* r;
         int np;
         // The hop loop reuses `next` (one global pseudo, r30) and keeps the table read in the loop
         // test, so the exit test copied to the entry is the pre-loop `tbl[..]`; the struct-view rtp
@@ -303,7 +301,7 @@ int RouteCkToPos(cEm* pMy, Vec* pPos, Vec* pDest, int mode, f32* pMax)
         // 30 raw insns would have the whole body up to the `break` rotated instead.
         dmax = a.y - b.y;
         dmax = fabsf(dmax);
-        r = (RtpData*) pG->Rtp;
+        r = (RTP*) pG->Rtp;
         np = r->nPoint;
         next = pMy->RckMy;
         while ((next = tbl[np * next + pMy->RckTo]) != -1) {
@@ -330,7 +328,7 @@ int RouteCkPosToPos(Vec* pPos1, Vec* pPos2, Vec* pDest)
     int p;
     int t;
     int next;
-    RtpData* rtp;
+    RTP* rtp;
     RTP_POINT* pts;
     RTP_POINT* pt;
     f32 d2;
@@ -362,8 +360,8 @@ int RouteCkPosToPos(Vec* pPos1, Vec* pPos2, Vec* pDest)
         return 1;
     }
     {
-        RtpData* r = (RtpData*) Global.Rtp;
-        tbl = (s8*) (r->nextOfs + (u32) r);
+        RTP* r = (RTP*) Global.Rtp;
+        tbl = (s8*) (r->pNext + (u32) r);
     }
     next = tbl[rtpData()->nPoint * p + t];
     if (next == -1) {
@@ -457,7 +455,7 @@ static inline void vecClear(Vec& v) { memset_v(&v, 0, sizeof(Vec)); }
 // Position of route point `no` (zero without RTP).
 void RouteCkGetPoint(int no, Vec* out)
 {
-    RtpData* rtp = rtpData();
+    RTP* rtp = rtpData();
     Vec p;
 
     if (rtp != NULL) {
@@ -471,7 +469,7 @@ void RouteCkGetPoint(int no, Vec* out)
 // Number of route points, -1 without RTP.
 int RouteCkGetPointNumber()
 {
-    RtpData* rtp = rtpData();
+    RTP* rtp = rtpData();
 
     return rtp != NULL ? rtp->nPoint : -1;
 }
@@ -490,8 +488,8 @@ f32 RouteCkGetDist(int n0, int n1)
         return d;
     }
     {
-        RtpData* r = (RtpData*) Global.Rtp;
-        tbl = (s8*) (r->nextOfs + (u32) r);
+        RTP* r = (RTP*) Global.Rtp;
+        tbl = (s8*) (r->pNext + (u32) r);
     }
     pt = &rtpPoint(rtpData())[n0];
     do {
@@ -569,7 +567,7 @@ s8 getNearPoint(Vec* pPos, int mode, int flag)
     f32 dist[10];
     int idx[10];
     Vec p2;
-    RtpData* rtp;
+    RTP* rtp;
     RTP_POINT* pt;
     int* ip;
     int n;
@@ -631,7 +629,7 @@ s8 getNearPoint(Vec* pPos, int mode, int flag)
 // two-way) and their direction arrows.
 void Draw_rtp()
 {
-    RtpData* rtp;
+    RTP* rtp;
     RTP_POINT* pt;
     RTP_POINT* np;
     Vec v0;
@@ -681,7 +679,7 @@ void Draw_rtp()
     }
     // The loop test refreshes a GLOBAL_WK* local: the pG value is one pseudo through the
     // entry copy and the latch (`mr r11,r5` twice), and the body's pRoomRtp load stays.
-    for (i = 0; i < ((RtpData*)(g = pG)->Rtp)->nPoint; i++) {
+    for (i = 0; i < ((RTP*)(g = pG)->Rtp)->nPoint; i++) {
         pt = &rtpPoint(rtpData())[i];
         for (j = 0; j < pt->nLine; j++) {
             Vec d;
@@ -689,14 +687,14 @@ void Draw_rtp()
             Vec e;
             Vec f;
             {
-                RtpData* r = rtpData();
-                RtpLink* lk = &rtpLink(r)[pt->offLine + j];
-                np = &rtpPoint(r)[lk->point];
+                RTP* r = rtpData();
+                RTP_LINE* lk = &rtpLink(r)[pt->offLine + j];
+                np = &rtpPoint(r)[lk->connect];
             }
             back = 0;
             for (k = 0; k < np->nLine; k++) {
-                RtpLink* lk = &rtpLink(rtpData())[np->offLine + k];
-                if (lk->point == i) {
+                RTP_LINE* lk = &rtpLink(rtpData())[np->offLine + k];
+                if (lk->connect == i) {
                     back = 1;
                     break;
                 }

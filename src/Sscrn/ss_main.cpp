@@ -31,7 +31,7 @@
 
 // `inline` and defined before ss_main.h so this deferred inline is queued, and output at the end of
 // the file, ahead of the synthesized widget destructors, as in the original (0xD5B4 before ~Widget).
-extern "C" inline void LightSetModel2(cModel* m)
+inline void LightSetModel2(cModel* m)
 {
     LightMgr.setModel2(m);
 }
@@ -49,9 +49,8 @@ extern void (*_dtors[])(void);
 
 // The widget classes (SsExitInit / SsExitMain / SsItemExamine) are declared in ss_main.h.
 
-extern "C" {
 void SubScreenTask();
-void clearZbuffer();
+void clearZbuffer(int*);
 void sscrnCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 int sscrnKey2Game(SUB_SCREEN* wk);
 void dispScrollBar(u32 top, u32 n, u32 num, ID_UNIT* bar, ID_UNIT* up, ID_UNIT* down);
@@ -63,7 +62,6 @@ void sscrnModelFree(SUB_SCREEN* wk);
 void weaponChangeRequest(u16 no, u16 type);
 int weaponChangeReadCheck();
 int weaponChangeMoveCheck();
-}
 
 static void weaponChangeTask();
 static void sscrnModelTrans(cModel* m);
@@ -109,20 +107,20 @@ void sscrnCameraInit(SUB_SCREEN* wk, CAMERA* cam)
     // Store order (sched1 weight rule): up.z is the last zero store in the source, so it carries the
     // zero register's death and is issued before the other zero stores; fovy is written last and
     // its late pool load lets up.z slip in front of it.
-    cam->param.pos.z = 5000.0f;
+    cam->param.Campos.z = 5000.0f;
     cam->Up.y = 1.0f;
-    cam->param.at.x = 0.0f;
-    cam->param.at.y = 0.0f;
-    cam->param.at.z = 0.0f;
-    cam->param.pos.x = 0.0f;
-    cam->param.pos.y = 0.0f;
+    cam->param.Target.x = 0.0f;
+    cam->param.Target.y = 0.0f;
+    cam->param.Target.z = 0.0f;
+    cam->param.Campos.x = 0.0f;
+    cam->param.Campos.y = 0.0f;
     cam->Up.x = 0.0f;
     cam->Up.z = 0.0f;
-    cam->param.fovy = 20.0f;
+    cam->param.Fovy = 20.0f;
     CameraSetOrientationUp(cam);
-    C_MTXPerspective(cam->ProjMat, cam->param.fovy, 1.3333334f, ZNEAR, ZFAR);
-    cam->Distance = PSVECDistance(&cam->param.pos, &cam->param.at);
-    C_MTXLookAt(cam->v_mat, &cam->param.pos, &cam->Up, &cam->param.at);
+    C_MTXPerspective(cam->ProjMat, cam->param.Fovy, 1.3333334f, ZNEAR, ZFAR);
+    cam->Distance = PSVECDistance(&cam->param.Campos, &cam->param.Target);
+    C_MTXLookAt(cam->v_mat, &cam->param.Campos, &cam->Up, &cam->param.Target);
 }
 
 // 1 when the player asks to return to the game: Y (Key bit 20) on a type 1 (inventory) screen, Y or B
@@ -163,7 +161,7 @@ void generalModelAlloc(SUB_SCREEN* wk)
 {
     int i;
 
-    wk->attr_flag |= 1;
+    wk->model_flag |= 1;
     ssModInfoMgr.roomInit();
     ssModInfoMgr.arrayAlloc(0xA0);
     ssPartsMgr.roomInit();
@@ -381,7 +379,7 @@ void SubScreenTask()
         EspGenLoopMove();
         IdSub.trans();
         IdNum.trans();
-        if (wk->wait_cnt == 0) {
+        if (wk->trans_off == 0) {
             cModel* m;
             void (*func)(cModel*);
             // `m->next` read before the call (`lwz r30, 4(r30)` above the `blrl`).
@@ -725,7 +723,7 @@ void IdNumErase()
     int i;
 
     for (i = 0; i < 0x3E; i++) {
-        IdNum.kill(0xFF, 0x40 + i);
+        IdNum.kill(0xFF, (ID_CLASS) (0x40 + i));
     }
     IdNum.kill(0xFF, IDC_SSCRN_NEAR_0);
     IdNum.kill(0xFF, IDC_SSCRN_NEAR_1);
@@ -737,7 +735,7 @@ void IdNumErase()
 
 // Clears the Z buffer with a full screen quad at the far plane (the model screens draw over the 2D
 // background).
-void clearZbuffer()
+void clearZbuffer(int*)
 {
     static f32 clear_z = -0.99999f;
     Mtx44 proj;
@@ -794,7 +792,7 @@ void sscrnModelClear(SUB_SCREEN* wk)
 // and frees the three arrays. No-op unless attr_flag bit 0 is set.
 void sscrnModelFree(SUB_SCREEN* wk)
 {
-    int off = !(wk->attr_flag & 1);
+    int off = !(wk->model_flag & 1);
 
     if (off) {
         return;
@@ -806,7 +804,7 @@ void sscrnModelFree(SUB_SCREEN* wk)
         ssModInfoMgr.arrayFree();
         ssPartsMgr.arrayFree();
         MapMgr.arrayFree();
-        wk->attr_flag &= ~1;
+        wk->model_flag &= ~1;
     }
 }
 
@@ -843,10 +841,10 @@ void numDisp(int id, int num, Vec* pos, u32 flags)
     ID_UNIT* u;
     int i;
 
-    u = IdNum.unitPtr(0, id);
+    u = IdNum.unitPtr(0, (ID_CLASS) id);
     u->be_flag &= ~8;
     for (i = 1; i <= 3; i++) {
-        u = IdNum.unitPtr(i, id);
+        u = IdNum.unitPtr(i, (ID_CLASS) id);
         u->be_flag &= ~8;
         if (flags & 2) {
             u->col0[0] = col1->col0[0];
@@ -861,7 +859,7 @@ void numDisp(int id, int num, Vec* pos, u32 flags)
         }
     }
     for (i = 0x11; i <= 0x13; i++) {
-        u = IdNum.unitPtr(i, id);
+        u = IdNum.unitPtr(i, (ID_CLASS) id);
         u->be_flag &= ~8;
     }
     if (pos) {
@@ -879,14 +877,14 @@ void numDisp(int id, int num, Vec* pos, u32 flags)
                 }
                 on = 1;
             }
-            u = IdNum.unitPtr(i + 1, id);
+            u = IdNum.unitPtr(i + 1, (ID_CLASS) id);
             u->be_flag |= 8;
             u->tex_flag |= 2;
             u->texNo = d[i];
-            u = IdNum.unitPtr(i + 0x11, id);
+            u = IdNum.unitPtr(i + 0x11, (ID_CLASS) id);
             u->be_flag |= 8;
         }
-        u = IdNum.unitPtr(0, id);
+        u = IdNum.unitPtr(0, (ID_CLASS) id);
         u->be_flag |= 8;
         u->pos0 = *pos;
     }

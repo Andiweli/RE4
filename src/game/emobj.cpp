@@ -48,7 +48,7 @@ void cEmObj::EmObjMove()
 // Registers a scenario (walkable / blocking) collision quad of half size sx / sz and height sy at
 // model-space `pos` (kept when NULL) with cSatMgr::create attribute `n` and `flag`; EMOBJ_WK(this)->flags bit1
 // keeps it following the object.
-void cEmObj::setSat(Vec* pos, int n, int flag, int cube, f32 sx, f32 sy, f32 sz)
+void cEmObj::setSat(f32 sx, f32 sy, f32 sz, Vec* pos, int n, int flag, int cube)
 {
     EmObjWork* w = EMOBJ_WK(this);
 
@@ -107,7 +107,7 @@ void cEmObj::clrSat()
 
 // Registers an effect collision quad (EatMgr: bullets, effects, thrown objects) like setSat;
 // EMOBJ_WK(this)->flags bit2 keeps it following the object.
-void cEmObj::setEat(Vec* pos, int n, int flag, int cube, f32 sx, f32 sy, f32 sz)
+void cEmObj::setEat(f32 sx, f32 sy, f32 sz, Vec* pos, int n, int flag, int cube)
 {
     EmObjWork* w = EMOBJ_WK(this);
 
@@ -165,7 +165,7 @@ void cEmObj::clrEat()
 
 // Adds hit box `no` to the object: a cylinder (cube == 0: YarareInitCube with radius `rad`) or a
 // box of width `w` / height `h` at model-space `pos` (origin when NULL); flag bit0 is always set.
-void cEmObj::setYarare(s16 no, Vec* pos, u16 flag, int cube, f32 w, f32 h, f32 rad)
+void cEmObj::setYarare(s16 no, f32 w, f32 h, f32 rad, Vec* pos, u16 flag, int cube)
 {
     Vec p;
 

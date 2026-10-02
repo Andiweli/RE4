@@ -98,8 +98,8 @@ void cToolBugcheck::menuPosMove()
     f32 speed;
     f32 floor;
 
-    pG->Stop_flg &= ~0x10000000;
-    pG->Stop_flg &= ~0x40000000;
+    SpfFlagOff(pG, SPF_PL);
+    SpfFlagOff(pG, SPF_CAMERA);
     while (1) {
         if (Joy[0].on & JOY_X) {
             DbgFlagOn(pG, DBG_PL_NOHIT);
@@ -144,8 +144,8 @@ void cToolBugcheck::menuPosMove()
         TaskSleep(1);
     }
     DbgFlagOff(pG, DBG_PL_NOHIT);
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x40000000;
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_CAMERA);
 }
 
 // Sub menu: edits the player's / Ashley's life and life maximum (stick / L / R), shows the level.
@@ -430,22 +430,22 @@ void cToolBugcheck::menu()
     case 14:
         if (Joy[0].trg & 0x30103) {
             FlagXor(&pG->Disp_flg, 1);
-            if (pG->Disp_flg & 0x40000000) {
-                pG->Disp_flg |= 0x80000000;
-                pG->Disp_flg |= 0x10000000;
-                pG->Stop_flg |= 0x20000000;
-                pG->Stop_flg |= 0x4000000;
+            if (DpfFlagChk(pG, DPF_PL)) {
+                DpfFlagOn(pG, DPF_EM);
+                DpfFlagOn(pG, DPF_OBJ);
+                SpfFlagOn(pG, SPF_EM);
+                SpfFlagOn(pG, SPF_OBJ);
             } else {
-                pG->Disp_flg &= ~0x80000000;
-                pG->Disp_flg &= ~0x10000000;
-                pG->Stop_flg &= ~0x20000000;
-                pG->Stop_flg &= ~0x4000000;
+                DpfFlagOff(pG, DPF_EM);
+                DpfFlagOff(pG, DPF_OBJ);
+                SpfFlagOff(pG, SPF_EM);
+                SpfFlagOff(pG, SPF_OBJ);
             }
         }
         break;
     case 15:
         if (Joy[0].trg & 0x30103) {
-            pG->Disp_flg ^= 0x8000000;
+            DpfFlagXor(pG, DPF_SCR);
         }
         break;
     case 16:
@@ -497,9 +497,9 @@ void cToolBugcheck::menu()
     py += 16;
     eprintf(px, py, 0, 0, "%s", DbgFlagChk(pG, DBG_SE_STOP) ? "ON" : "OFF");
     py += 16;
-    eprintf(px, py, 0, 0, "%s", (pG->Disp_flg & 0x40000000) ? "ON" : "OFF");
+    eprintf(px, py, 0, 0, "%s", DpfFlagChk(pG, DPF_PL) ? "ON" : "OFF");
     py += 16;
-    eprintf(px, py, 0, 0, "%s", (pG->Disp_flg & 0x8000000) ? "ON" : "OFF");
+    eprintf(px, py, 0, 0, "%s", DpfFlagChk(pG, DPF_SCR) ? "ON" : "OFF");
     py += 16;
     eprintf(px, py, 0, 0, "%s", DbgFlagChk(pG, DBG_EM_WEAK) ? "ON" : "OFF");
     py += 16;

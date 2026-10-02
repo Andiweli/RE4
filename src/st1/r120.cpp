@@ -33,11 +33,11 @@ struct R120Work {
 
 static R120Work* r120_work;
 
-extern "C" void R120Event();
-extern "C" void Evt_R120S00_Func(Event* e);
-extern "C" void Evt_R120S01_Func(Event* e);
-extern "C" void EventCarInit(Event* e);
-extern "C" void EvtTexRenderCamTrans(Event* e, int cut);
+void R120Event();
+void Evt_R120S00_Func(Event* e, u32);
+void Evt_R120S01_Func(Event* e, u32);
+void EventCarInit(Event* e);
+void EvtTexRenderCamTrans(Event* e, int cut);
 
 // Room init (the intro): registers the two event callbacks by name for the evd scripts, starts the
 // R120Event task unless debug trigger 1 skips it, and sets up the 256x256 render-to-texture used for
@@ -60,7 +60,7 @@ void R120Main()
 }
 
 // The movie, the two events, then the jump into the village road.
-extern "C" void R120Event()
+void R120Event()
 {
     SceSleep(1);
     if (pG->game_cnt != 0) {
@@ -127,7 +127,7 @@ static inline void r120_setTrans(int on)
 
 // Per-frame callback of event r120s00 (the drive to the village, Leon in the back of the police car).
 // The first frame of cut 0 fades in unless the event was skipped (StatusFlag 0x40000000).
-extern "C" void Evt_R120S00_Func(Event* e)
+void Evt_R120S00_Func(Event* e, u32)
 {
     void* lmod;
     void* mod;
@@ -258,7 +258,7 @@ extern "C" void Evt_R120S00_Func(Event* e)
 
 // Per-frame callback of event r120s01 (the car stops at the village road and Leon gets out).
 // funcMode 3 sets Scenario_flg[1] bit 0x10, which marks the intro as seen.
-extern "C" void Evt_R120S01_Func(Event* e)
+void Evt_R120S01_Func(Event* e, u32)
 {
     void* mod;
     int skip;
@@ -459,7 +459,7 @@ extern "C" void Evt_R120S01_Func(Event* e)
 }
 
 // Model flags of the car event: the passengers, the car and its wheels, the villagers.
-extern "C" void EventCarInit(Event* e)
+void EventCarInit(Event* e)
 {
     void* mod;
     cParts* p;
@@ -557,7 +557,7 @@ extern "C" void EventCarInit(Event* e)
 }
 
 // Registers the car window and the driver for the render-to-texture mirror.
-extern "C" void EvtTexRenderCamTrans(Event* e, int cut)
+void EvtTexRenderCamTrans(Event* e, int cut)
 {
     void* mod;
     int skip;

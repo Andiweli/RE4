@@ -3,12 +3,6 @@
 #include "light.h"
 #include "em.h"
 
-struct Light08Work {
-    u8 type;     // 0x00
-    u8 emId;     // 0x01
-    u8 partsNo;  // 0x02
-};
-
 // Nothing beyond the cLight constructor.
 cLight08::cLight08()
 {
@@ -18,12 +12,12 @@ cLight08::cLight08()
 // Spot light that tracks an enemy model part.
 void Light08_Move(cLight* pLi)
 {
-    Light08Work* w = (Light08Work*)pLi->work;
+    LIT08_MOVE_FREE* w = (LIT08_MOVE_FREE*)pLi->work;
 
     if (w->type == 0) {
-        cEm* em = EmMgr.getEmPtr(w->emId, 0);
+        cEm* em = EmMgr.getEmPtr(w->id, 0);
         if (em) {
-            cParts* parts = em->getPartsPtr(w->partsNo);
+            cParts* parts = em->getPartsPtr(w->pno);
             if (parts) {
                 pLi->setSpotTarget(&parts->world);
             }

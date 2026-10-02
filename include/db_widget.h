@@ -20,12 +20,12 @@ void DB_DrawBox(f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a);
 void DB_DrawBoxFill(f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a);
 void DB_DrawString(f32 x, f32 y, const char* s, f32 r, f32 g, f32 b, f32 a);
 
-struct DB_POINT {
+struct DB_POSITION {
     f32 x;
     f32 y;
 
-    DB_POINT() {}
-    DB_POINT(f32 x_, f32 y_) {
+    DB_POSITION() {}
+    DB_POSITION(f32 x_, f32 y_) {
         x = x_;
         y = y_;
     }
@@ -44,7 +44,7 @@ struct DB_RECT {
         w = w_;
         h = h_;
     }
-    int ChkHitRect(DB_POINT* p);
+    int ChkHitRect(DB_POSITION* p);
 };
 
 struct DB_COLOR {
@@ -144,11 +144,11 @@ public:
     DB_PRIMITIVE* child;        // 0x08
     DB_PRIMITIVE* prev;         // 0x0C
     DB_PRIMITIVE* next;         // 0x10
-    DB_POINT pos;               // 0x14  relative to the parent
-    DB_POINT drawPos;           // 0x1C  screen position (DrawRequest)
+    DB_POSITION pos;               // 0x14  relative to the parent
+    DB_POSITION drawPos;           // 0x1C  screen position (DrawRequest)
     DB_RECT rect;               // 0x24  hit rectangle (relative)
-    DB_POINT size;              // 0x34
-    DB_POINT base;              // 0x3C
+    DB_POSITION size;              // 0x34
+    DB_POSITION base;              // 0x3C
     int id;                     // 0x44
     u32 flag;                   // 0x48
     int click[3];               // 0x4C  per mouse button
@@ -175,15 +175,15 @@ public:
     virtual void Update();
     void DrawRequest();
     virtual void Draw();
-    int ChkClick(DB_POINT* p, int btn);
-    int ChkDoubleClick(DB_POINT* p, int btn);
-    int ChkMouseUp(DB_POINT* p, int btn);
-    int ChkMouseOn(DB_POINT* p);
-    int ChkMouseDrag(DB_POINT* p, int btn);
-    virtual void OnClick(DB_POINT* p, int btn);
-    virtual void OnDoubleClick(DB_POINT* p, int btn);
-    virtual void OnMouseUp(DB_POINT* p, int btn);
-    virtual void OnMouseDrag(DB_POINT* p, int btn);
+    int ChkClick(DB_POSITION* p, int btn);
+    int ChkDoubleClick(DB_POSITION* p, int btn);
+    int ChkMouseUp(DB_POSITION* p, int btn);
+    int ChkMouseOn(DB_POSITION* p);
+    int ChkMouseDrag(DB_POSITION* p, int btn);
+    virtual void OnClick(DB_POSITION* p, int btn);
+    virtual void OnDoubleClick(DB_POSITION* p, int btn);
+    virtual void OnMouseUp(DB_POSITION* p, int btn);
+    virtual void OnMouseDrag(DB_POSITION* p, int btn);
     virtual void OnKeybord(DB_KEYBORD* key);
     virtual void OnCalcMsg(int msg);
     virtual void OnCalcMsgFloat(f32 v);
@@ -239,7 +239,7 @@ public:
     int CallActiveChangeCallback(DB_PRIMITIVE* p, DB_KEYBORD* k);   // p, k unused
     void SetActiveChangeCallback(DB_WINDOW_CALLBACK cb);
     void SetCloseCallback(DB_WINDOW_CALLBACK cb);
-    virtual void OnClick(DB_POINT* p, int btn);
+    virtual void OnClick(DB_POSITION* p, int btn);
     int AddSelectablePrimitive(DB_PRIMITIVE* p, int x, int y);
     void Close();
     virtual void Draw();
@@ -259,15 +259,15 @@ public:
     void SetStringColor(f32 r, f32 g, f32 b, f32 a);
     int SetString(const char* s);
     virtual void Draw();
-    virtual void OnMouseDrag(DB_POINT* p, int btn);
-    virtual void OnDoubleClick(DB_POINT* p, int btn);
+    virtual void OnMouseDrag(DB_POSITION* p, int btn);
+    virtual void OnDoubleClick(DB_POSITION* p, int btn);
 };
 
 class DB_BUTTON_CLOSE : public DB_PRIMITIVE {
 public:
     DB_BUTTON_CLOSE();
     virtual void Draw();
-    virtual void OnClick(DB_POINT* p, int btn);
+    virtual void OnClick(DB_POSITION* p, int btn);
 };
 
 class DB_STRING : public DB_PRIMITIVE {
@@ -295,7 +295,7 @@ public:
 
     DB_BUTTON();
     void SetCallback(DB_PRIM_CALLBACK cb);
-    virtual void OnClick(DB_POINT* p, int btn);
+    virtual void OnClick(DB_POSITION* p, int btn);
     virtual void OnKeybord(DB_KEYBORD* key);
 };
 
@@ -332,7 +332,7 @@ public:
     void SetNumPointer(u32* p);
     void SetNumPointer(f32* p);
     void ClearToDefault();
-    virtual void OnDoubleClick(DB_POINT* p, int btn);
+    virtual void OnDoubleClick(DB_POSITION* p, int btn);
     int SetStringInt();
     int SetStringFloat();
     virtual void Update();
@@ -373,16 +373,16 @@ public:
     DB_SLIDEBAR();
     void UpdateHoldNum();
     virtual void Update();
-    virtual void OnMouseDrag(DB_POINT* p, int btn);
+    virtual void OnMouseDrag(DB_POSITION* p, int btn);
     virtual void Draw();
 };
 
 // Mouse snapshot (DB_GetMouseData); passed by value to DB_PRIM_ARRAY::ChkMouseButton.
 class DB_MOUSE {
 public:
-    DB_POINT pos;       // 0x00
-    DB_POINT oldPos;    // 0x08
-    DB_POINT move;      // 0x10
+    DB_POSITION pos;       // 0x00
+    DB_POSITION oldPos;    // 0x08
+    DB_POSITION move;      // 0x10
     int on[3];          // 0x18
     int trg[3];         // 0x24
     int click[3];       // 0x30
@@ -442,21 +442,21 @@ public:
     DB_BUTTON* MakeButtonPrimitive();
     DB_NUMERIC* MakeNumericPrimitive();
     DB_NUMERIC2* MakeNumeric2Primitive();
-    DB_WINDOW* CreateNormalWindow(const char* title, DB_POINT* pos, f32* w, f32* h, u32* keyFlag);
-    DB_STRING* CreateString(DB_PRIMITIVE* parent, const char* s, DB_POINT* pos);
-    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, s8* p, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, u8* p, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, u16* p, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, s32* p, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, u32* p, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, f32* p, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, s8* p, s8* p2, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, u8* p, u8* p2, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, s16* p, s16* p2, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, u16* p, u16* p2, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, s32* p, s32* p2, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, f32* p, f32* p2, DB_POINT* pos, int* selX, int selY, u32 flg);
-    DB_BUTTON* CreateButton(DB_WINDOW* w, const char* s, DB_POINT* pos, DB_PRIM_CALLBACK cb, int* selX, int selY);
+    DB_WINDOW* CreateNormalWindow(const char* title, DB_POSITION* pos, f32* w, f32* h, u32* keyFlag);
+    DB_STRING* CreateString(DB_PRIMITIVE* parent, const char* s, DB_POSITION* pos);
+    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, s8* p, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, u8* p, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, u16* p, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, s32* p, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, u32* p, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC* CreateNumeric(DB_WINDOW* w, f32* p, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, s8* p, s8* p2, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, u8* p, u8* p2, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, s16* p, s16* p2, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, u16* p, u16* p2, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, s32* p, s32* p2, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_NUMERIC2* CreateNumeric2(DB_WINDOW* w, f32* p, f32* p2, DB_POSITION* pos, int* selX, int selY, u32 flg);
+    DB_BUTTON* CreateButton(DB_WINDOW* w, const char* s, DB_POSITION* pos, DB_PRIM_CALLBACK cb, int* selX, int selY);
     DB_WINDOW* BringWindow(DB_WINDOW* w);
     DB_PRIMITIVE** PullPrimitivePtr();
     DB_WINDOW** PullWindowPtr();

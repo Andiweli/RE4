@@ -21,8 +21,8 @@ u32 Snd_str_prepare(u16 blk_no, u16 req_no, char* name, s8 no)
 // the header, 8 ARAM blocks (a stream that fits entirely is "short"), and acquires the AX voices.
 u32 Snd_str_init(SND_SHD* shd, SND_RIT* rit, u32 aram, char* name, s8 no)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
-    SND_STR_WORK* str;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
+    SND_STR* str;
     s8 idx;
 
     if (no >= 0) {
@@ -31,96 +31,96 @@ u32 Snd_str_init(SND_SHD* shd, SND_RIT* rit, u32 aram, char* name, s8 no)
         idx = rit->pl_id;
     }
     str = &Snd_str_work[idx];
-    if (str->status != 0) {
+    if (str->be_flag != 0) {
         return 0;
     }
-    DVDOpen(name, &str->dvd);
-    ctrl->req_id++;
-    if (ctrl->req_id == 0) {
-        ctrl->req_id++;
+    DVDOpen(name, &str->info);
+    ctrl->snd_id++;
+    if (ctrl->snd_id == 0) {
+        ctrl->snd_id++;
     }
-    str->snd_id = ctrl->req_id;
+    str->snd_id = ctrl->snd_id;
     if (rit->flag & 0x1) {
-        str->type = 2;
+        str->str_type = 2;
     } else {
-        str->type = 1;
+        str->str_type = 1;
     }
-    str->upd = 0;
-    str->shd = shd;
-    str->rit = rit;
-    str->buff = Snd_str_buff[idx];
+    str->update = 0;
+    str->shd_adrs = shd;
+    str->rit_adrs = rit;
+    str->buff_ptr = Snd_str_buff[idx];
     str->dvd_status = 0;
-    str->flag = shd->flag;
-    str->req = 0;
-    str->err = 0;
-    str->cancel = 0;
-    str->loop_top = 0;
-    str->shortflag = 0;
+    str->shd_flag = shd->flag;
+    str->req_flag = 0;
+    str->err_flag = 0;
+    str->recv_type = 0;
+    str->loop_flag = 0;
+    str->short_flag = 0;
     str->pan = rit->pan;
     str->span = str_init_get_span(rit);
     str->vol = str_init_get_vol(rit);
     str->svol = 0;
-    str->auxA = rit->aux_a;
-    str->auxB = rit->aux_b;
-    str->rate = (f32) shd->rate;
+    str->aux_a = rit->aux_a;
+    str->aux_b = rit->aux_b;
+    str->smp_rate = (f32) shd->rate;
     str->req_vol = 0;
-    str->calc_vol = 0;
-    str->vol2 = 0;
-    str->fade_time = 0;
-    str->fade_vol = 0;
-    str->fade_step = 0;
-    str->fade_target = 0;
-    str->err_step = 0;
-    str->err_target = 0;
-    str->aram = aram;
-    str->read_ofs = 0;
-    if (str->flag & 0x1) {
-        str->blk_half = 0x4000;
-        str->read_size = str->blk_half * 2;
-        str->read_end = shd->nibbles / 2 * 2;
+    str->out_vol = 0;
+    str->now_vol = 0;
+    str->req_fade_time = 0;
+    str->req_fade_end = 0;
+    str->nml_fade_spd = 0;
+    str->nml_fade_end = 0;
+    str->sys_fade_spd = 0;
+    str->sys_fade_end = 0;
+    str->file_offset = aram;
+    str->file_pos = 0;
+    if (str->shd_flag & 0x1) {
+        str->buff_size = 0x4000;
+        str->buff_one = str->buff_size * 2;
+        str->file_size = shd->nibbles / 2 * 2;
     } else {
-        str->blk_half = 0x8000;
-        str->read_size = str->blk_half;
-        str->read_end = shd->nibbles / 2;
+        str->buff_size = 0x8000;
+        str->buff_one = str->buff_size;
+        str->file_size = shd->nibbles / 2;
     }
-    if (str->read_end % str->read_size != 0) {
-        str->read_end = str->read_end / str->read_size + 1;
-        str->read_end = str->read_end * str->read_size;
+    if (str->file_size % str->buff_one != 0) {
+        str->file_size = str->file_size / str->buff_one + 1;
+        str->file_size = str->file_size * str->buff_one;
     }
-    str->blk_size = str->blk_half * 2;
+    str->buff_size_nbl = str->buff_size * 2;
+    str->aram_nbl = 0;
     str->play_nbl = 0;
-    str->play_pos = 0;
-    str->blk_end = str->blk_size;
-    str->loop_start = shd->lptop_nbl;
-    str->loop_end = shd->lpend_nbl;
-    str->play_blk = -1;
-    str->prev_blk = -1;
-    str->blk_cnt = 0;
+    str->next_nbl = str->buff_size_nbl;
+    str->lptop_nbl = shd->lptop_nbl;
+    str->lpend_nbl = shd->lpend_nbl;
+    str->now_play_idx = -1;
+    str->old_play_idx = -1;
+    str->ttl_play_idx = 0;
     str->dvd_busy = 0;
-    str->read_done = 0;
-    str->read_cnt = 1;
-    str->read_blk = 0;
-    str->dma_blk = -1;
-    str->buff_blks = 1;
+    str->dvd_comp = 0;
+    str->dvd_req_num = 1;
+    str->dvd_req_idx = 0;
+    str->dvd_end_idx = -1;
+    str->dvd_req_max = 1;
     str->dma_busy = 0;
-    str->dma_cnt = 0;
-    str->dma_aram_blk = 0;
-    str->dma_last_blk = -1;
-    str->aram_blks = 8;
-    if (str->read_end <= str->read_size * str->aram_blks) {
-        str->shortflag |= 0x1;
-        if (str->flag & 0x4) {
-            str->shortflag |= 0x2;
+    str->dma_req_num = 0;
+    str->dma_req_idx = 0;
+    str->dma_end_idx = -1;
+    str->dma_req_max = 8;
+    if (str->file_size <= str->buff_one * str->dma_req_max) {
+        str->short_flag |= 0x1;
+        if (str->shd_flag & 0x4) {
+            str->short_flag |= 0x2;
         } else {
-            str->shortflag |= 0x4;
+            str->short_flag |= 0x4;
         }
     }
     if (Snd_str_ax_voice_init(str, rit->ch, rit->poly) == 1) {
         return 0;
     }
-    str->state = 0;
-    str->prev_state = 0;
-    str->status = 1;
+    str->rno = 0;
+    str->rno_sv = 0;
+    str->be_flag = 1;
     return str->snd_id;
 }
 
@@ -159,16 +159,16 @@ int Snd_str_req(u32 snd_id, u32 cmd, u32 time, u32 vol)
 // Stores the request bits / parameters on the stream work; 1 when the id is unknown.
 int str_req_sub(u32 snd_id, u32 cmd, u32 time, u32 vol)
 {
-    SND_STR_WORK* str;
+    SND_STR* str;
 
     str = Snd_search_str_work_snd_id(snd_id);
     if (str == NULL) {
         return 1;
     }
-    str->req |= cmd;
+    str->req_flag |= cmd;
     if (cmd & 0x6) {
-        str->fade_time = time;
-        str->fade_vol = vol;
+        str->req_fade_time = time;
+        str->req_fade_end = vol;
     }
     if (cmd & 0x10) {
         str->req_vol = time;
@@ -197,33 +197,33 @@ void Snd_str_fade_out_type(u8 type, s16 time)
 // For every active stream of `type`: mode 0 volume refresh, 1 pan refresh, 2 fade-out / stop.
 void str_type_sub(u8 type, u32 mode, s16 time)
 {
-    SND_STR_WORK* str;
+    SND_STR* str;
     int old;
     int i;
 
     old = OSDisableInterrupts();
     for (i = 0; i < SND_STR_MAX; i++) {
         str = &Snd_str_work[i];
-        if (str->status == 0) {
+        if (str->be_flag == 0) {
             continue;
         }
-        if (!(str->type & type)) {
+        if (!(str->str_type & type)) {
             continue;
         }
         switch (mode) {
         case 1:
-            str->upd |= 0x2;
+            str->update |= 0x2;
             break;
         case 0:
-            str->upd |= 0x1;
+            str->update |= 0x1;
             break;
         case 2:
             if (time == 0) {
-                str->req |= 0x8;
+                str->req_flag |= 0x8;
             } else {
-                str->req |= 0x4;
-                str->fade_time = time;
-                str->fade_vol = 0;
+                str->req_flag |= 0x4;
+                str->req_fade_time = time;
+                str->req_fade_end = 0;
             }
             break;
         }
@@ -235,19 +235,19 @@ void str_type_sub(u8 type, u32 mode, s16 time)
 // 0x100 fading, 0x8000 DVD error...), -1 when unknown.
 int Snd_str_get_status(u32 snd_id)
 {
-    SND_STR_WORK* str;
+    SND_STR* str;
 
     str = Snd_search_str_work_snd_id(snd_id);
     if (str == NULL) {
         return -1;
     }
-    return (s16) str->status;
+    return (s16) str->be_flag;
 }
 
 // 1 while the stream work exists, 0 when gone.
 int Snd_str_end_check(u32 snd_id)
 {
-    SND_STR_WORK* str;
+    SND_STR* str;
 
     str = Snd_search_str_work_snd_id(snd_id);
     if (str == NULL) {
@@ -272,12 +272,12 @@ int Snd_str_pronounce_ck_type(u8 type)
 // 4 when any stream work of `type` is in use.
 int str_pro_ck_str_work(u8 type)
 {
-    SND_STR_WORK* str;
+    SND_STR* str;
     int i;
 
     for (i = 0; i < SND_STR_MAX; i++) {
         str = &Snd_str_work[i];
-        if (str->status != 0 && (type & str->type)) {
+        if (str->be_flag != 0 && (type & str->str_type)) {
             return 4;
         }
     }
@@ -287,11 +287,11 @@ int str_pro_ck_str_work(u8 type)
 // ARAM buffers of stream slot `no`: left at `adr`, right 128 KB above (and their nibble addresses).
 void Snd_str_aram_adrs_set(int no, u32 adr)
 {
-    SND_STR_WORK* str;
+    SND_STR* str;
 
     str = &Snd_str_work[no];
-    str->aram_L = adr;
-    str->aram_R = str->aram_L + 0x20000;
-    str->aram_L_nbl = str->aram_L * 2;
-    str->aram_R_nbl = str->aram_R * 2;
+    str->ar_buff_adrs_l = adr;
+    str->ar_buff_adrs_r = str->ar_buff_adrs_l + 0x20000;
+    str->ar_buff_nbl_l = str->ar_buff_adrs_l * 2;
+    str->ar_buff_nbl_r = str->ar_buff_adrs_r * 2;
 }

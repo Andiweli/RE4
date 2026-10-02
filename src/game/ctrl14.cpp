@@ -21,63 +21,63 @@
 // collision file 5. NULL when the objects or a work are missing.
 cCtrl* GetCtrlDragon(u32 type)
 {
-    cModel* obj[5];
+    cObj* pDragon[5];
     Vec pos;
     Vec rot;
     cCtrl* c;
-    Ctrl14Work* w;
+    CTRL14_FREE* w;
     u32 no;
 
     switch (type) {
     case 0:
-        obj[0] = SmdGetObjPtr(0xA);
-        obj[1] = SmdGetObjPtr(0xB);
-        obj[3] = SmdGetObjPtr(0xD);
+        pDragon[0] = SmdGetObjPtr(0xA);
+        pDragon[1] = SmdGetObjPtr(0xB);
+        pDragon[3] = SmdGetObjPtr(0xD);
         no = 0xE;
         break;
     case 1:
-        obj[0] = SmdGetObjPtr(0xF);
-        obj[1] = SmdGetObjPtr(0x10);
-        obj[3] = SmdGetObjPtr(0x12);
+        pDragon[0] = SmdGetObjPtr(0xF);
+        pDragon[1] = SmdGetObjPtr(0x10);
+        pDragon[3] = SmdGetObjPtr(0x12);
         no = 0x13;
         break;
     case 2:
-        obj[0] = SmdGetObjPtr(0x14);
-        obj[1] = SmdGetObjPtr(0x15);
-        obj[3] = SmdGetObjPtr(0x16);
+        pDragon[0] = SmdGetObjPtr(0x14);
+        pDragon[1] = SmdGetObjPtr(0x15);
+        pDragon[3] = SmdGetObjPtr(0x16);
         no = 0x17;
         break;
     default:
         goto create;
     }
-    obj[4] = SmdGetObjPtr(no);
-    if (obj[0] == NULL || obj[1] == NULL || obj[3] == NULL || obj[4] == NULL) {
+    pDragon[4] = SmdGetObjPtr(no);
+    if (pDragon[0] == NULL || pDragon[1] == NULL || pDragon[3] == NULL || pDragon[4] == NULL) {
         return NULL;
     }
-    obj[0]->setMove(1);
-    obj[1]->setMove(1);
-    obj[3]->setMove(1);
-    obj[4]->setMove(1);
+    pDragon[0]->setMove(1);
+    pDragon[1]->setMove(1);
+    pDragon[3]->setMove(1);
+    pDragon[4]->setMove(1);
 create:
     c = CtrlMgr.createBack(0x14);
     if (c == NULL) {
         return NULL;
     }
-    w = (Ctrl14Work*) c->work;
-    w->obj[0] = obj[0];
-    w->obj[1] = obj[1];
-    w->obj[3] = obj[3];
-    w->obj[4] = obj[4];
-    w->type = type;
-    w->espKind = EspPullCoreKind();
-    pos = w->obj[1]->pos;
-    rot = w->obj[1]->ang;
-    if (obj[0]) {
-        w->sat[0] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 5), 0, &pos, &rot, 1);
+    w = (CTRL14_FREE*) c->work;
+    w->pDragon[0] = pDragon[0];
+    w->pDragon[1] = pDragon[1];
+    w->pDragon[3] = pDragon[3];
+    w->pDragon[4] = pDragon[4];
+    w->Type = type;
+    w->EffKindId = EspPullCoreKind();
+    pos = w->pDragon[1]->pos;
+    rot = w->pDragon[1]->ang;
+    if (pDragon[0]) {
+        w->pEat[0] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 5), 0, &pos, &rot, 1);
     }
-    w->sat[1] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 5), 0, &pos, &rot, 2);
+    w->pEat[1] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 5), 0, &pos, &rot, 2);
     // pG: the original loads pG after the sat[1] store; a plain pG here is hoisted above the argument setup
-    w->sat[2] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 5), 0, &pos, &rot, 3);
+    w->pEat[2] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 5), 0, &pos, &rot, 3);
     return c;
 }
 
@@ -86,73 +86,73 @@ create:
 // moving flag (bit1, set by addWidth / addHeight this frame) changes.
 void cCtrl14::move()
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
     Vec pos;
     Vec rot;
     u8 flags;
 
-    if (w->fireDelay) {
-        w->fireDelay--;
-        if (w->fireDelay == 0) {
-            EstSet(w->obj[1], -1, NULL, NULL, EFF_ROOM, 2, 1, w->espKind, w->obj[1], NULL);
-            SndCall(6, 2, &w->obj[1]->pos, 0, 0, w->obj[1]);
-            w->fireTimer = 60;
+    if (w->Fire_wait) {
+        w->Fire_wait--;
+        if (w->Fire_wait == 0) {
+            EstSet(w->pDragon[1], -1, NULL, NULL, EFF_ROOM, 2, 1, w->EffKindId, w->pDragon[1], NULL);
+            SndCall(6, 2, &w->pDragon[1]->pos, 0, 0, w->pDragon[1]);
+            w->Fire_timer = 60;
         }
     }
-    if (w->fireTimer) {
-        w->fireTimer--;
-        if (w->fireTimer == 0) {
-            EffectEspgenDelete(0, w->espKind, w->obj[1]);
-            EstSet(w->obj[1], -1, NULL, NULL, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, w->obj[1], NULL);
+    if (w->Fire_timer) {
+        w->Fire_timer--;
+        if (w->Fire_timer == 0) {
+            EffectEspgenDelete(0, w->EffKindId, w->pDragon[1]);
+            EstSet(w->pDragon[1], -1, NULL, NULL, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, w->pDragon[1], NULL);
         }
     }
-    pos = w->obj[1]->getPartsPtr(0)->world;
-    rot = w->obj[1]->ang;
-    if (w->obj[0]) {
-        w->sat[0]->setCoord(&pos, &rot);
+    pos = w->pDragon[1]->getPartsPtr(0)->world;
+    rot = w->pDragon[1]->ang;
+    if (w->pDragon[0]) {
+        w->pEat[0]->setCoord(&pos, &rot);
     }
-    w->sat[1]->setCoord(&pos, &rot);
-    w->sat[2]->setCoord(&pos, &rot);
-    flags = w->flags;
+    w->pEat[1]->setCoord(&pos, &rot);
+    w->pEat[2]->setCoord(&pos, &rot);
+    flags = w->Chain_se_ck;
     if (flags & 1) {
         if (!(flags & 2)) {
-            w->flags = flags & ~1;
-            switch (w->type) {
+            w->Chain_se_ck = flags & ~1;
+            switch (w->Type) {
             case 0:
-                SndCall(6, 8, &w->obj[1]->pos, 0, 0, w->obj[1]);
+                SndCall(6, 8, &w->pDragon[1]->pos, 0, 0, w->pDragon[1]);
                 break;
             case 1:
-                SndCall(6, 0xA, &w->obj[1]->pos, 0, 0, w->obj[1]);
+                SndCall(6, 0xA, &w->pDragon[1]->pos, 0, 0, w->pDragon[1]);
                 break;
             case 2:
-                SndCall(6, 0xC, &w->obj[1]->pos, 0, 0, w->obj[1]);
+                SndCall(6, 0xC, &w->pDragon[1]->pos, 0, 0, w->pDragon[1]);
                 break;
             }
         }
     } else {
         if (flags & 2) {
-            w->flags = flags | 1;
-            switch (w->type) {
+            w->Chain_se_ck = flags | 1;
+            switch (w->Type) {
             case 0:
-                SndCall(6, 7, &w->obj[1]->pos, 0, 0, w->obj[1]);
+                SndCall(6, 7, &w->pDragon[1]->pos, 0, 0, w->pDragon[1]);
                 break;
             case 1:
-                SndCall(6, 9, &w->obj[1]->pos, 0, 0, w->obj[1]);
+                SndCall(6, 9, &w->pDragon[1]->pos, 0, 0, w->pDragon[1]);
                 break;
             case 2:
-                SndCall(6, 0xB, &w->obj[1]->pos, 0, 0, w->obj[1]);
+                SndCall(6, 0xB, &w->pDragon[1]->pos, 0, 0, w->pDragon[1]);
                 break;
             }
         }
     }
-    w->flags &= ~2;
+    w->Chain_se_ck &= ~2;
 }
 
 // Matrix of piece `idx` (0 base, 1 head, ...).
 void cCtrl14::getBaseMtx(Mtx m, int type)
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
-    cModel* o = w->obj[type];
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
+    cModel* o = w->pDragon[type];
 
     if (o) {
         PSMTXCopy(o->mat, m);
@@ -162,8 +162,8 @@ void cCtrl14::getBaseMtx(Mtx m, int type)
 // The head's position.
 void cCtrl14::getPos(Vec* pPos)
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
-    cModel* o = w->obj[1];
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
+    cModel* o = w->pDragon[1];
 
     if (o) {
         *pPos = o->pos;
@@ -173,8 +173,8 @@ void cCtrl14::getPos(Vec* pPos)
 // The head's yaw.
 f32 cCtrl14::getDir()
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
-    cModel* o = w->obj[1];
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
+    cModel* o = w->pDragon[1];
 
     if (o == NULL) {
         return 0.0f;
@@ -185,11 +185,11 @@ f32 cCtrl14::getDir()
 // The head's yaw relative to the base (how far it is turned).
 f32 cCtrl14::getDir2()
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
     f32 ret = 0.0f;
 
-    if (w->obj[1] && w->obj[0]) {
-        ret = Muku2(w->obj[0]->ang.y, w->obj[1]->ang.y, PI);
+    if (w->pDragon[1] && w->pDragon[0]) {
+        ret = Muku2(w->pDragon[0]->ang.y, w->pDragon[1]->ang.y, PI);
     } else {
         ret = 0.0f;
     }
@@ -200,8 +200,8 @@ f32 cCtrl14::getDir2()
 // type (type 2 does not slide); marks it moving.
 void cCtrl14::addWidth(f32 add)
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
-    cModel* o = w->obj[0];
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
+    cModel* o = w->pDragon[0];
     Vec v;
     Vec p;
 
@@ -210,8 +210,8 @@ void cCtrl14::addWidth(f32 add)
         v.y = 0.0f;
         v.z = 0.0f;
         PSMTXMultVecSR(o->mat, &v, &v);
-        PSVECAdd(&w->obj[0]->pos, &v, &p);
-        switch (w->type) {
+        PSVECAdd(&w->pDragon[0]->pos, &v, &p);
+        switch (w->Type) {
         case 0:
             if (p.x > -6300.0f) {
                 p.x = -6300.0f;
@@ -231,19 +231,19 @@ void cCtrl14::addWidth(f32 add)
         case 2:
             return;
         }
-        PSVECSubtract(&p, &w->obj[0]->pos, &v);
+        PSVECSubtract(&p, &w->pDragon[0]->pos, &v);
         v.y = 0.0f;
-        if (w->obj[0]) {
-            PSVECAdd(&w->obj[0]->pos, &v, &w->obj[0]->pos);
+        if (w->pDragon[0]) {
+            PSVECAdd(&w->pDragon[0]->pos, &v, &w->pDragon[0]->pos);
         }
-        if (w->obj[1]) {
-            PSVECAdd(&w->obj[1]->pos, &v, &w->obj[1]->pos);
+        if (w->pDragon[1]) {
+            PSVECAdd(&w->pDragon[1]->pos, &v, &w->pDragon[1]->pos);
         }
-        if (w->obj[3]) {
-            PSVECAdd(&w->obj[3]->pos, &v, &w->obj[3]->pos);
+        if (w->pDragon[3]) {
+            PSVECAdd(&w->pDragon[3]->pos, &v, &w->pDragon[3]->pos);
         }
-        if (w->obj[4]) {
-            PSVECAdd(&w->obj[4]->pos, &v, &w->obj[4]->pos);
+        if (w->pDragon[4]) {
+            PSVECAdd(&w->pDragon[4]->pos, &v, &w->pDragon[4]->pos);
         }
     }
 }
@@ -251,46 +251,46 @@ void cCtrl14::addWidth(f32 add)
 // Raises / lowers the whole dragon by `y` (upper limits per type); marks it moving.
 void cCtrl14::addHeight(f32 add)
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
 
-    if (w->type == 2) {
-        if (w->obj[0]->pos.y > 30000.0f && add > 0.0f) {
+    if (w->Type == 2) {
+        if (w->pDragon[0]->pos.y > 30000.0f && add > 0.0f) {
             return;
         }
     } else {
-        if (w->obj[0]->pos.y > 5000.0f && add > 0.0f) {
+        if (w->pDragon[0]->pos.y > 5000.0f && add > 0.0f) {
             return;
         }
     }
-    if (w->obj[0]) {
-        w->obj[0]->pos.y += add;
+    if (w->pDragon[0]) {
+        w->pDragon[0]->pos.y += add;
     }
-    if (w->obj[1]) {
-        w->obj[1]->pos.y += add;
+    if (w->pDragon[1]) {
+        w->pDragon[1]->pos.y += add;
     }
-    if (w->obj[3]) {
-        w->obj[3]->pos.y += add;
+    if (w->pDragon[3]) {
+        w->pDragon[3]->pos.y += add;
     }
-    if (w->obj[4]) {
-        w->obj[4]->pos.y += add;
+    if (w->pDragon[4]) {
+        w->pDragon[4]->pos.y += add;
     }
     add = fabsf(add);
     if (add > 1.0f) {
-        w->flags |= 2;
+        w->Chain_se_ck |= 2;
     }
 }
 
 // Turns the base by `add` radians; the head follows within +-45 degrees of the base.
 void cCtrl14::addDir(f32 add)
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
-    cModel* o = w->obj[1];
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
+    cModel* o = w->pDragon[1];
 
     if (o) {
         o->ang.y += add;
-        if (w->obj[0]) {
-            w->obj[1]->ang.y = w->obj[0]->ang.y + Muku2(w->obj[0]->ang.y, w->obj[1]->ang.y, PI / 4.0f);
-            w->obj[1]->ang.y = LIMIT_ANGLE(w->obj[1]->ang.y);
+        if (w->pDragon[0]) {
+            w->pDragon[1]->ang.y = w->pDragon[0]->ang.y + Muku2(w->pDragon[0]->ang.y, w->pDragon[1]->ang.y, PI / 4.0f);
+            w->pDragon[1]->ang.y = LIMIT_ANGLE(w->pDragon[1]->ang.y);
         }
     }
 }
@@ -298,40 +298,40 @@ void cCtrl14::addDir(f32 add)
 // Sets the head's yaw relative to the base.
 void cCtrl14::setDir(f32 dir)
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
 
-    if (w->obj[1] && w->obj[0]) {
-        w->obj[1]->ang.y = w->obj[0]->ang.y + dir;
-        w->obj[1]->ang.y = LIMIT_ANGLE(w->obj[1]->ang.y);
+    if (w->pDragon[1] && w->pDragon[0]) {
+        w->pDragon[1]->ang.y = w->pDragon[0]->ang.y + dir;
+        w->pDragon[1]->ang.y = LIMIT_ANGLE(w->pDragon[1]->ang.y);
     }
 }
 
 // Eases the head back to the base's direction (0.35 degrees per frame).
 void cCtrl14::resetDir()
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
 
-    if (w->obj[1]) {
-        w->obj[1]->ang.y += Muku2(w->obj[1]->ang.y, w->obj[0]->ang.y, 0.0061359233f);
-        w->obj[1]->ang.y = LIMIT_ANGLE(w->obj[1]->ang.y);
+    if (w->pDragon[1]) {
+        w->pDragon[1]->ang.y += Muku2(w->pDragon[1]->ang.y, w->pDragon[0]->ang.y, 0.0061359233f);
+        w->pDragon[1]->ang.y = LIMIT_ANGLE(w->pDragon[1]->ang.y);
     }
 }
 
 // Starts a flame: cancels a running jet, 30 frame wind-up est (1/3) with the SE, then the jet.
 void cCtrl14::setFire()
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
-    cModel* o = w->obj[1];
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
+    cModel* o = w->pDragon[1];
 
     if (o) {
-        if (w->fireTimer) {
-            w->fireTimer = 0;
-            EffectEspgenDelete(0, w->espKind, o);
-            EstSet(w->obj[1], -1, NULL, NULL, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, w->obj[1], NULL);
+        if (w->Fire_timer) {
+            w->Fire_timer = 0;
+            EffectEspgenDelete(0, w->EffKindId, o);
+            EstSet(w->pDragon[1], -1, NULL, NULL, EFF_ROOM, 4, 1, ESP_CORE_KIND_NONE, w->pDragon[1], NULL);
         }
-        w->fireDelay = 30;
-        EstSet(w->obj[1], -1, NULL, NULL, EFF_ROOM, 3, 1, w->espKind, w->obj[1], NULL);
-        SndCall(6, 1, &w->obj[1]->pos, 0, 0, w->obj[1]);
+        w->Fire_wait = 30;
+        EstSet(w->pDragon[1], -1, NULL, NULL, EFF_ROOM, 3, 1, w->EffKindId, w->pDragon[1], NULL);
+        SndCall(6, 1, &w->pDragon[1]->pos, 0, 0, w->pDragon[1]);
     }
 }
 
@@ -339,15 +339,15 @@ void cCtrl14::setFire()
 // +-1500 wide, +-5000 high).
 int cCtrl14::ckHitFire(Vec* pPos)
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
-    cModel* o = w->obj[1];
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
+    cModel* o = w->pDragon[1];
     Mtx inv;
     Vec v;
 
     if (o == NULL) {
         return 0;
     }
-    if (w->fireTimer == 0) {
+    if (w->Fire_timer == 0) {
         return 0;
     }
     PSMTXInverse(o->mat, inv);
@@ -377,19 +377,19 @@ int cCtrl14::ckHitFire(Vec* pPos)
 // at chest height, so the flame does not reach him.
 int cCtrl14::ckHitFireBlocked()
 {
-    Ctrl14Work* w = (Ctrl14Work*) work;
+    CTRL14_FREE* w = (CTRL14_FREE*) work;
     Vec a;
     Vec b;
 
-    if (w->obj[1]) {
+    if (w->pDragon[1]) {
         a.x = 0.0f;
         a.y = 0.0f;
         a.z = 6000.0f;
         b.x = -2000.0f;
         b.y = 0.0f;
         b.z = 15000.0f;
-        PSMTXMultVec(w->obj[1]->mat, &a, &a);
-        PSMTXMultVec(w->obj[1]->mat, &b, &b);
+        PSMTXMultVec(w->pDragon[1]->mat, &a, &a);
+        PSMTXMultVec(w->pDragon[1]->mat, &b, &b);
         a.y = pPL->pos.y + 1600.0f;
         b.y = pPL->pos.y + 1600.0f;
         if (EatMgr.hitCheck(&a, &b, NULL, NULL, 0, 0x400000)) {
@@ -401,8 +401,8 @@ int cCtrl14::ckHitFireBlocked()
         b.x = 0.0f;
         b.y = 0.0f;
         b.z = 15000.0f;
-        PSMTXMultVec(w->obj[1]->mat, &a, &a);
-        PSMTXMultVec(w->obj[1]->mat, &b, &b);
+        PSMTXMultVec(w->pDragon[1]->mat, &a, &a);
+        PSMTXMultVec(w->pDragon[1]->mat, &b, &b);
         a.y = pPL->pos.y + 1600.0f;
         b.y = pPL->pos.y + 1600.0f;
         if (EatMgr.hitCheck(&a, &b, NULL, NULL, 0, 0x400000)) {
@@ -414,8 +414,8 @@ int cCtrl14::ckHitFireBlocked()
         b.x = 2000.0f;
         b.y = 0.0f;
         b.z = 15000.0f;
-        PSMTXMultVec(w->obj[1]->mat, &a, &a);
-        PSMTXMultVec(w->obj[1]->mat, &b, &b);
+        PSMTXMultVec(w->pDragon[1]->mat, &a, &a);
+        PSMTXMultVec(w->pDragon[1]->mat, &b, &b);
         a.y = pPL->pos.y + 1600.0f;
         b.y = pPL->pos.y + 1600.0f;
         return EatMgr.hitCheck(&a, &b, NULL, NULL, 0, 0x400000) == 0;

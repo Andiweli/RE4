@@ -58,7 +58,7 @@ void TplViewer();
 void ToolTplView()
 {
     tplStopFlagBak = pG->Stop_flg;
-    pG->Stop_flg |= 0x10000000;
+    SpfFlagOn(pG, SPF_PL);
     ToolArrayPush(0);
     for (;;) {
         TplViewer();

@@ -62,12 +62,12 @@ static void R11b_bgm_ck();
 static void r11b_ThunderFlagOn();
 static void r11b_ThunderFlagOff();
 static void r11b_ThunderMove();
-extern "C" void EmSetChange();
+void EmSetChange();
 static void r11b_EmEvent_exit();
 static void r11b_EmEvent();
 static void R11b_Event();
 static void r11b_str_check();
-extern "C" void Evt_R11BS00_Func(Event* e);
+void Evt_R11BS00_Func(Event* e, u32);
 static void r11b_bort_pos_chk();
 
 // Room init for the lake shore and boat dock. The boat enemy is placed at the pier its return
@@ -104,8 +104,8 @@ void R11bInit()
     EatMgr.registEffInfo(EAT_ET_WATER, (AtEffInfo*) &r11b_eff_info);
     SceExec(0x12, (TaskFunc) r11b_ThunderMove, 0, 0, SCE_PRIO_DEF_2, 0);
     EvtMgr.SetFunc("evt_r11bs00_func", (void*) Evt_R11BS00_Func);
-    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, 0, obj);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 2, 0x800, ESP_CORE_KIND_NONE, 0, obj);
+    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 2, 0x800, ESP_CORE_KIND_NONE, 0, (ESPSEQ_CONTROL*) obj);
     StaFlagOn(pG, STA_ROOM_RAIN);
     if (RsfCheck(G_ROOM_ID, 0)) {
         SceExec(0x12, (TaskFunc) R11b_bgm_ck, 0, 0, SCE_PRIO_DEF_2, 0);
@@ -272,7 +272,7 @@ static void r11b_ThunderMove()
 #define EM_LIST_S(no) (&pG->Em_list[no])
 // Rewrite ESL entries 0x40/0x41/0x3E/0x3F (the shore Ganados) to their post-event positions near the
 // pier, un-set and alive, so they spawn there on later visits.
-extern "C" void EmSetChange()
+void EmSetChange()
 {
     EM_LIST* l;
 
@@ -474,7 +474,7 @@ static inline void r11b_evtEffDelete()
 // Event r11bs00 callback (two Ganados dump the officer's body in the lake; Del Lago takes them): hides
 // object 0x7C; fade-in on cut 0 unless skipped; per-cut splash / ripple effects (skipped when the event
 // is being skipped) and the water render setup on the player stand-in; the end restores the shore.
-extern "C" void Evt_R11BS00_Func(Event* e)
+void Evt_R11BS00_Func(Event* e, u32)
 {
     void* mod;
 

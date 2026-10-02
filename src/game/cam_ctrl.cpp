@@ -50,7 +50,7 @@ static const f32 smooth_ratio[12] = {0.0f, 0.9f, 0.85f, 0.92f, 0.8f, 0.92f, 0.9f
 
 // Converts a rail cut into the CameraMotion key-frame format (cam_motion): header, 4 channels
 // (pos, at, roll, fovy) x 3 components of hermite keys {value, tangent in, tangent out}.
-int CameraControl::HermiteExport(CameraCut* pCdat, u8* p)
+int CameraControl::HermiteExport(CAMERA_DATA* pCdat, u8* p)
 {
     u8* buf = p;  // the parameter is the running pointer (r5: `sth 0(r5); stbu 2(r5); addi r5,1`), buf the saved base
     u32* table;
@@ -69,7 +69,7 @@ int CameraControl::HermiteExport(CameraCut* pCdat, u8* p)
     f32 dt1;
     int n;
 
-    *(u16*) p = (pCdat->num - 1) * 30;
+    *(u16*) p = (pCdat->nPoint - 1) * 30;
     p += 2;
     *p++ = 4;
     for (i = 0; i < 4; i++) {
@@ -99,49 +99,49 @@ int CameraControl::HermiteExport(CameraCut* pCdat, u8* p)
     for (i = 0; i < 4; i++) {
         table[i] = p - buf;
         for (j = 0; j < 3; j++) {
-            *(u16*) p = pCdat->num;
+            *(u16*) p = pCdat->nPoint;
             p += 2;
             v = 0.0f;
             v0 = 0.0f;
             v1 = 0.0f;
             frames = (u16*) p;
-            for (k = 0; k < pCdat->num; k++) {
-                if (pCdat->frames == NULL) {
+            for (k = 0; k < pCdat->nPoint; k++) {
+                if (pCdat->pFrame == NULL) {
                     *(u16*) p = k * 30;
                 } else {
-                    *(u16*) p = pCdat->frames[k];
+                    *(u16*) p = pCdat->pFrame[k];
                 }
                 p += 2;
             }
-            for (k = 0; k < pCdat->num; k++) {
+            for (k = 0; k < pCdat->nPoint; k++) {
                 k1 = k + 1;
                 k0 = k - 1;
-                if (k1 > pCdat->num - 1) {
-                    k1 = pCdat->num - 1;
+                if (k1 > pCdat->nPoint - 1) {
+                    k1 = pCdat->nPoint - 1;
                 }
                 if (k0 < 0) {
                     k0 = 0;
                 }
                 switch (i) {
                 case 0:
-                    v = (&pCdat->pos[k].x)[j];
-                    v0 = (&pCdat->pos[k0].x)[j];
-                    v1 = (&pCdat->pos[k1].x)[j];
+                    v = (&pCdat->pCampos[k].x)[j];
+                    v0 = (&pCdat->pCampos[k0].x)[j];
+                    v1 = (&pCdat->pCampos[k1].x)[j];
                     break;
                 case 1:
-                    v = (&pCdat->at[k].x)[j];
-                    v0 = (&pCdat->at[k0].x)[j];
-                    v1 = (&pCdat->at[k1].x)[j];
+                    v = (&pCdat->pTarget[k].x)[j];
+                    v0 = (&pCdat->pTarget[k0].x)[j];
+                    v1 = (&pCdat->pTarget[k1].x)[j];
                     break;
                 case 2:
-                    v = pCdat->roll[k];
-                    v0 = pCdat->roll[k0];
-                    v1 = pCdat->roll[k1];
+                    v = pCdat->pRoll[k];
+                    v0 = pCdat->pRoll[k0];
+                    v1 = pCdat->pRoll[k1];
                     break;
                 case 3:
-                    v = pCdat->fovy[k];
-                    v0 = pCdat->fovy[k0];
-                    v1 = pCdat->fovy[k1];
+                    v = pCdat->pFovy[k];
+                    v0 = pCdat->pFovy[k0];
+                    v1 = pCdat->pFovy[k1];
                     v1 *= DEG2RAD;
                     v *= DEG2RAD;
                     v0 *= DEG2RAD;
@@ -153,7 +153,7 @@ int CameraControl::HermiteExport(CameraCut* pCdat, u8* p)
                 dt1 = (f32) (frames[k1] - frames[k]);
                 if (k == 0) {
                     tan = (v1 - v) / dt1;
-                } else if (pCdat->num - 1 == k) {
+                } else if (pCdat->nPoint - 1 == k) {
                     tan = (v - v0) / dt0;
                 } else {
                     tan = (dt1 * ((v - v0) / dt0) + dt0 * ((v1 - v) / dt1)) / (dt0 + dt1);
@@ -177,7 +177,7 @@ int CameraControl::HermiteExport(CameraCut* pCdat, u8* p)
             }
         }
     }
-    *(u16*) buf = frames[pCdat->num - 1];
+    *(u16*) buf = frames[pCdat->nPoint - 1];
     return p - buf;
 }
 
@@ -195,7 +195,7 @@ int CameraControl::IsChangeCamera()
 // flag, re-enables the area check and drops the motion-camera flag.
 void CameraControl::Comeback(int)
 {
-    pCamData = (CameraDataHeader*) pG->pCamRoom;
+    pCamData = (CAM_FILE_HEADER*) pG->pCamRoom;
     m_state_flag &= ~4;
     m_system_flag = (m_system_flag & ~8) | 0x10;
     if (m_system_flag & 0x20) {
@@ -227,7 +227,7 @@ void CameraControl::AreaCheckOnOff(int sw)
 // Number of camera areas in the room data.
 u8 CameraControl::AreaNum()
 {
-    return pCamData->numArea;
+    return pCamData->nAdat;
 }
 
 // Area number of the active camera (-1 none).
@@ -243,14 +243,14 @@ int CameraControl::CurrentCameraNo()
 }
 
 // The cut record with camera_no `no` (the last record when not found).
-CameraCut* CameraControl::DataSearch(int cameraNo)
+CAMERA_DATA* CameraControl::DataSearch(int cameraNo)
 {
-    CameraAreaRec* rec = (CameraAreaRec*) (pCamData + 1);
-    CameraAreaInfo* area = (CameraAreaInfo*) (rec + pCamData->numArea);
-    CameraCut* cut = (CameraCut*) (area + pCamData->numArea);
+    CUT_INFO* rec = (CUT_INFO*) (pCamData + 1);
+    AREA_DATA* area = (AREA_DATA*) (rec + pCamData->nAdat);
+    CAMERA_DATA* cut = (CAMERA_DATA*) (area + pCamData->nAdat);
     int i = 0;
 
-    while (i < pCamData->numCut && cameraNo != cut->camera_no) {
+    while (i < pCamData->nCdat && cameraNo != cut->No) {
         i++;
         cut++;
     }
@@ -259,17 +259,17 @@ CameraCut* CameraControl::DataSearch(int cameraNo)
 
 // The interpolation record for the transition from one area / camera to another; NULL when the
 // data has none (a hard cut).
-CameraLerp* CameraControl::LerpDataSearch(int srcNo, int srcSuf, int dstNo, int dstSuf)
+LERP_DATA* CameraControl::LerpDataSearch(int srcNo, int srcSuf, int dstNo, int dstSuf)
 {
-    CameraAreaRec* rec = (CameraAreaRec*) (pCamData + 1);
-    CameraAreaInfo* area = (CameraAreaInfo*) (rec + pCamData->numArea);
-    CameraCut* cut = (CameraCut*) (area + pCamData->numArea);
-    CameraLerp* lerp = (CameraLerp*) (cut + pCamData->numCut);
+    CUT_INFO* rec = (CUT_INFO*) (pCamData + 1);
+    AREA_DATA* area = (AREA_DATA*) (rec + pCamData->nAdat);
+    CAMERA_DATA* cut = (CAMERA_DATA*) (area + pCamData->nAdat);
+    LERP_DATA* lerp = (LERP_DATA*) (cut + pCamData->nCdat);
     int i;
 
-    for (i = 0; i < pCamData->numLerp; i++, lerp++) {
-        if (srcNo == lerp->area_from && srcSuf == lerp->cam_from && dstNo == lerp->area_to &&
-            dstSuf == lerp->cam_to) {
+    for (i = 0; i < pCamData->nLdat; i++, lerp++) {
+        if (srcNo == lerp->SrcNo && srcSuf == lerp->SrcSuffix && dstNo == lerp->DstNo &&
+            dstSuf == lerp->DstSuffix) {
             return lerp;
         }
     }
@@ -279,13 +279,14 @@ CameraLerp* CameraControl::LerpDataSearch(int srcNo, int srcSuf, int dstNo, int 
 // Relocates a camera data file in place ("B400".."B404": file offsets -> pointers for the area
 // polygons and the cut key arrays); older versions get their attr 8 promoted to 0x20. Returns
 // the buffer, or unchanged when already relocated / unknown.
-CameraDataHeader* CameraControl::calcAddr(CameraDataHeader* pBuff)
+CAM_FILE_HEADER* CameraControl::calcAddr(u8* head)
 {
+    CAM_FILE_HEADER* pBuff = (CAM_FILE_HEADER*) head;
     int ver2;
     int i;
-    CameraAreaRec* rec;
-    CameraAreaInfo* area;
-    CameraCut* cut;
+    CUT_INFO* rec;
+    AREA_DATA* area;
+    CAMERA_DATA* cut;
 
     if (cameraDataVersion((char*) pBuff) <= 1) {
         return pBuff;
@@ -296,54 +297,54 @@ CameraDataHeader* CameraControl::calcAddr(CameraDataHeader* pBuff)
         OSReport("CameraControl::calcAddr(): R%1d%02x Ver02", pG->stage_no, pG->room_no);
     }
 
-    rec = (CameraAreaRec*) (pBuff + 1);
-    for (i = 0; i < pBuff->numArea; i++, rec++) {
-        if ((s32) rec->area < 0) {
+    rec = (CUT_INFO*) (pBuff + 1);
+    for (i = 0; i < pBuff->nAdat; i++, rec++) {
+        if ((s32) rec->pAdat < 0) {
             return pBuff;
         }
-        rec->area = (CameraAreaInfo*) ((u32) rec->area + (u32) pBuff);
-        if (rec->cut) {
-            rec->cut = (CameraCut*) ((u32) rec->cut + (u32) pBuff);
+        rec->pAdat = (AREA_DATA*) ((u32) rec->pAdat + (u32) pBuff);
+        if (rec->pCdat) {
+            rec->pCdat = (CAMERA_DATA*) ((u32) rec->pCdat + (u32) pBuff);
         }
     }
 
-    area = (CameraAreaInfo*) rec;
-    for (i = 0; i < pBuff->numArea; i++, area++) {
-        area->points = (Vec*) ((u32) area->points + (u32) pBuff);
+    area = (AREA_DATA*) rec;
+    for (i = 0; i < pBuff->nAdat; i++, area++) {
+        area->pVer = (Vec*) ((u32) area->pVer + (u32) pBuff);
         if (ver2) {
-            area->attr = 3;
+            area->Attr = 3;
         }
-        if (area->attr & 8) {
-            area->attr |= 0x20;
+        if (area->Attr & 8) {
+            area->Attr |= 0x20;
         }
         if (cameraDataVersion((char*) pBuff) <= 3) {
-            area->attr2 = 1;
-            area->attr3 = 0xFF;
+            area->Type_char = 1;
+            area->Type_addr = 0xFF;
             OSReport("CameraControl::calcAddr(): R%1d%02x Ver%02d", pG->stage_no, pG->room_no,
                      cameraDataVersion((char*) pBuff));
         }
     }
 
-    cut = (CameraCut*) area;
-    for (i = 0; i < pBuff->numCut; i++, cut++) {
-        cut->pos = (Vec*) ((u32) cut->pos + (u32) pBuff);
-        cut->at = (Vec*) ((u32) cut->at + (u32) pBuff);
-        cut->roll = (f32*) ((u32) cut->roll + (u32) pBuff);
-        cut->fovy = (f32*) ((u32) cut->fovy + (u32) pBuff);
-        cut->frames = (u16*) ((u32) cut->frames + (u32) pBuff);
+    cut = (CAMERA_DATA*) area;
+    for (i = 0; i < pBuff->nCdat; i++, cut++) {
+        cut->pCampos = (Vec*) ((u32) cut->pCampos + (u32) pBuff);
+        cut->pTarget = (Vec*) ((u32) cut->pTarget + (u32) pBuff);
+        cut->pRoll = (f32*) ((u32) cut->pRoll + (u32) pBuff);
+        cut->pFovy = (f32*) ((u32) cut->pFovy + (u32) pBuff);
+        cut->pFrame = (u16*) ((u32) cut->pFrame + (u32) pBuff);
     }
     return pBuff;
 }
 
 // Installs the room's camera data (relocated).
-void CameraControl::RoomDataRead(CameraDataHeader* pBuff)
+void CameraControl::RoomDataRead(u8* pBuff)
 {
     pG->pCamRoom = calcAddr(pBuff);
-    pCamData = (CameraDataHeader*) pG->pCamRoom;
+    pCamData = (CAM_FILE_HEADER*) pG->pCamRoom;
 }
 
 // Installs the core (shared) camera data.
-void CameraControl::CoreDataRead(CameraDataHeader* pBuff)
+void CameraControl::CoreDataRead(u8* pBuff)
 {
     pG->pCamCore = calcAddr(pBuff);
 }
@@ -471,25 +472,25 @@ int cameraHitCheck(Vec* pos, Vec* nrm, Vec* from, Vec* to)
 }
 
 // Copies the cut's first key (pos / at / roll / fov) into a Camera and rebuilds its orientation.
-void CameraSetCutData(CAMERA* pCam, CameraCut* pData)
+void CameraSetCutData(CAMERA* pCam, CAMERA_DATA* pData)
 {
-    pCam->param.pos = *pData->pos;
-    pCam->param.at = *pData->at;
-    pCam->param.roll = *pData->roll;
-    pCam->param.fovy = *pData->fovy;
+    pCam->param.Campos = *pData->pCampos;
+    pCam->param.Target = *pData->pTarget;
+    pCam->param.Roll = *pData->pRoll;
+    pCam->param.Fovy = *pData->pFovy;
     CameraSetOrientationRoll(pCam);
 }
 
 // Script: enables / disables the camera area (area_no, camera_no) for the area check.
 void CameraControl::AreaOnOff(int No, int Suffix, int OnOff)
 {
-    CameraDataHeader* d = pCamData;
-    CameraAreaRec* rec = (CameraAreaRec*) (d + 1);
+    CAM_FILE_HEADER* d = pCamData;
+    CUT_INFO* rec = (CUT_INFO*) (d + 1);
     s8 i;
 
-    for (i = 0; i < d->numArea; i++, rec++) {
-        if (No == rec->area->area_no && Suffix == rec->area->camera_no) {
-            rec->area->enable = OnOff;
+    for (i = 0; i < d->nAdat; i++, rec++) {
+        if (No == rec->pAdat->No && Suffix == rec->pAdat->Suffix) {
+            rec->pAdat->Be_flag = OnOff;
             break;
         }
     }
@@ -498,13 +499,13 @@ void CameraControl::AreaOnOff(int No, int Suffix, int OnOff)
 // Script: ORs `attr` bits into the area's attribute (0x20 normal, 1 / 2 calm / battle...).
 void CameraControl::SetAreaAttr(int No, int Suffix, u8 attr)
 {
-    CameraDataHeader* d = pCamData;
-    CameraAreaRec* rec = (CameraAreaRec*) (d + 1);
+    CAM_FILE_HEADER* d = pCamData;
+    CUT_INFO* rec = (CUT_INFO*) (d + 1);
     s8 i;
 
-    for (i = 0; i < d->numArea; i++, rec++) {
-        if (No == rec->area->area_no && Suffix == rec->area->camera_no) {
-            rec->area->attr |= attr;
+    for (i = 0; i < d->nAdat; i++, rec++) {
+        if (No == rec->pAdat->No && Suffix == rec->pAdat->Suffix) {
+            rec->pAdat->Attr |= attr;
             break;
         }
     }
@@ -513,13 +514,13 @@ void CameraControl::SetAreaAttr(int No, int Suffix, u8 attr)
 // Script: clears `attr` bits of the area's attribute.
 void CameraControl::UnsetAreaAttr(int No, int Suffix, u8 attr)
 {
-    CameraDataHeader* d = pCamData;
-    CameraAreaRec* rec = (CameraAreaRec*) (d + 1);
+    CAM_FILE_HEADER* d = pCamData;
+    CUT_INFO* rec = (CUT_INFO*) (d + 1);
     s8 i;
 
-    for (i = 0; i < d->numArea; i++, rec++) {
-        if (No == rec->area->area_no && Suffix == rec->area->camera_no) {
-            rec->area->attr &= ~attr;
+    for (i = 0; i < d->nAdat; i++, rec++) {
+        if (No == rec->pAdat->No && Suffix == rec->pAdat->Suffix) {
+            rec->pAdat->Attr &= ~attr;
             break;
         }
     }
@@ -529,13 +530,13 @@ void CameraControl::UnsetAreaAttr(int No, int Suffix, u8 attr)
 // Comeback.
 void CameraControl::CutCall(int cutNo)
 {
-    CameraDataHeader* d = pCamData;
-    CameraAreaRec* rec = (CameraAreaRec*) (d + 1);
+    CAM_FILE_HEADER* d = pCamData;
+    CUT_INFO* rec = (CUT_INFO*) (d + 1);
     int found = 0;
     s8 i;
 
-    for (i = 0; i < d->numArea; i++, rec++) {
-        if (cutNo == rec->cut->camera_no) {
+    for (i = 0; i < d->nAdat; i++, rec++) {
+        if (cutNo == rec->pCdat->No) {
             found = 1;
             break;
         }
@@ -553,31 +554,31 @@ void CameraControl::CutCall(int cutNo)
 
 // Activates the area record: sets up the lerp from the current camera and picks the routine from
 // the cut type.
-void CameraControl::switchCamera(CameraAreaRec* rec)
+void CameraControl::switchCamera(CUT_INFO* rec)
 {
-    CameraAreaInfo* area = rec->area;
-    CameraCut* cut = rec->cut;
-    CameraLerp* lerp = NULL;
-    CameraDataHeader* d;
+    AREA_DATA* area = rec->pAdat;
+    CAMERA_DATA* cut = rec->pCdat;
+    LERP_DATA* lerp = NULL;
+    CAM_FILE_HEADER* d;
     int i;
     int size;
 
     if (areaNo != -1) {
-        lerp = LerpDataSearch(areaNo, areaSuffix, area->area_no, area->camera_no);
-        if (lerp && lerp->enable == 1) {
-            m_Inter.set(lerp->frame, &cur);
+        lerp = LerpDataSearch(areaNo, areaSuffix, area->No, area->Suffix);
+        if (lerp && lerp->Be_flag == 1) {
+            m_Inter.set(lerp->InterFrame, &cur);
         }
     } else {
         m_Inter.frame = 0;
     }
 
     if (m_system_flag & 2) {
-        if (!(rec->area->attr & 8)) {
-            CameraAreaRec* r;
+        if (!(rec->pAdat->Attr & 8)) {
+            CUT_INFO* r;
             d = pCamData;
-            for (r = (CameraAreaRec*) (d + 1), i = 0; i < d->numArea; r++, i++) {
-                if (r->area->attr & 8) {
-                    r->area->enable = 0;
+            for (r = (CUT_INFO*) (d + 1), i = 0; i < d->nAdat; r++, i++) {
+                if (r->pAdat->Attr & 8) {
+                    r->pAdat->Be_flag = 0;
                 }
             }
         }
@@ -585,23 +586,23 @@ void CameraControl::switchCamera(CameraAreaRec* rec)
     }
 
     if (area_rec != NULL) {
-        CameraAreaInfo* a = area_rec->area;
-        if (a->attr & 0x10) {
-            a->enable = 0;
-        } else if (a->attr & 8) {
-            CameraAreaRec* r;
+        AREA_DATA* a = area_rec->pAdat;
+        if (a->Attr & 0x10) {
+            a->Be_flag = 0;
+        } else if (a->Attr & 8) {
+            CUT_INFO* r;
             d = pCamData;
-            for (r = (CameraAreaRec*) (d + 1), i = 0; i < d->numArea; r++, i++) {
-                if (r->area->attr & 8) {
-                    r->area->enable = 0;
+            for (r = (CUT_INFO*) (d + 1), i = 0; i < d->nAdat; r++, i++) {
+                if (r->pAdat->Attr & 8) {
+                    r->pAdat->Be_flag = 0;
                 }
             }
         }
     }
 
-    areaNo = area->area_no;
-    areaSuffix = area->camera_no;
-    cameraNo = cut->camera_no;
+    areaNo = area->No;
+    areaSuffix = area->Suffix;
+    cameraNo = cut->No;
     area_rec = rec;
 
     if (areaNo != -1) {
@@ -609,13 +610,13 @@ void CameraControl::switchCamera(CameraAreaRec* rec)
             if (!(m_system_flag & 0x40)) {
                 LightMgr.update(areaNo, -1);
             }
-        } else if (!(area->attr & 0x80)) {
+        } else if (!(area->Attr & 0x80)) {
             LightMgr.update(areaNo, -1);
         }
     }
     m_state_flag |= 2;
 
-    switch (cut->type) {
+    switch (cut->Id) {
     case 0:
         r1 = 0;
         r0 = 1;
@@ -671,7 +672,7 @@ void CameraControl::switchCamera(CameraAreaRec* rec)
         if (q->readyArrayPtr() && p->transArrayPtr()) {
             p->setBlendData(q->readyArrayPtr(), p->transArrayPtr());
         }
-        q->setAreaData(area_rec->cut);
+        q->setAreaData(area_rec->pCdat);
         q->bindAreaCamera(area_rec);
         if (r0_old == 10 && !(m_system_flag & 0x10)) {
             m_QuasiFPS.setBlendCount(10);
@@ -687,9 +688,9 @@ void CameraControl::switchCamera(CameraAreaRec* rec)
 }
 
 // 1 when the area is enabled and matches both attribute masks.
-int areaAttr(CameraAreaInfo* p_area, u8 cut_attr, u8 char_type)
+int areaAttr(AREA_DATA* p_area, u8 cut_attr, u8 char_type)
 {
-    if ((p_area->enable & 1) && (p_area->attr & cut_attr) && (p_area->attr2 & char_type)) {
+    if ((p_area->Be_flag & 1) && (p_area->Attr & cut_attr) && (p_area->Type_char & char_type)) {
         return 1;
     }
     return 0;
@@ -697,15 +698,15 @@ int areaAttr(CameraAreaInfo* p_area, u8 cut_attr, u8 char_type)
 
 // 1 when `pos` is inside the area polygon (and, with attr 0x40, the facing `dir` is within 135
 // degrees of the area's direction).
-int areaHit(Vec* pPos, CameraAreaInfo* pArea, f32 dir_y)
+int areaHit(Vec* pPos, AREA_DATA* pArea, f32 dir_y)
 {
     int ret;
 
-    if (pArea->attr & 4) {
+    if (pArea->Attr & 4) {
         return 0;
     }
-    if (pArea->attr & 0x40) {
-        f32 d = pArea->dir;
+    if (pArea->Attr & 0x40) {
+        f32 d = pArea->Dir;
         while (dir_y >= PI) {
             dir_y -= PI2;
         }
@@ -723,7 +724,7 @@ int areaHit(Vec* pPos, CameraAreaInfo* pArea, f32 dir_y)
             return 0;
         }
     }
-    if (pArea->num > 4) {
+    if (pArea->nVer > 4) {
         ret = area_hit_pN(pPos, pArea);
     } else {
         ret = area_hit_p3(pPos, pArea);
@@ -732,27 +733,27 @@ int areaHit(Vec* pPos, CameraAreaInfo* pArea, f32 dir_y)
 }
 
 // Point in a convex area polygon of up to 4 points (height band base_y .. base_y + height).
-int area_hit_p3(Vec* pPos, CameraAreaInfo* pArea)
+int area_hit_p3(Vec* pPos, AREA_DATA* pArea)
 {
     Vec* p[3];  // the three corner pointers live in memory (stw/lwz around the calls)
     Vec v1, v2, v0, c0, c1;
     f32 y = pPos->y + 100.0f;
     int i, n, n1, i0;
 
-    if (y < pArea->base_y) {
+    if (y < pArea->Y) {
         return 0;
     }
-    if (y >= pArea->base_y + pArea->height) {
+    if (y >= pArea->Y + pArea->Height) {
         return 0;
     }
     for (i = 0; i <= 1; i++) {
-        n = pArea->num;
+        n = pArea->nVer;
         n1 = n - 1;   // its own statement: `(i0 + n - 1)` is reassociated by fold into `(i0 - 1) + n`
         i0 = i + i + 1;
         i0 %= n;      // two sets of i0: loop.c does not strength-reduce the 2i+1 giv
-        p[0] = &pArea->points[i0];
-        p[1] = &pArea->points[(i0 + n1) % n];
-        p[2] = &pArea->points[(i0 + 1) % n];
+        p[0] = &pArea->pVer[i0];
+        p[1] = &pArea->pVer[(i0 + n1) % n];
+        p[2] = &pArea->pVer[(i0 + 1) % n];
         PSVECSubtract(pPos, p[0], &v0);
         PSVECSubtract(p[1], p[0], &v1);
         PSVECSubtract(p[2], p[0], &v2);
@@ -768,7 +769,7 @@ int area_hit_p3(Vec* pPos, CameraAreaInfo* pArea)
 }
 
 // Point in an area polygon of more than 4 points (fan of triangles).
-int area_hit_pN(Vec* pPos, CameraAreaInfo* pArea)
+int area_hit_pN(Vec* pPos, AREA_DATA* pArea)
 {
     f32 y = pPos->y + 100.0f;
     f32 a0, c, pz;
@@ -778,19 +779,19 @@ int area_hit_pN(Vec* pPos, CameraAreaInfo* pArea)
                  // load (`mr r9,r7; lfs 0(r9)`), which combine cannot fold through the subreg
     int i, count, fx, fz;
 
-    if (y < pArea->base_y) {
+    if (y < pArea->Y) {
         return 0;
     }
-    if (y >= pArea->base_y + pArea->height) {
+    if (y >= pArea->Y + pArea->Height) {
         return 0;
     }
     a0 = 1.0f;  // a named 1.0: cse cannot fold it inside the loop (fmsubs/fmadds with f5), pool order 100/1.0/0.0
     pz = pPos->z;
     c = pPos->x - pz;
     count = 0;
-    for (i = 0; i < pArea->num; i++) {
-        pi = &pArea->points[i];
-        pj = &pArea->points[(i + 1) % pArea->num];
+    for (i = 0; i < pArea->nVer; i++) {
+        pi = &pArea->pVer[i];
+        pj = &pArea->pVer[(i + 1) % pArea->nVer];
         dx = pj->x - pi->x;
         dz = pj->z - pi->z;
         pt[0] = pi;
@@ -859,11 +860,11 @@ int area_hit_pN(Vec* pPos, CameraAreaInfo* pArea)
 void CameraControl::areaHitCheck()
 {
     static u8 blink = 0;
-    CameraDataHeader* d;
-    CameraAreaRec* rec;
-    CameraAreaRec* first;
-    CameraAreaInfo* pArea;
-    CameraCut* cut;
+    CAM_FILE_HEADER* d;
+    CUT_INFO* rec;
+    CUT_INFO* first;
+    AREA_DATA* pArea;
+    CAMERA_DATA* cut;
     u8 attr = 1;
     u8 old_attr;
     int old_area = areaNo;
@@ -932,12 +933,12 @@ void CameraControl::areaHitCheck()
         }
     }
 
-    first = rec = (CameraAreaRec*) (d + 1);
-    for (i = 0; i < d->numArea; i++, rec++) {
-        pArea = rec->area;
-        cut = rec->cut;
+    first = rec = (CUT_INFO*) (d + 1);
+    for (i = 0; i < d->nAdat; i++, rec++) {
+        pArea = rec->pAdat;
+        cut = rec->pCdat;
         if (areaAttr(pArea, 0x20, attr) && areaHit(&pPL->pos, pArea, pPL->ang.y)) {
-            if ((m_system_flag & 0x10) || cut->camera_no != cameraNo) {
+            if ((m_system_flag & 0x10) || cut->No != cameraNo) {
                 switchCamera(rec);
             }
             return;
@@ -968,18 +969,18 @@ void CameraControl::areaHitCheck()
     }
 
     if (areaNo != -1 && !(m_system_flag & 0x10)) {
-        pArea = area_rec->area;
+        pArea = area_rec->pAdat;
         if (areaAttr(pArea, m_cut_attr, attr) && areaHit(&pPL->pos, pArea, pPL->ang.y)) {
             return;
         }
     }
 
     rec = first;
-    for (i = 0; i < d->numArea; i++, rec++) {
-        pArea = rec->area;
-        cut = rec->cut;
+    for (i = 0; i < d->nAdat; i++, rec++) {
+        pArea = rec->pAdat;
+        cut = rec->pCdat;
         if (areaAttr(pArea, m_cut_attr, attr) && areaHit(&pPL->pos, pArea, pPL->ang.y)) {
-            if ((m_system_flag & 0x10) || cut->camera_no != cameraNo) {
+            if ((m_system_flag & 0x10) || cut->No != cameraNo) {
                 switchCamera(rec);
             }
             return;
@@ -1161,7 +1162,7 @@ void CameraControl::Move()
     }
     m_state_flag &= ~1;
     if (area_rec) {
-        CalcAim(area_rec->cut);
+        CalcAim(area_rec->pCdat);
     }
     switch (r0) {
     case 0:
@@ -1233,11 +1234,11 @@ void CameraControl::Move()
     }
 
     if (!StaFlagChk(pG, STA_EVENT)) {
-        if (GetWaterHeight(&cur.pos, &water_y)) {
-            t = sinf(cur.fovy * PI / 360.0f) / cosf(cur.fovy * PI / 360.0f);
+        if (GetWaterHeight(&cur.Campos, &water_y)) {
+            t = sinf(cur.Fovy * PI / 360.0f) / cosf(cur.Fovy * PI / 360.0f);
             lim = gain * (ZNEAR * t * 1.3333334f) + water_y;
-            if (cur.pos.y < lim) {
-                cur.pos.y = lim;
+            if (cur.Campos.y < lim) {
+                cur.Campos.y = lim;
             }
         }
     }
@@ -1254,7 +1255,7 @@ void CameraControl::Move()
 }
 
 // The aim point: player position + the cut's aim offset (flags bit0) or the default (1000 up).
-void CameraControl::CalcAim(CameraCut* pCdat)
+void CameraControl::CalcAim(CAMERA_DATA* pCdat)
 {
     static Vec offset0 = {0.0f, 1000.0f, 0.0f};
 
@@ -1265,8 +1266,8 @@ void CameraControl::CalcAim(CameraCut* pCdat)
     case 9:
         break;
     default:
-        if (pCdat->flags & 1) {
-            PSVECAdd(&pPL->pos, &pCdat->aim_ofs, &Aim);
+        if (pCdat->Attr & 1) {
+            PSVECAdd(&pPL->pos, &pCdat->offset, &Aim);
         } else {
             PSVECAdd(&pPL->pos, &offset0, &Aim);
         }
@@ -1281,7 +1282,7 @@ f32 CameraControl::getCameraPitch()
 }
 
 // Starts an interpolation of `f` frames from camera parameters `p`.
-void CameraInterpolation::set(int inter_frame, CameraParam* p)
+void CameraInterpolation::set(int inter_frame, CAMERA_POINT* p)
 {
     frame = inter_frame;
     param = *p;
@@ -1289,27 +1290,27 @@ void CameraInterpolation::set(int inter_frame, CameraParam* p)
 
 // One step toward the target parameters `p`: param moves 1 / frame of the remaining distance
 // each frame; when frame reaches 0 it snaps to `p`.
-void CameraInterpolation::move(CameraParam* p)
+void CameraInterpolation::move(CAMERA_POINT* p)
 {
-    CameraParam tmp;
+    CAMERA_POINT tmp;
     f32 r, s;
 
     if (frame != 0) {
         r = 1.0f / (f32) frame;
         s = 1.0f - r;
         tmp = *p;
-        PSVECScale(&param.pos, &param.pos, s);
-        PSVECScale(&param.at, &param.at, s);
-        param.roll *= s;
-        param.fovy *= s;
-        PSVECScale(&p->pos, &p->pos, r);
-        PSVECScale(&p->at, &p->at, r);
-        p->roll *= r;
-        p->fovy *= r;
-        PSVECAdd(&p->pos, &param.pos, &param.pos);
-        PSVECAdd(&p->at, &param.at, &param.at);
-        param.roll += p->roll;
-        param.fovy += p->fovy;
+        PSVECScale(&param.Campos, &param.Campos, s);
+        PSVECScale(&param.Target, &param.Target, s);
+        param.Roll *= s;
+        param.Fovy *= s;
+        PSVECScale(&p->Campos, &p->Campos, r);
+        PSVECScale(&p->Target, &p->Target, r);
+        p->Roll *= r;
+        p->Fovy *= r;
+        PSVECAdd(&p->Campos, &param.Campos, &param.Campos);
+        PSVECAdd(&p->Target, &param.Target, &param.Target);
+        param.Roll += p->Roll;
+        param.Fovy += p->Fovy;
         frame--;
     } else {
         frame = 0;
@@ -1318,14 +1319,14 @@ void CameraInterpolation::move(CameraParam* p)
 }
 
 // Resets the smoothing state to `p`.
-void CameraSmooth::init(CameraParam* p)
+void CameraSmooth::init(CAMERA_POINT* p)
 {
     m_effect = *p;
 }
 
 // Exponential smoothing: m_effect = m_ratio * old + (1 - m_ratio) * p (the quake offset is removed
 // from the old value first); a set reinit flag snaps to `p`.
-void CameraSmooth::move(CameraParam* p)
+void CameraSmooth::move(CAMERA_POINT* p)
 {
     Vec tmp;
 
@@ -1334,18 +1335,18 @@ void CameraSmooth::move(CameraParam* p)
         init(p);
         return;
     }
-    PSVECAdd(&m_effect.pos, &pG->quake_ofs, &m_effect.pos);
-    PSVECAdd(&m_effect.at, &pG->quake_ofs, &m_effect.at);
-    PSVECScale(&m_effect.pos, &m_effect.pos, m_ratio);
-    PSVECScale(&p->pos, &tmp, 1.0f - m_ratio);
-    PSVECAdd(&m_effect.pos, &tmp, &m_effect.pos);
-    PSVECScale(&m_effect.at, &m_effect.at, m_ratio);
-    PSVECScale(&p->at, &tmp, 1.0f - m_ratio);
-    PSVECAdd(&m_effect.at, &tmp, &m_effect.at);
-    m_effect.roll *= m_ratio;
-    m_effect.roll = p->roll * (1.0f - m_ratio) + m_effect.roll;
-    m_effect.fovy *= m_ratio;
-    m_effect.fovy = p->fovy * (1.0f - m_ratio) + m_effect.fovy;
+    PSVECAdd(&m_effect.Campos, &pG->quake_ofs, &m_effect.Campos);
+    PSVECAdd(&m_effect.Target, &pG->quake_ofs, &m_effect.Target);
+    PSVECScale(&m_effect.Campos, &m_effect.Campos, m_ratio);
+    PSVECScale(&p->Campos, &tmp, 1.0f - m_ratio);
+    PSVECAdd(&m_effect.Campos, &tmp, &m_effect.Campos);
+    PSVECScale(&m_effect.Target, &m_effect.Target, m_ratio);
+    PSVECScale(&p->Target, &tmp, 1.0f - m_ratio);
+    PSVECAdd(&m_effect.Target, &tmp, &m_effect.Target);
+    m_effect.Roll *= m_ratio;
+    m_effect.Roll = p->Roll * (1.0f - m_ratio) + m_effect.Roll;
+    m_effect.Fovy *= m_ratio;
+    m_effect.Fovy = p->Fovy * (1.0f - m_ratio) + m_effect.Fovy;
 }
 
 // r0 == 0: idle (an event / room owns pG->Camera).
@@ -1362,7 +1363,7 @@ void CameraControl::r0_Debug()
     Vec c;
     Vec unused[2];  // 0x18-byte frame slot between c and m in the original
     Mtx m;
-    CameraParam p;
+    CAMERA_POINT p;
     Vec hit;
     const Vec campos_ofs = {0.0f, 1900.0f, -2000.0f};
     const Vec target_ofs = {0.0f, 1000.0f, 0.0f};
@@ -1373,10 +1374,10 @@ void CameraControl::r0_Debug()
     case 0:
         this->campos_ofs = campos_ofs;
         this->target_ofs = target_ofs;
-        PSMTXMultVec(pPL->mat, &this->campos_ofs, &p.pos);
-        PSVECAdd(&pPL->pos, &this->target_ofs, &p.at);
-        p.roll = 0.0f;
-        p.fovy = 55.0f;
+        PSMTXMultVec(pPL->mat, &this->campos_ofs, &p.Campos);
+        PSVECAdd(&pPL->pos, &this->target_ofs, &p.Target);
+        p.Roll = 0.0f;
+        p.Fovy = 55.0f;
         cur = p;
         CamSmth.setFlag();
         r1++;
@@ -1409,14 +1410,14 @@ void CameraControl::r0_Debug()
         }
         PSVECAdd(&pPL->pos, dp, &a);
         PSVECAdd(&pPL->pos, da, &b);
-        PSVECScale(&cam->param.pos, &cam->param.pos, rate);
+        PSVECScale(&cam->param.Campos, &cam->param.Campos, rate);
         PSVECScale(&a, &c, 1.0f - rate);
-        PSVECAdd(&cam->param.pos, &c, &cam->param.pos);
-        PSVECScale(&cam->param.at, &cam->param.at, rate);
+        PSVECAdd(&cam->param.Campos, &c, &cam->param.Campos);
+        PSVECScale(&cam->param.Target, &cam->param.Target, rate);
         PSVECScale(&b, &c, 1.0f - rate);
-        PSVECAdd(&cam->param.at, &c, &cam->param.at);
-        if (SatMgr.hitCheck(&cam->param.at, &cam->param.pos, &hit, NULL, 0x8000, 0)) {
-            cam->param.pos = hit;
+        PSVECAdd(&cam->param.Target, &c, &cam->param.Target);
+        if (SatMgr.hitCheck(&cam->param.Target, &cam->param.Campos, &hit, NULL, 0x8000, 0)) {
+            cam->param.Campos = hit;
         }
         cur = cam->param;
         break;
@@ -1430,7 +1431,7 @@ void CameraControl::r0_Fix()
 {
     CAMERA cam;
 
-    CameraSetCutData(&cam, area_rec->cut);
+    CameraSetCutData(&cam, area_rec->pCdat);
     cur = cam.param;
     CamSmth.setFlag();
     r0 = 0;
@@ -1440,24 +1441,24 @@ void CameraControl::r0_Fix()
 // (Parametrize + searchRail + BSpline).
 void CameraControl::r0_Pan()
 {
-    CameraParam p;
-    CameraCut* cut = area_rec->cut;
+    CAMERA_POINT p;
+    CAMERA_DATA* cut = area_rec->pCdat;
 
     switch (r1) {
     case 0:
-        p.pos = *cut->pos;
-        p.roll = *cut->roll;
-        p.fovy = *cut->fovy;
-        p.at = Aim;
+        p.Campos = *cut->pCampos;
+        p.Roll = *cut->pRoll;
+        p.Fovy = *cut->pFovy;
+        p.Target = Aim;
         cur = p;
         CamSmth.setRatio(smooth_ratio[1]);
         CamSmth.setFlag();
         r1++;
     case 1:
-        p.pos = camera.param.pos;
-        p.roll = camera.param.roll;
-        p.fovy = camera.param.fovy;
-        p.at = Aim;
+        p.Campos = camera.param.Campos;
+        p.Roll = camera.param.Roll;
+        p.Fovy = camera.param.Fovy;
+        p.Target = Aim;
         cur = p;
         break;
     }
@@ -1468,8 +1469,8 @@ void CameraControl::r0_Pan()
 void CameraControl::r0_Track()
 {
     CAMERA cam;
-    CameraBSpline* bs = &CamBSpline;
-    CameraCut* cut = area_rec->cut;
+    CAM_B_SPLINE* bs = &CamBSpline;
+    CAMERA_DATA* cut = area_rec->pCdat;
 
     switch (r1) {
     case 0:
@@ -1496,15 +1497,15 @@ void CameraControl::r0_Track()
 void CameraControl::r0_RailPan()
 {
     CAMERA cam;
-    CameraBSpline* bs = &CamBSpline;
-    CameraCut* cut = area_rec->cut;
+    CAM_B_SPLINE* bs = &CamBSpline;
+    CAMERA_DATA* cut = area_rec->pCdat;
 
     switch (r1) {
     case 0:
         Parametrize(cut, bs);
         searchRail(bs, cut, &Aim, 0);
         BSpline(bs, &cam, 0);
-        cam.param.at = Aim;
+        cam.param.Target = Aim;
         cur = cam.param;
         CamSmth.setRatio(smooth_ratio[2]);
         CamSmth.setFlag();
@@ -1513,7 +1514,7 @@ void CameraControl::r0_RailPan()
     case 1:
         searchRail(bs, cut, &Aim, 0);
         BSpline(bs, &cam, 0);
-        cam.param.at = Aim;
+        cam.param.Target = Aim;
         cur = cam.param;
         if (pG->debug_mode == 0xF) {  // struct view: the pG load stays below the copy's stores
             debugDrawRail(cut);
@@ -1556,7 +1557,7 @@ void CameraControl::r0_RailBehind()
     Mtx m;
     Mtx inv;
     CAMERA* c = &camera;
-    CameraCut* cut = area_rec->cut;
+    CAMERA_DATA* cut = area_rec->pCdat;
     Vec xaxis = {1.0f, 0.0f, 0.0f};
     Vec yaxis = {0.0f, 1.0f, 0.0f};
     Vec zaxis = {0.0f, 0.0f, 1.0f};
@@ -1572,7 +1573,7 @@ void CameraControl::r0_RailBehind()
     Vec floor;
     Vec a;
     int reset = 0;
-    CameraBSpline* bs = &CamBSpline;
+    CAM_B_SPLINE* bs = &CamBSpline;
     JOY* joy = &Joy[0];
     int moved;
     int edge;
@@ -1584,8 +1585,8 @@ void CameraControl::r0_RailBehind()
     switch (r1) {
     case 0:
         Parametrize(cut, bs);
-        if (cut->flags & 1) {
-            this->campos_ofs = cut->aim_ofs;
+        if (cut->Attr & 1) {
+            this->campos_ofs = cut->offset;
             this->target_ofs = *(Vec*) &cut->floor_ratio;
         } else {
             this->campos_ofs = campos_ofs0;
@@ -1675,8 +1676,8 @@ void CameraControl::r0_RailBehind()
         }
         searchRail(bs, cut, &Aim, 0);
         edge = 0;
-        if (cut->flags & 4) {
-            if (bs->t == 0.0f || (f32) (cut->num - 1) == bs->t) {
+        if (cut->Attr & 4) {
+            if (bs->cand_t == 0.0f || (f32) (cut->nPoint - 1) == bs->cand_t) {
                 cam = camera_old;
                 edge = 1;
             }
@@ -1689,28 +1690,28 @@ void CameraControl::r0_RailBehind()
             if (edge == 1) {
                 edge_camera = 1;
             }
-            if ((cut->flags & 8) && init_flg == 1) {
+            if ((cut->Attr & 8) && init_flg == 1) {
                 edge_camera = 0;
                 if (edge == 0) {
                     init_flg = 0;
                 }
             }
         }
-        t = bs->t;
+        t = bs->cand_t;
         BSpline(bs, &cam, 0);
-        p0 = cam.param.at;
-        bs->t = t - 0.1f;
-        if (bs->t < 0.0f) {
-            bs->t = 0.0f;
+        p0 = cam.param.Target;
+        bs->cand_t = t - 0.1f;
+        if (bs->cand_t < 0.0f) {
+            bs->cand_t = 0.0f;
         }
         BSpline(bs, &cam, 0);
-        p1 = cam.param.at;
-        bs->t = t + 0.1f;
-        if (bs->t > (f32) (cut->num - 1)) {
-            bs->t = (f32) (cut->num - 1);
+        p1 = cam.param.Target;
+        bs->cand_t = t + 0.1f;
+        if (bs->cand_t > (f32) (cut->nPoint - 1)) {
+            bs->cand_t = (f32) (cut->nPoint - 1);
         }
         BSpline(bs, &cam, 0);
-        p2 = cam.param.at;
+        p2 = cam.param.Target;
         PSVECSubtract(&p1, &p2, &dir);
         dir.y = 0.0f;
         switch (r2) {
@@ -1731,7 +1732,7 @@ void CameraControl::r0_RailBehind()
             r2++;
             break;
         case 1:
-            PSVECSubtract(&pPL->pos, &c->param.pos, &v);
+            PSVECSubtract(&pPL->pos, &c->param.Campos, &v);
             if (PSVECDotProduct(&v, &dir) < 0.0f) {
                 PSVECScale(&dir, &dir, -1.0f);
             }
@@ -1758,22 +1759,22 @@ void CameraControl::r0_RailBehind()
         } else {
             floor = pPL->pos;
         }
-        PSMTXMultVecSR(m, &this->campos_ofs, &cam.param.pos);
-        PSVECAdd(&cam.param.pos, &floor, &cam.param.pos);
-        PSMTXMultVecSR(m, &this->target_ofs, &cam.param.at);
-        PSVECAdd(&cam.param.at, &floor, &cam.param.at);
-        if (!(cut->flags & 1)) {
-            cam.param.fovy = m_behind_fovy;
-            cam.param.roll = 0.0f;
+        PSMTXMultVecSR(m, &this->campos_ofs, &cam.param.Campos);
+        PSVECAdd(&cam.param.Campos, &floor, &cam.param.Campos);
+        PSMTXMultVecSR(m, &this->target_ofs, &cam.param.Target);
+        PSVECAdd(&cam.param.Target, &floor, &cam.param.Target);
+        if (!(cut->Attr & 1)) {
+            cam.param.Fovy = m_behind_fovy;
+            cam.param.Roll = 0.0f;
         } else {
-            cam.param.roll = 0.0f;
+            cam.param.Roll = 0.0f;
         }
         PSMTXInverse(m, inv);
-        PSMTXMultVec(inv, &cam.param.pos, &q);
+        PSMTXMultVec(inv, &cam.param.Campos, &q);
         if (moved) {
-            PSMTXMultVec(inv, &cam.param.at, &q2);
+            PSMTXMultVec(inv, &cam.param.Target, &q2);
             q2.x = q.x;
-            PSMTXMultVec(m, &q2, &cam.param.at);
+            PSMTXMultVec(m, &q2, &cam.param.Target);
         }
         if (CfgFlagChk(pSys, CFG_AIM_REVERSE)) {
             PSVECScale(&ang, &a, -1.0f);
@@ -1789,16 +1790,16 @@ void CameraControl::r0_RailBehind()
         // `&x` arguments of a plain call are precomputed into pseudos and gcse PRE turns them into
         // copies of the reaching registers; through the inline wrapper integrate substitutes the
         // addresses straight into the hard-register argument sets, which PRE never touches.
-        VecLinComb(&cam.param.at, &cam.param.pos, mm * k, n * k, &floor);
-        PSVECSubtract(&cam.param.at, &cam.param.pos, &dir);
+        VecLinComb(&cam.param.Target, &cam.param.Campos, mm * k, n * k, &floor);
+        PSVECSubtract(&cam.param.Target, &cam.param.Campos, &dir);
         dir.y = 0.0f;
         PSVECCrossProduct(&yaxis, &dir, &xaxis);
         MtxRotAxisPosRad(m, &xaxis, &floor, a.x);
-        PSMTXMultVec(m, &cam.param.at, &cam.param.at);
-        PSMTXMultVec(m, &cam.param.pos, &cam.param.pos);
+        PSMTXMultVec(m, &cam.param.Target, &cam.param.Target);
+        PSMTXMultVec(m, &cam.param.Campos, &cam.param.Campos);
         MtxRotAxisPosRad(m, &yaxis, &floor, a.y);
-        PSMTXMultVec(m, &cam.param.at, &cam.param.at);
-        PSMTXMultVec(m, &cam.param.pos, &cam.param.pos);
+        PSMTXMultVec(m, &cam.param.Target, &cam.param.Target);
+        PSMTXMultVec(m, &cam.param.Campos, &cam.param.Campos);
         PSMTXRotRad(m, 'y', pPL->ang.y);
         PSMTXMultVecSR(m, &zaxis, &v);
         if (PSVECDotProduct(&v, &dir) < 0.0f) {
@@ -1814,13 +1815,13 @@ void CameraControl::r0_RailBehind()
         } else {
             move_z = 0.0f;
         }
-        if (SatMgr.hitCheck(&cam.param.at, &cam.param.pos, &hit, NULL, 0x8000, 0)) {
-            cam.param.pos = hit;
+        if (SatMgr.hitCheck(&cam.param.Target, &cam.param.Campos, &hit, NULL, 0x8000, 0)) {
+            cam.param.Campos = hit;
         }
         if (edge_camera) {
             CamSmth.setRatio(rate);
-            cam.param.at = pPL->pos;
-            cam.param.at.y += 1550.0f;
+            cam.param.Target = pPL->pos;
+            cam.param.Target.y += 1550.0f;
         } else {
             CamSmth.setRatio(m_behind_A_ratio);
         }
@@ -1885,10 +1886,10 @@ void CameraControl::r0_Free()
         MtxRotAxisPosRad(m, &yaxis, &tofs, a.y);
         PSMTXMultVec(m, &this->campos_ofs, &this->campos_ofs);
         PSMTXMultVec(m, &this->target_ofs, &this->target_ofs);
-        PSMTXMultVec(cam_mat, &this->campos_ofs, &cam.param.pos);
-        PSMTXMultVec(cam_mat, &this->target_ofs, &cam.param.at);
-        cam.param.roll = 0.0f;
-        cam.param.fovy = m_behind_fovy;
+        PSMTXMultVec(cam_mat, &this->campos_ofs, &cam.param.Campos);
+        PSMTXMultVec(cam_mat, &this->target_ofs, &cam.param.Target);
+        cam.param.Roll = 0.0f;
+        cam.param.Fovy = m_behind_fovy;
         cur = cam.param;
         CamSmth.setFlag();
         r2 = 0;
@@ -1935,7 +1936,7 @@ void CameraControl::r0_Free()
                 d.x = 0.0f - ang.x;
                 d.y = pPL->ang.y - ang.y;
                 d.z = 0.0f;
-                VecRadLimit(&d);
+                VecRadLimit((f32*) &d);
                 ang.y += d.y * 0.1f;
                 ang.x += d.x * 0.1f;
                 if (!JoyOn(joy, 0x200) && !JoyOn(joy, 0x20)) {
@@ -1949,23 +1950,23 @@ void CameraControl::r0_Free()
             }
             }
         }
-        PSMTXMultVec(cam_mat, &this->campos_ofs, &cam.param.pos);
-        PSMTXMultVec(cam_mat, &this->target_ofs, &cam.param.at);
-        cam.param.roll = 0.0f;
-        cam.param.fovy = m_behind_fovy;
+        PSMTXMultVec(cam_mat, &this->campos_ofs, &cam.param.Campos);
+        PSMTXMultVec(cam_mat, &this->target_ofs, &cam.param.Target);
+        cam.param.Roll = 0.0f;
+        cam.param.Fovy = m_behind_fovy;
         rate = 0.8f;
-        PSVECScale(&cam.param.pos, &cam.param.pos, rate);
-        PSVECScale(&cur.pos, &tmp, 1.0f - rate);
-        PSVECAdd(&cam.param.pos, &tmp, &cam.param.pos);
-        PSVECScale(&cam.param.at, &cam.param.at, rate);
-        PSVECScale(&cur.at, &tmp, 1.0f - rate);
-        PSVECAdd(&cam.param.at, &tmp, &cam.param.at);
+        PSVECScale(&cam.param.Campos, &cam.param.Campos, rate);
+        PSVECScale(&cur.Campos, &tmp, 1.0f - rate);
+        PSVECAdd(&cam.param.Campos, &tmp, &cam.param.Campos);
+        PSVECScale(&cam.param.Target, &cam.param.Target, rate);
+        PSVECScale(&cur.Target, &tmp, 1.0f - rate);
+        PSVECAdd(&cam.param.Target, &tmp, &cam.param.Target);
         {
-            Vec from = cam.param.at;
-            Vec to = cam.param.pos;
+            Vec from = cam.param.Target;
+            Vec to = cam.param.Campos;
 
             if (cameraHitCheck(&hit, &nrm, &from, &to)) {
-                cam.param.pos = hit;
+                cam.param.Campos = hit;
             }
         }
         cur = cam.param;
@@ -2018,7 +2019,7 @@ f32 CameraControl::getCameraDirection()
 
 // Fits the cut's keys (pos, at, roll, fov) with a B-spline of degree min(2, num - 1): solves the
 // de Boor-Cox basis matrix for the control points (temporary MEM_ALLOC buffers).
-void Parametrize(CameraCut* pCdat, CameraBSpline* pB)
+void Parametrize(CAMERA_DATA* pCdat, CAM_B_SPLINE* pB)
 {
     int i;
     f32* B;
@@ -2032,45 +2033,45 @@ void Parametrize(CameraCut* pCdat, CameraBSpline* pB)
     f32* roll;
     f32* fovy;
 
-    pB->num = pCdat->num;
-    if (pB->num > 1) {
+    pB->p_num = pCdat->nPoint;
+    if (pB->p_num > 1) {
 #line 3058 "D:/Bio4/Prog/cam_ctrl.cpp"
-        B = (f32*) MEM_ALLOC(sizeof(f32) * pB->num * pB->num, 1, 0xd);
-        Binv = (f32*) MEM_ALLOC(sizeof(f32) * pB->num * pB->num, 1, 0xd);
-        px = (f32*) MEM_ALLOC(sizeof(f32) * pB->num, 1, 0xd);
-        py = (f32*) MEM_ALLOC(sizeof(f32) * pB->num, 1, 0xd);
-        pz = (f32*) MEM_ALLOC(sizeof(f32) * pB->num, 1, 0xd);
-        ax = (f32*) MEM_ALLOC(sizeof(f32) * pB->num, 1, 0xd);
-        ay = (f32*) MEM_ALLOC(sizeof(f32) * pB->num, 1, 0xd);
-        az = (f32*) MEM_ALLOC(sizeof(f32) * pB->num, 1, 0xd);
-        roll = (f32*) MEM_ALLOC(sizeof(f32) * pB->num, 1, 0xd);
-        fovy = (f32*) MEM_ALLOC(sizeof(f32) * pB->num, 1, 0xd);
-        pB->k = 2;
-        if (pB->k > pB->num - 1) {
-            pB->k = pB->num - 1;
+        B = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num * pB->p_num, 1, 0xd);
+        Binv = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num * pB->p_num, 1, 0xd);
+        px = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num, 1, 0xd);
+        py = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num, 1, 0xd);
+        pz = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num, 1, 0xd);
+        ax = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num, 1, 0xd);
+        ay = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num, 1, 0xd);
+        az = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num, 1, 0xd);
+        roll = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num, 1, 0xd);
+        fovy = (f32*) MEM_ALLOC(sizeof(f32) * pB->p_num, 1, 0xd);
+        pB->order = 2;
+        if (pB->order > pB->p_num - 1) {
+            pB->order = pB->p_num - 1;
         }
-        for (i = 0; i < pB->num; i++) {
-            px[i] = pCdat->pos[i].x;
-            py[i] = pCdat->pos[i].y;
-            pz[i] = pCdat->pos[i].z;
-            ax[i] = pCdat->at[i].x;
-            ay[i] = pCdat->at[i].y;
-            az[i] = pCdat->at[i].z;
-            roll[i] = pCdat->roll[i];
-            fovy[i] = pCdat->fovy[i];
+        for (i = 0; i < pB->p_num; i++) {
+            px[i] = pCdat->pCampos[i].x;
+            py[i] = pCdat->pCampos[i].y;
+            pz[i] = pCdat->pCampos[i].z;
+            ax[i] = pCdat->pTarget[i].x;
+            ay[i] = pCdat->pTarget[i].y;
+            az[i] = pCdat->pTarget[i].z;
+            roll[i] = pCdat->pRoll[i];
+            fovy[i] = pCdat->pFovy[i];
         }
-        for (i = 0; i < pB->num; i++) {
-            de_Boor_Cox(pB->num, NULL, (f32) i, pB->k, &B[pB->num * i]);
+        for (i = 0; i < pB->p_num; i++) {
+            de_Boor_Cox(pB->p_num, NULL, (f32) i, pB->order, &B[pB->p_num * i]);
         }
-        MtxNNInverse(pB->num, B, Binv);
-        MtxNNMultVecSR(pB->num, pB->num, Binv, px, pB->px);
-        MtxNNMultVecSR(pB->num, pB->num, Binv, py, pB->py);
-        MtxNNMultVecSR(pB->num, pB->num, Binv, pz, pB->pz);
-        MtxNNMultVecSR(pB->num, pB->num, Binv, ax, pB->ax);
-        MtxNNMultVecSR(pB->num, pB->num, Binv, ay, pB->ay);
-        MtxNNMultVecSR(pB->num, pB->num, Binv, az, pB->az);
-        MtxNNMultVecSR(pB->num, pB->num, Binv, roll, pB->roll);
-        MtxNNMultVecSR(pB->num, pB->num, Binv, fovy, pB->fovy);
+        MtxNNInverse(pB->p_num, B, Binv);
+        MtxNNMultVecSR(pB->p_num, pB->p_num, Binv, px, pB->c_alpha);
+        MtxNNMultVecSR(pB->p_num, pB->p_num, Binv, py, pB->c_beta);
+        MtxNNMultVecSR(pB->p_num, pB->p_num, Binv, pz, pB->c_gamma);
+        MtxNNMultVecSR(pB->p_num, pB->p_num, Binv, ax, pB->t_alpha);
+        MtxNNMultVecSR(pB->p_num, pB->p_num, Binv, ay, pB->t_beta);
+        MtxNNMultVecSR(pB->p_num, pB->p_num, Binv, az, pB->t_gamma);
+        MtxNNMultVecSR(pB->p_num, pB->p_num, Binv, roll, pB->r_alpha);
+        MtxNNMultVecSR(pB->p_num, pB->p_num, Binv, fovy, pB->f_alpha);
         Mem_free(B);
         Mem_free(Binv);
         Mem_free(px);
@@ -2085,27 +2086,27 @@ void Parametrize(CameraCut* pCdat, CameraBSpline* pB)
 }
 
 // Evaluates the rail at parameter bs->t into the camera's pos / at / roll / fov.
-void BSpline(CameraBSpline* bs, CAMERA* cam, int)
+void BSpline(CAM_B_SPLINE* bs, CAMERA* cam, int)
 {
     int i;
 
     memclr_asm(cam, sizeof(CAMERA));
-    de_Boor_Cox(bs->num, NULL, bs->t, bs->k, bs->basis);
-    for (i = 0; i < bs->num; i++) {
-        cam->param.at.x += bs->basis[i] * bs->ax[i];
-        cam->param.at.y += bs->basis[i] * bs->ay[i];
-        cam->param.at.z += bs->basis[i] * bs->az[i];
-        cam->param.pos.x += bs->basis[i] * bs->px[i];
-        cam->param.pos.y += bs->basis[i] * bs->py[i];
-        cam->param.pos.z += bs->basis[i] * bs->pz[i];
-        cam->param.roll += bs->basis[i] * bs->roll[i];
-        cam->param.fovy += bs->basis[i] * bs->fovy[i];
+    de_Boor_Cox(bs->p_num, NULL, bs->cand_t, bs->order, bs->B);
+    for (i = 0; i < bs->p_num; i++) {
+        cam->param.Target.x += bs->B[i] * bs->t_alpha[i];
+        cam->param.Target.y += bs->B[i] * bs->t_beta[i];
+        cam->param.Target.z += bs->B[i] * bs->t_gamma[i];
+        cam->param.Campos.x += bs->B[i] * bs->c_alpha[i];
+        cam->param.Campos.y += bs->B[i] * bs->c_beta[i];
+        cam->param.Campos.z += bs->B[i] * bs->c_gamma[i];
+        cam->param.Roll += bs->B[i] * bs->r_alpha[i];
+        cam->param.Fovy += bs->B[i] * bs->f_alpha[i];
     }
 }
 
 // Finds the rail parameter nearest the aim point: projects the aim on every key segment of the
 // cut's `at` polyline (falls back to the nearest key), storing t and the segment.
-void searchRail(CameraBSpline* bs, CameraCut* cut, Vec* aim, int)
+void searchRail(CAM_B_SPLINE* bs, CAMERA_DATA* cut, Vec* aim, int)
 {
     Vec d;
     Vec v;
@@ -2116,32 +2117,32 @@ void searchRail(CameraBSpline* bs, CameraCut* cut, Vec* aim, int)
     f32 s;
     f32 dist;
 
-    for (i = 0; i < cut->num - 1; i++) {
+    for (i = 0; i < cut->nPoint - 1; i++) {
         // One variable per value (each block-local with a single death): `dot0` for the first
         // product, `dot` for the second, `prod` tied to `dot` (`fmuls f31, f30, f31`).
         f32 dot0;
         f32 prod;
 
-        PSVECSubtract(&cut->at[i + 1], &cut->at[i], &d);
+        PSVECSubtract(&cut->pTarget[i + 1], &cut->pTarget[i], &d);
         d.y = 0.0f;
-        PSVECSubtract(aim, &cut->at[i], &v);
+        PSVECSubtract(aim, &cut->pTarget[i], &v);
         v.y = 0.0f;
         dot0 = PSVECDotProduct(&d, &v);
         s = dot0 / PSVECMag(&d);
-        PSVECSubtract(aim, &cut->at[i + 1], &v);
+        PSVECSubtract(aim, &cut->pTarget[i + 1], &v);
         v.y = 0.0f;
         dot = PSVECDotProduct(&d, &v);
         dot = dot / PSVECMag(&d);
         prod = s * dot;
         if (prod < 0.0f) {
-            d.y = cut->at[i + 1].y - cut->at[i].y;
+            d.y = cut->pTarget[i + 1].y - cut->pTarget[i].y;
             PSVECScale(&d, &v, s / PSVECMag(&d));
-            PSVECAdd(&v, &cut->at[i], &v);
+            PSVECAdd(&v, &cut->pTarget[i], &v);
             dist = PSVECDistance(aim, &v);
             if (dist < min) {
                 min = dist;
-                bs->t = (f32) i + s / PSVECMag(&d);
-                bs->seg = i;
+                bs->cand_t = (f32) i + s / PSVECMag(&d);
+                bs->history_i = i;
                 found = 1;
             }
         }
@@ -2150,8 +2151,8 @@ void searchRail(CameraBSpline* bs, CameraCut* cut, Vec* aim, int)
         f32 min2 = 10000000000.0f;
         int seg = 0;
 
-        for (i = 0; i < cut->num; i++) {
-            PSVECSubtract(aim, &cut->at[i], &d);
+        for (i = 0; i < cut->nPoint; i++) {
+            PSVECSubtract(aim, &cut->pTarget[i], &d);
             dist = PSVECMag(&d);
             if (dist < min2) {
                 min2 = dist;
@@ -2159,50 +2160,50 @@ void searchRail(CameraBSpline* bs, CameraCut* cut, Vec* aim, int)
             }
         }
         if (min > min2) {
-            bs->seg = seg;
-            bs->t = (f32) seg;
+            bs->history_i = seg;
+            bs->cand_t = (f32) seg;
         }
     } else {
         f32 min2 = 10000000000.0f;
 
-        for (i = 0; i < cut->num; i++) {
-            PSVECSubtract(aim, &cut->at[i], &d);
+        for (i = 0; i < cut->nPoint; i++) {
+            PSVECSubtract(aim, &cut->pTarget[i], &d);
             dist = PSVECMag(&d);
             if (dist < min2) {
                 min2 = dist;
-                bs->seg = i;
-                bs->t = (f32) i;
+                bs->history_i = i;
+                bs->cand_t = (f32) i;
             }
         }
     }
 }
 
 // Debug: draws the cut's rail (spline samples) and its keys.
-void CameraControl::debugDrawRail(CameraCut* pCdat)
+void CameraControl::debugDrawRail(CAMERA_DATA* pCdat)
 {
     static Vec Fc_old;
     static Vec Ft_old;
-    CameraBSpline* bs = &CamBSpline;
+    CAM_B_SPLINE* bs = &CamBSpline;
     Vec fc;
     Vec ft;
     int i;
     int j;
 
     for (i = 0; i < 100; i++) {
-        de_Boor_Cox(pCdat->num, NULL, (f32) ((pCdat->num - 1) * i) / 100.0f + 0.0f, bs->k, bs->basis);
+        de_Boor_Cox(pCdat->nPoint, NULL, (f32) ((pCdat->nPoint - 1) * i) / 100.0f + 0.0f, bs->order, bs->B);
         fc.x = 0.0f;
         fc.y = 0.0f;
         fc.z = 0.0f;
         ft.x = 0.0f;
         ft.y = 0.0f;
         ft.z = 0.0f;
-        for (j = 0; j < pCdat->num; j++) {
-            fc.x += bs->basis[j] * bs->px[j];
-            fc.y += bs->basis[j] * bs->py[j];
-            fc.z += bs->basis[j] * bs->pz[j];
-            ft.x += bs->basis[j] * bs->ax[j];
-            ft.y += bs->basis[j] * bs->ay[j];
-            ft.z += bs->basis[j] * bs->az[j];
+        for (j = 0; j < pCdat->nPoint; j++) {
+            fc.x += bs->B[j] * bs->c_alpha[j];
+            fc.y += bs->B[j] * bs->c_beta[j];
+            fc.z += bs->B[j] * bs->c_gamma[j];
+            ft.x += bs->B[j] * bs->t_alpha[j];
+            ft.y += bs->B[j] * bs->t_beta[j];
+            ft.z += bs->B[j] * bs->t_gamma[j];
         }
         if (i > 0) {
             Draw_line3d(&Fc_old, &fc, 0xFF2020FF, 0);
@@ -2214,7 +2215,7 @@ void CameraControl::debugDrawRail(CameraCut* pCdat)
 }
 
 CameraControl CamCtrl;
-CameraBSpline CamBSpline;
+CAM_B_SPLINE CamBSpline;
 CameraSmooth CamSmth;
 
 // Stores the up-cut placement (sel 0 position, 1 angles, 2 scale) used by the up-cut motion
@@ -2223,10 +2224,10 @@ void CameraControl::UpCutCall(int cutNo, Vec* pos, Vec* ang, Vec* scale, int typ
 {
     switch (type) {
     case 0:
-        pCamData = (CameraDataHeader*) pG->pCamCore;
+        pCamData = (CAM_FILE_HEADER*) pG->pCamCore;
         break;
     case 1:
-        pCamData = (CameraDataHeader*) pG->pCamRoom;
+        pCamData = (CAM_FILE_HEADER*) pG->pCamRoom;
         break;
     }
     if (pos) {
@@ -2373,7 +2374,7 @@ void CameraControl::GetBinocularIDAddr(void** eff_addr, void** uwf_addr)
 
 // Plays a camera motion file (cutscene camera, r0 5) interpolating from the current camera over
 // `frame` frames; flags the event camera (m_system_flag 0x28, Status_flg[2] 0x10000000).
-void CameraControl::MotionSet(void* motion, int frame, f32 speed)
+void CameraControl::MotionSet(void* motion, f32 speed, int frame)
 {
     m_system_flag |= 0x28;
     StaFlagOn(pG, STA_CUT_CHANGE);
@@ -2547,10 +2548,10 @@ void CameraControl::checkAttachCamera()
                 delete m_pProc;
             }
             m_pProc = new (m_Free) CameraAttachedToMotion(model);
-            m_pProc->param.pos = pG->Camera.param.pos;
-            m_pProc->param.at = pG->Camera.param.at;
-            m_pProc->param.roll = pG->Camera.param.roll;
-            m_pProc->param.fovy = pG->Camera.param.fovy;
+            m_pProc->param.Campos = pG->Camera.param.Campos;
+            m_pProc->param.Target = pG->Camera.param.Target;
+            m_pProc->param.Roll = pG->Camera.param.Roll;
+            m_pProc->param.Fovy = pG->Camera.param.Fovy;
         }
         inter_frame = ac->frame;
     } else if (m_p_attach_model_old) {

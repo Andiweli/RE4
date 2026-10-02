@@ -69,7 +69,7 @@ void Snd_soft_reset_req(void)
 // sounding; 0 = reset complete (flag cleared).
 int Snd_soft_reset_ck(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     int ret;
 
     if ((ctrl->reset_flag & 0x70) != 0x70) {
@@ -85,14 +85,14 @@ int Snd_soft_reset_ck(void)
 // Output mode changed: every SE and stream recomputes its pan.
 void Snd_reset_pan_all(void)
 {
-    Snd_ctrl_work.se_ctrl |= 0x80;
+    Snd_ctrl_work.se_ctrl_flag |= 0x80;
     Snd_str_reset_pan_type(3);
 }
 
 // Master volume changed: every SE, stream and sequence recomputes its volume.
 void Snd_reset_vol_all(void)
 {
-    Snd_ctrl_work.se_ctrl |= 0x100;
+    Snd_ctrl_work.se_ctrl_flag |= 0x100;
     Snd_str_reset_vol_type(3);
     Snd_seq_reset_vol_type(3);
 }
@@ -101,53 +101,53 @@ void Snd_reset_vol_all(void)
 // 0x10 / 0x20 stream.
 void Snd_set_system_vol(s16 type, u16 vol)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     u16 v;
 
     v = vol << 8;
     if (type & 0x1) {
-        ctrl->sys_vol[0] = v;
+        ctrl->vol_mas_bgm = v;
     }
     if (type & 0x2) {
-        ctrl->sys_vol[1] = v;
+        ctrl->vol_mas_se = v;
     }
     if (type & 0x4) {
-        ctrl->sys_vol[2] = v;
+        ctrl->vol_iss_bgm = v;
     }
     if (type & 0x8) {
-        ctrl->sys_vol[3] = v;
+        ctrl->vol_iss_se = v;
     }
     if (type & 0x10) {
-        ctrl->sys_vol[4] = v;
+        ctrl->vol_str_bgm = v;
     }
     if (type & 0x20) {
-        ctrl->sys_vol[5] = v;
+        ctrl->vol_str_se = v;
     }
 }
 
 // One system volume (see Snd_set_system_vol) as 0..127.
 s16 Snd_get_system_vol(s16 type)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     s16 v = 0;
 
     if (type == 1) {
-        v = ctrl->sys_vol[0];
+        v = ctrl->vol_mas_bgm;
     }
     if (type == 2) {
-        v = ctrl->sys_vol[1];
+        v = ctrl->vol_mas_se;
     }
     if (type == 4) {
-        v = ctrl->sys_vol[2];
+        v = ctrl->vol_iss_bgm;
     }
     if (type == 8) {
-        v = ctrl->sys_vol[3];
+        v = ctrl->vol_iss_se;
     }
     if (type == 16) {
-        v = ctrl->sys_vol[4];
+        v = ctrl->vol_str_bgm;
     }
     if (type == 32) {
-        v = ctrl->sys_vol[5];
+        v = ctrl->vol_str_se;
     }
     return v >> 8;
 }
@@ -178,18 +178,18 @@ s32 Snd_vol_ax_to_syn(s32 vol)
 // Driver random byte (16-bit generator in Snd_ctrl_work.rnd).
 u8 Snd_rnd(void)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     SND_RND r;
     SND_RND r2;
 
-    r.w = ctrl->rnd;
+    r.w = ctrl->random;
     r2.w = r.w * 3;
     r.b[1] += r2.b[0];
     r.b[0] = r2.b[0];
-    if (ctrl->rnd == r.w) {
-        ctrl->rnd++;
+    if (ctrl->random == r.w) {
+        ctrl->random++;
     } else {
-        ctrl->rnd = r.w;
+        ctrl->random = r.w;
     }
     return r.b[1];
 }
@@ -202,7 +202,7 @@ s16 Snd_get_rnd_pitch(SND_SIT* sit)
     s16 hi;
     s16 range;
     s16 r;
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
 
     lo = sit->pitch_l;
     hi = sit->pitch_h;
@@ -225,28 +225,28 @@ s16 Snd_get_rnd_pitch(SND_SIT* sit)
 // Resets the sound-test (debug menu) work: 14 SE blocks / 2 stream blocks, paths "/", display flags.
 void Snd_test_work_clear(void)
 {
-    SND_TEST_WORK* test;
+    SND_TEST* test;
     u32 i;
     u8* p;
 
     p = (u8*) &Snd_test_work;
-    for (i = 0; i < sizeof(SND_TEST_WORK); i++) {
+    for (i = 0; i < sizeof(SND_TEST); i++) {
         *p++ = 0;
     }
     test = &Snd_test_work;
-    test->tbl = 0;
-    test->aux = 0;
-    test->menu = 1;
-    test->dispFlag = 7;
-    test->blkMax[0] = 0xE;
-    test->blkMax[1] = 2;
-    strcpy(test->path0, "/");
-    strcpy(test->path1, "/");
+    test->tbl_type = 0;
+    test->aux_type = 0;
+    test->menu_flag = 1;
+    test->disp_flag = 7;
+    test->blk_max[0] = 0xE;
+    test->blk_max[1] = 2;
+    strcpy(test->dir_name[0], "/");
+    strcpy(test->dir_name[1], "/");
     for (i = 0; i < 14; i++) {
-        test->sitData[i] = 0;
+        test->iss_blk_name[i] = 0;
     }
     for (i = 0; i < 2; i++) {
-        test->ritData[i] = 0;
+        test->str_blk_name[i] = 0;
     }
-    test->aram_base = Snd_ctrl_work.aram_base;
+    test->aram_adrs = Snd_ctrl_work.zero_adrs;
 }

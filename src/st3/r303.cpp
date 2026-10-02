@@ -58,8 +58,8 @@ void R303Init()
         SmdGetObjPtr(0xB)->setAng(&r303_doorAng);
     }
     SceSetItemEvent(5, 0x80, 2, 1, r303_openTana, r303_openedTana, 0, 0);
-    SceSetItemEvent(7, 0x81, 4, 3, r303_DuraluminCaseOpen, r303_DuraluminCaseOpened, 0x19, 0);
-    SceSetItemEvent(8, 0x83, 5, 2, r303_DustBoxOpen, r303_DustBoxOpened, 0x1B, 0);
+    SceSetItemEvent(7, 0x81, 4, 3, r303_DuraluminCaseOpen, r303_DuraluminCaseOpened, (void*) 0x19, 0);
+    SceSetItemEvent(8, 0x83, 5, 2, r303_DustBoxOpen, r303_DustBoxOpened, (void*) 0x1B, 0);
     if (RsfCheck(G_ROOM_ID, 3) == 0) {
         SceAtDataSet_exec(6, 0x12, 0, (TaskFunc) oneshot_bgm, 0, 1);
     }
@@ -154,14 +154,13 @@ static void door_down()
     cEm* em;
     u32 cnt;
     f32 t;
-    u8 zero = 0;
 
     RsfSet(G_ROOM_ID, 0);
-    SmdGetObjPtr(0xB)->type = zero;
+    SmdGetObjPtr(0xB)->type = 0;
     em = setEm(0x24, -1, 1, 1, 1);
     em->flag |= 1;
-    EstSet(em, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, em, (void*) zero);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+    EstSet(em, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, em, 0);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0, ESP_CORE_KIND_NONE, 0, 0);
     t = 0.01f;
     cnt = 0;
     SndCall(6, 2, &SmdGetObjPtr(0xB)->pos, 0, 0, 0);

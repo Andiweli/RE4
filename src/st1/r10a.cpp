@@ -34,7 +34,7 @@ static void r10a_StrStart();
 static void r10a_zouen_ck();
 
 // Spawn the base Ganado wave: enemy list entries 0xB1..0xBA into em[0..9].
-extern "C" void EmSetNormal()
+void EmSetNormal()
 {
     r10a_work->em[0].setEm(0xB1, 0, 0, 1, 1);
     r10a_work->em[1].setEm(0xB2, 0, 0, 1, 1);
@@ -49,7 +49,7 @@ extern "C" void EmSetNormal()
 }
 
 // Spawn reinforcement wave A (list 0xAE, 0xC4..0xC7) into em[10..14]; recorded in Room_flg bit 0.
-extern "C" void EmSetZouenA()
+void EmSetZouenA()
 {
     r10a_work->em[10].setEm(0xAE, 0, 0, 1, 1);
     r10a_work->em[11].setEm(0xC4, 0, 0, 1, 1);
@@ -59,7 +59,7 @@ extern "C" void EmSetZouenA()
 }
 
 // Spawn reinforcement wave B (list 0x72, 0x73, 0x85, 0x86, 0x9F) into em[15..19]; Room_flg bit 1.
-extern "C" void EmSetZouenB()
+void EmSetZouenB()
 {
     r10a_work->em[15].setEm(0x72, 0, 0, 1, 1);
     r10a_work->em[16].setEm(0x73, 0, 0, 1, 1);

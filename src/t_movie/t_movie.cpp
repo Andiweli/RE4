@@ -25,7 +25,7 @@
 #include <string.h>
 
 // newlib ctype.h (game/ctype_.c; include/libc/ctype.h does not declare it)
-extern "C" const char _ctype_[];
+extern const char _ctype_[];
 #define _L 02
 #define islower(c) ((_ctype_ + 1)[(int) (c)] & _L)
 
@@ -292,10 +292,10 @@ void SoundTest()
     TaskSuspend(0);
     for (;;) {
         TaskSleep(1);
-        Snd_test_work.on = Joy[0].on;
-        Snd_test_work.old = Joy[0].old;
-        Snd_test_work.trg = Joy[0].trg;
-        Snd_test_work.rep = Joy[0].rep;
+        Snd_test_work.joy_now = Joy[0].on;
+        Snd_test_work.joy_old = Joy[0].old;
+        Snd_test_work.joy_trg = Joy[0].trg;
+        Snd_test_work.joy_rep = Joy[0].rep;
         if (Snd_test_mode()) {
             break;
         }

@@ -26,7 +26,7 @@ void SeAtInit()
         s->pSeAtData = 0;
         return;
     }
-    s->pSeAtData = (SeAt*) (s->pSeAtHeader + 1);
+    s->pSeAtData = (SE_AT_DATA*) (s->pSeAtHeader + 1);
 }
 
 // Per frame in the game routine (Rno0 3, not while Stop_flg 0x800): each enabled emitter waits
@@ -35,7 +35,7 @@ void SeAtInit()
 void SeAtCheck()
 {
     SND_WORK* s = &Snd;
-    SeAt* at;
+    SE_AT_DATA* at;
     Vec* pos;
     int i;
 
@@ -53,38 +53,38 @@ void SeAtCheck()
     }
     for (i = 0; i < s->pSeAtHeader->num; i++) {
         at = &s->pSeAtData[i];
-        if ((at->flags & 1) == 0) {
+        if ((at->be_flg & 1) == 0) {
             continue;
         }
-        if (at->repeat < 0) {
+        if (at->call_num < 0) {
             continue;
         }
-        if (at->wait == 0) {
-            if (at->cnt == 0) {
+        if (at->delay == 0) {
+            if (at->ctr == 0) {
                 pos = &at->pos;
-                if (at->flags2 & 1) {
+                if (at->flag & 1) {
                     pos = 0;
                 }
                 if (SndCall(at->blk, at->se_no, pos, 0, 0, 0) == 0) {
                     continue;
                 }
-                if (at->repeat == 1) {
-                    at->repeat = -1;
+                if (at->call_num == 1) {
+                    at->call_num = -1;
                     continue;
                 }
-                if (at->repeat != 0) {
-                    at->repeat--;
+                if (at->call_num != 0) {
+                    at->call_num--;
                 }
                 if (at->interval == 0) {
-                    at->cnt = at->rnd_base + Rnd() % at->rnd_range;
+                    at->ctr = at->rnd_base + Rnd() % at->rnd_interval;
                 } else {
-                    at->cnt = at->interval;
+                    at->ctr = at->interval;
                 }
             } else {
-                at->cnt--;
+                at->ctr--;
             }
         } else {
-            at->wait--;
+            at->delay--;
         }
     }
 }
@@ -92,7 +92,7 @@ void SeAtCheck()
 // Room script: enables / disables emitter `no` (flags bit0). 0 when not found.
 int SeAtSetOnOff(int no, int sw)
 {
-    SeAt* at = GetSeAtPtr(no);
+    SE_AT_DATA* at = GetSeAtPtr(no);
 
     if (at == 0) {
         if (sw == 1) {
@@ -103,17 +103,17 @@ int SeAtSetOnOff(int no, int sw)
         return 0;
     }
     if (sw == 1) {
-        at->flags |= 1;
+        at->be_flg |= 1;
     } else {
-        at->flags &= ~1;
+        at->be_flg &= ~1;
     }
     return 1;
 }
 
 // The emitter record numbered `no`, or 0.
-SeAt* GetSeAtPtr(int no)
+SE_AT_DATA* GetSeAtPtr(int no)
 {
-    SeAt* at;
+    SE_AT_DATA* at;
     u32 i;
 
     if (Snd.pSeAtHeader == 0) {
@@ -121,7 +121,7 @@ SeAt* GetSeAtPtr(int no)
     }
     for (i = 0; i < Snd.pSeAtHeader->num; i++) {
         at = &Snd.pSeAtData[i];
-        if (at->no == no) {
+        if (at->at_no == no) {
             return at;
         }
     }
@@ -131,10 +131,10 @@ SeAt* GetSeAtPtr(int no)
 // Plays emitter `no`'s SE once now; returns the SndCall handle (0 when not found).
 u32 SeAtSndCall(int no)
 {
-    SeAt* at = GetSeAtPtr(no);
+    SE_AT_DATA* at = GetSeAtPtr(no);
 
     if (at != 0) {
-        if (at->flags2 & 1) {
+        if (at->flag & 1) {
             return SndCall(at->blk, at->se_no, 0, 0, 0, 0);
         }
         return SndCall(at->blk, at->se_no, &at->pos, 0, 0, 0);

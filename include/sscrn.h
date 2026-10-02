@@ -15,11 +15,33 @@ struct SUB_SCREEN;
 struct SsFileWork;
 struct ItemScreenWork;
 
-// Sub screen data archive (ss_cmmn.dat / ss_pzzl.dat): a table of byte offsets to its sub-files.
-struct SsArc {
-    u32 ofs[0x12];
+// Sub screen data archive (ss_cmmn.dat / ss_pzzl.dat): a u32* to a table of byte offsets to its sub-files.
+#define SS_ARC_PTR(arc, no) ((void*) ((arc)[no] + (u32) (arc)))
+
+// The sub screen's record in the save image (PS2 SSCRN_SAVE_DATA, 4 bytes). GC saves the whole word
+// at SUB_SCREEN::save (map_mode, map_mark, ...); PS2 keeps only map_mark here.
+struct SSCRN_SAVE_DATA {
+    u32 save;
 };
-#define SS_ARC_PTR(arc, no) ((void*) ((arc)->ofs[no] + (u32) (arc)))
+
+enum SS_OPEN_FLAG {
+    SS_OPEN_NULL = 0,
+    SS_OPEN_NORMAL = 1,
+    SS_OPEN_MAP = 2,
+    SS_OPEN_PZZL = 4,
+    SS_OPEN_SHOP = 16,
+    SS_OPEN_TERM = 32,
+    SS_OPEN_FILE = 64,
+    SS_OPEN_ITEM = 128,
+    SS_OPEN_CAP = 256
+};
+
+enum SS_ATTR_FLAG {
+    SS_ATTR_NULL = 0,
+    SS_ATTR_EVENT = 1,
+    SS_ATTR_BOAT = 2,
+    SS_ATTR_ASHLEY = 4
+};
 
 // The work is the `SUB_SCREEN` of the Sscrn module's `Widget<SUB_SCREEN>` template (the module's
 // mangled names carry the tag); SubScreenWork is the DOL-side alias.
@@ -27,13 +49,13 @@ struct SUB_SCREEN {
     char filename[0x28];          // 0x000  "SS/<lang>/<file>" (sscrnSetLanguage / sscrnDataFilename)
     u8 Loop;                  // 0x028  1 while the sub screen main loop runs (sscrn opens, SubScreenTask exit clears)
     u8 pad_29[3];
-    s32 open_flag;             // 0x02C  open type: 1 inventory, 2, 0x10, 0x20 puzzle, 0x40, 0x80
-    s32 flags;                // 0x030  bit0 event, bit1 (flags_5010 bit21 at open), bit3 no sound
+    SS_OPEN_FLAG open_flag;    // 0x02C  open type: 1 inventory, 2, 0x10, 0x20 puzzle, 0x40, 0x80
+    SS_ATTR_FLAG attr_flag;       // 0x030  bit0 event, bit1 (flags_5010 bit21 at open), bit3 no sound
     s32 close_flag;           // 0x034  set by the screens as they close (2 item, 4 map, 8 term, 0x10 file, 0x10000 shop); cleared on menu change
-    s32 attr_flag;
-    s32 wait;                 // 0x03C  frames left before SubScreenCall may open (SubScreenWait)
     s32 model_flag;
-    s32 wait_cnt;
+    s32 wait_cnt;                 // 0x03C  frames left before SubScreenCall may open (SubScreenWait)
+    s32 item_get_flag;
+    s32 trans_off;
     s32 str_id;
     int (*scrn_out_func)(SUB_SCREEN*);  // 0x04C  screen exit routine (Sscrn ss_*: sscrn_*_out), run until it returns 1
     u32 stop_bak;              // 0x050  pG->flags_170 while open
@@ -58,18 +80,18 @@ struct SUB_SCREEN {
     u32 pCommonOffs;              // 0x1D0  ss_cmmn.dat offset
     u32 pSwitchOffs;              // 0x1D4  ss_pzzl.dat offset
     s32 relAddr;              // 0x1D8  Sscrn.rel address (0 while unlinked)
-    SsArc* pCmmn;             // 0x1DC
-    SsArc* pSwitchDat;        // 0x1E0  read buffer of the screen being switched to (item / map / puzzle .dat) (PS2 pSwitchDat)
-    SsArc* pPzzlDat;          // 0x1E4  puzzle screen data (SubScreenTask: = pSwitchDat once read) (PS2 pPzzlDat)
-    SsArc* pItemDat;             // 0x1E8  ss_item.dat archive (Sscrn ss_item)
-    SsArc* pTermDat;             // 0x1EC  ss_term.dat archive (Sscrn ss_term)
+    u32* pCmmn;             // 0x1DC
+    u32* pSwitchDat;        // 0x1E0  read buffer of the screen being switched to (item / map / puzzle .dat) (PS2 pSwitchDat)
+    u32* pPzzlDat;          // 0x1E4  puzzle screen data (SubScreenTask: = pSwitchDat once read) (PS2 pPzzlDat)
+    u32* pItemDat;             // 0x1E8  ss_item.dat archive (Sscrn ss_item)
+    u32* pTermDat;             // 0x1EC  ss_term.dat archive (Sscrn ss_term)
     void* pTermMes;            // 0x1F0  op/opNN.das (Sscrn ss_term: the message/sequence archive at +0x400)
-    SsArc* pMapDat;           // 0x1F4  ss_map.dat archive (Sscrn ss_map: common map data, pSwitchDat while the map is open)
-    SsArc* pMapObj;          // 0x1F8  SS/cmn/map_objNN.dat archive of the current area (Sscrn ss_map)
-    SsArc* pFileDat;             // 0x1FC  ss_file.dat archive (Sscrn ss_file)
-    SsArc* pExam;             // 0x200  item examine id data archive (examine ItemExamine::idSet)
-    SsArc* pShopDat;             // 0x204  ss_shop.dat archive (Sscrn ss_shop: read to pBuf + pFreeOffs)
-    void* pTelDat;           // 0x208  SS/cmn/ss_ocNNN.dat (Sscrn ss_term: the partner model data)
+    u32* pMapDat;           // 0x1F4  ss_map.dat archive (Sscrn ss_map: common map data, pSwitchDat while the map is open)
+    u32* pMapObj;          // 0x1F8  SS/cmn/map_objNN.dat archive of the current area (Sscrn ss_map)
+    u32* pFileDat;             // 0x1FC  ss_file.dat archive (Sscrn ss_file)
+    u32* pExam;             // 0x200  item examine id data archive (examine ItemExamine::idSet)
+    u32* pShopDat;             // 0x204  ss_shop.dat archive (Sscrn ss_shop: read to pBuf + pFreeOffs)
+    u32* pTelDat;           // 0x208  SS/cmn/ss_ocNNN.dat (Sscrn ss_term: the partner model data)
     void* pTplDat;            // 0x20C  0x20000-byte file picture TPL buffer (Sscrn ss_file)
     void* pWepDat;               // 0x210  weapon model data (pBuf + 0x2E5E00, Sscrn SubScreenTask / weaponChangeTask)
     void* binoA;              // 0x214  CameraControl::GetBinocularIDAddr
@@ -116,7 +138,7 @@ struct SUB_SCREEN {
     struct SsMapWork* map; // 0x308  Sscrn ss_map work (mark models, camera, viewport; 0x104C bytes)
     SsFileWork* file;      // 0x30C  Sscrn ss_file cursor/page state
     s8* pCapCursor;           // 0x310  Sscrn ss_cap cursor {row, column, row * 6 + column} (MEM_ALLOC(3))
-    struct ShopWork* shop; // 0x314  Sscrn ss_shop list/cursor state (0x48 bytes)
+    struct SSCRN_SHOP* shop; // 0x314  Sscrn ss_shop list/cursor state (0x48 bytes)
     class Merchant* merchant;// 0x318  Sscrn ss_shop: the shop session (game/merchant.cpp Merchant)
     s32 opeMdtNo;                // 0x31C  OpeSetOpenTerm number
     s32 sndId;               // 0x320  SndStrPlayBlock handle
@@ -158,10 +180,9 @@ struct ItemScreenWork {
 
 extern SubScreenWork SubScreenWk;
 
-extern "C" {
 int SscrnDataSize();
-void SscrnDataSave(u32* dst);
-void SscrnDataLoad(u32* pData);
+void SscrnDataSave(SSCRN_SAVE_DATA* dst);
+void SscrnDataLoad(SSCRN_SAVE_DATA* pData);
 void SubScreenAramRead();
 void sscrnSetLanguage(SubScreenWork* pSscrn, int language);
 void sscrnDataFilename(SubScreenWork* pSscrn, const char* name);
@@ -171,25 +192,6 @@ void SubScreenWait(int frame);
 void SubScreenCall();
 int sscrnStageNo();
 u16 sscrnRoomNo(u16 room_no);
-enum SS_OPEN_FLAG {
-    SS_OPEN_NULL = 0,
-    SS_OPEN_NORMAL = 1,
-    SS_OPEN_MAP = 2,
-    SS_OPEN_PZZL = 4,
-    SS_OPEN_SHOP = 16,
-    SS_OPEN_TERM = 32,
-    SS_OPEN_FILE = 64,
-    SS_OPEN_ITEM = 128,
-    SS_OPEN_CAP = 256
-};
-
-enum SS_ATTR_FLAG {
-    SS_ATTR_NULL = 0,
-    SS_ATTR_EVENT = 1,
-    SS_ATTR_BOAT = 2,
-    SS_ATTR_ASHLEY = 4
-};
-
 int SubScreenOpen(int type, int flags);
 void SubScreenMiss();
 void SubScreenExec();
@@ -202,7 +204,5 @@ void OpeOwTypeSet(u8 owType);
 void OpeSetOpenTerm(int no, f32 x, f32 y, f32 z, f32 ang);
 void OpeSetOpenTermCancel();
 void OpeSetOpenTermEnd();
-}
-
 
 #endif

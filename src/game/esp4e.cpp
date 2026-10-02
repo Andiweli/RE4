@@ -36,10 +36,8 @@ public:
     virtual void Destruct();
 };
 
-extern "C" {
 cEsp* Esp4e_Create();
 void Esp4e_Trans();
-}
 
 // Create entry of the EffSetId function table for effect id 0x4E.
 cEsp* Esp4e_Create()
@@ -200,9 +198,9 @@ int cEsp4e::SetFreeWork(cEspSeqTbl* pSeq, u32* pRand_seed)
         ny = 50;
     }
     if (ci) {
-        wk->pCl->Set(m_Ang, m_Pos, nx, ny, width, &wk->tex, height * (3000.0f / d / 23.0f), NULL, d, &wk->tlut, flag);
+        wk->pCl->Set(m_Ang, m_Pos, nx, ny, width, height * (3000.0f / d / 23.0f), d, &wk->tex, NULL, &wk->tlut, flag);
     } else {
-        wk->pCl->Set(m_Ang, m_Pos, nx, ny, width, &wk->tex, height * (3000.0f / d / 23.0f), NULL, d, NULL, flag);
+        wk->pCl->Set(m_Ang, m_Pos, nx, ny, width, height * (3000.0f / d / 23.0f), d, &wk->tex, NULL, NULL, flag);
     }
     if (pSeq->Blend_type) {
         wk->pCl->blendMode = 1;

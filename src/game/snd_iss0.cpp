@@ -18,21 +18,21 @@ int Snd_iss_req_para(u16 blk_no, u16 req_no, u8* para)
 // belongs to the same sound); dummy SITs (0x8000) and unknown numbers are refused.
 int req_iss_main(u16 blk_no, u16 req_no, u8* para)
 {
-    SND_CTRL_WORK* ctrl = &Snd_ctrl_work;
+    SND_CTRL* ctrl = &Snd_ctrl_work;
     SND_SIT* sit;
 
-    ctrl->multi_req = 0;
-    if (req_no >= Snd_iss_blk[blk_no].num) {
+    ctrl->IsLink = 0;
+    if (req_no >= Snd_iss_blk[blk_no].sit_num) {
         OSReport("SND REQ_NO is not found.\n");
         OSReport("BLK_NO : %d / REQ_NO : %d\n", blk_no, req_no);
         return 0;
     }
-    ctrl->req_id++;
-    if (ctrl->req_id == 0) {
-        ctrl->req_id++;
+    ctrl->snd_id++;
+    if (ctrl->snd_id == 0) {
+        ctrl->snd_id++;
     }
     while (1) {
-        sit = Snd_iss_blk[blk_no].sit;
+        sit = Snd_iss_blk[blk_no].sit_adrs;
         sit += req_no;
         if (sit->flag & 0x8000) {
             OSReport("SND REQ_NO is dummy data.\n");
@@ -44,28 +44,28 @@ int req_iss_main(u16 blk_no, u16 req_no, u8* para)
             return 0;
         }
         if (!(sit->flag & 0x2000)) {
-            return ctrl->req_id;
+            return ctrl->snd_id;
         }
-        ctrl->multi_req = 1;
+        ctrl->IsLink = 1;
         req_no++;
     }
 }
 
 // The surround type of the request: the override (ovr_flag 0x100) or the SIT's.
-void req_set_srd_type(SND_CTRL_WORK* ctrl, SND_SIT* sit, u8* para)
+void req_set_srd_type(SND_CTRL* ctrl, SND_SIT* sit, u8* para)
 {
-    if (ctrl->ovr_flag & 0x100) {
-        ctrl->srd_type = ctrl->srd_type_ovr;
+    if (ctrl->para_flag & 0x100) {
+        ctrl->now_srd_type = ctrl->srd_type;
     } else {
-        ctrl->srd_type = sit->srd_type;
+        ctrl->now_srd_type = sit->srd_type;
     }
     if (para != NULL) {
-        *para = ctrl->srd_type;
+        *para = ctrl->now_srd_type;
     }
 }
 
 // Queues one request with interrupts off. Returns 1 when the request bank is full.
-int req_iss_one(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
+int req_iss_one(SND_CTRL* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
 {
     int old;
     int ret;
@@ -78,9 +78,9 @@ int req_iss_one(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
 
 // Fills a free request slot: type 1 (one-shot SE, SIT flag 0x100) or 2, block / number / id / SIT
 // and the control parameters copied in.
-int req_iss_one_sub(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
+int req_iss_one_sub(SND_CTRL* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
 {
-    SND_REQ_WORK* req;
+    SND_REQ* req;
 
     req = Snd_open_req_work();
     if (req == NULL) {
@@ -92,10 +92,10 @@ int req_iss_one_sub(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
     } else {
         req->use_type = 2;
     }
-    req->srd_type = ctrl->srd_type;
+    req->srd_type = ctrl->now_srd_type;
     req->blk_no = blk_no;
     req->req_no = req_no;
-    req->snd_id = ctrl->req_id;
+    req->snd_id = ctrl->snd_id;
     req->sit_ptr = sit;
     Snd_req_work_copy_para(ctrl, req);
     return 0;
@@ -104,10 +104,10 @@ int req_iss_one_sub(SND_CTRL_WORK* ctrl, SND_SIT* sit, u16 blk_no, u16 req_no)
 // What sound id `snd_id` is: 1 SE (pending or on a voice), 2 sequence, 4 stream, 0 unknown / done.
 int Snd_get_play_type(u32 snd_id)
 {
-    SND_REQ_WORK* req;
-    SND_VOICE_WORK* voice;
-    SND_SEQ_WORK* seq;
-    SND_STR_WORK* str;
+    SND_REQ* req;
+    SND_VOICE* voice;
+    SND_SEQ* seq;
+    SND_STR* str;
     int old;
     int type = 0;
 

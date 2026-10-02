@@ -174,7 +174,6 @@ void cPl0e::setPos(Vec* p, f32 ang)
 static void pl0e_R0_Init(cPl0e* em)
 {
     Pl0eWork* w = PL0E_WK(em);
-    int zero;
 
     em->modelInit(ARC(PL0E_BIN_005), ARC(PL0E_TPL_006));
     em->be_flag &= ~0x10;
@@ -185,14 +184,13 @@ static void pl0e_R0_Init(cPl0e* em)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 4);
     }
-    zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->setStatus(EM_STATUS_IK_OFF);
     em->atari.m_flag &= 0xFCFF;
     em->atari.setPriority(PRI_LV1);
     em->setStatus(EM_STATUS_LOCKOFF);
     EspDataLoad((u32) ARC(PL0E_EFF_004), EFF_PL0E, 0);
-    w->flags = zero;
+    w->flags = 0;
     w->cnt68 = 0x1D;
     w->sink = 96000.0f;
     // pRailObj / spdX are written LAST: they are the last uses of the shared zero (r28) and 0.0 (f31),
@@ -202,9 +200,9 @@ static void pl0e_R0_Init(cPl0e* em)
     w->rollPhase = 0.0f;
     w->pitchPhase = 0.0f;
     w->x54 = 0.0f;
-    w->x78 = zero;
-    w->x71 = zero;
-    w->x72 = zero;
+    w->x78 = 0;
+    w->x71 = 0;
+    w->x72 = 0;
     w->swayAmp.x = 0.0f;
     w->swayAmp.y = 0.0f;
     w->swayAmp.z = 0.0f;
@@ -213,9 +211,9 @@ static void pl0e_R0_Init(cPl0e* em)
     w->swayPhase.z = 0.0f;
     w->xD8 = 0.0f;
     w->camRate = 0.0f;
-    w->jumpCnt = zero;
-    w->seNo = zero;
-    w->pitch104 = zero;
+    w->jumpCnt = 0;
+    w->seNo = 0;
+    w->pitch104 = 0;
     w->pPath = 0;
     w->ofs.x = 0.0f;
     w->ofs.y = 0.0f;
@@ -677,17 +675,17 @@ void pl0eCamMove(cPl0e* em)
     at.x = at.x * 0.5f + dir.x * 0.5f;
     at.z = at.z * 0.5f + dir.z * 0.5f;
     at.y = at.y + pl0e_cam_up;
-    PosToPos(&gcam->param.at, &target, &pl0e_camera.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &at, &pl0e_camera.param.pos, 1.0f);
-    pl0e_camera.param.fovy = pl0e_camera.param.fovy * 0.9f + 4.0f;
+    PosToPos(&gcam->param.Target, &target, &pl0e_camera.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &at, &pl0e_camera.param.Campos, 1.0f);
+    pl0e_camera.param.Fovy = pl0e_camera.param.Fovy * 0.9f + 4.0f;
     PSMTXRotRad(m, 'z', -Muku2(w->rotY, em->ang.y, PI) * 3.0f);
     dir.y = 1.0f;
     dir.x = 0.0f;
     dir.z = 0.0f;
     PSMTXMultVecSR(m, &dir, &pl0e_camera.Up);
     {
-        Vec* cp = &pl0e_camera.param.pos;
-        Vec* ca = &pl0e_camera.param.at;
+        Vec* cp = &pl0e_camera.param.Campos;
+        Vec* ca = &pl0e_camera.param.Target;
 
         pl0e_camera.Distance = VEC_DIST(cp, ca);
     }
@@ -1002,7 +1000,7 @@ void plboatBlendMotSet(cPlayer* pl, void* m0, void* m1, void* m2, int a, int b, 
     }
     bm = &pl->m_SubMot;
     MotionSetCore(pl, bm, m, (void*) f, pl->m_Hokan, 4, pl->m_Frame);
-    pl->Motion.blend = bm;
+    pl->pMotionB = bm;
     bm->Brate = rate * (1.0f / 256.0f);
     if (pl->m_Hokan) {
         pl->m_Hokan--;
@@ -1032,7 +1030,7 @@ void subBlendMotSet(cSubChar* sub, void* m0, void* m1, void* m2, int a, int b, i
     }
     bm = &sub->subMot;
     MotionSetCore(sub, bm, m, (void*) f, sub->m_Hokan, 4, sub->m_Frame);
-    sub->Motion.blend = bm;
+    sub->pMotionB = bm;
     bm->Brate = rate * (1.0f / 256.0f);
     if (sub->m_Hokan) {
         sub->m_Hokan--;
@@ -1582,7 +1580,7 @@ void pl0eBlendMotSet(cPl0e* em, void* m0, void* m1, void* m2, int a, int b, int 
     }
     bm = &w->blendMot;
     MotionSetCore(em, bm, m, (void*) f, (u8) w->hokan, 4, (u16) w->frame);
-    em->Motion.blend = bm;
+    em->pMotionB = bm;
     bm->Brate = rate * (1.0f / 256.0f);
     if (w->hokan) {
         w->hokan--;

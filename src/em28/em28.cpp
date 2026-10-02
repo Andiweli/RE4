@@ -251,7 +251,6 @@ void cEm28::move()
 static void em28_R0_Init(cEm28* em)
 {
     Em28Work* w = EM28_WK(em);
-    int zero;
 
     switch (em->type) {
     case 0:
@@ -272,28 +271,27 @@ static void em28_R0_Init(cEm28* em)
     }
     em->be_flag &= ~0x10;
     em->setStatus(EM_STATUS_IK_OFF);
-    zero = 0;
     em->setStatus(EM_STATUS_LOCKOFF);
-    em->Motion.flip = em28_flip_tbl;
+    em->pXFlip = em28_flip_tbl;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
         static const Vec size = { 500.0f, 500.0f, 0.0f };
 
         em->LightInfo.init2(0, 3, &ofs, &size, 2);
     }
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->atari.init(0.0f, 0.0f, 0.0f, 300.0f, 200.0f, 200.0f, 500.0f, 3, 0x2000, 10);
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     YarareInit(em, 0.0f, 0.0f, -130.0f, 200.0f, 100.0f, 3, YAT_FLAG_ON | YAT_FLAG_Z_AXIS);
     EspDataLoad((u32) ARC(EM28_EFF_00B), EFF_EM28, 0);
-    w->flags = zero;
-    w->escapeWait = zero;
+    w->flags = 0;
+    w->escapeWait = 0;
     w->pCtrl11 = GetCtrlCtrl11();
     w->pCtrl12 = GetCtrlCtrl12();
-    w->x17C = zero;
+    w->x17C = 0;
     em->setStatus(EM_STATUS_ACTIVE);
-    em->setRno(1, zero, zero, zero);
-    MotionSetCore(em, MOTION(em), ARC(EM28_MOT_00C), 0, 0, 5, 0);
+    em->setRno(1, 0, 0, 0);
+    MotionSetCore(em, &em->Motion, ARC(EM28_MOT_00C), 0, 0, 5, 0);
     MotionMove(em, 0);
     em28_R0_Move(em);
 }
@@ -333,7 +331,7 @@ static void em28_R1_Wait(cEm28* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_00C), 0, 0x1E, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_00C), 0, 0x1E, 5, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -351,7 +349,7 @@ static void em28_R1_Wait(cEm28* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_WAIT_00D), 0, 0xA, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_WAIT_00D), 0, 0xA, 1, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {
@@ -363,7 +361,7 @@ static void em28_R1_Wait(cEm28* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_WAIT_018), 0, 0xA, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_WAIT_018), 0, 0xA, 1, 0);
         em->r_no_2++;
     case 5:
         if (MotionMove(em, 0)) {
@@ -375,7 +373,7 @@ static void em28_R1_Wait(cEm28* em)
         }
         break;
     case 6:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_WAIT_019), 0, 0xA, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_WAIT_019), 0, 0xA, 1, 0);
         w->timer = 15;
         em->r_no_2++;
     case 7:
@@ -441,9 +439,9 @@ static void em28_R1_Walk(cEm28* em)
     switch (em->r_no_2) {
     case 0:
         if (Rnd() & 1) {
-            MotionSetCore(em, MOTION(em), ARC(EM28_MOT_WALK_00E), 0, 0xA, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM28_MOT_WALK_00E), 0, 0xA, 5, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM28_MOT_WALK_00F), 0, 0xA, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM28_MOT_WALK_00F), 0, 0xA, 5, 0);
         }
         w->targetAng = fRand1_1() * PI;
         w->timer = (u8) (Rnd() % 5) + 3;
@@ -476,7 +474,7 @@ static void em28_R1_Dash(cEm28* em)
 
     switch (st) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_DASH), ARC(EM28_SEQ_DASH), 3, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_DASH), ARC(EM28_SEQ_DASH), 3, 5, 0);
         w->targetAng = GetXZAngle(&pPL->pos, &em->pos);
         w->targetAng += fRand1_1() * (PI / 2.0f);
         w->targetAng = LIMIT_ANGLE(w->targetAng);
@@ -526,7 +524,7 @@ static void em28_R1_Jump(cEm28* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_JUMP_012), ARC(EM28_SEQ_JUMP_01C), 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_JUMP_012), ARC(EM28_SEQ_JUMP_01C), 3, 1, 0);
         w->targetAng = GetXZAngle(&pPL->pos, &em->pos);
         w->targetAng += fRand1_1() * (PI / 2.0f);
         w->targetAng = LIMIT_ANGLE(w->targetAng);
@@ -550,7 +548,7 @@ static void em28_R1_Jump(cEm28* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_JUMP_013), ARC(EM28_SEQ_JUMP_01D), 3, 4, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_JUMP_013), ARC(EM28_SEQ_JUMP_01D), 3, 4, 0);
         w->spd.x = 0.0f;
         w->spd.y = fRand0_1() * 100.0f + 150.0f;
         w->spd.z = fRand0_1() * 50.0f + 150.0f;
@@ -588,7 +586,7 @@ static void em28_R1_Jump(cEm28* em)
         break;
     }
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_JUMP_014), ARC(EM28_SEQ_JUMP_01E), 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_JUMP_014), ARC(EM28_SEQ_JUMP_01E), 3, 1, 0);
         em->r_no_2++;
     case 5:
         if (MotionMove(em, 0)) {
@@ -613,7 +611,7 @@ static void em28_R1_Dm_Small(cEm28* em)
 {
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_011), 0, 0, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_011), 0, 0, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -659,14 +657,14 @@ static void em28_R1_Die_Normal(cEm28* em)
         switch ((u8) (Rnd() % 3)) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM28_MOT_011), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM28_MOT_011), 0, 3, 1, 0);
             break;
         case 1:
             em->ang.y += Muku(&em->pos, &em->dmg.m_PosFrom, em->ang.y, PI);
-            MotionSetCore(em, MOTION(em), ARC(EM28_MOT_DIE_NORMAL_017), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM28_MOT_DIE_NORMAL_017), 0, 3, 1, 0);
             break;
         case 2:
-            MotionSetCore(em, MOTION(em), ARC(EM28_MOT_DIE_NORMAL_01A), 0, 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM28_MOT_DIE_NORMAL_01A), 0, 3, 1, 0);
             break;
         }
         w->timer = 14;
@@ -697,7 +695,7 @@ static void em28_R1_Die_Air(cEm28* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_DIE_AIR_015), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_DIE_AIR_015), 0, 3, 1, 0);
         em->r_no_2++;
     case 1: {
         Vec v;
@@ -725,7 +723,7 @@ static void em28_R1_Die_Air(cEm28* em)
         break;
     }
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM28_MOT_DIE_AIR_016), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM28_MOT_DIE_AIR_016), 0, 3, 1, 0);
         em->clearStatus(EM_STATUS_ACTIVE);
         em->atari.m_flag &= ~0x200;
         SndCall(8, 1, &em->pos, em->id, 0, em);

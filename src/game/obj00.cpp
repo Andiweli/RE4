@@ -10,7 +10,7 @@
 #include "motion.h"
 
 // One point of the falling rope (obj00FallMove).
-struct Obj00Node {
+struct OBJ00_FALLWK {
     Vec pos;
     Vec old;
     Vec spd;
@@ -18,10 +18,8 @@ struct Obj00Node {
     int reflect;
 };
 
-extern "C" {
 void obj00FallMove(cObj00* obj);
 void obj00SetOya(cObj00* obj);
-}
 
 // Per-frame: plays the motion when set; follows the parent (destroyed with it), runs the fall
 // simulation, updates the parts and collision unless flagged, fades out on be_flag 0x20.
@@ -150,15 +148,15 @@ void obj00FallMove(cObj00* obj)
 {
     FREE_OBJ00* w = OBJ00_WK(obj);
     Vec ofs[3] = { { 0.0f, 0.0f, 300.0f }, { 0.0f, 0.0f, -300.0f }, { 300.0f, 0.0f, 0.0f } };
-    Obj00Node node[3];
+    OBJ00_FALLWK node[3];
     Vec vx;
     Vec vy;
     Vec vz;
     Vec d;
     u32 i;
     u32 k;
-    Obj00Node* p;
-    Obj00Node* n;
+    OBJ00_FALLWK* p;
+    OBJ00_FALLWK* n;
     f32 mag;
     f32 diff;
 

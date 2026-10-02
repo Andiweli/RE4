@@ -12,7 +12,7 @@ section	offset	size	unit	scope	name	demangled
 .text	0x000005D8	0xA4	pl0a/wep07.cpp	global	wepDown__FP7cPlayer	wepDown
 .text	0x0000067C	0xBC	pl0a/wep07.cpp	global	countActiveWork__t8cManager1Z6cLight	cManager<cLight>::countActiveWork
 .text	0x00000738	0x158	pl0a/wep07.cpp	global	create__t8cManager1Z6cLighti	cManager<cLight>::create
-.text	0x00000890	0xF0	pl0a/pl_klauser.cpp	global	setTexRender	setTexRender
+.text	0x00000890	0xF0	pl0a/pl_klauser.cpp	global	setTexRender__FP10cModelInfo	setTexRender
 .text	0x00000980	0xE8	pl0a/pl_klauser.cpp	global	__10cPlKlauser	cPlKlauser::cPlKlauser
 .text	0x00000A68	0x158	pl0a/pl_klauser.cpp	global	setMotion__10cPlKlauser	cPlKlauser::setMotion
 .text	0x00000BC0	0xF0	pl0a/pl_klauser.cpp	global	move__10cPlKlauser	cPlKlauser::move

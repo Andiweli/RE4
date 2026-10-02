@@ -17,13 +17,11 @@
 #include "pl_npc.h"
 
 
-extern "C" {
 void obj08AddSpeed(cObj08* obj);
 int obj08ScrHitCk(cObj08* obj);
 int obj08ToEmHitCk(cObj08* obj);
 int obj08ToPlHitCk(cObj08* obj);
 void obj08DmEstSet(cObj08* obj, cModel* em, Vec* oldPos, YARARE_INFO* part);
-}
 
 Vec obj08HitBox[8] = {
     { -500.0f, -500.0f, 0.0f },   { 500.0f, -500.0f, 0.0f },
@@ -84,13 +82,13 @@ cObj* SetObj08(cModel* parent, void* bin, void* tpl, Vec* pos, Vec* rot, int fla
     if (flags & 0x40000000) {
         w->be_flag |= 0x20;
     }
-    w->pAtk = (EmAtkInfo*) atk;
+    w->pAtk = (ATK_INFO*) atk;
     w->wep_id = flags & 0xFFFF;
     return obj;
 }
 
 // Sets speed, life in frames (-1 = until it hits), gravity per frame and hit radius (min 1).
-void SetObj08Spd(cObj* obj, Vec* spd, int life, f32 grav, f32 rad)
+void SetObj08Spd(cObj* obj, Vec* spd, f32 grav, f32 rad, int life)
 {
     FREE_OBJ08* w;
 
@@ -254,7 +252,7 @@ int obj08ToEmHitCk(cObj08* pObj)
 {
     FREE_OBJ08* w = OBJ08_WK(pObj);
     Vec box[8];
-    WepTarget list[10];
+    TARGET_WK list[10];
     Vec ang;
     f32 len;
     u32 n;
@@ -310,8 +308,8 @@ int obj08ToEmHitCk(cObj08* pObj)
         return 0;
     }
     for (i = 0; i < n; i++) {
-        YARARE_INFO* part = list[i].part;
-        list[i].em->dmg.set(0, 10, (u8) w->wep_id, &pObj->pos, part->len, part);
+        YARARE_INFO* part = list[i].pAt;
+        list[i].pEm->dmg.set(0, 10, (u8) w->wep_id, &pObj->pos, part->len, part);
         if (w->eff4 && w->est4) {
             obj08DmEstSet(pObj, pPL, &pObj->pos_old, part);
         }

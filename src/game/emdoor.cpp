@@ -35,7 +35,7 @@ typedef void (*EmDoorFunc)(cEmDoor*);
 
 static void emDoor_R1_Open2(cEmDoor* em);
 
-// Parts index remap for the flipped motions (MotionWork::flip): identity.
+// Parts index remap for the flipped motions (cModel::pXFlip): identity.
 static u16 emDoor_xflip_tbl[20] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
 };
@@ -87,7 +87,6 @@ cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo)
     FREE_EMDOOR* w;
     u16* flg;
     Vec v;
-    int zero;
     f32 ry;
 
     em = (cEmDoor*) EmMgr.create(0x41);
@@ -115,11 +114,10 @@ cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo)
         w->Width = 650.0f;
         em->type = 1;
     }
-    em->Motion.flip = emDoor_xflip_tbl;
+    em->pXFlip = emDoor_xflip_tbl;
     EtcSetAddAmb(em, ETC_AMB_DOOR);
-    zero = 0;
     w->Eff_id = 0xFF;
-    AtariInit(&em->atari, -w->Width, w->Height * 0.5f, 0.0f, w->Width + 50.0f, 150.0f, 150.0f, w->Height * 0.5f + 50.0f, zero, 2, zero);
+    AtariInit(&em->atari, -w->Width, w->Height * 0.5f, 0.0f, w->Width + 50.0f, 150.0f, 150.0f, w->Height * 0.5f + 50.0f, 0, 2, 0);
     em->atari.setPriority(PRI_LV3);
     em->atari.offSca();
     em->setStatus(EM_STATUS_ACTIVE);
@@ -155,7 +153,7 @@ cEmDoor* SetDoor(void* bin, void* tpl, Vec* pos, Vec* rot, int type, int flagNo)
     w->pChain = 0;
     w->Se_cancel = 0;
     w->Be_flg = 0;
-    w->Key_flag = 0x36;
+    w->Key_flag = KYF_MAX;
     w->rnd = Rnd() % 5;
     w->Door_hp = (Rnd() & 1) + 1;
     w->Open_timer = 0;
@@ -1487,7 +1485,7 @@ void emDoor_R1_Open(cEmDoor* pEm)
                     hp = pSUB->hp;
                     pSUB->hp = 0;
                 }
-                if (PlWepHitCheck3(&v, 0x18, 10, 400.0f)) {
+                if (PlWepHitCheck3(&v, 0x18, 400.0f, 10)) {
                     SndCall(1, 0xF, &v, 0, 0, pEm);
                 }
                 if (pSUB) {
@@ -1690,7 +1688,7 @@ void emDoor_R1_Down(cEmDoor* pEm)
                     hp = pSUB->hp;
                     pSUB->hp = 0;
                 }
-                if (PlWepHitCheck3(&v, 0x14, 10, 400.0f)) {
+                if (PlWepHitCheck3(&v, 0x14, 400.0f, 10)) {
                     SndCall(1, 0xF, &pPL->pos, 0, 0, pPL);
                 }
                 if (pSUB) {
@@ -1812,10 +1810,10 @@ void emDoor_R1_Break(cEmDoor* pEm)
         if (flg) {
             *flg |= 1;
         }
-        if (w->Key_flag != 0x36) {
+        if (w->Key_flag != KYF_MAX) {
             u32* tbl = pG->Key_flg;
 
-            FlagOn(tbl, w->Key_flag);
+            FlagOn(tbl, (u32) w->Key_flag);
         }
         pEm->r_no_2++;
     }
@@ -2552,7 +2550,7 @@ u32 cEmDoor::ckOpen()
     if (ckObj() == 0) {
         return 2;
     }
-    if (w->Key_flag != 0x36 && emDoorKeyCk(w->Key_flag) == 0) {
+    if (w->Key_flag != KYF_MAX && emDoorKeyCk(w->Key_flag) == 0) {
         return 3;
     }
     return 0;
@@ -2566,7 +2564,7 @@ int cEmDoor::ckKick(Vec* pPos)
     Mtx m;
     Vec v;
 
-    if (w->Key_flag != 0x36 && emDoorKeyCk(w->Key_flag) == 0) {
+    if (w->Key_flag != KYF_MAX && emDoorKeyCk(w->Key_flag) == 0) {
         return 0;
     }
     if (w->Lock_L_hp > 1) {
@@ -2857,7 +2855,6 @@ void cEmDoor::setShock(int mode, Vec* pPos, int se_off)
 void cEmDoor::setBreak(Vec* pPos)
 {
     FREE_EMDOOR* w = EMDOOR_WK(this);
-    int zero;
 
     if (hp <= 0) {
         return;
@@ -2873,10 +2870,9 @@ void cEmDoor::setBreak(Vec* pPos)
         setOpen(pPos, 0, 0, 0);
         return;
     }
-    zero = 0;
-    EstSet(this, -1, 0, 0, w->Eff_id, 6, 0, ESP_CORE_KIND_NONE, this, (void*) zero);
+    EstSet(this, -1, 0, 0, w->Eff_id, 6, 0, ESP_CORE_KIND_NONE, this, 0);
     SndCall(6, 0x37, &this->pos, 0, 0, this);
-    hp = zero;
+    hp = 0;
     r_no_0 = 1;
     r_no_1 = 4;
     r_no_2 = 0;
@@ -2902,7 +2898,7 @@ void emDoorActEvtCk(cEmDoor* pEm)
     if (w->Be_flg & 1) {
         return;
     }
-    if (w->Key_flag != 0x36 && emDoorKeyCk(w->Key_flag) == 0) {
+    if (w->Key_flag != KYF_MAX && emDoorKeyCk(w->Key_flag) == 0) {
         return;
     }
     ang = fabsf(Muku2(w->base_dir, pPL->ang.y, PI));
@@ -3350,9 +3346,9 @@ void cEmDoor::setNormal()
 }
 
 // The pG->Key_flg key bit required to open the door (0x36 = none).
-void cEmDoor::setKey(int no)
+void cEmDoor::setKey(KEY_FLAG key_flag)
 {
-    EMDOOR_WK(this)->Key_flag = no;
+    EMDOOR_WK(this)->Key_flag = key_flag;
 }
 
 // The intact door `m` (an NPC / partner) stands in front of and faces, within its reach box;

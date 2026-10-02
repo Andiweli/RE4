@@ -143,7 +143,7 @@ static inline void r21d_FadeSetW(int no, u32 time, u32 z, int late)
     if (no & 0x80000000) {
         *(u32*) &col.start = black;
     } else {
-        *(u32*) &col.start = zero;
+        *(u32*) &col.start = 0;
     }
     if (no & 0x80000000) {
         *(u32*) &col.end = zero;
@@ -294,7 +294,7 @@ void r21d_searchEmReset()
                     break;
                 }
                 r21d_work->resetting[i] = 1;
-                SceExec(0x12, (TaskFunc) r21d_setEmReset, i, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) r21d_setEmReset, (void*) i, 0, SCE_PRIO_DEF_2, 0);
                 r21d_work->emSetCount++;
                 break;
             }

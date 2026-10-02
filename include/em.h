@@ -58,16 +58,15 @@ public:
     int isDamage() { return m_Flag || m_Timer; }
 };
 
-// Room water effect table registered at cEm::pRoomEff (pl_sub PlRegistRoomEff): 3 entries of
-// {u32 id; u8 pad[3]; u8 type;} used as EstSet(..., id, type, ...) for the ripple / splash effects.
-struct PlRoomEff {
+// Room water effect table registered at cEm::m_pEffRoom (pl_sub PlRegistRoomEff/PlWaterProc): 6
+// entries fed to EstSet(..., type, id, ...) for the ripple / splash effects.
+struct PlEffRoom {
+    u32 type;
     u32 id;
-    u8 pad_4[3];
-    u8 type;
 };
 
-// Blend motion work (0xD0 bytes): a MotionWork (model.h) without the trailing blend/flip/blendTbl
-// pointers. cEm::m_SubMot (0x42C) and cMot3::work are one; MotionWork::blend points at it.
+// Blend motion work: MOTION_INFO (model.h), the same struct cModel::Motion uses
+// (cModel::pMotionB points a model's own Motion at it). cEm::m_SubMot (0x42C) and cMot3::work are one.
 struct PlArc;      // global.h
 struct EmiEntry;   // embarrel.h
 class cSubChar;    // pl_npc.h
@@ -230,10 +229,8 @@ public:
 // The same for the enemy module's own archive; the enemy is the local `em`.
 #define ARC(no) PL_ARC_PTR(em->subArc, no)
 
-extern "C" {
 void emMove(cEm* pEm);        // per-frame update of one alive work: distance to the player, damage info, move()
 void battleCheck(cEm* pEm);
 void killEm(cEm* pEm);
-}
 
 #endif

@@ -39,8 +39,8 @@ struct R317Work {
     int hardMode;   // 0x04  1 above the easy difficulty: the button prompts come earlier
 };
 
-// Two-gear elevator (sce_com's SceElevatorData with a second stop, the gear objects and a second cut).
-struct SceElevator2Data {
+// Two-gear elevator (sce_com's ElevatorParam with a second stop, the gear objects and a second cut).
+struct ElevatorParam2 {
     s32 dir;        // 0x00  3 up / 1 down
     u32 objId;      // 0x04  cage
     u32 objId2;     // 0x08  gear (uv scroll forward)
@@ -70,8 +70,8 @@ static R317Work* r317_work;
 // The original object's .rodata (0x4cc -> 0x4d0) and .data (0xdc -> 0xe0) are 8-aligned: r318's
 // sections start 8-aligned in the REL.
 asm(".section .rodata\n\t.balign 8\n\t.section .data\n\t.balign 8\n\t.text");
-static SceElevator2Data r317_elvUp = {3, 0x2A, 0x19, 0x1A, {0.0f, 0.0f, 0.0f}, {0.0f, 10825.0f, 0.0f}, {6860.0f, -4775.0f, 11950.0f}, {6860.0f, 6016.0f, 11950.0f}, {0.0f, 3.1415927f, 0.0f}, 2, 3, 2, 4, 3, 0};
-static SceElevator2Data r317_elvDown = {1, 0x2A, 0x19, 0x1A, {0.0f, 10825.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {6860.0f, 6016.0f, 11950.0f}, {6860.0f, -4775.0f, 11950.0f}, {0.0f, 1.5707964f, 0.0f}, 3, 2, 2, 4, 3, 0};
+static ElevatorParam2 r317_elvUp = {3, 0x2A, 0x19, 0x1A, {0.0f, 0.0f, 0.0f}, {0.0f, 10825.0f, 0.0f}, {6860.0f, -4775.0f, 11950.0f}, {6860.0f, 6016.0f, 11950.0f}, {0.0f, 3.1415927f, 0.0f}, 2, 3, 2, 4, 3, 0};
+static ElevatorParam2 r317_elvDown = {1, 0x2A, 0x19, 0x1A, {0.0f, 10825.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {6860.0f, 6016.0f, 11950.0f}, {6860.0f, -4775.0f, 11950.0f}, {0.0f, 1.5707964f, 0.0f}, 3, 2, 2, 4, 3, 0};
 
 static f32 r317_elvSpd = 0.0f;
 static f32 r317_elvMaxSpd = 100.0f;
@@ -106,14 +106,14 @@ static inline void EffectDelete2001()
                                                                              \
         pG->Disp_flg = v;                                                    \
         v = 0;                                                               \
-        ActBtn.set(ACT_NO_DISP, 5, (void*) action, 0, ACTCTR_ENFORCE_EXEC | ACTCTR_EXACT_KEY, btn, ACT_FUNC_NORMAL, v);               \
+        ActBtn.set(ACT_NO_DISP, 5, (void*) action, 0, ACTCTR_ENFORCE_EXEC | ACTCTR_EXACT_KEY, btn, ACT_FUNC_NORMAL, (void*) v);               \
     } while (0)
 
 static void R317ContinuePointSet();
 void R317EventS00();
 void R317Elevator2Init();
-void SceElevator2Main(SceElevator2Data* d);
-void SceElevator2End(SceElevator2Data* d);
+void SceElevator2Main(ElevatorParam2* d);
+void SceElevator2End(ElevatorParam2* d);
 static void R317EventS00Action();
 static void R317EventS07Action();
 static void R317EventS09Action();
@@ -121,21 +121,21 @@ static void R317EventS11Action();
 static void R317EventS01Action();
 static void R317EventS03Action();
 void R317SmdAllOn();
-extern "C" void Evt_R317S00_Func(Event* e);
-extern "C" void Evt_R317S01_Func(Event* e);
-extern "C" void Evt_R317S02_Func(Event* e);
-extern "C" void Evt_R317S03_Func(Event* e);
-extern "C" void Evt_R317S04_Func(Event* e);
-extern "C" void Evt_R317S05_Func(Event* e);
-extern "C" void Evt_R317S06_Func(Event* e);
-extern "C" void Evt_R317S07_Func(Event* e);
-extern "C" void Evt_R317S08_Func(Event* e);
-extern "C" void Evt_R317S09_Func(Event* e);
-extern "C" void Evt_R317S10_Func(Event* e);
-extern "C" void Evt_R317S11_Func(Event* e);
-extern "C" void Evt_R317S12_Func(Event* e);
-extern "C" void Evt_R317S13_Func(Event* e);
-extern "C" void Evt_R317S14_Func(Event* e);
+void Evt_R317S00_Func(Event* e, u32);
+void Evt_R317S01_Func(Event* e, u32);
+void Evt_R317S02_Func(Event* e, u32);
+void Evt_R317S03_Func(Event* e, u32);
+void Evt_R317S04_Func(Event* e, u32);
+void Evt_R317S05_Func(Event* e, u32);
+void Evt_R317S06_Func(Event* e, u32);
+void Evt_R317S07_Func(Event* e, u32);
+void Evt_R317S08_Func(Event* e, u32);
+void Evt_R317S09_Func(Event* e, u32);
+void Evt_R317S10_Func(Event* e, u32);
+void Evt_R317S11_Func(Event* e, u32);
+void Evt_R317S12_Func(Event* e, u32);
+void Evt_R317S13_Func(Event* e, u32);
+void Evt_R317S14_Func(Event* e, u32);
 
 // Room init (the Krauser knife fight): hard mode after more than one continue (r_continue_cnt); a larger
 // shadow pool; the two-gear elevator (areas 6/7 up / down); the fifteen event callbacks; the fight chain
@@ -284,7 +284,6 @@ void R317EventS00()
         }
         EvtMgr.EvtReadExec("event/evd/r317s05.evd", 0, EvtReadFlagNone);
         SceEventEnd(0);
-        void* zero = 0;
         pPL->setPos(6970.0f, 3006.0f, -26415.0f);
         {
             Vec v;
@@ -299,7 +298,7 @@ void R317EventS00()
         pPL->setWound();
         ScfFlagOn(pG, SCF_R317_KNIFE_BATTLE);
         OpeSetOpenTerm(0x14, 0.0f, 0.0f, 0.0f, 0.0f);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM01, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
     }
 }
 
@@ -321,7 +320,7 @@ void R317Elevator2Init()
 // sce_com's SceElevator for the gear elevator: the cage accelerates until the fade, the arrival
 // starts stopDist2 away at full speed and decelerates; the two gears scroll their texture with
 // the speed.
-void SceElevator2Main(SceElevator2Data* d)
+void SceElevator2Main(ElevatorParam2* d)
 {
     cPlayer* pl = pPL;
     cObj* obj;
@@ -369,7 +368,7 @@ void SceElevator2Main(SceElevator2Data* d)
     gear1->pModelInfo->flagsDC |= 1;
     gear2->pModelInfo->flagsDC |= 1;
     SceEventStart(0);
-    SceSetEventCancel(1, (TaskFunc) SceElevator2End, (int) d, -1, 1);
+    SceSetEventCancel(1, (TaskFunc) SceElevator2End, d, -1, 1);
     obj->setNoSuspend(1);
     obj->setPos(&d->pos);
     pPL->setNoSuspend(1);
@@ -544,7 +543,7 @@ void SceElevator2Main(SceElevator2Data* d)
 
 // End of the two-gear elevator ride: fade killed, the cage and the player snapped to the arrival
 // positions, the gear UV scroll stopped, the motor sound stopped with the stop SE.
-void SceElevator2End(SceElevator2Data* d)
+void SceElevator2End(ElevatorParam2* d)
 {
     cObj* obj = SmdGetObjPtr(d->objId);
     cObj* gear1 = SmdGetObjPtr(d->objId2);
@@ -624,7 +623,7 @@ void R317SmdAllOn()
 // Event r317s00 callback (the fight's first cut): "missed" bit 31 preset, a coin toss (0x00200000) picks
 // the button variant, status 3 with cancel cut 3; the action-button window on its cut clears the bit
 // through R317EventS00Action; the Leon / Krauser / knife models' parts per cut.
-void Evt_R317S00_Func(Event* e)
+void Evt_R317S00_Func(Event* e, u32)
 {
     int on = 0;
 
@@ -714,7 +713,7 @@ void Evt_R317S00_Func(Event* e)
 }
 
 // Event r317s01 callback: as s00 with the missed bit 0x08000000, coin toss 0x00020000, cancel cut 6.
-void Evt_R317S01_Func(Event* e)
+void Evt_R317S01_Func(Event* e, u32)
 {
     int on = 0;
 
@@ -789,7 +788,7 @@ void Evt_R317S01_Func(Event* e)
 }
 
 // Event r317s02 callback (no button): the Leon model's part 6 hidden, evmd200 drawn with ot_type 1.
-void Evt_R317S02_Func(Event* e)
+void Evt_R317S02_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -829,7 +828,7 @@ void Evt_R317S02_Func(Event* e)
 
 // Event r317s03 callback: after the fight was continued (Room_flg bit 2) it starts at cut 5 of stream
 // 0x75; missed bit 0x04000000, coin toss 0x00010000; the Krauser (em3900) parts per cut.
-void Evt_R317S03_Func(Event* e)
+void Evt_R317S03_Func(Event* e, u32)
 {
     int on = 0;
 
@@ -952,7 +951,7 @@ void Evt_R317S03_Func(Event* e)
 }
 
 // Event r317s04 callback (no button): Leon's part 6 and Krauser's part 7 hidden on cut 0.
-void Evt_R317S04_Func(Event* e)
+void Evt_R317S04_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -979,7 +978,7 @@ void Evt_R317S04_Func(Event* e)
 
 // Event r317s05 callback (no button): the hard-mode Krauser model em3900h's part 7 hidden; per-cut
 // model flags and effects.
-void Evt_R317S05_Func(Event* e)
+void Evt_R317S05_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1084,7 +1083,7 @@ void Evt_R317S05_Func(Event* e)
 }
 
 // Event r317s06 callback (no button): Leon's part 6 and em3900h's part 7 hidden on cut 0.
-void Evt_R317S06_Func(Event* e)
+void Evt_R317S06_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1111,7 +1110,7 @@ void Evt_R317S06_Func(Event* e)
 
 // Event r317s07 callback: missed bit 0x40000000, coin toss 0x00100000, cancel cut 7; the button window
 // clears the bit via R317EventS07Action.
-void Evt_R317S07_Func(Event* e)
+void Evt_R317S07_Func(Event* e, u32)
 {
     int on = 0;
 
@@ -1200,7 +1199,7 @@ void Evt_R317S07_Func(Event* e)
 }
 
 // Event r317s08 callback (no button): Leon's part 6 and Krauser's part 7 hidden, per-cut flags.
-void Evt_R317S08_Func(Event* e)
+void Evt_R317S08_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1233,7 +1232,7 @@ void Evt_R317S08_Func(Event* e)
 }
 
 // Event r317s09 callback: missed bit 0x20000000 with its coin toss and cancel cut; button via R317EventS09Action.
-void Evt_R317S09_Func(Event* e)
+void Evt_R317S09_Func(Event* e, u32)
 {
     int on = 0;
 
@@ -1310,7 +1309,7 @@ void Evt_R317S09_Func(Event* e)
 }
 
 // Event r317s10 callback (no button): Leon's part 6 hidden, evmd400 (the knife) drawn.
-void Evt_R317S10_Func(Event* e)
+void Evt_R317S10_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1340,7 +1339,7 @@ void Evt_R317S10_Func(Event* e)
 }
 
 // Event r317s11 callback: missed bit 0x10000000, coin toss 0x00040000, cancel cut 2; button via R317EventS11Action.
-void Evt_R317S11_Func(Event* e)
+void Evt_R317S11_Func(Event* e, u32)
 {
     int on = 0;
 
@@ -1403,7 +1402,7 @@ void Evt_R317S11_Func(Event* e)
 
 // Event r317s12 callback (the button-mash cut): counts the presses into W->btnCount; Leon's part 6 and
 // evmd400 per cut.
-void Evt_R317S12_Func(Event* e)
+void Evt_R317S12_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -1433,7 +1432,7 @@ void Evt_R317S12_Func(Event* e)
 }
 
 // The button-mashing duel: count the presses of the prompted button, 17 clears the "missed" bit.
-void Evt_R317S13_Func(Event* e)
+void Evt_R317S13_Func(Event* e, u32)
 {
     int on = 0;
 
@@ -1540,7 +1539,7 @@ void Evt_R317S13_Func(Event* e)
 }
 
 // Event r317s14 callback (the fight's last cut): Leon's part 6 / evmd400 per cut; the end restores the arena.
-void Evt_R317S14_Func(Event* e)
+void Evt_R317S14_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:

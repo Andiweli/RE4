@@ -8,29 +8,21 @@
 #include "model.h"
 #include "cam_ctrl.h"
 
-// MotionSeqKey / MotionData / MotionWork are defined in model.h (cModel::Motion at 0x1D8).
-
-// The motion-driven model view (cMotBase::set(cMotModel*), MOTION(m)): cModel carries the work
-// itself now, so this adds nothing.
-class cMotModel : public cModel {
-public:
-};
+// SEQUENCE_DATA / MotionData / MOTION_INFO are defined in model.h (cModel::Motion at 0x1D8).
 
 // MotionParts (cParts::motParts, 0x174) is defined in model.h.
 
-#define MOTION(m) (&((cMotModel*)(m))->Motion)
-
 // HermiteInterpolation parameter block.
-struct HermitePrm {
-    f32 frame;     // 0x00
-    f32 maxFrame;  // 0x04
-    u32 flags;     // 0x08  bit0: search backwards, bit1: reverse, bit2: loop, bit3: ignore the key history
-    u8 type;       // 0x0C  Fcc type
+struct _HERMITE_SET {
+    f32 Frame;      // 0x00
+    f32 Frame_max;  // 0x04
+    u32 Attr;       // 0x08  bit0: search backwards, bit1: reverse, bit2: loop, bit3: ignore the key history
+    u8 Data_fmt;    // 0x0C  Fcc type
     u8 pad_D[3];
-    u8* key;       // 0x10
+    u8* pData;      // 0x10
 };
+typedef _HERMITE_SET HERMITE_SET;
 
-extern "C" {
 void PartsWorldPosCalc(cModel* pMod);
 void MotionBlendOff(cModel* pEm);
 void MotionPause(cModel* pEm);
@@ -48,11 +40,10 @@ f32 MotionGetMaxFrame(MOTION_INFO* w);
 f32 MotionGetCurrentFrame(MOTION_INFO* w);
 int MotionCheckCrossFrame(MOTION_INFO* w, f32 frame);
 int MotionGetState(cModel* m);
-int HermiteInterpolation(HermitePrm* prm, Vec* out, u16* hist);
+int HermiteInterpolation(HERMITE_SET* prm, Vec* out, u16* hist);
 int Fcc_next_axis_addr(int fmt, int n);
 void IKInit(cModel* pEm, MOTION_INFO* pInfo);
 void InverseKinematics(cModel* pEm, int arm_flag);
-}
 void MotionSetCore(cModel* m, void* w, void* data, void* seq, int hokan, int flags, int frame);
 
 #endif

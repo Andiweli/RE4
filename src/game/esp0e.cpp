@@ -38,11 +38,9 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" {
 static f32 GetDistAlpha(cEsp0e* esp);
 static f32 GetDirAlpha(cEsp0e* esp, Vec* dir);
 void Esp0e_HideCheck(cEsp* esp);
-}
 
 // EspCreateTbl[0x0E] factory.
 cEsp* Esp0e_Create()
@@ -146,7 +144,7 @@ void cEsp0e::move()
 
 // EspTransTbl[0x0E]: when alpha > 0.01 draws a one-frame screen-sprite copy (Parts_no 0xF8) at
 // scr + random R_pos jitter with the colour alpha and size scaled by `alpha`, via EspCommonTrans.
-extern "C" void Esp0e_Trans(cEsp0e* esp)
+void Esp0e_Trans(cEsp0e* esp)
 {
     ESP0E_WK* w = &esp->m_Free;
 
@@ -188,9 +186,9 @@ static f32 GetDistAlpha(cEsp0e* esp)
     if (w->del_dist != 0.0f) {
         CAMERA* cam = &pG->Camera;
 
-        d.x = w->wld_pos.x - cam->param.pos.x;
-        d.y = w->wld_pos.y - cam->param.pos.y;
-        d.z = w->wld_pos.z - cam->param.pos.z;
+        d.x = w->wld_pos.x - cam->param.Campos.x;
+        d.y = w->wld_pos.y - cam->param.Campos.y;
+        d.z = w->wld_pos.z - cam->param.Campos.z;
         a = PSVECMag(&d) / w->del_dist;
         if (a > 1.0f) {
             a = 1.0f;
@@ -216,9 +214,9 @@ static f32 GetDirAlpha(cEsp0e* esp, Vec* dir)
 
     ang = LIMIT_ANGLE(w->dir_ang);
     cam = &pG->Camera;
-    d.x = w->wld_pos.x - cam->param.pos.x;
-    d.y = w->wld_pos.y - cam->param.pos.y;
-    d.z = w->wld_pos.z - cam->param.pos.z;
+    d.x = w->wld_pos.x - cam->param.Campos.x;
+    d.y = w->wld_pos.y - cam->param.Campos.y;
+    d.z = w->wld_pos.z - cam->param.Campos.z;
 #line 295 "D:/Bio4/Prog/esp0e.cpp"
     VECNormalize(&d, &d);
     a = -PSVECDotProduct(&d, dir);

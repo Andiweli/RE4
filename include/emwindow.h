@@ -98,10 +98,8 @@ public:
 // argument), etc flag number, and the room archive the effect data comes from.
 cEmWindow* SetWindow(void* bin, void* tpl, Vec* pos, Vec* rot, int type, u8 etcNo, void* arc);
 
-extern "C" {
 // Window in front of `m` (its field `id` from SceAtCheckFieldInfo(b)): 1 when `m` may go through it;
 // `status` gets the etc flag word, `dir` the through direction, `pos` the window position.
 int ChkWindow(cModel* pModTar, Vec* pos0, Vec* pos1, int field_id, u16* etc_flag, Vec* pNorm, Vec* pCenter, cEmWindow** o_pEm);
-}
 
 #endif

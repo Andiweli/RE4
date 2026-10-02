@@ -5,18 +5,20 @@
 #include "vec.h"
 #include "obj.h"
 
+class cEm;
+
 // Spear work (game/obj1b.cpp `cObjSpear`): thrown (R1_Throw), stuck in a parts of the enemy it hit
 // (R1_Parent), then falling as a three-point rope (R1_Fall) and fading out (R1_LostWait / Lost).
-struct SpearWork {
+struct FREE_OBJ1B {
     u32 Be_flg;             // 0x00  bit0: keep the parent parts matrix as it is (no axis normalize)
     int Timer;              // 0x04  LostWait: frames before the fade (120); Throw: frames between the flight SEs
     int Timer2;             // 0x08  Throw: flight frames left (60)
     u8 pad_C[0xC];
-    cModel* pEm_oya;        // 0x18
-    int oya_parts;          // 0x1C
+    cEm* pEm_oya;           // 0x18
+    u32 oya_parts;          // 0x1C
     Vec spd[3];             // 0x20  rope point speeds (R1_Fall)
     Vec throw_v;            // 0x44
-    EmAtkInfo* pAtk;        // 0x50  always 0, never dereferenced (PS2 ATK_INFO*)
+    ATK_INFO* pAtk;        // 0x50  always 0, never dereferenced
     int Lost_wait;          // 0x54  frames until the spear falls off its parent (1800)
     int Eff_timer;          // 0x58  frames of the stuck-in-boss effect (600, every 2nd frame)
     u8 se_id_fall;          // 0x5C  landing SE (0xFF = none)
@@ -46,17 +48,17 @@ struct SpearWork {
 // follows a parts of the target), falls off as a three-point rope (R1_Fall) and fades out (Lost).
 class cObjSpear : public cObj {
 public:
-    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  SpearWork
+    u8 free[OBJ_WORK_SIZE - 0x328];   // 0x328  FREE_OBJ1B
 
     virtual void move();
     virtual void beginEvent(u32 mode);
     virtual ~cObjSpear() {}
-    void setParent(cModel* parent, int partsNo, int noNormalize);
+    void setParent(cEm* pEm, u32 oya_parts, u32 mode);
     void setFall(u8 type, Vec* dir);
     void setThrow(Vec* dir);
     void setLost();
 };
 
-#define SPEAR_WK(o) ((SpearWork*) (o)->free)
+#define SPEAR_WK(o) ((FREE_OBJ1B*) (o)->free)
 
 #endif

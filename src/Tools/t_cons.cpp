@@ -339,7 +339,7 @@ static void quit()
             pG->debug_mode = pCons->debugBak;
             pLog->clear();
             pLog->modeReset();
-            pG->Disp_flg &= ~0x08000000;
+            DpfFlagOff(pG, DPF_SCR);
         } else {
             clearWork();
             pCons->step = 0;

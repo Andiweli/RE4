@@ -13,7 +13,7 @@
 // inlines are therefore instantiated BEFORE atari.h: LightSetModel2 (the module's second copy,
 // its address is taken in mapModelDisp) and the ~Widget instantiation through `delete`. The
 // .rodata vtable order is unaffected (Widget's vtable still follows SsMapInit's).
-extern "C" inline void LightSetModel2(cModel* m)
+inline void LightSetModel2(cModel* m)
 {
     LightMgr.setModel2(m);
 }
@@ -74,8 +74,8 @@ struct SsMapWork {
     s8 nCoin;            // 0xFB5
     s8 nSave;            // 0xFB6
     u8 pad_FB7;
-    CameraParam from;    // 0xFB8  zoom start
-    CameraParam to;      // 0xFD8  zoom end
+    CAMERA_POINT from;    // 0xFB8  zoom start
+    CAMERA_POINT to;      // 0xFD8  zoom end
     s8 area;             // 0xFF8  getAreaNo
     s8 roomIdx;          // 0xFF9  map_room index of the current room (-1 none)
     s8 modeCursor;       // 0xFFA  mark mode menu cursor
@@ -125,7 +125,7 @@ struct MapDoorTbl {
 };
 
 // Room display flags (mapColor): stage flag numbers.
-struct MapDispFlag {
+struct MAP_DISP_FLAG {
     u16 room;
     u16 pad;
     u32 hide;
@@ -177,7 +177,6 @@ public:
     virtual void move(SUB_SCREEN* wk);
 };
 
-extern "C" {
 int getStageNo();
 int getAreaNo(u32 room);
 void mapInitViewport(SUB_SCREEN* wk);
@@ -210,7 +209,7 @@ int markSavePosition(SUB_SCREEN* wk, int no, Vec* pos);
 void markSaveDisp(SUB_SCREEN* wk, int sw);
 int mapPos2screenPos(Vec* pos, Vec* out);
 void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMat, Mtx out, int multi);
-MapDispFlag* searchMapDispFlag(u16 room, MapDispFlag* tbl, int n);
+MAP_DISP_FLAG* searchMapDispFlag(u16 room, MAP_DISP_FLAG* tbl, int n);
 int mapColor(u16 room);
 int mapRoomNum(MapRoomData* p);
 void* mapBinAddr(MapRoomData* p, int no);
@@ -241,9 +240,9 @@ void doorModelDisp(SUB_SCREEN* wk);
 void mapCameraInit(SUB_SCREEN* wk, CAMERA* cam);
 void mapCameraMove(SUB_SCREEN* wk);
 f32 zoomOutLimit();
-void mapCameraEntire(SUB_SCREEN* wk, CameraParam* out);
+void mapCameraEntire(SUB_SCREEN* wk, CAMERA_POINT* out);
 f32 zoomInLimit();
-void mapCameraZoomIn(SUB_SCREEN* wk, CameraParam* out);
+void mapCameraZoomIn(SUB_SCREEN* wk, CAMERA_POINT* out);
 int zoomMove(SsMapWork* m, int max, int cnt);
 void mapAreaFilename(int area, char* name);
 int scf_check_merchant();
@@ -253,7 +252,6 @@ int scf_check_typewriter();
 void sscrn_map_out_init(SUB_SCREEN* wk);
 int mapModeCheck(SUB_SCREEN* wk, s8 no);
 void mapModeChange(SUB_SCREEN* wk, s8 no);
-}
 
 static int sscrn_map_out(SUB_SCREEN* wk);
 static void setViewport(MapViewport* vp);
@@ -348,7 +346,7 @@ cModel* ssPlMotion = 0;
 cModel* ssWepModel2 = 0;
 
 // Whole-map camera per stage.
-static const CameraParam map_cam_entire[4] = {
+static const CAMERA_POINT map_cam_entire[4] = {
     {{0.0f, 10000.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, 0.0f, 55.0f},
     {{21000.0f, 82850.0f, 12650.0f}, {21000.0f, 0.0f, 12650.0f}, 0.0f, 55.0f},
     {{-425.0f, 104000.0f, -3210.0f}, {-425.0f, 0.0f, -3210.0f}, 0.0f, 55.0f},
@@ -1211,7 +1209,7 @@ int mapPos2screenPos(Vec* pos, Vec* out)
     if (out->z > -fabsf(ZNEAR)) {
         return 0;
     }
-    f32 ang = pG->Camera.param.fovy * 0.5f * 0.017453292f;
+    f32 ang = pG->Camera.param.Fovy * 0.5f * 0.017453292f;
     f32 kx;
     f32 ky;
 
@@ -1254,7 +1252,7 @@ void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMa
     f32 best;
     int idx;
     int i;
-    AtPoly* poly;
+    SAT_POLY* poly;
     Vec* vtx;
 
     pl.x = plMat[0][3];
@@ -1287,7 +1285,7 @@ void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMa
     }
     poly = satB.poly_p;
     for (i = 0; i < satB.floor_num + satB.slope_num; i++, poly++) {
-        if (At_poly_line_ck((AtPolyData*) &satB, &hit2, poly, &a, &b, 0, 0)) {
+        if (At_poly_line_ck(&satB, &hit2, poly, &a, &b, 0, 0)) {
             if (hit2.y <= best) {
                 idx = i;
                 hit = hit2;
@@ -1321,7 +1319,7 @@ void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMa
                 u32 col;
 
                 if (i != idx) {
-                    col = poly->attr;
+                    col = poly->m_Status;
                 } else {
                     col = 0xFFFF0000;
                 }
@@ -1365,8 +1363,8 @@ void mapPositionCheck(cSatHeader* hdrB, cSatHeader* hdrA, Mtx plMat, Mtx partsMa
     }
 }
 
-// Finds the display-flag row of `room` in a per-stage MapDispFlag table (0 when absent).
-MapDispFlag* searchMapDispFlag(u16 room, MapDispFlag* tbl, int n)
+// Finds the display-flag row of `room` in a per-stage MAP_DISP_FLAG table (0 when absent).
+MAP_DISP_FLAG* searchMapDispFlag(u16 room, MAP_DISP_FLAG* tbl, int n)
 {
     int i;
 
@@ -1381,7 +1379,7 @@ MapDispFlag* searchMapDispFlag(u16 room, MapDispFlag* tbl, int n)
 // Room model colour: 0 current room, 1 visited, 2 open, 3 cleared, 4 hidden.
 int mapColor(u16 room)
 {
-    MapDispFlag st1[22] = {
+    MAP_DISP_FLAG st1[22] = {
         {0x100, 0, 0, 29, 28}, {0x101, 0, 0, 29, 0},  {0x102, 0, 0, 29, 0},  {0x103, 0, 0, 29, 0},
         {0x104, 0, 0, 29, 28}, {0x105, 0, 0, 29, 28}, {0x106, 0, 0, 29, 28}, {0x107, 0, 0, 29, 28},
         {0x108, 0, 0, 29, 0},  {0x109, 0, 0, 29, 11}, {0x10A, 0, 0, 29, 11}, {0x10B, 0, 0, 29, 11},
@@ -1389,7 +1387,7 @@ int mapColor(u16 room)
         {0x117, 0, 0, 29, 0},  {0x11C, 0, 0, 29, 0},  {0x11D, 0, 0, 29, 0},  {0x11E, 0, 0, 29, 0},
         {0x11F, 0, 0, 29, 0},  {0x200, 0, 0, 29, 0},
     };
-    MapDispFlag st2a[27] = {
+    MAP_DISP_FLAG st2a[27] = {
         {0x200, 0, 0, 40, 0}, {0x201, 0, 0, 40, 0}, {0x202, 0, 0, 40, 0}, {0x203, 0, 0, 40, 0},
         {0x204, 0, 0, 40, 0}, {0x205, 0, 0, 40, 0}, {0x206, 0, 0, 40, 0}, {0x207, 0, 0, 40, 0},
         {0x208, 0, 0, 40, 0}, {0x209, 0, 0, 40, 0}, {0x20A, 0, 0, 40, 0}, {0x20B, 0, 0, 40, 0},
@@ -1398,64 +1396,64 @@ int mapColor(u16 room)
         {0x214, 0, 0, 40, 0}, {0x215, 0, 0, 40, 0}, {0x216, 0, 0, 40, 0}, {0x217, 0, 0, 40, 0},
         {0x218, 0, 0, 40, 0}, {0x219, 0, 0, 40, 0}, {0x222, 0, 0, 40, 0},
     };
-    MapDispFlag st2b[11] = {
+    MAP_DISP_FLAG st2b[11] = {
         {0x21D, 0, 0, 40, 0}, {0x220, 0, 0, 40, 0}, {0x221, 0, 0, 40, 0}, {0x223, 0, 0, 40, 0},
         {0x224, 0, 0, 40, 0}, {0x225, 0, 0, 40, 0}, {0x226, 0, 0, 40, 0}, {0x227, 0, 0, 40, 0},
         {0x228, 0, 0, 40, 0}, {0x229, 0, 0, 40, 0}, {0x22A, 0, 0, 40, 0},
     };
-    MapDispFlag st2c[2] = {
+    MAP_DISP_FLAG st2c[2] = {
         {0x21A, 0, 0, 40, 0}, {0x21B, 0, 0, 40, 0},
     };
-    MapDispFlag st3a[1] = {
+    MAP_DISP_FLAG st3a[1] = {
         {0x300, 0, 0, 47, 0},
     };
-    MapDispFlag st3b[5] = {
+    MAP_DISP_FLAG st3b[5] = {
         {0x301, 0, 0, 47, 0}, {0x303, 0, 0, 47, 0}, {0x304, 0, 0, 47, 0}, {0x305, 0, 0, 47, 0},
         {0x306, 0, 0, 47, 0},
     };
-    MapDispFlag st3c[8] = {
+    MAP_DISP_FLAG st3c[8] = {
         {0x306, 0, 0, 47, 0}, {0x307, 0, 0, 47, 0}, {0x308, 0, 0, 47, 0}, {0x309, 0, 0, 47, 0},
         {0x30A, 0, 0, 47, 0}, {0x30B, 0, 0, 47, 0}, {0x30C, 0, 0, 47, 0}, {0x30E, 0, 0, 47, 0},
     };
-    MapDispFlag st3d[5] = {
+    MAP_DISP_FLAG st3d[5] = {
         {0x310, 0, 0, 47, 0}, {0x311, 0, 0, 47, 0}, {0x312, 0, 0, 47, 0}, {0x30D, 0, 0, 47, 0},
         {0x30F, 0, 0, 47, 0},
     };
-    MapDispFlag st3e[13] = {
+    MAP_DISP_FLAG st3e[13] = {
         {0x315, 0, 0, 47, 0}, {0x316, 0, 0, 47, 0}, {0x317, 0, 0, 47, 0}, {0x318, 0, 0, 47, 0},
         {0x31A, 0, 0, 47, 0}, {0x31B, 0, 0, 47, 0}, {0x31D, 0, 0, 47, 0}, {0x31C, 0, 0, 47, 0},
         {0x320, 0, 0, 47, 0}, {0x321, 0, 0, 47, 0}, {0x325, 0, 0, 47, 0}, {0x326, 0, 0, 47, 0},
         {0x327, 0, 0, 47, 0},
     };
-    MapDispFlag st3f[5] = {
+    MAP_DISP_FLAG st3f[5] = {
         {0x329, 0, 0, 47, 0}, {0x330, 0, 0, 47, 0}, {0x331, 0, 0, 47, 0}, {0x332, 0, 0, 47, 0},
         {0x333, 0, 0, 47, 0},
     };
-    MapDispFlag st4a[1] = {
+    MAP_DISP_FLAG st4a[1] = {
         {0x400, 0, 0, 29, 0},
     };
-    MapDispFlag st4b[1] = {
+    MAP_DISP_FLAG st4b[1] = {
         {0x402, 0, 0, 29, 0},
     };
-    MapDispFlag st4c[1] = {
+    MAP_DISP_FLAG st4c[1] = {
         {0x403, 0, 0, 29, 0},
     };
-    MapDispFlag st4d[1] = {
+    MAP_DISP_FLAG st4d[1] = {
         {0x404, 0, 0, 29, 0},
     };
-    MapDispFlag st4e[1] = {
+    MAP_DISP_FLAG st4e[1] = {
         {0x405, 0, 0, 29, 0},
     };
-    MapDispFlag st4f[1] = {
+    MAP_DISP_FLAG st4f[1] = {
         {0x406, 0, 0, 29, 0},
     };
-    MapDispFlag st4g[8] = {
+    MAP_DISP_FLAG st4g[8] = {
         {0x40A, 0, 0, 29, 0}, {0x40B, 0, 0, 29, 0}, {0x40C, 0, 0, 29, 0}, {0x40D, 0, 0, 29, 0},
         {0x40E, 0, 0, 29, 0}, {0x40F, 0, 0, 29, 0}, {0x410, 0, 0, 29, 0}, {0x411, 0, 0, 29, 0},
     };
-    MapDispFlag* tbl = 0;
+    MAP_DISP_FLAG* tbl = 0;
     int n = 0;
-    MapDispFlag* p;
+    MAP_DISP_FLAG* p;
     int passed;
 
     switch (getAreaNo(room)) {
@@ -1903,7 +1901,7 @@ void mapTblInit(SUB_SCREEN* wk)
 // Map screen model managers: 0x80 model infos / 0x100 parts / 0x80 MapMgr works (no player model).
 void mapModelAlloc(SUB_SCREEN* wk)
 {
-    wk->attr_flag |= 1;
+    wk->model_flag |= 1;
     ssModInfoMgr.roomInit();
     ssModInfoMgr.arrayAlloc(0x80);
     ssPartsMgr.roomInit();
@@ -2067,7 +2065,7 @@ void doorModelInit(SUB_SCREEN* wk)
     void* bin;
 
     if ((int) wk->pMapObj >= 0) {
-        wk->pMapObj = (SsArc*) ((u8*) wk->pMapObj + (u32) wk->pBuf);
+        wk->pMapObj = (u32*) ((u8*) wk->pMapObj + (u32) wk->pBuf);
     }
     m = wk->map;
     base = (s8) wk->map_obj_num;
@@ -2197,14 +2195,14 @@ void mapCameraMove(SUB_SCREEN* wk)
         }
     }
     if (d.x != 0.0f || d.y != 0.0f || d.z != 0.0f) {
-        PSVECAdd(&pG->Camera.param.pos, &d, &pG->Camera.param.pos);
+        PSVECAdd(&pG->Camera.param.Campos, &d, &pG->Camera.param.Campos);
         d.y = 0.0f;
-        PSVECAdd(&pG->Camera.param.at, &d, &pG->Camera.param.at);
-        if (pG->Camera.param.pos.y <= zoomInLimit()) {
-            pG->Camera.param.pos.y = zoomInLimit();
+        PSVECAdd(&pG->Camera.param.Target, &d, &pG->Camera.param.Target);
+        if (pG->Camera.param.Campos.y <= zoomInLimit()) {
+            pG->Camera.param.Campos.y = zoomInLimit();
         }
-        if (pG->Camera.param.pos.y >= zoomOutLimit()) {
-            pG->Camera.param.pos.y = zoomOutLimit();
+        if (pG->Camera.param.Campos.y >= zoomOutLimit()) {
+            pG->Camera.param.Campos.y = zoomOutLimit();
         }
         CameraSetOrientationUp(&pG->Camera);
     }
@@ -2213,11 +2211,11 @@ void mapCameraMove(SUB_SCREEN* wk)
 // Camera height of the whole-stage view (map_cam_entire of the stage).
 f32 zoomOutLimit()
 {
-    return map_cam_entire[(s8) SubScreenWk.stage_no].pos.y;
+    return map_cam_entire[(s8) SubScreenWk.stage_no].Campos.y;
 }
 
 // Whole-stage camera of the stage into `out`; swaps the "zoom in" / "zoom out" button hints.
-void mapCameraEntire(SUB_SCREEN* wk, CameraParam* out)
+void mapCameraEntire(SUB_SCREEN* wk, CAMERA_POINT* out)
 {
     *out = map_cam_entire[(s8) wk->stage_no];
     IdSub.unitPtr(1, IDC_SSCRN_CKPT_1)->be_flag |= 8;
@@ -2228,12 +2226,12 @@ void mapCameraEntire(SUB_SCREEN* wk, CameraParam* out)
 // Closest camera height: 4000 units of half-width at the current fov.
 f32 zoomInLimit()
 {
-    return 4000.0f / tanf(pG->Camera.param.fovy * 0.5f * 3.1415927f / 180.0f);
+    return 4000.0f / tanf(pG->Camera.param.Fovy * 0.5f * 3.1415927f / 180.0f);
 }
 
 // Zoomed camera into `out`: centred between the player and the goal, high enough to frame both
 // (4:3), clamped to the zoom limits; swaps the button hints.
-void mapCameraZoomIn(SUB_SCREEN* wk, CameraParam* out)
+void mapCameraZoomIn(SUB_SCREEN* wk, CAMERA_POINT* out)
 {
     Vec pl;
     Vec goal;
@@ -2254,16 +2252,16 @@ void mapCameraZoomIn(SUB_SCREEN* wk, CameraParam* out)
     if (!(d.z / d.x >= 0.75f)) {
         d.z = d.x * 0.75f;
     }
-    h = d.z / tanf(pG->Camera.param.fovy * 0.5f * 3.1415927f / 180.0f);
+    h = d.z / tanf(pG->Camera.param.Fovy * 0.5f * 3.1415927f / 180.0f);
     if (h <= zoomInLimit()) {
         h = zoomInLimit();
     }
     if (h >= zoomOutLimit()) {
         h = zoomOutLimit();
     }
-    out->pos = mid;
-    out->at = mid;
-    out->pos.y += h;
+    out->Campos = mid;
+    out->Target = mid;
+    out->Campos.y += h;
     IdSub.unitPtr(1, IDC_SSCRN_CKPT_1)->rev_flag |= 0xF;
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_1)->rev_flag &= 0xF0;
     IdSub.unitPtr(0, IDC_SSCRN_CKPT_1)->be_flag |= 8;
@@ -2278,16 +2276,16 @@ int zoomMove(SsMapWork* m, int max, int cnt)
     Vec b;
     f32 s;
 
-    CameraParam* from = &m->from;
-    CameraParam* to = &m->to;
+    CAMERA_POINT* from = &m->from;
+    CAMERA_POINT* to = &m->to;
 
-    PSVECScale(&to->pos, &a, t);
+    PSVECScale(&to->Campos, &a, t);
     s = 1.0f - t;
-    PSVECScale(&from->pos, &b, s);
-    PSVECAdd(&a, &b, &pG->Camera.param.pos);
-    PSVECScale(&to->at, &a, t);
-    PSVECScale(&from->at, &b, s);
-    PSVECAdd(&a, &b, &pG->Camera.param.at);
+    PSVECScale(&from->Campos, &b, s);
+    PSVECAdd(&a, &b, &pG->Camera.param.Campos);
+    PSVECScale(&to->Target, &a, t);
+    PSVECScale(&from->Target, &b, s);
+    PSVECAdd(&a, &b, &pG->Camera.param.Target);
     // pG loads pG separately from the earlier pG loads, so pG is reloaded for the call after the copy
     pG->Camera.Up = up;
     CameraSetOrientationUp(&pG->Camera);
@@ -2376,12 +2374,12 @@ void SsMapInit::move(SUB_SCREEN* wk)
     case 0:
         if (wk->scrn_out_func(wk) == 1) {
             if (wk->menu_old == 2) {
-                wk->wait_cnt = 1;
+                wk->trans_off = 1;
             }
             IdSubErase();
             IdNumErase();
             IdFreeBuffer();
-            IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
+            IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
             map_wait[0] = 0;
             state++;
         }
@@ -2413,7 +2411,7 @@ void SsMapInit::move(SUB_SCREEN* wk)
         ssPlMotion = 0;
         ssWepModel2 = 0;
         IdAllocBuffer();
-        wk->wait_cnt = 0;
+        wk->trans_off = 0;
         state++;
     case 3: {
         int result;
@@ -2423,7 +2421,7 @@ void SsMapInit::move(SUB_SCREEN* wk)
             break;
         }
         wk->pMapDat = wk->pSwitchDat;
-        wk->pMapObj = (SsArc*) ((u8*) wk->pSwitchDat + result);
+        wk->pMapObj = (u32*) ((u8*) wk->pSwitchDat + result);
         state++;
     }
     case 4:
@@ -2460,15 +2458,15 @@ void SsMapMain::init(SUB_SCREEN* wk)
     cur = focus;
     IdTexDataLoad(SS_ARC_PTR(wk->pMapDat, 4), TEX_OWNER_ID_SSCRN);
     if (!IdSub.setCk(IDC_SSCRN_NEAR_1)) {
-        IdSub.set(SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
+        IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 0xC), 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
     }
-    IdSub.set(SS_ARC_PTR(wk->pMapDat, 5), 0xFF, IDC_SSCRN_FAR_1, 9, 2, 0);
-    IdNum.set(SS_ARC_PTR(wk->pMapDat, 0xA), 0xFF, IDC_SSCRN_2, 0xC, 6, 0);
-    IdNum.set(SS_ARC_PTR(wk->pMapDat, 9), 0xFF, IDC_SSCRN_1, 0xC, 6, 0);
-    IdNum.set(SS_ARC_PTR(wk->pMapDat, 8), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
-    IdSub.set(SS_ARC_PTR(wk->pMapDat, 6), 0xFF, IDC_SSCRN_0, 0xC, 5, 0);
-    IdSub.set(SS_ARC_PTR(wk->pMapDat, 7), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
-    IdSub.set(SS_ARC_PTR(wk->pMapDat, 0xB), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 8, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 5), 0xFF, IDC_SSCRN_FAR_1, 9, 2, 0);
+    IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 0xA), 0xFF, IDC_SSCRN_2, 0xC, 6, 0);
+    IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 9), 0xFF, IDC_SSCRN_1, 0xC, 6, 0);
+    IdNum.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 8), 0xFF, IDC_SSCRN_0, 0xC, 6, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 6), 0xFF, IDC_SSCRN_0, 0xC, 5, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 7), 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
+    IdSub.set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pMapDat, 0xB), 0xFF, IDC_SSCRN_CKPT_1, 0x13, 8, 0);
     IdSub.unitPtr(0x10, IDC_SSCRN_NEAR_0)->rev_flag |= 0xF;
     IdSub.unitPtr(0x10, IDC_SSCRN_NEAR_0)->be_flag &= ~8;
     IdSub.unitPtr(0, IDC_SSCRN_NEAR_0)->be_flag &= ~8;

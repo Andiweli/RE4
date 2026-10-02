@@ -118,7 +118,6 @@ enum R30F_FLAG {
 
 #define R30F_SAVE_FLAGS (*(u32*) (RoomData.getRoomSavePtr(pG->room_id) + 4))
 
-extern "C" {
 cEm* setem(u8 no, int force);
 void reva_common_move(cObj* obj, f32 lo, f32 hi);
 void EmHitUpdate(cModel* m);
@@ -149,11 +148,10 @@ static void em_set();
 static void lift_start_task();
 static void r30f_switch();
 void addPos(Vec* add, cModel* m);
-void addPos_sca(Vec* add, SceAtWork* at);
+void addPos_sca(Vec* add, SCE_AT_DATA* at);
 void setLiftMoveAdd(Vec* add);
 static void em_set2();
 static void gate_open();
-}
 
 // Room init (the bulldozer ride). JumpPoint 1..4 skips ahead to that gate, otherwise the ride task
 // starts and the bulldozer (cObjBull, SetBull) is created.
@@ -215,7 +213,7 @@ void R30fInit()
         AreaSet(2);
         r30f_work->truckNo = 2;
         SceExec(0x12, (TaskFunc) R30f_ride, 0, 0, 2, 0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x801, ESP_CORE_KIND_ROOM01, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x801, ESP_CORE_KIND_ROOM01, (void*) zero, 0);
         SceAtSetEnable(0x18, 0);
         SceAtSetEnable(0x19, 0);
     } else {
@@ -775,7 +773,7 @@ static void track_move()
 
                 if (no == 0) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3C), 0, 0, 1, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0x18, 0, ESP_CORE_KIND_NONE, (void*) no, (void*) no);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0x18, 0, ESP_CORE_KIND_NONE, 0, 0);
                 }
                 if (r30f_work->truckNo == 1) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3F), 0, 0, 1, 0);
@@ -807,17 +805,17 @@ static void track_move()
                 RmfFlagOn(pG, RMF_TRACK_DIE);
                 if (r30f_work->truckNo == 0) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x3D), 0, 0, 1, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0, ESP_CORE_KIND_NONE, (void*) hitT, (void*) hitT);
-                    EstSet(r30f_work->lift, -1, 0, 0, EFF_ROOM, 9, 0, ESP_CORE_KIND_NONE, r30f_work->lift, (void*) hitT);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0, ESP_CORE_KIND_NONE, 0, 0);
+                    EstSet(r30f_work->lift, -1, 0, 0, EFF_ROOM, 9, 0, ESP_CORE_KIND_NONE, r30f_work->lift, 0);
                 }
                 if (r30f_work->truckNo == 1) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x40), 0, 0, 1, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, (void*) hitT, (void*) hitT);
-                    EstSet(r30f_work->lift, -1, 0, 0, EFF_ROOM, 0xB, 0, ESP_CORE_KIND_NONE, r30f_work->lift, (void*) hitT);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
+                    EstSet(r30f_work->lift, -1, 0, 0, EFF_ROOM, 0xB, 0, ESP_CORE_KIND_NONE, r30f_work->lift, 0);
                 }
                 if (r30f_work->truckNo == 2) {
                     r30f_work->lift->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x37), 0, 0, 1, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, (void*) hitT, (void*) hitT);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, 0, 0);
                 }
                 SndCall(6, 0x15, &r30f_work->lift->pList->pList->world, 0, 0x80000000, 0);
             }
@@ -825,7 +823,6 @@ static void track_move()
         }
         t++;
         hitT++;
-        life = 0;   // the zero register of the pl_life store and the EstSet arguments below
         if (RmfFlagChk(pG, RMF_TRACK_DIE) && hitT == 0x1E) {
             PlWepHitCheck2(0, &pPL->pos, &pPL->pos, 0x12, 2, 6000.0f);
             pG->pl_life = 0;
@@ -1277,7 +1274,7 @@ void AreaSet(u32 no)
 // Removes the live list enemies standing in area `at`.
 void em_destroy_area(int at)
 {
-    SceAtWork* w = SceAtPtr(at);
+    SCE_AT_DATA* w = SceAtPtr(at);
     u32 i;
 
     for (i = 0; i < 90; i++) {
@@ -1545,7 +1542,7 @@ void addPos(Vec* add, cModel* m)
 }
 
 // Moves a 4-point area with the lift.
-void addPos_sca(Vec* add, SceAtWork* at)
+void addPos_sca(Vec* add, SCE_AT_DATA* at)
 {
     at->area.xz4.p[0].x += add->x;
     at->area.xz4.p[0].z += add->z;
@@ -1566,7 +1563,7 @@ void setLiftMoveAdd(Vec* add)
     u32 i;
     // One at/s1/s2/c for all nine SceAt blocks: function-scope pseudos, so s1 is the first
     // callee-saved allocation (r31) and the loop offset / &v take r31 in global.c pass 0.
-    SceAtWork* at;
+    SCE_AT_DATA* at;
     cSat* s1;
     cSat* s2;
     Vec c;
@@ -1574,8 +1571,8 @@ void setLiftMoveAdd(Vec* add)
     addPos(add, pPL);
     v = *add;
     if (CamCtrl.m_pExtraCamera != 0) {
-        PSVECAdd(&CamCtrl.m_pExtraCamera->param.at, &v, &CamCtrl.m_pExtraCamera->param.at);
-        PSVECAdd(&CamCtrl.m_pExtraCamera->param.pos, &v, &CamCtrl.m_pExtraCamera->param.pos);
+        PSVECAdd(&CamCtrl.m_pExtraCamera->param.Target, &v, &CamCtrl.m_pExtraCamera->param.Target);
+        PSVECAdd(&CamCtrl.m_pExtraCamera->param.Campos, &v, &CamCtrl.m_pExtraCamera->param.Campos);
     }
     pG->quake_ofs = v;
     // Struct-member view of pSUB: its load is not hoisted above the quake_ofs copy (the pG trick).
@@ -1589,12 +1586,12 @@ void setLiftMoveAdd(Vec* add)
         }
     }
     at = SceAtPtr(7);
-    s1 = at->scr.pSat;
-    s2 = at->scr.pEat;
+    s1 = at->scr_at.pSat;
+    s2 = at->scr_at.pEat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
         if (s2) {
@@ -1602,65 +1599,65 @@ void setLiftMoveAdd(Vec* add)
         }
     }
     at = SceAtPtr(0xE);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x10);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x13);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x14);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x11);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(0x12);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }
     at = SceAtPtr(6);
-    s1 = at->scr.pSat;
+    s1 = at->scr_at.pSat;
     if (s1) {
         c.x = s1->mat[0][3];
-        c.y = at->scr.pSat->mat[1][3];
-        c.z = at->scr.pSat->mat[2][3];
+        c.y = at->scr_at.pSat->mat[1][3];
+        c.z = at->scr_at.pSat->mat[2][3];
         PSVECAdd(&c, add, &c);
         s1->setCoord(&c, (Vec*) &vecZero);
     }

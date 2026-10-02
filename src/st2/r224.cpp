@@ -181,7 +181,7 @@ void R224Main()
         // its `li` waits for the `stw` that reads v and it shares v's r0, like the
         // reload-materialised original; a fresh `0` is born early and takes r9 from pG)
         v = 0;
-        ActBtn.set(ACT_SLIDE_DOWN, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, v);
+        ActBtn.set(ACT_SLIDE_DOWN, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, (void*) v);
         if (Key.trg & 0x00080000) {
             SceExec(0x12, (TaskFunc) r224_toroko, 0, 0, SCE_PRIO_DEF_2, 0);
         }
@@ -429,7 +429,6 @@ static void futa_move()
 {
     cEm2b* em0;
     cEm2b* em1;
-    void* zero;
 
     SceSleep(15);
     pG->Room_flg[0] |= 0x80000000;
@@ -456,10 +455,9 @@ static void futa_move()
         RsfSet(G_ROOM_ID, 0);
         em1->setNoSuspend(1);
     }
-    zero = 0;
     CamCtrl.CutCall(5);
     SceEventStart(1);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x40, 1, ESP_CORE_KIND_ROOM00, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x40, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     gnd_open();
     SceSleep(60);
     CamCtrl.Comeback(0);
@@ -475,7 +473,7 @@ static void futa_move()
     SceSleep(15);
     pG->Room_flg[0] &= 0x7FFFFFFF;
     SceSleep(135);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x3F, 1, ESP_CORE_KIND_ROOM00, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x3F, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     gnd_close();
     if (RsfCheck(G_ROOM_ID, 0)) {
         pG->Room_flg[0] |= 0x10000000;
@@ -587,9 +585,9 @@ static void reva_move()
             ActBtn.set(ACT_OPERATION, 5, 0, 0, ACTCTR_ENFORCE_EXEC, DISP_A_NORMAL, ACT_FUNC_NORMAL, 0);
             cam = &r224_work->cam;
             add = 0.0f;
-            d.x = cam->param.at.x - cam->param.pos.x;
-            d.y = cam->param.at.y - cam->param.pos.y;
-            d.z = cam->param.at.z - cam->param.pos.z;
+            d.x = cam->param.Target.x - cam->param.Campos.x;
+            d.y = cam->param.Target.y - cam->param.Campos.y;
+            d.z = cam->param.Target.z - cam->param.Campos.z;
             ang = atan2f(d.x, d.z) * 57.295776f;
             if (ang < 90.0f) {
                 if (Key.on & 0x8) {
@@ -603,7 +601,7 @@ static void reva_move()
             }
             PSMTXRotRad(mtx, 'y', add * 0.017453292f);
             PSMTXMultVecSR(mtx, &d, &d);
-            PSVECAdd(&d, &cam->param.pos, &cam->param.at);
+            PSVECAdd(&d, &cam->param.Campos, &cam->param.Target);
             CameraSetOrientationUp(&r224_work->cam);
             CamCtrl.SetExtraCamera(&r224_work->cam);
             if (Key.trg & 0x00080000) {

@@ -67,7 +67,7 @@ struct R117Work {
     void* evTpl;          // 0x30  ev0101's texture palette saved by the s10 event
     cDataUnit* evd0;      // 0x34  evd/r117s00.evd
     cDataUnit* evd1;      // 0x38  evd/r117s10.evd
-    ReadModule* mod;      // 0x3C  enemy module 3 (the event data is swapped into its archive)
+    MODULE_DAT* mod;      // 0x3C  enemy module 3 (the event data is swapped into its archive)
 };
 
 static R117Work* r117_work;
@@ -99,23 +99,23 @@ static inline void r117_fadeWhite(int no, u32 start, u32 end)
     FadeSet(no, &col.start, &col.end, 5, 0, 0);
 }
 
-extern "C" void r117_MechanismInit();
-extern "C" void r117_LightSet(int n);
-extern "C" void r117_LightDirCalc(int n);
+void r117_MechanismInit();
+void r117_LightSet(int n);
+void r117_LightDirCalc(int n);
 static void r117_EventAshleyFind();
 static void r117_EventSaddlerAppear();
 static void r117_LightMechanism();
 static void r117_LightMechanismInit();
 static void r117_LightMechanismMove();
 static void r117_LightMechanismEndProc(int mode);
-extern "C" void r117_LightRotate(int no, f32 dir);
-extern "C" void r117_MechanismDisarm();
+void r117_LightRotate(int no, f32 dir);
+void r117_MechanismDisarm();
 static void r117_EventChandelier();
 static void r117_ThunderFlagOn();
 static void r117_ThunderFlagOff();
 static void r117_ThunderMove();
-extern "C" void Evt_R117S00_Func(Event* e);
-extern "C" void Evt_R117S10_Func(Event* e);
+void Evt_R117S00_Func(Event* e, u32);
+void Evt_R117S10_Func(Event* e, u32);
 static void R117S0_WhiteFade();
 
 // Room init (the church interior, chapter 2-1). Until Ashley is found (Scenario_flg[0] 0x00100000)
@@ -154,18 +154,15 @@ void R117Init()
         EstSet(0, -1, 0, 0, EFF_ROOM, 0x27, 1, ESP_CORE_KIND_ROOM00, 0, 0);
     }
     if (pG->Part == 1) {
-        void* zero = 0;
-
-        EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-        EstSet(pPL, -1, 0, 0, EFF_ROOM, 0x26, 0x800, ESP_CORE_KIND_NONE, zero, zero);
+        EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+        EstSet(pPL, -1, 0, 0, EFF_ROOM, 0x26, 0x800, ESP_CORE_KIND_NONE, 0, 0);
     }
 }
 
 // The mechanism state from the room flags: bit 1 = solved, bit 2 = started; bits 3..14 hold the
 // three current quarter turns (4 flags each), bits 15..26 the three object turns.
-extern "C" void r117_MechanismInit()
+void r117_MechanismInit()
 {
-    void* zero = 0;
     int i;
 
     if (RsfCheck(G_ROOM_ID, 1)) {
@@ -173,7 +170,7 @@ extern "C" void r117_MechanismInit()
         W->cur[1] = 0;
         W->cur[2] = 0;
         r117_MechanismDisarm();
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0x25, 1, ESP_CORE_KIND_ROOM00, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0x25, 1, ESP_CORE_KIND_ROOM00, 0, 0);
         for (i = 0; i < 4; i++) {
             if (RsfCheck(G_ROOM_ID, i + 0xF)) {
                 W->tgt[0] = i;
@@ -249,7 +246,7 @@ extern "C" void r117_MechanismInit()
 }
 
 // The three light beams for step n (0 = off, 1..4 = the effect sets 5/13/9 .. 8/16/12).
-extern "C" void r117_LightSet(int n)
+void r117_LightSet(int n)
 {
     u8 type[3];
 
@@ -326,7 +323,7 @@ void R117Main()
 }
 
 // Turn light object n (smd 0x1B / 0x19 / 0x1A) toward its beam.
-extern "C" void r117_LightDirCalc(int n)
+void r117_LightDirCalc(int n)
 {
     Vec dir;
     Vec rot;
@@ -362,13 +359,13 @@ static void r117_EventAshleyFind()
     ScfFlagOn(pG, SCF_R117_FIND_ASHLEY);
     ScfFlagOff(pG, SCF_90);
     if (W->evd0->waitLoadOk() == 1) {
-        MemorySwap(W->mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
-        EvtMgr.SetEvt(W->mod->pArc, (u32*) 0);
+        MemorySwap(W->mod->pData, W->evd0->getAddr(), W->evd0->getSize());
+        EvtMgr.SetEvt(W->mod->pData, 0);
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
         SysFlagOn(pG, SYS_SCREEN_STOP);
-        MemorySwap(W->mod->pArc, (u32) W->evd0->getAddr(), W->evd0->getSize());
+        MemorySwap(W->mod->pData, W->evd0->getAddr(), W->evd0->getSize());
         W->evd0->setCommand(CMND_DEL_DATA, 0, 0);
     }
     StaFlagOn(pG, STA_SUB_ASHLEY);
@@ -403,21 +400,20 @@ static void r117_EventSaddlerAppear()
     StaFlagOff(pG, STA_SUB_ASHLEY);
     SceSleep(3);
     if (W->evd1->waitLoadOk() == 1) {
-        MemorySwap(W->mod->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
-        if (EvtMgr.SetEvt(W->mod->pArc, (u32*) &ev)) {
+        MemorySwap(W->mod->pData, W->evd1->getAddr(), W->evd1->getSize());
+        if (EvtMgr.SetEvt(W->mod->pData, &ev)) {
             ev->FlgOnStatus(EvtStfFadeOut);
         }
         while (EvtMgr.IsAliveEvt(EvtMgr.GetNowExeEvtNamePtr(), 0, 0) != 0) {
             SceSleep(1);
         }
-        MemorySwap(W->mod->pArc, (u32) W->evd1->getAddr(), W->evd1->getSize());
+        MemorySwap(W->mod->pData, W->evd1->getAddr(), W->evd1->getSize());
         W->evd1->setCommand(CMND_DEL_DATA, 0, 0);
     }
     EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
-    void* zero = 0;
     EffectEspgenDelete(0x2001, ESP_CORE_KIND_ROOM01, 0);
     EffectEfmDelete(0x2001, ESP_CORE_KIND_ROOM01, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x27, 0x2001, ESP_CORE_KIND_ROOM01, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x27, 0x2001, ESP_CORE_KIND_ROOM01, 0, 0);
     SceEventEnd(0);
     f32 ry = -0.46134f;
     StaFlagOn(pG, STA_SUB_ASHLEY);
@@ -432,8 +428,8 @@ static void r117_EventSaddlerAppear()
     SubCharCtrl(SCC_CHASE, 0);
     SndBgmTblSet(0x117, 1);
     SceSetChapterEnd(CHAPTER_2_1, -1);
-    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-    EstSet(pPL, -1, 0, 0, EFF_ROOM, 0x26, 0x800, ESP_CORE_KIND_NONE, zero, zero);
+    EstSet(pPL, -1, 0, 0, EFF_PL00, 2, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 0x26, 0x800, ESP_CORE_KIND_NONE, 0, 0);
 }
 
 static void (*r117_lightMechTbl[2])() = {r117_LightMechanismInit, r117_LightMechanismMove};
@@ -572,7 +568,7 @@ static void r117_LightMechanismMove()
         SceAtDataReset(8);
         CamCtrl.CutCall(5);
         W->se = RoomSeCall(0xD, 0, 0, 0, 0);
-        SceSetEventCancel(1, (TaskFunc) r117_LightMechanismEndProc, 1, -1, 1);
+        SceSetEventCancel(1, (TaskFunc) r117_LightMechanismEndProc, (void*) 1, -1, 1);
         EstSet(0, -1, 0, 0, EFF_ROOM, 0x28, 1, ESP_CORE_KIND_NONE, 0, 0);
         {
             f32 spd = 22.0f;
@@ -611,7 +607,7 @@ static void r117_LightMechanismEndProc(int mode)
         EffectEspgenDelete(1, ESP_CORE_KIND_ROOM00, 0);
         EffectEfmDelete(1, ESP_CORE_KIND_ROOM00, 0);
         r117_LightSet(0);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0x25, 0x801, ESP_CORE_KIND_ROOM00, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0x25, 0x801, ESP_CORE_KIND_ROOM00, zero, 0);
     }
     f32 ry = -3.11f;
     cPlayer* pl = pPL;
@@ -626,7 +622,7 @@ static void r117_LightMechanismEndProc(int mode)
 }
 
 // Turn beam and object `no` a quarter turn in direction `dir` over 10 frames.
-extern "C" void r117_LightRotate(int no, f32 dir)
+void r117_LightRotate(int no, f32 dir)
 {
     f32 step[10] = {1.0f, 3.0f, 6.0f, 10.0f, 15.0f, 20.0f, 25.0f, 6.0f, 3.0f, 1.0f};
     int i;
@@ -647,7 +643,7 @@ extern "C" void r117_LightRotate(int no, f32 dir)
 
 // The lights are solved: areas 9/0xA/0xC/0xD/3/4 off, the gate objects 1/2 hidden (the way up opens),
 // area 5 (the stairs) on.
-extern "C" void r117_MechanismDisarm()
+void r117_MechanismDisarm()
 {
     SceAtSetEnable(9, 0);
     SceAtSetEnable(0xA, 0);
@@ -827,7 +823,7 @@ static void r117_ThunderMove()
 }
 
 // Event r117s00 handler: the etc models, the chandelier rope and the light sources.
-extern "C" void Evt_R117S00_Func(Event* e)
+void Evt_R117S00_Func(Event* e, u32)
 {
     switch (e->GetFuncType()) {
     case 0:
@@ -917,7 +913,7 @@ extern "C" void Evt_R117S00_Func(Event* e)
 }
 
 // Event r117s10 handler: the event models' light sets, the ev0101 texture swap, the white fades.
-extern "C" void Evt_R117S10_Func(Event* e)
+void Evt_R117S10_Func(Event* e, u32)
 {
     void* mod;
     void* mod2;

@@ -47,8 +47,6 @@ void R40fDoorOpened(int on);
 // 0x15 hidden.
 void R40fInit()
 {
-    void* model = NULL;
-
 #line 32 "D:/Bio4/Prog/r40f.cpp"
     r40f_work = (R40fWork*) MEM_CALLOC(sizeof(R40fWork), 1, 0xd);
     if (RsfCheck(G_ROOM_ID, 3) == 0) {
@@ -56,10 +54,10 @@ void R40fInit()
     }
     SceAtDataSet_exec(8, SCE_LEVEL10, 0, (TaskFunc) R40fDoorSwitchMain, 0, 1);
     if (RsfCheck(G_ROOM_ID, 5)) {
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM00, 0, model);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0x2001, ESP_CORE_KIND_ROOM00, 0, 0);
         R40fDoorOpened(1);
     } else {
-        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x2001, ESP_CORE_KIND_ROOM00, 0, model);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x2001, ESP_CORE_KIND_ROOM00, 0, 0);
         R40fDoorOpened(0);
     }
     if (RsfCheck(G_ROOM_ID, 7) == 0) {
@@ -151,7 +149,6 @@ static void R40fDoorEvent00End()
 // The lever: choosing to pull it opens the door and lets the guards in.
 static void R40fDoorSwitchMain()
 {
-    void* model = NULL;
     int i;
 
     if (RsfCheck(G_ROOM_ID, 5) == 0) {
@@ -167,7 +164,7 @@ static void R40fDoorSwitchMain()
             EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM00, 0, 0);
             EffectEspgenDelete(0x2001, ESP_CORE_KIND_ROOM00, 0);
             EffectEfmDelete(0x2001, ESP_CORE_KIND_ROOM00, 0);
-            EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x2001, ESP_CORE_KIND_ROOM00, 0, model);
+            EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x2001, ESP_CORE_KIND_ROOM00, 0, 0);
             SndCall(6, 7, 0, 0, 0, 0);
             SceMesCamSndSet(0xA, 8, 6, 4);
             r40f_work->bomb0.destroy();
@@ -225,8 +222,6 @@ static void R40fDoorSwitchMain()
 // alerted and released; the door shut with its effect, camera back, SceEventEnd.
 static void R40fDoorSwitchEnd()
 {
-    void* model = NULL;
-
     if (RsfCheck(G_ROOM_ID, 6) == 0) {
         RsfSet(G_ROOM_ID, 6);
         r40f_work->em0.setFlag(1);
@@ -244,7 +239,7 @@ static void R40fDoorSwitchEnd()
     EffectEspDelete(0x2001, ESP_CORE_KIND_ROOM00, 0, 0);
     EffectEspgenDelete(0x2001, ESP_CORE_KIND_ROOM00, 0);
     EffectEfmDelete(0x2001, ESP_CORE_KIND_ROOM00, 0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x2001, ESP_CORE_KIND_ROOM00, 0, model);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 1, 0x2001, ESP_CORE_KIND_ROOM00, 0, 0);
     CamCtrl.Comeback(0);
     SceEventEnd(0);
     SceExit();

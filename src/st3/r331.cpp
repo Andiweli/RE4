@@ -36,8 +36,8 @@ void st3_checkCountDown();
 
 static void R331ExecEventS00();
 static void R331ExecEventS10();
-extern "C" void Evt_R331S00_Func(Event* e);
-extern "C" void Evt_R331S10_Func(Event* e);
+void Evt_R331S00_Func(Event* e, u32);
+void Evt_R331S10_Func(Event* e, u32);
 
 
 // Room init: the s00 / s10 callbacks; until Room_flg bit 0 area 3 = the s00 event (pre-loaded). With
@@ -119,12 +119,12 @@ static void R331ExecEventS10()
 
 // Event r331s00 callback: cut 0 hands scroll object 0x24 (scr0000) to the event; cut 4 fades out unless
 // the event is skipped; the end restores the object.
-extern "C" void Evt_R331S00_Func(Event* e)
+void Evt_R331S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -156,8 +156,8 @@ extern "C" void Evt_R331S00_Func(Event* e)
     case 2:
         w = SmdGetWorkPtr(0x24);
         if ((obj = SmdGetObjPtr(0x24)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         SysFlagOn(pG, SYS_SCREEN_STOP);
         break;
@@ -167,12 +167,12 @@ extern "C" void Evt_R331S00_Func(Event* e)
 // Event r331s10 callback: remembers the count-down at the start; cut 0 hands scroll object 0x24 to the
 // event with a fade-in, cut 2 fades out; the end restores the object and restarts the count-down with
 // the event's length subtracted.
-extern "C" void Evt_R331S10_Func(Event* e)
+void Evt_R331S10_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -211,8 +211,8 @@ extern "C" void Evt_R331S10_Func(Event* e)
     case 2:
         w = SmdGetWorkPtr(0x24);
         if ((obj = SmdGetObjPtr(0x24)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         st3_setCountDownTimer(r331_work->timer - e->GetMaxTotalFrame());
         st3_startCountDown();

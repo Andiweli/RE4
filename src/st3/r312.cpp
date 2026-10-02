@@ -24,7 +24,7 @@ void R312Init()
 {
 #line 44 "D:/Bio4/Prog/r312.cpp"
     r312_work = (R312Work*) MEM_CALLOC(sizeof(R312Work), 1, 0xd);
-    SceSetItemEvent(6, 0x82, 2, 5, OpenBoxTreasure, OpenedBoxTreasure, 0x82, 0);
+    SceSetItemEvent(6, 0x82, 2, 5, OpenBoxTreasure, OpenedBoxTreasure, (void*) 0x82, 0);
 }
 
 // Per-frame room main: nothing.

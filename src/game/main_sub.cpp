@@ -60,7 +60,7 @@ static void GXVerifyCallback(int level, u32 id, const char* msg)
 }
 
 GXRenderModeObj Rmode = {
-    0,       // viTVmode
+    VI_TVMODE_NTSC_INT,  // viTVmode
     0x200,   // fbWidth
     0x1C0,   // efbHeight
     0x1C0,   // xfbHeight
@@ -68,7 +68,7 @@ GXRenderModeObj Rmode = {
     0x10,    // viYOrigin
     0x280,   // viWidth
     0x1C0,   // viHeight
-    1,       // xFBmode
+    VI_XFBMODE_DF,       // xFBmode
     0,       // field_rendering
     0,       // aa
     {{6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}},

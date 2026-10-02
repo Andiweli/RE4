@@ -105,7 +105,7 @@ void R21bInit()
         SceExec(0x12, (TaskFunc) r21b_StrPlay, 0, 0, SCE_PRIO_DEF_2, 0);
         SceExec(0x12, (TaskFunc) r21b_HalfWaySwitchMove, 0, 0, SCE_PRIO_DEF_2, 0);
         SceExec(0x12, (TaskFunc) r21b_GanadoJumpDownCheck, 0, 0, SCE_PRIO_DEF_2, 0);
-        SceExec(0x12, (TaskFunc) r21b_GanadoJumpDownCheck, 1, 0, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r21b_GanadoJumpDownCheck, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
     }
     PlRegistMotion(0, 0, 0, 0, 0, 0, 0, 0, ROOM_ARC_PTR(pG->pRoom, 0x2A), ROOM_ARC_PTR(pG->pRoom, 0x2B),
                    ROOM_ARC_PTR(pG->pRoom, 0x2C), ROOM_ARC_PTR(pG->pRoom, 0x2D));
@@ -137,7 +137,7 @@ void R21bMain()
             case 0x13:
                 break;
             default:
-                SceExec(0x12, (TaskFunc) r21b_SwitchMove, 1, 0, SCE_PRIO_DEF_2, 0);
+                SceExec(0x12, (TaskFunc) r21b_SwitchMove, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
                 break;
             }
         }
@@ -173,7 +173,7 @@ static void r21b_GanadoJumpDownCheck(int no)
         if (no == 3) {
             SceExec(0x12, (TaskFunc) r21b_HalfWayGanadoSet, 0, 0, SCE_PRIO_DEF_2, 0);
         } else {
-            SceExec(0x12, (TaskFunc) r21b_GanadoJumpDownCheck, no + 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r21b_GanadoJumpDownCheck, (void*) (no + 1), 0, SCE_PRIO_DEF_2, 0);
         }
     }
 }
@@ -213,7 +213,7 @@ static void r21b_HalfWayGanadoSet()
         }
         SceSleep(1);
     }
-    SceExec(0x12, (TaskFunc) r21b_GanadoJumpDownCheck, 4, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r21b_GanadoJumpDownCheck, (void*) 4, 0, SCE_PRIO_DEF_2, 0);
 }
 
 // The switch lever (no 0: the first stop, 1: the half-way stop) starts the cart.

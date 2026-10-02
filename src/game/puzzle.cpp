@@ -31,7 +31,7 @@ static u8 piece_max = 0x79;
 static u8 space_w = 6;
 static u8 space_h = 0xC;
 
-PieceInfo piece_info[] = {
+ITEM_PIECE_INFO piece_info[] = {
     { 0x0003, 0, 5, 2, { 0, 0 }, 2.0f, 0.5f, "1111111111", { 0 } },
     { 0x0021, 0, 3, 2, { 0, 0 }, 1.0f, 0.5f, "111111", { 0 } },
     { 0x0040, 0, 3, 2, { 0, 0 }, 1.0f, 0.5f, "111111", { 0 } },
@@ -94,7 +94,7 @@ PieceInfo piece_info[] = {
 };
 
 // Shape record of item `id` in the piece table (ends with id 0xFFFF); 0 when the item has none.
-pieceData* searchItemPieceData(int item_id, PieceInfo* p_info)
+pieceData* searchItemPieceData(int item_id, ITEM_PIECE_INFO* p_info)
 {
     int i;
 
@@ -109,7 +109,7 @@ pieceData* searchItemPieceData(int item_id, PieceInfo* p_info)
 }
 
 // Model record of item `id` in the piece table; 0 when none.
-u8* searchItemModelData(int item_id, PieceInfo* p_info)
+u8* searchItemModelData(int item_id, ITEM_PIECE_INFO* p_info)
 {
     int i;
 

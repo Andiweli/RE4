@@ -20,7 +20,7 @@
 
 void SetToolLight(int on);  // this module's db_light object
 
-// Tool-side view of the SeAt record (block / se number as ints).
+// Tool-side view of the SE_AT_DATA record (block / se number as ints).
 struct TSeAt {
     u8 flags;        // 0x00  bit 0 enabled, bit 1 created
     u8 no;           // 0x01
@@ -81,7 +81,7 @@ static SeAtWork* seAtWk;
 static TSeAt* seAtCur;
 #define pCur (seAtCur)
 static SeAtHead* seAtSaveHead;
-static SeAt* seAtSaveList;
+static SE_AT_DATA* seAtSaveList;
 
 static const char* seAtBlockName[7] = {"CORE", "WEAPON", "BGM 0", "BGM 1", "DOOR", "FOOT", "ROOM"};
 
@@ -142,23 +142,23 @@ void seAtInit()
 
     TutilInitDefault();
     pW->saveStop = pG->Stop_flg;
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
     pW->saveDisp = pG->Disp_flg;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
-    pG->Disp_flg |= 0x2000000;
-    pG->Disp_flg |= 0x100000;
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
+    DpfFlagOn(pG, DPF_SHADOW);
+    DpfFlagOn(pG, DPF_FILTER);
     DbgFlagOn(pG, DBG_DBG_CAM);
     SetToolLight(1);
     pW->head.magic[0] = 'E';
     pW->head.magic[1] = 'S';
     pW->head.magic[2] = 'E';
-    pW->head.magic[3] = zero;
+    pW->head.magic[3] = 0;
     pW->head.version = 0x100;
     pW->head.num = 64;
     pW->x0 = 0x2D;
@@ -167,7 +167,7 @@ void seAtInit()
     CameraCamposDistance(cam, 2500.0f);
     {
         SeAtHead* head = Snd.pSeAtHeader;
-        SeAt* list = Snd.pSeAtData;
+        SE_AT_DATA* list = Snd.pSeAtData;
         Snd.pSeAtData = NULL;
         Snd.pSeAtHeader = NULL;
         // the original's `lwz pW` waits for the four stores (ours floats it to the block top:
@@ -177,11 +177,11 @@ void seAtInit()
         seAtSaveList = list;
         asm("" : "=m"(seAtWk) : "m"(Snd.pSeAtHeader), "m"(Snd.pSeAtData)); // COMPILER-DIFF: #13 (memory anchor)
     }
-    pW->camPos = g->Camera.param.pos;
-    pW->camAt = g->Camera.param.at;
+    pW->camPos = g->Camera.param.Campos;
+    pW->camAt = g->Camera.param.Target;
     pW->mode = 2;
-    pW->sub = zero;
-    pW->step = zero;
+    pW->sub = 0;
+    pW->step = 0;
     pW->step2 = zero;
 }
 
@@ -257,7 +257,7 @@ static void seAtAreaEdit()
         f32 dist;
         CAMERA* cam = &pG->Camera;
         dist = cam->Distance;
-        cam->param.at = pCur->pos;
+        cam->param.Target = pCur->pos;
         CameraSetOrientationRoll(cam);
         CameraCamposDistance(cam, dist);
         eprintf(pW->x + 0x58, pW->y, 0, 0, "POS( %f, %f, %f )", pCur->pos.x, pCur->pos.y, pCur->pos.z);
@@ -278,8 +278,8 @@ static void seAtAreaEdit()
         Draw_line3d(&v[0], &v[1], 0xFF00FFFF, 0);
     } else {
         CAMERA* cam = &pG->Camera;
-        cam->param.pos = pW->camPos;
-        cam->param.at = pW->camAt;
+        cam->param.Campos = pW->camPos;
+        cam->param.Target = pW->camAt;
         CameraSetOrientationRoll(cam);
         CameraCamposDistance(cam, 2500.0f);
         eprintf(pW->x + 0x58, pW->y, 2, 0, "NO DATA:");
@@ -403,12 +403,12 @@ static void seAtAreaEdit_AreaMove()
     }
     if (joy->substickX) {
         Vec axis = {0.0f, 1.0f, 0.0f};
-        CameraRotAxisPosRad(cam, &axis, &cam->param.at, (f32) joy->substickX * 0.05f * 0.017453292f);
+        CameraRotAxisPosRad(cam, &axis, &cam->param.Target, (f32) joy->substickX * 0.05f * 0.017453292f);
     }
     if (joy->substickY) {
         CameraCamposRot(cam, 'x', (f32) joy->substickY * -0.05f * 0.017453292f);
     }
-    pCur->pos = cam->param.at;
+    pCur->pos = cam->param.Target;
     if (Joy[0].trg & JOY_B) {
         pW->sub = 0;
         pW->step = 0;
@@ -721,7 +721,7 @@ static void seAtAreaEdit_AreaDelete()
 // Creates the record at the camera target with default values.
 static void seAtAreaEdit_AreaCreate()
 {
-    pCur->pos = pG->Camera.param.at;
+    pCur->pos = pG->Camera.param.Target;
     pCur->flags |= 3;
     pW->editCursor = 0;
     pW->sub = 0;
@@ -882,7 +882,7 @@ static TOOL_MENU seAtSaveMenu[3] = {
     {1, "DON'T SAVE", NULL},
 };
 
-// DATA SAVE: SERVER / LOCAL / DON'T SAVE; packs the live records (header + SeAt) and writes them.
+// DATA SAVE: SERVER / LOCAL / DON'T SAVE; packs the live records (header + SE_AT_DATA) and writes them.
 static void seAtDataSave()
 {
     char pathX[0x40];
@@ -987,8 +987,8 @@ static void preview_init()
     u32 i;
     int n = 0;
 
-    pG->Stop_flg &= ~0x10000000;
-    pG->Disp_flg &= ~0x40000000;
+    SpfFlagOff(pG, SPF_PL);
+    DpfFlagOff(pG, DPF_PL);
     DbgFlagOff(pG, DBG_DBG_CAM);
     for (i = 0; i < 64; i++) {
         if (pW->area[i].flags & 1) {
@@ -1004,7 +1004,7 @@ static void preview_init()
     pW->fileHead.version = 0x100;
     pW->fileHead.num = n;
     Snd.pSeAtHeader = &pW->fileHead;
-    Snd.pSeAtData = (SeAt*) pW->file;
+    Snd.pSeAtData = (SE_AT_DATA*) pW->file;
     pW->sub++;
 }
 
@@ -1023,14 +1023,14 @@ static void preview_main()
 // Re-pauses the game, back to the main menu.
 static void preview_exit()
 {
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
     DbgFlagOn(pG, DBG_DBG_CAM);
     Snd.pSeAtHeader = NULL;
     Snd.pSeAtData = NULL;

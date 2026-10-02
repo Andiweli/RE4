@@ -51,13 +51,9 @@ void R111Init()
         rack->setRange(2000.0f, 800.0f, 0.0f, 4400.0f);
     }
     SceExec(0x12, (TaskFunc) r111_ThunderMove, 0, 0, SCE_PRIO_DEF_2, 0);
-    {
-        void* zero = 0;
-
-        EstSet(pPL, -1, 0, 0, EFF_ROOM, 0, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-        EstSet(pPL, -1, 0, 0, EFF_PL00, 1, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-        EstSet(pPL, -1, 0, 0, EFF_CORE, 0x23, 0x800, ESP_CORE_KIND_NONE, zero, zero);
-    }
+    EstSet(pPL, -1, 0, 0, EFF_ROOM, 0, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_PL00, 1, 0x800, ESP_CORE_KIND_NONE, 0, 0);
+    EstSet(pPL, -1, 0, 0, EFF_CORE, 0x23, 0x800, ESP_CORE_KIND_NONE, 0, 0);
     StaFlagOn(pG, STA_ROOM_RAIN);
     if (getRoomEtcWindow(0, &win, 1)) {
         win->SetBreakModel();
@@ -77,7 +73,6 @@ void R111Main()
 static void r111_ThunderMove()
 {
     int cnt;
-    void* zero = 0;
 
     SceSleep(1);
     {
@@ -92,22 +87,22 @@ static void r111_ThunderMove()
                 EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 1, ESP_CORE_KIND_NONE, 0, 0);
             }
             if (EffGetAreaState(0)) {
-                EstSet(0, -1, 0, 0, EFF_ROOM, 4, 0, ESP_CORE_KIND_NONE, zero, zero);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 4, 0, ESP_CORE_KIND_NONE, 0, 0);
             }
             if (EffGetAreaState(1)) {
-                EstSet(0, -1, 0, 0, EFF_ROOM, 6, 0, ESP_CORE_KIND_NONE, zero, zero);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 6, 0, ESP_CORE_KIND_NONE, 0, 0);
             }
             if (EffGetAreaState(2)) {
-                EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0, ESP_CORE_KIND_NONE, zero, zero);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 8, 0, ESP_CORE_KIND_NONE, 0, 0);
             }
             if (EffGetAreaState(3)) {
-                EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, zero, zero);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 0xA, 0, ESP_CORE_KIND_NONE, 0, 0);
             }
             if (EffGetAreaState(4)) {
-                EstSet(0, -1, 0, 0, EFF_ROOM, 0xC, 0, ESP_CORE_KIND_NONE, zero, zero);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 0xC, 0, ESP_CORE_KIND_NONE, 0, 0);
             }
             if (EffGetAreaState(5)) {
-                EstSet(0, -1, 0, 0, EFF_ROOM, 0xE, 0, ESP_CORE_KIND_NONE, zero, zero);
+                EstSet(0, -1, 0, 0, EFF_ROOM, 0xE, 0, ESP_CORE_KIND_NONE, 0, 0);
             }
             {
                 u8 r = Rnd() % 30;

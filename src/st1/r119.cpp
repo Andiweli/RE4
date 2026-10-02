@@ -79,24 +79,24 @@ static void r119_EventGolemAppear();
 static void r119_EventParasiet();
 static void r119_EventDogAppear();
 static void koya_destroy_check();
-extern "C" void koyaA_destroy();
-extern "C" void koyaB_destroy();
-extern "C" void koyaC_destroy();
-extern "C" void YaneA_destroy();
-extern "C" void YaneB_destroy();
-extern "C" void YaneC_destroy();
-extern "C" void koyaA_delete();
-extern "C" void koyaB_smd_delete();
-extern "C" void koyaB_delete();
-extern "C" void koyaC_delete();
-extern "C" void YaneA_delete();
-extern "C" void YaneB_smd_delete();
-extern "C" void YaneB_delete();
-extern "C" void YaneC_delete();
-extern "C" void koya_init();
-extern "C" void Evt_R119S00_Func(Event* e);
-extern "C" void Evt_R119S10_Func(Event* e);
-extern "C" void Evt_R119S20_Func(Event* e);
+void koyaA_destroy();
+void koyaB_destroy();
+void koyaC_destroy();
+void YaneA_destroy();
+void YaneB_destroy();
+void YaneC_destroy();
+void koyaA_delete();
+void koyaB_smd_delete();
+void koyaB_delete();
+void koyaC_delete();
+void YaneA_delete();
+void YaneB_smd_delete();
+void YaneB_delete();
+void YaneC_delete();
+void koya_init();
+void Evt_R119S00_Func(Event* e, u32);
+void Evt_R119S10_Func(Event* e, u32);
+void Evt_R119S20_Func(Event* e, u32);
 
 // Third SetTree block: the pRoomArc read goes through the struct view `pG` so the `lwz pG` depends
 // on the preceding pos/rot stores (a plain `pG` load is a fixed scalar that sched2 hoists above them).
@@ -307,7 +307,7 @@ static void r119_EventGolemAppear()
             SceAtSetEnable(4, 0);
             StaFlagOff(pG, STA_CAMERA_SET_ROOM);
             r119_work->golem->setDie();
-            EstSet(r119_work->golem, -1, 0, 0, EFF_ROOM, 0xF, 0, ESP_CORE_KIND_NONE, r119_work->golem, (void*) stat);
+            EstSet(r119_work->golem, -1, 0, 0, EFF_ROOM, 0xF, 0, ESP_CORE_KIND_NONE, r119_work->golem, 0);
             if (r119_work->dog != 0) {
                 EmMgr.destroy(r119_work->dog);
             }
@@ -428,7 +428,7 @@ static void koya_destroy_check()
 
 // Hut A is smashed by the giant: crash SE, the dust / debris effect (type 5 if its roof already fell,
 // Room_flg bit 4, else type 3), its models and collision removed, torch 0 broken.
-extern "C" void koyaA_destroy()
+void koyaA_destroy()
 {
     Vec pos = {113011.0f, 2270.0f, 16997.0f};
     Vec rot = {0.0f, 3.1415927f, 0.0f};
@@ -447,7 +447,7 @@ extern "C" void koyaA_destroy()
 }
 
 // Hut B is smashed: as koyaA_destroy (roof flag bit 5, torch 1).
-extern "C" void koyaB_destroy()
+void koyaB_destroy()
 {
     Vec pos = {117111.0f, 2270.0f, 17477.0f};
     Vec rot = {0.0f, 3.1415927f, 0.0f};
@@ -466,7 +466,7 @@ extern "C" void koyaB_destroy()
 }
 
 // Hut C is smashed: as koyaA_destroy (roof flag bit 6, torch 2).
-extern "C" void koyaC_destroy()
+void koyaC_destroy()
 {
     Vec pos = {121560.0f, 2270.0f, 15877.0f};
     Vec rot = {0.0f, 2.268928f, 0.0f};
@@ -485,7 +485,7 @@ extern "C" void koyaC_destroy()
 }
 
 // Hut A's roof is knocked off: crash SE, effect type 4, roof removed.
-extern "C" void YaneA_destroy()
+void YaneA_destroy()
 {
     Vec pos = {113011.0f, 2270.0f, 16997.0f};
     Vec rot = {0.0f, 3.1415927f, 0.0f};
@@ -496,7 +496,7 @@ extern "C" void YaneA_destroy()
 }
 
 // Hut B's roof is knocked off (see YaneA_destroy).
-extern "C" void YaneB_destroy()
+void YaneB_destroy()
 {
     Vec pos = {117111.0f, 2270.0f, 17477.0f};
     Vec rot = {0.0f, 3.1415927f, 0.0f};
@@ -507,7 +507,7 @@ extern "C" void YaneB_destroy()
 }
 
 // Hut C's roof is knocked off (see YaneA_destroy).
-extern "C" void YaneC_destroy()
+void YaneC_destroy()
 {
     Vec pos = {121560.0f, 2270.0f, 15877.0f};
     Vec rot = {0.0f, 2.268928f, 0.0f};
@@ -518,7 +518,7 @@ extern "C" void YaneC_destroy()
 }
 
 // Remove hut A: its collision pieces, scroll objects 1/4/5/0x26/0x27 hidden, item areas 0x98/0x99 off.
-extern "C" void koyaA_delete()
+void koyaA_delete()
 {
     SatMgr.destroy(r119_work->sat[0]);
     EatMgr.destroy(r119_work->eat[0]);
@@ -532,7 +532,7 @@ extern "C" void koyaA_delete()
 }
 
 // Hide hut B's scroll objects (2/6/7/0x28/0x29); shared with the s00 event's setup.
-extern "C" void koyaB_smd_delete()
+void koyaB_smd_delete()
 {
     SmdSetTrans(2, 0);
     SmdSetTrans(6, 0);
@@ -542,7 +542,7 @@ extern "C" void koyaB_smd_delete()
 }
 
 // Remove hut B: collision pieces, scroll objects, item area 0x97 off.
-extern "C" void koyaB_delete()
+void koyaB_delete()
 {
     SatMgr.destroy(r119_work->sat[1]);
     EatMgr.destroy(r119_work->eat[1]);
@@ -551,7 +551,7 @@ extern "C" void koyaB_delete()
 }
 
 // Remove hut C: collision pieces, scroll objects 3/8/9/0x2A/0x2B, item areas 0x93..0x95 off.
-extern "C" void koyaC_delete()
+void koyaC_delete()
 {
     SatMgr.destroy(r119_work->sat[2]);
     EatMgr.destroy(r119_work->eat[2]);
@@ -567,7 +567,7 @@ extern "C" void koyaC_delete()
 
 // Hut A without its roof: the attribute collision becomes the roofless piece (archive 0x21), roof
 // objects 4/5 hidden, the broken-roof objects 0x26/0x27 shown.
-extern "C" void YaneA_delete()
+void YaneA_delete()
 {
     EatMgr.destroy(r119_work->eat[0]);
     r119_work->eat[0] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 0x21), 0, &r119_koyaPos[0], &r119_koyaRot[0], 0);
@@ -578,7 +578,7 @@ extern "C" void YaneA_delete()
 }
 
 // Hut B without its roof (see YaneA_delete; objects 6/7 -> 0x28/0x29); shared with the s00 event.
-extern "C" void YaneB_smd_delete()
+void YaneB_smd_delete()
 {
     EatMgr.destroy(r119_work->eat[1]);
     r119_work->eat[1] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 0x21), 0, &r119_koyaPos[1], &r119_koyaRot[1], 0);
@@ -589,13 +589,13 @@ extern "C" void YaneB_smd_delete()
 }
 
 // Hut B without its roof.
-extern "C" void YaneB_delete()
+void YaneB_delete()
 {
     YaneB_smd_delete();
 }
 
 // Hut C without its roof (objects 8/9 -> 0x2A/0x2B).
-extern "C" void YaneC_delete()
+void YaneC_delete()
 {
     EatMgr.destroy(r119_work->eat[2]);
     r119_work->eat[2] = EatMgr.create(ROOM_ARC_PTR(pG->pRoom, 0x21), 0, &r119_koyaPos[2], &r119_koyaRot[2], 0);
@@ -606,7 +606,7 @@ extern "C" void YaneC_delete()
 }
 
 // All three huts intact: hut/roof objects shown, the broken-roof objects hidden.
-extern "C" void koya_init()
+void koya_init()
 {
     SmdSetTrans(1, 1);
     SmdSetTrans(4, 1);
@@ -660,12 +660,12 @@ static inline void r119_evtBridgeOn()
 // hands scroll objects 0x21..0x23 (scr0000..scr0300) to the event at the origin; cuts 0xC/0xD swap the
 // gate objects, cuts 0x10/0xE/0x13/0x14/0x17 hide the bridge and hut parts the giant smashes; the end
 // (funcMode 2) restores them via r119_evtBridgeOn.
-extern "C" void Evt_R119S00_Func(Event* e)
+void Evt_R119S00_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -776,30 +776,30 @@ extern "C" void Evt_R119S00_Func(Event* e)
         }
         w = SmdGetWorkPtr(0x21);
         if ((obj = SmdGetObjPtr(0x21)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x22);
         if ((obj = SmdGetObjPtr(0x22)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x24);
         if ((obj = SmdGetObjPtr(0x24)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x25);
         if ((obj = SmdGetObjPtr(0x25)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         break;
     }
 }
 
 // Event r119s10 callback: show the giant model em2b00 on its first frame.
-extern "C" void Evt_R119S10_Func(Event* e)
+void Evt_R119S10_Func(Event* e, u32)
 {
     if (e->GetFuncType() == 1 && e->GetNowCut() == 0 && e->GetNowFrame() == 0) {
         r119_evtSetGiant(e, "em2b00");
@@ -807,12 +807,12 @@ extern "C" void Evt_R119S10_Func(Event* e)
 }
 
 // Event r119s20 callback (the giant's death): hands scroll object 0x21 (scr0000) to the event on cut 0.
-extern "C" void Evt_R119S20_Func(Event* e)
+void Evt_R119S20_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec rot = {0.0f, 0.0f, 0.0f};
     cObj* obj;
-    SmdWork* w;
+    cSmdWork* w;
 
     switch (e->GetFuncType()) {
     case 0:
@@ -853,23 +853,23 @@ extern "C" void Evt_R119S20_Func(Event* e)
     case 2:
         w = SmdGetWorkPtr(0x21);
         if ((obj = SmdGetObjPtr(0x21)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x22);
         if ((obj = SmdGetObjPtr(0x22)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x24);
         if ((obj = SmdGetObjPtr(0x24)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         w = SmdGetWorkPtr(0x25);
         if ((obj = SmdGetObjPtr(0x25)) != 0 && w != 0) {
-            obj->setPos(&w->pos);
-            obj->setAng(&w->rot);
+            obj->setPos(&w->Pos);
+            obj->setAng(&w->Ang);
         }
         {
             cObj* o;

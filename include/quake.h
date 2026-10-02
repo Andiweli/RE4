@@ -28,11 +28,9 @@ extern QuakeWork Quake;
 
 void QuakeInit();
 
-extern "C" {
 void QuakeMove();
 void QuakeExec(u8 id, u16 delay, s16 time, f32 power, u8 axis);
 void QuakeScheduler();
 void QuakeMain();
-}
 
 #endif

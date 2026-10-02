@@ -51,7 +51,6 @@ public:
     void setUnderCk();
 };
 
-extern "C" {
 cEmBarred* SetEmBarred(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo, int type);
 void emBarredDmCk(cEmBarred* pEm);
 void emBarred_R1_Set(cEmBarred* pEm);
@@ -61,6 +60,5 @@ void emBarred_R1_Break(cEmBarred* pEm);
 void emBarredEatSet(cEmBarred* pEm);
 int emBarredNearCk(cEmBarred* pEm);
 int emBarredUnderCk(cEmBarred* pEm);
-}
 
 #endif

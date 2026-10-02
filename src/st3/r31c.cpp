@@ -372,10 +372,10 @@ void R31cInit()
         r31c_work->door8->setCloseLock();
         SceAtDataSet_exec(0x11, 0x12, 0, (TaskFunc) r31c_Krauser1stBattle, 0, 1);
         EstSet(r31c_work->door8, -1, 0, 0, EFF_ROOM, 0x17, 1, ESP_CORE_KIND_ROOM01, 0, 0);
-        KyfFlagOff(pG, KYF_ST1_23);
+        KyfFlagOff(pG, KYF_ST3_22);
     } else {
         EstSet(r31c_work->door8, -1, 0, 0, EFF_ROOM, 0x18, 1, ESP_CORE_KIND_NONE, 0, 0);
-        KyfFlagOn(pG, KYF_ST1_23);
+        KyfFlagOn(pG, KYF_ST3_22);
     }
     SceExec(0x12, (TaskFunc) r31c_SeekerFirstSet, 0, 0, 2, 0);
     if (RsfCheck(G_ROOM_ID, 0x14) == 0) {
@@ -487,7 +487,7 @@ static void r31c_CrestDoorOpen()
     SceAtSetEnable(0, 1);
     SceAtSetEnable(0x10, 0);
     SceEventStart(1);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x19, 1, ESP_CORE_KIND_ROOM00, 0, model);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x19, 1, ESP_CORE_KIND_ROOM00, 0, (ESPSEQ_CONTROL*) model);
     r31c_work->door[0].setOpen();
     CamCtrl.CutCall(0x18);
     pG->Room_flg[0] &= ~0x80000000;
@@ -527,7 +527,7 @@ static void r31c_SeekerSet(u32 no)
         if (r31c_work->seeker[1].setEm(0x1D, 7, 0, 1, 0)) {
             r31c_work->seeker[1].setFlag(1);
         }
-        SceExec(0x12, (TaskFunc) r31c_SeekerAppearCut, 1, 0, 2, 0);
+        SceExec(0x12, (TaskFunc) r31c_SeekerAppearCut, (void*) 1, 0, 2, 0);
         break;
     case 0xC:
         if (r31c_work->seeker[2].setEm(0x23, 7, 0, 1, 0)) {
@@ -603,7 +603,7 @@ static void r31c_SeekerAppearCut(int no)
     SceEventStart(1);
     StaFlagOn(pG, STA_ESP_COMPULSION_NOSUSPEND);
     pG->Room_flg[0] &= ~0x80000000;
-    SceSetEventCancel(1, (TaskFunc) r31c_SeekerAppearCutEndProc, no, 0, 1);
+    SceSetEventCancel(1, (TaskFunc) r31c_SeekerAppearCutEndProc, (void*) no, 0, 1);
     if (no == 0) {
         r31c_work->seeker[11].setNoSuspend(1);
         r31c_work->seeker[11].setFlag(1);
@@ -679,7 +679,7 @@ static void r31c_CheckTalkToKrauser(int no)
 
         while (r31c_work->krauser.isActive()) {
             if ((em->*ck)() == 1) {
-                r31c_work->talkTask = SceExec(0x12, (TaskFunc) r31c_TalktoKrauser, no, 0, 2, 0);
+                r31c_work->talkTask = SceExec(0x12, (TaskFunc) r31c_TalktoKrauser, (void*) no, 0, 2, 0);
                 return;
             }
             SceSleep(1);
@@ -789,7 +789,7 @@ static void r31c_KrauserDieCheck(cEm39* em)
     CamCtrl.clearAttachCamera();
     em->setDie();
     pG->Room_flg[0] &= ~0x80000000;
-    SceSetEventCancel(1, (TaskFunc) r31c_KrauserDieCheckEndProc, (int) em, 0, 1);
+    SceSetEventCancel(1, (TaskFunc) r31c_KrauserDieCheckEndProc, em, 0, 1);
     while ((MotionGetState(r31c_work->krauser2.getPtr()) & 4) == 0) {
         SceSleep(1);
     }
@@ -829,8 +829,8 @@ static void r31c_KrauserDieCheckEndProc(cEm39* em)
     at[3].x = -750.0f;
     at[3].y = 0.0f;
     at[3].z = -750.0f;
-    SceAtCreateExecAt(r31c_work->krauser2.getPtr(), at, 1, 8, 1, 1000.0f, 1, 0.0f, 0.0f, 1, 0x12,
-                      (TaskFunc) r31c_KrauserCorpseMes, zero, flag);
+    SceAtCreateExecAt(r31c_work->krauser2.getPtr(), at, 1000.0f, 1, 8, 1, 1, 0.0f, 0.0f, 1, 0x12,
+                      (TaskFunc) r31c_KrauserCorpseMes, (void*) zero, flag);
     r31c_work->countDown.setPause(0);
     r31c_work->countDown.setDisp(1);
 }
@@ -936,7 +936,7 @@ static void r31c_TimerDoorCountDown()
     SceSleep(10);
     EffectDelete(1, ESP_CORE_KIND_ROOM01);
     EstSet(r31c_work->door8, -1, 0, 0, EFF_ROOM, 0x18, 1, ESP_CORE_KIND_NONE, 0, 0);
-    KyfFlagOn(pG, KYF_ST1_23);
+    KyfFlagOn(pG, KYF_ST3_22);
     RoomSeCall(0x12, 0, 0, 0, 0);
     SceMesSet(3, 0x20, 1, 0x64, 0x150 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
     while (CamCtrl.IsMotionEnd() == 0) {
@@ -1078,7 +1078,7 @@ static void r31c_SwitchPushCheck()
         pG->Room_flg[0] &= ~0x80000000;
         SceSetEventCancel(1, (TaskFunc) r31c_SwitchPushCheckEndProc, 0, 0, 1);
         CamCtrl.CutCall(0x12);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 1, ESP_CORE_KIND_ROOM00, 0, model);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0x10, 1, ESP_CORE_KIND_ROOM00, 0, (ESPSEQ_CONTROL*) model);
         r31c_work->door[4].setOpen();
         while (r31c_work->door[4].getStatus() != 1) {
             SceSleep(1);
@@ -1149,7 +1149,7 @@ static void r31c_LeverCheck()
             if (r31c_work->sw[1]->ckSwitch() == 1) {
                 RsfSet(G_ROOM_ID, 0x13);
                 r31c_work->sw[1]->setActButton(0);
-                SceExec(0x12, (TaskFunc) r31c_LeverOperate, 1, 0, 2, 0);
+                SceExec(0x12, (TaskFunc) r31c_LeverOperate, (void*) 1, 0, 2, 0);
             }
         } else {
             r31c_work->sw[1]->setOpened();
@@ -1181,17 +1181,17 @@ static void r31c_LeverOperate(int no)
 
     SceEventStart(1);
     pG->Room_flg[0] &= ~0x80000000;
-    SceSetEventCancel(1, (TaskFunc) r31c_LeverOperateEndProc, no, 0, 1);
+    SceSetEventCancel(1, (TaskFunc) r31c_LeverOperateEndProc, (void*) no, 0, 1);
     if (no == 0) {
         CamCtrl.CutCall(0x13);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0x11, 1, ESP_CORE_KIND_NONE, 0, model);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0x11, 1, ESP_CORE_KIND_NONE, 0, 0);
         r31c_work->door[1].setOpen();
         while (r31c_work->door[1].getStatus() != 1) {
             SceSleep(1);
         }
     } else {
         CamCtrl.CutCall(0x14);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 0x12, 1, ESP_CORE_KIND_NONE, 0, model);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 0x12, 1, ESP_CORE_KIND_NONE, 0, (ESPSEQ_CONTROL*) model);
         r31c_work->door[6].setOpen();
         while (r31c_work->door[6].getStatus() != 1) {
             SceSleep(1);
@@ -1267,7 +1267,7 @@ static void r31c_TowerEntranceClose()
     pG->Room_flg[0] &= ~0x80000000;
     SceSetEventCancel(1, (TaskFunc) r31c_TowerEntranceCloseEndProc, 0, 0, 1);
     CamCtrl.CutCall(0x20);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 0x16, 1, ESP_CORE_KIND_ROOM00, 0, model);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 0x16, 1, ESP_CORE_KIND_ROOM00, 0, (ESPSEQ_CONTROL*) model);
     r31c_work->door[8].setClose();
     while (r31c_work->door[8].getStatus() != 0) {
         SceSleep(1);
@@ -1545,8 +1545,8 @@ void r31cEventS01EndProc()
     r31c_work->krauser.destroy();
     CamCtrl.Comeback(0);
     GamePointBossReset();
-    SceExec(0x12, (TaskFunc) r31c_KrauserDieCheck, (int) r31c_work->krauser2.getPtr(), 0, 2, 0);
-    SceExec(0x12, (TaskFunc) r31c_BombCutSet, (int) r31c_work->krauser2.getPtr(), 0, 2, 0);
+    SceExec(0x12, (TaskFunc) r31c_KrauserDieCheck, r31c_work->krauser2.getPtr(), 0, 2, 0);
+    SceExec(0x12, (TaskFunc) r31c_BombCutSet, r31c_work->krauser2.getPtr(), 0, 2, 0);
     for (i = 0; i < 15; i++) {
         if (r31c_work->seeker[i].isAlive()) {
             r31c_work->seeker[i].destroy();

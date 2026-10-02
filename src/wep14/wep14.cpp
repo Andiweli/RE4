@@ -139,7 +139,6 @@ static void wep14_r2_ready(cPlayer* pl)
 // = 0, launcher object mode 1 (raise + load).
 static void wep14_r3_ready00(cPlayer* pl)
 {
-    const f32 zero = 0.0f;
     cObjWep* obj;
     f32 pitch;
     void* m;
@@ -147,16 +146,16 @@ static void wep14_r3_ready00(cPlayer* pl)
     int hokan;
 
     pl->m_Work1 = 0;
-    pl->Wep->m_CenterY = zero;
+    pl->Wep->m_CenterY = 0.0f;
     pitch = CamCtrl.getCameraPitch();
-    if (pitch > zero) {
+    if (pitch > 0.0f) {
         pitch += pitch;
     }
     pl->Wep->pitch = pitch;
-    m3r.setDelay(zero);
+    m3r.setDelay(0.0f);
     pitch *= 2.0f / PI;
     m3r.reset(pitch);
-    pl->m_Fwork0 = zero;
+    pl->m_Fwork0 = 0.0f;
     pl->Wep->m_CamAdjY = CamCtrl.getCameraDirection();
     wep14changeRightHand(pl, WEP_ARC_PTR(0xA));
     pl->Neck->init(0, 0, 0);
@@ -170,8 +169,8 @@ static void wep14_r3_ready00(cPlayer* pl)
     mot3.set(pl, m, m, m, 0, 0, 0, hokan, 0);
     mot3.move(m3r);
     pl->motionMove();
-    m3r.reset(zero);
-    m3r.setDelay(zero);
+    m3r.reset(0.0f);
+    m3r.setDelay(0.0f);
     lockCtr = 0;
     obj = WEP_OBJ(pl);
     obj->r_no_1 = 0;

@@ -20,6 +20,16 @@
 #include "em_sub.h"
 #include "est.h"
 
+// One rope node of the falling shield (emShield_R1_Fall): three point masses joined by distance
+// constraints; the model matrix is rebuilt from them every frame.
+struct EMSHIELD_FALLWK {
+    Vec pos;
+    Vec old;
+    Vec spd;
+    f32 len;
+    int reflect;
+};
+
 typedef void (*EmShieldFunc)(cEmShield*);
 
 static EmShieldFunc EmShield_R0_move_tbl[4] = {
@@ -43,7 +53,7 @@ static EmShieldFunc EmShield_R1_move_tbl[5] = {
 cEmShield* SetShield(void* bin, void* tpl, Vec* pos, Vec* rot)
 {
     cEmShield* em;
-    EmShieldWork* w;
+    FREE_EMSHIELD* w;
 
     em = (cEmShield*) EmMgr.createBack(0x50);
     if (em == 0) {
@@ -63,15 +73,15 @@ cEmShield* SetShield(void* bin, void* tpl, Vec* pos, Vec* rot)
     }
     int no = 0;
     YarareInitCube(em, 0.0f, -50.0f, -100.0f, 200.0f, 100.0f, 300.0f, no, no);
-    YarareAddCube(em, &w->hit[0], 0.0f, 0.0f, -70.0f, 100.0f, 90.0f, 300.0f, 2, YAT_FLAG_ON);
-    YarareAddCube(em, &w->hit[1], 0.0f, 0.0f, 100.0f, 150.0f, 90.0f, 300.0f, 3, YAT_FLAG_ON);
-    YarareAddCube(em, &w->hit[2], 0.0f, 0.0f, 0.0f, 100.0f, 90.0f, 300.0f, 4, YAT_FLAG_ON);
-    YarareAddCube(em, &w->hit[3], 0.0f, 0.0f, 0.0f, 100.0f, 90.0f, 300.0f, 5, YAT_FLAG_ON);
-    YarareAddCube(em, &w->hit[4], 0.0f, 0.0f, 0.0f, 150.0f, 90.0f, 200.0f, 6, YAT_FLAG_ON);
-    YarareAddCube(em, &w->hit[5], 0.0f, 0.0f, -75.0f, 100.0f, 90.0f, 300.0f, 7, YAT_FLAG_ON);
-    YarareAddCube(em, &w->hit[6], 0.0f, 0.0f, 0.0f, 150.0f, 90.0f, 250.0f, 8, YAT_FLAG_ON);
-    YarareAddCube(em, &w->hit[7], 0.0f, 0.0f, 0.0f, 150.0f, 90.0f, 250.0f, 9, YAT_FLAG_ON);
-    YarareAddCube(em, &w->hit[8], -50.0f, 0.0f, 0.0f, 150.0f, 90.0f, 250.0f, 10, YAT_FLAG_ON);
+    YarareAddCube(em, &w->YarareTbl[0], 0.0f, 0.0f, -70.0f, 100.0f, 90.0f, 300.0f, 2, YAT_FLAG_ON);
+    YarareAddCube(em, &w->YarareTbl[1], 0.0f, 0.0f, 100.0f, 150.0f, 90.0f, 300.0f, 3, YAT_FLAG_ON);
+    YarareAddCube(em, &w->YarareTbl[2], 0.0f, 0.0f, 0.0f, 100.0f, 90.0f, 300.0f, 4, YAT_FLAG_ON);
+    YarareAddCube(em, &w->YarareTbl[3], 0.0f, 0.0f, 0.0f, 100.0f, 90.0f, 300.0f, 5, YAT_FLAG_ON);
+    YarareAddCube(em, &w->YarareTbl[4], 0.0f, 0.0f, 0.0f, 150.0f, 90.0f, 200.0f, 6, YAT_FLAG_ON);
+    YarareAddCube(em, &w->YarareTbl[5], 0.0f, 0.0f, -75.0f, 100.0f, 90.0f, 300.0f, 7, YAT_FLAG_ON);
+    YarareAddCube(em, &w->YarareTbl[6], 0.0f, 0.0f, 0.0f, 150.0f, 90.0f, 250.0f, 8, YAT_FLAG_ON);
+    YarareAddCube(em, &w->YarareTbl[7], 0.0f, 0.0f, 0.0f, 150.0f, 90.0f, 250.0f, 9, YAT_FLAG_ON);
+    YarareAddCube(em, &w->YarareTbl[8], -50.0f, 0.0f, 0.0f, 150.0f, 90.0f, 250.0f, 10, YAT_FLAG_ON);
     em->atari.init(0.0f, 0.0f, 0.0f, 150.0f, 150.0f, 150.0f, 300.0f, 1, 0x2000, 10);
     em->hp_max = em->hp = 1000;
     {
@@ -89,49 +99,49 @@ cEmShield* SetShield(void* bin, void* tpl, Vec* pos, Vec* rot)
     w->Be_flg = 0;
     em->be_flag &= ~0x10;
     w->Fall_wait = 0;
-    w->inWater = 0;
+    w->Water_ck = 0;
     w->Break_num = 0;
-    w->pParent = 0;
-    w->pOldParent = 0;
-    w->xA8 = 0;
-    w->x38 = -1;
+    w->pEm_oya = 0;
+    w->pEm_old = 0;
+    w->pAtk = 0;
+    w->At_no = -1;
     w->Parts_hp = (Rnd() % 3) + 2;
-    w->seAlwaysWait = 4;
+    w->throw_se_wait = 4;
     w->Gravity = 20.0f;
     w->seFall[0] = 0xFF;
     w->seFall[1] = 0xFF;
     w->seFall[2] = 0;
-    w->landed = 0;
+    w->se_ck_fall = 0;
     w->seHit[0] = 0xFF;
     w->seHit[1] = 0xFF;
     w->seHit[2] = 0;
     w->seWall[0] = 0xFF;
     w->seWall[1] = 0xFF;
     w->seWall[2] = 0;
-    w->se8F[0] = 0xFF;
-    w->se8F[1] = 0xFF;
-    w->se8F[2] = 0;
-    w->seAlways[0] = 0xFF;
-    w->seAlways[1] = 0xFF;
-    w->seAlways[2] = 0;
+    w->seDamage[0] = 0xFF;
+    w->seDamage[1] = 0xFF;
+    w->seDamage[2] = 0;
+    w->seThrow[0] = 0xFF;
+    w->seThrow[1] = 0xFF;
+    w->seThrow[2] = 0;
     w->effFall[0] = 0xFF;
     w->effFall[1] = 0xFF;
-    w->eff9D[0] = 0xFF;
-    w->eff9D[1] = 0xFF;
-    w->eff9B[0] = 0xFF;
-    w->eff9B[1] = 0xFF;
+    w->effDamage[0] = 0xFF;
+    w->effDamage[1] = 0xFF;
+    w->effHit[0] = 0xFF;
+    w->effHit[1] = 0xFF;
     w->effWater[0] = 0xFF;
     w->effWater[1] = 0xFF;
     w->effAlways[0] = 0xFF;
     w->effAlways[1] = 0xFF;
     w->always2_parts = 0xFF;
-    w->x34 = 0;
+    w->seid_throw = 0;
     w->always2_wait = 0;
     w->always2_timer = 0;
     w->always2_offset.x = 0.0f;
     w->always2_offset.y = 0.0f;
     w->always2_offset.z = 0.0f;
-    w->estNo = 50;
+    w->EffKindId = 50;
     em->r_no_0 = 1;
     em->r_no_1 = 0;
     em->r_no_2 = 0;
@@ -143,7 +153,7 @@ cEmShield* SetShield(void* bin, void* tpl, Vec* pos, Vec* rot)
 // Event start: a shield nobody carries is destroyed.
 void cEmShield::beginEvent(u32 flag)
 {
-    if (EMSHIELD_WK(this)->pParent == 0) {
+    if (EMSHIELD_WK(this)->pEm_oya == 0) {
         EmMgr.destroy(this);
     }
 }
@@ -156,7 +166,7 @@ void SndCallV(u16, u16, Vec*, int, int, cUnit*) asm("SndCall__FUsUsP3VeciiP5cUni
 // fourth plank or a heavy / explosive weapon breaks the whole shield. Shotguns decide by hit distance.
 void emShieldDmCk(cEmShield* pEm)
 {
-    EmShieldWork* w = EMSHIELD_WK(pEm);
+    FREE_EMSHIELD* w = EMSHIELD_WK(pEm);
     Vec p;
     Vec r;
     u8 wep;
@@ -188,8 +198,8 @@ void emShieldDmCk(cEmShield* pEm)
         return;
     }
     parts0 = pEm->getPartsPtr(0);
-    if (w->pParent) {
-        SndCall(8, 0xAC, &parts0->world, w->pParent->id, 0, pEm);
+    if (w->pEm_oya) {
+        SndCall(8, 0xAC, &parts0->world, w->pEm_oya->id, 0, pEm);
     }
     switch (pEm->dmg.m_Wep) {
     default:
@@ -228,8 +238,8 @@ void emShieldDmCk(cEmShield* pEm)
         } else {
             EstSet(0, -1, &p, &r, EFF_EM10, 0x61, 0, ESP_CORE_KIND_NONE, 0, 0);
         }
-        if (w->pParent) {
-            SndCall(8, 0xAD, &parts0->world, w->pParent->id, 0, pEm);
+        if (w->pEm_oya) {
+            SndCall(8, 0xAD, &parts0->world, w->pEm_oya->id, 0, pEm);
         }
         parts0->scale.x = 0.0f;
         parts0->scale.y = 0.0f;
@@ -254,8 +264,8 @@ void emShieldDmCk(cEmShield* pEm)
             p = parts0->world;
             Matrix2AxisAngle(parts0->mat, &r);
             EstSet(0, -1, &p, &r, EFF_EM10, 0x62, 0, ESP_CORE_KIND_NONE, 0, 0);
-            if (w->pParent) {
-                SndCall(8, 0xAE, &parts0->world, w->pParent->id, 0, pEm);
+            if (w->pEm_oya) {
+                SndCall(8, 0xAE, &parts0->world, w->pEm_oya->id, 0, pEm);
             }
             pEm->hp = 0;
             pEm->r_no_0 = 1;
@@ -272,8 +282,8 @@ void emShieldDmCk(cEmShield* pEm)
         } else {
             EstSet(0, -1, &p, &r, EFF_EM10, 0x61, 0, ESP_CORE_KIND_NONE, 0, 0);
         }
-        if (w->pParent) {
-            SndCall(8, 0xAD, &parts->world, w->pParent->id, 0, pEm);
+        if (w->pEm_oya) {
+            SndCall(8, 0xAD, &parts->world, w->pEm_oya->id, 0, pEm);
         }
         parts->scale.x = 0.0f;
         parts->scale.y = 0.0f;
@@ -308,9 +318,9 @@ void emShieldDmCk(cEmShield* pEm)
         pEm->r_no_1 = 2;
         pEm->r_no_2 = 0;
         pEm->r_no_3 = 0;
-        if (w->pParent) {
+        if (w->pEm_oya) {
             do {
-                SndCallV(8, 0xAE, &parts0->world, w->pParent->id, 0, pEm);
+                SndCallV(8, 0xAE, &parts0->world, w->pEm_oya->id, 0, pEm);
             } while (0);
         }
         break;
@@ -336,8 +346,8 @@ void emShieldDmCk(cEmShield* pEm)
         parts2->scale.z = 0.0f;
         part->flag &= ~1;
         w->Parts_hp = (Rnd() % 3) + 2;
-        if (w->pParent) {
-            SndCall(8, 0xAD, &pEm->getPartsPtr(0)->world, w->pParent->id, 0, pEm);
+        if (w->pEm_oya) {
+            SndCall(8, 0xAD, &pEm->getPartsPtr(0)->world, w->pEm_oya->id, 0, pEm);
         }
         break;
     }
@@ -348,16 +358,16 @@ void emShieldDmCk(cEmShield* pEm)
 // destroyed when the carrier work is gone.
 void cEmShield::move()
 {
-    EmShieldWork* w = EMSHIELD_WK(this);
+    FREE_EMSHIELD* w = EMSHIELD_WK(this);
     Vec p;
 
     emShieldDmCk(this);
     EmShield_R0_move_tbl[r_no_0](this);
     if (isAlive()) {
-        if (w->pParent) {
-            invisible_factor = w->pParent->invisible_factor;
-            invisible_factor2 = w->pParent->invisible_factor2;
-            if (w->pParent->be_flag & 2) {
+        if (w->pEm_oya) {
+            invisible_factor = w->pEm_oya->invisible_factor;
+            invisible_factor2 = w->pEm_oya->invisible_factor2;
+            if (w->pEm_oya->be_flag & 2) {
                 be_flag |= 2;
             } else {
                 be_flag &= ~2;
@@ -375,11 +385,11 @@ void cEmShield::move()
                 w->always2_timer = w->always2_wait;
             }
         }
-        if (w->pParent) {
-            if (((cEm*) w->pParent)->hp <= 0) {
+        if (w->pEm_oya) {
+            if (w->pEm_oya->hp <= 0) {
                 hp = 0;
             }
-            if (w->pParent && !w->pParent->isAlive()) {
+            if (w->pEm_oya && !w->pEm_oya->isAlive()) {
                 EmMgr.destroy(this);
             }
         }
@@ -419,7 +429,7 @@ void emShield_R1_Set(cEmShield* pEm)
 // or at once when it leaves the screen, then Rno1 2.
 void emShield_R1_LostWait(cEmShield* pEm)
 {
-    EmShieldWork* w = EMSHIELD_WK(pEm);
+    FREE_EMSHIELD* w = EMSHIELD_WK(pEm);
     Vec scr;
     Vec pos;
 
@@ -463,16 +473,16 @@ void emShield_R1_LostWait(cEmShield* pEm)
 // work.
 void emShield_R1_Lost(cEmShield* pEm)
 {
-    EmShieldWork* w = EMSHIELD_WK(pEm);
+    FREE_EMSHIELD* w = EMSHIELD_WK(pEm);
 
     if (pEm->r_no_2 == 0) {
         pEm->hp = 0;
         pEm->be_flag &= ~2;
         pEm->be_flag &= ~0x20;
         pEm->setStatus(EM_STATUS_LOCKOFF);
-        EffectEspDelete(0, w->estNo, pEm, 0);
-        EffectEspgenDelete(0, w->estNo, pEm);
-        EffectEfmDelete(0, w->estNo, pEm);
+        EffectEspDelete(0, w->EffKindId, pEm, 0);
+        EffectEspgenDelete(0, w->EffKindId, pEm);
+        EffectEfmDelete(0, w->EffKindId, pEm);
         pEm->r_no_2++;
         EmMgr.destroy(pEm);
     }
@@ -486,8 +496,8 @@ void emShield_R1_Parent(cEmShield* pEm)
     Vec v0;
     Vec v1;
     Vec v2;
-    EmShieldWork* w = EMSHIELD_WK(pEm);
-    cModel* parent = w->pParent;
+    FREE_EMSHIELD* w = EMSHIELD_WK(pEm);
+    cModel* parent = w->pEm_oya;
 
     RotMatrix(pEm->mat, &pEm->ang);
     TransMatrix(pEm->mat, &pEm->pos);
@@ -552,19 +562,21 @@ void emShield_R1_Parent(cEmShield* pEm)
 // speeds are small; entering water spawns the water est and SE once.
 void emShield_R1_Fall(cEmShield* pEm)
 {
-    EmShieldWork* w = EMSHIELD_WK(pEm);
+    FREE_EMSHIELD* w = EMSHIELD_WK(pEm);
     Vec pt[3] = {
         { -200.0f, 30.0f, 500.0f },
         { -200.0f, 30.0f, -800.0f },
         { 500.0f, 30.0f, 0.0f },
     };
-    EmTreeNode node[3];
+    EMSHIELD_FALLWK node[3];
     Vec b;
     Vec c;
     Vec a;
     Vec tmp;
-    EmTreeNode* n;    // shared by every node loop (emtree emTree_R1_Fall: the giv final-value copy)
-    EmTreeNode* nx;
+    EMSHIELD_FALLWK* n;    // reused as the cursor in every node loop below (emtree.cpp's emTree_R1_Fall
+                           // has the identical shape: the compiler's final-value copy of the induction
+                           // variable needs the declaration written this way to match)
+    EMSHIELD_FALLWK* nx;
     f32 floor;
     u32 i;
     u32 k;
@@ -577,9 +589,9 @@ void emShield_R1_Fall(cEmShield* pEm)
     floor = EatMgr.getFloor(&pEm->pos, 0, 600.0f, 100000.0f, 0) + 80.0f;
     for (i = 0; i < 3; i++) {
         n = &node[i];
-        n->spd.x = w->pt[i].x;
-        n->spd.y = w->pt[i].y;
-        n->spd.z = w->pt[i].z;
+        n->spd.x = w->spd[i].x;
+        n->spd.y = w->spd[i].y;
+        n->spd.z = w->spd[i].z;
     }
     for (i = 0; i < 3; i++) {
         n = &node[i];
@@ -633,19 +645,19 @@ void emShield_R1_Fall(cEmShield* pEm)
             nx = &node[i + 1];
         }
         if (n->reflect) {
-            if (w->landed == 0 && n->spd.y < -50.0f) {
-                w->landed = 1;
-                if (w->inWater == 0 && w->pOldParent) {
+            if (w->se_ck_fall == 0 && n->spd.y < -50.0f) {
+                w->se_ck_fall = 1;
+                if (w->Water_ck == 0 && w->pEm_old) {
                     parts0 = pEm->getPartsPtr(0);
-                    SndCall(8, 0xAF, &parts0->world, w->pOldParent->id, 0, pEm);
+                    SndCall(8, 0xAF, &parts0->world, w->pEm_old->id, 0, pEm);
                 }
                 if (w->effFall[0] != 0xFF && w->effFall[1] != 0xFF) {
                     EstSet(pEm, -1, 0, 0, w->effFall[0], w->effFall[1], 0, ESP_CORE_KIND_NONE, pEm, 0);
                 }
             }
-            EffectEspDelete(0, w->estNo, pEm, 0);
-            EffectEspgenDelete(0, w->estNo, pEm);
-            EffectEfmDelete(0, w->estNo, pEm);
+            EffectEspDelete(0, w->EffKindId, pEm, 0);
+            EffectEspgenDelete(0, w->EffKindId, pEm);
+            EffectEfmDelete(0, w->EffKindId, pEm);
             n->spd.x *= fRand0_1() * 0.2f + 0.5f;
             n->spd.y *= -(fRand0_1() * 0.2f + 0.5f);
             n->spd.z *= fRand0_1() * 0.2f + 0.5f;
@@ -661,9 +673,9 @@ void emShield_R1_Fall(cEmShield* pEm)
     }
     for (i = 0; i < 3; i++) {
         n = &node[i];
-        w->pt[i].x = n->spd.x;
-        w->pt[i].y = n->spd.y;
-        w->pt[i].z = n->spd.z;
+        w->spd[i].x = n->spd.x;
+        w->spd[i].y = n->spd.y;
+        w->spd[i].z = n->spd.z;
     }
     PSVECSubtract(&node[0].pos, &node[1].pos, &a);
     PSVECSubtract(&node[2].pos, &node[1].pos, &b);
@@ -703,26 +715,26 @@ void emShield_R1_Fall(cEmShield* pEm)
         pEm->r_no_3 = 0;
     }
     pEm->partsWorldCalc();
-    if (w->inWater == 0) {
+    if (w->Water_ck == 0) {
         parts0 = pEm->getPartsPtr(0);
         if (CheckInWater(pEm, 0)) {
             if (w->effWater[0] != 0xFF && w->effWater[1] != 0xFF) {
                 EstSet(0, -1, &pEm->pos, 0, w->effWater[0], w->effWater[1], 0, ESP_CORE_KIND_NONE, 0, 0);
             }
             SndCall(6, 0x17, &parts0->world, 0, 0, pEm);
-            w->inWater = 1;
+            w->Water_ck = 1;
         }
     }
 }
 
-// Hands the shield to `parent` parts `partsNo` (Rno1 3); flag skips the matrix normalisation.
-void cEmShield::setParent(cModel* parent, int partsNo, int flag)
+// Hands the shield to `pEm` parts `oya_parts` (Rno1 3); mode skips the matrix normalisation.
+void cEmShield::setParent(cEm* pEm, u32 oya_parts, u32 mode)
 {
-    EmShieldWork* w = EMSHIELD_WK(this);
+    FREE_EMSHIELD* w = EMSHIELD_WK(this);
 
-    w->pParent = parent;
-    w->oya_parts = partsNo;
-    if (flag) {
+    w->pEm_oya = pEm;
+    w->oya_parts = oya_parts;
+    if (mode) {
         w->Be_flg |= 1;
     } else {
         w->Be_flg &= ~1;
@@ -739,7 +751,7 @@ void cEmShield::setParent(cModel* parent, int partsNo, int flag)
 // or random when NULL.
 void cEmShield::setFall(Vec* pSpd, f32 gravity)
 {
-    EmShieldWork* w = EMSHIELD_WK(this);
+    FREE_EMSHIELD* w = EMSHIELD_WK(this);
     Mtx m;
     Vec v;
     u32 i;
@@ -752,9 +764,9 @@ void cEmShield::setFall(Vec* pSpd, f32 gravity)
             switch (i) {
             case 0:
             default:
-                w->pt[i].x = pSpd->x;
-                w->pt[i].y = pSpd->y;
-                w->pt[i].z = pSpd->z;
+                w->spd[i].x = pSpd->x;
+                w->spd[i].y = pSpd->y;
+                w->spd[i].z = pSpd->z;
                 break;
             case 1:
                 if (pSpd->x == 0.0f && pSpd->z == 0.0f) {
@@ -764,9 +776,9 @@ void cEmShield::setFall(Vec* pSpd, f32 gravity)
                 }
                 PSMTXRotRad(m, 'y', ang + 1.5707964f);
                 PSMTXMultVec(m, pSpd, &v);
-                w->pt[i].x = v.x;
-                w->pt[i].y = v.y;
-                w->pt[i].z = v.z;
+                w->spd[i].x = v.x;
+                w->spd[i].y = v.y;
+                w->spd[i].z = v.z;
                 break;
             case 2:
                 if (pSpd->x == 0.0f && pSpd->z == 0.0f) {
@@ -776,19 +788,19 @@ void cEmShield::setFall(Vec* pSpd, f32 gravity)
                 }
                 PSMTXRotRad(m, 'y', ang - 1.5707964f);
                 PSMTXMultVec(m, pSpd, &v);
-                w->pt[i].x = v.x;
-                w->pt[i].y = v.y;
-                w->pt[i].z = v.z;
+                w->spd[i].x = v.x;
+                w->spd[i].y = v.y;
+                w->spd[i].z = v.z;
                 break;
             }
         } else {
-            w->pt[i].x = fRand1_1() * 20.0f;
-            w->pt[i].y = fRand1_1() * 20.0f;
-            w->pt[i].z = fRand1_1() * 20.0f;
+            w->spd[i].x = fRand1_1() * 20.0f;
+            w->spd[i].y = fRand1_1() * 20.0f;
+            w->spd[i].z = fRand1_1() * 20.0f;
         }
     }
-    w->pOldParent = w->pParent;
-    w->pParent = 0;
+    w->pEm_old = w->pEm_oya;
+    w->pEm_oya = 0;
     hp = 0;
     w->Gravity = gravity;
     pos.x = mat[0][3];

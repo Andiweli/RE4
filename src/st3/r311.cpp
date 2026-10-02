@@ -321,7 +321,7 @@ static void r311_execEmAppear()
         em[i].setPtr(list[i], -1, 0);
     }
     if (em[0].isAlive() == 1 || em[1].isAlive() == 1 || em[2].isAlive() == 1 || em[3].isAlive() == 1) {
-        r311_work->doorTask = SceExec(0x12, (TaskFunc) r311_moveEmDoor, 1, 0, 2, 0);
+        r311_work->doorTask = SceExec(0x12, (TaskFunc) r311_moveEmDoor, (void*) 1, 0, 2, 0);
         SceSleep(20);
         em[0].setGoto(&center, 1);
         SceSleep(10);
@@ -606,7 +606,7 @@ static void r311_throwIronBall()
                 SceSleep(1);
             }
             R311_SAVE_FLAGS |= 0x40000000;
-            KyfFlagOn(pG, KYF_ST1_08);
+            KyfFlagOn(pG, KYF_ST3_08);
             r311_work->resetCnt = 0;
             SceAtSetEnable(2, 0);
             SceAtSetEnable(0, 1);
@@ -661,7 +661,7 @@ static void r311_execAshleyOperateTerminal()
     step = 0;
     wait = 0;
     pSUB->atari.setPriority(3);
-    pSUB->atari.set(0, 100.0f, 200.0f);
+    pSUB->atari.set(100.0f, 200.0f, 0);
     pSUB->atari.on();
     pSUB->motionSet(ROOM_ARC_PTR(pG->pRoom, 0x2B), 10, 0, 1, 0);
     if (r311_work->throwing == 1) {

@@ -5,32 +5,32 @@
 // Registers an ISS block from its file header (count, DLS, SIT and sequence offsets).
 void Snd_iss_blk_init(u32 blk_no, void* data)
 {
-    SND_ISS_BLK* blk;
+    SND_IBLK* blk;
     u32* p;
 
     blk = &Snd_iss_blk[blk_no];
     p = (u32*) data;
-    blk->num = *p++;
-    blk->dls = (u8*) data + *p++;
-    blk->sit = (SND_SIT*) ((u8*) data + *p++);
-    blk->seq = (u8*) data + *p++;
+    blk->sit_num = *p++;
+    blk->wt_adrs = (u8*) data + *p++;
+    blk->sit_adrs = (SND_SIT*) ((u8*) data + *p++);
+    blk->seq_adrs = (u8*) data + *p++;
 }
 
 // Registers a stream block from its file header (count, stream headers, RIT offsets).
 void Snd_str_blk_init(u32 blk_no, void* data)
 {
-    SND_STR_BLK* blk;
+    SND_RBLK* blk;
     u32* p;
 
     blk = &Snd_str_blk[blk_no];
     p = (u32*) data;
-    blk->num = *p++;
-    blk->shd = (u8*) data + *p++;
-    blk->rit = (SND_RIT*) ((u8*) data + *p++);
+    blk->rit_num = *p++;
+    blk->sbh_adrs = (u8*) data + *p++;
+    blk->rit_adrs = (SND_RIT*) ((u8*) data + *p++);
 }
 
 // The ISS block `blk_no`.
-SND_ISS_BLK* Snd_get_blk_adrs(u16 blk_no, u16 req_no)
+SND_IBLK* Snd_get_blk_adrs(u16 blk_no, u16 req_no)
 {
     return &Snd_iss_blk[blk_no];
 }
@@ -40,7 +40,7 @@ SND_SIT* Snd_get_sit_adrs(u16 blk_no, u16 req_no)
 {
     SND_SIT* sit;
 
-    sit = Snd_iss_blk[blk_no].sit;
+    sit = Snd_iss_blk[blk_no].sit_adrs;
     sit += req_no;
     return sit;
 }
@@ -50,7 +50,7 @@ SND_RIT* Snd_get_rit_adrs(u16 blk_no, u16 req_no)
 {
     SND_RIT* rit;
 
-    rit = Snd_str_blk[blk_no].rit;
+    rit = Snd_str_blk[blk_no].rit_adrs;
     rit += req_no;
     return rit;
 }
@@ -62,7 +62,7 @@ SND_SHD* Snd_get_shd_adrs(u16 blk_no, u16 req_no)
     u8* shd;
 
     rit = Snd_get_rit_adrs(blk_no, req_no);
-    shd = Snd_str_blk[blk_no].shd;
+    shd = Snd_str_blk[blk_no].sbh_adrs;
     shd += ((u32*) shd)[rit->str_no];
     return (SND_SHD*) shd;
 }
@@ -147,9 +147,9 @@ s8 Snd_iss_get_sit_span(u16 blk_no, u16 req_no)
 // articulation pan.
 s8 get_dls_vol_pan(u16 blk_no, u16 req_no, int mode)
 {
-    SND_ISS_BLK* blk;
+    SND_IBLK* blk;
     SND_SIT* sit;
-    SND_WT_HDR* hdr;
+    WTFILEHEADER* hdr;
     WTINST* inst;
     WTREGION* rgn;
     WTART* art;
@@ -157,12 +157,12 @@ s8 get_dls_vol_pan(u16 blk_no, u16 req_no, int mode)
 
     blk = Snd_get_blk_adrs(blk_no, req_no);
     sit = Snd_get_sit_adrs(blk_no, req_no);
-    hdr = (SND_WT_HDR*) blk->dls;
-    inst = (WTINST*) (blk->dls + hdr->inst_ofs);
+    hdr = (WTFILEHEADER*) blk->wt_adrs;
+    inst = (WTINST*) (blk->wt_adrs + hdr->offsetMelodicInst);
     inst += (u16) (sit->note >> 8);
-    rgn = (WTREGION*) (blk->dls + hdr->rgn_ofs);
+    rgn = (WTREGION*) (blk->wt_adrs + hdr->offsetRegions);
     rgn += inst->keyRegion[sit->note & 0xFF];
-    art = (WTART*) (blk->dls + hdr->art_ofs);
+    art = (WTART*) (blk->wt_adrs + hdr->offsetArticulations);
     art += rgn->articulationIndex;
     if (mode == 0) {
         vol = rgn->attn / 0x10000;

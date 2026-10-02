@@ -42,8 +42,8 @@ struct RockMotData {
 
 typedef void (*EmRockFunc)(cEmRock*);
 
-extern "C" void emRock_R0_Move(cEmRock* em);
-extern "C" void emRock_R1_Lost(cEmRock* em);
+void emRock_R0_Move(cEmRock* em);
+void emRock_R1_Lost(cEmRock* em);
 
 EmRockFunc EmRock_R0_move_tbl[4] = {
     emRock_R0_Init,
@@ -65,7 +65,7 @@ static EmRockFunc EmRock_R1_move_tbl[9] = {
 };
 
 // Attack parameters of a falling / thrown rock without its own (setFall / setThrow); range = radius.
-static EmAtkInfo emRockAtk = { 1500.0f, PL_DM_AUTO, 9999, 0, 10, 0 };
+static ATK_INFO emRockAtk = { 1500.0f, PL_DM_AUTO, 9999, 0, 10, 0 };
 
 // Event camera of the escape / drop scenes (CamCtrl.x250 points at it while they run).
 static CAMERA emRockCam = { 0 };
@@ -76,7 +76,7 @@ static CAMERA emRockCam = { 0 };
 cEmRock* SetRock(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
 {
     cEmRock* em;
-    EmRockWork* w;
+    FREE_EMROCK* w;
 
     em = (cEmRock*) EmMgr.createBack(0x4A);
     if (em == 0) {
@@ -129,44 +129,44 @@ cEmRock* SetRock(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
     // second block's literal zeros are the fresh post-label `li r30, 0` of the original.
     int zero;
     zero = 0;
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     em->setStatus(EM_STATUS_LOCKOFF);
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     em->be_flag &= ~0x01000000;
     em->atari.setPriority(PRI_LV3);
     em->atari.offSca();
     em->be_flag &= ~0x10;
-    w->alwaysWait = 4;
-    w->seid_throw = zero;
-    w->Be_flg = zero;
-    w->x24 = zero;
-    w->pEm_oya = (cEm*) zero;
-    w->pEm_old = zero;
-    w->pAtk = (EmAtkInfo*) zero;
-    w->xA1 = zero;
-    w->se8C = zero;
+    w->throw_se_wait = 4;
+    w->seid_throw = 0;
+    w->Be_flg = 0;
+    w->Fall_wait = 0;
+    w->pEm_oya = 0;
+    w->pEm_old = 0;
+    w->pAtk = 0;
+    w->Catch_ck = 0;
+    w->fall_type = 0;
     w->seFall[0] = 0xFF;
     w->seFall[1] = 0xFF;
-    w->seFall[2] = zero;
-    w->seFall[3] = zero;
-    w->se8D[0] = 0xFF;
-    w->se8D[1] = 0xFF;
-    w->se8D[2] = zero;
-    w->se97[0] = 0xFF;
-    w->se97[1] = 0xFF;
-    w->se97[2] = zero;
-    w->se90[0] = 0xFF;
-    w->se90[1] = 0xFF;
-    w->se90[2] = zero;
-    w->seAlways[0] = 0xFF;
-    w->seAlways[1] = 0xFF;
-    w->seAlways[2] = zero;
+    w->seFall[2] = 0;
+    w->seFall[3] = 0;
+    w->seHit[0] = 0xFF;
+    w->seHit[1] = 0xFF;
+    w->seHit[2] = 0;
+    w->seWall[0] = 0xFF;
+    w->seWall[1] = 0xFF;
+    w->seWall[2] = 0;
+    w->seDamage[0] = 0xFF;
+    w->seDamage[1] = 0xFF;
+    w->seDamage[2] = 0;
+    w->seThrow[0] = 0xFF;
+    w->seThrow[1] = 0xFF;
+    w->seThrow[2] = 0;
     w->effFall[0] = 0xFF;
     w->effFall[1] = 0xFF;
-    w->eff9E[0] = 0xFF;
-    w->eff9E[1] = 0xFF;
-    w->eff9C[0] = 0xFF;
-    w->eff9C[1] = 0xFF;
+    w->effDamage[0] = 0xFF;
+    w->effDamage[1] = 0xFF;
+    w->effHit[0] = 0xFF;
+    w->effHit[1] = 0xFF;
     asm volatile("" : : "r"(zero)); // COMPILER-DIFF: #13
     if (em->type != 3) {
         w->Radius = em->scale.x * 600.0f;
@@ -175,7 +175,7 @@ cEmRock* SetRock(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
     }
     w->Roll_flag = 0;
     w->Gravity = 20.0f;
-    w->rollWait = 0;
+    w->Bound_wait = 0;
     em->Motion.pMot = (MotionData*) 0;
     w->Mot_tbl[2] = (void*) 0;
     w->Mot_tbl[3] = (void*) 0;
@@ -192,7 +192,7 @@ cEmRock* SetRock(void* bin, void* tpl, Vec* pos, Vec* rot, u8 type)
     w->Mot_pldie = (void*) 0;
     w->Mot_subdie = (void*) 0;
     w->pSat = (cSat*) 0;
-    w->espKind = EspPullCoreKind();
+    w->EffKindId = EspPullCoreKind();
     em->setStatus(EM_STATUS_ACTIVE);
     em->flag &= ~1;
     em->r_no_0 = 1;
@@ -222,7 +222,7 @@ void emRockDmCk(cEmRock* pEm)
 // piece.
 void cEmRock::move()
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
 
     emRockDmCk(this);
     EmRock_R0_move_tbl[r_no_0](this);
@@ -266,7 +266,7 @@ void emRock_R0_Move(cEmRock* pEm)
 // rolling (Rno1 6) when emRockRollStartCk fires (player crosses the trigger).
 void emRock_R1_Set(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
 
     if (pEm->Motion.pMot) {
         MotionMove(pEm, 0);
@@ -299,14 +299,14 @@ void emRock_R1_Set(cEmRock* pEm)
 // Rno1 == 1: hides the rock, drops ACTIVE and its effects, destroys the work 30 frames later.
 void emRock_R1_Lost(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
         pEm->hp = 0;
         pEm->be_flag &= ~2;
         pEm->clearStatus(EM_STATUS_ACTIVE);
-        EffectEspgenDelete(0, w->espKind, pEm);
+        EffectEspgenDelete(0, w->EffKindId, pEm);
         pEm->r_no_2++;
         w->Timer = 30;
     case 1:
@@ -323,7 +323,7 @@ void emRock_R1_Lost(cEmRock* pEm)
 // bit0) and plays its own motion when it has one; lost when the holder vanishes.
 void emRock_R1_Parent(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     cEm* parent = w->pEm_oya;
     Mtx m;
     Vec v0;
@@ -386,7 +386,7 @@ void emRock_R1_Parent(cEmRock* pEm)
 // pAtk (emRockAtkCk); spins with the travelled distance; gives up after 60 frames.
 void emRock_R1_Fall(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     Vec d;
     Vec nrm;
     f32 len;
@@ -412,8 +412,8 @@ void emRock_R1_Fall(cEmRock* pEm)
         EstSet(0, -1, &pEm->pos, 0, EFF_ROOM, 8, 0, ESP_CORE_KIND_NONE, 0, 0);
         break;
     }
-    w->spd.y -= w->Gravity;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= w->Gravity;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     nrm.x = 0.0f;
     nrm.y = 0.0f;
     nrm.z = 0.0f;
@@ -432,7 +432,7 @@ void emRock_R1_Fall(cEmRock* pEm)
         return;
     }
     if (w->pAtk) {
-        emRockAtkCk(pEm, w->pAtk, 0, w->Radius);
+        emRockAtkCk(pEm, w->pAtk, w->Radius, 0);
     }
     {
         Mtx m;
@@ -475,7 +475,7 @@ void emRock_R1_Fall(cEmRock* pEm)
 // player through pAtk, and stops (dust est, Lost) after 60 frames or when it comes to rest.
 void emRock_R1_Throw(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     Vec d;
     Vec nrm;
     f32 len;
@@ -490,9 +490,9 @@ void emRock_R1_Throw(cEmRock* pEm)
         if (w->Timer) {
             w->Timer--;
         } else {
-            w->Timer = w->alwaysWait;
-            if (w->seAlways[0] != 0xFF && w->seAlways[1] != 0xFF) {
-                w->seid_throw = SndCall(w->seAlways[0], w->seAlways[1], &pEm->pos, w->seAlways[2], 0, pEm);
+            w->Timer = w->throw_se_wait;
+            if (w->seThrow[0] != 0xFF && w->seThrow[1] != 0xFF) {
+                w->seid_throw = SndCall(w->seThrow[0], w->seThrow[1], &pEm->pos, w->seThrow[2], 0, pEm);
             }
         }
         if (w->Timer2) {
@@ -510,8 +510,8 @@ void emRock_R1_Throw(cEmRock* pEm)
         EstSet(0, -1, &pEm->pos, 0, EFF_ROOM, 8, 0, ESP_CORE_KIND_NONE, 0, 0);
         break;
     }
-    w->spd.y -= w->Gravity;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= w->Gravity;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     nrm.x = 0.0f;
     nrm.y = 0.0f;
     nrm.z = 0.0f;
@@ -519,9 +519,9 @@ void emRock_R1_Throw(cEmRock* pEm)
     if (nrm.x != 0.0f || nrm.y != 0.0f || nrm.z != 0.0f) {
         f32 spd;
 
-        spd = RootSumSquare3(&w->spd);
-        C_VECReflect(&w->spd, &nrm, &d);
-        PSVECScale(&d, &w->spd, spd * 0.99f);
+        spd = RootSumSquare3(&w->throw_v);
+        C_VECReflect(&w->throw_v, &nrm, &d);
+        PSVECScale(&d, &w->throw_v, spd * 0.99f);
         if (nrm.y < 0.5f) {
             pEm->be_flag &= ~2;
             pEm->pos.x = pEm->mat[0][3];
@@ -535,7 +535,7 @@ void emRock_R1_Throw(cEmRock* pEm)
             EstSet(0, -1, &pEm->pos, 0, EFF_ROOM, 8, 0, ESP_CORE_KIND_NONE, 0, 0);
             return;
         }
-        if (w->spd.y > 50.0f) {
+        if (w->throw_v.y > 50.0f) {
             if (w->seFall[0] != 0xFF && w->seFall[1] != 0xFF) {
                 SndCall(w->seFall[0], w->seFall[1], &pEm->pos, w->seFall[2], 0, pEm);
             }
@@ -550,7 +550,7 @@ void emRock_R1_Throw(cEmRock* pEm)
         }
     }
     if (w->pAtk) {
-        emRockAtkCk(pEm, w->pAtk, 1, w->Radius);
+        emRockAtkCk(pEm, w->pAtk, w->Radius, 1);
     }
     {
         Mtx m;
@@ -593,7 +593,7 @@ void emRock_R1_Throw(cEmRock* pEm)
 // player still has more than 500 life, else 1/2).
 void emRock_R1_Throw2(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     cAtariInfo* at;
     Vec d;
     Vec nrm;
@@ -612,9 +612,9 @@ void emRock_R1_Throw2(cEmRock* pEm)
         if (w->Timer) {
             w->Timer--;
         } else {
-            w->Timer = w->alwaysWait;
-            if (w->seAlways[0] != 0xFF && w->seAlways[1] != 0xFF) {
-                w->seid_throw = SndCall(w->seAlways[0], w->seAlways[1], &pEm->pos, w->seAlways[2], 0, pEm);
+            w->Timer = w->throw_se_wait;
+            if (w->seThrow[0] != 0xFF && w->seThrow[1] != 0xFF) {
+                w->seid_throw = SndCall(w->seThrow[0], w->seThrow[1], &pEm->pos, w->seThrow[2], 0, pEm);
             }
         }
         if (w->Timer2) {
@@ -631,8 +631,8 @@ void emRock_R1_Throw2(cEmRock* pEm)
         pEm->r_no_3 = 0;
         break;
     }
-    w->spd.y -= w->Gravity;
-    PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
+    w->throw_v.y -= w->Gravity;
+    PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
     nrm.x = 0.0f;
     nrm.y = 0.0f;
     nrm.z = 0.0f;
@@ -640,8 +640,8 @@ void emRock_R1_Throw2(cEmRock* pEm)
     if (nrm.x != 0.0f || nrm.y != 0.0f || nrm.z != 0.0f) {
         Vec p;
 
-        RootSumSquare3(&w->spd);
-        C_VECReflect(&w->spd, &nrm, &d);
+        RootSumSquare3(&w->throw_v);
+        C_VECReflect(&w->throw_v, &nrm, &d);
         if ((s16) pG->pl_life > 500) {
             w->pAtk->flag |= 4;
         } else {
@@ -650,7 +650,7 @@ void emRock_R1_Throw2(cEmRock* pEm)
         p = pEm->pos;
         p.y += 1000.0f;
         PlWepHitCheck2(0, &p, &p, 0x12, 3, 5000.0f);
-        EffectEspgenDelete(0, w->espKind, pEm);
+        EffectEspgenDelete(0, w->EffKindId, pEm);
         if (nrm.y > 0.7f) {
             EstSet(0, -1, &pEm->pos, 0, EFF_ROOM, 1, 0, ESP_CORE_KIND_NONE, 0, 0);
         } else {
@@ -706,7 +706,7 @@ void emRock_R1_Throw2(cEmRock* pEm)
 // route) breaks it (SE, est 1/0x1F, Lost).
 void emRock_R1_Roll(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     Vec d;
     f32 len;
     f32 ang;
@@ -741,15 +741,15 @@ void emRock_R1_Roll(cEmRock* pEm)
         pPL->ang.y = pEm->ang.y;
         SetPlDamage(pEm, plemRockEscape);
         w->Roll_wait = 75;
-        w->spd.x = 0.0f;
-        w->spd.y = 0.0f;
-        w->spd.z = 0.0f;
+        w->throw_v.x = 0.0f;
+        w->throw_v.y = 0.0f;
+        w->throw_v.z = 0.0f;
         if (pG->stage_no == 1 && pG->room_no == 4) {
             w->First_bound = 1;
-            w->rollWait = 0;
+            w->Bound_wait = 0;
         } else {
             w->First_bound = 0;
-            w->rollWait = 25;
+            w->Bound_wait = 25;
         }
         pEm->r_no_2++;
     case 1:
@@ -772,18 +772,18 @@ void emRock_R1_Roll(cEmRock* pEm)
             return;
         }
     default:
-        w->spd.y -= 10.0f;
-        PSVECAdd(&pEm->pos, &w->spd, &pEm->pos);
-        if (w->rollWait) {
-            w->rollWait--;
+        w->throw_v.y -= 10.0f;
+        PSVECAdd(&pEm->pos, &w->throw_v, &pEm->pos);
+        if (w->Bound_wait) {
+            w->Bound_wait--;
         } else {
             f32 floor;
 
             floor = EatMgr.getFloor(&pEm->pos, 0, 600.0f, 100000.0f, 0) + w->Radius;
             if (pEm->pos.y < floor) {
                 pEm->pos.y = floor;
-                w->spd.y *= -0.5f;
-                if (w->spd.y > 50.0f) {
+                w->throw_v.y *= -0.5f;
+                if (w->throw_v.y > 50.0f) {
                     Vec fp;
 
                     fp = pEm->pos;
@@ -792,8 +792,8 @@ void emRock_R1_Roll(cEmRock* pEm)
                     SndCall(6, 7, &pEm->pos, 0, 0, pEm);
                     if (w->First_bound == 0) {
                         w->First_bound = 1;
-                        w->spd.x = 0.0f;
-                        w->spd.z = 0.0f;
+                        w->throw_v.x = 0.0f;
+                        w->throw_v.z = 0.0f;
                     }
                 }
             }
@@ -843,7 +843,7 @@ void emRock_R1_Roll(cEmRock* pEm)
 // him (plemDropDie) or the escape succeeds; ends in Lost.
 void emRock_R1_Drop(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -858,7 +858,7 @@ void emRock_R1_Drop(cEmRock* pEm)
         pEm->r_no_2++;
     case 2:
         MotionSetCore(pEm, &pEm->Motion, w->Mot_drop, 0, 0, 1, 0);
-        EstSet(pEm, -1, 0, 0, EFF_ROOM, 4, 0, w->espKind, pEm, 0);
+        EstSet(pEm, -1, 0, 0, EFF_ROOM, 4, 0, w->EffKindId, pEm, 0);
         SndCall(6, 8, &pEm->pos, 0, 0, pEm);
         w->Timer = 37;
         pEm->r_no_2++;
@@ -875,7 +875,7 @@ void emRock_R1_Drop(cEmRock* pEm)
                 pEm->r_no_1 = 1;
                 pEm->r_no_2 = 0;
                 pEm->r_no_3 = 0;
-                EffectEspgenDelete(0, w->espKind, pEm);
+                EffectEspgenDelete(0, w->EffKindId, pEm);
                 EstSet(0, -1, &pEm->getPartsPtr(0)->world, 0, EFF_ROOM, 1, 0, ESP_CORE_KIND_NONE, 0, 0);
                 SndCall(6, 7, &pEm->pos, 0, 0, pEm);
                 break;
@@ -900,7 +900,7 @@ void emRock_R1_Drop(cEmRock* pEm)
 // (plemDropDie), a press plays the escape motion (plemDropEscape).
 void emRock_R1_Drop2(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
 
     switch (pEm->r_no_2) {
     case 0:
@@ -996,7 +996,7 @@ void plemDropEscAction(cEmRock* ptr)
 // Player damage routine of the drop: notices the rock, then the escape / death routine takes over.
 void plemDropFind(cPlayer* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm->pEmCatch);
+    FREE_EMROCK* w = EMROCK_WK(pEm->pEmCatch);
 
     pEm->subArc = pEm->pEmCatch->subArc;
     pEm->dmg.m_Timer = 2;
@@ -1024,7 +1024,7 @@ void plemDropFind(cPlayer* pEm)
 // Player damage routine: the player dives out of the way of the dropping rock.
 void plemDropEscape(cPlayer* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm->pEmCatch);
+    FREE_EMROCK* w = EMROCK_WK(pEm->pEmCatch);
 
     pEm->subArc = pEm->pEmCatch->subArc;
     switch (pEm->r_no_2) {
@@ -1054,7 +1054,7 @@ void plemDropEscape(cPlayer* pEm)
 // The rolling rock runs the player over: 1 when it hit him this frame.
 int emRockRollHitCk(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     int dead;
 
     if ((s16) pG->pl_life <= 0) {
@@ -1078,15 +1078,15 @@ int emRockRollHitCk(cEmRock* pEm)
     return 1;
 }
 
-// Hangs the rock on parts `partsNo_` of `parent` (Rno1 2); flag skips the matrix normalisation.
+// Hangs the rock on parts `oya_parts` of `pEm` (Rno1 2); mode skips the matrix normalisation.
 // Clears the holder's atari flag 0x200.
-void cEmRock::setParent(cEm* parent, int partsNo_, int flag)
+void cEmRock::setParent(cEm* pEm, u32 oya_parts, u32 mode)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
 
-    w->oya_parts = partsNo_;
-    w->pEm_oya = parent;
-    if (flag) {
+    w->oya_parts = oya_parts;
+    w->pEm_oya = pEm;
+    if (mode) {
         w->Be_flg |= 1;
     } else {
         w->Be_flg &= ~1;
@@ -1095,18 +1095,18 @@ void cEmRock::setParent(cEm* parent, int partsNo_, int flag)
     r_no_1 = 2;
     r_no_2 = 0;
     r_no_3 = 0;
-    parent->atari.m_flag &= ~0x200;
+    pEm->atari.m_flag &= ~0x200;
 }
 
 // Drops the rock off its parent: it falls straight down (emRock_R1_Fall) with `atk` as its attack.
-void cEmRock::setFall(EmAtkInfo* atk)
+void cEmRock::setFall(ATK_INFO* atk)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
     Mtx m;
 
-    w->spd.x = 0.0f;
-    w->spd.y = 0.0f;
-    w->spd.z = 0.0f;
+    w->throw_v.x = 0.0f;
+    w->throw_v.y = 0.0f;
+    w->throw_v.z = 0.0f;
     pos.x = mat[0][3];
     pos.y = mat[1][3];
     pos.z = mat[2][3];
@@ -1116,7 +1116,7 @@ void cEmRock::setFall(EmAtkInfo* atk)
     TransMatrix(mat, &pos);
     pos_old = pos;
     if (w->pEm_oya) {
-        w->pEm_old = (u32) w->pEm_oya;
+        w->pEm_old = w->pEm_oya;
     }
     w->pEm_oya = 0;
     hp = 1;
@@ -1125,7 +1125,7 @@ void cEmRock::setFall(EmAtkInfo* atk)
         w->pAtk = atk;
     } else {
         w->pAtk = &emRockAtk;
-        emRockAtk.range = w->Radius;
+        emRockAtk.radius = w->Radius;
     }
     r_no_0 = 1;
     r_no_1 = 3;
@@ -1134,9 +1134,9 @@ void cEmRock::setFall(EmAtkInfo* atk)
 }
 
 // Throws the rock with speed `spd` (a random forward throw in the parent's frame when NULL).
-void cEmRock::setThrow(Vec* spd, EmAtkInfo* atk)
+void cEmRock::setThrow(Vec* spd, ATK_INFO* atk)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
     Vec v;
     Mtx m;
 
@@ -1152,9 +1152,9 @@ void cEmRock::setThrow(Vec* spd, EmAtkInfo* atk)
             PSMTXMultVecSR(mat, &v, &v);
         }
     }
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     ang.x = 0.0f;
     ang.y = atan2f(v.x, v.z);
     ang.z = 0.0f;
@@ -1167,7 +1167,7 @@ void cEmRock::setThrow(Vec* spd, EmAtkInfo* atk)
     TransMatrix(mat, &pos);
     pos_old = pos;
     if (w->pEm_oya) {
-        w->pEm_old = (u32) w->pEm_oya;
+        w->pEm_old = w->pEm_oya;
     }
     w->pEm_oya = 0;
     hp = 1;
@@ -1176,7 +1176,7 @@ void cEmRock::setThrow(Vec* spd, EmAtkInfo* atk)
         w->pAtk = atk;
     } else {
         w->pAtk = &emRockAtk;
-        emRockAtk.range = w->Radius;
+        emRockAtk.radius = w->Radius;
     }
     r_no_0 = 1;
     r_no_1 = 4;
@@ -1185,9 +1185,9 @@ void cEmRock::setThrow(Vec* spd, EmAtkInfo* atk)
 }
 
 // setThrow variant that breaks on the first scenario hit (emRock_R1_Throw2).
-void cEmRock::setThrow2(Vec* spd, EmAtkInfo* atk)
+void cEmRock::setThrow2(Vec* spd, ATK_INFO* atk)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
     Vec v;
     Mtx m;
 
@@ -1203,9 +1203,9 @@ void cEmRock::setThrow2(Vec* spd, EmAtkInfo* atk)
             PSMTXMultVecSR(mat, &v, &v);
         }
     }
-    w->spd.x = v.x;
-    w->spd.y = v.y;
-    w->spd.z = v.z;
+    w->throw_v.x = v.x;
+    w->throw_v.y = v.y;
+    w->throw_v.z = v.z;
     ang.x = 0.0f;
     ang.y = atan2f(v.x, v.z);
     ang.z = 0.0f;
@@ -1218,7 +1218,7 @@ void cEmRock::setThrow2(Vec* spd, EmAtkInfo* atk)
     TransMatrix(mat, &pos);
     pos_old = pos;
     if (w->pEm_oya) {
-        w->pEm_old = (u32) w->pEm_oya;
+        w->pEm_old = w->pEm_oya;
     }
     w->pEm_oya = 0;
     hp = 1;
@@ -1227,7 +1227,7 @@ void cEmRock::setThrow2(Vec* spd, EmAtkInfo* atk)
         w->pAtk = atk;
     } else {
         w->pAtk = &emRockAtk;
-        emRockAtk.range = w->Radius;
+        emRockAtk.radius = w->Radius;
     }
     r_no_0 = 1;
     r_no_1 = 5;
@@ -1239,17 +1239,17 @@ void cEmRock::setThrow2(Vec* spd, EmAtkInfo* atk)
 // setThrow2's pool and setYarareCube's.
 static void emRockSpdClear(cEmRock* em)
 {
-    EmRockWork* w = EMROCK_WK(em);
+    FREE_EMROCK* w = EMROCK_WK(em);
 
-    w->spd.x = 0.0f;
-    w->spd.y = 0.0f;
-    w->spd.z = 0.0f;
+    w->throw_v.x = 0.0f;
+    w->throw_v.y = 0.0f;
+    w->throw_v.z = 0.0f;
 }
 
 // SE (block / number / volume) played when the thrown rock lands hard (0xFF = none).
 void cEmRock::setSeFall(u8 se_id, u8 se_no, u8 em_id)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
 
     w->seFall[0] = se_id;
     w->seFall[1] = se_no;
@@ -1260,7 +1260,7 @@ void cEmRock::setSeFall(u8 se_id, u8 se_no, u8 em_id)
 // Est spawned at the floor when the thrown rock lands hard (0xFF = none).
 void cEmRock::setEffFall(u8 eff_id, u8 est_id)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
 
     w->effFall[0] = eff_id;
     w->effFall[1] = est_id;
@@ -1269,7 +1269,7 @@ void cEmRock::setEffFall(u8 eff_id, u8 est_id)
 // Attaches a continuous est (trail / glow) to the rock under its Core_kind.
 void cEmRock::setEffAlways(u8 eff_id, u8 est_id)
 {
-    EstSet(this, -1, 0, 0, eff_id, est_id, 0, EMROCK_WK(this)->espKind, this, 0);
+    EstSet(this, -1, 0, 0, eff_id, est_id, 0, EMROCK_WK(this)->EffKindId, this, 0);
 }
 
 // Gives the rock a hit box (offset `size` or 400 below the origin) of x / y / z so it can be
@@ -1287,7 +1287,7 @@ void cEmRock::setYarareCube(f32 w, f32 h, f32 d, Vec* pOfs)
 // on == 0 keeps the rock hidden (Be_flg bit1), on != 0 shows it.
 void cEmRock::setTransMode(int mode)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
 
     if (mode) {
         w->Be_flg &= ~2;
@@ -1356,7 +1356,7 @@ void emRockAtkScrCk(cEmRock* pEm)
 // First EMI route point (type 6): 1 when found (routeIdx / pRoute set).
 int emRockSetRollRoute(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     u8* emi;
     int i;
     int idx;
@@ -1390,7 +1390,7 @@ int emRockSetRollRoute(cEmRock* pEm)
 // 500 units; 1 when the route ends (the rock stops).
 int emRockSetRollSpd(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     u8* emi;
     EmiEntry* e;
     int idx;
@@ -1430,7 +1430,7 @@ int emRockSetRollSpd(cEmRock* pEm)
     dir.y = 0.0f;
 #line 2170 "D:/Bio4/Prog/emrock.cpp"
     VECNormalize(&dir, &dir);
-    spd = SQRTF(w->spd.x * w->spd.x + w->spd.z * w->spd.z);
+    spd = SQRTF(w->throw_v.x * w->throw_v.x + w->throw_v.z * w->throw_v.z);
     if (w->First_bound) {
         add = 1.3f;
         if (pG->Game_level <= 2) {
@@ -1447,8 +1447,8 @@ int emRockSetRollSpd(cEmRock* pEm)
         spd = 500.0f;
     }
     PSVECScale(&dir, &dir, spd);
-    w->spd.x = dir.x;
-    w->spd.z = dir.z;
+    w->throw_v.x = dir.x;
+    w->throw_v.z = dir.z;
     return 0;
 }
 
@@ -1494,7 +1494,7 @@ int emRockRollStartCk(cEmRock* pEm)
 // button-mash speed motions, and jumps to the side (or gets caught) at the goal.
 void plemRockEscape(cPlayer* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm->pEmCatch);
+    FREE_EMROCK* w = EMROCK_WK(pEm->pEmCatch);
     void* mot;
     void* mot2;
     Vec v;
@@ -1699,7 +1699,7 @@ void plemRockEscape(cPlayer* pEm)
 // Stores the 16 player motions of the boulder chase escape (plemRockEscape steps).
 void cEmRock::setPlMotion(void** pTbl)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
 
     w->Mot_tbl[0] = *pTbl++;
     w->Mot_tbl[1] = *pTbl++;
@@ -1804,28 +1804,28 @@ void plemRockEscapeCamMove(cPlayer* pEm, f32 rate)
     GLOBAL_WK* g = pG;
     CAMERA* cam = &emRockCam;
 
-    cam->param.fovy = 27.0f;
+    cam->param.Fovy = 27.0f;
     PSMTXMultVec(pEm->mat, &emRock_campos, &p0);
     PSMTXMultVec(pEm->mat, &emRock_target, &p1);
-    PosToPos(&g->Camera.param.at, &p1, &emRockCam.param.at, rate);
-    PosToPos(&g->Camera.param.pos, &p0, &emRockCam.param.pos, rate);
+    PosToPos(&g->Camera.param.Target, &p1, &emRockCam.param.Target, rate);
+    PosToPos(&g->Camera.param.Campos, &p0, &emRockCam.param.Campos, rate);
     r.x = fRand1_1() * 10.0f;
     r.y = fRand1_1() * 10.0f;
     r.z = fRand1_1() * 10.0f;
-    PSVECAdd(&emRockCam.param.pos, &r, &emRockCam.param.pos);
-    PSVECAdd(&emRockCam.param.at, &r, &emRockCam.param.at);
-    if (EatMgr.hitCheck(&emRockCam.param.at, &emRockCam.param.pos, &hit, 0, 0x8000, 0)) {
-        PSVECSubtract(&hit, &emRockCam.param.at, &d);
+    PSVECAdd(&emRockCam.param.Campos, &r, &emRockCam.param.Campos);
+    PSVECAdd(&emRockCam.param.Target, &r, &emRockCam.param.Target);
+    if (EatMgr.hitCheck(&emRockCam.param.Target, &emRockCam.param.Campos, &hit, 0, 0x8000, 0)) {
+        PSVECSubtract(&hit, &emRockCam.param.Target, &d);
         len = SQRTF(d.x * d.x + d.y * d.y + d.z * d.z) - 250.0f;
 #line 2738 "D:/Bio4/Prog/emrock.cpp"
         VECNormalize(&d, &d);
         PSVECScale(&d, &d, len);
-        PSVECAdd(&emRockCam.param.at, &d, &emRockCam.param.pos);
+        PSVECAdd(&emRockCam.param.Target, &d, &emRockCam.param.Campos);
     }
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &cam->param.pos;
-        Vec* ca = &cam->param.at;
+        Vec* cp = &cam->param.Campos;
+        Vec* ca = &cam->param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -1848,7 +1848,7 @@ void plemRockEscapeCamMove2(cPlayer* pEm, int mode)
     f32 len;
     CAMERA* gcam = &pG->Camera;
 
-    emRockCam.param.fovy = 50.0f;
+    emRockCam.param.Fovy = 50.0f;
     if (mode) {
         emRock_campos.x = 30.0f;
         emRock_target.x = -397.0f;
@@ -1863,17 +1863,17 @@ void plemRockEscapeCamMove2(cPlayer* pEm, int mode)
     }
     PSMTXMultVec(pEm->mat, &emRock_campos, &p0);
     PSMTXMultVec(pEm->mat, &emRock_target, &p1);
-    PosToPos(&gcam->param.at, &p1, &emRockCam.param.at, 1.0f);
-    PosToPos(&gcam->param.pos, &p0, &emRockCam.param.pos, 1.0f);
+    PosToPos(&gcam->param.Target, &p1, &emRockCam.param.Target, 1.0f);
+    PosToPos(&gcam->param.Campos, &p0, &emRockCam.param.Campos, 1.0f);
     r.x = fRand1_1() * 10.0f;
     r.y = fRand1_1() * 10.0f;
     r.z = fRand1_1() * 10.0f;
-    PSVECAdd(&emRockCam.param.pos, &r, &emRockCam.param.pos);
-    PSVECAdd(&emRockCam.param.at, &r, &emRockCam.param.at);
+    PSVECAdd(&emRockCam.param.Campos, &r, &emRockCam.param.Campos);
+    PSVECAdd(&emRockCam.param.Target, &r, &emRockCam.param.Target);
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &emRockCam.param.pos;
-        Vec* ca = &emRockCam.param.at;
+        Vec* cp = &emRockCam.param.Campos;
+        Vec* ca = &emRockCam.param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -1893,7 +1893,7 @@ void plemRockDropDieCamMove(cEmRock* pEm)
     cParts* parts;
     CAMERA* gcam = &pG->Camera;
 
-    emRockCam.param.fovy = 50.0f;
+    emRockCam.param.Fovy = 50.0f;
     if (Muku(&pEm->pos, &pPL->pos, pEm->ang.y, 3.1415927f) < 0.0f) {
         p.x = -10000.0f;
         p.y = 5000.0f;
@@ -1905,12 +1905,12 @@ void plemRockDropDieCamMove(cEmRock* pEm)
     }
     PSMTXMultVec(pEm->mat, &p, &p);
     parts = pPL->getPartsPtr(0);
-    PosToPos(&gcam->param.at, &parts->world, &emRockCam.param.at, 0.1f);
-    PosToPos(&gcam->param.pos, &p, &emRockCam.param.pos, 0.1f);
+    PosToPos(&gcam->param.Target, &parts->world, &emRockCam.param.Target, 0.1f);
+    PosToPos(&gcam->param.Campos, &p, &emRockCam.param.Campos, 0.1f);
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &emRockCam.param.pos;
-        Vec* ca = &emRockCam.param.at;
+        Vec* cp = &emRockCam.param.Campos;
+        Vec* ca = &emRockCam.param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -1930,7 +1930,7 @@ void emRockPushCamMove(cEmRock* pEm)
     cParts* parts;
     CAMERA* gcam = &pG->Camera;
 
-    emRockCam.param.fovy = 50.0f;
+    emRockCam.param.Fovy = 50.0f;
     switch (pG->room_no) {
     case 4:
     default:
@@ -1955,12 +1955,12 @@ void emRockPushCamMove(cEmRock* pEm)
         break;
     }
     parts = pEm->getPartsPtr(0);
-    PosToPos(&gcam->param.at, &parts->world, &emRockCam.param.at, 1.0f);
-    emRockCam.param.pos = p;
+    PosToPos(&gcam->param.Target, &parts->world, &emRockCam.param.Target, 1.0f);
+    emRockCam.param.Campos = p;
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &emRockCam.param.pos;
-        Vec* ca = &emRockCam.param.at;
+        Vec* cp = &emRockCam.param.Campos;
+        Vec* ca = &emRockCam.param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -1979,7 +1979,7 @@ void emRockPushCamMove2(cEmRock* pEm)
     Vec p1;
     f32 len;
 
-    emRockCam.param.fovy = 27.0f;
+    emRockCam.param.Fovy = 27.0f;
     switch (pG->room_no) {
     case 4:
     default:
@@ -2007,12 +2007,12 @@ void emRockPushCamMove2(cEmRock* pEm)
         p1.z = 69202.0f;
         break;
     }
-    emRockCam.param.pos = p0;
-    emRockCam.param.at = p1;
+    emRockCam.param.Campos = p0;
+    emRockCam.param.Target = p1;
     {
         CAMERA* cam = &emRockCam;
-        Vec* cp = &cam->param.pos;
-        Vec* ca = &cam->param.at;
+        Vec* cp = &cam->param.Campos;
+        Vec* ca = &cam->param.Target;
 
         len = (cp->x - ca->x) * (cp->x - ca->x) + (cp->y - ca->y) * (cp->y - ca->y) + (cp->z - ca->z) * (cp->z - ca->z);
         cam->Up.x = 0.0f;
@@ -2031,18 +2031,18 @@ void emRockDropCamMove(cEmRock* em)
     Vec p1;
     f32 len;
     CAMERA* cam = &emRockCam;
-    Vec* cp = &cam->param.pos;
-    Vec* ca = &cam->param.at;
+    Vec* cp = &cam->param.Campos;
+    Vec* ca = &cam->param.Target;
 
-    cam->param.fovy = 50.0f;
+    cam->param.Fovy = 50.0f;
     p0.x = -5217.81f;
     p0.y = -12316.48f;
     p0.z = -16037.2f;
     p1.x = -5256.36f;
     p1.y = -10495.61f;
     p1.z = -15051.18f;
-    cam->param.pos = p0;
-    cam->param.at = p1;
+    cam->param.Campos = p0;
+    cam->param.Target = p1;
     // `up` is set BEFORE `len`: with the up stores after the six len loads, the up.x store is the
     // 34th memory insn of the block and sched1 flushes its pending lists there (haifa's 32-entry
     // limit), which pins the 1.0/0.0 stores behind it and swaps the three pool highs (r27..r29).
@@ -2058,7 +2058,7 @@ void emRockDropCamMove(cEmRock* em)
 // Enemies (ids 0x10..0x20) within 1.5 radii of the rock are knocked down (routine 3/4).
 void emRockRunDownCk(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     cParts* p = pEm->getPartsPtr(0);
     cEm* e;
     Vec v;
@@ -2099,26 +2099,26 @@ void emRockRunDownCk(cEmRock* pEm)
 }
 
 // Flying rock against the player (`atk` with the rock's radius as range): 1 on a hit.
-int emRockAtkCk(cEmRock* em, EmAtkInfo* atk, int type, f32 r)
+int emRockAtkCk(cEmRock* em, ATK_INFO* atk, f32 r, int type)
 {
-    EmRockWork* w = EMROCK_WK(em);
-    EmAtkInfo a;
+    FREE_EMROCK* w = EMROCK_WK(em);
+    ATK_INFO a;
 
     if (atk) {
         a = *atk;
-        a.range = w->Radius;
+        a.radius = w->Radius;
         if (EmAtkHitCk(&a, &em->pos, &em->pos_old, 1)) {
             VibSetData((VibDataTbl*) (pG->pCore->ofs_1C + (u32) pG->pCore), 7, 1);
-            if (w->se8D[0] != 0xFF && w->se8D[1] != 0xFF) {
-                SndCall(w->se8D[0], w->se8D[1], &em->pos, w->se8D[2], 0, em);
+            if (w->seHit[0] != 0xFF && w->seHit[1] != 0xFF) {
+                SndCall(w->seHit[0], w->seHit[1], &em->pos, w->seHit[2], 0, em);
             }
             SndStop(w->seid_throw, 0);
             QuakeExec(0, 0, 5, 22.0f, 2);
             if (type) {
                 PlSetDamage(PL_DM_AUTO, 0, 0);
             }
-            if (w->eff9C[0] != 0xFF && w->eff9C[1] != 0xFF) {
-                EmPlBloodSet2(em, &em->pos, 1, w->eff9C[0], w->eff9C[1]);
+            if (w->effHit[0] != 0xFF && w->effHit[1] != 0xFF) {
+                EmPlBloodSet2(em, &em->pos, 1, w->effHit[0], w->effHit[1]);
             } else {
                 EmPlBloodSet2(em, &em->pos, 1, 0xFF, 0xFF);
             }
@@ -2131,7 +2131,7 @@ int emRockAtkCk(cEmRock* em, EmAtkInfo* atk, int type, f32 r)
 // Starts the push motions (plMot[13..15], round robin) on the enemies pushing the rock.
 void emRockPushCk(cEmRock* pEm, int frame)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     cEm* e;
     u32 n;
     u32 i;
@@ -2175,7 +2175,7 @@ void emRockPushCk(cEmRock* pEm, int frame)
 // motion d.
 void cEmRock::setDropMot(void* a, void* b, void* c, void* d)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
 
     w->Mot_wait = a;
     w->Mot_drop = b;
@@ -2191,7 +2191,7 @@ void cEmRock::setDropMot(void* a, void* b, void* c, void* d)
 // three escape player motions e / f / g.
 void cEmRock::setDropMot2(void* a, void* b, void* c, void* d, void* e, void* f, void* g)
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
 
     w->Mot_drop = a;
     w->Mot_pldie = b;
@@ -2209,7 +2209,7 @@ void cEmRock::setDropMot2(void* a, void* b, void* c, void* d, void* e, void* f, 
 // The dropping rock reached the player (radius + 1000): starts the death routine. 1 on a hit.
 int emRockDropHitCk(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     cParts* p;
     int dead;
     f32 len;
@@ -2242,7 +2242,7 @@ int emRockDropHitCk(cEmRock* pEm)
 // Same for the sub character.
 int emRockDropHitCkSub(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     cParts* p;
     int dead;
     f32 len;
@@ -2278,7 +2278,7 @@ int emRockDropHitCkSub(cEmRock* pEm)
 // The dropping rock hit an em2b (parts 2 within radius + 2000): knocks it down unless flagged. 1 on a hit.
 int emRockDropHitCkEm2b(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     cParts* p = pEm->getPartsPtr(0);
     cEm* e;
     cParts* q;
@@ -2321,7 +2321,7 @@ int emRockDropHitCkEm2b(cEmRock* pEm)
 // Player damage routine: crushed by the dropping rock.
 void plemDropDie(cPlayer* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm->pEmCatch);
+    FREE_EMROCK* w = EMROCK_WK(pEm->pEmCatch);
 
     pEm->subArc = pEm->pEmCatch->subArc;
     switch (pEm->r_no_2) {
@@ -2346,7 +2346,7 @@ void plemDropDie(cPlayer* pEm)
 void subemDropDie()
 {
     cEm* sub = pSUB;
-    EmRockWork* w = EMROCK_WK(sub->pEmCatch);
+    FREE_EMROCK* w = EMROCK_WK(sub->pEmCatch);
 
     sub->subArc = sub->pEmCatch->subArc;
     switch (sub->r_no_2) {
@@ -2364,7 +2364,7 @@ void subemDropDie()
 // Room 11E: the rock breaks (effect, sound) and stops.
 void cEmRock::setBreakR11E()
 {
-    EmRockWork* w = EMROCK_WK(this);
+    FREE_EMROCK* w = EMROCK_WK(this);
 
     EstSet(0, -1, &getPartsPtr(0)->world, 0, EFF_ROOM, 2, 0, ESP_CORE_KIND_NONE, 0, 0);
     SndCall(6, 7, &pos, 0, 0, this);
@@ -2375,13 +2375,13 @@ void cEmRock::setBreakR11E()
     r_no_1 = 1;
     r_no_2 = 0;
     r_no_3 = 0;
-    EffectEspgenDelete(0, w->espKind, this);
+    EffectEspgenDelete(0, w->EffKindId, this);
 }
 
 // Room 11E type 3 rocks: deactivates the rock's scenario collision piece.
 void emRockSatClear(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
 
     if (pG->room_id != 0x11E) {
         return;
@@ -2399,7 +2399,7 @@ void emRockSatClear(cEmRock* pEm)
 // (the boulders the player must climb around).
 void emRockSatSet(cEmRock* pEm)
 {
-    EmRockWork* w = EMROCK_WK(pEm);
+    FREE_EMROCK* w = EMROCK_WK(pEm);
     Vec pos;
     Vec rot;
 

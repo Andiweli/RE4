@@ -32,13 +32,11 @@
 #include <dolphin/os.h>
 #include <dolphin/db.h>
 
-extern "C" {
 void debugInfoDisp(int slot, int type);
 void CRCInit();
 u32 CRCCalc(u8* data, u32 len);
 int CRCVerify(u8* data, u32 len, u32 saved);
 void setMsgBG(int a, int flag);
-}
 
 // Sub screen data archive (SndMem.sub_adr): offsets to its sub-files.
 // Archive header shared by the sub screen sound data (SndMem.sub_adr: [0] icon/banner TPL,
@@ -157,7 +155,7 @@ public:
 void dispSaveInfo(int no, SaveInfo* info, int type, int broken);
 // cCard::exit passes the saved int width as a full word (`lwz`, not the `lhz 0x41a` narrowing a u16
 // parameter gets): int view of ScreenReSize.
-extern "C" void ScreenReSizeI(int w, int h) asm("ScreenReSize");
+extern "C" void ScreenReSizeI(int w, int h) asm("ScreenReSize__FUsUs");
 
 int isDbgInfoAlloc = 0;
 static int isDbgInfoCached = 0;
@@ -222,7 +220,7 @@ static void* g_p_spln_org[1];
 #define ROUNDUP(x, a) (((x) + ((a) - 1)) / (a) * (a))
 
 // Free blocks of a slot (free bytes rounded up to the sector size).
-#define FREE_BLOCKS(s) (((s).sectorSize ? ROUNDUP((s).freeBytes, (s).sectorSize) : 0) / (s).sectorSize)
+#define FREE_BLOCKS(s) (((s).SectorSize ? ROUNDUP((s).FreeSize, (s).SectorSize) : 0) / (s).SectorSize)
 
 // Dev mode: prints the slot list (CARD SLOT A / HARD DISK) with the selected one highlighted.
 void debugInfoDisp(int slot_no, int type)
@@ -264,8 +262,8 @@ void cCard::slotSelect()
     case 0:
         if (unmount(0) == 1) {
             for (i = 0; i < 20; i++) {
-                m_Slot[0].fileFlag[i] = 0;
-                m_Slot[2].fileFlag[i] = 0;
+                m_Slot[0].FileInfo[i] = 0;
+                m_Slot[2].FileInfo[i] = 0;
             }
             m_Rno1++;
         }
@@ -306,7 +304,7 @@ void cCard::slotSelect()
 void cCard::inSlotCheck()
 {
     int ret;
-    CardSlot* s;
+    CARD_SLOT_INFO* s;
 
     switch (m_Rno1) {
     case 0:
@@ -404,7 +402,7 @@ void cCard::inSlotCheck()
         break;
     case 8:
         s = &m_Slot[m_SlotNo];
-        if (s->flags & 0x200) {
+        if (s->Status & 0x200) {
                         m_Rno0 = 8;
             m_Rno1 = 0;
             m_Rno2 = 0;
@@ -431,7 +429,7 @@ void cCard::inSlotCheck()
 void cCard::dataSelect()
 {
     int i;
-    CardSlot* s;
+    CARD_SLOT_INFO* s;
     int sel;
     SaveInfo* info;
 
@@ -440,17 +438,17 @@ void cCard::dataSelect()
             errorSet(-3);
             return;
         }
-        eprintf(32, 300, 0, 0, "Card    : %2dMbit", m_Slot[m_SlotNo].memSize);
-        eprintf(32, 320, 0, 0, "Sector  : 0x%x", m_Slot[m_SlotNo].sectorSize);
-        eprintf(32, 340, 0, 0, "F size  : %d", m_Slot[m_SlotNo].freeBytes);
+        eprintf(32, 300, 0, 0, "Card    : %2dMbit", m_Slot[m_SlotNo].MemSize);
+        eprintf(32, 320, 0, 0, "Sector  : 0x%x", m_Slot[m_SlotNo].SectorSize);
+        eprintf(32, 340, 0, 0, "F size  : %d", m_Slot[m_SlotNo].FreeSize);
         eprintf(32, 360, 0, 0, "F entry : %d", m_Slot[m_SlotNo].freeFiles);
         eprintf(32, 380, 0, 0, "F block : %d", FREE_BLOCKS(m_Slot[m_SlotNo]));
     }
-    if (m_Slot[m_SlotNo].fileFlag[m_SaveNo] & 1) {
+    if (m_Slot[m_SlotNo].FileInfo[m_SaveNo] & 1) {
         info = (SaveInfo*) m_pSaveInfo[m_SaveNo];
         if (info->magic != 0x116) {
             eprintf2(12, 16, 220, 380, 0, 0, "DATA IS CORRUPTED");
-            m_Slot[m_SlotNo].fileFlag[m_SaveNo] |= 2;
+            m_Slot[m_SlotNo].FileInfo[m_SaveNo] |= 2;
         } else {
             eprintf2(12, 16, 220, 380, 0, 0, "R%03X", info->room);
             eprintf2(12, 16, 220, 400, 0, 0, "%02d/%02d/%02d %02d:%02d:%02d", info->time.year % 100, info->time.mon + 1,
@@ -468,7 +466,7 @@ void cCard::dataSelect()
             int found = 0;
             u32 n;
             for (n = 0; n < 20; n++) {
-                if (m_Slot[m_SlotNo].fileFlag[n] & 1) {
+                if (m_Slot[m_SlotNo].FileInfo[n] & 1) {
                     m_SaveNo = n;
                     found = 1;
                     break;
@@ -479,7 +477,7 @@ void cCard::dataSelect()
             } else {
                 n = m_SaveNo + 1;
                 while (n <= 19) {
-                    if (m_Slot[m_SlotNo].fileFlag[n] & 1) {
+                    if (m_Slot[m_SlotNo].FileInfo[n] & 1) {
                         info = (SaveInfo*) m_pSaveInfo[m_SaveNo];
                         if (OSCalendarTimeToTicks(&((SaveInfo*) m_pSaveInfo[n])->time) > OSCalendarTimeToTicks(&info->time)) {
                             m_SaveNo = n;
@@ -532,13 +530,13 @@ void cCard::dataSelect()
         int blocks;
         s = &m_Slot[m_SlotNo];
         blocks = FREE_BLOCKS(*s);
-        if (s->fileFlag[m_SaveNo] != 0) {
+        if (s->FileInfo[m_SaveNo] != 0) {
             if (m_aMode == 1) {
                 m_Rno1 = 3;
                 if (m_SlotNo == 2) {
                     break;
                 }
-                if (s->flags & 0x200) {
+                if (s->Status & 0x200) {
                     break;
                 }
                 if (blocks != 0 && s->freeFiles != 0) {
@@ -546,7 +544,7 @@ void cCard::dataSelect()
                 }
                 errorSet(-0x20A);
             } else {
-                if (s->fileFlag[m_SaveNo] & 2) {
+                if (s->FileInfo[m_SaveNo] & 2) {
                     errorSet(-0x202);
                 } else {
                     m_Rno1 = 5;
@@ -559,7 +557,7 @@ void cCard::dataSelect()
                     break;
                 }
                 m_Rno1 = 4;
-                if (!(s->flags & 0x200)) {
+                if (!(s->Status & 0x200)) {
                     if ((u32) blocks < m_SaveSize + m_SysSize || s->freeFiles < 2) {
                         errorSet(-0x201);
                     }
@@ -642,7 +640,7 @@ void cCard::loadMain()
         sprintf(m_Name, "bh4_data%02d", m_SaveNo);
     }
     name = m_Name;
-    if (m_Slot[m_SlotNo].fileFlag[m_SaveNo] & 4) {
+    if (m_Slot[m_SlotNo].FileInfo[m_SaveNo] & 4) {
         errorSet(-0x202);
         return;
     }
@@ -694,7 +692,7 @@ void cCard::loadMain()
     case 3:
         if (CRCVerify(pSaveBuf, SAVE_CRC, *(u32*) (pSaveBuf + SAVE_CRC)) == 0) {
             if (m_RetryCtr == 3) {
-                m_Slot[m_SlotNo].fileFlag[m_SaveNo] |= 2;
+                m_Slot[m_SlotNo].FileInfo[m_SaveNo] |= 2;
                 errorSet(-0x202);
             } else {
                 m_Rno1 = 2;
@@ -944,7 +942,7 @@ void cCard::saveMain()
         }
         break;
     case 4:
-        ret = CARDGetStatus(m_SlotNo, m_Slot[m_SlotNo].fileInfo.fileNo, &m_Slot[m_SlotNo].stat);
+        ret = CARDGetStatus(m_SlotNo, m_Slot[m_SlotNo].CardInfo.fileNo, &m_Slot[m_SlotNo].CardStat);
         if (ret == -1) {
             break;
         }
@@ -957,7 +955,7 @@ void cCard::saveMain()
     case 5:
         (this->*makeFunc)();
         if (m_mMode == 0) {
-            m_Slot[m_SlotNo].fileFlag[m_SaveNo] = 1;
+            m_Slot[m_SlotNo].FileInfo[m_SaveNo] = 1;
             memcpy(m_pSaveInfo[m_SaveNo], pSaveBuf + 0x2000, 0x200);
             g_id->setAction(4);
             resetStatus(1);
@@ -1013,7 +1011,7 @@ void cCard::saveMain()
         break;
     case 7:
         makeCardStatus(&m_Slot[m_SlotNo]);
-        CARDSetStatusAsync(m_SlotNo, m_Slot[m_SlotNo].fileInfo.fileNo, &m_Slot[m_SlotNo].stat, 0);
+        CARDSetStatusAsync(m_SlotNo, m_Slot[m_SlotNo].CardInfo.fileNo, &m_Slot[m_SlotNo].CardStat, 0);
         m_Rno1++;
         // fallthrough
     case 8:
@@ -1136,8 +1134,8 @@ void cCard::exit()
                     FadeSet(0x80000000, (GXColor*) &c0, (GXColor*) &c1, 10, 0, 0);
                 }
                 for (i = 0; i < 4; i++) {
-                    if (m_StrInfo[i].id != 0 && SndStrStatusCk(m_StrInfo[i].id, 0x10) != 0) {
-                        SndStrReq(m_StrInfo[i].id, 4, 100, m_StrInfo[i].vol);
+                    if (m_StrInfo[i].snd_id != 0 && SndStrStatusCk(m_StrInfo[i].snd_id, 0x10) != 0) {
+                        SndStrReq(m_StrInfo[i].snd_id, 4, 100, m_StrInfo[i].vol);
                     }
                 }
                 SndSePauseAll(0);
@@ -1391,7 +1389,7 @@ void cCard::fileDelete()
         break;
     case 3:
         if (m_aMode != 2) {
-            m_Slot[m_SlotNo].fileFlag[m_SaveNo] &= ~1;
+            m_Slot[m_SlotNo].FileInfo[m_SaveNo] &= ~1;
         }
         cardMesSet(MES_DELETE_DONE, 0, 0);
         if (Key.trg & KEY_A) {
@@ -1648,7 +1646,7 @@ void cCard::errorDisp()
     if (m_SlotNo != 2 && cardcheck == 1 && probe != -1) {
         switch (probe) {
         case -3:
-            if (!(m_Slot[m_SlotNo].flags & 2)) {
+            if (!(m_Slot[m_SlotNo].Status & 2)) {
                 cMes.Clear();
                 if (m_aMode == 2) {
                     m_Rno0 = 0;
@@ -1664,7 +1662,7 @@ void cCard::errorDisp()
         case -0x80:
         case -2:
         case 0:
-            if (m_Slot[m_SlotNo].flags & 2) {
+            if (m_Slot[m_SlotNo].Status & 2) {
                 cMes.Clear();
                 if (m_aMode == 2) {
                     m_Rno0 = 0;
@@ -1730,7 +1728,7 @@ int cCard::initialize(int type)
         if (pG->CardStatus & 0x80) {
             addr = (u32) pG->pOption;
         } else {
-            addr = MemGetHeapStartAddr(heap);
+            addr = (u32) MemGetHeapStartAddr(heap);
             if (!(pG->CardStatus & 8)) {
                 c0 = 0;
                 c1 = 0xFF;
@@ -1755,7 +1753,7 @@ int cCard::initialize(int type)
             return 0;
         }
         if (!(pG->CardStatus & 0x80)) {
-            SndPlayWork* s;
+            BGM_STAT* s;
             int i;
             g_id->init(this->m_aMode, (CardArc*) m_IdDataAddr);
             m_Width_bak = (int) Screen.width;
@@ -1768,12 +1766,12 @@ int cCard::initialize(int type)
             s = Snd.str_state;
             i = 0;
             do {
-                if (s->used == 1 && s->stat == 0) {
-                    m_StrInfo[i].id = s->id;
-                    m_StrInfo[i].vol = s->vol;
-                    SndStrReq(s->id, 4, 100, 1);
+                if (s->busy == 1 && s->stop_req == 0) {
+                    m_StrInfo[i].snd_id = s->play_id;
+                    m_StrInfo[i].vol = s->now_play_vol;
+                    SndStrReq(s->play_id, 4, 100, 1);
                 } else {
-                    m_StrInfo[i].id = 0;
+                    m_StrInfo[i].snd_id = 0;
                 }
                 i++;
                 s++;
@@ -1784,9 +1782,9 @@ int cCard::initialize(int type)
     }
     dispFlag = 1;
     CRCInit();
-    m_Slot[0].chan = 0;
-    m_Slot[1].chan = 1;
-    m_Slot[2].chan = 2;
+    m_Slot[0].SlotNo = SLOT_A;
+    m_Slot[1].SlotNo = SLOT_B;
+    m_Slot[2].SlotNo = HARD_DISK;
     return 1;
 }
 
@@ -1876,17 +1874,17 @@ u32 cCard::getUseMemSize()
 
 // Async step: creates `fileName` with `blocks` x 8 KB on the card; 1 when done, negative CARD
 // result on failure.
-int cCard::fileCreate(u8* sub, int blocks, CardSlot* s)
+int cCard::fileCreate(u8* sub, int blocks, CARD_SLOT_INFO* s)
 {
     int ret = 0;
 
     switch (*sub) {
     case 0:
-        CARDCreateAsync(s->chan, m_Name, blocks << 13, &s->fileInfo, 0);
+        CARDCreateAsync(s->SlotNo, m_Name, blocks << 13, &s->CardInfo, 0);
         (*sub)++;
         // fallthrough
     case 1:
-        m_ResultCode = CARDGetResultCode(s->chan);
+        m_ResultCode = CARDGetResultCode(s->SlotNo);
         if (m_ResultCode == -1) {
             break;
         }
@@ -1905,7 +1903,7 @@ int cCard::fileCreate(u8* sub, int blocks, CardSlot* s)
 
 // commentAddr stored before iconAddr (the zero's qty is born first and takes r0); the tail mask
 // through a two-use temp (see below).
-void cCard::makeCardStatus(CardSlot* s)
+void cCard::makeCardStatus(CARD_SLOT_INFO* s)
 {
     u32 fmt;
     u32 spd;
@@ -1913,27 +1911,27 @@ void cCard::makeCardStatus(CardSlot* s)
     u32 spd2;
     int i;
 
-    s->stat.bannerFormat = (u8) ((s->stat.bannerFormat & ~3) | 2);
-    s->stat.commentAddr = 0;
-    s->stat.iconAddr = 0x40;
-    fmt = s->stat.iconFormat;
-    spd = s->stat.iconSpeed;
+    s->CardStat.bannerFormat = (u8) ((s->CardStat.bannerFormat & ~3) | 2);
+    s->CardStat.commentAddr = 0;
+    s->CardStat.iconAddr = 0x40;
+    fmt = s->CardStat.iconFormat;
+    spd = s->CardStat.iconSpeed;
     for (i = 0; i < ICON_NUM; i++) {
         fmt2 = (fmt & ~(3 << (2 * i))) | (1 << (2 * i));
         spd2 = (spd & ~(3 << (2 * i))) | (3 << (2 * i));
         fmt = fmt2;
         spd = spd2;
     }
-    s->stat.iconFormat = fmt2;
+    s->CardStat.iconFormat = fmt2;
     {
         // The mask must stay a 32-bit `rlwinm` (a two-use temp keeps combine from folding it into
         // the u16 store as `andi. 0xfff3`); spd2 keeps 5 refs so spd (r11) is coloured before it.
         u32 t = spd2 & ~(3 << (2 * ICON_NUM));
-        s->stat.iconSpeed = t;
+        s->CardStat.iconSpeed = t;
         spd2 = t;  // COMPILER-DIFF: dead statement (second use of t)
     }
-    s->stat.bannerFormat |= 4;
-    DCFlushRange(&s->stat, sizeof(CardStat));
+    s->CardStat.bannerFormat |= 4;
+    DCFlushRange(&s->CardStat, sizeof(CardStat));
 }
 
 // Rno0 == 0 (first check at boot): walks slot A (and the host disk in dev mode): unmount, exist,
@@ -2001,7 +1999,7 @@ void cCard::firstCheck00()
     }
     if (m_SlotNo == 1) {
         m_SlotNo = 0;
-        if (m_Slot[0].flags & 0x200) {
+        if (m_Slot[0].Status & 0x200) {
             m_Rno0++;
         } else if (pG->IsDevConsole == 1) {
             m_SlotNo = 2;
@@ -2073,7 +2071,7 @@ void cCard::firstCheck10()
 // otherwise done.
 void cCard::firstCheck20()
 {
-    u32 f = m_Slot[0].flags;
+    u32 f = m_Slot[0].Status;
 
     if (f & 2) {
         errorSet(-3);
@@ -2218,7 +2216,7 @@ void CardSave(int no, int f)
         pG->CardStatus |= 0x98;
     }
     pG->terminal_no = no;
-    TaskExec(1, (TaskFunc) CardMainTask, 1);
+    TaskExec(1, (TaskFunc) CardMainTask, (void*) 1);
     TaskSleep(1);
 }
 
@@ -2226,7 +2224,7 @@ void CardSave(int no, int f)
 void CardSysSave()
 {
     pG->CardStatus |= 0x98;
-    TaskExec(1, (TaskFunc) CardMainTask, 1);
+    TaskExec(1, (TaskFunc) CardMainTask, (void*) 1);
     TaskSleep(1);
 }
 
@@ -2237,38 +2235,38 @@ void CardFirstCheck()
         pG->CardStatus |= 0x80000000;
         TaskExit();
     }
-    TaskChain((TaskFunc) CardMainTask, 2);
+    TaskChain((TaskFunc) CardMainTask, (void*) 2);
 }
 
 // Probes slot `chan` (CARDProbeEx): records size / sector size or the error flag (no card, wrong
 // device, fatal, bad sector size). 1 when a usable card is there (the host disk always).
-int cCard::existCheck(int slot, CardSlot* s)
+int cCard::existCheck(int slot, CARD_SLOT_INFO* s)
 {
     int ret = 0;
 
     if (slot == 2) {
         return 1;
     }
-    m_ResultCode = CARDProbeEx(slot, &s->memSize, &s->sectorSize);
+    m_ResultCode = CARDProbeEx(slot, &s->MemSize, &s->SectorSize);
     switch (m_ResultCode) {
     case 0:
         ret = 1;
-        if (s->sectorSize != 0x2000) {
-            s->flags |= 0x80;
+        if (s->SectorSize != 0x2000) {
+            s->Status |= 0x80;
             ret = -1;
             m_ResultCode = -0x200;
         }
         break;
     case -3:
-        s->flags |= 2;
+        s->Status |= 2;
         ret = -1;
         break;
     case -2:
-        s->flags |= 0x20;
+        s->Status |= 0x20;
         ret = -1;
         break;
     case -0x80:
-        s->flags |= 0x40;
+        s->Status |= 0x40;
         ret = -1;
         break;
     case -1:
@@ -2279,38 +2277,38 @@ int cCard::existCheck(int slot, CardSlot* s)
 
 // Async step: mounts the card (CARDMountAsync), setting the slot's error flags on failure. 1 when
 // mounted.
-int cCard::mount(u8* Rno, CardSlot* s)
+int cCard::mount(u8* Rno, CARD_SLOT_INFO* s)
 {
     int ret = 0;
 
-    if (s->chan == 2) {
+    if (s->SlotNo == 2) {
         return 1;
     }
     switch (*Rno) {
     case 0:
-        CARDMountAsync(s->chan, s->workArea, 0, 0);
+        CARDMountAsync(s->SlotNo, s->workArea, 0, 0);
         (*Rno)++;
         // fallthrough
     case 1:
-        m_ResultCode = CARDGetResultCode(s->chan);
+        m_ResultCode = CARDGetResultCode(s->SlotNo);
         switch (m_ResultCode) {
         case 0:
         case -6:
         case -0xD:
-            OSReport("Slot %c Mount\n", s->chan + 'A');
+            OSReport("Slot %c Mount\n", s->SlotNo + 'A');
             ret = 1;
             break;
         case -3:
-            s->flags |= 2;
+            s->Status |= 2;
             ret = -1;
             break;
         case -2:
-            s->flags |= 0x20;
+            s->Status |= 0x20;
             ret = -1;
             break;
         case -5:
         case -0x80:
-            s->flags |= 0x40;
+            s->Status |= 0x40;
             ret = -1;
             break;
         case -1:
@@ -2345,26 +2343,26 @@ int cCard::unmount(int slot)
     }
     if (ret == 1) {
         OSReport("Slot %c Unmount\n", slot + 'A');
-        m_Slot[slot].flags = 0;
+        m_Slot[slot].Status = 0;
     }
     return ret;
 }
 
 // Async step: CARDCheckAsync (file system check); broken -> flag 0x10.
-int cCard::verifyCheck(u8* Rno, CardSlot* s)
+int cCard::verifyCheck(u8* Rno, CARD_SLOT_INFO* s)
 {
     int ret = 0;
 
-    if (s->chan == 2) {
+    if (s->SlotNo == 2) {
         return 1;
     }
     switch (*Rno) {
     case 0:
-        CARDCheckAsync(s->chan, 0);
+        CARDCheckAsync(s->SlotNo, 0);
         (*Rno)++;
         // fallthrough
     case 1:
-        m_ResultCode = CARDGetResultCode(s->chan);
+        m_ResultCode = CARDGetResultCode(s->SlotNo);
         switch (m_ResultCode) {
         case 0:
             *Rno = 0;
@@ -2372,16 +2370,16 @@ int cCard::verifyCheck(u8* Rno, CardSlot* s)
             break;
         case -6:
         case -0xD:
-            s->flags |= 0x10;
+            s->Status |= 0x10;
             ret = -1;
             break;
         case -3:
-            s->flags |= 2;
+            s->Status |= 2;
             ret = -1;
             break;
         case -5:
         case -0x80:
-            s->flags |= 0x40;
+            s->Status |= 0x40;
             ret = -1;
             break;
         case -1:
@@ -2397,29 +2395,29 @@ int cCard::verifyCheck(u8* Rno, CardSlot* s)
 
 // Reads the free blocks / files of the card and flags "no space" (0x4 with 0x400 / 0x800 for
 // which file) when a save or the system file would not fit.
-int cCard::freeCheck(u8* Rno, CardSlot* s)
+int cCard::freeCheck(u8* Rno, CARD_SLOT_INFO* s)
 {
     int ret = 0;
 
-    if (s->chan == 2) {
+    if (s->SlotNo == 2) {
         return 1;
     }
     switch (*Rno) {
     case 0:
-        switch (CARDFreeBlocks(s->chan, &s->freeBytes, &s->freeFiles)) {
+        switch (CARDFreeBlocks(s->SlotNo, &s->FreeSize, &s->freeFiles)) {
         case 0:
             (*Rno)++;
             break;
         case -6:
-            s->flags |= 0x10;
+            s->Status |= 0x10;
             ret = -1;
             break;
         case -3:
-            s->flags |= 2;
+            s->Status |= 2;
             ret = -1;
             break;
         case -0x80:
-            s->flags |= 0x40;
+            s->Status |= 0x40;
             ret = -1;
             break;
         case -1:
@@ -2427,30 +2425,30 @@ int cCard::freeCheck(u8* Rno, CardSlot* s)
         }
         break;
     case 1: {
-        u32 f = s->flags & 0x300;
+        u32 f = s->Status & 0x300;
         if (f == 0x200) {
-            if (s->freeFiles > 0 && (u32) (s->freeBytes + 0x1FFF) / 0x2000 >= m_SaveSize) {
+            if (s->freeFiles > 0 && (u32) (s->FreeSize + 0x1FFF) / 0x2000 >= m_SaveSize) {
                 ret = 1;
             } else {
                 ret = -1;
                 m_ResultCode = -0x201;
-                s->flags |= 0x804;
+                s->Status |= 0x804;
             }
         } else if (f == 0x100) {
-            if (s->freeFiles > 0 && (u32) (s->freeBytes + 0x1FFF) / 0x2000 >= m_SysSize) {
+            if (s->freeFiles > 0 && (u32) (s->FreeSize + 0x1FFF) / 0x2000 >= m_SysSize) {
                 ret = 1;
             } else {
                 ret = -1;
                 m_ResultCode = -0x201;
-                s->flags |= 0x404;
+                s->Status |= 0x404;
             }
         } else if (f == 0) {
-            if (s->freeFiles > 1 && (u32) (s->freeBytes + 0x1FFF) / 0x2000 >= m_SaveSize + m_SysSize) {
+            if (s->freeFiles > 1 && (u32) (s->FreeSize + 0x1FFF) / 0x2000 >= m_SaveSize + m_SysSize) {
                 ret = 1;
             } else {
                 ret = -1;
                 m_ResultCode = -0x201;
-                s->flags |= 4;
+                s->Status |= 4;
             }
         } else {
             ret = 1;
@@ -2465,22 +2463,22 @@ int cCard::freeCheck(u8* Rno, CardSlot* s)
 }
 
 // Opens `fileName` on the slot; 1 when open, error flags otherwise.
-int cCard::fileOpen(CardSlot* s)
+int cCard::fileOpen(CARD_SLOT_INFO* s)
 {
     int ret = 0;
 
-    m_ResultCode = CARDOpen(s->chan, m_Name, &s->fileInfo);
+    m_ResultCode = CARDOpen(s->SlotNo, m_Name, &s->CardInfo);
     switch (m_ResultCode) {
     case 0:
     case -4:
         ret = 1;
         break;
     case -0x80:
-        s->flags |= 0x40;
+        s->Status |= 0x40;
         ret = -1;
         break;
     case -3:
-        s->flags |= 2;
+        s->Status |= 2;
         ret = -1;
         break;
     case -6:
@@ -2494,21 +2492,21 @@ int cCard::fileOpen(CardSlot* s)
 }
 
 // Closes the slot's open file.
-int cCard::fileClose(CardSlot* s)
+int cCard::fileClose(CARD_SLOT_INFO* s)
 {
     int ret = 0;
 
-    m_ResultCode = CARDClose(&s->fileInfo);
+    m_ResultCode = CARDClose(&s->CardInfo);
     switch (m_ResultCode) {
     case 0:
         ret = 1;
         break;
     case -3:
-        s->flags |= 2;
+        s->Status |= 2;
         ret = -1;
         break;
     case -0x80:
-        s->flags |= 0x40;
+        s->Status |= 0x40;
         ret = -1;
         break;
     case -1:
@@ -2520,7 +2518,7 @@ int cCard::fileClose(CardSlot* s)
 // Async step over the 20 save files: opens each, reads its 0x200 header into pInfo[], verifies
 // the header CRC / version (fileFlag bits 1 exists, 2 corrupt, 4 wrong version) and records the
 // card serial. 1 when all files were checked.
-int cCard::saveFileCheck(u8* Rno, CardSlot* s)
+int cCard::saveFileCheck(u8* Rno, CARD_SLOT_INFO* s)
 {
     int ret = 0;
     int r;
@@ -2530,7 +2528,7 @@ int cCard::saveFileCheck(u8* Rno, CardSlot* s)
     case 0:
         CfgFlagOff(pSys, CFG_06);
         m_SaveNo = 0;
-        memclr_asm(s->fileFlag, sizeof(s->fileFlag));
+        memclr_asm(s->FileInfo, sizeof(s->FileInfo));
         m_RetryCtr = 0;
         (*Rno)++;
         // fallthrough
@@ -2541,7 +2539,7 @@ int cCard::saveFileCheck(u8* Rno, CardSlot* s)
             *Rno = 0;
             break;
         }
-        if (s->chan == 2) {
+        if (s->SlotNo == 2) {
             int dbg = 1;
             if (!SysFlagChk(pG, SYS_SN_PC_READ)) {
                 dbg = 0;
@@ -2552,7 +2550,7 @@ int cCard::saveFileCheck(u8* Rno, CardSlot* s)
             sprintf(m_Name, "d:\\bio4/room/savedata%02d.dat", m_SaveNo);
             if (file_exist(m_Name)) {
                 CfgFlagOn(pSys, CFG_06);
-                s->fileFlag[m_SaveNo] |= 1;
+                s->FileInfo[m_SaveNo] |= 1;
                 bit = 1 << m_SaveNo;
                 if (DBG_CACHED & bit) {
                     memcpy(m_pSaveInfo[m_SaveNo], pDbgSaveInfo[m_SaveNo], 0x200);
@@ -2564,7 +2562,7 @@ int cCard::saveFileCheck(u8* Rno, CardSlot* s)
                     OSReport("save Info data%d cached.\n", m_SaveNo);
                 }
                 if (((SaveInfo*) m_pSaveInfo[m_SaveNo])->magic != 0x116) {
-                    s->fileFlag[m_SaveNo] |= 4;
+                    s->FileInfo[m_SaveNo] |= 4;
                 }
             } else {
                 memclr_asm(pDbgSaveInfo[m_SaveNo], 0x200);
@@ -2580,8 +2578,8 @@ int cCard::saveFileCheck(u8* Rno, CardSlot* s)
             } else if (r > 0) {
                 if (m_ResultCode == 0) {
                     CfgFlagOn(pSys, CFG_06);
-                    s->fileFlag[m_SaveNo] |= 1;
-                    s->flags |= 0x100;
+                    s->FileInfo[m_SaveNo] |= 1;
+                    s->Status |= 0x100;
                     if (m_aMode == 2) {
                         *Rno = 3;
                     } else {
@@ -2602,13 +2600,13 @@ int cCard::saveFileCheck(u8* Rno, CardSlot* s)
         }
         break;
     case 2:
-        r = CARDGetStatus(m_SlotNo, m_Slot[m_SlotNo].fileInfo.fileNo, &m_Slot[m_SlotNo].stat);
+        r = CARDGetStatus(m_SlotNo, m_Slot[m_SlotNo].CardInfo.fileNo, &m_Slot[m_SlotNo].CardStat);
         if (r == -1) {
             break;
         }
         if (r == 0) {
-            if (s->stat.commentAddr == 0xFFFFFFFF) {
-                s->fileFlag[m_SaveNo] |= 2;
+            if (s->CardStat.commentAddr == 0xFFFFFFFF) {
+                s->FileInfo[m_SaveNo] |= 2;
                 *Rno = 4;
             } else {
                 (*Rno)++;
@@ -2623,7 +2621,7 @@ int cCard::saveFileCheck(u8* Rno, CardSlot* s)
         } else if (r > 0) {
             if (CRCVerify(m_pSaveInfo[m_SaveNo] + 4, 0x1FC, ((SaveInfo*) m_pSaveInfo[m_SaveNo])->crc) == 0) {
                 if (m_RetryCtr == 3) {
-                    s->fileFlag[m_SaveNo] |= 2;
+                    s->FileInfo[m_SaveNo] |= 2;
                     (*Rno)++;
                 } else {
                     m_RetryCtr++;
@@ -2631,12 +2629,12 @@ int cCard::saveFileCheck(u8* Rno, CardSlot* s)
             } else {
                 (*Rno)++;
                 if (((SaveInfo*) m_pSaveInfo[m_SaveNo])->magic != 0x116) {
-                    s->fileFlag[m_SaveNo] |= 6;
+                    s->FileInfo[m_SaveNo] |= 6;
                 }
             }
         } else {
             if (m_RetryCtr == 3) {
-                s->fileFlag[m_SaveNo] |= 2;
+                s->FileInfo[m_SaveNo] |= 2;
                 (*Rno)++;
             } else {
                 m_RetryCtr++;
@@ -2655,12 +2653,12 @@ int cCard::saveFileCheck(u8* Rno, CardSlot* s)
 }
 
 // Async step: looks for the system file (flag 0x200 when present) and reads its status.
-int cCard::systemFileCheck(u8* Rno, CardSlot* s)
+int cCard::systemFileCheck(u8* Rno, CARD_SLOT_INFO* s)
 {
     int ret = 0;
     int r;
 
-    if (s->chan == 2) {
+    if (s->SlotNo == 2) {
         return 1;
     }
     switch (*Rno) {
@@ -2675,7 +2673,7 @@ int cCard::systemFileCheck(u8* Rno, CardSlot* s)
         } else if (r > 0) {
             if (m_ResultCode == 0) {
                 (*Rno)++;
-                s->flags |= 0x200;
+                s->Status |= 0x200;
             } else {
                 ret = 1;
                 *Rno = 0;
@@ -2700,17 +2698,17 @@ int cCard::systemFileCheck(u8* Rno, CardSlot* s)
 }
 
 // Async step: reads `len` bytes at `ofs` of the open file; 1 done, negative on error.
-int cCard::fileRead(u8* Rno, void* addr, s32 size, s32 offset, CardSlot* s)
+int cCard::fileRead(u8* Rno, void* addr, s32 size, s32 offset, CARD_SLOT_INFO* s)
 {
     int ret = 0;
 
     switch (*Rno) {
     case 0:
-        CARDReadAsync(&s->fileInfo, addr, size, offset, 0);
+        CARDReadAsync(&s->CardInfo, addr, size, offset, 0);
         (*Rno)++;
         // fallthrough
     case 1:
-        m_ResultCode = CARDGetResultCode(s->chan);
+        m_ResultCode = CARDGetResultCode(s->SlotNo);
         if (m_ResultCode == -1) {
             break;
         }
@@ -2729,17 +2727,17 @@ int cCard::fileRead(u8* Rno, void* addr, s32 size, s32 offset, CardSlot* s)
 }
 
 // Async step: writes `blocks` x 8 KB from `buf` to the open file; 1 done.
-int cCard::fileWrite(u8* Rno, void* addr, int wblock, CardSlot* s)
+int cCard::fileWrite(u8* Rno, void* addr, int wblock, CARD_SLOT_INFO* s)
 {
     int ret = 0;
 
     switch (*Rno) {
     case 0:
-        CARDWriteAsync(&s->fileInfo, addr, wblock << 13, 0, 0);
+        CARDWriteAsync(&s->CardInfo, addr, wblock << 13, 0, 0);
         (*Rno)++;
         // fallthrough
     case 1:
-        m_ResultCode = CARDGetResultCode(s->chan);
+        m_ResultCode = CARDGetResultCode(s->SlotNo);
         if (m_ResultCode == -1) {
             break;
         }
@@ -2782,7 +2780,7 @@ int cCard::sysfileRead(u8* Rno0, u8* Rno1, int err_set)
         }
         break;
     case 1:
-        r = CARDGetStatus(m_SlotNo, m_Slot[m_SlotNo].fileInfo.fileNo, &m_Slot[m_SlotNo].stat);
+        r = CARDGetStatus(m_SlotNo, m_Slot[m_SlotNo].CardInfo.fileNo, &m_Slot[m_SlotNo].CardStat);
         if (r == -1) {
             break;
         }
@@ -2794,7 +2792,7 @@ int cCard::sysfileRead(u8* Rno0, u8* Rno1, int err_set)
             ret = -1;
             break;
         }
-        if (m_Slot[m_SlotNo].stat.commentAddr != 0xFFFFFFFF) {
+        if (m_Slot[m_SlotNo].CardStat.commentAddr != 0xFFFFFFFF) {
             (*Rno0)++;
         } else {
             if (err_set != 0) {
@@ -2943,7 +2941,7 @@ void cCard::createSysfile()
         }
         break;
     case 4:
-        ret = CARDGetStatus(m_SlotNo, m_Slot[m_SlotNo].fileInfo.fileNo, &m_Slot[m_SlotNo].stat);
+        ret = CARDGetStatus(m_SlotNo, m_Slot[m_SlotNo].CardInfo.fileNo, &m_Slot[m_SlotNo].CardStat);
         if (ret == -1) {
             break;
         }
@@ -2972,7 +2970,7 @@ void cCard::createSysfile()
         break;
     case 7:
         makeCardStatus(&m_Slot[m_SlotNo]);
-        CARDSetStatusAsync(m_SlotNo, m_Slot[m_SlotNo].fileInfo.fileNo, &m_Slot[m_SlotNo].stat, 0);
+        CARDSetStatusAsync(m_SlotNo, m_Slot[m_SlotNo].CardInfo.fileNo, &m_Slot[m_SlotNo].CardStat, 0);
         m_Rno1++;
         // fallthrough
     case 8:
@@ -3152,7 +3150,7 @@ void CardDbgCacheSet()
         for (i = 0; i <= (digits_) - 1; i++) {            \
             d[i] = num % 10;                              \
             num /= 10;                                    \
-            u = (id)->unitPtr((idNo_) - i, type);         \
+            u = (id)->unitPtr((idNo_) - i, (ID_CLASS) type);         \
             u->tex_flag |= 2;                             \
             u->texNo = d[i];                                 \
         }                                                 \
@@ -3174,7 +3172,7 @@ void dispSaveInfo(int no, SaveInfo* p_info, int type, int flag)
     int num;
 
     putNumber(id, no + 1, 2, 2, type);
-    u = id->unitPtr(0x16, type);
+    u = id->unitPtr(0x16, (ID_CLASS) type);
     if (p_info == 0) {
         u->be_flag &= ~8;
         return;
@@ -3182,29 +3180,29 @@ void dispSaveInfo(int no, SaveInfo* p_info, int type, int flag)
     u->be_flag |= 8;
     special = 0;
     chapter = p_info->chapter;
-    id->unitPtr(0x20, type)->be_flag &= ~8;
-    id->unitPtr(7, type)->be_flag &= ~8;
-    id->unitPtr(6, type)->be_flag &= ~8;
-    id->unitPtr(0x21, type)->be_flag &= ~8;
-    id->unitPtr(0x19, type)->be_flag &= ~8;
+    id->unitPtr(0x20, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(7, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(6, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(0x21, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(0x19, (ID_CLASS) type)->be_flag &= ~8;
     if (flag) {
-        u = id->unitPtr(0x20, type);
+        u = id->unitPtr(0x20, (ID_CLASS) type);
     } else {
         switch (p_info->mode) {
         case 1:
             if (chapter == 0x12) {
-                u = id->unitPtr(0x19, type);
+                u = id->unitPtr(0x19, (ID_CLASS) type);
                 special = 1;
             } else {
-                u = id->unitPtr(7, type);
+                u = id->unitPtr(7, (ID_CLASS) type);
             }
             break;
         case 2:
             chapter--;
-            u = id->unitPtr(6, type);
+            u = id->unitPtr(6, (ID_CLASS) type);
             break;
         case 3:
-            u = id->unitPtr(0x21, type);
+            u = id->unitPtr(0x21, (ID_CLASS) type);
             special = 1;
             break;
         default:
@@ -3214,59 +3212,59 @@ void dispSaveInfo(int no, SaveInfo* p_info, int type, int flag)
     u->be_flag |= 8;
 skip:
     getChapterSection(chapter, &chap, &sec);
-    u = id->unitPtr(5, type);
+    u = id->unitPtr(5, (ID_CLASS) type);
     u->tex_flag |= 2;
     u->texNo = sec;
-    u = id->unitPtr(3, type);
+    u = id->unitPtr(3, (ID_CLASS) type);
     u->tex_flag |= 2;
     u->texNo = chap;
     if (flag || special) {
-        id->unitPtr(3, type)->be_flag &= ~8;
-        id->unitPtr(4, type)->be_flag &= ~8;
-        id->unitPtr(5, type)->be_flag &= ~8;
+        id->unitPtr(3, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(4, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(5, (ID_CLASS) type)->be_flag &= ~8;
     } else {
-        id->unitPtr(3, type)->be_flag |= 8;
-        id->unitPtr(4, type)->be_flag |= 8;
-        id->unitPtr(5, type)->be_flag |= 8;
+        id->unitPtr(3, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(4, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(5, (ID_CLASS) type)->be_flag |= 8;
     }
     putNumber(id, p_info->save_cnt, 0xA, 3, type);
     if (flag) {
-        id->unitPtr(8, type)->be_flag &= ~8;
-        id->unitPtr(9, type)->be_flag &= ~8;
-        id->unitPtr(0xA, type)->be_flag &= ~8;
+        id->unitPtr(8, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(9, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xA, (ID_CLASS) type)->be_flag &= ~8;
     } else {
-        id->unitPtr(8, type)->be_flag |= 8;
-        id->unitPtr(9, type)->be_flag |= 8;
-        id->unitPtr(0xA, type)->be_flag |= 8;
+        id->unitPtr(8, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(9, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xA, (ID_CLASS) type)->be_flag |= 8;
     }
     SecToTime(p_info->playTime, &h, &m, &s);
     putNumber(id, h, 0xC, 2, type);
-    u = id->unitPtr(0xD, type);
+    u = id->unitPtr(0xD, (ID_CLASS) type);
     u->texNo = 0xB;
     u->tex_flag |= 2;
     putNumber(id, m, 0xF, 2, type);
-    u = id->unitPtr(0x10, type);
+    u = id->unitPtr(0x10, (ID_CLASS) type);
     u->texNo = 0xB;
     u->tex_flag |= 2;
     putNumber(id, s, 0x12, 2, type);
     if (flag) {
-        id->unitPtr(0xB, type)->be_flag &= ~8;
-        id->unitPtr(0xC, type)->be_flag &= ~8;
-        id->unitPtr(0xD, type)->be_flag &= ~8;
-        id->unitPtr(0xE, type)->be_flag &= ~8;
-        id->unitPtr(0xF, type)->be_flag &= ~8;
-        id->unitPtr(0x10, type)->be_flag &= ~8;
-        id->unitPtr(0x11, type)->be_flag &= ~8;
-        id->unitPtr(0x12, type)->be_flag &= ~8;
+        id->unitPtr(0xB, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xC, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xD, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xE, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0xF, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0x10, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0x11, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0x12, (ID_CLASS) type)->be_flag &= ~8;
     } else {
-        id->unitPtr(0xB, type)->be_flag |= 8;
-        id->unitPtr(0xC, type)->be_flag |= 8;
-        id->unitPtr(0xD, type)->be_flag |= 8;
-        id->unitPtr(0xE, type)->be_flag |= 8;
-        id->unitPtr(0xF, type)->be_flag |= 8;
-        id->unitPtr(0x10, type)->be_flag |= 8;
-        id->unitPtr(0x11, type)->be_flag |= 8;
-        id->unitPtr(0x12, type)->be_flag |= 8;
+        id->unitPtr(0xB, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xC, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xD, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xE, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0xF, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0x10, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0x11, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0x12, (ID_CLASS) type)->be_flag |= 8;
     }
     num = p_info->count + 1;
     if (p_info->mode == 3) {
@@ -3274,49 +3272,49 @@ skip:
     }
     putNumber(id, num, 0x14, 2, type);
     if (flag) {
-        id->unitPtr(0x13, type)->be_flag &= ~8;
-        id->unitPtr(0x14, type)->be_flag &= ~8;
+        id->unitPtr(0x13, (ID_CLASS) type)->be_flag &= ~8;
+        id->unitPtr(0x14, (ID_CLASS) type)->be_flag &= ~8;
     } else {
-        id->unitPtr(0x13, type)->be_flag |= 8;
-        id->unitPtr(0x14, type)->be_flag |= 8;
+        id->unitPtr(0x13, (ID_CLASS) type)->be_flag |= 8;
+        id->unitPtr(0x14, (ID_CLASS) type)->be_flag |= 8;
     }
-    id->unitPtr(0x22, type)->be_flag &= ~8;
-    id->unitPtr(0x17, type)->be_flag &= ~8;
-    id->unitPtr(0x18, type)->be_flag &= ~8;
+    id->unitPtr(0x22, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(0x17, (ID_CLASS) type)->be_flag &= ~8;
+    id->unitPtr(0x18, (ID_CLASS) type)->be_flag &= ~8;
     if (pSys->language == 0) {
         switch (p_info->game_mode_disp) {
         case 1:
-            id->unitPtr(0x22, type)->be_flag |= 8;
+            id->unitPtr(0x22, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 3:
         default:
-            id->unitPtr(0x17, type)->be_flag |= 8;
+            id->unitPtr(0x17, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 5:
-            id->unitPtr(0x18, type)->be_flag |= 8;
+            id->unitPtr(0x18, (ID_CLASS) type)->be_flag |= 8;
             break;
         }
     } else if (pSys->language == 1) {
         switch (p_info->game_mode_disp) {
         case 5:
         default:
-            id->unitPtr(0x17, type)->be_flag |= 8;
+            id->unitPtr(0x17, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 6:
-            id->unitPtr(0x18, type)->be_flag |= 8;
+            id->unitPtr(0x18, (ID_CLASS) type)->be_flag |= 8;
             break;
         }
     } else {
         switch (p_info->game_mode_disp) {
         case 3:
-            id->unitPtr(0x22, type)->be_flag |= 8;
+            id->unitPtr(0x22, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 5:
         default:
-            id->unitPtr(0x17, type)->be_flag |= 8;
+            id->unitPtr(0x17, (ID_CLASS) type)->be_flag |= 8;
             break;
         case 6:
-            id->unitPtr(0x18, type)->be_flag |= 8;
+            id->unitPtr(0x18, (ID_CLASS) type)->be_flag |= 8;
             break;
         }
     }
@@ -3342,8 +3340,8 @@ void CardID::updateSaveInfo(cCard* pCard)
         if (no > 19) {
             no -= 20;
         }
-        g_id->m_IdSave.unitPtr(0x15, type)->be_flag |= 8;
-        f = pCard->getSlotInfo(sl)->fileFlag[no];
+        g_id->m_IdSave.unitPtr(0x15, (ID_CLASS) type)->be_flag |= 8;
+        f = pCard->getSlotInfo(sl)->FileInfo[no];
         if (f & 1) {
             if (f & 2) {
                 dispSaveInfo(no, (SaveInfo*) pCard->getSaveInfo((s8) no), type, 1);
@@ -3363,7 +3361,6 @@ void CardID::init(int type, CardArc* data)
     int i;
     ID_UNIT* u;
     ID_UNIT* v;
-    f32 zero;
 
     this->m_mode = type;
     pTex = (u8*) (data->ofs[0] + (u32) data);
@@ -3383,29 +3380,28 @@ void CardID::init(int type, CardArc* data)
     IdSys.kill(0xFF, IDC_CINESCO);
     IdSys.kill(0xFF, IDC_OPTION_BG);
     IdSys.kill(0xFF, IDC_OPTION);
-    m_IdSave.set(pFrame, 0xFF, IDC_SSCRN_FAR_0, 9, 3, 0);
+    m_IdSave.set((ID_FILE_HEADER*) pFrame, 0xFF, IDC_SSCRN_FAR_0, 9, 3, 0);
     for (i = 0; i < 7; i++) {
-        m_IdSave.set(pFile, 0xFF, 0x40 + i, 0xC, 6, 0);
+        m_IdSave.set((ID_FILE_HEADER*) pFile, 0xFF, (ID_CLASS) (0x40 + i), 0xC, 6, 0);
     }
     if (this->m_mode == 1) {
-        IdSys.set(pSaveDat, 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
+        IdSys.set((ID_FILE_HEADER*) pSaveDat, 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
         IdSys.unitPtr(1, IDC_SSCRN_NEAR_0)->rev_flag |= 0xF;
     } else if (this->m_mode == 0) {
-        IdSys.set(pLoadDat, 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
+        IdSys.set((ID_FILE_HEADER*) pLoadDat, 0xFF, IDC_SSCRN_NEAR_0, 0xF, 2, 0);
     }
-    IdSys.set(pBg, 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
+    IdSys.set((ID_FILE_HEADER*) pBg, 0xFF, IDC_SSCRN_NEAR_1, 0xF, 1, 0);
     IdSys.unitPtr(0, IDC_SSCRN_NEAR_1)->be_flag &= ~8;
     IdSys.unitPtr(0, IDC_SSCRN_NEAR_1)->rev_flag |= 0xF;
     IdSys.unitPtr(1, IDC_SSCRN_NEAR_1)->be_flag &= ~8;
     IdSys.unitPtr(1, IDC_SSCRN_NEAR_1)->rev_flag |= 0xF;
-    zero = 0.0f;
     for (int j = 0; j < 7; j++) {
-        ID_UNIT* p = g_id->m_IdSave.unitPtr(0x15, 0x40 + j);
+        ID_UNIT* p = g_id->m_IdSave.unitPtr(0x15, (ID_CLASS) (0x40 + j));
         ID_UNIT* q = g_id->m_IdSave.unitPtr((u8) (j + 0x10), IDC_SSCRN_FAR_0);
         q->type = 1;
-        p->pos0.z = zero;
-        p->pos0.y = zero;
-        p->pos0.x = zero;
+        p->pos0.z = 0.0f;
+        p->pos0.y = 0.0f;
+        p->pos0.x = 0.0f;
         g_id->m_IdSave.unitParent(q, p);
     }
     u = g_id->m_IdSave.unitPtr(0, IDC_SSCRN_FAR_0);
@@ -3459,7 +3455,7 @@ void CardID::move(cCard* pCard)
             a->path1 = b->path1;
             a->pos0 = b->pos0;
             FuncPathParametrize(a->path0, a->path1);
-            m_IdSave.setTime(a, (s8) a->curve[0]->key[a->curve[0]->num - 1].t);
+            m_IdSave.setTime(a, (s8) a->curve[0]->Point[a->curve[0]->nPoint - 1].T);
             a->rev_flag |= 0xF;
             setAction(0);
             IdSys.unitPtr(5, IDC_SSCRN_NEAR_0)->rev_flag |= 0xF;
@@ -3573,7 +3569,7 @@ void CardID::up_down(cCard* pCard)
         if (m_IdSave.unitPtr(0, IDC_SSCRN_FAR_0)->anima_state & 1) {
             ID_UNIT* u = m_IdSave.unitPtr(0, IDC_SSCRN_FAR_0);
             u->path0 = g_p_path_org[0];
-            u->curve[0] = (Hermite1*) g_p_hrmt_org[0];
+            u->curve[0] = (HERMITE_1_PTR*) g_p_hrmt_org[0];
             u->path1 = g_p_spln_org[0];
             u->pos0 = g_pos0_org;
             FuncPathParametrize(u->path0, u->path1);
@@ -3605,7 +3601,7 @@ void CardID::up_down(cCard* pCard)
 void CardID::save(cCard* pCard)
 {
     ID_UNIT* u = IdSys.unitPtr(1, IDC_SSCRN_NEAR_0);
-    Hermite1* h = u->curve[0];
+    HERMITE_1_PTR* h = u->curve[0];
     int n = ((s8*) h)[3];
     int i;
 
@@ -3618,7 +3614,7 @@ void CardID::save(cCard* pCard)
         return;
     }
     for (i = 0; i < n; i++) {
-        if ((s8) h->key[i].t == (s16) u->timer[0]) {
+        if ((s8) h->Point[i].T == (s16) u->timer[0]) {
             switch (i) {
             case 0:
                 break;

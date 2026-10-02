@@ -18,7 +18,7 @@ struct FREE_OBJ08 {
     f32 r;                  // 0x28  hit radius (min 1.0)
     cModel* pEm;            // 0x2C  thrower (its id goes to SndCall)
     int timer;              // 0x30  frames left (-1 = forever)
-    EmAtkInfo* pAtk;        // 0x34  attack record for EmAtkHitCk
+    ATK_INFO* pAtk;        // 0x34  attack record for EmAtkHitCk
     u32 wep_id;             // 0x38  low 16 bits: GetWepTargetList flag, low byte: damage kind
     u32 eff1;               // 0x3C  ?
     u32 eff2;               // 0x40  scenario hit / timeout

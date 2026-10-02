@@ -7,11 +7,9 @@
 #include "math_sub.h"
 #include "db_log.h"
 
-extern "C" {
 void espgen10_Update(cEspgen* w);
 void espgen10_Move00(cEspgen* w);
 void espgen10_Move01(cEspgen* w);
-}
 
 // Spawns record `no` of the sequence: Kind 0 -> one esp via EspSeqSet (pos is passed only when
 // flag != 0), Kind 1 -> a controller via EspgenSeqSet. In event mode (Core_flg 0x1000) the parent
@@ -51,15 +49,15 @@ BOOL EspgenDataSet(cEspSeqHead* pSeqHed, u32 seq_ptr, cEffectCore* pCore, u32* p
     }
     return ret;
 }
-// Fills the controller's cEffectCore owner block: Core_flg = a, Call_no = b, Core_kind = c, Core_pEm = d,
+// Fills a cEffectCore owner block: Core_flg = a, Call_no = b, Core_kind = c, Core_pEm = d,
 // owner = e (the ids EfmDelete / EspDelete use to find effects by owner).
-void SetEspCore(cEspgen* pCore, int Core_flg, u32 Call_no, u8 Core_kind, void* Core_pEm, int owner)
+void SetEspCore(cEffectCore* pCore, int Core_flg, u32 Call_no, u8 Core_kind, void* Core_pEm, int owner)
 {
-    pCore->Eff_core.Core_flg = Core_flg;
-    pCore->Eff_core.Core_kind = Core_kind;
-    pCore->Eff_core.Call_no = Call_no;
-    pCore->Eff_core.Core_pEm = Core_pEm;
-    pCore->Eff_core.owner = owner;
+    pCore->Core_flg = Core_flg;
+    pCore->Core_kind = Core_kind;
+    pCore->Call_no = Call_no;
+    pCore->Core_pEm = Core_pEm;
+    pCore->owner = owner;
 }
 
 // Takes a free controller from the pool (front == 1: from the front, drawn first) and stamps the
@@ -74,7 +72,7 @@ int PullEspEspgen(cEspgen** ppEspgen, int Core_flg, int Core_kind, u32 Call_no, 
         ret = PullEspgen(ppEspgen);
     }
     if (ret) {
-        SetEspCore(*ppEspgen, Core_flg, Call_no, Core_kind, Core_pEm, owner);
+        SetEspCore(&(*ppEspgen)->Eff_core, Core_flg, Call_no, Core_kind, Core_pEm, owner);
     }
     return ret;
 }

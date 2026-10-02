@@ -59,27 +59,36 @@ s32 CARDGetStatus(s32 chan, s32 fileNo, CardStat* stat);
 s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CardStat* stat, CardCallback callback);
 }
 
-// One memory card slot (chan 0 = slot A, 1 = slot B, 2 = the host "HARD DISK" of the dev kit).
-struct CardSlot {
+enum SLOT_NO {
+    SLOT_A = 0,
+    SLOT_B = 1,
+    HARD_DISK = 2,  // the host disk of the dev kit
+    SLOT_MAX = 3
+};
+
+// One memory card slot.
+// PS2's CARD_SLOT_INFO is 0xE4 bytes: workArea, freeFiles, pad_6C and serial below are GC's own,
+// no PS2 equivalent (the Dolphin CARD API needs the async work area; PS2's doesn't track a serial).
+struct CARD_SLOT_INFO {
     void* workArea;         // 0x00  CARDMountAsync work area (0xA000, slot A only)
-    s32 chan;               // 0x04
-    u32 flags;              // 0x08  error bits (2 no card, 4 no space, 0x10 broken, 0x20 wrong device,
+    SLOT_NO SlotNo;         // 0x04
+    u32 Status;             // 0x08  error bits (2 no card, 4 no space, 0x10 broken, 0x20 wrong device,
                             //       0x40 fatal, 0x80 sector size, 0x100 save file seen, 0x200 system
                             //       file seen, 0x400/0x800 which file lacks space)
-    s32 memSize;            // 0x0C  Mbit
-    s32 sectorSize;         // 0x10
-    s32 freeBytes;          // 0x14
+    s32 MemSize;            // 0x0C  Mbit
+    s32 SectorSize;         // 0x10
+    s32 FreeSize;           // 0x14
     s32 freeFiles;          // 0x18
-    u32 fileFlag[20];       // 0x1C  per save file: 1 exists, 2 corrupted, 4 wrong version
+    u32 FileInfo[20];       // 0x1C  per save file: 1 exists, 2 corrupted, 4 wrong version
     u32 pad_6C;
     u64 serial;             // 0x70
-    CardFileInfo fileInfo;  // 0x78
-    CardStat stat;          // 0x8C
+    CardFileInfo CardInfo;  // 0x78
+    CardStat CardStat;      // 0x8C
 };                          // 0xF8
 
 // Stream slot saved across the card screen.
-struct CardStr {
-    u32 id;      // 0x00
+struct STR_INFO {
+    u32 snd_id;      // 0x00
     s8 vol;      // 0x04
     u8 pad_5[3];
 };
@@ -158,7 +167,7 @@ private:
     u8 m_RetryCtr;            // 0x01F
     s32 m_ErrCode;         // 0x020  CARD result / -0x2xx game error shown by errorDisp
     u8 pad_24[4];
-    CardSlot m_Slot[3];   // 0x028
+    CARD_SLOT_INFO m_Slot[3];   // 0x028
     u8* pSaveBuf;        // 0x310
     u32 saveBufSize;     // 0x314  0xEAFC
     u32 m_SaveSize;      // 0x318  8
@@ -172,7 +181,7 @@ private:
     s32 m_Timer;           // 0x384
     s32 m_StrTimer;        // 0x388
     s32 m_ResultCode;          // 0x38C  last CARD result code
-    CardStr m_StrInfo[4];      // 0x390
+    STR_INFO m_StrInfo[4];      // 0x390
     u32 m_SndId;        // 0x3B0
     s32 formatted;       // 0x3B4
     s32 exitFlag;        // 0x3B8
@@ -203,24 +212,24 @@ public:
     int initSub();
     int workAlloc();
     u32 getUseMemSize();
-    public: int fileCreate(u8* sub, int blocks, CardSlot* s);
-    private: void makeCardStatus(CardSlot* s);
+    public: int fileCreate(u8* sub, int blocks, CARD_SLOT_INFO* s);
+    private: void makeCardStatus(CARD_SLOT_INFO* s);
     void firstCheck00();
     void firstCheck10();
     void firstCheck20();
     void firstCheck30();
     public: void MainLoop(int arg);
-    private: int existCheck(int slot, CardSlot* s);
-    int mount(u8* Rno, CardSlot* s);
+    private: int existCheck(int slot, CARD_SLOT_INFO* s);
+    int mount(u8* Rno, CARD_SLOT_INFO* s);
     int unmount(int slot);
-    int verifyCheck(u8* Rno, CardSlot* s);
-    int freeCheck(u8* Rno, CardSlot* s);
-    int fileOpen(CardSlot* s);
-    int fileClose(CardSlot* s);
-    int saveFileCheck(u8* Rno, CardSlot* s);
-    int systemFileCheck(u8* Rno, CardSlot* s);
-    int fileRead(u8* Rno, void* addr, s32 size, s32 offset, CardSlot* s);
-    int fileWrite(u8* Rno, void* addr, int wblock, CardSlot* s);
+    int verifyCheck(u8* Rno, CARD_SLOT_INFO* s);
+    int freeCheck(u8* Rno, CARD_SLOT_INFO* s);
+    int fileOpen(CARD_SLOT_INFO* s);
+    int fileClose(CARD_SLOT_INFO* s);
+    int saveFileCheck(u8* Rno, CARD_SLOT_INFO* s);
+    int systemFileCheck(u8* Rno, CARD_SLOT_INFO* s);
+    int fileRead(u8* Rno, void* addr, s32 size, s32 offset, CARD_SLOT_INFO* s);
+    int fileWrite(u8* Rno, void* addr, int wblock, CARD_SLOT_INFO* s);
     int sysfileRead(u8* Rno0, u8* Rno1, int err_set);
     void createSysfile();
     void screenTrans();
@@ -238,7 +247,7 @@ public:
     }
     s8 getSaveNo() { return m_SaveNo; }
     u8 getSlotNo() { return m_SlotNo; }
-    CardSlot* getSlotInfo(int no) { return &m_Slot[no]; }
+    CARD_SLOT_INFO* getSlotInfo(int no) { return &m_Slot[no]; }
     u8* getSaveInfo(int no) { return m_pSaveInfo[no]; }
     u8 getRno0() { return m_Rno0; }
     private: void setStatus(u32 bit) { m_Status |= bit; }
@@ -249,7 +258,6 @@ public:
     void operator delete(void* p) { Mem_free(p); }
 };
 
-extern "C" {
 void CardFirstCheck();
 int CardCheckDone();
 void CardSave(int terminal_no, int attr);
@@ -258,7 +266,6 @@ void CardSysSave();
 void CardInit();
 void CardDbgCacheSet();
 void CardMainTask(int mode);
-}
 
 // pSys->language == n (0 jpn, 1 eng(US), 2 eng(EU), 3 ger, 4 fra, 5 esp, 6 ita, 7 eng) (card, option).
 static inline int isLang(u8 lang, int n)

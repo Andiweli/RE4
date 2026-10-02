@@ -27,21 +27,6 @@ struct ShadowMng {
     void* pTex;          // 0xD0  g_Shd_tex_size^2 I8 shadow texture
 };
 
-// cLight::work of a type 4 (shadow) light.
-struct ShadowLightWork {
-    u16 flags;    // 0x00  bit0: room texture light map (texId), bit1: position from `pos` (getPos2), bit2: TransLightTexture flag
-    u8 mode;      // 0x02  5: foot shadows only (foot_shadow.cpp); 1..4: fixed shadow light
-    u8 texId;     // 0x03  room texture id of the light map (0xFF: none)
-    s16 rotX;     // 0x04  direction (degrees)
-    s16 rotY;     // 0x06
-    u8 angle;     // 0x08  fixed light perspective angle (0 = 90)
-    u8 selfShadow;  // 0x09  self shadow passes (trans: loop count), 0 = none
-    u8 soft;      // 0x0A  soft shadow passes (0 = hard)
-    u8 setStatus; // 0x0B  nonzero: Status_flg[1] bit 0x4000 set after the texture was rendered
-    Vec pos;      // 0x0C  light position source when flags bit1 is set
-    u8 angleSub;  // 0x18  perspective angle (fov) reduction in degrees
-};
-
 // Shadow object placement file (room "SHD" data): header then `num` entries.
 struct ShdEntry {
     Vec pos;      // 0x00
@@ -62,7 +47,6 @@ struct ShdHeader {
     ShdEntry entry[1];  // 0x10
 };
 
-extern "C" {
 void SetShadowCamMoveSize(f32 size);
 void ResetShadowCamMoveSize();
 void SetShadowParallelDirX(f32 x);
@@ -90,12 +74,11 @@ void make_shadow_texture(ShadowMng* mng);
 int shadowChkInFrustum(ShadowMng* mng, cModel* m);
 void ProcShadowScrModel(cModel* m, ShadowMng* mngs);
 void shadowScrModelRender(ShadowMng* mngs);
-void shadowShaderSetup2(cModel* m, struct ModelPart* part, ShadowMng** tbl, u32 num);
+void shadowShaderSetup2(cModel* m, struct cPolyHeader* part, ShadowMng** tbl, u32 num);
 void shadowModelTrans(cModel* m, class cModelInfo* info, Mtx viewMat, ShadowMng** tbl, u32 num);
 void shadowModelTrans2(cModel* m, class cModelInfo* info, Mtx viewMat);
 void TransLightTexture(GXTexObj* tex, GXTlutObj* tlut, s16 x, s16 y, s16 z, s16 w, s16 h, ShadowMng* mng, int flag2, int flag1);
 ShadowMng* GetCastShadowMngPtr(cModel* m);
-}
 
 // game/shadow.cpp: self shadow switches and the shadow texture matrix constants (trans.cpp SelfShadowSetup).
 extern int isSelfUse;

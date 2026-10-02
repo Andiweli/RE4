@@ -22,27 +22,24 @@
 #include "motion.h"
 #include "em_sub.h"
 
-extern "C" {
 cObj* SetObj16(void* bin, void* tpl, cModel* target, cModel* body, int partsNo, u8 type, Vec* pos, Vec* rot);
 void obj16_R1_Set(cObj16* obj);
 void obj16_R1_CoreMove(cObj16* obj);
 void obj16_R1_Atk(cObj16* obj);
 void obj16_R1_Critical(cObj16* obj);
 void obj16_R1_Damage(cObj16* obj);
-void MotSetObj16(cObj* obj, void* mot, int a, int b);
 void obj16MatCalc(cObj16* obj);
 int obj16AtkCk(cObj16* obj, u32 kind, int partsNo);
 void obj16PlHeadLost(cObj16* obj);
 static void obj16NeckMove(cObj16* obj);
 void plemDmMStar(cPlayer* pl);
-}
 
 void (*Obj16_R1_move_tbl[5])(cObj16*) = {
     obj16_R1_Set, obj16_R1_CoreMove, obj16_R1_Atk, obj16_R1_Critical, obj16_R1_Damage,
 };
 
 // Attack parameters per obj16AtkCk kind (EmAtkHitCk).
-EmAtkInfo obj16_atk_info[4] = {
+ATK_INFO obj16_atk_info[4] = {
     { 500.0f, PL_DM_AUTO, 0x320, 0, 0xA, 0 },
     { 500.0f, PL_DM_AUTO, 0x320, 0, 0xA, 0 },
     { 500.0f, PL_DM_AUTO, 0x1F4, 0, 0xA, 0 },
@@ -1005,7 +1002,7 @@ int obj16AtkCk(cObj16* obj, u32 atk_type, int parts_no)
     cParts* p;
     Vec* pp;
     Vec plPos;
-    EmAtkInfo info;
+    ATK_INFO info;
     Vec pos;
     int hit;
     f32 ang;

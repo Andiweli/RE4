@@ -13,7 +13,7 @@
 #include "em_sub.h"
 
 // One point of the falling rope (fallMove).
-struct Obj12Node {
+struct OBJ12_FALLWK {
     Vec pos;
     Vec old;
     Vec spd;
@@ -291,15 +291,15 @@ void cObj12::fallMove()
         { { -140.0f, 30.0f, 140.0f }, { -140.0f, 30.0f, -140.0f }, { 200.0f, 30.0f, 0.0f } },
         { { 140.0f, -140.0f, 0.0f }, { -140.0f, -140.0f, 0.0f }, { 0.0f, 200.0f, 0.0f } },
     };
-    Obj12Node node[3];
+    OBJ12_FALLWK node[3];
     Vec vx;
     Vec vy;
     Vec vz;
     Vec d;
     u32 i;
     u32 k;
-    Obj12Node* p;
-    Obj12Node* n;
+    OBJ12_FALLWK* p;
+    OBJ12_FALLWK* n;
     f32 mag;
     f32 diff;
     f32 floor;
@@ -478,7 +478,7 @@ void cObj12::throwMove()
     if (!(w->be_flag & 0x100)) {
         return;
     }
-    static EmAtkInfo obj12Atk = { 300.0f, PL_DM_AUTO, 400, 0, 10, 0 };
+    static ATK_INFO obj12Atk = { 300.0f, PL_DM_AUTO, 400, 0, 10, 0 };
 
     w->spd[0][1] -= 15;
     spd.x = (f32) w->spd[0][0];

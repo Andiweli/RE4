@@ -56,9 +56,9 @@ static void r228_execSalazarNeckDown();
 static void r228_checkSalazarBattle();
 static void r228_execEvent00();
 void r228_initEvent00();
-extern "C" void Evt_R228S00_Func(Event* e);
-extern "C" void Evt_R228S01_Func(Event* e);
-extern "C" void Evt_R228S02_Func(Event* e);
+void Evt_R228S00_Func(Event* e, u32);
+void Evt_R228S01_Func(Event* e, u32);
+void Evt_R228S02_Func(Event* e, u32);
 void setTexRender();
 
 
@@ -226,7 +226,7 @@ static void r228_execEvent00()
         }
     }
     SceEventEnd(0);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0x801, (u8) r228_work->eff2, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 2, 0x801, (u8) r228_work->eff2, zero, (ESPSEQ_CONTROL*) zero);
     SceAtSetEnable(8, 1);
     if (r228_work->obj76) {
         r228_work->obj76->be_flag |= 2;
@@ -331,7 +331,7 @@ static inline void r228_evtEffectSet()
 // Event r228s00 callback (Salazar's speech, part 1): the shared effect setup; cut 0 hides object 1 and
 // flags evma400a (shadow camera zeroed), frame 1 pre-loads r228s01 (Room_flg[0] 0x00200000); fades near
 // the ends of cuts 2 and later; the end mode hands over to s01.
-extern "C" void Evt_R228S00_Func(Event* e)
+void Evt_R228S00_Func(Event* e, u32)
 {
     void* mod;
 
@@ -417,7 +417,7 @@ extern "C" void Evt_R228S00_Func(Event* e)
 
 // Event r228s01 callback (part 2): as s00 for cut 0 (pre-loads r228s02, Room_flg[0] 0x00100000) with
 // fade in/out at frames 0/1; the end hands over to s02.
-extern "C" void Evt_R228S01_Func(Event* e)
+void Evt_R228S01_Func(Event* e, u32)
 {
     void* mod;
 
@@ -468,7 +468,7 @@ extern "C" void Evt_R228S01_Func(Event* e)
 // Event r228s02 callback (part 3, the throne transforms): object 0x25 hidden during cut 5; cut 0 hands
 // scroll object 1 (scr0000) to the event; later cuts swap the throne objects 0x76/0x78 -> 0x77/0x79 and
 // set the event models' flags; the end restores the room for the fight.
-extern "C" void Evt_R228S02_Func(Event* e)
+void Evt_R228S02_Func(Event* e, u32)
 {
     Vec pos = {0.0f, 0.0f, 0.0f};
     Vec ang = {0.0f, 0.0f, 0.0f};
@@ -550,13 +550,13 @@ extern "C" void Evt_R228S02_Func(Event* e)
         }
         break;
     case 2: {
-        SmdWork* w = SmdGetWorkPtr(1);
+        cSmdWork* w = SmdGetWorkPtr(1);
 
         o = SmdGetObjPtr(1);
 
         if (o && w) {
-            o->setPos(&w->pos);
-            o->setAng(&w->rot);
+            o->setPos(&w->Pos);
+            o->setAng(&w->Ang);
         }
         SmdSetTrans(1, 1);
         break;

@@ -182,7 +182,7 @@ void R205Init()
         }
     }
     SceAtSetDoorFunc(0, (TaskFunc) r205_RoomExitFunc, 0);
-    SceSetItemEvent(5, 0x8E, 0xB, 0xB, r205_TreasureBoxOpen, r205_TreasureBoxOpened, 0x8B, 0);
+    SceSetItemEvent(5, 0x8E, 0xB, 0xB, r205_TreasureBoxOpen, r205_TreasureBoxOpened, (void*) 0x8B, 0);
 }
 
 // Per frame: player OT type 5 (water); marks each wave Ganado dead once it stops being active; records
@@ -451,7 +451,7 @@ static void r205_ExecDieDemo(R205Pend* p)
             if (i == 2) {
                 EstSet(pPL, -1, &pPL->getPartsPtr(2)->world, 0, EFF_ROOM, 0x10, 0, ESP_CORE_KIND_NONE, pPL, 0);
             }
-            cam.param.at = parts->world;
+            cam.param.Target = parts->world;
             i++;
             CameraSetOrientationUp(&cam);
             CamCtrl.SetExtraCamera(&cam);
@@ -482,10 +482,7 @@ static void r205_DrainEvent()
     SceSleep(1);
     SceMesSet(0, 0x20, 1, 0x64, 0x150 - cMes.getLineGap(0) - cMes.getFontHeight(0) - 1);
     if (SceMesGetSelection() == 1) {
-        void* zero;
-
         SndRoomStrVolSet(1, 0x15E);
-        zero = NULL;
         RsfSet(G_ROOM_ID, 0);
         SceAtSetEnable(8, 0);
         SceAtSetEnable(7, 0);
@@ -496,7 +493,7 @@ static void r205_DrainEvent()
         EffectEfmDelete(0, ESP_CORE_KIND_ROOM_AREA02, 0);
         SetSstDispFlag(0xC, 0);
         SetSstDispFlag(0xD, 1);
-        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_ROOM01, zero, zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, ESP_CORE_KIND_ROOM01, 0, 0);
         SceSetEventCancel(1, (TaskFunc) r205_DrainEventEnd, 0, -1, 1);
         while (CamCtrl.IsMotionEnd() == 0) {
             SceSleep(1);
@@ -591,7 +588,7 @@ static void r205_EnemyAppear()
     SpfFlagOff(pG, SPF_PL);
     DpfFlagOff(pG, DPF_PL);
     pPL->setNoSuspend(1);
-    EstSet(0, -1, 0, 0, EFF_ROOM, 6, 1, ESP_CORE_KIND_ROOM01, zero, zero);
+    EstSet(0, -1, 0, 0, EFF_ROOM, 6, 1, ESP_CORE_KIND_ROOM01, zero, 0);
     CamCtrl.CutCall(9);
     SceSetEventCancel(1, (TaskFunc) r205_EnemyAppearEndProc, 0, -1, 1);
     while (CamCtrl.IsMotionEnd() == 0) {

@@ -530,7 +530,7 @@ static void r221_moveElevator(int dir)
                 SceAtExecute(0xF);
             }
         } else {
-            r221_work->wireTask = SceExec(0x12, (TaskFunc) r221_moveWire, 1, 2, SCE_PRIO_DEF_2, 0);
+            r221_work->wireTask = SceExec(0x12, (TaskFunc) r221_moveWire, (void*) 1, 2, SCE_PRIO_DEF_2, 0);
             SndCall(6, 1, 0, 0, 0, 0);
             r221_work->elvSe0 = 0;
             r221_work->elvSe1 = 0;
@@ -767,7 +767,7 @@ static void r221_checkBossAppear_end()
                 emDeadWords(list)[0x8C >> 5] &= ~(0x80000000 >> (0x8C & 31));
             }
         }
-        pG->Em_list[0x8C].set = zero;
+        pG->Em_list[0x8C].set = 0;
         pG->Em_list[0x8C].be_flag = zero;
         pG->Em_list[0x8C].pos[0] = -0x4F8;
         pG->Em_list[0x8C].pos[1] = 0x58;
@@ -784,14 +784,14 @@ static void r221_checkBossAppear_end()
         EffectEspgenDelete(1, ESP_CORE_KIND_ROOM00, em.getPtr());
         EffectEfmDelete(1, ESP_CORE_KIND_ROOM00, em.getPtr());
     }
-    SceAtPtr(1)->actBtnKind = 0x35;
-    SceAtPtr(2)->actBtnKind = 0x35;
-    SceAtPtr(3)->actBtnKind = 0x35;
-    SceAtPtr(0x10)->actBtnKind = 0x35;
-    SceAtPtr(1)->trigger |= 0x80;
-    SceAtPtr(2)->trigger |= 0x80;
-    SceAtPtr(3)->trigger |= 0x80;
-    SceAtPtr(0x10)->trigger |= 0x80;
+    SceAtPtr(1)->act_type = 0x35;
+    SceAtPtr(2)->act_type = 0x35;
+    SceAtPtr(3)->act_type = 0x35;
+    SceAtPtr(0x10)->act_type = 0x35;
+    SceAtPtr(1)->trg_type |= 0x80;
+    SceAtPtr(2)->trg_type |= 0x80;
+    SceAtPtr(3)->trg_type |= 0x80;
+    SceAtPtr(0x10)->trg_type |= 0x80;
     em.setNoSuspend(0);
     pG->Room_flg[0] |= 0x00800000;
     pG->Room_flg[0] |= 0x00200000;
@@ -1077,7 +1077,7 @@ void r221_initInsectboss()
     } else {
         if (pG->room_id_prev == 0x220 && FlagChkSignW(pG->System_flg, SYS_LOAD_GAME) == 0 && FlagChkSignW(pG->System_flg, SYS_CONTINUE) == 0) {
             r221_moveElevatoDoor(0, 1);
-            SceExec(0x12, (TaskFunc) r221_moveElevator, 1, 0, SCE_PRIO_DEF_2, 0);
+            SceExec(0x12, (TaskFunc) r221_moveElevator, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
         } else {
             r221_moveElevatoDoor(1, 1);
         }
@@ -1141,19 +1141,19 @@ void r201_initBonbe()
     SceAtSetEnable(6, 0);
     SceAtSetEnable(0x11, 0);
     if (RsfCheck(G_ROOM_ID, 3) == 0) {
-        SceAtPtr(1)->actBtnKind = 1;
-        SceAtPtr(2)->actBtnKind = 1;
-        SceAtPtr(3)->actBtnKind = 1;
-        SceAtPtr(0x10)->actBtnKind = 1;
+        SceAtPtr(1)->act_type = 1;
+        SceAtPtr(2)->act_type = 1;
+        SceAtPtr(3)->act_type = 1;
+        SceAtPtr(0x10)->act_type = 1;
     } else {
-        SceAtPtr(1)->actBtnKind = 0x35;
-        SceAtPtr(2)->actBtnKind = 0x35;
-        SceAtPtr(3)->actBtnKind = 0x35;
-        SceAtPtr(0x10)->actBtnKind = 0x35;
-        SceAtPtr(1)->trigger |= 0x80;
-        SceAtPtr(2)->trigger |= 0x80;
-        SceAtPtr(3)->trigger |= 0x80;
-        SceAtPtr(0x10)->trigger |= 0x80;
+        SceAtPtr(1)->act_type = 0x35;
+        SceAtPtr(2)->act_type = 0x35;
+        SceAtPtr(3)->act_type = 0x35;
+        SceAtPtr(0x10)->act_type = 0x35;
+        SceAtPtr(1)->trg_type |= 0x80;
+        SceAtPtr(2)->trg_type |= 0x80;
+        SceAtPtr(3)->trg_type |= 0x80;
+        SceAtPtr(0x10)->trg_type |= 0x80;
     }
     if (RsfCheck(G_ROOM_ID, 0) == 0) {
         SceAtDataSet_exec(1, SCE_LEVEL10, 0, (TaskFunc) r201_throwBonbe, 0, 1);
@@ -1288,7 +1288,7 @@ static void r201_throwBonbe(int no)
         pos.y = 0.0f;
         pos.z = -1350.1799f;
         SceAtSetEnable(0x13, 0);
-        SceExec(0x12, (TaskFunc) r221_callBonbeSe, 1, 2, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r221_callBonbeSe, (void*) 1, 2, SCE_PRIO_DEF_2, 0);
         SceExec(0x12, (TaskFunc) r221_callFootSe, 0, 2, SCE_PRIO_DEF_2, 0);
         break;
     case 2:
@@ -1325,7 +1325,7 @@ static void r201_throwBonbe(int no)
         pos.y = 0.0f;
         pos.z = -1350.1799f;
         SceAtSetEnable(0x15, 0);
-        SceExec(0x12, (TaskFunc) r221_callBonbeSe, 1, 2, SCE_PRIO_DEF_2, 0);
+        SceExec(0x12, (TaskFunc) r221_callBonbeSe, (void*) 1, 2, SCE_PRIO_DEF_2, 0);
         SceExec(0x12, (TaskFunc) r221_callFootSe, 0, 2, SCE_PRIO_DEF_2, 0);
         break;
     }
@@ -1386,7 +1386,7 @@ static void r201_throwBonbe(int no)
     EffectEfmDelete(0, (u8) k0, 0);
     EffectEspgenDelete(0, (u8) k1, 0);
     EstSet(0, -1, 0, 0, EFF_ROOM, (u8) eff2, 0, ESP_CORE_KIND_NONE, 0, 0);
-    SceExec(0x12, (TaskFunc) r221_fadeoutBonbe, (int) bonbe, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r221_fadeoutBonbe, bonbe, 0, SCE_PRIO_DEF_2, 0);
 }
 
 // The floor render target blended over object 0x28 (refraction shader 2).

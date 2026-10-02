@@ -58,9 +58,9 @@ class cObjWep;
 struct R22cResultData {
     u8 pad_0[0x10];
     u32 ofsTexResult;   // 0x10  IdTexDataLoad(.., 7)
-    u32 ofsIdResult;    // 0x14  IdSys.set(.., 0xFF, IDC_TITLE, ..)
+    u32 ofsIdResult;    // 0x14  IdSys.set((ID_FILE_HEADER*) .., 0xFF, IDC_TITLE, ..)
     u32 ofsIdHigh;      // 0x18  the high-score variant of the result table
-    u32 ofsIdReload;    // 0x1C  IdSys.set(.., 0xFF, IDC_EVENT, ..)
+    u32 ofsIdReload;    // 0x1C  IdSys.set((ID_FILE_HEADER*) .., 0xFF, IDC_EVENT, ..)
     u32 ofsTexReload;   // 0x20  IdTexDataLoad(.., 6)
 };
 
@@ -420,7 +420,6 @@ static void r22c_AshleyCtrl();
 void ScoreInit();
 void ScoreSet(int pt, Vec* pos);
 
-extern "C" {
 void getBonus();
 int r22c_checkGameLevel();
 int r22c_checkGame();
@@ -431,7 +430,6 @@ void scoreRegist();
 void setWepmanKilled();
 void ScoreClear();
 void ScoreMove();
-}
 
 // Room init (the shooting range). The game level (A..D) comes from the room the player came from,
 // since each range entrance is a level.
@@ -1084,20 +1082,20 @@ static void shootInit()
     pG->Room_flg[0] &= ~0x40000000;
     weaponSelect(r22c_work->wepSel);
     ItemMgr.reload();
-    r22c_work->timer = zero;
-    r22c_work->hits = zero;
-    r22c_work->score = zero;
-    r22c_work->time = zero;
-    r22c_work->combo = zero;
-    r22c_work->pause = zero;
-    r22c_work->ufoWait = zero;
-    r22c_work->total = zero;
-    r22c_work->ageSum = zero;
-    r22c_work->cnt46 = zero;
-    r22c_work->cnt47 = zero;
+    r22c_work->timer = 0;
+    r22c_work->hits = 0;
+    r22c_work->score = 0;
+    r22c_work->time = 0;
+    r22c_work->combo = 0;
+    r22c_work->pause = 0;
+    r22c_work->ufoWait = 0;
+    r22c_work->total = 0;
+    r22c_work->ageSum = 0;
+    r22c_work->cnt46 = 0;
+    r22c_work->cnt47 = 0;
     r22c_work->shotHit = pG->g_hit_cnt;
     r22c_work->shotTotal = pG->g_shot_cnt;
-    r22c_work->effTimer = zero;
+    r22c_work->effTimer = 0;
     r22c_work->effFlags = zero;
     LightMgr.onKind(1);
     LightMgr.offKind(2);
@@ -1709,7 +1707,7 @@ void ResultScreen::reloadtime()
     IdTexRelease(TEX_OWNER_ID_EVENT);
     IdTexDataLoad(RES_PTR(data, ofsTexReload), TEX_OWNER_ID_EVENT);
     IdSys.kill(0xFF, IDC_EVENT);
-    IdSys.set(RES_PTR(data, ofsIdReload), 0xFF, IDC_EVENT, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) RES_PTR(data, ofsIdReload), 0xFF, IDC_EVENT, 0x13, 6, 0);
 }
 
 // Show the high-score variant of the result board with `score` split into seven digits.
@@ -1722,7 +1720,7 @@ void ResultScreen::highscore(int score)
     IdTexRelease(TEX_OWNER_ID_COCKPIT);
     IdSys.roomInit();
     IdTexDataLoad(RES_PTR(data, ofsTexResult), TEX_OWNER_ID_TITLE);
-    IdSys.set(RES_PTR(data, ofsIdHigh), 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) RES_PTR(data, ofsIdHigh), 0xFF, IDC_TITLE, 0x13, 6, 0);
     for (i = 0; i < 7; i++) {
         digit[i] = score % 10;
         score /= 10;
@@ -1754,7 +1752,7 @@ void ResultScreen::init()
     IdTexRelease(TEX_OWNER_ID_COCKPIT);
     IdSys.roomInit();
     IdTexDataLoad(RES_PTR(data, ofsTexResult), TEX_OWNER_ID_TITLE);
-    IdSys.set(RES_PTR(data, ofsIdResult), 0xFF, IDC_TITLE, 0x13, 6, 0);
+    IdSys.set((ID_FILE_HEADER*) RES_PTR(data, ofsIdResult), 0xFF, IDC_TITLE, 0x13, 6, 0);
     if (r22c_work->capId == 0xFFFF) {
         SndCall(6, 0xA, 0, 0, 0, 0);
     } else {
@@ -1889,7 +1887,7 @@ void ScoreMove()
             r22c_work->scoreTimer[i] = 0;
         }
         if (r22c_work->scoreTimer[i] == 0) {
-            r22c_work->score2.kill(0xFF, 0x40 + i);
+            r22c_work->score2.kill(0xFF, (ID_CLASS) (0x40 + i));
         }
     }
     r22c_work->score2.move();
@@ -1926,8 +1924,8 @@ void ScoreSet(int pt, Vec* pos)
     }
     r22c_work->scoreTimer[slot] = 30;
     type = slot + 0x40;
-    r22c_work->score2.set(ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, type, 0x13, 6, 0);
-    u = r22c_work->score2.unitPtr(0, type);
+    r22c_work->score2.set((ID_FILE_HEADER*) ROOM_ARC_PTR(pG->pRoom, 0x21), 0xFF, (ID_CLASS) type, 0x13, 6, 0);
+    u = r22c_work->score2.unitPtr(0, (ID_CLASS) type);
     v = *pos;
     GetScreenPos(&v, &scr);
     scr.x = (scr.x - 256.0f) * 1.25f;
@@ -1937,14 +1935,14 @@ void ScoreSet(int pt, Vec* pos)
         ID_UNIT* m;
 
         pt = -pt;
-        r22c_work->score2.unitPtr(0xFE, type)->be_flag &= ~8;
-        m = r22c_work->score2.unitPtr(0xFD, type);
+        r22c_work->score2.unitPtr(0xFE, (ID_CLASS) type)->be_flag &= ~8;
+        m = r22c_work->score2.unitPtr(0xFD, (ID_CLASS) type);
         u->col0[0] = m->col0[0];
         u->col0[1] = m->col0[1];
         u->col0[2] = m->col0[2];
         u->col0[3] = m->col0[3];
     } else {
-        r22c_work->score2.unitPtr(0xFE, type)->be_flag |= 8;
+        r22c_work->score2.unitPtr(0xFE, (ID_CLASS) type)->be_flag |= 8;
     }
     d = digit;
     {
@@ -1969,7 +1967,7 @@ void ScoreSet(int pt, Vec* pos)
         }
     }
     for (i = 3; i >= 0; i--) {
-        ID_UNIT* du = r22c_work->score2.unitPtr(i + 1, type);
+        ID_UNIT* du = r22c_work->score2.unitPtr(i + 1, (ID_CLASS) type);
 
         if (i - n >= 0) {
             du->tex_flag = 2;

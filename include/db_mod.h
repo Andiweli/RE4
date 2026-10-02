@@ -41,7 +41,6 @@ public:
 extern DbModSlot dbModSlot[64];  // Tools .bss 0xE8
 extern DbModState* pDbModState;  // Tools .bss 0x13AAE8
 
-extern "C" {
 void dbModelInit();
 void dbModelQuit();
 int dbModel(int mode);
@@ -49,8 +48,8 @@ void dbModMotionMove();
 u32 dbModGetViewFlag();
 void dbModSetViewFlag(u32 flag);
 void dbModUnsetViewFlag(u32 flag);
-// Plays sequence `seq` (u16 count + MotionSeqKey[]) on slot `slot` from key `no`.
-void dbModMotionSetSeq(int slot, void* seq, int flag, int no);
+// Plays sequence `seq` (u16 count + SEQUENCE_DATA[]) on slot `slot` from key `no`.
+void dbModMotionSetSeq(s8 slot, SEQUENCE_FILE* seq, u32 flag, u32 no);
 // Copies the motion file name of slot `slot` into `dst`.
 void dbModGetMotFilename(int slot, char* dst);
 // Slot access and the model set loader (db_port.cpp drives them for the effect tool).
@@ -67,6 +66,5 @@ int LoadModelSetName(char* name, int motNum, int no);
 void SetLoopFlag(int on, int no);
 void SetTransMode(int mode, int no);
 void SetXFlipFlag(int on, int no);
-}
 
 #endif

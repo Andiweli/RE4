@@ -108,7 +108,6 @@ struct TBlockWork {
 static TBlockWork* blockWk;
 #define pW (blockWk)
 
-extern "C" {
 void tBlockInit_base();
 void tBlockInit();
 void set_filename();
@@ -138,7 +137,6 @@ static void tBlockDataLoad();
 static void tBlockDataSave();
 void tBlockSaveDataCreate();
 void tBlock_DebugCamera();
-}
 
 
 
@@ -218,20 +216,20 @@ void tBlockInit_base()
 {
     pG->debug_mode = 0x11;
     DbgFlagOn(pG, DBG_BACK_CLIP);
-    pG->Stop_flg |= 0x20000000;
-    pG->Stop_flg |= 0x10000000;
-    pG->Stop_flg |= 0x8000000;
-    pG->Stop_flg |= 0x800000;
-    pG->Stop_flg |= 0x400000;
-    pG->Stop_flg |= 0x10000;
-    pG->Stop_flg |= 0x2000;
-    pG->Stop_flg |= 0x200;
-    pG->Disp_flg |= 0x20000000;
-    pG->Disp_flg |= 0x40000000;
-    pG->Disp_flg |= 0x80000000;
-    pG->Disp_flg |= 0x4000000;
-    pG->Disp_flg |= 0x2000000;
-    pG->Disp_flg |= 0x100000;
+    SpfFlagOn(pG, SPF_EM);
+    SpfFlagOn(pG, SPF_PL);
+    SpfFlagOn(pG, SPF_ESP);
+    SpfFlagOn(pG, SPF_SCE);
+    SpfFlagOn(pG, SPF_SCE_AT);
+    SpfFlagOn(pG, SPF_EARTHQUAKE);
+    SpfFlagOn(pG, SPF_MIST);
+    SpfFlagOn(pG, SPF_BLOCK);
+    DpfFlagOn(pG, DPF_SUBCHAR);
+    DpfFlagOn(pG, DPF_PL);
+    DpfFlagOn(pG, DPF_EM);
+    DpfFlagOn(pG, DPF_ESP);
+    DpfFlagOn(pG, DPF_SHADOW);
+    DpfFlagOn(pG, DPF_FILTER);
     DbgFlagOn(pG, DBG_DBG_CAM);
     SetToolLight(1);
 }
@@ -726,7 +724,7 @@ static void tBlockArea_Create()
     TBlockArea* a = &pW->area[pW->areaNo];
 
     if (!(a->flags & 2)) {
-        AreaDataInit(&a->area, &pPL->pos, AREA_TYPE_XZ4, 10000.0f, 5000.0f);
+        AreaDataInit(&a->area, &pPL->pos, 10000.0f, 5000.0f, AREA_TYPE_XZ4);
     }
     a->flags |= 3;
     a->slot = pW->areaNo;
@@ -1184,7 +1182,7 @@ void tBlockArea_dispBlockBox(u8 no, u32 col)
             box[7].y = hy;
             box[7].z = hz;
             PSMTXMultVecArray(m, box, box, 8);
-            PSMTXMultVec(m, &info->bound.center, &c);
+            PSMTXMultVec(m, &info->bound.offset, &c);
             for (j = 0; j < 8; j++) {
                 box[j].x += obj->pos.x + c.x;
                 box[j].y += obj->pos.y + c.y;

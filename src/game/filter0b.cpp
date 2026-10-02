@@ -14,7 +14,6 @@
 // is blended back with filter0b_alpha (once per SetAlpha) inside the letterbox area.
 
 
-extern "C" {
 void Filter0bAllocBuf();
 void Filter0bFreeBuf();
 void Filter0bCapture();
@@ -23,7 +22,6 @@ void Filter0bRender();
 void Filter0bGetEFB(int div, int div2);
 void Filter0bGXDraw(f32 x, f32 y, f32 z, f32 u, f32 v, f32 alpha, f32 s, f32 ofs, int div);
 void Filter0bDrawBuffer();
-}
 
 void* filter0b_buff = 0;
 u8 filter0b_alpha = 0;

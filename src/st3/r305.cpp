@@ -98,9 +98,9 @@ void R305Init()
         SceExec(0x12, (TaskFunc) r305_GanadoDieCheck, 0, 0, 2, 0);
     }
     SceAtSetDoorFunc(1, (TaskFunc) r305_RoomExitFunc, 0);
-    SceSetItemEvent(6, 0x81, 2, 1, (void (*)(int)) r305_ItemBoxOpen, (void (*)(int)) r305_ItemBoxOpened, 0x14, 0);
-    SceSetItemEvent(7, 0x85, 3, 2, (void (*)(int)) r305_ItemBoxOpen, (void (*)(int)) r305_ItemBoxOpened, 0x16, 0);
-    SceSetItemEvent(8, 0x86, 4, 3, (void (*)(int)) r305_ItemBoxOpen, (void (*)(int)) r305_ItemBoxOpened, 0x17, 0);
+    SceSetItemEvent(6, 0x81, 2, 1, (void (*)(int)) r305_ItemBoxOpen, (void (*)(int)) r305_ItemBoxOpened, (void*) 0x14, 0);
+    SceSetItemEvent(7, 0x85, 3, 2, (void (*)(int)) r305_ItemBoxOpen, (void (*)(int)) r305_ItemBoxOpened, (void*) 0x16, 0);
+    SceSetItemEvent(8, 0x86, 4, 3, (void (*)(int)) r305_ItemBoxOpen, (void (*)(int)) r305_ItemBoxOpened, (void*) 0x17, 0);
 }
 
 // Per frame: step the shutter state machine.

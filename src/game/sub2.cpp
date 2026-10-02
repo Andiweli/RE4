@@ -178,7 +178,7 @@ int Front_check(cModel* a, Vec* b, f32 ang)
 }
 
 // 1 when `b` is within +-ang of the facing `rot` at `a`.
-int Front_check(Vec* a, Vec* b, f32 rot, f32 ang)
+int Front_check(Vec* a, f32 rot, Vec* b, f32 ang)
 {
     f32 d = GetXZAngleLocal(a, b, rot);
     int ret = 0;
@@ -269,19 +269,19 @@ void Get3DPosFrom2D(Vec* pPos3d, f32 sx, f32 sy, f32 h)
 #line 518 "D:/Bio4/Prog/sub2.cpp"
     VECNormalize(&dir, &dir);
     PSVECScale(&dir, &dir, 20000.0f);
-    PSVECAdd(&cam->param.pos, &dir, &far);
+    PSVECAdd(&cam->param.Campos, &dir, &far);
     if (h == 100000000.0f) {
-        if (SatMgr.hitCheck(&cam->param.pos, &far, &hit, 0, 0x40, 0)) {
+        if (SatMgr.hitCheck(&cam->param.Campos, &far, &hit, 0, 0x40, 0)) {
             *pPos3d = hit;
             return;
         }
         h = pPL->pos.y;
     }
     {
-        f32 t = (h - cam->param.pos.y) / (far.y - cam->param.pos.y);
+        f32 t = (h - cam->param.Campos.y) / (far.y - cam->param.Campos.y);
         if (t > 0.0f) {
             PSVECScale(&dir, &dir, t);
-            PSVECAdd(&cam->param.pos, &dir, pPos3d);
+            PSVECAdd(&cam->param.Campos, &dir, pPos3d);
         } else {
             *pPos3d = far;
         }

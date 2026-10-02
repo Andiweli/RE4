@@ -21,7 +21,7 @@ public:
     virtual int SetFreeWork(cEspSeqTbl* gen, u32* seed);
 };
 
-extern "C" void get_angle(Vec* v, f32* rx, f32* ry);
+void get_angle(Vec* v, f32* rx, f32* ry);
 
 // EspCreateTbl[0x1A] factory.
 cEsp* Esp1a_Create()
@@ -53,7 +53,7 @@ void cEsp1a::move()
             } else {
                 wpos = m_Pos;
             }
-            PSVECSubtract(&wpos, &cam->param.pos, &look);
+            PSVECSubtract(&wpos, &cam->param.Campos, &look);
 #line 84 "D:/Bio4/Prog/esp1a.cpp"
             VECNormalize(&look, &look);
             CameraGetUpVec(cam, &up);

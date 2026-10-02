@@ -20,13 +20,11 @@
 // blends a tinted (sr/sg/sb[ptn]) I8 copy back over the frame.
 
 
-extern "C" {
 void Filter08GetEFB(int div, int div2, int mip, int mode);
 static void Filter08Render();
 void setCoord(f32 s, f32 t, f32 su, f32 sv);
 void Filter08GXDraw(f32 x, f32 y, f32 z, f32 u, f32 v, f32 alpha, f32 alpha2, f32 alpha3, f32 s, int div, int mode);
 void Filter08DrawBuffer();
-}
 
 static void* filter08_buff = 0;
 f32 filter08_ratio = 0.0f;

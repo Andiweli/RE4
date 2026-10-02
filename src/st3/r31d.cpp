@@ -22,7 +22,7 @@ void R31dInit()
 {
 #line 29 "D:/Bio4/Prog/r31d.cpp"
     r31d_work = (R31dWork*) MEM_CALLOC(sizeof(R31dWork), 1, 0xd);
-    SceSetItemEvent(7, 0x85, 0, 2, r31d_ShelfOpen, (void (*)(int)) r31d_ShelfOpened, 0x35, 0);
+    SceSetItemEvent(7, 0x85, 0, 2, r31d_ShelfOpen, (void (*)(int)) r31d_ShelfOpened, (void*) 0x35, 0);
 }
 
 // Per-frame room main: nothing.

@@ -85,9 +85,9 @@ void R40aInit()
     if (pG->room_id_prev == 0x406) {
         SceExec(0x12, (TaskFunc) first_init, 0, 0, SCE_PRIO_DEF_2, 0);
     }
-    SceSetItemEvent(8, 0x80, 1, 9, r40a_DuraluminCaseOpen, r40a_DuraluminCaseOpened, 0x17, 0);
-    SceSetItemEvent(9, 0x87, 2, 8, r40a_TanaOpen, r40a_TanaOpened, 0x19, 0);
-    SceSetItemEvent(0xA, 0x83, 3, 7, r40a_TanaOpen, r40a_TanaOpened, 0x1B, 0);
+    SceSetItemEvent(8, 0x80, 1, 9, r40a_DuraluminCaseOpen, r40a_DuraluminCaseOpened, (void*) 0x17, 0);
+    SceSetItemEvent(9, 0x87, 2, 8, r40a_TanaOpen, r40a_TanaOpened, (void*) 0x19, 0);
+    SceSetItemEvent(0xA, 0x83, 3, 7, r40a_TanaOpen, r40a_TanaOpened, (void*) 0x1B, 0);
 }
 
 // Per-frame room main: nothing.

@@ -119,9 +119,7 @@ void incResetNum();
 cEm* emset(int no);
 void R300emReset();
 // The original's setTexRender has C linkage (an unmangled local in the .sym).
-extern "C" {
 static void setTexRender();
-}
 static void R300_Event();
 static void Evt_R300S00_Func(Event* e);
 static void r300_em_reset_task();
@@ -284,8 +282,8 @@ void R300Init()
     }
     EvtMgr.SetFunc("evt_r300s00_func", (void*) Evt_R300S00_Func);
     EvtMgr.SetFunc("evt_r300s99_func", (void*) Evt_R300S00_Func);
-    KyfFlagOn(pG, KYF_ST1_17);
-    KyfFlagOn(pG, KYF_ST1_25);
+    KyfFlagOn(pG, KYF_ST3_16);
+    KyfFlagOn(pG, KYF_ST3_24);
     setTexRender();
     PlRegistMotion(ROOM_ARC_PTR(pG->pRoom, 0x1F), ROOM_ARC_PTR(pG->pRoom, 0x20), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     {
@@ -1115,9 +1113,9 @@ static void r300_mira_exec()
             Mtx m;
             Vec dir;
             CAMERA* cam = &r300_work->cam;
-            dir.x = cam->param.at.x - pos.x;
+            dir.x = cam->param.Target.x - pos.x;
             dir.y = 0.0f;
-            dir.z = cam->param.at.z - pos.z;
+            dir.z = cam->param.Target.z - pos.z;
             dir.z = PSVECMag(&dir);
             dir.x = 0.0f;
             dir.y = 0.0f;
@@ -1127,11 +1125,11 @@ static void r300_mira_exec()
                 PSMTXRotRad(m, 'y', SmdGetObjPtr(0x3C)->ang.y);
             }
             PSMTXMultVecSR(m, &dir, &dir);
-            dir.y = cam->param.at.y - pos.y;
-            PSVECAdd(&dir, &pos, &cam->param.at);
-            dir.x = cam->param.pos.x - pos.x;
+            dir.y = cam->param.Target.y - pos.y;
+            PSVECAdd(&dir, &pos, &cam->param.Target);
+            dir.x = cam->param.Campos.x - pos.x;
             dir.y = 0.0f;
-            dir.z = cam->param.pos.z - pos.z;
+            dir.z = cam->param.Campos.z - pos.z;
             dir.z = PSVECMag(&dir);
             dir.x = 0.0f;
             dir.y = 0.0f;
@@ -1142,10 +1140,10 @@ static void r300_mira_exec()
             }
             PSMTXMultVecSR(m, &dir, &dir);
             dir.x = -dir.x;
-            dir.y = cam->param.pos.y - pos.y;
+            dir.y = cam->param.Campos.y - pos.y;
             dir.z = -dir.z;
-            PSVECAdd(&dir, &pos, &cam->param.pos);
-            r300_work->cam.param.roll = 0.0f;
+            PSVECAdd(&dir, &pos, &cam->param.Campos);
+            r300_work->cam.param.Roll = 0.0f;
             CameraSetOrientationRoll(&r300_work->cam);
             cc->SetExtraCamera(&r300_work->cam);
             SceSleep(1);
@@ -1201,9 +1199,9 @@ static void r300_mirb_exec()
             Mtx m;
             Vec dir;
             CAMERA* cam = &r300_work->cam;
-            dir.x = cam->param.at.x - pos.x;
+            dir.x = cam->param.Target.x - pos.x;
             dir.y = 0.0f;
-            dir.z = cam->param.at.z - pos.z;
+            dir.z = cam->param.Target.z - pos.z;
             dir.z = PSVECMag(&dir);
             dir.x = 0.0f;
             dir.y = 0.0f;
@@ -1213,11 +1211,11 @@ static void r300_mirb_exec()
                 PSMTXRotRad(m, 'y', SmdGetObjPtr(0x3D)->ang.y);
             }
             PSMTXMultVecSR(m, &dir, &dir);
-            dir.y = cam->param.at.y - pos.y;
-            PSVECAdd(&dir, &pos, &cam->param.at);
-            dir.x = cam->param.pos.x - pos.x;
+            dir.y = cam->param.Target.y - pos.y;
+            PSVECAdd(&dir, &pos, &cam->param.Target);
+            dir.x = cam->param.Campos.x - pos.x;
             dir.y = 0.0f;
-            dir.z = cam->param.pos.z - pos.z;
+            dir.z = cam->param.Campos.z - pos.z;
             dir.z = PSVECMag(&dir);
             dir.x = 0.0f;
             dir.y = 0.0f;
@@ -1228,10 +1226,10 @@ static void r300_mirb_exec()
             }
             PSMTXMultVecSR(m, &dir, &dir);
             dir.x = -dir.x;
-            dir.y = cam->param.pos.y - pos.y;
+            dir.y = cam->param.Campos.y - pos.y;
             dir.z = -dir.z;
-            PSVECAdd(&dir, &pos, &cam->param.pos);
-            r300_work->cam.param.roll = 0.0f;
+            PSVECAdd(&dir, &pos, &cam->param.Campos);
+            r300_work->cam.param.Roll = 0.0f;
             CameraSetOrientationRoll(&r300_work->cam);
             cc->SetExtraCamera(&r300_work->cam);
             SceSleep(1);
@@ -1248,7 +1246,7 @@ static void r300_mirb_exec()
 // gate 0x42 snapped down to y -8825, Room_flg bit 5, the mirror / laser / gate areas off, camera back.
 static void DoorOpen_exit()
 {
-    KyfFlagOn(pG, KYF_ST1_00);
+    KyfFlagOn(pG, KYF_ST3_00);
     EffectEspDelete(1, ESP_CORE_KIND_ROOM02, 0, 0);
     EffectEspgenDelete(1, ESP_CORE_KIND_ROOM02, 0);
     EffectEfmDelete(1, ESP_CORE_KIND_ROOM02, 0);

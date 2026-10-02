@@ -144,21 +144,20 @@ cEmSwitch* SetEmSwitch(void* bin, void* tpl, Vec* pos, Vec* rot, int flagNo)
 
         em->LightInfo.init2(0, 1, &ofs, &size, 0x10);
     }
-    f32 zero = 0.0f;
-    AtariInit(&em->atari, zero, zero, -700.0f, 350.0f, 700.0f, 700.0f, 2000.0f, 0, 2, 0);
+    AtariInit(&em->atari, 0.0f, 0.0f, -700.0f, 350.0f, 700.0f, 700.0f, 2000.0f, 0, 2, 0);
     em->atari.m_flag &= ~0x300;
     em->atari.setPriority(PRI_LV3);
     em->setStatus(EM_STATUS_LOCKOFF);
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
-    YarareInitCube((cEmHit*) em, zero, -300.0f, zero, 250.0f, 600.0f, 200.0f, 0, YAT_FLAG_ON);
+    YarareInitCube((cEmHit*) em, 0.0f, -300.0f, 0.0f, 250.0f, 600.0f, 200.0f, 0, YAT_FLAG_ON);
     em->hp_max = 1000;
     em->hp = 0;
     if (pos) {
         em->pos = *pos;
     } else {
-        em->pos.x = zero;
-        em->pos.y = zero;
-        em->pos.z = zero;
+        em->pos.x = 0.0f;
+        em->pos.y = 0.0f;
+        em->pos.z = 0.0f;
     }
     em->pos_old = em->pos;
     if (rot) {

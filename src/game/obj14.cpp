@@ -14,14 +14,12 @@
 #include <string.h>
 
 
-extern "C" {
 void obj14_R1_Set(cObjBell* obj);
 void obj14_R1_Break(cObjBell* obj);
 void obj14MatCalc(cObjBell* obj);
 void obj14DmCk(cObjBell* obj);
 void obj14ClothSet(cObjBell* obj);
 void obj14ClothMove(cObjBell* obj);
-}
 
 void (*Obj14_R1_move_tbl[2])(cObjBell*) = { obj14_R1_Set, obj14_R1_Break };
 u8 obj14ClothP[] = { 1, 2 };

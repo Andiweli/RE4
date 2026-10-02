@@ -8,8 +8,7 @@
 #define FILE_OPEN_READ   1
 #define FILE_OPEN_RDWR   2  // create for writing
 
-// game/file.cpp (C linkage; enabled by pG->flags_54 & 0x20000).
-extern "C" {
+// game/file.cpp (enabled by pG->flags_54 & 0x20000).
 int InitFile();
 int file_open(const char* path, int mode);
 int file_close(int hFile);   // 0 = ok, -1 = failed
@@ -18,7 +17,6 @@ int file_write(int hFile, const void* addr, int len);
 int file_seek(int hFile, int ofs, int mode);
 int file_exist(const char* path);
 int file_path(const char* name);   // "SETROOT:<dir>"
-}
 
 // game/file_app.cpp: whole-file helpers on top of the above.
 int HDRead(const char* fname, void* addr);

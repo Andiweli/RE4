@@ -165,7 +165,7 @@ static u16 em21_flip_tbl[50] = {
 // The camera plemTrapCancel installs (the trap release cut): explicitly zero-initialised so it
 // stays in .data.
 static CAMERA em21_trap_cam = { 0 };
-// COMPILER-DIFF: candidate #12 (cse related-value): `cam = &em21_trap_cam` after the `&em21_trap_cam.param.pos/at`
+// COMPILER-DIFF: candidate #12 (cse related-value): `cam = &em21_trap_cam` after the `&em21_trap_cam.param.Campos/at`
 // pointers are known is a fresh `lis/addi` pair in the original; our cse rewrites it as `at - 0xB0`.
 // An asm-labelled alias declaration gives cse a distinct SYMBOL_REF and keeps the fresh pair.
 extern CAMERA em21_trap_cam_v asm("em21_trap_cam");
@@ -216,7 +216,6 @@ static void em21_R0_Init(cEm21* em)
 {
     Em21Work* w = EM21_WK(em);
     cAtariInfo* at;
-    int zero;
 
     switch (em->type) {
     case 0:
@@ -236,27 +235,26 @@ static void em21_R0_Init(cEm21* em)
         break;
     }
     em->setStatus(EM_STATUS_LOCKOFF);
-    zero = 0;
     em->setStatus(EM_STATUS_ASHLEY_NO_HELP);
     at = &em->atari;
     em->hp = 1000;
-    em->Motion.flip = em21_flip_tbl;
+    em->pXFlip = em21_flip_tbl;
     {
         static const Vec ofs = { 0.0f, 0.0f, 0.0f };
         static const Vec size = { 1000.0f, 1000.0f, 0.0f };
 
         em->LightInfo.init2(0, 1, &ofs, &size, 2);
     }
-    em->setTarget(zero, 0.0f, 0.0f, 0.0f);
+    em->setTarget(0, 0.0f, 0.0f, 0.0f);
     at->init(0.0f, -500.0f, 0.0f, 450.0f, 400.0f, 400.0f, 1000.0f, 3, 0x2000, 10);
     em21YarareInit(em);
     w->tilt = 0.0f;
     w->plDist = 100000000.0f;
-    w->stuckTimer = zero;
+    w->stuckTimer = 0;
     w->neckX = 0.0f;
     w->neckY = 0.0f;
-    w->pTrap = (cEm*) zero;
-    w->sndId = zero;
+    w->pTrap = 0;
+    w->sndId = 0;
     switch (em->set) {
     default:
         em->setRno(1, 0, 0, 0);
@@ -269,7 +267,7 @@ static void em21_R0_Init(cEm21* em)
         em->setRno(1, 8, 0, 0);
         break;
     }
-    MotionSetCore(em, MOTION(em), ARC(EM21_MOT_00B), 0, 0, 5, 0);
+    MotionSetCore(em, &em->Motion, ARC(EM21_MOT_00B), 0, 0, 5, 0);
     MotionMove(em, 0);
     em21_R0_Move(em);
 }
@@ -288,7 +286,7 @@ static void em21_R1_Wait(cEm21* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_00B), 0, 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_00B), 0, 30, 5, 0);
         w->timer = Rnd() % 3;
         em->r_no_2++;
     case 1:
@@ -301,7 +299,7 @@ static void em21_R1_Wait(cEm21* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_WAIT), ARC(EM21_SEQ_WAIT), 30, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_WAIT), ARC(EM21_SEQ_WAIT), 30, 1, 0);
         em->r_no_2++;
     case 3:
         if (MotionMove(em, 0)) {
@@ -329,7 +327,7 @@ static void em21_R1_Wander(cEm21* em)
     w->flags |= 4;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_007), ARC(EM21_SEQ_00D), 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_007), ARC(EM21_SEQ_00D), 30, 5, 0);
         w->timer = Rnd() % 5;
         em->r_no_2++;
     case 1:
@@ -357,7 +355,7 @@ static void em21_R1_Turn(cEm21* em)
     w->flags |= 2;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_007), ARC(EM21_SEQ_00D), 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_007), ARC(EM21_SEQ_00D), 30, 5, 0);
         em->r_no_2++;
     case 1:
         em->ang.y += Muku(&em->pos, &w->targetPos, em->ang.y, PI / 64.0f);
@@ -406,16 +404,16 @@ static void em21_R1_Escape(cEm21* em)
         switch (Rnd() & 3) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_009), ARC(EM21_SEQ_012), 3, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_009), ARC(EM21_SEQ_012), 3, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_009), ARC(EM21_SEQ_ESCAPE_013), 3, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_009), ARC(EM21_SEQ_ESCAPE_013), 3, 5, 0);
             break;
         case 2:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_009), ARC(EM21_SEQ_ESCAPE_014), 3, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_009), ARC(EM21_SEQ_ESCAPE_014), 3, 5, 0);
             break;
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_009), ARC(EM21_SEQ_ESCAPE_015), 3, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_009), ARC(EM21_SEQ_ESCAPE_015), 3, 5, 0);
             break;
         }
         em21EscapeWithYou(em);
@@ -455,7 +453,7 @@ static void em21_R1_Escape(cEm21* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_00A), ARC(EM21_SEQ_016), 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_00A), ARC(EM21_SEQ_016), 3, 1, 0);
         em21EscapeWithYou(em);
         em->r_no_2++;
     case 3:
@@ -489,7 +487,7 @@ static void em21_R1_Bark(cEm21* em)
     w->flags |= 2;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_00B), 0, 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_00B), 0, 30, 5, 0);
         em->r_no_2++;
     case 1:
         em21DirMatrix(em, 0.0f);
@@ -511,16 +509,16 @@ static void em21_R1_Bark(cEm21* em)
         switch (Rnd() & 3) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_008), ARC(EM21_SEQ_00E), 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_008), ARC(EM21_SEQ_00E), 30, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_008), ARC(EM21_SEQ_00F), 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_008), ARC(EM21_SEQ_00F), 30, 5, 0);
             break;
         case 2:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_008), ARC(EM21_SEQ_010), 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_008), ARC(EM21_SEQ_010), 30, 5, 0);
             break;
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_008), ARC(EM21_SEQ_011), 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_008), ARC(EM21_SEQ_011), 30, 5, 0);
             break;
         }
         em->r_no_2++;
@@ -529,7 +527,7 @@ static void em21_R1_Bark(cEm21* em)
         if (MotionMove(em, 0)) {
             int zero = 0;
 
-            em->r_no_2 = zero;
+            em->r_no_2 = 0;
             if (w->routeAngAbs > PI / 4.0f) {
                 em->setRno(1, 2, 0, 0);
             } else {
@@ -556,7 +554,7 @@ static void em21_R1_R100TrapWait(cEm21* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_R100_TRAP_WAIT), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_R100_TRAP_WAIT), 0, 0, 5, 0);
         w->pTrap = 0;
         w->timer = Rnd() % 30 + 75;
         em->r_no_2++;
@@ -590,7 +588,7 @@ static void em21_R1_R100TrapCancel(cEm21* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_R100_TRAP_CANCEL), ARC(EM21_SEQ_R100_TRAP_CANCEL), 3, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_R100_TRAP_CANCEL), ARC(EM21_SEQ_R100_TRAP_CANCEL), 3, 5, 0);
         if (w->pTrap) {
             w->pTrap->flag |= 1;
         }
@@ -619,11 +617,11 @@ static void em21_R1_R100Escape(cEm21* em)
     case 0:
         EmSetDie(em);
         if (em->r_no_3) {
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_009), ARC(EM21_SEQ_012), 3, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_009), ARC(EM21_SEQ_012), 3, 5, 0);
             SndStop(w->sndId, 0);
             w->sndId = SndCall(8, 0xB, &em->pos, em->id, 0, em);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_01A), ARC(EM21_SEQ_01D), 3, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_01A), ARC(EM21_SEQ_01D), 3, 5, 0);
         }
         em->atari.m_flag |= 0x100;
         MotionMove(em, 0);
@@ -646,7 +644,7 @@ static void em21_R1_R100Escape(cEm21* em)
         break;
     }
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_R100_ESCAPE), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_R100_ESCAPE), 0, 3, 1, 0);
         em->atari.m_flag &= ~0x100;
         MotionMove(em, 0);
         em->r_no_2++;
@@ -660,7 +658,7 @@ static void em21_R1_R100Escape(cEm21* em)
         }
         break;
     case 4:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_01A), ARC(EM21_SEQ_01D), 3, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_01A), ARC(EM21_SEQ_01D), 3, 5, 0);
         MotionMove(em, 0);
         em->r_no_2++;
     case 5:
@@ -695,7 +693,7 @@ static void em21_R1_VsElgigante(cEm21* em)
     w->flags |= 8;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_VS_ELGIGANTE_024), 0, 0, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_VS_ELGIGANTE_024), 0, 0, 5, 0);
         em->r_no_2++;
     case 1:
         MotionMove(em, 0);
@@ -704,7 +702,7 @@ static void em21_R1_VsElgigante(cEm21* em)
         }
         break;
     case 2:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_VS_ELGIGANTE_020), 0, 5, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_VS_ELGIGANTE_020), 0, 5, 5, 0);
         w->timer = Rnd() % 60 + 60;
         em->r_no_2++;
     case 3:
@@ -741,16 +739,16 @@ static void em21_R1_VsElgigante(cEm21* em)
         switch (Rnd() & 3) {
         case 0:
         default:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_008), ARC(EM21_SEQ_00E), 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_008), ARC(EM21_SEQ_00E), 30, 5, 0);
             break;
         case 1:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_008), ARC(EM21_SEQ_00F), 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_008), ARC(EM21_SEQ_00F), 30, 5, 0);
             break;
         case 2:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_008), ARC(EM21_SEQ_010), 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_008), ARC(EM21_SEQ_010), 30, 5, 0);
             break;
         case 3:
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_008), ARC(EM21_SEQ_011), 30, 5, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_008), ARC(EM21_SEQ_011), 30, 5, 0);
             break;
         }
         em->r_no_2++;
@@ -776,9 +774,9 @@ static void em21_R1_VsElgigante(cEm21* em)
         break;
     case 6:
         if (Rnd() & 2) {
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_VS_ELGIGANTE_01F), ARC(EM21_SEQ_VS_ELGIGANTE_022), 3, 0x41, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_VS_ELGIGANTE_01F), ARC(EM21_SEQ_VS_ELGIGANTE_022), 3, 0x41, 0);
         } else {
-            MotionSetCore(em, MOTION(em), ARC(EM21_MOT_VS_ELGIGANTE_01F), ARC(EM21_SEQ_VS_ELGIGANTE_022), 3, 1, 0);
+            MotionSetCore(em, &em->Motion, ARC(EM21_MOT_VS_ELGIGANTE_01F), ARC(EM21_SEQ_VS_ELGIGANTE_022), 3, 1, 0);
         }
         em->r_no_2++;
     case 7:
@@ -796,7 +794,7 @@ static void em21_R1_VsElgigante(cEm21* em)
         }
         break;
     case 8:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_01A), ARC(EM21_SEQ_01D), 3, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_01A), ARC(EM21_SEQ_01D), 3, 5, 0);
         em->r_no_2++;
     case 9:
         w->flags |= 2;
@@ -832,7 +830,7 @@ static void em21_R1_VsElgigante(cEm21* em)
         }
         break;
     case 0xA:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_00A), ARC(EM21_SEQ_016), 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_00A), ARC(EM21_SEQ_016), 3, 1, 0);
         em->r_no_2++;
     case 0xB:
         if (MotionMove(em, 0)) {
@@ -844,7 +842,7 @@ static void em21_R1_VsElgigante(cEm21* em)
         }
         break;
     case 0xC:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_VS_ELGIGANTE_021), ARC(EM21_SEQ_VS_ELGIGANTE_023), 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_VS_ELGIGANTE_021), ARC(EM21_SEQ_VS_ELGIGANTE_023), 3, 1, 0);
         em->r_no_2++;
     case 0xD:
         if (MotionMove(em, 0)) {
@@ -856,7 +854,7 @@ static void em21_R1_VsElgigante(cEm21* em)
         }
         break;
     case 0xE:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_VS_ELGIGANTE_026), ARC(EM21_SEQ_VS_ELGIGANTE_027), 3, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_VS_ELGIGANTE_026), ARC(EM21_SEQ_VS_ELGIGANTE_027), 3, 5, 0);
         em->r_no_2++;
     case 0xF:
         em->ang.y += Muku(&em->pos, &w->targetPos, em->ang.y, PI / 64.0f);
@@ -878,7 +876,7 @@ static void em21_R1_VsElgigante(cEm21* em)
         }
         break;
     case 0x10:
-        MotionSetCore(em, MOTION(em), ARC(EM21_MOT_VS_ELGIGANTE_025), 0, 10, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM21_MOT_VS_ELGIGANTE_025), 0, 10, 5, 0);
         em->r_no_2++;
     case 0x11:
         w->flags |= 2;
@@ -942,7 +940,7 @@ static void plemTrapCancel(cPlayer* pl)
         v.z = -989.88f;
         pl->ang.y = em->ang.y;
         PSMTXMultVec(em->mat, &v, &pl->pos);
-        MotionSetCore(pl, MOTION(pl), EM_ARC(pl, EM21_MOT_PL_EM_TRAP_CANCEL), 0, 0, 1, 0);
+        MotionSetCore(pl, &pl->Motion, EM_ARC(pl, EM21_MOT_PL_EM_TRAP_CANCEL), 0, 0, 1, 0);
         pl->r_no_2++;
     case 1:
         pl->dmg.m_Timer = 2;
@@ -973,11 +971,11 @@ void plem21TrapCamMove(cModel* m)
     a.y = 1000.0f;
     a.z = 1000.0f;
     PSMTXMultVec(m->mat, &a, &a);
-    PosToPos(&c->param.at, &a, &em21_trap_cam.param.at, 1.0f);
-    PosToPos(&c->param.pos, &v, &em21_trap_cam.param.pos, 1.0f);
+    PosToPos(&c->param.Target, &a, &em21_trap_cam.param.Target, 1.0f);
+    PosToPos(&c->param.Campos, &v, &em21_trap_cam.param.Campos, 1.0f);
     {
-        Vec* pos = &em21_trap_cam.param.pos;
-        Vec* at = &em21_trap_cam.param.at;
+        Vec* pos = &em21_trap_cam.param.Campos;
+        Vec* at = &em21_trap_cam.param.Target;
         f32 dx = pos->x - at->x;
         f32 dy = pos->y - at->y;
         f32 dz = pos->z - at->z;
@@ -988,7 +986,7 @@ void plem21TrapCamMove(cModel* m)
         cam->Up.z = 0.0f;
         cam->Distance = SQRTF(dx * dx + dy * dy + dz * dz);
     }
-    cam->param.fovy = 55.0f;
+    cam->param.Fovy = 55.0f;
     CameraSetOrientationUp(cam);
     CamCtrl.SetExtraCamera(cam);
 }

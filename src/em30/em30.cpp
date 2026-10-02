@@ -259,7 +259,7 @@ static void em30_R0_Init(cEm30* em)
     em->r_no_1 = 0;
     em->r_no_2 = 0;
     em->r_no_3 = 0;
-    MotionSetCore(em, MOTION(em), ARC(EM30_MOT_00F), 0, 0, 1, 0);
+    MotionSetCore(em, &em->Motion, ARC(EM30_MOT_00F), 0, 0, 1, 0);
     MotionMove(em, 0);
     em30_R0_Move(em);
 }
@@ -279,7 +279,7 @@ static void em30_R1_Wait(cEm30* em)
     w->flags |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM30_MOT_00F), 0, 30, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM30_MOT_00F), 0, 30, 5, 0);
         em->r_no_2++;
     case 1:
         MotionMove(em, 0);
@@ -299,7 +299,7 @@ static void em30_R1_Walk(cEm30* em)
     w->flags |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM30_MOT_WALK), 0, 10, 5, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM30_MOT_WALK), 0, 10, 5, 0);
         em->r_no_2++;
     case 1:
         em->ang.y += Muku(&em->pos, &w->targetPos, em->ang.y, PI / 64.0f);
@@ -329,7 +329,7 @@ static void em30_R1_Dm_Normal(cEm30* em)
     w->flags |= 0x10;
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM30_MOT_00F), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM30_MOT_00F), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {
@@ -357,7 +357,7 @@ static void em30_R1_Die_Normal(cEm30* em)
 
     switch (em->r_no_2) {
     case 0:
-        MotionSetCore(em, MOTION(em), ARC(EM30_MOT_00F), 0, 3, 1, 0);
+        MotionSetCore(em, &em->Motion, ARC(EM30_MOT_00F), 0, 3, 1, 0);
         em->r_no_2++;
     case 1:
         if (MotionMove(em, 0)) {

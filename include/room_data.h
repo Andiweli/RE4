@@ -8,17 +8,17 @@
 struct OSModuleHeader;
 
 // One room of a stage table (St<n>_data_tbl), 0xC bytes.
-struct RoomTblEntry {
-    u8 stat;         // 0x00  1 = the room has a save record
+struct ROOM_DATA {
+    u8 save_flg;         // 0x00  1 = the room has a save record
     u8 pad_1;
-    u16 rel_no;      // 0x02  FileTbl index of the room DLL (0 = none)
-    void (*init)();  // 0x04
-    void (*main)();  // 0x08
+    u16 rel_file;      // 0x02  FileTbl index of the room DLL (0 = none)
+    void (*pInit)();  // 0x04
+    void (*pMain)();  // 0x08
 };
 
 // Room_data_tbl[10]: one row per stage.
 struct StageTbl {
-    RoomTblEntry* tbl;  // 0x00
+    ROOM_DATA* tbl;  // 0x00
     u16 num;            // 0x04
     u16 pad_6;
 };
@@ -30,17 +30,24 @@ struct RoomSaveHdr {
     u8 pad_8[8];
 };
 
-// One room save record (0xD8 bytes): stage, room, passed bits, then the room's own data.
-struct RoomSave {
+// One room save record (0xD8 bytes): stage, room, passed bits, the script flag words, the etc model
+// flags and the room's BGM / stream tables.
+struct ROOM_SAVE_DATA {
     union {
-        u16 id;      // 0x00  stage << 8 | room
+        u16 RoomNo;    // 0x00  stage << 8 | room
         struct {
-            u8 stage;  // 0x00
-            u8 room;   // 0x01
+            u8 Stage;  // 0x00
+            u8 Room;   // 0x01
         };
     };
-    u8 passed;  // 0x02  bit (0x80 >> n): checkPassed/setPassed
-    u8 data[0xD8 - 3];
+    u8 passed_flg;         // 0x02  bit (0x80 >> n): checkPassed/setPassed
+    u8 _padding;           // 0x03
+    u32 save_flg[1];       // 0x04
+    u32 item_flg[4];       // 0x08
+    u32 item_find_flg[4];  // 0x18
+    u16 EtcModelFlg[64];   // 0x28
+    u32 BgmTable[6];       // 0xA8  room BGM table: slot 0 low half, slot 1 high half
+    u32 StrTable[6];       // 0xC0  room stream table
 };
 
 class cRoomData {
@@ -92,9 +99,9 @@ public:
 extern cRoomData RoomData;
 
 // game/roomdata.cpp: the per-stage room tables the stage modules' Init fills (StN_data_tbl[no].init = ...).
-extern RoomTblEntry St1_data_tbl[33];
-extern RoomTblEntry St2_data_tbl[46];
-extern RoomTblEntry St3_data_tbl[52];
-extern RoomTblEntry St4_data_tbl[18];
+extern ROOM_DATA St1_data_tbl[33];
+extern ROOM_DATA St2_data_tbl[46];
+extern ROOM_DATA St3_data_tbl[52];
+extern ROOM_DATA St4_data_tbl[18];
 
 #endif

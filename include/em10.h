@@ -280,15 +280,13 @@ extern Em10Func Em10SetFunc;
 cObj* SetObj01(void* bin, void* tpl, Vec* pos, Vec* rot, Vec* v, f32 a, f32 b, int c, int d);
 // game/obj08.cpp: the thrown projectile object (em2d poison; em10 declares them locally).
 cObj* SetObj08(cModel* parent, void* bin, void* tpl, Vec* pos, Vec* rot, int flags, void* atk);
-void SetObj08Spd(cObj* obj, Vec* spd, int life, f32 grav, f32 rad);
+void SetObj08Spd(cObj* obj, Vec* spd, f32 grav, f32 rad, int life);
 void SetObj08Est(cObj* obj, int no0, int prm0, int no1, int prm1, int no2, int prm2, int no3, int prm3, u8 flag);
 void SetObj08Se(cObj* obj, u16 blk, u16 no);
 void Obj01SetEst(cObj* pObj, u32 eff, u32 est, u32 action, u32 eff2, u32 est2, u32 eff3, u32 est3, u32 eff4, u32 est4);
 int GetWepDmVal(cEm* pEm, u32 wep_no, int near);
 void EmCatchSubSet(cEm* pEm, cEm* pSub, f32 pl_dir, u32 mode, f32 x, f32 y, f32 z, void (*ft)(cSubChar*));   // em_sub.cpp; PS2 order (the ang / mode swap is not visible in the bytes)
-extern "C" {
 void MotSetObj16(cObj* obj, void* mot, int a, int b);
 int GetEm10EyeEffectEnable();
-}
 
 #endif

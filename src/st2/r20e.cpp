@@ -53,10 +53,10 @@ public:
     int check();
     int checkActive();
     int getCamNo();
-    void init(const struct R20eFenceData* d);
+    void init(const struct FENCE_DATA* d);
 };
 
-struct R20eFenceData {
+struct FENCE_DATA {
     u32 objId;    // 0x00
     int atNo;     // 0x04
     int camNo;    // 0x08
@@ -117,7 +117,7 @@ struct R20eThrough {
     int x14;       // 0x14
 };
 
-static R20eFenceData r20e_fenceTbl[3] = {
+static FENCE_DATA r20e_fenceTbl[3] = {
     {0x37, 0xE, 0x19, 5},
     {0x38, 0xF, 0x17, 6},
     {0x39, 0x10, 0x18, 7},
@@ -191,7 +191,7 @@ void R20eInit()
         r20e_initMaze();
     }
     SceSetItemEvent(2, 0x81, 0, 2, r20e_openShelf, r20e_openedShelf, 0, 0);
-    SceSetItemEvent(3, 0x83, 1, 3, r20e_openShelf, r20e_openedShelf, 1, 0);
+    SceSetItemEvent(3, 0x83, 1, 3, r20e_openShelf, r20e_openedShelf, (void*) 1, 0);
     SceSetItemEvent(4, 0x82, 2, 4, r20e_openBox, r20e_openedBox, 0, 0);
     SceAtDataSet_exec(7, SCE_LEVEL10, 0, (TaskFunc) r20e_execThrough, 0, 1);
     SceAtDataSet_exec(8, SCE_LEVEL10, 0, (TaskFunc) r20e_execThrough, (void*) 1, 1);
@@ -291,7 +291,7 @@ int cFence20e::getCamNo()
 }
 
 // Bind a maze fence from its table entry (object, area, camera cut, save flag) and snap it to the saved state.
-void cFence20e::init(const R20eFenceData* d)
+void cFence20e::init(const FENCE_DATA* d)
 {
     obj = SmdGetObjPtr(d->objId);
     if (obj) {
@@ -366,7 +366,7 @@ static void r20e_checkSwitch(int sw)
         SndCall(6, 2, 0, 0, 0, 0);
         SceEventStart(1);
         r20e_work->snd = 0;
-        SceSetEventCancel(1, (TaskFunc) r20e_checkSwitch_end, sw, -1, 1);
+        SceSetEventCancel(1, (TaskFunc) r20e_checkSwitch_end, (void*) sw, -1, 1);
         pPL->setNoSuspend(1);
         if (r20e_work->fence[up].check() == 0) {
             int act;
@@ -663,7 +663,7 @@ static void r20d_getSnakeObject()
     while (SceAtItemFlgCk(0x85) == 0) {
         SceSleep(1);
     }
-    SceExec(0x12, (TaskFunc) r20e_moveCrestDoor, 1, 0, SCE_PRIO_DEF_2, 0);
+    SceExec(0x12, (TaskFunc) r20e_moveCrestDoor, (void*) 1, 0, SCE_PRIO_DEF_2, 0);
     {
         cEmWrap em0;
         cEmWrap em1;

@@ -158,10 +158,8 @@ static void r301_execContinuePoint()
         break;
     case 1:
     default: {
-        u32 zero = 0;
-
         RsfSet(G_ROOM_ID, 5);
-        KyfFlagOn(pG, KYF_ST1_01);
+        KyfFlagOn(pG, KYF_ST3_01);
         SceAtSetEnable(0xF, 0);
         r301_work->espKind = 0;
         r301_work->sndId = 0;
@@ -169,7 +167,7 @@ static void r301_execContinuePoint()
         SceEventStart(0);
         CamCtrl.CutCall(6);
         r301_work->espKind = EspPullCoreKind();
-        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, (u8) r301_work->espKind, (void*) zero, (void*) zero);
+        EstSet(0, -1, 0, 0, EFF_ROOM, 4, 1, (u8) r301_work->espKind, 0, 0);
         SndCall(6, 5, 0, 0, 0, 0);
         SceSleep(15);
         r301_work->sndId = SndCall(6, 6, 0, 0, 0, 0);
@@ -629,7 +627,7 @@ static void r301_checkRockWall()
                         obj->be_flag &= ~2;
                     }
                     SndCall(6, 2, &obj->pos, 0, 0, 0);
-                    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, (void*) zero, (void*) zero);
+                    EstSet(0, -1, 0, 0, EFF_ROOM, 0, 0, ESP_CORE_KIND_NONE, 0, 0);
                     SceExit();
                     break;
                 }

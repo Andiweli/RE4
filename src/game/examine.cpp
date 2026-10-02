@@ -28,14 +28,12 @@
 
 int GetDrawTmpBufType();
 
-extern "C" {
 void getEFB();
 static void gxDraw(f32 x, f32 y, f32 z, f32 alpha, void* buf);
 void drawBuffer();
 void store();
 void render();
-ExamInfo* examInfo(int id, int ext);
-}
+ITEM_EXAMINE_INFO* examInfo(int id, int ext);
 
 f32 cap_dist_min = 8000.0f;
 f32 cap_dist_max = 10000.0f;
@@ -43,7 +41,7 @@ static f32 g_rad_x = 0.0f;
 f32 cap_xrad_max = 0.3926991f;
 static f32 cap_xrad_min = -1.0471976f;
 
-static ExamInfo exam_info[225] = {
+static ITEM_EXAMINE_INFO exam_info[225] = {
     { 0x00, 0, { 60.0f, 0.0f, 0.0f }, 1.1f, 4, 0, 0 },
     { 0x01, 0, { 0.0f, 0.0f, 20.0f }, 1.1f, 4, 0, 0 },
     { 0x02, 0, { 0.0f, 0.0f, 20.0f }, 1.1f, 4, 0, 0 },
@@ -270,7 +268,7 @@ static ExamInfo exam_info[225] = {
     { 0xF2, 0, { 0.0f, 0.0f, 0.0f }, 20.0f, 0, 0, 0 },
     { 0xF3, 0, { 0.0f, 0.0f, 0.0f }, 20.0f, 0, 0, 0 },
 };
-ExamInfo exam_info_ext[2] = {
+ITEM_EXAMINE_INFO exam_info_ext[2] = {
     { 0x59, 0, { -5.0f, 0.0f, 0.0f }, 2.1f, 4, 0, 0 },
     { 0x8A, 0, { -5.0f, 0.0f, 0.0f }, 2.1f, 4, 0, 0 },
 };
@@ -395,9 +393,9 @@ void render()
 
 // View parameters for item `id`: the merchant ext table first when ext != 0, then the main table;
 // 0 when the item has no entry.
-ExamInfo* examInfo(int id, int ext_flag)
+ITEM_EXAMINE_INFO* examInfo(int id, int ext_flag)
 {
-    ExamInfo* p;
+    ITEM_EXAMINE_INFO* p;
     int i;
     int n;
 
@@ -405,14 +403,14 @@ ExamInfo* examInfo(int id, int ext_flag)
         n = 2;
         p = exam_info_ext;
         for (i = 0; i < n; i++, p++) {
-            if (id == p->id) {
+            if (id == p->item_id) {
                 return p;
             }
         }
     }
     p = exam_info;
     for (i = 0; i < 225; i++, p++) {
-        if (id == p->id) {
+        if (id == p->item_id) {
             return p;
         }
     }
@@ -458,7 +456,7 @@ void ItemExamine::idSet()
     }
     switch (m_scrn_flag) {
     case 1:
-        m_pIdSys->set(SS_ARC_PTR(wk->pCmmn, 15), 0xFF, IDC_DATA, 0x15, 2, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pCmmn, 15), 0xFF, IDC_DATA, 0x15, 2, 0);
         itemInfo(m_item_id, &inf);
         if (inf.type == 1) {
             val = 0;
@@ -548,17 +546,17 @@ void ItemExamine::idSet()
         }
         break;
     case 2:
-        m_pIdSys->set(SS_ARC_PTR(wk->pExam, 8), 0xFF, IDC_DATA, 0x15, 2, 0);
-        m_pIdSys->set(SS_ARC_PTR(wk->pExam, 9), 0xFF, IDC_DATA, 0x15, 2, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pExam, 8), 0xFF, IDC_DATA, 0x15, 2, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pExam, 9), 0xFF, IDC_DATA, 0x15, 2, 0);
         break;
     }
     switch (m_scrn_flag) {
     case 0:
     case 1:
-        m_pIdSys->set((void*) (pG->pCore->ofs_78 + (u32) pG->pCore), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) (pG->pCore->ofs_78 + (u32) pG->pCore), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
         break;
     case 2:
-        m_pIdSys->set(SS_ARC_PTR(wk->pExam, 7), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
+        m_pIdSys->set((ID_FILE_HEADER*) SS_ARC_PTR(wk->pExam, 7), 0xFF, IDC_EXAMINE, 0x13, 0, 0);
         break;
     }
 }
@@ -566,7 +564,7 @@ void ItemExamine::idSet()
 // Starts examining `model_` of item `id_` in mode `mode_`: saves the model's flags/pos/ang/ot and
 // its root parts, recentres the root on the model bound centre, applies the exam_info rotation
 // (degrees), builds the id overlay, sets the treasure camera (mode 2), creates the three lights of
-// the exam light set (pArc ofs_58..68 by ExamInfo::light) and starts the item's est (owner 0xD1).
+// the exam light set (pArc ofs_58..68 by ITEM_EXAMINE_INFO::light) and starts the item's est (owner 0xD1).
 void ItemExamine::init(u16 id, cModel* p_model, u8 scrn_flag)
 {
     static f32 c0 = -0.5f;
@@ -643,15 +641,15 @@ void ItemExamine::init(u16 id, cModel* p_model, u8 scrn_flag)
         VecLinearCombination(p0, c, &m_pModel->getPartsPtr(1)->world, 1.0f - c0, &mid);
         PSVECScale(&mid, &mid, 0.5f);
         PSVECAdd(&mid, &p, &at);
-        itemCamera.param.at = mid;
-        itemCamera.param.pos = at;
+        itemCamera.param.Target = mid;
+        itemCamera.param.Campos = at;
         itemCamera.Distance = cap_dist_max;
         g_rad_x = 0.0f;
     } else {
         arc = pG->pCore;
         lit = (cLit*) (arc->ofs_58 + (u32) arc);
         if (m_pInfo) {
-            switch (m_pInfo->light) {
+            switch (m_pInfo->light_no) {
             case 0:
                 lit = (cLit*) (arc->ofs_58 + (u32) arc);
                 break;
@@ -706,7 +704,7 @@ void ItemExamine::level(s8 pwr, s8 spd, s8 rld, s8 blt)
     m_level[3] = blt;
 }
 
-// Per-frame: spins the model pi/60 rad per frame about the axis chosen by ExamInfo rot0/rot1
+// Per-frame: spins the model pi/60 rad per frame about the axis chosen by ITEM_EXAMINE_INFO rot0/rot1
 // (world y or model y; the treasure viewer lets the stick rotate and C up/down zoom between
 // cap_dist_min/max instead), fits the camera so the model bound spans the id frame, lights it and
 // queues the background render.
@@ -736,7 +734,7 @@ void ItemExamine::move()
     if (m_pInfo) {
         switch (m_scrn_flag) {
         case 1:
-            switch (m_pInfo->rot1) {
+            switch (m_pInfo->axis_id) {
             case 0:
                 rotMode = 0;
                 break;
@@ -746,7 +744,7 @@ void ItemExamine::move()
             }
             break;
         case 0:
-            switch (m_pInfo->rot0) {
+            switch (m_pInfo->axis_scr) {
             case 0:
                 rotMode = 0;
                 break;
@@ -811,11 +809,11 @@ void ItemExamine::move()
             }
             CameraCamposRot(&itemCamera, 'X', r);
         }
-        itemCamera.param.roll = 0.0f;
-        itemCamera.param.fovy = _fovy;
+        itemCamera.param.Roll = 0.0f;
+        itemCamera.param.Fovy = _fovy;
         CameraSetOrientationRoll(&itemCamera);
     } else {
-        ModelBound* b = &m_pModel->pModelInfo->bound;
+        cBoundingBox* b = &m_pModel->pModelInfo->bound;
         Vec a;
         Vec c;
         Vec e;
@@ -850,13 +848,13 @@ void ItemExamine::move()
         _target.y = -y;
         _campos.y = -y;
         _campos.z = z;
-        itemCamera.param.pos = _campos;
-        itemCamera.param.at = _target;
+        itemCamera.param.Campos = _campos;
+        itemCamera.param.Target = _target;
         itemCamera.Up = _up;
-        itemCamera.param.fovy = _fovy;
+        itemCamera.param.Fovy = _fovy;
     }
-    C_MTXPerspective(itemCamera.ProjMat, itemCamera.param.fovy, 1.3333334f, ZNEAR, ZFAR);
-    C_MTXLookAt(itemCamera.v_mat, &itemCamera.param.pos, &itemCamera.Up, &itemCamera.param.at);
+    C_MTXPerspective(itemCamera.ProjMat, itemCamera.param.Fovy, 1.3333334f, ZNEAR, ZFAR);
+    C_MTXLookAt(itemCamera.v_mat, &itemCamera.param.Campos, &itemCamera.Up, &itemCamera.param.Target);
     LightMgr.setModel2(m_pModel);
     if (!StaFlagChk(pG, STA_SUB_SCRN)) {
         AddOtDirect(ot_type, (void*) 0xCDCDCDCD, render, ot_no, ot_kind, 0, 0.0f);

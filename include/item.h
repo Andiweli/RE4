@@ -168,7 +168,6 @@ u16 WeaponNo2WeaponId(u8 wep_no, u8 type);
 // life meter level of a max life `max` (cockpit: lifeLevel(20, pl_life_max, 1200))
 int lifeLevel(int level_up_num, s16 curr_life_max, int init_life_max);
 
-extern "C" {
 // item id -> weapon number / type (0xFF when unknown), item attributes
 u8 WeaponId2WeaponNo(ITEM_ID id);
 u8 WeaponId2WeaponType(ITEM_ID id);
@@ -192,7 +191,6 @@ int reload_main(cItem* pItem_A, cItem* pItem_B, int charge_num);
 u8 gld_order(u8 no);
 int gld_cmp(const void* a, const void* b);
 int order_cmp(const void* a, const void* b);
-}
 
 // Each reads one field of the ITEM_INFO that itemInfo() fills (type, defNum, maxNum: offsets 2, 3 and 4),
 // as the three free inlines of the original (an ITEM_INFO temp at every call site). Free inlines carry no

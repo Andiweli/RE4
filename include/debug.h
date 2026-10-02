@@ -3,8 +3,7 @@
 
 #include "types.h"
 
-// game/debug.cpp (C linkage): debug overlays, process timing bars and the debug/config.txt reader.
-extern "C" {
+// game/debug.cpp: debug overlays, process timing bars and the debug/config.txt reader.
 void DebugControl();
 void debugPadInfoDisp();
 void processBarDisp();
@@ -17,7 +16,6 @@ int symbol_check(char** p, const char* pSym);
 char* space_skip(char* p);
 int comment_check(char** p);
 int num_get(char** p);
-}
 
 // proc_name is defined in debug.cpp only: an extern here would push its decl before proc_tick's and
 // swap the two arrays in .bss (deferred file-scope variables are emitted in first-declaration order).
