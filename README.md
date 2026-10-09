@@ -19,6 +19,31 @@ The code is built with the compilers the original was built with:
 There are no game assets in this repository. To build it you need your own images of the debug
 discs. Disc 1 has `main.dol` and most of the RELs, disc 2 has the four RELs for the island stages.
 
+## Android port (work in progress)
+
+This fork is also being used to develop a **native Android port** of the GameCube debug build
+(G4BE08, November 25, 2004). The goal is to reuse the original C/C++ game logic, room scripts,
+enemy AI, events and resource formats rather than recreate each room manually.
+
+**Current development status:** Early engine-porting work. A separate Android NDK build supports
+`armeabi-v7a` and `arm64-v8a`. Initial original-code routines, a stack-preserving task
+scheduler, background processing and Yz2 decoding have passed host and Android 13 device tests.
+The Android port is **not yet playable**. This work is currently on a local development branch
+and has not been pushed to this repository.
+
+**Planned work:** Import resources from both original debug discs, connect the original
+gameplay and room systems, and implement Android graphics, audio and controller support.
+Optional graphics settings are planned for MSAA (off/2x/4x), anisotropic filtering
+(2x/4x/8x) and depth of field, subject to device capabilities.
+
+This fork is based on the decompilation by
+[adonis-singh](https://github.com/adonis-singh/re4). The original project's build and
+research documentation remains below. **No game assets are included.** Users must supply
+their own legally obtained matching debug-disc images. The CC0 terms in [LICENSE](LICENSE)
+apply only to the original project's own tools, configuration and documentation—not to
+Capcom's game code or Nintendo/CRI SDK and middleware code. The Android port does not
+change those ownership or licensing limitations.
+
 ## Building
 
 You need Linux, Python 3 and [ninja](https://ninja-build.org/). The first configure run downloads
